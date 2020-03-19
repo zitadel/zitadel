@@ -10,5 +10,5 @@ type Config struct {
 }
 
 func Start(ctx context.Context, config Config) error {
-	return errors.ThrowUnimplemented(nil, "", "") //TODO: implement
+	return errors.ThrowUnimplemented(nil, "MANAG-h3k3x", "not implemented yet") //TODO: implement
 }

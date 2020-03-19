@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"github.com/caos/logging"
 	"github.com/ghodss/yaml"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -62,8 +61,7 @@ func readConfigFile(configReader Reader, configFile string, obj interface{}) err
 	configFile = os.ExpandEnv(configFile)
 
 	if _, err := os.Stat(configFile); err != nil {
-		logging.LogWithFields("CONFI-Hs93M", "file", configFile).WithError(err).Warn("config file does not exist")
-		return nil
+		return errors.ThrowNotFoundf(err, "CONFI-Hs93M", "config file %s does not exist", configFile)
 	}
 
 	configStr, err := ioutil.ReadFile(configFile)
