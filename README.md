@@ -21,6 +21,10 @@ It will be an IAM ;-)
 
 TBD
 
+## Security
+
+See the policy [here](./SECURITY.md)
+
 ## License
 
 See the exact licensing terms [here](./LICENSE)
