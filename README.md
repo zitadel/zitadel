@@ -9,7 +9,7 @@
 
 ## What Is It
 
-Tt will be an IAM ;-)
+It will be an IAM ;-)
 
 ## How Does It Work
 
