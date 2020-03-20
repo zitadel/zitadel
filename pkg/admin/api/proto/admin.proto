@@ -1,0 +1,100 @@
+
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "authoption/options.proto";
+import "github.com/caos/zitadel/pkg/admin/api/proto/org.proto";
+
+package zitadel.admin.api.v1;
+
+option go_package ="github.com/caos/zitadel/admin/api/grpc";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+    info: {
+        title: "admin service";
+        version: "0.1";
+        contact:{
+            url: "https://github.com/caos/zitadel/admin"
+        };
+    };
+
+    schemes: HTTPS;
+
+    consumes: "application/json";
+    consumes: "application/grpc";
+
+    produces: "application/json";
+    produces: "application/grpc";
+};
+
+service AdminService {
+    // ---------
+    // Probes
+    // ---------
+
+    // Healthz returns status OK as soon as the service started
+    rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+           get: "/healthz"
+        };
+    }
+
+    // Ready returns status OK as soon as all dependent services are available
+    rpc Ready(google.protobuf.Empty) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+           get: "/ready"
+        };
+    }
+
+    rpc Validate(google.protobuf.Empty) returns (google.protobuf.Struct) {
+        option (google.api.http) = {
+            get: "/validate"
+        };
+    }
+
+//ORG
+    rpc IsOrgUnique(zitadel.admin.v1.UniqueOrgRequest) returns (zitadel.admin.v1.UniqueOrgResponse) {
+        option (google.api.http) = {
+            get: "/orgs/_isunique"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc GetOrgByID(zitadel.admin.v1.OrgID) returns (zitadel.admin.v1.Org) {
+        option (google.api.http) = {
+            get: "/orgs/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc SearchOrgs(zitadel.admin.v1.OrgSearchRequest) returns (zitadel.admin.v1.OrgSearchResponse) {
+        option (google.api.http) = {
+            post: "/orgs/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.read"
+        };
+    }
+
+    rpc SetUpOrg(zitadel.admin.v1.OrgSetUpRequest) returns (zitadel.admin.v1.OrgSetUpResponse) {
+        option (google.api.http) = {
+            post: "/orgs/_setup"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.write"
+        };
+    }
+}
