@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/auth"
 )
 
@@ -22,7 +23,7 @@ func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Conf
 			return nil, status.Error(codes.Unauthenticated, "auth header missing")
 		}
 
-		orgID := GetHeader(ctx, ZitadelOrgID)
+		orgID := GetHeader(ctx, api.ZitadelOrgID)
 
 		ctx, err := auth.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)
 		if err != nil {
