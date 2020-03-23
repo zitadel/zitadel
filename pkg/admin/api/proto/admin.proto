@@ -11,14 +11,14 @@ import "authoption/options.proto";
 
 package zitadel.admin.api.v1;
 
-option go_package ="github.com/caos/zitadel/admin/api/grpc";
+option go_package ="github.com/caos/zitadel/pkg/admin/api/grpc";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     info: {
         title: "admin service";
         version: "0.1";
         contact:{
-            url: "https://github.com/caos/zitadel/admin"
+            url: "https://github.com/caos/zitadel/pkg/admin"
         };
     };
 

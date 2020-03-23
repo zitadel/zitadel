@@ -1,0 +1,2938 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Auth API",
+    "version": "0.1",
+    "contact": {
+      "url": "https://github.com/caos/zitadel/pkg/auth"
+    }
+  },
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json",
+    "application/grpc"
+  ],
+  "produces": [
+    "application/json",
+    "application/grpc"
+  ],
+  "paths": {
+    "/applications/_authorize": {
+      "post": {
+        "operationId": "AuthorizeApplication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Application"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ApplicationAuthorizeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/applications/_search": {
+      "post": {
+        "operationId": "SearchApplications",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ApplicationSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ApplicationSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/applications/{id}": {
+      "get": {
+        "summary": "Application",
+        "operationId": "GetApplicationByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Application"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/global/_isiamadmin": {
+      "get": {
+        "operationId": "IsIamAdmin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IsAdminResponse"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/global/projectorgs/_search": {
+      "post": {
+        "operationId": "SearchMyProjectOrgs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MyProjectOrgSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1MyProjectOrgSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/grants/_search": {
+      "post": {
+        "summary": "Grant",
+        "operationId": "SearchGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GrantSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GrantSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Readiness",
+        "operationId": "Healthz",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/me/usersessions": {
+      "get": {
+        "operationId": "GetMyUserSessions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserSessionViews"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/permissions/zitadel/me": {
+      "get": {
+        "summary": "Permission",
+        "operationId": "GetMyZitadelPermissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MyPermissions"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "Ready",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/tokens/{id}/authsession": {
+      "get": {
+        "operationId": "GetAuthSessionByTokenID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionView"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents": {
+      "post": {
+        "operationId": "CreateUserAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserAgent"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserAgentCreation"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/authsessions": {
+      "post": {
+        "operationId": "CreateAuthSession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionCreation"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/authsessions/{auth_session_id}/_selectuser": {
+      "put": {
+        "operationId": "SelectUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "auth_session_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SelectUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/authsessions/{auth_session_id}/_verifymfa": {
+      "put": {
+        "operationId": "VerifyMfa",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "auth_session_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyMfaRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/authsessions/{auth_session_id}/_verifypassword": {
+      "put": {
+        "operationId": "VerifyPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "auth_session_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyPasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/authsessions/{auth_session_id}/_verifyuser": {
+      "put": {
+        "operationId": "VerifyUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "auth_session_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/authsessions/{auth_session_id}/tokens": {
+      "post": {
+        "operationId": "CreateToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Token"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "auth_session_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/authsessions/{id}": {
+      "get": {
+        "operationId": "GetAuthSession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthSessionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "browser_info.user_agent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "browser_info.remote_ip.V4",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "browser_info.remote_ip.V6",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "browser_info.accept_language",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{agent_id}/usersessions/{id}": {
+      "get": {
+        "operationId": "GetUserSession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserSession"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      },
+      "delete": {
+        "operationId": "TerminateUserSession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{id}": {
+      "get": {
+        "summary": "Authorization",
+        "operationId": "GetUserAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserAgent"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      },
+      "put": {
+        "operationId": "RevokeUserAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserAgent"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserAgentID"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/useragents/{id}/usersessions": {
+      "get": {
+        "operationId": "GetUserAgentSessions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserSessions"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/_externalregister": {
+      "post": {
+        "operationId": "RegisterUserWithExternal",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1User"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RegisterUserExternalIDPRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/_isunique": {
+      "get": {
+        "summary": "User",
+        "operationId": "IsUserUnique",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UniqueUserResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/_register": {
+      "post": {
+        "operationId": "RegisterUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1User"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RegisterUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/address": {
+      "get": {
+        "operationId": "GetMyUserAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserAddress"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateMyUserAddress",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserAddress"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserAddressRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/email": {
+      "get": {
+        "operationId": "GetMyUserEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserEmail"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
+      "put": {
+        "operationId": "ChangeMyUserEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserEmail"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserEmailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/email/_resendverification": {
+      "post": {
+        "operationId": "ResendMyEmailVerificationMail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/email/_verify": {
+      "post": {
+        "operationId": "VerifyMyUserEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyMyUserEmailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/mfa/otp": {
+      "delete": {
+        "operationId": "RemoveMfaOTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
+      "post": {
+        "summary": "MFA",
+        "operationId": "AddMfaOTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MfaOtpResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/mfa/otp/_verify": {
+      "put": {
+        "operationId": "VerifyMfaOTP",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MfaOtpResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyMfaOtp"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/mfas": {
+      "get": {
+        "operationId": "GetMyMfas",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1MultiFactors"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/passwords": {
+      "put": {
+        "operationId": "SetMyPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/passwords/_change": {
+      "put": {
+        "operationId": "ChangeMyPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordChange"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/phone": {
+      "get": {
+        "operationId": "GetMyUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserPhone"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
+      "put": {
+        "operationId": "ChangeMyUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserPhone"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserPhoneRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/phone/_resendverification": {
+      "post": {
+        "operationId": "ResendMyPhoneVerificationCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/phone/_verify": {
+      "post": {
+        "operationId": "VerifyMyUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyUserPhoneRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/profile": {
+      "get": {
+        "operationId": "GetMyUserProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserProfile"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateMyUserProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserProfile"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserProfileRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/passwords/_requestpwreset": {
+      "post": {
+        "operationId": "RequestPasswordReset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ResetPasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "TODO: Remove func only for tests",
+        "operationId": "GetUserByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1User"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/{id}/email/_resendverification": {
+      "post": {
+        "operationId": "ResendEmailVerificationMail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserID"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/{id}/email/_verify": {
+      "post": {
+        "operationId": "VerifyUserEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyUserEmailRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/{id}/passwords/_resetpw": {
+      "post": {
+        "operationId": "PasswordReset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ResetPassword"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/{user_id}/mfa/_skipinit": {
+      "post": {
+        "operationId": "SkipMfaInit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SkipMfaInitRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/validate": {
+      "get": {
+        "operationId": "Validate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protobufStruct"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Repeated field of dynamically typed values."
+        }
+      },
+      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "protobufStruct": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Unordered map of dynamically typed values."
+        }
+      },
+      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
+    },
+    "protobufValue": {
+      "type": "object",
+      "properties": {
+        "null_value": {
+          "$ref": "#/definitions/protobufNullValue",
+          "description": "Represents a null value."
+        },
+        "number_value": {
+          "type": "number",
+          "format": "double",
+          "description": "Represents a double value."
+        },
+        "string_value": {
+          "type": "string",
+          "description": "Represents a string value."
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Represents a boolean value."
+        },
+        "struct_value": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Represents a structured value."
+        },
+        "list_value": {
+          "$ref": "#/definitions/protobufListValue",
+          "description": "Represents a repeated `Value`."
+        }
+      },
+      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
+    "v1AppState": {
+      "type": "string",
+      "enum": [
+        "APPSTATE_UNSPECIFIED",
+        "APPSTATE_ACTIVE",
+        "APPSTATE_INACTIVE",
+        "APPSTATE_DELETED"
+      ],
+      "default": "APPSTATE_UNSPECIFIED"
+    },
+    "v1Application": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1AppState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "oidc_config": {
+          "$ref": "#/definitions/v1OIDCConfig"
+        }
+      }
+    },
+    "v1ApplicationAuthorizeRequest": {
+      "type": "object",
+      "properties": {
+        "oidc_client_auth": {
+          "$ref": "#/definitions/v1OIDCClientAuth"
+        }
+      }
+    },
+    "v1ApplicationSearchKey": {
+      "type": "string",
+      "enum": [
+        "APPLICATIONSEARCHKEY_UNSPECIFIED",
+        "APPLICATIONSEARCHKEY_APP_TYPE",
+        "APPLICATIONSEARCHKEY_STATE",
+        "APPLICATIONSEARCHKEY_CLIENT_ID",
+        "APPLICATIONSEARCHKEY_APP_NAME",
+        "APPLICATIONSEARCHKEY_PROJECT_ID"
+      ],
+      "default": "APPLICATIONSEARCHKEY_UNSPECIFIED"
+    },
+    "v1ApplicationSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1ApplicationSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ApplicationSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "sorting_column": {
+          "$ref": "#/definitions/v1ApplicationSearchKey"
+        },
+        "asc": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ApplicationSearchQuery"
+          }
+        }
+      }
+    },
+    "v1ApplicationSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Application"
+          }
+        }
+      }
+    },
+    "v1AuthRequestOIDC": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "response_type": {
+          "$ref": "#/definitions/v1OIDCResponseType"
+        },
+        "nonce": {
+          "type": "string"
+        },
+        "code_challenge": {
+          "$ref": "#/definitions/v1CodeChallenge"
+        }
+      }
+    },
+    "v1AuthSessionCreation": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1AuthSessionType"
+        },
+        "browser_info": {
+          "$ref": "#/definitions/v1BrowserInformation"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "redirect_uri": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "prompt": {
+          "$ref": "#/definitions/v1Prompt"
+        },
+        "auth_context_class_reference": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ui_locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "login_hint": {
+          "type": "string"
+        },
+        "max_age": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "oidc": {
+          "$ref": "#/definitions/v1AuthRequestOIDC"
+        },
+        "preselected_user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AuthSessionMultiFactorOTP": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AuthSessionResponse": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1AuthSessionType"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "redirect_uri": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "prompt": {
+          "$ref": "#/definitions/v1Prompt"
+        },
+        "auth_context_class_reference": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ui_locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "login_hint": {
+          "type": "string"
+        },
+        "max_age": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "oidc": {
+          "$ref": "#/definitions/v1AuthRequestOIDC"
+        },
+        "possible_steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1NextStep"
+          }
+        },
+        "project_client_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "user_session": {
+          "$ref": "#/definitions/v1UserSession"
+        }
+      }
+    },
+    "v1AuthSessionType": {
+      "type": "string",
+      "enum": [
+        "AUTHSESSIONTYPE_UNSPECIFIED",
+        "AUTHSESSIONTYPE_OIDC",
+        "AUTHSESSIONTYPE_SAML"
+      ],
+      "default": "AUTHSESSIONTYPE_UNSPECIFIED"
+    },
+    "v1AuthSessionView": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_session_id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1AuthSessionType"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "user_session_id": {
+          "type": "string"
+        },
+        "project_client_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "token_id": {
+          "type": "string"
+        },
+        "token_expiration": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AuthUser": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BrowserInformation": {
+      "type": "object",
+      "properties": {
+        "user_agent": {
+          "type": "string"
+        },
+        "remote_ip": {
+          "$ref": "#/definitions/v1IP"
+        },
+        "accept_language": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ChooseUser": {
+      "type": "object",
+      "properties": {
+        "user_session_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "user_session_state": {
+          "$ref": "#/definitions/v1UserSessionState"
+        }
+      }
+    },
+    "v1ChooseUserData": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ChooseUser"
+          }
+        }
+      }
+    },
+    "v1CodeChallenge": {
+      "type": "object",
+      "properties": {
+        "challenge": {
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/definitions/v1CodeChallengeMethod"
+        }
+      }
+    },
+    "v1CodeChallengeMethod": {
+      "type": "string",
+      "enum": [
+        "CODECHALLENGEMETHOD_PLAIN",
+        "CODECHALLENGEMETHOD_S256"
+      ],
+      "default": "CODECHALLENGEMETHOD_PLAIN"
+    },
+    "v1CreateTokenRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_session_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Gender": {
+      "type": "string",
+      "enum": [
+        "GENDER_UNSPECIFIED",
+        "GENDER_FEMALE",
+        "GENDER_MALE",
+        "GENDER_DIVERSE"
+      ],
+      "default": "GENDER_UNSPECIFIED"
+    },
+    "v1Grant": {
+      "type": "object",
+      "properties": {
+        "OrgId": {
+          "type": "string"
+        },
+        "ProjectId": {
+          "type": "string"
+        },
+        "UserId": {
+          "type": "string"
+        },
+        "Roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "OrgName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GrantSearchKey": {
+      "type": "string",
+      "enum": [
+        "GRANTSEARCHKEY_UNSPECIFIED",
+        "GRANTSEARCHKEY_ORG_ID",
+        "GRANTSEARCHKEY_PROJECT_ID",
+        "GRANTSEARCHKEY_USER_ID"
+      ],
+      "default": "GRANTSEARCHKEY_UNSPECIFIED"
+    },
+    "v1GrantSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1GrantSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GrantSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "sorting_column": {
+          "$ref": "#/definitions/v1GrantSearchKey"
+        },
+        "asc": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1GrantSearchQuery"
+          }
+        }
+      }
+    },
+    "v1GrantSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Grant"
+          }
+        }
+      }
+    },
+    "v1IDPProvider": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "externalIdpID": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IP": {
+      "type": "object",
+      "properties": {
+        "V4": {
+          "type": "string"
+        },
+        "V6": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IsAdminResponse": {
+      "type": "object",
+      "properties": {
+        "is_admin": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1LoginData": {
+      "type": "object",
+      "properties": {
+        "err_msg": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MFAState": {
+      "type": "string",
+      "enum": [
+        "MFASTATE_UNSPECIFIED",
+        "MFASTATE_NOT_READY",
+        "MFASTATE_READY",
+        "MFASTATE_REMOVED"
+      ],
+      "default": "MFASTATE_UNSPECIFIED"
+    },
+    "v1MfaOtpResponse": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1MFAState"
+        }
+      }
+    },
+    "v1MfaPromptData": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "mfa_providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MfaType"
+          }
+        }
+      }
+    },
+    "v1MfaType": {
+      "type": "string",
+      "enum": [
+        "MFATYPE_UNSPECIFIED",
+        "MFATYPE_SMS",
+        "MFATYPE_OTP"
+      ],
+      "default": "MFATYPE_UNSPECIFIED"
+    },
+    "v1MfaVerifyData": {
+      "type": "object",
+      "properties": {
+        "err_msg": {
+          "type": "string"
+        },
+        "failure_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "mfa_providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MfaType"
+          }
+        }
+      }
+    },
+    "v1MultiFactor": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v1MfaType"
+        },
+        "state": {
+          "$ref": "#/definitions/v1MFAState"
+        }
+      }
+    },
+    "v1MultiFactors": {
+      "type": "object",
+      "properties": {
+        "mfas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MultiFactor"
+          }
+        }
+      }
+    },
+    "v1MyPermissions": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1MyProjectOrgSearchKey": {
+      "type": "string",
+      "enum": [
+        "MYPROJECTORGSEARCHKEY_UNSPECIFIED",
+        "MYPROJECTORGSEARCHKEY_ORG_NAME"
+      ],
+      "default": "MYPROJECTORGSEARCHKEY_UNSPECIFIED"
+    },
+    "v1MyProjectOrgSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1MyProjectOrgSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1MyProjectOrgSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "asc": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1MyProjectOrgSearchQuery"
+          }
+        }
+      }
+    },
+    "v1MyProjectOrgSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Org"
+          }
+        }
+      }
+    },
+    "v1NextStep": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v1NextStepType"
+        },
+        "login": {
+          "$ref": "#/definitions/v1LoginData"
+        },
+        "password": {
+          "$ref": "#/definitions/v1PasswordData"
+        },
+        "mfa_verify": {
+          "$ref": "#/definitions/v1MfaVerifyData"
+        },
+        "mfa_prompt": {
+          "$ref": "#/definitions/v1MfaPromptData"
+        },
+        "choose_user": {
+          "$ref": "#/definitions/v1ChooseUserData"
+        }
+      }
+    },
+    "v1NextStepType": {
+      "type": "string",
+      "enum": [
+        "NEXTSTEP_UNSPECIFIED",
+        "NEXTSTEP_LOGIN",
+        "NEXTSTEP_PASSWORD",
+        "NEXTSTEP_CHANGE_PASSWORD",
+        "NEXTSTEP_MFA_PROMPT",
+        "NEXTSTEP_MFA_INIT_CHOICE",
+        "NEXTSTEP_MFA_INIT_CREATE",
+        "NEXTSTEP_MFA_INIT_VERIFY",
+        "NEXTSTEP_MFA_INIT_DONE",
+        "NEXTSTEP_MFA_VERIFY",
+        "NEXTSTEP_MFA_VERIFY_ASYNC",
+        "NEXTSTEP_VERIFY_EMAIL",
+        "NEXTSTEP_REDIRECT_TO_CALLBACK",
+        "NEXTSTEP_INIT_PASSWORD",
+        "NEXTSTEP_CHOOSE_USER"
+      ],
+      "default": "NEXTSTEP_UNSPECIFIED"
+    },
+    "v1NotificationType": {
+      "type": "string",
+      "enum": [
+        "NOTIFICATIONTYPE_EMAIL",
+        "NOTIFICATIONTYPE_SMS"
+      ],
+      "default": "NOTIFICATIONTYPE_EMAIL"
+    },
+    "v1OIDCApplicationType": {
+      "type": "string",
+      "enum": [
+        "OIDCAPPLICATIONTYPE_WEB",
+        "OIDCAPPLICATIONTYPE_USER_AGENT",
+        "OIDCAPPLICATIONTYPE_NATIVE"
+      ],
+      "default": "OIDCAPPLICATIONTYPE_WEB"
+    },
+    "v1OIDCAuthMethodType": {
+      "type": "string",
+      "enum": [
+        "OIDCAUTHMETHODTYPE_BASIC",
+        "OIDCAUTHMETHODTYPE_POST",
+        "OIDCAUTHMETHODTYPE_NONE"
+      ],
+      "default": "OIDCAUTHMETHODTYPE_BASIC"
+    },
+    "v1OIDCClientAuth": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        }
+      }
+    },
+    "v1OIDCConfig": {
+      "type": "object",
+      "properties": {
+        "redirect_uris": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "response_types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1OIDCResponseType"
+          }
+        },
+        "grant_types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1OIDCGrantType"
+          }
+        },
+        "application_type": {
+          "$ref": "#/definitions/v1OIDCApplicationType"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "auth_method_type": {
+          "$ref": "#/definitions/v1OIDCAuthMethodType"
+        },
+        "post_logout_redirect_uris": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1OIDCGrantType": {
+      "type": "string",
+      "enum": [
+        "OIDCGRANTTYPE_AUTHORIZATION_CODE",
+        "OIDCGRANTTYPE_GRANT_TYPE_NONE",
+        "OIDCGRANTTYPE_REFRESH_TOKEN"
+      ],
+      "default": "OIDCGRANTTYPE_AUTHORIZATION_CODE"
+    },
+    "v1OIDCResponseType": {
+      "type": "string",
+      "enum": [
+        "OIDCRESPONSETYPE_CODE",
+        "OIDCRESPONSETYPE_ID_TOKEN",
+        "OIDCRESPONSETYPE_ID_TOKEN_TOKEN"
+      ],
+      "default": "OIDCRESPONSETYPE_CODE"
+    },
+    "v1Org": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1PasswordChange": {
+      "type": "object",
+      "properties": {
+        "old_password": {
+          "type": "string"
+        },
+        "new_password": {
+          "type": "string"
+        }
+      }
+    },
+    "v1PasswordData": {
+      "type": "object",
+      "properties": {
+        "err_msg": {
+          "type": "string"
+        },
+        "failure_count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "v1PasswordRequest": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Prompt": {
+      "type": "string",
+      "enum": [
+        "PROMPT_UNSPECIFIED",
+        "PROMPT_NONE",
+        "PROMPT_LOGIN",
+        "PROMPT_CONSENT",
+        "PROMPT_SELECT_ACCOUNT"
+      ],
+      "default": "PROMPT_UNSPECIFIED"
+    },
+    "v1RegisterUserExternalIDPRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "idp_provider": {
+          "$ref": "#/definitions/v1IDPProvider"
+        },
+        "org_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RegisterUserRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "password": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ResetPassword": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "new_password": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ResetPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "user_name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v1NotificationType"
+        }
+      }
+    },
+    "v1SearchMethod": {
+      "type": "string",
+      "enum": [
+        "SEARCHMETHOD_EQUALS",
+        "SEARCHMETHOD_STARTS_WITH",
+        "SEARCHMETHOD_CONTAINS"
+      ],
+      "default": "SEARCHMETHOD_EQUALS"
+    },
+    "v1SelectUserRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_session_id": {
+          "type": "string"
+        },
+        "user_session_id": {
+          "type": "string"
+        },
+        "browser_info": {
+          "$ref": "#/definitions/v1BrowserInformation"
+        }
+      }
+    },
+    "v1SkipMfaInitRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Token": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "expiration": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1UniqueUserResponse": {
+      "type": "object",
+      "properties": {
+        "is_unique": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1UpdateUserAddressRequest": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateUserEmailRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateUserPhoneRequest": {
+      "type": "object",
+      "properties": {
+        "phone": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateUserProfileRequest": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        }
+      }
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1UserState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "activation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_login": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "password_changed": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "email": {
+          "type": "string"
+        },
+        "is_email_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        },
+        "password_change_required": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1UserAddress": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserAgent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "browser_info": {
+          "$ref": "#/definitions/v1BrowserInformation"
+        },
+        "state": {
+          "$ref": "#/definitions/v1UserAgentState"
+        }
+      }
+    },
+    "v1UserAgentCreation": {
+      "type": "object",
+      "properties": {
+        "browser_info": {
+          "$ref": "#/definitions/v1BrowserInformation"
+        }
+      }
+    },
+    "v1UserAgentID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserAgentState": {
+      "type": "string",
+      "enum": [
+        "USERAGENTSTATE_UNSPECIFIED",
+        "USERAGENTSTATE_ACTIVE",
+        "USERAGENTSTATE_TERMINATED"
+      ],
+      "default": "USERAGENTSTATE_UNSPECIFIED"
+    },
+    "v1UserEmail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "isEmailVerified": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1UserID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserPhone": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1UserProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        }
+      }
+    },
+    "v1UserSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_state": {
+          "$ref": "#/definitions/v1UserSessionState"
+        },
+        "user": {
+          "$ref": "#/definitions/v1AuthUser"
+        },
+        "password_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "mfa": {
+          "$ref": "#/definitions/v1MfaType"
+        },
+        "mfa_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "auth_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1UserSessionState": {
+      "type": "string",
+      "enum": [
+        "USERSESSIONSTATE_UNSPECIFIED",
+        "USERSESSIONSTATE_ACTIVE",
+        "USERSESSIONSTATE_TERMINATED"
+      ],
+      "default": "USERSESSIONSTATE_UNSPECIFIED"
+    },
+    "v1UserSessionView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_state": {
+          "$ref": "#/definitions/v1UserSessionState"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserSessionViews": {
+      "type": "object",
+      "properties": {
+        "user_sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserSessionView"
+          }
+        }
+      }
+    },
+    "v1UserSessions": {
+      "type": "object",
+      "properties": {
+        "user_sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserSession"
+          }
+        }
+      }
+    },
+    "v1UserState": {
+      "type": "string",
+      "enum": [
+        "USERSTATE_UNSPECIEFIED",
+        "USERSTATE_ACTIVE",
+        "USERSTATE_INACTIVE",
+        "USERSTATE_DELETED",
+        "USERSTATE_LOCKED",
+        "USERSTATE_SUSPEND",
+        "USERSTATE_INITIAL"
+      ],
+      "default": "USERSTATE_UNSPECIEFIED"
+    },
+    "v1VerifyMfaOtp": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyMfaRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_session_id": {
+          "type": "string"
+        },
+        "browser_info": {
+          "$ref": "#/definitions/v1BrowserInformation"
+        },
+        "otp": {
+          "$ref": "#/definitions/v1AuthSessionMultiFactorOTP"
+        }
+      }
+    },
+    "v1VerifyMyUserEmailRequest": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_session_id": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "browser_info": {
+          "$ref": "#/definitions/v1BrowserInformation"
+        }
+      }
+    },
+    "v1VerifyUserEmailRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyUserPhoneRequest": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyUserRequest": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "auth_session_id": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "browser_info": {
+          "$ref": "#/definitions/v1BrowserInformation"
+        }
+      }
+    }
+  }
+}

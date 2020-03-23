@@ -10,14 +10,14 @@ import "authoption/options.proto";
 
 package zitadel.auth.api.v1;
 
-option go_package = "github.com/caos/zitadel/auth/api/grpc";
+option go_package = "github.com/caos/zitadel/pkg/auth/api/grpc";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     info: {
         title: "Auth API";
         version: "0.1";
         contact:{
-            url: "https://github.com/caos/zitadel/auth"
+            url: "https://github.com/caos/zitadel/pkg/auth"
         };
     };
 
