@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	caos_errs "github.com/caos/utils/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 func TestUnimplementedError(t *testing.T) {
