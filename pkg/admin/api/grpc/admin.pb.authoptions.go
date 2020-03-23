@@ -5,15 +5,36 @@ package grpc
 import (
 	"google.golang.org/grpc"
 
-	utils_auth "github.com/caos/citadel/utils/auth"
-	utils_grpc "github.com/caos/citadel/utils/grpc"
+	utils_auth "github.com/caos/zitadel/internal/auth"
+	utils_grpc "github.com/caos/zitadel/internal/grpc"
 )
 
 /**
  * AdminService
  */
 
-var AdminService_AuthMethods = utils_auth.AuthMethodMapping{}
+var AdminService_AuthMethods = utils_auth.AuthMethodMapping{
+
+	"/zitadel.admin.api.v1.AdminService/IsOrgUnique": utils_auth.AuthOption{
+		Permission: "iam.read",
+		CheckParam: "",
+	},
+
+	"/zitadel.admin.api.v1.AdminService/GetOrgByID": utils_auth.AuthOption{
+		Permission: "iam.read",
+		CheckParam: "",
+	},
+
+	"/zitadel.admin.api.v1.AdminService/SearchOrgs": utils_auth.AuthOption{
+		Permission: "iam.read",
+		CheckParam: "",
+	},
+
+	"/zitadel.admin.api.v1.AdminService/SetUpOrg": utils_auth.AuthOption{
+		Permission: "iam.write",
+		CheckParam: "",
+	},
+}
 
 func AdminService_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.AuthConfig) grpc.UnaryServerInterceptor {
 	return utils_grpc.AuthorizationInterceptor(verifier, authConf, AdminService_AuthMethods)

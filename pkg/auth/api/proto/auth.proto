@@ -4,19 +4,20 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
 
 package zitadel.auth.api.v1;
 
-option go_package = "github.com/caos/citadel/auth/api/grpc";
+option go_package = "github.com/caos/zitadel/auth/api/grpc";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     info: {
         title: "Auth API";
         version: "0.1";
         contact:{
-            url: "https://github.com/caos/citadel/auth"
+            url: "https://github.com/caos/zitadel/auth"
         };
     };
 
@@ -134,7 +135,7 @@ service AuthService {
                 get: "/me/usersessions"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -178,7 +179,7 @@ service AuthService {
                 get: "/users/me/profile"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -189,7 +190,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -199,7 +200,7 @@ service AuthService {
                 get: "/users/me/email"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -210,7 +211,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -221,7 +222,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -240,7 +241,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -258,7 +259,7 @@ service AuthService {
                 get: "/users/me/phone"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -269,7 +270,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -280,7 +281,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -291,7 +292,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -301,7 +302,7 @@ service AuthService {
                 get: "/users/me/address"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -312,7 +313,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -322,7 +323,7 @@ service AuthService {
                 get: "/users/me/mfas"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -334,7 +335,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -359,7 +360,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -370,7 +371,7 @@ service AuthService {
                 post: "/users/me/mfa/otp"
                 body: "*"
             };
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -381,7 +382,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -391,7 +392,7 @@ service AuthService {
                 delete: "/users/me/mfa/otp"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -446,7 +447,7 @@ service AuthService {
                 body: "*"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
@@ -456,18 +457,18 @@ service AuthService {
                 get: "/global/_isiamadmin"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }
 
     //Permission
-    rpc GetMyCitadelPermissions(google.protobuf.Empty) returns (MyPermissions) {
+    rpc GetMyZitadelPermissions(google.protobuf.Empty) returns (MyPermissions) {
         option (google.api.http) = {
                 get: "/permissions/zitadel/me"
             };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
     }

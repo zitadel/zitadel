@@ -4,7 +4,7 @@
     "title": "admin service",
     "version": "0.1",
     "contact": {
-      "url": "https://github.com/caos/citadel/admin"
+      "url": "https://github.com/caos/zitadel/admin"
     }
   },
   "schemes": [
@@ -31,6 +31,113 @@
             }
           }
         },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/orgs/_isunique": {
+      "get": {
+        "summary": "ORG",
+        "operationId": "IsOrgUnique",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UniqueOrgResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/orgs/_search": {
+      "post": {
+        "operationId": "SearchOrgs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/orgs/_setup": {
+      "post": {
+        "operationId": "SetUpOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgSetUpResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgSetUpRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/orgs/{id}": {
+      "get": {
+        "operationId": "GetOrgByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Org"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "tags": [
           "AdminService"
         ]
@@ -136,6 +243,288 @@
         }
       },
       "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
+    "v1CreateOrgRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Gender": {
+      "type": "string",
+      "enum": [
+        "GENDER_UNSPECIFIED",
+        "GENDER_FEMALE",
+        "GENDER_MALE",
+        "GENDER_DIVERSE"
+      ],
+      "default": "GENDER_UNSPECIFIED"
+    },
+    "v1Org": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1OrgState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        }
+      }
+    },
+    "v1OrgSearchKey": {
+      "type": "string",
+      "enum": [
+        "ORGSEARCHKEY_UNSPECIFIED",
+        "ORGSEARCHKEY_ORG_NAME",
+        "ORGSEARCHKEY_DOMAIN",
+        "ORGSEARCHKEY_STATE"
+      ],
+      "default": "ORGSEARCHKEY_UNSPECIFIED"
+    },
+    "v1OrgSearchMethod": {
+      "type": "string",
+      "enum": [
+        "ORGSEARCHMETHOD_EQUALS",
+        "ORGSEARCHMETHOD_STARTS_WITH",
+        "ORGSEARCHMETHOD_CONTAINS"
+      ],
+      "default": "ORGSEARCHMETHOD_EQUALS"
+    },
+    "v1OrgSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1OrgSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1OrgSearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1OrgSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "sorting_column": {
+          "$ref": "#/definitions/v1OrgSearchKey"
+        },
+        "asc": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1OrgSearchQuery"
+          }
+        }
+      }
+    },
+    "v1OrgSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Org"
+          }
+        }
+      }
+    },
+    "v1OrgSetUpRequest": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "$ref": "#/definitions/v1CreateOrgRequest"
+        },
+        "user": {
+          "$ref": "#/definitions/v1RegisterUserRequest"
+        }
+      }
+    },
+    "v1OrgSetUpResponse": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "$ref": "#/definitions/v1Org"
+        },
+        "user": {
+          "$ref": "#/definitions/v1User"
+        }
+      }
+    },
+    "v1OrgState": {
+      "type": "string",
+      "enum": [
+        "ORGSTATE_UNSPECIFIED",
+        "ORGSTATE_ACTIVE",
+        "ORGSTATE_INACTIVE"
+      ],
+      "default": "ORGSTATE_UNSPECIFIED"
+    },
+    "v1RegisterUserRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "password": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UniqueOrgResponse": {
+      "type": "object",
+      "properties": {
+        "is_unique": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1UserState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "email": {
+          "type": "string"
+        },
+        "isEmailVerified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "isPhoneVerified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserState": {
+      "type": "string",
+      "enum": [
+        "USERSTATE_UNSPECIFIED",
+        "USERSTATE_ACTIVE",
+        "USERSTATE_INACTIVE",
+        "USERSTATE_DELETED",
+        "USERSTATE_LOCKED",
+        "USERSTATE_SUSPEND",
+        "USERSTATE_INITIAL"
+      ],
+      "default": "USERSTATE_UNSPECIFIED"
     }
   }
 }

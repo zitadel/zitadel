@@ -5,6 +5,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
+import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
 

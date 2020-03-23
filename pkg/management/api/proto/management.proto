@@ -9,26 +9,26 @@ import "validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 import "authoption/options.proto";
 
-package caos.citadel.management.api.v1;
+package caos.zitadel.management.api.v1;
 
-option go_package = "github.com/caos/citadel/management/api/grpc";
+option go_package = "github.com/caos/zitadel/management/api/grpc";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     info: {
         title: "Management API";
-version: "0.1";
-contact:{
-url: "https://github.com/caos/citadel/management"
-};
-};
+        version: "0.1";
+        contact:{
+            url: "https://github.com/caos/zitadel/management"
+        };
+    };
 
-schemes: HTTPS;
+    schemes: HTTPS;
 
-consumes: "application/json";
-consumes: "application/grpc";
+    consumes: "application/json";
+    consumes: "application/grpc";
 
-produces: "application/json";
-produces: "application/grpc";
+    produces: "application/json";
+    produces: "application/grpc";
 };
 
 service ManagementService {
@@ -57,7 +57,7 @@ service ManagementService {
             get: "/users/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -67,7 +67,7 @@ service ManagementService {
             get: "/global/users/email/{email}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -78,7 +78,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -88,7 +88,7 @@ service ManagementService {
             get: "/users/_isunique"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -99,7 +99,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -110,7 +110,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -121,7 +121,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -132,7 +132,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -143,7 +143,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -153,7 +153,7 @@ service ManagementService {
             delete: "/users/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.delete"
         };
     }
@@ -163,7 +163,7 @@ service ManagementService {
             get: "/users/{id}/changes"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -173,7 +173,7 @@ service ManagementService {
             get: "/applications/{id}/changes"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.read"
         };
     }
@@ -183,7 +183,7 @@ service ManagementService {
             get: "/orgs/{id}/changes"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.read"
         };
     }
@@ -193,7 +193,7 @@ service ManagementService {
             get: "/projects/{id}/changes"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.read"
         };
     }
@@ -204,7 +204,7 @@ service ManagementService {
             get: "/users/{id}/profile"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -215,7 +215,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -226,7 +226,7 @@ service ManagementService {
             get: "/users/{id}/email"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -237,7 +237,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -248,7 +248,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -259,7 +259,7 @@ service ManagementService {
             get: "/users/{id}/phone"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -270,7 +270,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -281,7 +281,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -292,7 +292,7 @@ service ManagementService {
             get: "/users/{id}/address"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -303,7 +303,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -313,7 +313,7 @@ service ManagementService {
             get: "/users/{id}/mfas"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.read"
         };
     }
@@ -326,7 +326,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -338,7 +338,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.write"
         };
     }
@@ -350,7 +350,7 @@ service ManagementService {
             get: "/policies/passwords/complexity"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -361,7 +361,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -372,7 +372,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -382,7 +382,7 @@ service ManagementService {
             delete: "/policies/passwords/complexity/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.delete"
         };
     }
@@ -393,7 +393,7 @@ service ManagementService {
             get: "/policies/passwords/age"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -404,7 +404,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -415,7 +415,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -425,7 +425,7 @@ service ManagementService {
             delete: "/policies/passwords/age/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.delete"
         };
     }
@@ -436,7 +436,7 @@ service ManagementService {
             get: "/policies/passwords/lockout"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.read"
         };
     }
@@ -447,7 +447,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -458,7 +458,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.write"
         };
     }
@@ -468,7 +468,7 @@ service ManagementService {
             delete: "/policies/passwords/lockout/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "policy.delete"
         };
     }
@@ -479,7 +479,7 @@ service ManagementService {
             get: "/orgs/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.read"
         };
     }
@@ -489,7 +489,7 @@ service ManagementService {
             get: "/global/orgs/domain/{domain}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.read"
         };
     }
@@ -500,7 +500,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.write"
         };
     }
@@ -511,7 +511,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.write"
         };
     }
@@ -522,7 +522,7 @@ service ManagementService {
             get: "/orgs/members/roles"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.member.read"
         };
     }
@@ -533,7 +533,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.member.write"
         };
     }
@@ -544,7 +544,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.member.write"
         };
     }
@@ -554,7 +554,7 @@ service ManagementService {
             delete: "/orgs/{org_id}/members/{user_id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.member.delete"
         };
     }
@@ -565,7 +565,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "org.member.read"
         };
     }
@@ -577,7 +577,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.read"
         };
     }
@@ -587,7 +587,7 @@ service ManagementService {
             get: "/projects/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.read"
             check_field_name: "Id"
         };
@@ -599,7 +599,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.write"
         };
     }
@@ -610,7 +610,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.write"
             check_field_name: "Id"
         };
@@ -622,7 +622,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.write"
             check_field_name: "Id"
         };
@@ -634,7 +634,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.write"
             check_field_name: "Id"
         };
@@ -646,7 +646,7 @@ service ManagementService {
             get: "/grants/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.read"
         };
     }
@@ -657,7 +657,7 @@ service ManagementService {
             get: "/projects/members/roles"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.member.read"
         };
     }
@@ -668,7 +668,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.member.read"
             check_field_name: "ProjectId"
         };
@@ -680,7 +680,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.member.write"
             check_field_name: "Id"
         };
@@ -692,7 +692,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.member.write"
             check_field_name: "Id"
         };
@@ -703,7 +703,7 @@ service ManagementService {
             delete: "/projects/{id}/members/{user_id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.member.delete"
             check_field_name: "Id"
         };
@@ -716,7 +716,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.role.read"
             check_field_name: "ProjectId"
         };
@@ -728,7 +728,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.role.write"
             check_field_name: "Id"
         };
@@ -739,7 +739,7 @@ service ManagementService {
             delete: "/projects/{id}/roles/{name}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.role.delete"
             check_field_name: "Id"
         };
@@ -752,7 +752,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.read"
             check_field_name: "ProjectId"
         };
@@ -763,7 +763,7 @@ service ManagementService {
             get: "/projects/{project_id}/applications/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.read"
             check_field_name: "ProjectId"
         };
@@ -775,7 +775,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
@@ -787,7 +787,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
@@ -799,7 +799,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
@@ -811,7 +811,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
@@ -823,7 +823,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
@@ -835,7 +835,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
         };
@@ -848,7 +848,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.read"
             check_field_name: "ProjectId"
         };
@@ -859,7 +859,7 @@ service ManagementService {
             get: "/projects/{project_id}/grants/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.read"
         };
     }
@@ -870,7 +870,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.write"
         };
     }
@@ -881,7 +881,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.write"
         };
     }
@@ -892,7 +892,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.write"
         };
     }
@@ -903,7 +903,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.write"
         };
     }
@@ -915,7 +915,7 @@ service ManagementService {
             get: "/projects/grants/members/roles"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.member.read"
         };
     }
@@ -925,7 +925,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.member.read"
         };
     }
@@ -936,7 +936,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.member.write"
         };
     }
@@ -947,7 +947,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.member.write"
         };
     }
@@ -957,7 +957,7 @@ service ManagementService {
             delete: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.member.delete"
         };
     }
@@ -970,7 +970,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.read"
         };
     }
@@ -980,7 +980,7 @@ service ManagementService {
             get: "/users/{user_id}/grants/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.read"
         };
     }
@@ -991,7 +991,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.write"
         };
     }
@@ -1002,7 +1002,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.write"
         };
     }
@@ -1013,7 +1013,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.write"
         };
     }
@@ -1024,7 +1024,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.write"
         };
     }
@@ -1036,7 +1036,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.user.grant.read"
             check_field_name: "ProjectId"
         };
@@ -1047,7 +1047,7 @@ service ManagementService {
             get: "/projects/{project_id}/users/{user_id}/grants/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.user.grant.read"
             check_field_name: "ProjectId"
         };
@@ -1059,7 +1059,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.user.grant.write"
             check_field_name: "ProjectId"
         };
@@ -1071,7 +1071,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.user.grant.write"
             check_field_name: "ProjectId"
         };
@@ -1083,7 +1083,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.user.grant.write"
             check_field_name: "ProjectId"
         };
@@ -1095,7 +1095,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.user.grant.write"
             check_field_name: "ProjectId"
         };
@@ -1107,7 +1107,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.user.grant.read"
             check_field_name: "ProjectGrantId"
         };
@@ -1118,7 +1118,7 @@ service ManagementService {
             get: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.user.grant.read"
             check_field_name: "ProjectGrantId"
         };
@@ -1130,7 +1130,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.user.grant.write"
             check_field_name: "ProjectGrantId"
         };
@@ -1142,7 +1142,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.user.grant.write"
             check_field_name: "ProjectGrantId"
         };
@@ -1154,7 +1154,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.user.grant.write"
             check_field_name: "ProjectGrantId"
         };
@@ -1166,7 +1166,7 @@ service ManagementService {
             body: "*"
         };
 
-        option (caos.citadel.utils.v1.auth_option) = {
+        option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.grant.user.grant.write"
             check_field_name: "ProjectGrantId"
         };

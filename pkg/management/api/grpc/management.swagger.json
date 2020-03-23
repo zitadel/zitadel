@@ -4,7 +4,7 @@
     "title": "Management API",
     "version": "0.1",
     "contact": {
-      "url": "https://github.com/caos/citadel/management"
+      "url": "https://github.com/caos/zitadel/management"
     }
   },
   "schemes": [

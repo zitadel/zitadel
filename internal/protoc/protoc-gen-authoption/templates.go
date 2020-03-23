@@ -83,7 +83,7 @@ func templatesAuth_method_mappingGoTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/auth_method_mapping.go.tmpl", size: 1010, mode: os.FileMode(420), modTime: time.Unix(1584960713, 0)}
+	info := bindataFileInfo{name: "templates/auth_method_mapping.go.tmpl", size: 1010, mode: os.FileMode(420), modTime: time.Unix(1584961378, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
