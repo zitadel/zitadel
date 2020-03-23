@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package caos.zitadel.utils.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption";
+
+
+extend google.protobuf.MethodOptions {
+    AuthOption auth_option = 50000;
+}
+
+message AuthOption {
+    string permission = 1;
+    string check_field_name = 2;
+}
