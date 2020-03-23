@@ -22,7 +22,6 @@ type Config struct {
 
 func main() {
 	configPath := flag.String("config-file", "/zitadel/config/startup.yaml", "path to the config file")
-	eventstoreEnabled := flag.Bool("eventstore", true, "enable eventstore")
 	managementEnabled := flag.Bool("management", true, "enable management api")
 	authEnabled := flag.Bool("auth", true, "enable auth api")
 	adminEnabled := flag.Bool("admin", true, "enable admin api")
@@ -34,10 +33,6 @@ func main() {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
-	if *eventstoreEnabled {
-		err = eventstore.Start(ctx, conf.Eventstore)
-		logging.Log("MAIN-sj2Sd").OnError(err).Fatal("error starting eventstore")
-	}
 	if *managementEnabled {
 		err = management.Start(ctx, conf.Management)
 		logging.Log("MAIN-39Nv5").OnError(err).Fatal("error starting management api")
