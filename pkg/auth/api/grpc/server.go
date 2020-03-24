@@ -1,6 +1,8 @@
 package grpc
 
 import (
+	grpc_utils "github.com/caos/zitadel/internal/api/grpc"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
 
@@ -28,7 +30,13 @@ func (s *Server) GRPCPort() string {
 }
 
 func (s *Server) GRPCServer() (*grpc.Server, error) {
-	gs := grpc.NewServer()
+	gs := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(
+				grpc_utils.ErrorHandler(),
+			),
+		),
+	)
 	RegisterAuthServiceServer(gs, s)
 	return gs, nil
 }
