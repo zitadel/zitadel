@@ -4,7 +4,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var _ AdminServiceServer = (*Server)(nil)
+var _ ManagementServiceServer = (*Server)(nil)
 
 type Config struct {
 	Port        string
@@ -29,6 +29,6 @@ func (s *Server) GRPCPort() string {
 
 func (s *Server) GRPCServer() (*grpc.Server, error) {
 	gs := grpc.NewServer()
-	RegisterAdminServiceServer(gs, s)
+	RegisterManagementServiceServer(gs, s)
 	return gs, nil
 }
