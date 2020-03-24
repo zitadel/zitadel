@@ -2,7 +2,11 @@ package api
 
 const (
 	Authorization  = "authorization"
-	AcceptLanguage = "Accept-Language"
+	Accept         = "accept"
+	AcceptLanguage = "accept-language"
+	ContentType    = "content-type"
+	Location       = "location"
+	Origin         = "origin"
 
 	ZitadelOrgID = "x-zitadel-orgid"
 )

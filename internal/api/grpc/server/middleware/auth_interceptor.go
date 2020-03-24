@@ -1,4 +1,4 @@
-package grpc
+package middleware
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/auth"
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 )
 
 func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Config, authMethods auth.MethodMapping) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -18,12 +19,12 @@ func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Conf
 			return handler(ctx, req)
 		}
 
-		authToken := GetAuthorizationHeader(ctx)
+		authToken := grpc_util.GetAuthorizationHeader(ctx)
 		if authToken == "" {
 			return nil, status.Error(codes.Unauthenticated, "auth header missing")
 		}
 
-		orgID := GetHeader(ctx, api.ZitadelOrgID)
+		orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
 
 		ctx, err := auth.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)
 		if err != nil {
