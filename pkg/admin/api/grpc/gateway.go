@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"github.com/caos/utils/api/grpc/server"
+	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"strings"
 )

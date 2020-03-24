@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	grpc_utils "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
@@ -31,9 +31,10 @@ func (s *Server) GRPCPort() string {
 
 func (s *Server) GRPCServer() (*grpc.Server, error) {
 	gs := grpc.NewServer(
+		middleware.TracingStatsServer("/Healthz", "/Ready", "/Validate"),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				grpc_utils.ErrorHandler(),
+				middleware.ErrorHandler(),
 			),
 		),
 	)
