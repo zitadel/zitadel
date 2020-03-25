@@ -1,16 +1,13 @@
 package grpc
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"strings"
-)
 
-type GatewayConfig struct {
-	Port          string
-	GRPCEndpoint  string
-	CustomHeaders []string
-}
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/grpc/server"
+)
 
 type Gateway struct {
 	grpcEndpoint string
@@ -18,7 +15,7 @@ type Gateway struct {
 	cutomHeaders []string
 }
 
-func StartGateway(conf GatewayConfig) *Gateway {
+func StartGateway(conf *grpc_util.GatewayConfig) *Gateway {
 	return &Gateway{
 		grpcEndpoint: conf.GRPCEndpoint,
 		port:         conf.Port,

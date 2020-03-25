@@ -1,27 +1,23 @@
 package grpc
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
+
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
 var _ AuthServiceServer = (*Server)(nil)
-
-type Config struct {
-	Port        string
-	SearchLimit int
-}
 
 type Server struct {
 	port        string
 	searchLimit int
 }
 
-func StartServer(conf Config) *Server {
+func StartServer(conf *grpc_util.ServerConfig) *Server {
 	return &Server{
-		port:        conf.Port,
-		searchLimit: conf.SearchLimit,
+		port: conf.Port,
 	}
 }
 

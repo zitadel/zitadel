@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/pkg/admin/api/grpc"
 )
@@ -12,14 +13,13 @@ type API struct {
 }
 
 type Config struct {
-	GRPCServer grpc.Config
-	Gateway    grpc.GatewayConfig
+	GRPC grpc_util.Config
 }
 
 func Start(ctx context.Context, conf *Config) error {
 	api := &API{
-		grpcServer: *grpc.StartServer(conf.GRPCServer),
-		gateway:    *grpc.StartGateway(conf.Gateway),
+		grpcServer: *grpc.StartServer(conf.GRPC.ToServerConfig()),
+		gateway:    *grpc.StartGateway(conf.GRPC.ToGatewayConfig()),
 	}
 	server.StartServer(ctx, &api.grpcServer)
 	server.StartGateway(ctx, &api.gateway)
