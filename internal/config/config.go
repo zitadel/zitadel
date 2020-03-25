@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
 
 	"github.com/caos/zitadel/internal/errors"
 )
@@ -21,7 +21,7 @@ type ReaderFunc func(data []byte, o interface{}) error
 var (
 	JSONReader = json.Unmarshal
 	TOMLReader = toml.Unmarshal
-	YAMLReader = yaml.Unmarshal
+	YAMLReader = func(data []byte, o interface{}) error { return yaml.Unmarshal(data, o) }
 )
 
 // Read deserializes each config file to the target obj

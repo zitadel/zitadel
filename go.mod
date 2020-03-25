@@ -11,6 +11,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/aws/aws-sdk-go v1.29.16 // indirect
 	github.com/caos/logging v0.0.0-20191210002624-b3260f690a6a
+	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.3.5
@@ -34,5 +35,5 @@ require (
 	google.golang.org/api v0.20.0 // indirect
 	google.golang.org/genproto v0.0.0-20200319113533-08878b785e9c // indirect
 	google.golang.org/grpc v1.28.0
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
