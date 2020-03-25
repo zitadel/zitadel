@@ -8,9 +8,9 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/caos/logging"
+	"github.com/ghodss/yaml"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
 
 	"github.com/caos/zitadel/internal/api"
 	http_util "github.com/caos/zitadel/internal/api/http"
@@ -43,8 +43,9 @@ func NewTranslator(config TranslatorConfig) (*Translator, error) {
 
 func newBundle(i18nDir string, defaultLanguage language.Tag) (*i18n.Bundle, error) {
 	bundle := i18n.NewBundle(defaultLanguage)
-	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-	bundle.RegisterUnmarshalFunc("yml", yaml.Unmarshal)
+	yamlUnmarshal := func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) }
+	bundle.RegisterUnmarshalFunc("yaml", yamlUnmarshal)
+	bundle.RegisterUnmarshalFunc("yml", yamlUnmarshal)
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	files, err := ioutil.ReadDir(i18nDir)
