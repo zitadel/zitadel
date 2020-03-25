@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 
 	utils_auth "github.com/caos/zitadel/internal/api/auth"
-	utils_grpc "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
 /**
@@ -517,5 +517,5 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 }
 
 func ManagementService_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.Config) grpc.UnaryServerInterceptor {
-	return utils_grpc.AuthorizationInterceptor(verifier, authConf, ManagementService_AuthMethods)
+	return middleware.AuthorizationInterceptor(verifier, authConf, ManagementService_AuthMethods)
 }

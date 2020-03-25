@@ -2,9 +2,9 @@ package management
 
 import (
 	"context"
+	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/errors"
 	app "github.com/caos/zitadel/internal/management"
 	"github.com/caos/zitadel/pkg/management/api"
 )
@@ -15,5 +15,7 @@ type Config struct {
 }
 
 func Start(ctx context.Context, config *Config, authZ *auth.Config) error {
-	return errors.ThrowUnimplemented(nil, "MANAG-h3k3x", "not implemented yet") //TODO: implement
+	err := api.Start(ctx, config.API)
+	logging.Log("MAIN-BmOLI").OnError(err).Panic("unable to start api")
+	return err
 }
