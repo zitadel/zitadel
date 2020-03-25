@@ -14,7 +14,6 @@ Mgmt:
     GRPC:
       ServerPort: 60020
       GatewayPort: 60021
-      SearchLimit: 100
       CustomHeaders:
         - x-caos-
 
@@ -23,7 +22,6 @@ Auth:
     GRPC:
       ServerPort: 60050
       GatewayPort: 60051
-      SearchLimit: 100
       CustomHeaders:
         - x-caos-
 
@@ -35,7 +33,6 @@ Admin:
     GRPC:
       ServerPort: 60090
       GatewayPort: 60091
-      SearchLimit: 100
       CustomHeaders:
         - x-caos-
 

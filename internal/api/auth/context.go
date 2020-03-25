@@ -7,10 +7,6 @@ import (
 	"github.com/caos/logging"
 )
 
-const (
-	HeaderOrgID = "x-caos-zitadel-orgid"
-)
-
 type CtxKeyPermissions struct{}
 type CtxKeyData struct{}
 

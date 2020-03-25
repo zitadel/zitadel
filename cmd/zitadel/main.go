@@ -22,8 +22,8 @@ type Config struct {
 	Admin   *admin.Config
 	Console *console.Config
 
-	//Log
-	//Tracing tracing.TracingConfig
+	//Log //TODO: add
+	//Tracing tracing.TracingConfig //TODO: add
 	AuthZ *authz.Config
 }
 
@@ -35,7 +35,6 @@ func main() {
 	loginEnabled := flag.Bool("login", true, "enable login ui")
 	adminEnabled := flag.Bool("admin", true, "enable admin api")
 	consoleEnabled := flag.Bool("console", true, "enable console ui")
-
 	flag.Parse()
 
 	conf := new(Config)
