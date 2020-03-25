@@ -3,14 +3,12 @@ package grpc
 type Config struct {
 	ServerPort    string
 	GatewayPort   string
-	SearchLimit   int
 	CustomHeaders []string
 }
 
 func (c *Config) ToServerConfig() *ServerConfig {
 	return &ServerConfig{
-		Port:        c.ServerPort,
-		SearchLimit: c.SearchLimit,
+		Port: c.ServerPort,
 	}
 }
 
@@ -23,8 +21,7 @@ func (c *Config) ToGatewayConfig() *GatewayConfig {
 }
 
 type ServerConfig struct {
-	Port        string
-	SearchLimit int
+	Port string
 }
 
 type GatewayConfig struct {
