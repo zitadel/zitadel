@@ -90,7 +90,7 @@ func (db *SQL) PushEvents(ctx context.Context, aggregates ...lib_models.Aggregat
 	ctx, span := tracing.NewSpan(ctx)
 	defer span.EndWithError(err)
 
-	err = crdb.ExecuteTx(ctx, db.sqlClient, nil, func(tx *sql.Tx) error {
+	err = crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.Prepare("insert into eventstore.events " +
 			"(event_type, aggregate_type, aggregate_id, creation_date, event_data, modifier_user, modifier_service, modifier_tenant, resource_owner, previous_sequence) " +
 			"select $1, $2, $3, coalesce($4, now()), $5, $6, $7, $8, $9, " +

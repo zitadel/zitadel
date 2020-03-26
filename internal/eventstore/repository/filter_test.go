@@ -145,8 +145,7 @@ func TestSQL_Filter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sql := &SQL{
-				client:    tt.fields.client.db,
-				sqlClient: tt.fields.client.sqlClient,
+				client: tt.fields.client.sqlClient,
 			}
 			err := sql.Filter(context.Background(), tt.args.events, tt.args.searchQuery)
 			if (err != nil) != tt.wantErr {

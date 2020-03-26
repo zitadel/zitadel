@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 )
 
@@ -32,13 +31,12 @@ var (
 )
 
 type dbMock struct {
-	db        *gorm.DB
 	sqlClient *sql.DB
 	mock      sqlmock.Sqlmock
 }
 
 func (db *dbMock) close() {
-	db.db.Close()
+	db.sqlClient.Close()
 }
 
 func mockDB(t *testing.T) *dbMock {
@@ -47,11 +45,6 @@ func mockDB(t *testing.T) *dbMock {
 	mockDB.sqlClient, mockDB.mock, err = sqlmock.New()
 	if err != nil {
 		t.Fatalf("error occured while creating stub db %v", err)
-	}
-
-	mockDB.db, err = gorm.Open("postgres", mockDB.sqlClient)
-	if err != nil {
-		t.Fatalf("error occured while connecting to stub db: %v", err)
 	}
 
 	mockDB.mock.MatchExpectationsInOrder(true)
