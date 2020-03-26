@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -15,41 +14,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 )
-
-const (
-	//first param is where clause
-	//second param is order by
-	//third param is limit
-	filterFormat = "SELECT * FROM eventstore.events%s%s%s"
-)
-
-func (db *SQL) F(ctx context.Context, events models.Events, searchQuery models.SearchQuery) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
-
-	eventList := make([]*Event, 0)
-	query := db.client.Table(eventsTable)
-	query = generateFilters(query, searchQuery)
-	if searchQuery.Limit() != 0 {
-		query = query.Limit(searchQuery.Limit())
-	}
-
-	if searchQuery.OrderDesc() {
-		query = query.Order("event_sequence desc")
-	} else {
-		query = query.Order("event_sequence")
-	}
-	if err := query.Scan(&eventList).Error; err != nil {
-		return caos_errs.ThrowInternal(err, "SQL-8rIU1", "unable to query events")
-	}
-
-	for _, event := range eventList {
-		e := eventToApp(event)
-		events.Append(e)
-	}
-
-	return nil
-}
 
 func (db *SQL) Filter(ctx context.Context, events models.Events, searchQuery models.SearchQuery) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -85,7 +49,7 @@ func (db *SQL) Filter(ctx context.Context, events models.Events, searchQuery mod
 
 	query = numberPlaceholder(query, "?", "$")
 
-	rows, err := db.sqlClient.Query(query, values...)
+	rows, err := db.client.Query(query, values...)
 	if err != nil {
 		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
 		return caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
@@ -111,13 +75,6 @@ func (db *SQL) Filter(ctx context.Context, events models.Events, searchQuery mod
 	}
 
 	return nil
-}
-
-// \"SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id FROM eventstore.events LIMIT $1 ORDER BY event_sequence\"
-
-type condition struct {
-	clause string
-	value  interface{}
 }
 
 func numberPlaceholder(query, old, new string) string {
@@ -153,12 +110,9 @@ func prepareWhere(searchQuery models.SearchQuery) (clause string, values []inter
 func generateFilters(query *gorm.DB, searchQuery models.SearchQuery) *gorm.DB {
 	for _, f := range searchQuery.Filters() {
 		value := f.GetValue()
-		switch t := value.(type) {
+		switch value.(type) {
 		case []bool, []float64, []int64, []string, *[]bool, *[]float64, *[]int64, *[]string:
-			log.Println(t)
 			value = pq.Array(value)
-		default:
-			log.Println(t)
 		}
 		query = query.Where(getCondition(f), value)
 	}

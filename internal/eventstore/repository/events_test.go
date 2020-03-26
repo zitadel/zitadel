@@ -271,8 +271,7 @@ func TestSQL_PushEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sql := &SQL{
-				client:    tt.fields.client.db,
-				sqlClient: tt.fields.client.sqlClient,
+				client: tt.fields.client.sqlClient,
 			}
 			err := sql.PushEvents(context.Background(), tt.args.aggregates...)
 			if err != nil && !tt.isError(err) {
