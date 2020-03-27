@@ -210,7 +210,6 @@ func Test_GetFieldFromReq(t *testing.T) {
 }
 
 func Test_HasGlobalPermission(t *testing.T) {
-
 	type args struct {
 		perms []string
 	}
@@ -245,7 +244,6 @@ func Test_HasGlobalPermission(t *testing.T) {
 }
 
 func Test_GetPermissionCtxIDs(t *testing.T) {
-
 	type args struct {
 		perms []string
 	}
