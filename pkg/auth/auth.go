@@ -14,6 +14,6 @@ type Config struct {
 	API *api.Config
 }
 
-func Start(ctx context.Context, config *Config, authZ *auth.Config) error {
+func Start(ctx context.Context, config Config, authZ auth.Config) error {
 	return errors.ThrowUnimplemented(nil, "AUTH-l7Hdx", "not implemented yet") //TODO: implement
 }

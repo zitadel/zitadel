@@ -14,6 +14,6 @@ type Config struct {
 	API *api.Config
 }
 
-func Start(ctx context.Context, config *Config, authZ *auth.Config) error {
+func Start(ctx context.Context, config Config, authZ auth.Config) error {
 	return errors.ThrowUnimplemented(nil, "ADMIN-n8vw5", "not implemented yet") //TODO: implement
 }

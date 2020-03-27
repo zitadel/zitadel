@@ -11,6 +11,6 @@ type Config struct {
 	StaticDir string
 }
 
-func Start(ctx context.Context, config *Config) error {
+func Start(ctx context.Context, config Config) error {
 	return errors.ThrowUnimplemented(nil, "CONSO-4cT5D", "not implemented yet") //TODO: implement
 }

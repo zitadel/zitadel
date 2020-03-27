@@ -16,15 +16,15 @@ import (
 )
 
 type Config struct {
-	Mgmt    *management.Config
-	Auth    *auth.Config
-	Login   *login.Config
-	Admin   *admin.Config
-	Console *console.Config
+	Mgmt    management.Config
+	Auth    auth.Config
+	Login   login.Config
+	Admin   admin.Config
+	Console console.Config
 
 	//Log //TODO: add
 	//Tracing tracing.TracingConfig //TODO: add
-	AuthZ *authz.Config
+	AuthZ authz.Config
 }
 
 func main() {
