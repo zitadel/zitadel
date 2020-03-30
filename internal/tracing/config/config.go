@@ -3,9 +3,7 @@ package config
 import (
 	"encoding/json"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/tracing"
 	tracing_g "github.com/caos/zitadel/internal/tracing/google"
 	tracing_log "github.com/caos/zitadel/internal/tracing/log"
@@ -28,7 +26,7 @@ func (c *TracingConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	if err := json.Unmarshal(data, &rc); err != nil {
-		return status.Errorf(codes.Internal, "%v parse config: %v", "TRACE-vmjS", err)
+		return errors.ThrowInternal(err, "TRACE-vmjS", "error parsing config")
 	}
 
 	c.Type = rc.Type
@@ -36,7 +34,7 @@ func (c *TracingConfig) UnmarshalJSON(data []byte) error {
 	var err error
 	c.Config, err = newTracingConfig(c.Type, rc.Config)
 	if err != nil {
-		return status.Errorf(codes.Internal, "%v parse config: %v", "TRACE-Ws9E", err)
+		return err
 	}
 
 	return c.Config.NewTracer()
@@ -45,7 +43,7 @@ func (c *TracingConfig) UnmarshalJSON(data []byte) error {
 func newTracingConfig(tracerType string, configData []byte) (tracing.Config, error) {
 	t, ok := tracer[tracerType]
 	if !ok {
-		return nil, status.Errorf(codes.Internal, "%v No config: %v", "TRACE-HMEJ", tracerType)
+		return nil, errors.ThrowInternalf(nil, "TRACE-HMEJ", "config type %s not supported", tracerType)
 	}
 
 	tracingConfig := t()
@@ -54,7 +52,7 @@ func newTracingConfig(tracerType string, configData []byte) (tracing.Config, err
 	}
 
 	if err := json.Unmarshal(configData, tracingConfig); err != nil {
-		return nil, status.Errorf(codes.Internal, "%v Could not read conifg: %v", "TRACE-1tSS", err)
+		return nil, errors.ThrowInternal(err, "TRACE-1tSS", "Could not read config: %v")
 	}
 
 	return tracingConfig, nil

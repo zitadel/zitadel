@@ -31,9 +31,8 @@ func NewRenderer(templatesDir string, tmplMapping map[string]string, funcs map[s
 
 func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, tmpl *template.Template, data interface{}, reqFuncs map[string]interface{}) {
 	reqFuncs = r.registerTranslateFn(req, reqFuncs)
-	if err := tmpl.Funcs(reqFuncs).Execute(w, data); err != nil {
-		logging.Log("HTML-lF8F6w").WithError(err).WithField("template", tmpl.Name).Error("error rendering template")
-	}
+	err := tmpl.Funcs(reqFuncs).Execute(w, data)
+	logging.LogWithFields("HTML-lF8F6w", "template", tmpl.Name).OnError(err).Error("error rendering template")
 }
 
 func (r *Renderer) Localize(id string, args map[string]interface{}) string {

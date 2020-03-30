@@ -7,35 +7,36 @@ Tracing:
 
 Log:
   Level: debug
-  Formatter: text
+  Formatter:
+    Format: text
 
 Mgmt:
   API:
     GRPC:
-      ServerPort: 60020
-      GatewayPort: 60021
+      ServerPort: 50010
+      GatewayPort: 50011
       CustomHeaders:
         - x-caos-
 
 Auth:
   API:
     GRPC:
-      ServerPort: 60050
-      GatewayPort: 60051
+      ServerPort: 50020
+      GatewayPort: 50021
       CustomHeaders:
         - x-caos-
 
 Login:
-
+#  will get port range 5003x
 
 Admin:
   API:
     GRPC:
-      ServerPort: 60090
-      GatewayPort: 60091
+      ServerPort: 50040
+      GatewayPort: 50041
       CustomHeaders:
         - x-caos-
 
 Console:
-  Port: '9090'
-  StaticDir: '/app/console/dist'
+  Port: 50050
+  StaticDir: /app/console/dist

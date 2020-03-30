@@ -5,8 +5,9 @@ import (
 	"strconv"
 
 	"go.opencensus.io/trace"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+
+	"github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 type Span struct {
@@ -39,10 +40,8 @@ func (s *Span) SetStatusByError(err error) {
 }
 
 func statusFromError(err error) trace.Status {
-	if statusErr, ok := status.FromError(err); ok {
-		return trace.Status{Code: int32(statusErr.Code()), Message: statusErr.Message()}
-	}
-	return trace.Status{Code: int32(codes.Unknown), Message: "Unknown"}
+	code, msg, _ := grpc.Extract(err)
+	return trace.Status{Code: int32(code), Message: msg}
 }
 
 // AddAnnotation creates an annotation. The annotation will not be added to the tracing use Annotate(msg) afterwards
@@ -80,7 +79,7 @@ func toTraceAttribute(key string, value interface{}) (attr trace.Attribute, err 
 	if valueInt, err := convertToInt64(value); err == nil {
 		return trace.Int64Attribute(key, valueInt), nil
 	}
-	return attr, status.Error(codes.InvalidArgument, "Attribute is not of type bool, string or int64")
+	return attr, errors.ThrowInternal(nil, "TRACE-jlq3s", "Attribute is not of type bool, string or int64")
 }
 
 func convertToInt64(value interface{}) (int64, error) {
