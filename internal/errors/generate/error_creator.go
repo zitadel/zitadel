@@ -32,7 +32,7 @@ func main() {
 
 	fmt.Print(`
 !!!!!
-  Add status mapping in grpc/errors/caos_errors.go	//TODO: fix path when pkg exists
+  Add status mapping in internal/api/grpc/caos_errors.go	
 !!!!!`)
 }
 

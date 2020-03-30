@@ -6,49 +6,62 @@ import (
 
 	"github.com/caos/logging"
 
+	authz "github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/config"
+	tracing "github.com/caos/zitadel/internal/tracing/config"
 	"github.com/caos/zitadel/pkg/admin"
 	"github.com/caos/zitadel/pkg/auth"
-	"github.com/caos/zitadel/pkg/eventstore"
+	"github.com/caos/zitadel/pkg/console"
+	"github.com/caos/zitadel/pkg/login"
 	"github.com/caos/zitadel/pkg/management"
 )
 
 type Config struct {
-	Eventstore eventstore.Config
-	Management management.Config
-	Auth       auth.Config
-	Admin      admin.Config
+	Mgmt    management.Config
+	Auth    auth.Config
+	Login   login.Config
+	Admin   admin.Config
+	Console console.Config
+
+	Log     logging.Config
+	Tracing tracing.TracingConfig
+	AuthZ   authz.Config
 }
 
 func main() {
-	configPath := flag.String("config-file", "/zitadel/config/startup.yaml", "path to the config file")
-	eventstoreEnabled := flag.Bool("eventstore", true, "enable eventstore")
+	var configPaths config.ArrayFlags
+	flag.Var(&configPaths, "config-files", "path to the config files")
 	managementEnabled := flag.Bool("management", true, "enable management api")
 	authEnabled := flag.Bool("auth", true, "enable auth api")
+	loginEnabled := flag.Bool("login", true, "enable login ui")
 	adminEnabled := flag.Bool("admin", true, "enable admin api")
-
+	consoleEnabled := flag.Bool("console", true, "enable console ui")
 	flag.Parse()
 
 	conf := new(Config)
-	err := config.Read(conf, *configPath)
+	err := config.Read(conf, configPaths...)
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
-	if *eventstoreEnabled {
-		err = eventstore.Start(ctx, conf.Eventstore)
-		logging.Log("MAIN-sj2Sd").OnError(err).Fatal("error starting eventstore")
-	}
 	if *managementEnabled {
-		err = management.Start(ctx, conf.Management)
+		err = management.Start(ctx, conf.Mgmt, conf.AuthZ)
 		logging.Log("MAIN-39Nv5").OnError(err).Fatal("error starting management api")
 	}
 	if *authEnabled {
-		err = auth.Start(ctx, conf.Auth)
+		err = auth.Start(ctx, conf.Auth, conf.AuthZ)
 		logging.Log("MAIN-x0nD2").OnError(err).Fatal("error starting auth api")
 	}
+	if *loginEnabled {
+		err = login.Start(ctx, conf.Login)
+		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
+	}
 	if *adminEnabled {
-		err = admin.Start(ctx, conf.Admin)
+		err = admin.Start(ctx, conf.Admin, conf.AuthZ)
 		logging.Log("MAIN-0na71").OnError(err).Fatal("error starting admin api")
+	}
+	if *consoleEnabled {
+		err = console.Start(ctx, conf.Console)
+		logging.Log("MAIN-3Dfuc").OnError(err).Fatal("error starting console ui")
 	}
 	<-ctx.Done()
 	logging.Log("MAIN-s8d2h").Info("stopping zitadel")
