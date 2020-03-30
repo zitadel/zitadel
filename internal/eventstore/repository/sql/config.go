@@ -1,9 +1,9 @@
-package repository
+package sql
 
 import (
 	"database/sql"
 
-	"github.com/caos/eventstore-lib/pkg/repository"
+	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 type Config struct {

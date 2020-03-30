@@ -5,5 +5,5 @@ import (
 )
 
 func (app *app) Health(ctx context.Context) error {
-	return app.eventstore.Health(ctx)
+	return app.repo.Health(ctx)
 }

@@ -4,23 +4,20 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
-
-	lib_models "github.com/caos/eventstore-lib/pkg/models"
 )
 
 func (es *app) CreateEvents(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
-	libAggregates := make([]lib_models.Aggregate, len(aggregates))
-	for idx, aggregate := range aggregates {
-		libAggregates[idx] = aggregate
+	for _, agg := range aggregates {
+		if err = agg.Validate(); err != nil {
+			return err
+		}
 	}
-
-	return es.eventstore.PushEvents(ctx, libAggregates...)
+	return es.repo.PushEvents(ctx, aggregates...)
 }
 
-func (es *app) FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events *models.Events, err error) {
-	events = models.InitEvents()
-	if err := es.eventstore.Filter(ctx, events, searchQuery); err != nil {
+func (es *app) FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error) {
+	if err = searchQuery.Validate(); err != nil {
 		return nil, err
 	}
-	return events, nil
+	return es.repo.Filter(ctx, searchQuery)
 }
