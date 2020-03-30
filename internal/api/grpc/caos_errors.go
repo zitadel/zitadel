@@ -11,14 +11,14 @@ func CaosToGRPCError(err error) error {
 	if err == nil {
 		return nil
 	}
-	code, msg, ok := extract(err)
+	code, msg, ok := Extract(err)
 	if !ok {
 		return status.Convert(err).Err()
 	}
 	return status.Error(code, msg)
 }
 
-func extract(err error) (c codes.Code, msg string, ok bool) {
+func Extract(err error) (c codes.Code, msg string, ok bool) {
 	switch caosErr := err.(type) {
 	case *caos_errs.AlreadyExistsError:
 		return codes.AlreadyExists, caosErr.GetMessage(), true
