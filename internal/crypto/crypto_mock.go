@@ -46,31 +46,31 @@ func (mr *MockCryptoMockRecorder) Algorithm() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockCrypto)(nil).Algorithm))
 }
 
-// MockEncryptionAlg is a mock of EncryptionAlg interface
-type MockEncryptionAlg struct {
+// MockEncryptionAlgorithm is a mock of EncryptionAlgorithm interface
+type MockEncryptionAlgorithm struct {
 	ctrl     *gomock.Controller
-	recorder *MockEncryptionAlgMockRecorder
+	recorder *MockEncryptionAlgorithmMockRecorder
 }
 
-// MockEncryptionAlgMockRecorder is the mock recorder for MockEncryptionAlg
-type MockEncryptionAlgMockRecorder struct {
-	mock *MockEncryptionAlg
+// MockEncryptionAlgorithmMockRecorder is the mock recorder for MockEncryptionAlgorithm
+type MockEncryptionAlgorithmMockRecorder struct {
+	mock *MockEncryptionAlgorithm
 }
 
-// NewMockEncryptionAlg creates a new mock instance
-func NewMockEncryptionAlg(ctrl *gomock.Controller) *MockEncryptionAlg {
-	mock := &MockEncryptionAlg{ctrl: ctrl}
-	mock.recorder = &MockEncryptionAlgMockRecorder{mock}
+// NewMockEncryptionAlgorithm creates a new mock instance
+func NewMockEncryptionAlgorithm(ctrl *gomock.Controller) *MockEncryptionAlgorithm {
+	mock := &MockEncryptionAlgorithm{ctrl: ctrl}
+	mock.recorder = &MockEncryptionAlgorithmMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockEncryptionAlg) EXPECT() *MockEncryptionAlgMockRecorder {
+func (m *MockEncryptionAlgorithm) EXPECT() *MockEncryptionAlgorithmMockRecorder {
 	return m.recorder
 }
 
 // Algorithm mocks base method
-func (m *MockEncryptionAlg) Algorithm() string {
+func (m *MockEncryptionAlgorithm) Algorithm() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Algorithm")
 	ret0, _ := ret[0].(string)
@@ -78,13 +78,13 @@ func (m *MockEncryptionAlg) Algorithm() string {
 }
 
 // Algorithm indicates an expected call of Algorithm
-func (mr *MockEncryptionAlgMockRecorder) Algorithm() *gomock.Call {
+func (mr *MockEncryptionAlgorithmMockRecorder) Algorithm() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockEncryptionAlg)(nil).Algorithm))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockEncryptionAlgorithm)(nil).Algorithm))
 }
 
 // EncryptionKeyID mocks base method
-func (m *MockEncryptionAlg) EncryptionKeyID() string {
+func (m *MockEncryptionAlgorithm) EncryptionKeyID() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EncryptionKeyID")
 	ret0, _ := ret[0].(string)
@@ -92,13 +92,13 @@ func (m *MockEncryptionAlg) EncryptionKeyID() string {
 }
 
 // EncryptionKeyID indicates an expected call of EncryptionKeyID
-func (mr *MockEncryptionAlgMockRecorder) EncryptionKeyID() *gomock.Call {
+func (mr *MockEncryptionAlgorithmMockRecorder) EncryptionKeyID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncryptionKeyID", reflect.TypeOf((*MockEncryptionAlg)(nil).EncryptionKeyID))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncryptionKeyID", reflect.TypeOf((*MockEncryptionAlgorithm)(nil).EncryptionKeyID))
 }
 
 // DecryptionKeyIDs mocks base method
-func (m *MockEncryptionAlg) DecryptionKeyIDs() []string {
+func (m *MockEncryptionAlgorithm) DecryptionKeyIDs() []string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DecryptionKeyIDs")
 	ret0, _ := ret[0].([]string)
@@ -106,13 +106,13 @@ func (m *MockEncryptionAlg) DecryptionKeyIDs() []string {
 }
 
 // DecryptionKeyIDs indicates an expected call of DecryptionKeyIDs
-func (mr *MockEncryptionAlgMockRecorder) DecryptionKeyIDs() *gomock.Call {
+func (mr *MockEncryptionAlgorithmMockRecorder) DecryptionKeyIDs() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptionKeyIDs", reflect.TypeOf((*MockEncryptionAlg)(nil).DecryptionKeyIDs))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptionKeyIDs", reflect.TypeOf((*MockEncryptionAlgorithm)(nil).DecryptionKeyIDs))
 }
 
 // Encrypt mocks base method
-func (m *MockEncryptionAlg) Encrypt(value []byte) ([]byte, error) {
+func (m *MockEncryptionAlgorithm) Encrypt(value []byte) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Encrypt", value)
 	ret0, _ := ret[0].([]byte)
@@ -121,13 +121,13 @@ func (m *MockEncryptionAlg) Encrypt(value []byte) ([]byte, error) {
 }
 
 // Encrypt indicates an expected call of Encrypt
-func (mr *MockEncryptionAlgMockRecorder) Encrypt(value interface{}) *gomock.Call {
+func (mr *MockEncryptionAlgorithmMockRecorder) Encrypt(value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Encrypt", reflect.TypeOf((*MockEncryptionAlg)(nil).Encrypt), value)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Encrypt", reflect.TypeOf((*MockEncryptionAlgorithm)(nil).Encrypt), value)
 }
 
 // Decrypt mocks base method
-func (m *MockEncryptionAlg) Decrypt(hashed []byte, keyID string) ([]byte, error) {
+func (m *MockEncryptionAlgorithm) Decrypt(hashed []byte, keyID string) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decrypt", hashed, keyID)
 	ret0, _ := ret[0].([]byte)
@@ -136,13 +136,13 @@ func (m *MockEncryptionAlg) Decrypt(hashed []byte, keyID string) ([]byte, error)
 }
 
 // Decrypt indicates an expected call of Decrypt
-func (mr *MockEncryptionAlgMockRecorder) Decrypt(hashed, keyID interface{}) *gomock.Call {
+func (mr *MockEncryptionAlgorithmMockRecorder) Decrypt(hashed, keyID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decrypt", reflect.TypeOf((*MockEncryptionAlg)(nil).Decrypt), hashed, keyID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decrypt", reflect.TypeOf((*MockEncryptionAlgorithm)(nil).Decrypt), hashed, keyID)
 }
 
 // DecryptString mocks base method
-func (m *MockEncryptionAlg) DecryptString(hashed []byte, keyID string) (string, error) {
+func (m *MockEncryptionAlgorithm) DecryptString(hashed []byte, keyID string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DecryptString", hashed, keyID)
 	ret0, _ := ret[0].(string)
@@ -151,36 +151,36 @@ func (m *MockEncryptionAlg) DecryptString(hashed []byte, keyID string) (string, 
 }
 
 // DecryptString indicates an expected call of DecryptString
-func (mr *MockEncryptionAlgMockRecorder) DecryptString(hashed, keyID interface{}) *gomock.Call {
+func (mr *MockEncryptionAlgorithmMockRecorder) DecryptString(hashed, keyID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptString", reflect.TypeOf((*MockEncryptionAlg)(nil).DecryptString), hashed, keyID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptString", reflect.TypeOf((*MockEncryptionAlgorithm)(nil).DecryptString), hashed, keyID)
 }
 
-// MockHashAlg is a mock of HashAlg interface
-type MockHashAlg struct {
+// MockHashAlgorithm is a mock of HashAlgorithm interface
+type MockHashAlgorithm struct {
 	ctrl     *gomock.Controller
-	recorder *MockHashAlgMockRecorder
+	recorder *MockHashAlgorithmMockRecorder
 }
 
-// MockHashAlgMockRecorder is the mock recorder for MockHashAlg
-type MockHashAlgMockRecorder struct {
-	mock *MockHashAlg
+// MockHashAlgorithmMockRecorder is the mock recorder for MockHashAlgorithm
+type MockHashAlgorithmMockRecorder struct {
+	mock *MockHashAlgorithm
 }
 
-// NewMockHashAlg creates a new mock instance
-func NewMockHashAlg(ctrl *gomock.Controller) *MockHashAlg {
-	mock := &MockHashAlg{ctrl: ctrl}
-	mock.recorder = &MockHashAlgMockRecorder{mock}
+// NewMockHashAlgorithm creates a new mock instance
+func NewMockHashAlgorithm(ctrl *gomock.Controller) *MockHashAlgorithm {
+	mock := &MockHashAlgorithm{ctrl: ctrl}
+	mock.recorder = &MockHashAlgorithmMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockHashAlg) EXPECT() *MockHashAlgMockRecorder {
+func (m *MockHashAlgorithm) EXPECT() *MockHashAlgorithmMockRecorder {
 	return m.recorder
 }
 
 // Algorithm mocks base method
-func (m *MockHashAlg) Algorithm() string {
+func (m *MockHashAlgorithm) Algorithm() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Algorithm")
 	ret0, _ := ret[0].(string)
@@ -188,13 +188,13 @@ func (m *MockHashAlg) Algorithm() string {
 }
 
 // Algorithm indicates an expected call of Algorithm
-func (mr *MockHashAlgMockRecorder) Algorithm() *gomock.Call {
+func (mr *MockHashAlgorithmMockRecorder) Algorithm() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockHashAlg)(nil).Algorithm))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockHashAlgorithm)(nil).Algorithm))
 }
 
 // Hash mocks base method
-func (m *MockHashAlg) Hash(value []byte) ([]byte, error) {
+func (m *MockHashAlgorithm) Hash(value []byte) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Hash", value)
 	ret0, _ := ret[0].([]byte)
@@ -203,13 +203,13 @@ func (m *MockHashAlg) Hash(value []byte) ([]byte, error) {
 }
 
 // Hash indicates an expected call of Hash
-func (mr *MockHashAlgMockRecorder) Hash(value interface{}) *gomock.Call {
+func (mr *MockHashAlgorithmMockRecorder) Hash(value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockHashAlg)(nil).Hash), value)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockHashAlgorithm)(nil).Hash), value)
 }
 
 // CompareHash mocks base method
-func (m *MockHashAlg) CompareHash(hashed, comparer []byte) error {
+func (m *MockHashAlgorithm) CompareHash(hashed, comparer []byte) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CompareHash", hashed, comparer)
 	ret0, _ := ret[0].(error)
@@ -217,7 +217,7 @@ func (m *MockHashAlg) CompareHash(hashed, comparer []byte) error {
 }
 
 // CompareHash indicates an expected call of CompareHash
-func (mr *MockHashAlgMockRecorder) CompareHash(hashed, comparer interface{}) *gomock.Call {
+func (mr *MockHashAlgorithmMockRecorder) CompareHash(hashed, comparer interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompareHash", reflect.TypeOf((*MockHashAlg)(nil).CompareHash), hashed, comparer)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompareHash", reflect.TypeOf((*MockHashAlgorithm)(nil).CompareHash), hashed, comparer)
 }

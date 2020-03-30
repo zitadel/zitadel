@@ -24,7 +24,7 @@ type Generator interface {
 type EncryptionGenerator struct {
 	length uint
 	expiry time.Duration
-	alg    EncryptionAlg
+	alg    EncryptionAlgorithm
 	runes  []rune
 }
 
@@ -44,7 +44,7 @@ func (g *EncryptionGenerator) Runes() []rune {
 	return g.runes
 }
 
-func NewEncryptionGenerator(length uint, expiry time.Duration, alg EncryptionAlg, runes []rune) *EncryptionGenerator {
+func NewEncryptionGenerator(length uint, expiry time.Duration, alg EncryptionAlgorithm, runes []rune) *EncryptionGenerator {
 	return &EncryptionGenerator{
 		length: length,
 		expiry: expiry,
@@ -56,7 +56,7 @@ func NewEncryptionGenerator(length uint, expiry time.Duration, alg EncryptionAlg
 type HashGenerator struct {
 	length uint
 	expiry time.Duration
-	alg    HashAlg
+	alg    HashAlgorithm
 	runes  []rune
 }
 
@@ -76,7 +76,7 @@ func (g *HashGenerator) Runes() []rune {
 	return g.runes
 }
 
-func NewHashGenerator(length uint, expiry time.Duration, alg HashAlg, runes []rune) *HashGenerator {
+func NewHashGenerator(length uint, expiry time.Duration, alg HashAlgorithm, runes []rune) *HashGenerator {
 	return &HashGenerator{
 		length: length,
 		expiry: expiry,
@@ -106,9 +106,9 @@ func VerifyCode(creationDate time.Time, expiry time.Duration, cryptoCode *Crypto
 		return errors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "verification code is expired")
 	}
 	switch alg := g.Alg().(type) {
-	case EncryptionAlg:
+	case EncryptionAlgorithm:
 		return verifyEncryptedCode(cryptoCode, verificationCode, alg)
-	case HashAlg:
+	case HashAlgorithm:
 		return verifyHashedCode(cryptoCode, verificationCode, alg)
 	}
 	return errors.ThrowInvalidArgument(nil, "CODE-fW2gNa", "generator alg is not supported")
@@ -136,7 +136,7 @@ func generateRandomString(length uint, chars []rune) (string, error) {
 	return "", nil
 }
 
-func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg EncryptionAlg) error {
+func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg EncryptionAlgorithm) error {
 	code, err := DecryptString(cryptoCode, alg)
 	if err != nil {
 		return err
@@ -148,6 +148,6 @@ func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg E
 	return nil
 }
 
-func verifyHashedCode(cryptoCode *CryptoValue, verificationCode string, alg HashAlg) error {
+func verifyHashedCode(cryptoCode *CryptoValue, verificationCode string, alg HashAlgorithm) error {
 	return CompareHash(cryptoCode, []byte(verificationCode), alg)
 }

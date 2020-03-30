@@ -9,7 +9,7 @@ import (
 )
 
 func Test_Encrypted_OK(t *testing.T) {
-	mCrypto := NewMockEncryptionAlg(gomock.NewController(t))
+	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
 	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})
@@ -35,7 +35,7 @@ func Test_Encrypted_OK(t *testing.T) {
 }
 
 func Test_Verify_Encrypted_OK(t *testing.T) {
-	mCrypto := NewMockEncryptionAlg(gomock.NewController(t))
+	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
 	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})
@@ -57,7 +57,7 @@ func Test_Verify_Encrypted_OK(t *testing.T) {
 	assert.NoError(t, err)
 }
 func Test_Verify_Encrypted_Invalid_Err(t *testing.T) {
-	mCrypto := NewMockEncryptionAlg(gomock.NewController(t))
+	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("enc")
 	mCrypto.EXPECT().EncryptionKeyID().AnyTimes().Return("id")
 	mCrypto.EXPECT().DecryptionKeyIDs().AnyTimes().Return([]string{"id"})

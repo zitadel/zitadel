@@ -74,10 +74,8 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			errFunc: func(err error) bool {
-				return caos_errs.IsUnauthenticated(err)
-			},
-			result: []string{"project.read"},
+			errFunc: caos_errs.IsUnauthenticated,
+			result:  []string{"project.read"},
 		},
 		{
 			name: "No Grants",
@@ -393,7 +391,6 @@ func Test_AddRoleContextIDToPerm(t *testing.T) {
 }
 
 func Test_ExistisPerm(t *testing.T) {
-
 	type args struct {
 		existing []string
 		perm     string
