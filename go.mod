@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/caos/citadel v0.40.8
 	github.com/caos/eventstore-lib v0.0.0-20200325143837-dfa765017774
 	github.com/caos/logging v0.0.0-20191210002624-b3260f690a6a
 	github.com/caos/utils v0.0.0-20200305060859-ac2fa70f313e
@@ -16,7 +17,6 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.3 // indirect
-	github.com/jackc/pgconn v1.4.0 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/lib/pq v1.3.0
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
