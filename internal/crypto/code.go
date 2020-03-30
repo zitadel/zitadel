@@ -137,6 +137,9 @@ func generateRandomString(length uint, chars []rune) (string, error) {
 }
 
 func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg EncryptionAlgorithm) error {
+	if cryptoCode == nil {
+		return errors.ThrowInvalidArgument(nil, "CRYPT-aqrFV", "cryptoCode must not be nil")
+	}
 	code, err := DecryptString(cryptoCode, alg)
 	if err != nil {
 		return err
@@ -149,5 +152,8 @@ func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg E
 }
 
 func verifyHashedCode(cryptoCode *CryptoValue, verificationCode string, alg HashAlgorithm) error {
+	if cryptoCode == nil {
+		return errors.ThrowInvalidArgument(nil, "CRYPT-2q3r", "cryptoCode must not be nil")
+	}
 	return CompareHash(cryptoCode, []byte(verificationCode), alg)
 }
