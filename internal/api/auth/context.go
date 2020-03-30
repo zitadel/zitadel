@@ -6,8 +6,12 @@ import (
 	"github.com/caos/logging"
 )
 
-type CtxKeyPermissions struct{}
-type CtxKeyData struct{}
+type key int
+
+var (
+	permissionsKey key
+	dataKey        key
+)
 
 type CtxData struct {
 	UserID    string
@@ -42,15 +46,15 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t Toke
 	projectID, err := t.GetProjectIDByClientID(ctx, clientID)
 	logging.LogWithFields("AUTH-GfAoV", "clientID", clientID).OnError(err).Warn("could not read projectid by clientid")
 
-	return context.WithValue(ctx, CtxKeyData{}, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID}), nil
+	return context.WithValue(ctx, dataKey, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID}), nil
 }
 
 func GetCtxData(ctx context.Context) CtxData {
-	ctxData, _ := ctx.Value(CtxKeyData{}).(CtxData)
+	ctxData, _ := ctx.Value(dataKey).(CtxData)
 	return ctxData
 }
 
 func GetPermissionsFromCtx(ctx context.Context) []string {
-	ctxPermission, _ := ctx.Value(CtxKeyPermissions{}).([]string)
+	ctxPermission, _ := ctx.Value(permissionsKey).([]string)
 	return ctxPermission
 }

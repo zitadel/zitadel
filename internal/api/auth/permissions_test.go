@@ -8,7 +8,7 @@ import (
 )
 
 func getTestCtx(userID, orgID string) context.Context {
-	return context.WithValue(context.Background(), CtxKeyData{}, CtxData{UserID: userID, OrgID: orgID})
+	return context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
 }
 
 type testVerifier struct {
