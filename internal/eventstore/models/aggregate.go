@@ -1,67 +1,56 @@
 package models
 
 import (
-	"regexp"
-
-	"github.com/caos/eventstore-lib/pkg/models"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 )
 
-var _ models.Aggregate = (*Aggregate)(nil)
-
-var versionRegexp = regexp.MustCompile(`^v[0-9]+(\.[0-9]+){0,2}$`)
-
-type Version string
-
 type Aggregate struct {
-	id             string
-	typ            string
-	events         []*Event
-	latestSequence uint64
-	version        Version
+	ID             string
+	Typ            string
+	Events         []*Event
+	LatestSequence uint64
+	Version        version
 }
 
-func NewAggregate(id, typ, version string, latestSequence uint64, events ...*Event) *Aggregate {
-	return &Aggregate{id: id, typ: typ, events: events, latestSequence: latestSequence}
-}
-
-func (a *Aggregate) Type() string {
-	return a.typ
-}
-
-func (a *Aggregate) ID() string {
-	return a.id
-}
-
-func (a *Aggregate) Events() models.Events {
-	events := make(Events, len(a.events))
-	for idx, event := range a.events {
-		events[idx] = event
+func NewAggregate(id, typ string, v version, latestSequence uint64, events ...*Event) (*Aggregate, error) {
+	if err := v.Validate(); err != nil {
+		return nil, err
 	}
-
-	return &events
+	for _, event := range events {
+		if err := event.Validate(); err != nil {
+			return nil, err
+		}
+	}
+	return &Aggregate{
+		ID:             id,
+		Typ:            typ,
+		Events:         events,
+		LatestSequence: latestSequence,
+		Version:        v,
+	}, nil
 }
 
-func (a *Aggregate) LatestSequence() uint64 {
-	return a.latestSequence
+func MustNewAggregate(id, typ string, v version, latestSequence uint64, events ...*Event) *Aggregate {
+	aggregate, err := NewAggregate(id, typ, v, latestSequence, events...)
+	logging.Log("MODEL-10XZW").OnError(err).Fatal("unable to create aggregate")
+	return aggregate
 }
 
 func (a *Aggregate) Validate() error {
-	if a.id == "" {
+	if a.ID == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-FSjKV", "id not set")
 	}
-	if a.typ == "" {
+	if a.Typ == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-aj4t2", "type not set")
 	}
-	if len(a.events) < 1 {
+	if len(a.Events) < 1 {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-PupjX", "no events set")
 	}
-	return a.version.Validate()
-}
-
-func (v Version) Validate() error {
-	if !versionRegexp.MatchString(string(v)) {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-luDuS", "version is not semver")
+	for _, event := range a.Events {
+		if err := event.Validate(); err != nil {
+			return err
+		}
 	}
-	return nil
+	return a.Version.Validate()
 }

@@ -1,62 +1,22 @@
-package repository
+package sql
 
 import (
 	"context"
 	"database/sql"
 	"testing"
 
-	"github.com/caos/eventstore-lib/pkg/models"
 	"github.com/caos/utils/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/jinzhu/gorm"
 )
-
-type mockSearchQuery struct {
-	t       *testing.T
-	limit   uint64
-	desc    bool
-	filters []*mockFilter
-}
-
-func (f *mockSearchQuery) Limit() uint64 {
-	return f.limit
-}
-
-func (f *mockSearchQuery) OrderDesc() bool {
-	return f.desc
-}
-
-func (f *mockSearchQuery) Filters() []models.Filter {
-	filters := make([]models.Filter, len(f.filters))
-	for i, filter := range f.filters {
-		filters[i] = filter
-	}
-	return filters
-}
-
-type mockFilter struct {
-	key       models.Field
-	operation models.Operation
-	value     interface{}
-}
-
-func (f *mockFilter) GetField() models.Field {
-	return f.key
-}
-func (f *mockFilter) GetOperation() models.Operation {
-	return f.operation
-}
-func (f *mockFilter) GetValue() interface{} {
-	return f.value
-}
 
 func TestSQL_Filter(t *testing.T) {
 	type fields struct {
 		client *dbMock
 	}
 	type args struct {
-		events      models.Events
-		searchQuery models.SearchQuery
+		events      *mockEvents
+		searchQuery *es_models.SearchQuery
 	}
 	tests := []struct {
 		name      string
@@ -64,7 +24,7 @@ func TestSQL_Filter(t *testing.T) {
 		args      args
 		eventsLen int
 		wantErr   bool
-		isErrFunc isExpectedError
+		isErrFunc func(error) bool
 	}{
 		{
 			name: "only limit filter",
@@ -73,7 +33,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: &mockSearchQuery{limit: 34},
+				searchQuery: es_models.NewSearchQuery(34, false),
 			},
 			eventsLen: 3,
 			wantErr:   false,
@@ -85,7 +45,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: &mockSearchQuery{desc: true},
+				searchQuery: es_models.NewSearchQuery(0, true),
 			},
 			eventsLen: 34,
 			wantErr:   false,
@@ -97,7 +57,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: &mockSearchQuery{},
+				searchQuery: &es_models.SearchQuery{},
 			},
 			wantErr:   true,
 			isErrFunc: errors.IsInternal,
@@ -109,7 +69,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: &mockSearchQuery{},
+				searchQuery: &es_models.SearchQuery{},
 			},
 			wantErr:   true,
 			isErrFunc: errors.IsInternal,
@@ -121,7 +81,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: &mockSearchQuery{limit: 5, filters: []*mockFilter{&mockFilter{key: es_models.AggregateID, operation: es_models.Equals, value: "hop"}}},
+				searchQuery: es_models.NewSearchQuery(5, false).AggregateIDFilter("hop"),
 			},
 			wantErr:   false,
 			isErrFunc: nil,
@@ -132,11 +92,8 @@ func TestSQL_Filter(t *testing.T) {
 				client: mockDB(t).expectFilterEventsAggregateIDTypeLimit("hop", "user", 5),
 			},
 			args: args{
-				events: &mockEvents{t: t},
-				searchQuery: &mockSearchQuery{limit: 5, filters: []*mockFilter{
-					&mockFilter{key: es_models.AggregateID, operation: es_models.Equals, value: "hop"},
-					&mockFilter{key: es_models.AggregateType, operation: es_models.In, value: []string{"user"}},
-				}},
+				events:      &mockEvents{t: t},
+				searchQuery: es_models.NewSearchQuery(5, false).AggregateIDFilter("hop").AggregateTypeFilter("user"),
 			},
 			wantErr:   false,
 			isErrFunc: nil,
@@ -147,12 +104,12 @@ func TestSQL_Filter(t *testing.T) {
 			sql := &SQL{
 				client: tt.fields.client.sqlClient,
 			}
-			err := sql.Filter(context.Background(), tt.args.events, tt.args.searchQuery)
+			events, err := sql.Filter(context.Background(), tt.args.searchQuery)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SQL.UnlockAggregates() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if tt.eventsLen != 0 && tt.args.events.Len() != tt.eventsLen {
-				t.Errorf("events has wrong length got: %d want %d", tt.args.events.Len(), tt.eventsLen)
+			if tt.eventsLen != 0 && len(events) != tt.eventsLen {
+				t.Errorf("events has wrong length got: %d want %d", len(events), tt.eventsLen)
 			}
 			if tt.wantErr && !tt.isErrFunc(err) {
 				t.Errorf("got wrong error %v", err)
@@ -167,7 +124,7 @@ func TestSQL_Filter(t *testing.T) {
 
 func Test_getCondition(t *testing.T) {
 	type args struct {
-		filter models.Filter
+		filter *es_models.Filter
 	}
 	tests := []struct {
 		name string
@@ -177,22 +134,14 @@ func Test_getCondition(t *testing.T) {
 		{
 			name: "single value",
 			args: args{
-				filter: &mockFilter{
-					key:       es_models.LatestSequence,
-					operation: es_models.Greater,
-					value:     34,
-				},
+				filter: es_models.NewFilter(es_models.LatestSequence, 34, es_models.Greater),
 			},
 			want: "event_sequence > ?",
 		},
 		{
 			name: "list value",
 			args: args{
-				filter: &mockFilter{
-					key:       es_models.AggregateType,
-					operation: es_models.In,
-					value:     []string{"a", "b"},
-				},
+				filter: es_models.NewFilter(es_models.AggregateType, []string{"a", "b"}, es_models.In),
 			},
 			want: "aggregate_type IN (?)",
 		},

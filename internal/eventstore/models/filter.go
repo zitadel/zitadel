@@ -1,22 +1,13 @@
 package models
 
 import (
-	"github.com/caos/eventstore-lib/pkg/models"
+	"github.com/caos/zitadel/internal/errors"
 )
 
-type FilterEventsRequest struct {
-	Limit           uint64
-	AggregateID     string
-	AggregateType   string
-	LatestSequence  uint64
-	ResourceOwner   string
-	ModifierService string
-	ModifierUser    string
-	ModifierTenant  string
-}
+type Field int32
 
 const (
-	AggregateType models.Field = iota
+	AggregateType Field = iota
 	AggregateID
 	LatestSequence
 	ResourceOwner
@@ -25,51 +16,23 @@ const (
 	ModifierTenant
 )
 
+type Operation int32
+
 const (
-	Equals models.Operation = iota
+	Equals Operation = iota
 	Greater
 	Less
 	In
 )
 
-type SearchQuery struct {
-	limit   uint64
-	desc    bool
-	filters []*Filter
-}
-
-func NewSearchQuery(limit uint64, desc bool, filters ...*Filter) *SearchQuery {
-	return &SearchQuery{
-		limit:   limit,
-		desc:    desc,
-		filters: filters,
-	}
-}
-
-func (q *SearchQuery) Limit() uint64 {
-	return q.limit
-}
-
-func (q *SearchQuery) OrderDesc() bool {
-	return q.desc
-}
-
-func (q *SearchQuery) Filters() []models.Filter {
-	filters := make([]models.Filter, len(q.filters))
-	for idx, filter := range q.filters {
-		filters[idx] = filter
-	}
-
-	return filters
-}
-
 type Filter struct {
-	field     models.Field
+	field     Field
 	value     interface{}
-	operation models.Operation
+	operation Operation
 }
 
-func NewFilter(field models.Field, value interface{}, operation models.Operation) *Filter {
+//NewFilter is used in tests. Use searchQuery.*Filter() instead
+func NewFilter(field Field, value interface{}, operation Operation) *Filter {
 	return &Filter{
 		field:     field,
 		value:     value,
@@ -77,12 +40,28 @@ func NewFilter(field models.Field, value interface{}, operation models.Operation
 	}
 }
 
-func (f *Filter) GetField() models.Field {
+func (f *Filter) GetField() Field {
 	return f.field
 }
-func (f *Filter) GetOperation() models.Operation {
+func (f *Filter) GetOperation() Operation {
 	return f.operation
 }
 func (f *Filter) GetValue() interface{} {
 	return f.value
+}
+
+func (f *Filter) Validate() error {
+	if f == nil {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-z6KcG", "filter is nil")
+	}
+	if f.field < 0 {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-zw62U", "field not definded")
+	}
+	if f.value == nil {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-GJ9ct", "no value definded")
+	}
+	if f.operation < 0 {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-RrQTy", "operation not definded")
+	}
+	return nil
 }

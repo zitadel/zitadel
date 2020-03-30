@@ -3,58 +3,38 @@ package models
 import (
 	"time"
 
-	"github.com/caos/eventstore-lib/pkg/models"
+	"github.com/caos/zitadel/internal/errors"
 )
 
-var _ models.Event = (*Event)(nil)
-
 type Event struct {
-	id               string
-	creationDate     time.Time
-	typ              string
+	//ID is set by eventstore
+	ID               string
+	CreationDate     time.Time
+	Typ              string
 	Sequence         uint64
 	PreviousSequence uint64
-	data             []byte
+	Data             []byte
 	ModifierService  string
 	ModifierTenant   string
 	ModifierUser     string
 	ResourceOwner    string
 	AggregateType    string
 	AggregateID      string
+	AggregateVersion version
 }
 
-func NewEvent(id string) *Event {
-	return &Event{id: id}
-}
-
-func (e *Event) ID() string {
-	return e.id
-}
-
-func (e *Event) CreationDate() time.Time {
-	return e.creationDate
-}
-
-func (e *Event) SetCreationDate(creationDate time.Time) {
-	e.creationDate = creationDate
-}
-
-func (e *Event) SetID(id string) {
-	e.id = id
-}
-
-func (e *Event) Type() string {
-	return e.typ
-}
-
-func (e *Event) SetType(typ string) {
-	e.typ = typ
-}
-
-func (e *Event) Data() []byte {
-	return e.data
-}
-
-func (e *Event) SetData(data []byte) {
-	e.data = data
+func (e *Event) Validate() error {
+	if e.Typ == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-R2sB0", "type not defined")
+	}
+	if e.ModifierService == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-iGnu0", "modifier service not defined")
+	}
+	if e.ModifierUser == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-uZcBF", "modifier user not defined")
+	}
+	if e.ResourceOwner == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-Bv0we", "resource owner not defined")
+	}
+	return nil
 }

@@ -1,4 +1,4 @@
-package repository
+package sql
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"runtime"
 	"testing"
 
-	lib_models "github.com/caos/eventstore-lib/pkg/models"
 	"github.com/caos/utils/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
@@ -17,38 +16,12 @@ type mockEvents struct {
 	t      *testing.T
 }
 
-func (events *mockEvents) Append(event lib_models.Event) {
-	e, ok := event.(*models.Event)
-	if !ok {
-		events.t.Error("event is not type *models.Event")
-		return
-	}
-	events.events = append(events.events, e)
-}
-
-func (events *mockEvents) Len() int {
-	return len(events.events)
-}
-func (events *mockEvents) Get(index int) lib_models.Event {
-	if events.Len() < index {
-		return nil
-	}
-	return events.events[index]
-}
-func (events *mockEvents) GetAll() []lib_models.Event {
-	events.t.Fatal("GetAll is not implemented")
-	return nil
-}
-func (events *mockEvents) Insert(position int, event lib_models.Event) {
-	events.t.Fatal("Insert is not implemented")
-}
-
 func TestSQL_PushEvents(t *testing.T) {
 	type fields struct {
 		client *dbMock
 	}
 	type args struct {
-		aggregates []lib_models.Aggregate
+		aggregates []*models.Aggregate
 	}
 	tests := []struct {
 		name              string
@@ -67,7 +40,7 @@ func TestSQL_PushEvents(t *testing.T) {
 					expectReleaseSavepoint(nil).
 					expectCommit(nil),
 			},
-			args:              args{aggregates: []lib_models.Aggregate{}},
+			args:              args{aggregates: []*models.Aggregate{}},
 			shouldCheckEvents: false,
 			isError:           noErr,
 		},
@@ -82,7 +55,7 @@ func TestSQL_PushEvents(t *testing.T) {
 					expectCommit(nil),
 			},
 
-			args:              args{aggregates: []lib_models.Aggregate{}},
+			args:              args{aggregates: []*models.Aggregate{}},
 			isError:           errors.IsInternal,
 			shouldCheckEvents: false,
 		},
@@ -93,44 +66,50 @@ func TestSQL_PushEvents(t *testing.T) {
 					expectBegin(nil).
 					expectSavepoint().
 					expectPrepareInsert().
-					expectInsertEvent(Event{
+					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
 						ModifierService:  "svc",
 						ModifierTenant:   "tenant",
-						ModiferUser:      "usr",
+						ModifierUser:     "usr",
 						ResourceOwner:    "ro",
 						PreviousSequence: 34,
+						Typ:              "eventTyp",
 						Data:             []byte("{}"),
+						AggregateVersion: "v0.0.1",
 					},
 						"asdfölk-234", 45).
-					expectInsertEvent(Event{
+					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
 						ModifierService:  "svc2",
 						ModifierTenant:   "tenant2",
-						ModiferUser:      "usr2",
+						ModifierUser:     "usr2",
 						ResourceOwner:    "ro2",
 						PreviousSequence: 45,
+						Typ:              "eventTyp",
 						Data:             []byte("{}"),
+						AggregateVersion: "v0.0.1",
 					}, "asdfölk-233", 46).
 					expectReleaseSavepoint(nil).
 					expectCommit(nil),
 			},
 			args: args{
-				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", "v0.0", 34,
+				aggregates: []*models.Aggregate{
+					models.MustNewAggregate("aggID", "aggType", models.MustVersion(0, 0, 1), 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
 							ModifierUser:    "usr",
 							ResourceOwner:   "ro",
+							Typ:             "eventTyp",
 						},
 						&models.Event{
 							ModifierService: "svc2",
 							ModifierTenant:  "tenant2",
 							ModifierUser:    "usr2",
 							ResourceOwner:   "ro2",
+							Typ:             "eventTyp",
 						},
 					),
 				},
@@ -145,45 +124,51 @@ func TestSQL_PushEvents(t *testing.T) {
 					expectBegin(nil).
 					expectSavepoint().
 					expectPrepareInsert().
-					expectInsertEvent(Event{
+					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
 						ModifierService:  "svc",
 						ModifierTenant:   "tenant",
-						ModiferUser:      "usr",
+						ModifierUser:     "usr",
 						ResourceOwner:    "ro",
 						PreviousSequence: 34,
 						Data:             []byte("{}"),
+						Typ:              "eventTyp",
+						AggregateVersion: "v0.0.1",
 					}, "asdfölk-233", 47).
-					expectInsertEvent(Event{
+					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID2",
 						AggregateType:    "aggType2",
 						ModifierService:  "svc",
 						ModifierTenant:   "tenant",
-						ModiferUser:      "usr",
+						ModifierUser:     "usr",
 						ResourceOwner:    "ro",
 						PreviousSequence: 40,
 						Data:             []byte("{}"),
+						Typ:              "eventTyp",
+						AggregateVersion: "v0.0.1",
 					}, "asdfölk-233", 48).
 					expectReleaseSavepoint(nil).
 					expectCommit(nil),
 			},
 			args: args{
-				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", "v0.0", 34,
+				aggregates: []*models.Aggregate{
+					models.MustNewAggregate("aggID", "aggType", "v0.0.1", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
 							ModifierUser:    "usr",
 							ResourceOwner:   "ro",
+							Typ:             "eventTyp",
 						},
 					),
-					models.NewAggregate("aggID2", "aggType2", "v0.0", 40,
+					models.MustNewAggregate("aggID2", "aggType2", "v0.0.1", 40,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
 							ModifierUser:    "usr",
 							ResourceOwner:   "ro",
+							Typ:             "eventTyp",
 						},
 					),
 				},
@@ -197,33 +182,37 @@ func TestSQL_PushEvents(t *testing.T) {
 				client: mockDB(t).
 					expectBegin(nil).
 					expectSavepoint().
-					expectInsertEventError(Event{
+					expectInsertEventError(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
 						ModifierService:  "svc",
 						ModifierTenant:   "tenant",
-						ModiferUser:      "usr",
+						ModifierUser:     "usr",
 						ResourceOwner:    "ro",
 						PreviousSequence: 34,
 						Data:             []byte("{}"),
+						Typ:              "eventTyp",
+						AggregateVersion: "v0.0.1",
 					}).
 					expectReleaseSavepoint(nil).
 					expectRollback(nil),
 			},
 			args: args{
-				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", "v0.0", 34,
+				aggregates: []*models.Aggregate{
+					models.MustNewAggregate("aggID", "aggType", "v0.0.1", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
 							ModifierUser:    "usr",
 							ResourceOwner:   "ro",
+							Typ:             "eventTyp",
 						},
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
 							ModifierUser:    "usr",
 							ResourceOwner:   "ro",
+							Typ:             "eventTyp",
 						},
 					),
 				},
@@ -238,27 +227,30 @@ func TestSQL_PushEvents(t *testing.T) {
 					expectBegin(nil).
 					expectPrepareInsert().
 					expectSavepoint().
-					expectInsertEvent(Event{
+					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
 						ModifierService:  "svc",
 						ModifierTenant:   "tenant",
-						ModiferUser:      "usr",
+						ModifierUser:     "usr",
 						ResourceOwner:    "ro",
 						PreviousSequence: 34,
+						Typ:              "eventTyp",
 						Data:             []byte("{}"),
+						AggregateVersion: "v0.0.1",
 					}, "asdfölk-233", 47).
 					expectReleaseSavepoint(sql.ErrConnDone).
 					expectCommit(nil).
 					expectRollback(nil),
 			},
 			args: args{
-				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", "v0.0", 34,
+				aggregates: []*models.Aggregate{
+					models.MustNewAggregate("aggID", "aggType", "v0.0.1", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
 							ModifierUser:    "usr",
+							Typ:             "eventTyp",
 							ResourceOwner:   "ro",
 						},
 					),
@@ -281,12 +273,11 @@ func TestSQL_PushEvents(t *testing.T) {
 				return
 			}
 			for _, aggregate := range tt.args.aggregates {
-				for _, event := range aggregate.Events().GetAll() {
-					e := event.(*models.Event)
-					if e.Sequence == 0 {
+				for _, event := range aggregate.Events {
+					if event.Sequence == 0 {
 						t.Error("sequence of returned event is not set")
 					}
-					if e.AggregateType == "" || e.AggregateID == "" {
+					if event.AggregateType == "" || event.AggregateID == "" {
 						t.Error("aggregate of event is not set")
 					}
 				}
