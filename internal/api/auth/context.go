@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/logging"
 )
@@ -43,24 +42,15 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t Toke
 	projectID, err := t.GetProjectIDByClientID(ctx, clientID)
 	logging.LogWithFields("AUTH-GfAoV", "clientID", clientID).OnError(err).Warn("could not read projectid by clientid")
 
-	return context.WithValue(ctx, CtxKeyData{}, &CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID}), nil
+	return context.WithValue(ctx, CtxKeyData{}, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID}), nil
 }
 
 func GetCtxData(ctx context.Context) CtxData {
-	if data := ctx.Value(CtxKeyData{}); data != nil {
-		ctxData, ok := data.(*CtxData)
-		if ok {
-			return *ctxData
-		}
-		time.Now()
-	}
-	return CtxData{}
+	ctxData, _ := ctx.Value(CtxKeyData{}).(CtxData)
+	return ctxData
 }
 
 func GetPermissionsFromCtx(ctx context.Context) []string {
-	if data := ctx.Value(CtxKeyPermissions{}); data != nil {
-		ctxPermission, _ := data.([]string)
-		return ctxPermission
-	}
-	return nil
+	ctxPermission, _ := ctx.Value(CtxKeyPermissions{}).([]string)
+	return ctxPermission
 }
