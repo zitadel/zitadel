@@ -8,17 +8,15 @@ import (
 
 func GetCaller() string {
 	fpcs := make([]uintptr, 1)
-
 	n := runtime.Callers(3, fpcs)
 	if n == 0 {
-		logging.Log("HELPE-rWjfC").Debug("no caller")
+		logging.Log("TRACE-rWjfC").Debug("no caller")
+		return ""
 	}
-
 	caller := runtime.FuncForPC(fpcs[0] - 1)
 	if caller == nil {
-		logging.Log("HELPE-25POw").Debug("caller was nil")
+		logging.Log("TRACE-25POw").Debug("caller was nil")
+		return ""
 	}
-
-	// Print the name of the function
 	return caller.Name()
 }

@@ -17,6 +17,11 @@ type validatable struct {
 	Test bool
 }
 
+type multiple struct {
+	Test     bool
+	MoreData string
+}
+
 func (v *validatable) Validate() error {
 	if v.Test {
 		return nil
@@ -33,22 +38,25 @@ func TestRead(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
+		want    interface{}
 	}{
 		{
 			"not supoorted config file error",
 			args{
 				configFiles: []string{"notsupported.unknown"},
-				obj:         nil,
+				obj:         &test{},
 			},
 			true,
+			&test{},
 		},
 		{
 			"non existing config file error",
 			args{
 				configFiles: []string{"nonexisting.yaml"},
-				obj:         nil,
+				obj:         &test{},
 			},
 			true,
+			&test{},
 		},
 		{
 			"non parsable config file error",
@@ -57,6 +65,7 @@ func TestRead(t *testing.T) {
 				obj:         &test{},
 			},
 			true,
+			&test{},
 		},
 		{
 			"invalid parsable config file error",
@@ -65,6 +74,16 @@ func TestRead(t *testing.T) {
 				obj:         &validatable{},
 			},
 			true,
+			&validatable{},
+		},
+		{
+			"multiple files, one non parsable error ",
+			args{
+				configFiles: []string{"./testdata/non_parsable.json", "./testdata/more_data.yaml"},
+				obj:         &multiple{},
+			},
+			true,
+			&multiple{},
 		},
 		{
 			"parsable config file ok",
@@ -73,6 +92,16 @@ func TestRead(t *testing.T) {
 				obj:         &test{},
 			},
 			false,
+			&test{Test: true},
+		},
+		{
+			"multiple parsable config files ok",
+			args{
+				configFiles: []string{"./testdata/valid.json", "./testdata/more_data.yaml"},
+				obj:         &multiple{},
+			},
+			false,
+			&multiple{Test: true, MoreData: "data"},
 		},
 		{
 			"valid parsable config file ok",
@@ -81,12 +110,16 @@ func TestRead(t *testing.T) {
 				obj:         &validatable{},
 			},
 			false,
+			&validatable{Test: true},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := Read(tt.args.obj, tt.args.configFiles...); (err != nil) != tt.wantErr {
 				t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.args.obj, tt.want) {
+				t.Errorf("Read() got = %v, want = %v", tt.args.obj, tt.want)
 			}
 		})
 	}

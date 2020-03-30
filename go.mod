@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/aws/aws-sdk-go v1.29.16 // indirect
-	github.com/caos/logging v0.0.0-20191210002624-b3260f690a6a
+	github.com/caos/logging v0.0.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
@@ -25,11 +25,12 @@ require (
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.0.3
 	github.com/rs/cors v1.7.0
+	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3
 	golang.org/x/crypto v0.0.0-20200320181102-891825fb96df
 	golang.org/x/net v0.0.0-20200320220750-118fecf932d8 // indirect
-	golang.org/x/sys v0.0.0-20200321134203-328b4cd54aae // indirect
+	golang.org/x/sys v0.0.0-20200327173247-9dae0f8f5775 // indirect
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200212150539-ea181f53ac56
 	google.golang.org/api v0.20.0 // indirect

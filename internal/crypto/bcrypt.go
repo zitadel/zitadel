@@ -4,7 +4,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var _ HashAlg = (*BCrypt)(nil)
+var _ HashAlgorithm = (*BCrypt)(nil)
 
 type BCrypt struct {
 	cost int

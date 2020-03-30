@@ -18,7 +18,6 @@ var (
 			api.AcceptLanguage,
 			api.Authorization,
 			api.ZitadelOrgID,
-			"x-grpc-web", //TODO: needed
 		},
 		AllowedMethods: []string{
 			http.MethodOptions,

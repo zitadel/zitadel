@@ -104,7 +104,7 @@ func TestCrypt(t *testing.T) {
 func TestEncrypt(t *testing.T) {
 	type args struct {
 		value []byte
-		c     EncryptionAlg
+		c     EncryptionAlgorithm
 	}
 	tests := []struct {
 		name    string
@@ -136,7 +136,7 @@ func TestEncrypt(t *testing.T) {
 func TestDecrypt(t *testing.T) {
 	type args struct {
 		value *CryptoValue
-		c     EncryptionAlg
+		c     EncryptionAlgorithm
 	}
 	tests := []struct {
 		name    string
@@ -174,7 +174,7 @@ func TestDecrypt(t *testing.T) {
 func TestDecryptString(t *testing.T) {
 	type args struct {
 		value *CryptoValue
-		c     EncryptionAlg
+		c     EncryptionAlgorithm
 	}
 	tests := []struct {
 		name    string
@@ -212,7 +212,7 @@ func TestDecryptString(t *testing.T) {
 func TestHash(t *testing.T) {
 	type args struct {
 		value []byte
-		c     HashAlg
+		c     HashAlgorithm
 	}
 	tests := []struct {
 		name    string
@@ -245,7 +245,7 @@ func TestCompareHash(t *testing.T) {
 	type args struct {
 		value    *CryptoValue
 		comparer []byte
-		c        HashAlg
+		c        HashAlgorithm
 	}
 	tests := []struct {
 		name    string

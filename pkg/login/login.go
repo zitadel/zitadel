@@ -9,10 +9,10 @@ import (
 )
 
 type Config struct {
-	App *app.Config
-	API *api.Config
+	App app.Config
+	API api.Config
 }
 
-func Start(ctx context.Context, config *Config) error {
+func Start(ctx context.Context, config Config) error {
 	return errors.ThrowUnimplemented(nil, "LOGIN-3fwvD", "not implemented yet") //TODO: implement
 }

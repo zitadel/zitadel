@@ -6,14 +6,14 @@ type Config struct {
 	CustomHeaders []string
 }
 
-func (c *Config) ToServerConfig() *ServerConfig {
-	return &ServerConfig{
+func (c Config) ToServerConfig() ServerConfig {
+	return ServerConfig{
 		Port: c.ServerPort,
 	}
 }
 
-func (c *Config) ToGatewayConfig() *GatewayConfig {
-	return &GatewayConfig{
+func (c Config) ToGatewayConfig() GatewayConfig {
+	return GatewayConfig{
 		Port:          c.GatewayPort,
 		GRPCEndpoint:  c.ServerPort,
 		CustomHeaders: c.CustomHeaders,
