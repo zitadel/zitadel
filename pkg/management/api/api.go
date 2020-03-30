@@ -17,7 +17,7 @@ type Config struct {
 	GRPC grpc_util.Config
 }
 
-func Start(ctx context.Context, conf *Config) error {
+func Start(ctx context.Context, conf Config) error {
 	api := &API{
 		grpcServer: *grpc.StartServer(conf.GRPC.ToServerConfig()),
 		gateway:    *grpc.StartGateway(conf.GRPC.ToGatewayConfig()),
