@@ -119,7 +119,7 @@ func TestSQL_PushEvents(t *testing.T) {
 			},
 			args: args{
 				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", 34,
+					models.NewAggregate("aggID", "aggType", "v0.0", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
@@ -170,7 +170,7 @@ func TestSQL_PushEvents(t *testing.T) {
 			},
 			args: args{
 				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", 34,
+					models.NewAggregate("aggID", "aggType", "v0.0", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
@@ -178,7 +178,7 @@ func TestSQL_PushEvents(t *testing.T) {
 							ResourceOwner:   "ro",
 						},
 					),
-					models.NewAggregate("aggID2", "aggType2", 40,
+					models.NewAggregate("aggID2", "aggType2", "v0.0", 40,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
@@ -212,7 +212,7 @@ func TestSQL_PushEvents(t *testing.T) {
 			},
 			args: args{
 				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", 34,
+					models.NewAggregate("aggID", "aggType", "v0.0", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
@@ -254,7 +254,7 @@ func TestSQL_PushEvents(t *testing.T) {
 			},
 			args: args{
 				aggregates: []lib_models.Aggregate{
-					models.NewAggregate("aggID", "aggType", 34,
+					models.NewAggregate("aggID", "aggType", "v0.0", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
