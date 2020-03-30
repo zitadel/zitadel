@@ -9,14 +9,10 @@ import (
 	"database/sql"
 
 	caos_errs "github.com/caos/utils/errors"
-	"github.com/caos/utils/tracing"
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
 func (db *SQL) PushEvents(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
-
 	err = crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.Prepare("insert into eventstore.events " +
 			"(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, modifier_user, modifier_service, modifier_tenant, resource_owner, previous_sequence) " +
