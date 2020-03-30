@@ -85,10 +85,7 @@ func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, va
 	if c.securecookie == nil {
 		return errors.ThrowInternal(nil, "HTTP-X6XpnL", "securecookie not configured")
 	}
-	if err := c.securecookie.Decode(name, cookie.Value, value); err != nil {
-		return err
-	}
-	return nil
+	return c.securecookie.Decode(name, cookie.Value, value)
 }
 
 func (c *CookieHandler) SetCookie(w http.ResponseWriter, name string, value string) {

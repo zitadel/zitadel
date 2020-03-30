@@ -98,12 +98,12 @@ func (t *Translator) localizer(langs ...string) *i18n.Localizer {
 
 func (t *Translator) langsFromRequest(r *http.Request) []string {
 	langs := make([]string, 0)
-	if r != nil {
-		lang, err := t.cookieHandler.GetCookieValue(r, t.cookieName)
-		if err == nil {
-			langs = append(langs, lang)
-		}
-		langs = append(langs, r.Header.Get(api.AcceptLanguage))
+	if r == nil {
+		return langs
 	}
-	return langs
+	lang, err := t.cookieHandler.GetCookieValue(r, t.cookieName)
+	if err == nil {
+		langs = append(langs, lang)
+	}
+	return append(langs, r.Header.Get(api.AcceptLanguage))
 }
