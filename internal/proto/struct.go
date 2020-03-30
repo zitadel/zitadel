@@ -10,6 +10,10 @@ import (
 	"github.com/caos/logging"
 )
 
+var (
+	marshaller = new(jsonpb.Marshaler)
+)
+
 func MustToPBStruct(object interface{}) *pb_struct.Struct {
 	s, err := ToPBStruct(object)
 	logging.Log("PROTO-7Aa3t").OnError(err).Panic("unable to map object to pb-struct")
@@ -38,7 +42,6 @@ func MustFromPBStruct(object interface{}, s *pb_struct.Struct) {
 }
 
 func FromPBStruct(object interface{}, s *pb_struct.Struct) error {
-	marshaller := new(jsonpb.Marshaler)
 	jsonString, err := marshaller.MarshalToString(s)
 	if err != nil {
 		return err
