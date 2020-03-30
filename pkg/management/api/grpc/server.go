@@ -13,7 +13,7 @@ type Server struct {
 	port string
 }
 
-func StartServer(conf *grpc_util.ServerConfig) *Server {
+func StartServer(conf grpc_util.ServerConfig) *Server {
 	return &Server{
 		port: conf.Port,
 	}

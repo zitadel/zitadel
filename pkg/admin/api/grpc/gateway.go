@@ -13,7 +13,7 @@ type Gateway struct {
 	cutomHeaders []string
 }
 
-func StartGateway(conf *grpc_util.GatewayConfig) *Gateway {
+func StartGateway(conf grpc_util.GatewayConfig) *Gateway {
 	return &Gateway{
 		grpcEndpoint: conf.GRPCEndpoint,
 		port:         conf.Port,

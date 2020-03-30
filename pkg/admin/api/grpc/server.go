@@ -20,7 +20,7 @@ type Server struct {
 	searchLimit int
 }
 
-func StartServer(conf *grpc_util.ServerConfig) *Server {
+func StartServer(conf grpc_util.ServerConfig) *Server {
 	return &Server{
 		port: conf.Port,
 	}
