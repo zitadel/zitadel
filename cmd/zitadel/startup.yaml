@@ -7,7 +7,8 @@ Tracing:
 
 Log:
   Level: debug
-  Formatter: text
+  Formatter:
+    Format: text
 
 Mgmt:
   API:

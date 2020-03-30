@@ -8,6 +8,7 @@ import (
 
 	authz "github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/config"
+	tracing "github.com/caos/zitadel/internal/tracing/config"
 	"github.com/caos/zitadel/pkg/admin"
 	"github.com/caos/zitadel/pkg/auth"
 	"github.com/caos/zitadel/pkg/console"
@@ -22,9 +23,9 @@ type Config struct {
 	Admin   admin.Config
 	Console console.Config
 
-	//Log //TODO: add
-	//Tracing tracing.TracingConfig //TODO: add
-	AuthZ authz.Config
+	Log     logging.Config
+	Tracing tracing.TracingConfig
+	AuthZ   authz.Config
 }
 
 func main() {
