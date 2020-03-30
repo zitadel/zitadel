@@ -8,16 +8,12 @@ import (
 
 	caos_errs "github.com/caos/utils/errors"
 	"github.com/caos/utils/logging"
-	"github.com/caos/utils/tracing"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 )
 
 func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*es_models.Event, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
-
 	query := "SELECT" +
 		" id" +
 		", creation_date" +
