@@ -10,8 +10,8 @@ import (
 )
 
 type Config struct {
-	App *app.Config
-	API *api.Config
+	App app.Config
+	API api.Config
 }
 
 func Start(ctx context.Context, config Config, authZ auth.Config) error {

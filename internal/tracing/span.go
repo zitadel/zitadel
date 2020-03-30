@@ -7,6 +7,8 @@ import (
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/caos/zitadel/internal/errors"
 )
 
 type Span struct {
@@ -80,7 +82,7 @@ func toTraceAttribute(key string, value interface{}) (attr trace.Attribute, err 
 	if valueInt, err := convertToInt64(value); err == nil {
 		return trace.Int64Attribute(key, valueInt), nil
 	}
-	return attr, status.Error(codes.InvalidArgument, "Attribute is not of type bool, string or int64")
+	return attr, errors.ThrowInternal(nil, "TRACE-jlq3s", "Attribute is not of type bool, string or int64")
 }
 
 func convertToInt64(value interface{}) (int64, error) {
