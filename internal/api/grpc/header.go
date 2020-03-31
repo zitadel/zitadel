@@ -4,12 +4,8 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
-)
 
-const (
-	Authorization = "authorization"
-
-	ZitadelOrgID = "x-zitadel-orgid"
+	"github.com/caos/zitadel/internal/api"
 )
 
 func GetHeader(ctx context.Context, headername string) string {
@@ -17,5 +13,5 @@ func GetHeader(ctx context.Context, headername string) string {
 }
 
 func GetAuthorizationHeader(ctx context.Context) string {
-	return GetHeader(ctx, Authorization)
+	return GetHeader(ctx, api.Authorization)
 }
