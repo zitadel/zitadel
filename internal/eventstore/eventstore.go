@@ -8,25 +8,25 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
-type App interface {
+type Eventstore interface {
 	AggregateCreator() *models.AggregateCreator
 	Health(ctx context.Context) error
 	PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) error
 	FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error)
 }
 
-var _ App = (*app)(nil)
+var _ Eventstore = (*eventstore)(nil)
 
-type app struct {
+type eventstore struct {
 	repo             repository.Repository
 	aggregateCreator *models.AggregateCreator
 }
 
-func (es *app) AggregateCreator() *models.AggregateCreator {
+func (es *eventstore) AggregateCreator() *models.AggregateCreator {
 	return es.aggregateCreator
 }
 
-func (es *app) PushEvents(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
+func (es *eventstore) PushEvents(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
 	return errors.ThrowUnimplemented(nil, "EVENT-fLtHG", "needs improvement use PushAggregates instead")
 	// aggs := make([][]*models.Event, len(aggregates))
 	// for aggIdx, aggregate := range aggregates {
@@ -51,7 +51,7 @@ func (es *app) PushEvents(ctx context.Context, aggregates ...*models.Aggregate) 
 	// return es.repo.PushEvents(ctx, aggs)
 }
 
-func (es *app) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
+func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
 	for _, aggregate := range aggregates {
 		if err = aggregate.Validate(); err != nil {
 			return err
@@ -71,7 +71,7 @@ func (es *app) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 	return nil
 }
 
-func (es *app) FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) ([]*models.Event, error) {
+func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) ([]*models.Event, error) {
 	if err := searchQuery.Validate(); err != nil {
 		return nil, err
 	}

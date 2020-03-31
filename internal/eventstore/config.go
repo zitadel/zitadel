@@ -10,8 +10,8 @@ type Config struct {
 	ServiceName string
 }
 
-func Start(conf Config) App {
-	return &app{
+func Start(conf Config) Eventstore {
+	return &eventstore{
 		repo:             sql.Start(conf.Repository),
 		aggregateCreator: models.NewAggregateCreator(conf.ServiceName),
 	}
