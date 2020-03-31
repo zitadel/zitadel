@@ -4,6 +4,6 @@ import (
 	"context"
 )
 
-func (app *app) Health(ctx context.Context) error {
+func (app *eventstore) Health(ctx context.Context) error {
 	return app.repo.Health(ctx)
 }
