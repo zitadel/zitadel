@@ -3,12 +3,12 @@ package management
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
-	app "github.com/caos/zitadel/internal/management"
+	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/pkg/management/api"
 )
 
 type Config struct {
-	App app.Config
+	App repository.Config
 	API api.Config
 }
 

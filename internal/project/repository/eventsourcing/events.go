@@ -2,11 +2,12 @@ package eventsourcing
 
 import (
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/proto"
 )
 
-func FromEvents(project *Project, events ...*eventstore.Event) (*Project, error) {
+func FromEvents(project *Project, events ...*models.Event) (*Project, error) {
 	if project == nil {
 		project = &Project{}
 	}
@@ -14,7 +15,7 @@ func FromEvents(project *Project, events ...*eventstore.Event) (*Project, error)
 	return project, project.AppendEvents(events...)
 }
 
-func (p *Project) AppendEvents(events ...*eventstore.Event) error {
+func (p *Project) AppendEvents(events ...*models.Event) error {
 	for _, event := range events {
 		if err := p.AppendEvent(event); err != nil {
 			return err
@@ -23,7 +24,7 @@ func (p *Project) AppendEvents(events ...*eventstore.Event) error {
 	return nil
 }
 
-func (p *Project) AppendEvent(event *eventstore.Event) error {
+func (p *Project) AppendEvent(event *models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {

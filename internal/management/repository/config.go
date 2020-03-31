@@ -1,3 +1,3 @@
-package management
+package repository
 
 type Config struct{}
