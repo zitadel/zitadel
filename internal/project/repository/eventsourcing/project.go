@@ -30,7 +30,7 @@ func ProjectFromModel(project *model.Project) *Project {
 
 func ProjectToModel(project *Project) *model.Project {
 	return &model.Project{
-		ObjectRoot: pkg.ObjectRoot{
+		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ID,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
@@ -41,7 +41,7 @@ func ProjectToModel(project *Project) *model.Project {
 	}
 }
 
-func ProjectByIDFilter(id string, latestSequence uint64) *models.FilterEventsRequest {
+func ProjectByIDFilter(id string, latestSequence uint64) *FilterEventsRequest {
 	return &models.FilterEventsRequest{
 		LatestSequence: latestSequence,
 		AggregateType:  model.ProjectAggregate,

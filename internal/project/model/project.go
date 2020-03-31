@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	in_model "github.com/caos/zitadel/internal/model"
 )
 
 type Project struct {
@@ -11,7 +12,7 @@ type Project struct {
 	Name  string
 }
 
-type ProjectState es_models.Enum
+type ProjectState in_model.Enum
 
 var states = []string{"Active", "Inactive"}
 
