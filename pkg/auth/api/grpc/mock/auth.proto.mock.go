@@ -8,9 +8,9 @@ import (
 	context "context"
 	grpc "github.com/caos/zitadel/pkg/auth/api/grpc"
 	gomock "github.com/golang/mock/gomock"
-	empty "github.com/golang/protobuf/ptypes/empty"
-	struct0 "github.com/golang/protobuf/ptypes/struct"
 	grpc0 "google.golang.org/grpc"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 )
 
@@ -38,7 +38,7 @@ func (m *MockAuthServiceClient) EXPECT() *MockAuthServiceClientMockRecorder {
 }
 
 // AddMfaOTP mocks base method
-func (m *MockAuthServiceClient) AddMfaOTP(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.MfaOtpResponse, error) {
+func (m *MockAuthServiceClient) AddMfaOTP(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.MfaOtpResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -57,35 +57,15 @@ func (mr *MockAuthServiceClientMockRecorder) AddMfaOTP(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMfaOTP", reflect.TypeOf((*MockAuthServiceClient)(nil).AddMfaOTP), varargs...)
 }
 
-// AuthorizeApplication mocks base method
-func (m *MockAuthServiceClient) AuthorizeApplication(arg0 context.Context, arg1 *grpc.ApplicationAuthorizeRequest, arg2 ...grpc0.CallOption) (*grpc.Application, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "AuthorizeApplication", varargs...)
-	ret0, _ := ret[0].(*grpc.Application)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AuthorizeApplication indicates an expected call of AuthorizeApplication
-func (mr *MockAuthServiceClientMockRecorder) AuthorizeApplication(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AuthorizeApplication", reflect.TypeOf((*MockAuthServiceClient)(nil).AuthorizeApplication), varargs...)
-}
-
 // ChangeMyPassword mocks base method
-func (m *MockAuthServiceClient) ChangeMyPassword(arg0 context.Context, arg1 *grpc.PasswordChange, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) ChangeMyPassword(arg0 context.Context, arg1 *grpc.PasswordChange, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ChangeMyPassword", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -137,128 +117,8 @@ func (mr *MockAuthServiceClientMockRecorder) ChangeMyUserPhone(arg0, arg1 interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeMyUserPhone", reflect.TypeOf((*MockAuthServiceClient)(nil).ChangeMyUserPhone), varargs...)
 }
 
-// CreateAuthSession mocks base method
-func (m *MockAuthServiceClient) CreateAuthSession(arg0 context.Context, arg1 *grpc.AuthSessionCreation, arg2 ...grpc0.CallOption) (*grpc.AuthSessionResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateAuthSession", varargs...)
-	ret0, _ := ret[0].(*grpc.AuthSessionResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateAuthSession indicates an expected call of CreateAuthSession
-func (mr *MockAuthServiceClientMockRecorder) CreateAuthSession(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAuthSession", reflect.TypeOf((*MockAuthServiceClient)(nil).CreateAuthSession), varargs...)
-}
-
-// CreateToken mocks base method
-func (m *MockAuthServiceClient) CreateToken(arg0 context.Context, arg1 *grpc.CreateTokenRequest, arg2 ...grpc0.CallOption) (*grpc.Token, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateToken", varargs...)
-	ret0, _ := ret[0].(*grpc.Token)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateToken indicates an expected call of CreateToken
-func (mr *MockAuthServiceClientMockRecorder) CreateToken(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateToken", reflect.TypeOf((*MockAuthServiceClient)(nil).CreateToken), varargs...)
-}
-
-// CreateUserAgent mocks base method
-func (m *MockAuthServiceClient) CreateUserAgent(arg0 context.Context, arg1 *grpc.UserAgentCreation, arg2 ...grpc0.CallOption) (*grpc.UserAgent, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateUserAgent", varargs...)
-	ret0, _ := ret[0].(*grpc.UserAgent)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CreateUserAgent indicates an expected call of CreateUserAgent
-func (mr *MockAuthServiceClientMockRecorder) CreateUserAgent(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserAgent", reflect.TypeOf((*MockAuthServiceClient)(nil).CreateUserAgent), varargs...)
-}
-
-// GetApplicationByID mocks base method
-func (m *MockAuthServiceClient) GetApplicationByID(arg0 context.Context, arg1 *grpc.ApplicationID, arg2 ...grpc0.CallOption) (*grpc.Application, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetApplicationByID", varargs...)
-	ret0, _ := ret[0].(*grpc.Application)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetApplicationByID indicates an expected call of GetApplicationByID
-func (mr *MockAuthServiceClientMockRecorder) GetApplicationByID(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplicationByID", reflect.TypeOf((*MockAuthServiceClient)(nil).GetApplicationByID), varargs...)
-}
-
-// GetAuthSession mocks base method
-func (m *MockAuthServiceClient) GetAuthSession(arg0 context.Context, arg1 *grpc.AuthSessionID, arg2 ...grpc0.CallOption) (*grpc.AuthSessionResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetAuthSession", varargs...)
-	ret0, _ := ret[0].(*grpc.AuthSessionResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAuthSession indicates an expected call of GetAuthSession
-func (mr *MockAuthServiceClientMockRecorder) GetAuthSession(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthSession", reflect.TypeOf((*MockAuthServiceClient)(nil).GetAuthSession), varargs...)
-}
-
-// GetAuthSessionByTokenID mocks base method
-func (m *MockAuthServiceClient) GetAuthSessionByTokenID(arg0 context.Context, arg1 *grpc.TokenID, arg2 ...grpc0.CallOption) (*grpc.AuthSessionView, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetAuthSessionByTokenID", varargs...)
-	ret0, _ := ret[0].(*grpc.AuthSessionView)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAuthSessionByTokenID indicates an expected call of GetAuthSessionByTokenID
-func (mr *MockAuthServiceClientMockRecorder) GetAuthSessionByTokenID(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthSessionByTokenID", reflect.TypeOf((*MockAuthServiceClient)(nil).GetAuthSessionByTokenID), varargs...)
-}
-
 // GetMyMfas mocks base method
-func (m *MockAuthServiceClient) GetMyMfas(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.MultiFactors, error) {
+func (m *MockAuthServiceClient) GetMyMfas(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.MultiFactors, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -278,7 +138,7 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyMfas(arg0, arg1 interface{}, a
 }
 
 // GetMyUserAddress mocks base method
-func (m *MockAuthServiceClient) GetMyUserAddress(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.UserAddress, error) {
+func (m *MockAuthServiceClient) GetMyUserAddress(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.UserAddress, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -298,7 +158,7 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyUserAddress(arg0, arg1 interfa
 }
 
 // GetMyUserEmail mocks base method
-func (m *MockAuthServiceClient) GetMyUserEmail(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.UserEmail, error) {
+func (m *MockAuthServiceClient) GetMyUserEmail(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.UserEmail, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -318,7 +178,7 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyUserEmail(arg0, arg1 interface
 }
 
 // GetMyUserPhone mocks base method
-func (m *MockAuthServiceClient) GetMyUserPhone(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.UserPhone, error) {
+func (m *MockAuthServiceClient) GetMyUserPhone(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.UserPhone, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -338,7 +198,7 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyUserPhone(arg0, arg1 interface
 }
 
 // GetMyUserProfile mocks base method
-func (m *MockAuthServiceClient) GetMyUserProfile(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.UserProfile, error) {
+func (m *MockAuthServiceClient) GetMyUserProfile(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.UserProfile, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -358,7 +218,7 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyUserProfile(arg0, arg1 interfa
 }
 
 // GetMyUserSessions mocks base method
-func (m *MockAuthServiceClient) GetMyUserSessions(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.UserSessionViews, error) {
+func (m *MockAuthServiceClient) GetMyUserSessions(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.UserSessionViews, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -378,7 +238,7 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyUserSessions(arg0, arg1 interf
 }
 
 // GetMyZitadelPermissions mocks base method
-func (m *MockAuthServiceClient) GetMyZitadelPermissions(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.MyPermissions, error) {
+func (m *MockAuthServiceClient) GetMyZitadelPermissions(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.MyPermissions, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -395,46 +255,6 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyZitadelPermissions(arg0, arg1 
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyZitadelPermissions", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyZitadelPermissions), varargs...)
-}
-
-// GetUserAgent mocks base method
-func (m *MockAuthServiceClient) GetUserAgent(arg0 context.Context, arg1 *grpc.UserAgentID, arg2 ...grpc0.CallOption) (*grpc.UserAgent, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetUserAgent", varargs...)
-	ret0, _ := ret[0].(*grpc.UserAgent)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserAgent indicates an expected call of GetUserAgent
-func (mr *MockAuthServiceClientMockRecorder) GetUserAgent(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAgent", reflect.TypeOf((*MockAuthServiceClient)(nil).GetUserAgent), varargs...)
-}
-
-// GetUserAgentSessions mocks base method
-func (m *MockAuthServiceClient) GetUserAgentSessions(arg0 context.Context, arg1 *grpc.UserAgentID, arg2 ...grpc0.CallOption) (*grpc.UserSessions, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetUserAgentSessions", varargs...)
-	ret0, _ := ret[0].(*grpc.UserSessions)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserAgentSessions indicates an expected call of GetUserAgentSessions
-func (mr *MockAuthServiceClientMockRecorder) GetUserAgentSessions(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAgentSessions", reflect.TypeOf((*MockAuthServiceClient)(nil).GetUserAgentSessions), varargs...)
 }
 
 // GetUserByID mocks base method
@@ -457,35 +277,15 @@ func (mr *MockAuthServiceClientMockRecorder) GetUserByID(arg0, arg1 interface{},
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockAuthServiceClient)(nil).GetUserByID), varargs...)
 }
 
-// GetUserSession mocks base method
-func (m *MockAuthServiceClient) GetUserSession(arg0 context.Context, arg1 *grpc.UserSessionID, arg2 ...grpc0.CallOption) (*grpc.UserSession, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetUserSession", varargs...)
-	ret0, _ := ret[0].(*grpc.UserSession)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserSession indicates an expected call of GetUserSession
-func (mr *MockAuthServiceClientMockRecorder) GetUserSession(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSession", reflect.TypeOf((*MockAuthServiceClient)(nil).GetUserSession), varargs...)
-}
-
 // Healthz mocks base method
-func (m *MockAuthServiceClient) Healthz(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) Healthz(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Healthz", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -498,7 +298,7 @@ func (mr *MockAuthServiceClientMockRecorder) Healthz(arg0, arg1 interface{}, arg
 }
 
 // IsIamAdmin mocks base method
-func (m *MockAuthServiceClient) IsIamAdmin(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*grpc.IsAdminResponse, error) {
+func (m *MockAuthServiceClient) IsIamAdmin(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.IsAdminResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -517,55 +317,15 @@ func (mr *MockAuthServiceClientMockRecorder) IsIamAdmin(arg0, arg1 interface{}, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsIamAdmin", reflect.TypeOf((*MockAuthServiceClient)(nil).IsIamAdmin), varargs...)
 }
 
-// IsUserUnique mocks base method
-func (m *MockAuthServiceClient) IsUserUnique(arg0 context.Context, arg1 *grpc.UniqueUserRequest, arg2 ...grpc0.CallOption) (*grpc.UniqueUserResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "IsUserUnique", varargs...)
-	ret0, _ := ret[0].(*grpc.UniqueUserResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// IsUserUnique indicates an expected call of IsUserUnique
-func (mr *MockAuthServiceClientMockRecorder) IsUserUnique(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserUnique", reflect.TypeOf((*MockAuthServiceClient)(nil).IsUserUnique), varargs...)
-}
-
-// PasswordReset mocks base method
-func (m *MockAuthServiceClient) PasswordReset(arg0 context.Context, arg1 *grpc.ResetPassword, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "PasswordReset", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// PasswordReset indicates an expected call of PasswordReset
-func (mr *MockAuthServiceClientMockRecorder) PasswordReset(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasswordReset", reflect.TypeOf((*MockAuthServiceClient)(nil).PasswordReset), varargs...)
-}
-
 // Ready mocks base method
-func (m *MockAuthServiceClient) Ready(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) Ready(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Ready", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -577,55 +337,15 @@ func (mr *MockAuthServiceClientMockRecorder) Ready(arg0, arg1 interface{}, arg2 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ready", reflect.TypeOf((*MockAuthServiceClient)(nil).Ready), varargs...)
 }
 
-// RegisterUser mocks base method
-func (m *MockAuthServiceClient) RegisterUser(arg0 context.Context, arg1 *grpc.RegisterUserRequest, arg2 ...grpc0.CallOption) (*grpc.User, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "RegisterUser", varargs...)
-	ret0, _ := ret[0].(*grpc.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RegisterUser indicates an expected call of RegisterUser
-func (mr *MockAuthServiceClientMockRecorder) RegisterUser(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockAuthServiceClient)(nil).RegisterUser), varargs...)
-}
-
-// RegisterUserWithExternal mocks base method
-func (m *MockAuthServiceClient) RegisterUserWithExternal(arg0 context.Context, arg1 *grpc.RegisterUserExternalIDPRequest, arg2 ...grpc0.CallOption) (*grpc.User, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "RegisterUserWithExternal", varargs...)
-	ret0, _ := ret[0].(*grpc.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RegisterUserWithExternal indicates an expected call of RegisterUserWithExternal
-func (mr *MockAuthServiceClientMockRecorder) RegisterUserWithExternal(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUserWithExternal", reflect.TypeOf((*MockAuthServiceClient)(nil).RegisterUserWithExternal), varargs...)
-}
-
 // RemoveMfaOTP mocks base method
-func (m *MockAuthServiceClient) RemoveMfaOTP(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) RemoveMfaOTP(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "RemoveMfaOTP", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -637,55 +357,15 @@ func (mr *MockAuthServiceClientMockRecorder) RemoveMfaOTP(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMfaOTP", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMfaOTP), varargs...)
 }
 
-// RequestPasswordReset mocks base method
-func (m *MockAuthServiceClient) RequestPasswordReset(arg0 context.Context, arg1 *grpc.ResetPasswordRequest, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "RequestPasswordReset", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RequestPasswordReset indicates an expected call of RequestPasswordReset
-func (mr *MockAuthServiceClientMockRecorder) RequestPasswordReset(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RequestPasswordReset", reflect.TypeOf((*MockAuthServiceClient)(nil).RequestPasswordReset), varargs...)
-}
-
-// ResendEmailVerificationMail mocks base method
-func (m *MockAuthServiceClient) ResendEmailVerificationMail(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ResendEmailVerificationMail", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ResendEmailVerificationMail indicates an expected call of ResendEmailVerificationMail
-func (mr *MockAuthServiceClientMockRecorder) ResendEmailVerificationMail(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResendEmailVerificationMail", reflect.TypeOf((*MockAuthServiceClient)(nil).ResendEmailVerificationMail), varargs...)
-}
-
 // ResendMyEmailVerificationMail mocks base method
-func (m *MockAuthServiceClient) ResendMyEmailVerificationMail(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) ResendMyEmailVerificationMail(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ResendMyEmailVerificationMail", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -698,14 +378,14 @@ func (mr *MockAuthServiceClientMockRecorder) ResendMyEmailVerificationMail(arg0,
 }
 
 // ResendMyPhoneVerificationCode mocks base method
-func (m *MockAuthServiceClient) ResendMyPhoneVerificationCode(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) ResendMyPhoneVerificationCode(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ResendMyPhoneVerificationCode", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -715,66 +395,6 @@ func (mr *MockAuthServiceClientMockRecorder) ResendMyPhoneVerificationCode(arg0,
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResendMyPhoneVerificationCode", reflect.TypeOf((*MockAuthServiceClient)(nil).ResendMyPhoneVerificationCode), varargs...)
-}
-
-// RevokeUserAgent mocks base method
-func (m *MockAuthServiceClient) RevokeUserAgent(arg0 context.Context, arg1 *grpc.UserAgentID, arg2 ...grpc0.CallOption) (*grpc.UserAgent, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "RevokeUserAgent", varargs...)
-	ret0, _ := ret[0].(*grpc.UserAgent)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RevokeUserAgent indicates an expected call of RevokeUserAgent
-func (mr *MockAuthServiceClientMockRecorder) RevokeUserAgent(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeUserAgent", reflect.TypeOf((*MockAuthServiceClient)(nil).RevokeUserAgent), varargs...)
-}
-
-// SearchApplications mocks base method
-func (m *MockAuthServiceClient) SearchApplications(arg0 context.Context, arg1 *grpc.ApplicationSearchRequest, arg2 ...grpc0.CallOption) (*grpc.ApplicationSearchResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SearchApplications", varargs...)
-	ret0, _ := ret[0].(*grpc.ApplicationSearchResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SearchApplications indicates an expected call of SearchApplications
-func (mr *MockAuthServiceClientMockRecorder) SearchApplications(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchApplications", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchApplications), varargs...)
-}
-
-// SearchGrant mocks base method
-func (m *MockAuthServiceClient) SearchGrant(arg0 context.Context, arg1 *grpc.GrantSearchRequest, arg2 ...grpc0.CallOption) (*grpc.GrantSearchResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SearchGrant", varargs...)
-	ret0, _ := ret[0].(*grpc.GrantSearchResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SearchGrant indicates an expected call of SearchGrant
-func (mr *MockAuthServiceClientMockRecorder) SearchGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchGrant", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchGrant), varargs...)
 }
 
 // SearchMyProjectOrgs mocks base method
@@ -797,35 +417,15 @@ func (mr *MockAuthServiceClientMockRecorder) SearchMyProjectOrgs(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyProjectOrgs", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyProjectOrgs), varargs...)
 }
 
-// SelectUser mocks base method
-func (m *MockAuthServiceClient) SelectUser(arg0 context.Context, arg1 *grpc.SelectUserRequest, arg2 ...grpc0.CallOption) (*grpc.AuthSessionResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SelectUser", varargs...)
-	ret0, _ := ret[0].(*grpc.AuthSessionResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SelectUser indicates an expected call of SelectUser
-func (mr *MockAuthServiceClientMockRecorder) SelectUser(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUser", reflect.TypeOf((*MockAuthServiceClient)(nil).SelectUser), varargs...)
-}
-
 // SetMyPassword mocks base method
-func (m *MockAuthServiceClient) SetMyPassword(arg0 context.Context, arg1 *grpc.PasswordRequest, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) SetMyPassword(arg0 context.Context, arg1 *grpc.PasswordRequest, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SetMyPassword", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -835,46 +435,6 @@ func (mr *MockAuthServiceClientMockRecorder) SetMyPassword(arg0, arg1 interface{
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMyPassword", reflect.TypeOf((*MockAuthServiceClient)(nil).SetMyPassword), varargs...)
-}
-
-// SkipMfaInit mocks base method
-func (m *MockAuthServiceClient) SkipMfaInit(arg0 context.Context, arg1 *grpc.SkipMfaInitRequest, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SkipMfaInit", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SkipMfaInit indicates an expected call of SkipMfaInit
-func (mr *MockAuthServiceClientMockRecorder) SkipMfaInit(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SkipMfaInit", reflect.TypeOf((*MockAuthServiceClient)(nil).SkipMfaInit), varargs...)
-}
-
-// TerminateUserSession mocks base method
-func (m *MockAuthServiceClient) TerminateUserSession(arg0 context.Context, arg1 *grpc.UserSessionID, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "TerminateUserSession", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// TerminateUserSession indicates an expected call of TerminateUserSession
-func (mr *MockAuthServiceClientMockRecorder) TerminateUserSession(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TerminateUserSession", reflect.TypeOf((*MockAuthServiceClient)(nil).TerminateUserSession), varargs...)
 }
 
 // UpdateMyUserAddress mocks base method
@@ -918,14 +478,14 @@ func (mr *MockAuthServiceClientMockRecorder) UpdateMyUserProfile(arg0, arg1 inte
 }
 
 // Validate mocks base method
-func (m *MockAuthServiceClient) Validate(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*struct0.Struct, error) {
+func (m *MockAuthServiceClient) Validate(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*structpb.Struct, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Validate", varargs...)
-	ret0, _ := ret[0].(*struct0.Struct)
+	ret0, _ := ret[0].(*structpb.Struct)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -935,26 +495,6 @@ func (mr *MockAuthServiceClientMockRecorder) Validate(arg0, arg1 interface{}, ar
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockAuthServiceClient)(nil).Validate), varargs...)
-}
-
-// VerifyMfa mocks base method
-func (m *MockAuthServiceClient) VerifyMfa(arg0 context.Context, arg1 *grpc.VerifyMfaRequest, arg2 ...grpc0.CallOption) (*grpc.AuthSessionResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "VerifyMfa", varargs...)
-	ret0, _ := ret[0].(*grpc.AuthSessionResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// VerifyMfa indicates an expected call of VerifyMfa
-func (mr *MockAuthServiceClientMockRecorder) VerifyMfa(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyMfa", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyMfa), varargs...)
 }
 
 // VerifyMfaOTP mocks base method
@@ -978,14 +518,14 @@ func (mr *MockAuthServiceClientMockRecorder) VerifyMfaOTP(arg0, arg1 interface{}
 }
 
 // VerifyMyUserEmail mocks base method
-func (m *MockAuthServiceClient) VerifyMyUserEmail(arg0 context.Context, arg1 *grpc.VerifyMyUserEmailRequest, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) VerifyMyUserEmail(arg0 context.Context, arg1 *grpc.VerifyMyUserEmailRequest, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "VerifyMyUserEmail", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -998,14 +538,14 @@ func (mr *MockAuthServiceClientMockRecorder) VerifyMyUserEmail(arg0, arg1 interf
 }
 
 // VerifyMyUserPhone mocks base method
-func (m *MockAuthServiceClient) VerifyMyUserPhone(arg0 context.Context, arg1 *grpc.VerifyUserPhoneRequest, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAuthServiceClient) VerifyMyUserPhone(arg0 context.Context, arg1 *grpc.VerifyUserPhoneRequest, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "VerifyMyUserPhone", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1015,64 +555,4 @@ func (mr *MockAuthServiceClientMockRecorder) VerifyMyUserPhone(arg0, arg1 interf
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyMyUserPhone", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyMyUserPhone), varargs...)
-}
-
-// VerifyPassword mocks base method
-func (m *MockAuthServiceClient) VerifyPassword(arg0 context.Context, arg1 *grpc.VerifyPasswordRequest, arg2 ...grpc0.CallOption) (*grpc.AuthSessionResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "VerifyPassword", varargs...)
-	ret0, _ := ret[0].(*grpc.AuthSessionResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// VerifyPassword indicates an expected call of VerifyPassword
-func (mr *MockAuthServiceClientMockRecorder) VerifyPassword(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyPassword", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyPassword), varargs...)
-}
-
-// VerifyUser mocks base method
-func (m *MockAuthServiceClient) VerifyUser(arg0 context.Context, arg1 *grpc.VerifyUserRequest, arg2 ...grpc0.CallOption) (*grpc.AuthSessionResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "VerifyUser", varargs...)
-	ret0, _ := ret[0].(*grpc.AuthSessionResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// VerifyUser indicates an expected call of VerifyUser
-func (mr *MockAuthServiceClientMockRecorder) VerifyUser(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyUser", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyUser), varargs...)
-}
-
-// VerifyUserEmail mocks base method
-func (m *MockAuthServiceClient) VerifyUserEmail(arg0 context.Context, arg1 *grpc.VerifyUserEmailRequest, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "VerifyUserEmail", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// VerifyUserEmail indicates an expected call of VerifyUserEmail
-func (mr *MockAuthServiceClientMockRecorder) VerifyUserEmail(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyUserEmail", reflect.TypeOf((*MockAuthServiceClient)(nil).VerifyUserEmail), varargs...)
 }

@@ -51,85 +51,6 @@ service AuthService {
     }
 
     // Authorization
-    rpc GetUserAgent(UserAgentID) returns (UserAgent) {
-        option (google.api.http) = {
-                get: "/useragents/{id}"
-                };
-    }
-
-    rpc CreateUserAgent(UserAgentCreation) returns (UserAgent) {
-        option (google.api.http) = {
-                post: "/useragents"
-                body: "*"
-            };
-    }
-
-    rpc RevokeUserAgent(UserAgentID) returns (UserAgent) {
-        option (google.api.http) = {
-                put: "/useragents/{id}"
-                body: "*"
-            };
-    }
-
-    rpc CreateAuthSession(AuthSessionCreation) returns (AuthSessionResponse) {
-        option (google.api.http) = {
-                post: "/useragents/{agent_id}/authsessions"
-                body: "*"
-            };
-    }
-
-    rpc GetAuthSession(AuthSessionID) returns (AuthSessionResponse) {
-        option (google.api.http) = {
-                get: "/useragents/{agent_id}/authsessions/{id}"
-            };
-    }
-
-    rpc GetAuthSessionByTokenID(TokenID) returns (AuthSessionView) {
-        option (google.api.http) = {
-                get: "/tokens/{id}/authsession"
-            };
-    }
-
-    rpc SelectUser(SelectUserRequest) returns (AuthSessionResponse) {
-        option (google.api.http) = {
-                put: "/useragents/{agent_id}/authsessions/{auth_session_id}/_selectuser"
-                body: "*"
-            };
-    }
-
-    rpc VerifyUser(VerifyUserRequest) returns (AuthSessionResponse) {
-        option (google.api.http) = {
-                put: "/useragents/{agent_id}/authsessions/{auth_session_id}/_verifyuser"
-                body: "*"
-            };
-    }
-
-    rpc VerifyPassword(VerifyPasswordRequest) returns (AuthSessionResponse) {
-        option (google.api.http) = {
-                put: "/useragents/{agent_id}/authsessions/{auth_session_id}/_verifypassword"
-                body: "*"
-            };
-    }
-
-    rpc VerifyMfa(VerifyMfaRequest) returns (AuthSessionResponse) {
-        option (google.api.http) = {
-                put: "/useragents/{agent_id}/authsessions/{auth_session_id}/_verifymfa"
-                body: "*"
-            };
-    }
-
-    rpc GetUserAgentSessions(UserAgentID)  returns (UserSessions) {
-        option (google.api.http) = {
-                get: "/useragents/{id}/usersessions"
-            };
-    }
-
-    rpc GetUserSession(UserSessionID)  returns (UserSession) {
-        option (google.api.http) = {
-                get: "/useragents/{agent_id}/usersessions/{id}"
-            };
-    }
-
     rpc GetMyUserSessions(google.protobuf.Empty) returns (UserSessionViews) {
         option (google.api.http) = {
                 get: "/me/usersessions"
@@ -140,40 +61,7 @@ service AuthService {
             };
     }
 
-    rpc TerminateUserSession(UserSessionID) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-                delete: "/useragents/{agent_id}/usersessions/{id}"
-            };
-    }
-
-    rpc CreateToken(CreateTokenRequest) returns (Token) {
-        option (google.api.http) = {
-                post: "/useragents/{agent_id}/authsessions/{auth_session_id}/tokens"
-                body: "*"
-            };
-    }
-
     //User
-    rpc IsUserUnique(UniqueUserRequest) returns (UniqueUserResponse) {
-        option (google.api.http) = {
-                get: "/users/_isunique"
-            };
-    }
-
-    rpc RegisterUser(RegisterUserRequest) returns (User) {
-        option (google.api.http) = {
-                post: "/users/_register"
-                body: "*"
-            };
-    }
-
-    rpc RegisterUserWithExternal(RegisterUserExternalIDPRequest) returns (User) {
-        option (google.api.http) = {
-                post: "/users/_externalregister"
-                body: "*"
-            };
-    }
-
     rpc GetMyUserProfile(google.protobuf.Empty) returns (UserProfile) {
         option (google.api.http) = {
                 get: "/users/me/profile"
@@ -227,14 +115,6 @@ service AuthService {
             };
     }
 
-    rpc VerifyUserEmail(VerifyUserEmailRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-                post: "/users/{id}/email/_verify"
-                body: "*"
-            };
-
-    }
-
     rpc ResendMyEmailVerificationMail(google.protobuf.Empty) returns (google.protobuf.Empty) {
         option (google.api.http) = {
                 post: "/users/me/email/_resendverification"
@@ -244,14 +124,6 @@ service AuthService {
         option (caos.zitadel.utils.v1.auth_option) = {
                 permission: "authenticated"
             };
-    }
-
-    rpc ResendEmailVerificationMail(UserID) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-                post: "/users/{id}/email/_resendverification"
-                body: "*"
-            };
-
     }
 
     rpc GetMyUserPhone(google.protobuf.Empty) returns (UserPhone) {
@@ -340,20 +212,6 @@ service AuthService {
             };
     }
 
-    rpc RequestPasswordReset(ResetPasswordRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-                post: "/users/passwords/_requestpwreset"
-                body: "*"
-            };
-    }
-
-    rpc PasswordReset(ResetPassword) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-                post: "/users/{id}/passwords/_resetpw"
-                body: "*"
-            };
-    }
-
     rpc ChangeMyPassword(PasswordChange) returns (google.protobuf.Empty) {
         option (google.api.http) = {
                 put: "/users/me/passwords/_change"
@@ -397,47 +255,10 @@ service AuthService {
             };
     }
 
-    rpc SkipMfaInit(SkipMfaInitRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-                post: "/users/{user_id}/mfa/_skipinit"
-                body: "*"
-            };
-    }
-
-
     //TODO: Remove func only for tests
     rpc GetUserByID(UserID) returns (User) {
         option (google.api.http) = {
                 get: "/users/{id}"
-            };
-    }
-
-    //Application
-    rpc GetApplicationByID(ApplicationID) returns (Application) {
-        option (google.api.http) = {
-                get: "/applications/{id}"
-            };
-    }
-
-    rpc SearchApplications(ApplicationSearchRequest) returns (ApplicationSearchResponse) {
-        option (google.api.http) = {
-                post: "/applications/_search"
-                body: "*"
-            };
-    }
-
-    rpc AuthorizeApplication(ApplicationAuthorizeRequest) returns (Application) {
-        option (google.api.http) = {
-                post: "/applications/_authorize"
-                body: "*"
-            };
-    }
-
-    //Grant
-    rpc SearchGrant(GrantSearchRequest) returns (GrantSearchResponse) {
-        option (google.api.http) = {
-                post: "/grants/_search"
-                body: "*"
             };
     }
 
@@ -474,111 +295,6 @@ service AuthService {
     }
 }
 
-
-message SessionRequest {
-    string user_id = 1;
-    BrowserInformation browser_info = 2;
-}
-
-message UserAgent {
-    string id = 1;
-    BrowserInformation browser_info = 2;
-    UserAgentState state = 3;
-}
-
-
-enum UserAgentState {
-    USERAGENTSTATE_UNSPECIFIED = 0;
-    USERAGENTSTATE_ACTIVE = 1;
-    USERAGENTSTATE_TERMINATED = 2;
-}
-
-message UserAgentID {
-    string id = 1;
-}
-
-message UserAgentCreation {
-    BrowserInformation browser_info = 1 [(validate.rules).message.required = true];
-}
-
-message UserAgents {
-    repeated UserAgent sessions = 1;
-}
-
-message AuthSessionCreation {
-    string agent_id = 1 [(validate.rules).string.min_len = 1];
-    AuthSessionType type = 2;
-    BrowserInformation browser_info = 3 [(validate.rules).message.required = true];
-    string client_id = 4 [(validate.rules).string.min_len = 1];
-    string redirect_uri = 5 [(validate.rules).string.min_len = 1];
-    string state = 6;
-    Prompt prompt = 7;
-    repeated string auth_context_class_reference = 8;
-    repeated string ui_locales = 9;
-    string login_hint = 10;
-    uint32 max_age = 11;
-    oneof type_info {
-        AuthRequestOIDC oidc = 12;
-    }
-    string preselected_user_id = 13;
-}
-
-message AuthSessionResponse {
-    string agent_id = 1;
-    string id = 2;
-    AuthSessionType type = 3;
-    string client_id = 4;
-    string redirect_uri = 5;
-    string state = 6;
-    Prompt prompt = 7;
-    repeated string auth_context_class_reference = 8;
-    repeated string ui_locales = 9;
-    string login_hint = 10;
-    uint32 max_age = 11;
-    oneof type_info {
-        AuthRequestOIDC oidc = 12;
-    }
-    repeated NextStep possible_steps = 13;
-    repeated string project_client_ids = 14;
-    UserSession user_session = 15;
-}
-
-message AuthSessionView {
-    string agent_id = 1;
-    string auth_session_id = 2;
-    AuthSessionType type = 3;
-    string client_id = 4;
-    string user_session_id = 5;
-    repeated string project_client_ids = 6;
-    string token_id = 7;
-    google.protobuf.Timestamp token_expiration = 8;
-    string user_id = 9;
-}
-
-message TokenID {
-    string id = 1;
-}
-
-message UserSessionID {
-    string id = 1;
-    string agent_id = 2;
-}
-
-message UserSessions {
-    repeated UserSession user_sessions = 1;
-}
-
-message UserSession {
-    string id = 1;
-    string agent_id = 2;
-    UserSessionState auth_state = 3;
-    AuthUser user = 4;
-    bool password_verified = 5;
-    MfaType mfa = 6;
-    bool mfa_verified = 7;
-    google.protobuf.Timestamp auth_time = 8;
-}
-
 message UserSessionViews {
     repeated UserSessionView user_sessions = 1;
 }
@@ -590,151 +306,10 @@ message UserSessionView {
     string user_name = 5;
 }
 
-message AuthUser {
-    string user_id = 1;
-    string user_name = 2;
-}
-
 enum UserSessionState {
     USERSESSIONSTATE_UNSPECIFIED = 0;
     USERSESSIONSTATE_ACTIVE = 1;
     USERSESSIONSTATE_TERMINATED = 2;
-}
-
-message AuthSessionID {
-    string id = 1;
-    string agent_id = 2;
-    BrowserInformation browser_info = 3;
-}
-
-message SelectUserRequest {
-    string agent_id = 1;
-    string auth_session_id = 2;
-    string user_session_id = 3;
-    BrowserInformation browser_info = 4 [(validate.rules).message.required = true];
-}
-
-message VerifyUserRequest {
-    string agent_id = 1 [(validate.rules).string.min_len = 1];
-    string auth_session_id = 2 [(validate.rules).string.min_len = 1];
-    string user_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    BrowserInformation browser_info = 4 [(validate.rules).message.required = true];
-}
-
-message VerifyPasswordRequest {
-    string agent_id = 1 [(validate.rules).string.min_len = 1];
-    string auth_session_id = 2 [(validate.rules).string.min_len = 1];
-    string password = 3 [(validate.rules).string = {min_len: 1, max_len: 72}];
-    BrowserInformation browser_info = 4 [(validate.rules).message.required = true];
-}
-
-message VerifyMfaRequest {
-    string agent_id = 1 [(validate.rules).string.min_len = 1];
-    string auth_session_id = 2 [(validate.rules).string.min_len = 1];
-    BrowserInformation browser_info = 3;
-    oneof mfa {
-        AuthSessionMultiFactorOTP otp = 4;
-    }
-}
-
-message AuthSessionMultiFactorOTP {
-    string code = 1 [(validate.rules).string = {max_len: 200}];
-}
-
-message NextStep {
-    NextStepType type = 1;
-    oneof data {
-        LoginData login = 2;
-        PasswordData password = 3;
-        MfaVerifyData mfa_verify = 4;
-        MfaPromptData mfa_prompt = 5;
-        ChooseUserData choose_user = 6;
-    }
-}
-
-enum NextStepType {
-    NEXTSTEP_UNSPECIFIED = 0;
-    NEXTSTEP_LOGIN = 1;
-    NEXTSTEP_PASSWORD = 2;
-    NEXTSTEP_CHANGE_PASSWORD = 3;
-    NEXTSTEP_MFA_PROMPT = 4; //TODO: ?
-    NEXTSTEP_MFA_INIT_CHOICE = 5; //TODO: ?
-    NEXTSTEP_MFA_INIT_CREATE = 6;
-    NEXTSTEP_MFA_INIT_VERIFY = 7;
-    NEXTSTEP_MFA_INIT_DONE = 8;
-    NEXTSTEP_MFA_VERIFY = 9;
-    NEXTSTEP_MFA_VERIFY_ASYNC = 10;
-    NEXTSTEP_VERIFY_EMAIL = 11;
-    NEXTSTEP_REDIRECT_TO_CALLBACK = 12;
-    NEXTSTEP_INIT_PASSWORD = 13;
-    NEXTSTEP_CHOOSE_USER = 14;
-}
-
-message LoginData {
-    string err_msg = 1;
-}
-
-message PasswordData {
-    string err_msg = 1;
-    uint32 failure_count = 2;
-}
-
-message MfaVerifyData {
-    string err_msg = 1;
-    uint32 failure_count = 2;
-    repeated MfaType mfa_providers = 3;
-}
-
-message MfaPromptData {
-    bool required = 1;
-    repeated MfaType mfa_providers = 2;
-}
-
-message ChooseUserData {
-    repeated ChooseUser users = 1;
-}
-
-message ChooseUser {
-    string user_session_id = 1;
-    string user_id = 2;
-    string user_name = 3;
-    UserSessionState user_session_state = 4;
-}
-
-message SkipMfaInitRequest {
-    string user_id = 1;
-}
-
-enum AuthSessionType {
-    AUTHSESSIONTYPE_UNSPECIFIED = 0; //TODO: necessary?
-    AUTHSESSIONTYPE_OIDC = 1;
-    AUTHSESSIONTYPE_SAML = 2;
-}
-
-message BrowserInformation {
-    string user_agent = 1;
-    IP remote_ip = 2 [(validate.rules).message.required = true];
-    string accept_language = 3;
-}
-
-message IP {
-    string V4 = 1;
-    string V6 = 2;
-}
-
-enum Prompt {
-    PROMPT_UNSPECIFIED = 0;
-    PROMPT_NONE = 1;
-    PROMPT_LOGIN = 2;
-    PROMPT_CONSENT = 3;
-    PROMPT_SELECT_ACCOUNT = 4;
-}
-
-message AuthRequestOIDC {
-    repeated string scope = 1;
-    OIDCResponseType response_type = 2;
-    string nonce = 3;
-    CodeChallenge code_challenge = 4;
 }
 
 enum OIDCResponseType {
@@ -743,57 +318,8 @@ enum OIDCResponseType {
     OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
 }
 
-message CodeChallenge {
-    string challenge = 1;
-    CodeChallengeMethod method = 2;
-}
-
-enum CodeChallengeMethod {
-    CODECHALLENGEMETHOD_PLAIN = 0;
-    CODECHALLENGEMETHOD_S256 = 1;
-}
-
 message UserID {
     string id = 1;
-}
-
-message UniqueUserRequest {
-    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string email = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message UniqueUserResponse {
-    bool is_unique = 1;
-}
-
-
-message RegisterUserRequest {
-    string email = 1 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
-    string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-    string display_name = 5 [(validate.rules).string = {max_len: 200}];
-    string preferred_language = 6 [(validate.rules).string = {max_len: 200}];
-    Gender gender = 7;
-    string password = 8 [(validate.rules).string = {min_len: 1, max_len: 72}];
-    string org_id = 9 [(validate.rules).string.min_len = 1];
-}
-
-message RegisterUserExternalIDPRequest {
-    string email = 1 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
-    string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-    string display_name = 5 [(validate.rules).string = {max_len: 200}];
-    string preferred_language = 6 [(validate.rules).string = {max_len: 200}];
-    Gender gender = 7;
-    IDPProvider idp_provider = 8;
-    string org_id = 9 [(validate.rules).string.min_len = 1];
-}
-
-message IDPProvider {
-    string provider = 8;
-    string externalIdpID = 9;
 }
 
 message User {
@@ -910,33 +436,12 @@ message UpdateUserAddressRequest {
     string street_address = 5 [(validate.rules).string = {max_len: 200}];
 }
 
-message PasswordID{
+message PasswordID {
     string id = 1;
 }
 
 message PasswordRequest {
     string password = 1 [(validate.rules).string = {min_len: 1, max_len: 72}];
-}
-
-message ResetPasswordRequest {
-    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    NotificationType type = 2;
-}
-
-message ResetPassword {
-    string id = 1 [(validate.rules).string.min_len = 1];
-    string code = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string new_password = 3 [(validate.rules).string = {min_len: 1, max_len: 72}];
-}
-
-message SetPasswordNotificationRequest {
-    string id = 1;
-    NotificationType type = 2;
-}
-
-enum NotificationType {
-    NOTIFICATIONTYPE_EMAIL = 0;
-    NOTIFICATIONTYPE_SMS = 1;
 }
 
 message PasswordChange {
@@ -977,141 +482,9 @@ enum MFAState {
     MFASTATE_REMOVED = 3;
 }
 
-message ApplicationID {
-    string id = 1;
-}
-
-message Application {
-    string id = 1;
-    AppState state = 2;
-    google.protobuf.Timestamp creation_date = 3;
-    google.protobuf.Timestamp change_date = 4;
-    string name = 5;
-    oneof app_config {
-        OIDCConfig oidc_config = 8;
-    }
-}
-
-
-enum AppState {
-    APPSTATE_UNSPECIFIED = 0;
-    APPSTATE_ACTIVE = 1;
-    APPSTATE_INACTIVE = 2;
-    APPSTATE_DELETED = 3;
-}
-
-
-message OIDCConfig {
-    repeated string redirect_uris = 1;
-    repeated OIDCResponseType response_types = 2;
-    repeated OIDCGrantType grant_types = 3;
-    OIDCApplicationType application_type = 4;
-    string client_secret = 5;
-    string client_id = 6;
-    OIDCAuthMethodType auth_method_type = 7;
-    repeated string post_logout_redirect_uris = 8;
-}
-
-enum OIDCGrantType {
-    OIDCGRANTTYPE_AUTHORIZATION_CODE = 0;
-    OIDCGRANTTYPE_GRANT_TYPE_NONE = 1;
-    OIDCGRANTTYPE_REFRESH_TOKEN = 2;
-}
-
-enum OIDCApplicationType {
-    OIDCAPPLICATIONTYPE_WEB = 0;
-    OIDCAPPLICATIONTYPE_USER_AGENT = 1;
-    OIDCAPPLICATIONTYPE_NATIVE = 2;
-}
-
-enum OIDCAuthMethodType {
-    OIDCAUTHMETHODTYPE_BASIC = 0;
-    OIDCAUTHMETHODTYPE_POST = 1;
-    OIDCAUTHMETHODTYPE_NONE = 2;
-}
-
-message ApplicationSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    ApplicationSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];;
-    bool asc = 4;
-    repeated ApplicationSearchQuery queries = 5;
-}
-
-message ApplicationSearchQuery {
-    ApplicationSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];;
-    SearchMethod method = 2;
-    string value = 3;
-}
-
-enum ApplicationSearchKey {
-    APPLICATIONSEARCHKEY_UNSPECIFIED = 0;
-    APPLICATIONSEARCHKEY_APP_TYPE = 1;
-    APPLICATIONSEARCHKEY_STATE = 2;
-    APPLICATIONSEARCHKEY_CLIENT_ID = 3;
-    APPLICATIONSEARCHKEY_APP_NAME = 4;
-    APPLICATIONSEARCHKEY_PROJECT_ID = 5;
-}
-
-message ApplicationSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated Application result = 4;
-}
-
-enum SearchMethod {
-    SEARCHMETHOD_EQUALS = 0;
-    SEARCHMETHOD_STARTS_WITH = 1;
-    SEARCHMETHOD_CONTAINS = 2;
-}
-
-message ApplicationAuthorizeRequest {
-    oneof auth {
-        OIDCClientAuth oidc_client_auth = 1;
-    }
-}
-
 message OIDCClientAuth {
     string client_id = 1;
     string client_secret = 2;
-}
-
-
-message GrantSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    GrantSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];;
-    bool asc = 4;
-    repeated GrantSearchQuery queries = 5;
-}
-
-message GrantSearchQuery {
-    GrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];;
-    SearchMethod method = 2;
-    string value = 3;
-}
-
-enum GrantSearchKey {
-    GRANTSEARCHKEY_UNSPECIFIED = 0;
-    GRANTSEARCHKEY_ORG_ID = 1;
-    GRANTSEARCHKEY_PROJECT_ID = 2;
-    GRANTSEARCHKEY_USER_ID = 3;
-}
-
-message GrantSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated Grant result = 4;
-}
-
-message Grant {
-    string OrgId = 1;
-    string ProjectId = 2;
-    string UserId = 3;
-    repeated string Roles = 4;
-    string OrgName = 5;
 }
 
 message MyProjectOrgSearchRequest {
@@ -1148,23 +521,12 @@ message Org {
     string name = 2;
 }
 
-message CreateTokenRequest {
-    string agent_id = 1 [(validate.rules).string.min_len = 1];
-    string auth_session_id = 2 [(validate.rules).string.min_len = 1];
-}
-
-message Token {
-    string id = 1;
-    google.protobuf.Timestamp expiration = 8;
-}
-
 message MyPermissions {
     repeated string permissions = 1;
 }
 
-
-message VerifyUserInitRequest {
-    string id = 1;
-    string code = 2;
-    string password = 3;
+enum SearchMethod {
+    SEARCHMETHOD_EQUALS = 0;
+    SEARCHMETHOD_STARTS_WITH = 1;
+    SEARCHMETHOD_CONTAINS = 2;
 }

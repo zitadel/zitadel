@@ -8,22 +8,14 @@ import (
 	"github.com/caos/zitadel/pkg/auth/api/grpc"
 )
 
-type API struct {
-	grpcServer grpc.Server
-	gateway    grpc.Gateway
-}
-
 type Config struct {
 	GRPC grpc_util.Config
 }
 
-func Start(ctx context.Context, conf Config) error {
-	api := &API{
-		grpcServer: *grpc.StartServer(conf.GRPC.ToServerConfig()),
-		gateway:    *grpc.StartGateway(conf.GRPC.ToGatewayConfig()),
-	}
-	server.StartServer(ctx, &api.grpcServer)
-	server.StartGateway(ctx, &api.gateway)
+func Start(ctx context.Context, conf Config) {
+	grpcServer := grpc.StartServer(conf.GRPC.ToServerConfig())
+	grpcGateway := grpc.StartGateway(conf.GRPC.ToGatewayConfig())
 
-	return nil
+	server.StartServer(ctx, grpcServer)
+	server.StartGateway(ctx, grpcGateway)
 }
