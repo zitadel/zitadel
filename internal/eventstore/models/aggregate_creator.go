@@ -2,8 +2,6 @@ package models
 
 import (
 	"context"
-
-	"github.com/caos/logging"
 )
 
 type AggregateCreator struct {
@@ -30,18 +28,6 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 		editorUser:     editorUser(ctx),
 		resourceOwner:  resourceOwner(ctx),
 	}, nil
-}
-
-func MustNewAggregate(id string, typ AggregateType, v Version, latestSequence uint64, events ...*Event) *Aggregate {
-	c := NewAggregateCreator("svc")
-	aggregate, err := c.NewAggregate(context.TODO(), id, typ, v, latestSequence)
-	logging.Log("MODEL-10XZW").OnError(err).Fatal("unable to create aggregate")
-	for _, event := range events {
-		aggregate, err = aggregate.AppendEvent(event.Type, event.Data)
-		logging.Log("MODEL-ASLX5").OnError(err).Fatal("unable to append event")
-	}
-
-	return aggregate
 }
 
 func editorUser(ctx context.Context) string {
