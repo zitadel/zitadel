@@ -2,15 +2,12 @@ package sql
 
 import (
 	"context"
-
-	"github.com/caos/utils/logging"
-	"github.com/cockroachdb/cockroach-go/crdb"
-
 	"database/sql"
 
-	caos_errs "github.com/caos/utils/errors"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/cockroachdb/cockroach-go/crdb"
 )
 
 func (db *SQL) PushEvents(ctx context.Context, aggregates [][]*models.Event) (err error) {
@@ -33,7 +30,7 @@ func (db *SQL) PushEvents(ctx context.Context, aggregates [][]*models.Event) (er
 	// 	if err != nil {
 	// 		tx.Rollback()
 	// 		logging.Log("SQL-9ctx5").WithError(err).Warn("prepare failed")
-	// 		return caos_errs.ThrowInternal(err, "SQL-juCgA", "prepare failed")
+	// 		return errors.ThrowInternal(err, "SQL-juCgA", "prepare failed")
 	// 	}
 
 	// 	for _, aggregate := range aggregates {
@@ -55,7 +52,7 @@ func (db *SQL) PushEvents(ctx context.Context, aggregates [][]*models.Event) (er
 	// 			if err != nil {
 	// 				logging.Log("SQL-EXA0q").WithError(err).Info("query failed")
 	// 				tx.Rollback()
-	// 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
+	// 				return errors.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 	// 			}
 	// 			defer rows.Close()
 
@@ -68,7 +65,7 @@ func (db *SQL) PushEvents(ctx context.Context, aggregates [][]*models.Event) (er
 
 	// 			if !rowInserted {
 	// 				tx.Rollback()
-	// 				return caos_errs.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
+	// 				return errors.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 	// 			}
 
 	// 			previousSequence = event.Sequence
@@ -77,8 +74,8 @@ func (db *SQL) PushEvents(ctx context.Context, aggregates [][]*models.Event) (er
 	// 	return nil
 	// })
 
-	// if _, ok := err.(*caos_errs.CaosError); !ok && err != nil {
-	// 	err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
+	// if _, ok := err.(*errors.CaosError); !ok && err != nil {
+	// 	err = errors.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
 	// }
 
 	// return err
@@ -103,7 +100,7 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		if err != nil {
 			tx.Rollback()
 			logging.Log("SQL-9ctx5").WithError(err).Warn("prepare failed")
-			return caos_errs.ThrowInternal(err, "SQL-juCgA", "prepare failed")
+			return errors.ThrowInternal(err, "SQL-juCgA", "prepare failed")
 		}
 
 		for _, aggregate := range aggregates {
@@ -125,7 +122,7 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 				if err != nil {
 					logging.Log("SQL-EXA0q").WithError(err).Info("query failed")
 					tx.Rollback()
-					return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
+					return errors.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 				}
 				defer rows.Close()
 
@@ -138,7 +135,7 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 
 				if !rowInserted {
 					tx.Rollback()
-					return caos_errs.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
+					return errors.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 				}
 
 				previousSequence = event.Sequence
@@ -147,8 +144,8 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		return nil
 	})
 
-	if _, ok := err.(*caos_errs.CaosError); !ok && err != nil {
-		err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
+	if _, ok := err.(*errors.CaosError); !ok && err != nil {
+		err = errors.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
 	}
 
 	return err

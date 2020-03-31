@@ -3,14 +3,13 @@ package sql
 import (
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
-
-	caos_errs "github.com/caos/utils/errors"
-	"github.com/caos/utils/logging"
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/lib/pq"
+	"strconv"
+	"strings"
 )
 
 func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*models.Event, err error) {
@@ -48,7 +47,7 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 	rows, err := db.client.Query(query, values...)
 	if err != nil {
 		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
-		return nil, caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+		return nil, errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
 	}
 	defer rows.Close()
 

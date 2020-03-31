@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/caos/utils/errors"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
