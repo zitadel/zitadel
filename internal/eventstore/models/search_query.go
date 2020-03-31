@@ -10,11 +10,11 @@ type SearchQuery struct {
 
 func NewSearchQuery() *SearchQuery {
 	return &SearchQuery{
-		filters: make([]*Filter, 0, 4),
+		Filters: make([]*Filter, 0, 4),
 	}
 }
 
-func (q *SearchQuery) Limit(limit uint64) *SearchQuery {
+func (q *SearchQuery) SetLimit(limit uint64) *SearchQuery {
 	if limit < 0 {
 		return q
 	}
@@ -28,7 +28,7 @@ func (q *SearchQuery) OrderDesc() *SearchQuery {
 }
 
 func (q *SearchQuery) OrderAsc() *SearchQuery {
-	q.desc = false
+	q.Desc = false
 	return q
 }
 
@@ -42,7 +42,7 @@ func (q *SearchQuery) AggregateTypeFilter(types ...string) *SearchQuery {
 
 func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
 	sortOrder := Operation_Greater
-	if q.desc {
+	if q.Desc {
 		sortOrder = Operation_Less
 	}
 	return q.setFilter(NewFilter(Field_LatestSequence, sequence, sortOrder))
@@ -54,13 +54,13 @@ func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
 }
 
 func (q *SearchQuery) setFilter(filter *Filter) *SearchQuery {
-	for _, f := range q.filters {
+	for _, f := range q.Filters {
 		if f.field == filter.field {
 			f = filter
 			return q
 		}
 	}
-	q.filters = append(q.filters, filter)
+	q.Filters = append(q.Filters, filter)
 	return q
 }
 
@@ -68,7 +68,7 @@ func (q *SearchQuery) Validate() error {
 	if q == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-J5xQi", "search query is nil")
 	}
-	for _, filter := range q.filters {
+	for _, filter := range q.Filters {
 		if err := filter.Validate(); err != nil {
 			return err
 		}

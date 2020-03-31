@@ -32,7 +32,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(34, false),
+				searchQuery: es_models.NewSearchQuery().SetLimit(34),
 			},
 			eventsLen: 3,
 			wantErr:   false,
@@ -44,7 +44,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(0, true),
+				searchQuery: es_models.NewSearchQuery().OrderDesc(),
 			},
 			eventsLen: 34,
 			wantErr:   false,
@@ -80,7 +80,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(5, false).AggregateIDFilter("hop"),
+				searchQuery: es_models.NewSearchQuery().SetLimit(5).AggregateIDFilter("hop"),
 			},
 			wantErr:   false,
 			isErrFunc: nil,
@@ -92,7 +92,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(5, false).AggregateIDFilter("hop").AggregateTypeFilter("user"),
+				searchQuery: es_models.NewSearchQuery().SetLimit(5).AggregateIDFilter("hop").AggregateTypeFilter("user"),
 			},
 			wantErr:   false,
 			isErrFunc: nil,

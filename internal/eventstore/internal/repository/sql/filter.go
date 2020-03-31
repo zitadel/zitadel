@@ -34,12 +34,12 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 	query += where
 
 	query += " ORDER BY event_sequence"
-	if searchQuery.OrderDesc() {
+	if searchQuery.Desc {
 		query += " DESC"
 	}
 
-	if searchQuery.Limit() > 0 {
-		values = append(values, searchQuery.Limit())
+	if searchQuery.Limit > 0 {
+		values = append(values, searchQuery.Limit)
 		query += " LIMIT ?"
 	}
 
@@ -52,7 +52,7 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 	}
 	defer rows.Close()
 
-	events = make([]*es_models.Event, 0, searchQuery.Limit())
+	events = make([]*es_models.Event, 0, searchQuery.Limit)
 
 	for rows.Next() {
 		event := new(models.Event)
@@ -88,14 +88,14 @@ func numberPlaceholder(query, old, new string) string {
 }
 
 func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []interface{}) {
-	values = make([]interface{}, len(searchQuery.Filters()))
-	clauses := make([]string, len(searchQuery.Filters()))
+	values = make([]interface{}, len(searchQuery.Filters))
+	clauses := make([]string, len(searchQuery.Filters))
 
 	if len(values) == 0 {
 		return clause, values
 	}
 
-	for i, filter := range searchQuery.Filters() {
+	for i, filter := range searchQuery.Filters {
 		value := filter.GetValue()
 		switch value.(type) {
 		case []bool, []float64, []int64, []string, *[]bool, *[]float64, *[]int64, *[]string:

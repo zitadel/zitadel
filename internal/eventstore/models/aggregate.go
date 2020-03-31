@@ -75,7 +75,7 @@ func (a *Aggregate) Validate() error {
 	return a.Version.Validate()
 }
 
-func (a *Aggregate) Appender(appendFn appender) *Aggregate {
-	a.appender = appendFn
+func (a *Aggregate) SetAppender(appendFn appender) *Aggregate {
+	a.Appender = appendFn
 	return a
 }
