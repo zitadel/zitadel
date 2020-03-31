@@ -15,9 +15,6 @@ func NewSearchQuery() *SearchQuery {
 }
 
 func (q *SearchQuery) SetLimit(limit uint64) *SearchQuery {
-	if limit < 0 {
-		return q
-	}
 	q.Limit = limit
 	return q
 }
@@ -49,14 +46,13 @@ func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
 }
 
 func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
-	q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
-	return q
+	return q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
 }
 
 func (q *SearchQuery) setFilter(filter *Filter) *SearchQuery {
-	for _, f := range q.Filters {
+	for i, f := range q.Filters {
 		if f.field == filter.field {
-			f = filter
+			q.Filters[i] = filter
 			return q
 		}
 	}

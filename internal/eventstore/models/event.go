@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"reflect"
 	"time"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -34,7 +35,7 @@ func eventData(i interface{}) ([]byte, error) {
 	switch v := i.(type) {
 	case []byte:
 		return v, nil
-	case map[string]interface{}, interface{}:
+	case map[string]interface{}:
 		bytes, err := json.Marshal(v)
 		if err != nil {
 			return nil, errors.ThrowInvalidArgument(err, "MODEL-s2fgE", "unable to marshal data")
@@ -42,9 +43,20 @@ func eventData(i interface{}) ([]byte, error) {
 		return bytes, nil
 	case nil:
 		return nil, nil
+	default:
+		t := reflect.TypeOf(i)
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+		if t.Kind() != reflect.Struct {
+			return nil, errors.ThrowInvalidArgument(nil, "MODEL-rjWdN", "data is not valid")
+		}
+		bytes, err := json.Marshal(v)
+		if err != nil {
+			return nil, errors.ThrowInvalidArgument(err, "MODEL-Y2OpM", "unable to marshal data")
+		}
+		return bytes, nil
 	}
-
-	return nil, errors.ThrowInvalidArgument(nil, "MODEL-y7Lg5", "data is not valid")
 }
 
 func (e *Event) Validate() error {
@@ -53,9 +65,6 @@ func (e *Event) Validate() error {
 	}
 	if string(e.Type) == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-R2sB0", "type not defined")
-	}
-	if e.PreviousSequence < 0 {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-Cp7i5", "previous sequence < 0")
 	}
 	if e.AggregateID == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-A6WwL", "aggregate id not set")

@@ -2,42 +2,46 @@ package models
 
 import (
 	"context"
+
+	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 type AggregateCreator struct {
 	serviceName string
+	//ignoreCtxData is needed to ignore ctxData.IsZero() in tests
+	ignoreCtxData bool
 }
 
 func NewAggregateCreator(serviceName string) *AggregateCreator {
 	return &AggregateCreator{serviceName: serviceName}
 }
 
-func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, v Version, latestSequence uint64) (*Aggregate, error) {
-	if err := v.Validate(); err != nil {
+func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, latestSequence uint64) (*Aggregate, error) {
+	if id == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "MODEL-sPLP8", "no id")
+	}
+	if string(typ) == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "MODEL-yfmjm", "no type")
+	}
+	if err := version.Validate(); err != nil {
 		return nil, err
+	}
+
+	ctxData := auth.GetCtxData(ctx)
+	if !c.ignoreCtxData && ctxData.IsZero() {
+		return nil, errors.ThrowInvalidArgument(nil, "MODEL-lZkk9", "ctxData zero")
 	}
 
 	return &Aggregate{
 		ID:             id,
 		Type:           typ,
 		latestSequence: latestSequence,
-		Version:        v,
+		Version:        version,
 		Events:         make([]*Event, 0, 2),
-		editorOrg:      editorOrg(ctx),
+		editorOrg:      ctxData.OrgID,
 		editorService:  c.serviceName,
-		editorUser:     editorUser(ctx),
-		resourceOwner:  resourceOwner(ctx),
+		editorUser:     ctxData.UserID,
+		resourceOwner:  ctxData.OrgID,
 	}, nil
-}
-
-func editorUser(ctx context.Context) string {
-	return "userID"
-}
-
-func editorOrg(ctx context.Context) string {
-	return "orgID"
-}
-
-func resourceOwner(ctx context.Context) string {
-	return "resourceOwner"
 }

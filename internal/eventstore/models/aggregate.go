@@ -31,9 +31,12 @@ type Aggregate struct {
 type appender func(...*Event)
 
 func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate, error) {
+	if string(typ) == "" {
+		return a, errors.ThrowInvalidArgument(nil, "MODEL-TGoCb", "no event type")
+	}
 	data, err := eventData(payload)
 	if err != nil {
-		return a, nil
+		return a, err
 	}
 
 	e := &Event{
@@ -67,12 +70,15 @@ func (a *Aggregate) Validate() error {
 	if len(a.Events) < 1 {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-PupjX", "no events set")
 	}
+	if err := a.Version.Validate(); err != nil {
+		return errors.ThrowPreconditionFailed(err, "MODEL-PupjX", "invalid version")
+	}
 	for _, event := range a.Events {
 		if err := event.Validate(); err != nil {
 			return err
 		}
 	}
-	return a.Version.Validate()
+	return nil
 }
 
 func (a *Aggregate) SetAppender(appendFn appender) *Aggregate {
