@@ -255,13 +255,6 @@ service AuthService {
             };
     }
 
-    //TODO: Remove func only for tests
-    rpc GetUserByID(UserID) returns (User) {
-        option (google.api.http) = {
-                get: "/users/{id}"
-            };
-    }
-
     rpc SearchMyProjectOrgs(MyProjectOrgSearchRequest) returns (MyProjectOrgSearchResponse) {
         option (google.api.http) = {
                 post: "/global/projectorgs/_search"
@@ -316,10 +309,6 @@ enum OIDCResponseType {
     OIDCRESPONSETYPE_CODE = 0;
     OIDCRESPONSETYPE_ID_TOKEN = 1;
     OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
-}
-
-message UserID {
-    string id = 1;
 }
 
 message User {

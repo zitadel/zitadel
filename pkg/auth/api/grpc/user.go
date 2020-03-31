@@ -6,10 +6,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) GetUserByID(ctx context.Context, request *UserID) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-fj74G", "Not implemented")
-}
-
 func (s *Server) GetMyUserProfile(ctx context.Context, _ *empty.Empty) (*UserProfile, error) {
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-fis93", "Not implemented")
 }

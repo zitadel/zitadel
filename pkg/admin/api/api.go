@@ -7,11 +7,6 @@ import (
 	"github.com/caos/zitadel/pkg/admin/api/grpc"
 )
 
-type API struct {
-	grpcServer grpc.Server
-	gateway    grpc.Gateway
-}
-
 type Config struct {
 	GRPC grpc_util.Config
 }

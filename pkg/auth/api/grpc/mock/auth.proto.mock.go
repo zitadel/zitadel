@@ -257,26 +257,6 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyZitadelPermissions(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyZitadelPermissions", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyZitadelPermissions), varargs...)
 }
 
-// GetUserByID mocks base method
-func (m *MockAuthServiceClient) GetUserByID(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.User, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetUserByID", varargs...)
-	ret0, _ := ret[0].(*grpc.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserByID indicates an expected call of GetUserByID
-func (mr *MockAuthServiceClientMockRecorder) GetUserByID(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockAuthServiceClient)(nil).GetUserByID), varargs...)
-}
-
 // Healthz mocks base method
 func (m *MockAuthServiceClient) Healthz(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
