@@ -1,4 +1,4 @@
-package repository
+package sql
 
 import (
 	"context"
@@ -6,32 +6,28 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/caos/eventstore-lib/pkg/models"
 	caos_errs "github.com/caos/utils/errors"
 	"github.com/caos/utils/logging"
-	"github.com/caos/utils/tracing"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 )
 
-func (db *SQL) Filter(ctx context.Context, events models.Events, searchQuery models.SearchQuery) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.EndWithError(err)
-
+func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*es_models.Event, err error) {
 	query := "SELECT" +
-		" id," +
-		" creation_date," +
-		" event_type," +
-		" event_sequence," +
-		" previous_sequence," +
-		" event_data," +
-		" modifier_service," +
-		" modifier_tenant," +
-		" modifier_user," +
-		" resource_owner," +
-		" aggregate_type," +
-		" aggregate_id" +
+		" id" +
+		", creation_date" +
+		", event_type" +
+		", event_sequence" +
+		", previous_sequence" +
+		", event_data" +
+		", modifier_service" +
+		", modifier_tenant" +
+		", modifier_user" +
+		", resource_owner" +
+		", aggregate_type" +
+		", aggregate_id" +
+		", aggregate_version" +
 		" FROM eventstore.events"
 
 	where, values := prepareWhere(searchQuery)
@@ -52,11 +48,11 @@ func (db *SQL) Filter(ctx context.Context, events models.Events, searchQuery mod
 	rows, err := db.client.Query(query, values...)
 	if err != nil {
 		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
-		return caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+		return nil, caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
 	}
 
 	for rows.Next() {
-		event := new(Event)
+		event := new(es_models.Event)
 		rows.Scan(
 			&event.ID,
 			&event.CreationDate,
@@ -66,15 +62,16 @@ func (db *SQL) Filter(ctx context.Context, events models.Events, searchQuery mod
 			&event.Data,
 			&event.ModifierService,
 			&event.ModifierTenant,
-			&event.ModiferUser,
+			&event.ModifierUser,
 			&event.ResourceOwner,
 			&event.AggregateType,
 			&event.AggregateID,
+			&event.AggregateVersion,
 		)
-		events.Append(eventToApp(event))
+		events = append(events, event)
 	}
 
-	return nil
+	return events, err
 }
 
 func numberPlaceholder(query, old, new string) string {
@@ -86,7 +83,7 @@ func numberPlaceholder(query, old, new string) string {
 	return query
 }
 
-func prepareWhere(searchQuery models.SearchQuery) (clause string, values []interface{}) {
+func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []interface{}) {
 	values = make([]interface{}, len(searchQuery.Filters()))
 	clauses := make([]string, len(searchQuery.Filters()))
 
@@ -107,7 +104,7 @@ func prepareWhere(searchQuery models.SearchQuery) (clause string, values []inter
 	return " WHERE " + strings.Join(clauses, " AND "), values
 }
 
-func generateFilters(query *gorm.DB, searchQuery models.SearchQuery) *gorm.DB {
+func generateFilters(query *gorm.DB, searchQuery es_models.SearchQuery) *gorm.DB {
 	for _, f := range searchQuery.Filters() {
 		value := f.GetValue()
 		switch value.(type) {
@@ -120,7 +117,7 @@ func generateFilters(query *gorm.DB, searchQuery models.SearchQuery) *gorm.DB {
 	return query
 }
 
-func getCondition(filter models.Filter) string {
+func getCondition(filter *es_models.Filter) string {
 	field := getField(filter.GetField())
 	operation := getOperation(filter.GetOperation())
 	format := prepareConditionFormat(filter.GetOperation())
@@ -128,42 +125,42 @@ func getCondition(filter models.Filter) string {
 	return fmt.Sprintf(format, field, operation)
 }
 
-func prepareConditionFormat(operation models.Operation) string {
-	if operation == es_models.In {
+func prepareConditionFormat(operation es_models.Operation) string {
+	if operation == es_models.Operation_In {
 		return "%s %s (?)"
 	}
 	return "%s %s ?"
 }
 
-func getField(field models.Field) string {
+func getField(field es_models.Field) string {
 	switch field {
-	case es_models.AggregateID:
+	case es_models.Field_AggregateID:
 		return "aggregate_id"
-	case es_models.AggregateType:
+	case es_models.Field_AggregateType:
 		return "aggregate_type"
-	case es_models.LatestSequence:
+	case es_models.Field_LatestSequence:
 		return "event_sequence"
-	case es_models.ResourceOwner:
+	case es_models.Field_ResourceOwner:
 		return "resource_owner"
-	case es_models.ModifierService:
+	case es_models.Field_ModifierService:
 		return "modifier_service"
-	case es_models.ModifierUser:
+	case es_models.Field_ModifierUser:
 		return "modifier_user"
-	case es_models.ModifierTenant:
+	case es_models.Field_ModifierTenant:
 		return "modifier_tenant"
 	}
 	return ""
 }
 
-func getOperation(operation models.Operation) string {
+func getOperation(operation es_models.Operation) string {
 	switch operation {
-	case es_models.Equals:
+	case es_models.Operation_Equals:
 		return "="
-	case es_models.Greater:
+	case es_models.Operation_Greater:
 		return ">"
-	case es_models.Less:
+	case es_models.Operation_Less:
 		return "<"
-	case es_models.In:
+	case es_models.Operation_In:
 		return "IN"
 	}
 	return ""
