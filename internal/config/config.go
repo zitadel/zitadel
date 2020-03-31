@@ -12,26 +12,16 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-type Reader interface {
-	Unmarshal(data []byte, o interface{}) error
-}
-
 type ValidatableConfiguration interface {
 	Validate() error
 }
 
 type ReaderFunc func(data []byte, o interface{}) error
 
-func (c ReaderFunc) Unmarshal(data []byte, o interface{}) error {
-	return c(data, o)
-}
-
 var (
-	JSONReader = ReaderFunc(json.Unmarshal)
-	TOMLReader = ReaderFunc(toml.Unmarshal)
-	YAMLReader = ReaderFunc(func(y []byte, o interface{}) error {
-		return yaml.Unmarshal(y, o)
-	})
+	JSONReader = json.Unmarshal
+	TOMLReader = toml.Unmarshal
+	YAMLReader = func(data []byte, o interface{}) error { return yaml.Unmarshal(data, o) }
 )
 
 // Read deserializes each config file to the target obj
@@ -39,11 +29,11 @@ var (
 // env vars are replaced in the config file as well as the file path
 func Read(obj interface{}, configFiles ...string) error {
 	for _, cf := range configFiles {
-		configReader, err := configReaderForFile(cf)
+		readerFunc, err := readerFuncForFile(cf)
 		if err != nil {
 			return err
 		}
-		if err := readConfigFile(configReader, cf, obj); err != nil {
+		if err := readConfigFile(readerFunc, cf, obj); err != nil {
 			return err
 		}
 	}
@@ -57,12 +47,8 @@ func Read(obj interface{}, configFiles ...string) error {
 	return nil
 }
 
-func readConfigFile(configReader Reader, configFile string, obj interface{}) error {
+func readConfigFile(readerFunc ReaderFunc, configFile string, obj interface{}) error {
 	configFile = os.ExpandEnv(configFile)
-
-	if _, err := os.Stat(configFile); err != nil {
-		return errors.ThrowNotFoundf(err, "CONFI-Hs93M", "config file %s does not exist", configFile)
-	}
 
 	configStr, err := ioutil.ReadFile(configFile)
 	if err != nil {
@@ -71,14 +57,14 @@ func readConfigFile(configReader Reader, configFile string, obj interface{}) err
 
 	configStr = []byte(os.ExpandEnv(string(configStr)))
 
-	if err := configReader.Unmarshal(configStr, obj); err != nil {
+	if err := readerFunc(configStr, obj); err != nil {
 		return errors.ThrowInternalf(err, "CONFI-2Mc3c", "error parse config file %s", configFile)
 	}
 
 	return nil
 }
 
-func configReaderForFile(configFile string) (Reader, error) {
+func readerFuncForFile(configFile string) (ReaderFunc, error) {
 	ext := filepath.Ext(configFile)
 	switch ext {
 	case ".yaml", ".yml":

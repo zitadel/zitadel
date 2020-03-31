@@ -8,7 +8,7 @@ import (
 )
 
 func getTestCtx(userID, orgID string) context.Context {
-	return context.WithValue(context.Background(), CtxKeyData{}, &CtxData{UserID: userID, OrgID: orgID})
+	return context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
 }
 
 type testVerifier struct {
@@ -27,7 +27,7 @@ func (v *testVerifier) GetProjectIDByClientID(ctx context.Context, clientID stri
 	return "", nil
 }
 
-func EqualStringArray(a, b []string) bool {
+func equalStringArray(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -74,10 +74,8 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			errFunc: func(err error) bool {
-				return caos_errs.IsUnauthenticated(err)
-			},
-			result: []string{"project.read"},
+			errFunc: caos_errs.IsUnauthenticated,
+			result:  []string{"project.read"},
 		},
 		{
 			name: "No Grants",
@@ -135,7 +133,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 
-			if !tt.wantErr && !EqualStringArray(perms, tt.result) {
+			if !tt.wantErr && !equalStringArray(perms, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, perms)
 			}
 		})
@@ -241,7 +239,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := mapGrantsToPermissions(tt.args.requiredPerm, tt.args.grants, tt.args.authConfig)
-			if !EqualStringArray(result, tt.result) {
+			if !equalStringArray(result, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}
 		})
@@ -348,7 +346,7 @@ func Test_MapRoleToPerm(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := mapRoleToPerm(tt.args.requiredPerm, tt.args.actualRole, tt.args.authConfig, tt.args.resolvedPermissions)
-			if !EqualStringArray(result, tt.result) {
+			if !equalStringArray(result, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}
 		})
@@ -393,7 +391,6 @@ func Test_AddRoleContextIDToPerm(t *testing.T) {
 }
 
 func Test_ExistisPerm(t *testing.T) {
-
 	type args struct {
 		existing []string
 		perm     string
