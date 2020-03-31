@@ -1,49 +1,67 @@
 package models
 
 import (
-	"github.com/caos/logging"
+	"time"
+
 	"github.com/caos/zitadel/internal/errors"
 )
 
 type AggregateType string
 
+func (at AggregateType) String() string {
+	return string(at)
+}
+
+type Aggregates []*Aggregate
+
 type Aggregate struct {
 	ID             string
-	Typ            AggregateType
-	Events         []*Event
-	LatestSequence uint64
+	Type           AggregateType
+	latestSequence uint64
 	Version        Version
+
+	editorService string
+	editorUser    string
+	editorOrg     string
+	resourceOwner string
+	Events        []*Event
+	Appender      appender
 }
 
-func NewAggregate(id string, typ AggregateType, v Version, latestSequence uint64, events ...*Event) (*Aggregate, error) {
-	if err := v.Validate(); err != nil {
-		return nil, err
-	}
-	for _, event := range events {
-		if err := event.Validate(); err != nil {
-			return nil, err
-		}
-	}
-	return &Aggregate{
-		ID:             id,
-		Typ:            typ,
-		Events:         events,
-		LatestSequence: latestSequence,
-		Version:        v,
-	}, nil
-}
+type appender func(...*Event)
 
-func MustNewAggregate(id string, typ AggregateType, v Version, latestSequence uint64, events ...*Event) *Aggregate {
-	aggregate, err := NewAggregate(id, typ, v, latestSequence, events...)
-	logging.Log("MODEL-10XZW").OnError(err).Fatal("unable to create aggregate")
-	return aggregate
+func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate, error) {
+	data, err := eventData(payload)
+	if err != nil {
+		return a, nil
+	}
+
+	e := &Event{
+		CreationDate:     time.Now(),
+		Data:             data,
+		Type:             typ,
+		PreviousSequence: a.latestSequence,
+		AggregateID:      a.ID,
+		AggregateType:    a.Type,
+		AggregateVersion: a.Version,
+		EditorOrg:        a.editorOrg,
+		EditorService:    a.editorService,
+		EditorUser:       a.editorUser,
+		ResourceOwner:    a.resourceOwner,
+	}
+
+	a.Events = append(a.Events, e)
+	return a, nil
 }
 
 func (a *Aggregate) Validate() error {
+	if a == nil {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-yi5AC", "aggregate is nil")
+	}
 	if a.ID == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-FSjKV", "id not set")
 	}
-	if a.Typ == "" {
+	if string(a.Type) == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-aj4t2", "type not set")
 	}
 	if len(a.Events) < 1 {
@@ -55,4 +73,9 @@ func (a *Aggregate) Validate() error {
 		}
 	}
 	return a.Version.Validate()
+}
+
+func (a *Aggregate) Appender(appendFn appender) *Aggregate {
+	a.appender = appendFn
+	return a
 }

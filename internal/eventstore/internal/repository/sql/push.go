@@ -46,11 +46,11 @@ func (db *SQL) PushEvents(ctx context.Context, aggregates [][]*models.Event) (er
 	// 				event.Data = []byte("{}")
 	// 			}
 
-	// 			rows, err := stmt.Query(event.Typ, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.ModifierUser, event.ModifierService, event.ModifierTenant, event.ResourceOwner,
-	// 				event.AggregateType, event.AggregateID,
-	// 				event.AggregateType, event.AggregateID,
-	// 				event.PreviousSequence, event.AggregateType, event.AggregateID,
-	// 				event.AggregateType, event.AggregateID, event.PreviousSequence)
+	// 			rows, err := stmt.Query(event.Typ, event.AggregateType,, event.AggregateID,, event.AggregateVersion,, event.CreationDate, event.Data, event.ModifierUser, event.ModifierService, event.ModifierTenant, event.ResourceOwner,
+	// 				event.AggregateType,, event.AggregateID,,
+	// 				event.AggregateType,, event.AggregateID,,
+	// 				event.PreviousSequence, event.AggregateType,, event.AggregateID,,
+	// 				event.AggregateType,, event.AggregateID,, event.PreviousSequence)
 
 	// 			if err != nil {
 	// 				logging.Log("SQL-EXA0q").WithError(err).Info("query failed")
@@ -107,19 +107,16 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		}
 
 		for _, aggregate := range aggregates {
-			previousSequence := aggregate.LatestSequence
+			previousSequence := aggregate.Events[0].PreviousSequence
 			for _, event := range aggregate.Events {
 				event.PreviousSequence = previousSequence
-				event.AggregateType = aggregate.Typ
-				event.AggregateID = aggregate.ID
-				event.AggregateVersion = aggregate.Version
 
 				if event.Data == nil || len(event.Data) == 0 {
 					//json decoder failes with EOF if json text is empty
 					event.Data = []byte("{}")
 				}
 
-				rows, err := stmt.Query(event.Typ, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.ModifierUser, event.ModifierService, event.ModifierTenant, event.ResourceOwner,
+				rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.EditorUser, event.EditorService, event.EditorOrg, event.ResourceOwner,
 					event.AggregateType, event.AggregateID,
 					event.AggregateType, event.AggregateID,
 					event.PreviousSequence, event.AggregateType, event.AggregateID,

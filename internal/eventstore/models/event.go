@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -8,35 +9,71 @@ import (
 
 type EventType string
 
+func (et EventType) String() string {
+	return string(et)
+}
+
 type Event struct {
-	//ID is set by eventstore
 	ID               string
-	CreationDate     time.Time
-	Typ              EventType
 	Sequence         uint64
+	CreationDate     time.Time
+	Type             EventType
 	PreviousSequence uint64
 	Data             []byte
-	ModifierService  string
-	ModifierTenant   string
-	ModifierUser     string
-	ResourceOwner    string
-	AggregateType    AggregateType
+
 	AggregateID      string
+	AggregateType    AggregateType
 	AggregateVersion Version
+	EditorService    string
+	EditorUser       string
+	EditorOrg        string
+	ResourceOwner    string
+}
+
+func eventData(i interface{}) ([]byte, error) {
+	switch v := i.(type) {
+	case []byte:
+		return v, nil
+	case map[string]interface{}, interface{}:
+		bytes, err := json.Marshal(v)
+		if err != nil {
+			return nil, errors.ThrowInvalidArgument(err, "MODEL-s2fgE", "unable to marshal data")
+		}
+		return bytes, nil
+	case nil:
+		return nil, nil
+	}
+
+	return nil, errors.ThrowInvalidArgument(nil, "MODEL-y7Lg5", "data is not valid")
 }
 
 func (e *Event) Validate() error {
-	if e.Typ == "" {
+	if e == nil {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-oEAG4", "event is nil")
+	}
+	if string(e.Type) == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-R2sB0", "type not defined")
 	}
-	if e.ModifierService == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-iGnu0", "modifier service not defined")
+	if e.PreviousSequence < 0 {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-Cp7i5", "previous sequence < 0")
 	}
-	if e.ModifierUser == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-uZcBF", "modifier user not defined")
+	if e.AggregateID == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-A6WwL", "aggregate id not set")
+	}
+	if e.AggregateType == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-EzdyK", "aggregate type not set")
+	}
+	if e.EditorService == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-4Yqik", "editor service not set")
+	}
+	if e.EditorUser == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-L3NHO", "editor user not set")
+	}
+	if e.EditorOrg == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-84fIw", "editor org not set")
 	}
 	if e.ResourceOwner == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-Bv0we", "resource owner not defined")
+		return errors.ThrowPreconditionFailed(nil, "MODEL-omFVT", "resource ow")
 	}
-	return nil
+	return e.AggregateVersion.Validate()
 }

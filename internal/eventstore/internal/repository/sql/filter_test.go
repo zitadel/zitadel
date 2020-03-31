@@ -7,7 +7,6 @@ import (
 
 	"github.com/caos/utils/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/jinzhu/gorm"
 )
 
 func TestSQL_Filter(t *testing.T) {
@@ -53,7 +52,7 @@ func TestSQL_Filter(t *testing.T) {
 		{
 			name: "no events found",
 			fields: fields{
-				client: mockDB(t).expectFilterEventsError(gorm.ErrRecordNotFound),
+				client: mockDB(t).expectFilterEventsError(sql.ErrNoRows),
 			},
 			args: args{
 				events:      &mockEvents{t: t},

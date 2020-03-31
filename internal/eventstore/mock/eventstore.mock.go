@@ -34,23 +34,18 @@ func (m *MockApp) EXPECT() *MockAppMockRecorder {
 	return m.recorder
 }
 
-// CreateEvents mocks base method
-func (m *MockApp) CreateEvents(arg0 context.Context, arg1 ...*models.Aggregate) error {
+// AggregateCreator mocks base method
+func (m *MockApp) AggregateCreator() *models.AggregateCreator {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0}
-	for _, a := range arg1 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "CreateEvents", varargs...)
-	ret0, _ := ret[0].(error)
+	ret := m.ctrl.Call(m, "AggregateCreator")
+	ret0, _ := ret[0].(*models.AggregateCreator)
 	return ret0
 }
 
-// CreateEvents indicates an expected call of CreateEvents
-func (mr *MockAppMockRecorder) CreateEvents(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// AggregateCreator indicates an expected call of AggregateCreator
+func (mr *MockAppMockRecorder) AggregateCreator() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEvents", reflect.TypeOf((*MockApp)(nil).CreateEvents), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AggregateCreator", reflect.TypeOf((*MockApp)(nil).AggregateCreator))
 }
 
 // FilterEvents mocks base method
@@ -80,4 +75,23 @@ func (m *MockApp) Health(arg0 context.Context) error {
 func (mr *MockAppMockRecorder) Health(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockApp)(nil).Health), arg0)
+}
+
+// PushAggregates mocks base method
+func (m *MockApp) PushAggregates(arg0 context.Context, arg1 ...*models.Aggregate) error {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PushAggregates", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PushAggregates indicates an expected call of PushAggregates
+func (mr *MockAppMockRecorder) PushAggregates(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushAggregates", reflect.TypeOf((*MockApp)(nil).PushAggregates), varargs...)
 }
