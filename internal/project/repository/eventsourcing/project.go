@@ -1,8 +1,7 @@
 package eventsourcing
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/eventstore/pkg"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/sony/sonyflake"
 	"strconv"
@@ -11,7 +10,7 @@ import (
 var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
 type Project struct {
-	pkg.ObjectRoot
+	es_models.ObjectRoot
 	Name  string `json:"name,omitempty"`
 	State int32  `json:"-"`
 }
@@ -20,8 +19,8 @@ func ProjectFromModel(project *model.Project) *Project {
 	return &Project{
 		Name:  project.Name,
 		State: model.ProjectStateToInt(project.State),
-		ObjectRoot: pkg.ObjectRoot{
-			ID:           project.ID,
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           project.ObjectRoot.ID,
 			Sequence:     project.Sequence,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,

@@ -1,23 +1,22 @@
 package model
 
 import (
-	es_pkg "github.com/caos/zitadel/internal/eventstore/pkg"
-	"github.com/caos/zitadel/internal/model"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 type Project struct {
-	es_pkg.ObjectRoot
+	es_models.ObjectRoot
 
 	State ProjectState
 	Name  string
 }
 
-type ProjectState model.Enum
+type ProjectState es_models.Enum
 
 var states = []string{"Active", "Inactive"}
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_pkg.ObjectRoot{ID: id}, State: Active}
+	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: Active}
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
