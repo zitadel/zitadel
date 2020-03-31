@@ -21,3 +21,7 @@ debug
 # IDE
 .idea
 .vscode
+
+# credential
+google-credentials
+key.json

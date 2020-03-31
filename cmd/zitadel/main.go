@@ -44,20 +44,17 @@ func main() {
 
 	ctx := context.Background()
 	if *managementEnabled {
-		err = management.Start(ctx, conf.Mgmt, conf.AuthZ)
-		logging.Log("MAIN-39Nv5").OnError(err).Fatal("error starting management api")
+		management.Start(ctx, conf.Mgmt, conf.AuthZ)
 	}
 	if *authEnabled {
-		err = auth.Start(ctx, conf.Auth, conf.AuthZ)
-		logging.Log("MAIN-x0nD2").OnError(err).Fatal("error starting auth api")
+		auth.Start(ctx, conf.Auth, conf.AuthZ)
 	}
 	if *loginEnabled {
 		err = login.Start(ctx, conf.Login)
 		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
 	}
 	if *adminEnabled {
-		err = admin.Start(ctx, conf.Admin, conf.AuthZ)
-		logging.Log("MAIN-0na71").OnError(err).Fatal("error starting admin api")
+		admin.Start(ctx, conf.Admin, conf.AuthZ)
 	}
 	if *consoleEnabled {
 		err = console.Start(ctx, conf.Console)

@@ -11,10 +11,11 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/aws/aws-sdk-go v1.29.16 // indirect
 	github.com/caos/logging v0.0.1
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
-	github.com/golang/protobuf v1.3.5
+	github.com/golang/protobuf v1.4.0-rc.4
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/securecookie v1.1.1
@@ -34,7 +35,8 @@ require (
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200212150539-ea181f53ac56
 	google.golang.org/api v0.20.0 // indirect
-	google.golang.org/genproto v0.0.0-20200319113533-08878b785e9c // indirect
+	google.golang.org/genproto v0.0.0-20200319113533-08878b785e9c
 	google.golang.org/grpc v1.28.0
+	google.golang.org/protobuf v1.20.1
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
