@@ -1,7 +1,7 @@
 package eventstore
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/repository/sql"
+	"github.com/caos/zitadel/internal/eventstore/internal/repository/sql"
 )
 
 type Config struct {

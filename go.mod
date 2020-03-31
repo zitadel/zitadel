@@ -26,4 +26,3 @@ require (
 	google.golang.org/genproto v0.0.0-20200330113809-af700f360a68 // indirect
 	google.golang.org/grpc v1.28.0
 )
- 

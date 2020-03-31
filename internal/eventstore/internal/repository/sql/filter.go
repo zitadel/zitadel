@@ -126,7 +126,7 @@ func getCondition(filter *es_models.Filter) string {
 }
 
 func prepareConditionFormat(operation es_models.Operation) string {
-	if operation == es_models.In {
+	if operation == es_models.Operation_In {
 		return "%s %s (?)"
 	}
 	return "%s %s ?"
@@ -134,19 +134,19 @@ func prepareConditionFormat(operation es_models.Operation) string {
 
 func getField(field es_models.Field) string {
 	switch field {
-	case es_models.AggregateID:
+	case es_models.Field_AggregateID:
 		return "aggregate_id"
-	case es_models.AggregateType:
+	case es_models.Field_AggregateType:
 		return "aggregate_type"
-	case es_models.LatestSequence:
+	case es_models.Field_LatestSequence:
 		return "event_sequence"
-	case es_models.ResourceOwner:
+	case es_models.Field_ResourceOwner:
 		return "resource_owner"
-	case es_models.ModifierService:
+	case es_models.Field_ModifierService:
 		return "modifier_service"
-	case es_models.ModifierUser:
+	case es_models.Field_ModifierUser:
 		return "modifier_user"
-	case es_models.ModifierTenant:
+	case es_models.Field_ModifierTenant:
 		return "modifier_tenant"
 	}
 	return ""
@@ -154,13 +154,13 @@ func getField(field es_models.Field) string {
 
 func getOperation(operation es_models.Operation) string {
 	switch operation {
-	case es_models.Equals:
+	case es_models.Operation_Equals:
 		return "="
-	case es_models.Greater:
+	case es_models.Operation_Greater:
 		return ">"
-	case es_models.Less:
+	case es_models.Operation_Less:
 		return "<"
-	case es_models.In:
+	case es_models.Operation_In:
 		return "IN"
 	}
 	return ""

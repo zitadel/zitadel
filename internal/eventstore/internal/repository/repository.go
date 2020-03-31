@@ -11,7 +11,9 @@ type Repository interface {
 
 	// PushEvents adds all events of the given aggregates to the eventstreams of the aggregates.
 	// This call is transaction save. The transaction will be rolled back if one event fails
-	PushEvents(ctx context.Context, aggregates ...*models.Aggregate) error
+	PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) error
+
+	PushEvents(ctx context.Context, aggregates [][]*models.Event) (err error)
 	// Filter returns all events matching the given search query
 	Filter(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error)
 }

@@ -42,23 +42,23 @@ func (q *SearchQuery) Validate() error {
 }
 
 func (q *SearchQuery) AggregateIDFilter(id string) *SearchQuery {
-	return q.setFilter(NewFilter(AggregateID, id, Equals))
+	return q.setFilter(NewFilter(Field_AggregateID, id, Operation_Equals))
 }
 
 func (q *SearchQuery) AggregateTypeFilter(types ...string) *SearchQuery {
-	return q.setFilter(NewFilter(AggregateType, types, In))
+	return q.setFilter(NewFilter(Field_AggregateType, types, Operation_In))
 }
 
 func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
-	sortOrder := Greater
+	sortOrder := Operation_Greater
 	if q.desc {
-		sortOrder = Less
+		sortOrder = Operation_Less
 	}
-	return q.setFilter(NewFilter(LatestSequence, sequence, sortOrder))
+	return q.setFilter(NewFilter(Field_LatestSequence, sequence, sortOrder))
 }
 
 func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
-	q.setFilter(NewFilter(ResourceOwner, resourceOwner, Equals))
+	q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
 	return q
 }
 

@@ -4,27 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-type Field int32
-
-const (
-	AggregateType Field = iota
-	AggregateID
-	LatestSequence
-	ResourceOwner
-	ModifierService
-	ModifierUser
-	ModifierTenant
-)
-
-type Operation int32
-
-const (
-	Equals Operation = iota
-	Greater
-	Less
-	In
-)
-
 type Filter struct {
 	field     Field
 	value     interface{}

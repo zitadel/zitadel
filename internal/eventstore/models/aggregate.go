@@ -5,15 +5,17 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
+type AggregateType string
+
 type Aggregate struct {
 	ID             string
-	Typ            string
+	Typ            AggregateType
 	Events         []*Event
 	LatestSequence uint64
-	Version        version
+	Version        Version
 }
 
-func NewAggregate(id, typ string, v version, latestSequence uint64, events ...*Event) (*Aggregate, error) {
+func NewAggregate(id string, typ AggregateType, v Version, latestSequence uint64, events ...*Event) (*Aggregate, error) {
 	if err := v.Validate(); err != nil {
 		return nil, err
 	}
@@ -31,7 +33,7 @@ func NewAggregate(id, typ string, v version, latestSequence uint64, events ...*E
 	}, nil
 }
 
-func MustNewAggregate(id, typ string, v version, latestSequence uint64, events ...*Event) *Aggregate {
+func MustNewAggregate(id string, typ AggregateType, v Version, latestSequence uint64, events ...*Event) *Aggregate {
 	aggregate, err := NewAggregate(id, typ, v, latestSequence, events...)
 	logging.Log("MODEL-10XZW").OnError(err).Fatal("unable to create aggregate")
 	return aggregate

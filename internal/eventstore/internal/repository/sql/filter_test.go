@@ -134,14 +134,14 @@ func Test_getCondition(t *testing.T) {
 		{
 			name: "single value",
 			args: args{
-				filter: es_models.NewFilter(es_models.LatestSequence, 34, es_models.Greater),
+				filter: es_models.NewFilter(es_models.Field_LatestSequence, 34, es_models.Operation_Greater),
 			},
 			want: "event_sequence > ?",
 		},
 		{
 			name: "list value",
 			args: args{
-				filter: es_models.NewFilter(es_models.AggregateType, []string{"a", "b"}, es_models.In),
+				filter: es_models.NewFilter(es_models.Field_AggregateType, []string{"a", "b"}, es_models.Operation_In),
 			},
 			want: "aggregate_type IN (?)",
 		},

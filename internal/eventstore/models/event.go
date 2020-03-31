@@ -6,11 +6,13 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
+type EventType string
+
 type Event struct {
 	//ID is set by eventstore
 	ID               string
 	CreationDate     time.Time
-	Typ              string
+	Typ              EventType
 	Sequence         uint64
 	PreviousSequence uint64
 	Data             []byte
@@ -18,9 +20,9 @@ type Event struct {
 	ModifierTenant   string
 	ModifierUser     string
 	ResourceOwner    string
-	AggregateType    string
+	AggregateType    AggregateType
 	AggregateID      string
-	AggregateVersion version
+	AggregateVersion Version
 }
 
 func (e *Event) Validate() error {

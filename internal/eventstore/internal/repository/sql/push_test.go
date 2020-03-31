@@ -16,7 +16,7 @@ type mockEvents struct {
 	t      *testing.T
 }
 
-func TestSQL_PushEvents(t *testing.T) {
+func TestSQL_PushAggregates(t *testing.T) {
 	type fields struct {
 		client *dbMock
 	}
@@ -96,7 +96,7 @@ func TestSQL_PushEvents(t *testing.T) {
 			},
 			args: args{
 				aggregates: []*models.Aggregate{
-					models.MustNewAggregate("aggID", "aggType", models.MustVersion(0, 0, 1), 34,
+					models.MustNewAggregate("aggID", "aggType", "v0.0.1", 34,
 						&models.Event{
 							ModifierService: "svc",
 							ModifierTenant:  "tenant",
@@ -265,7 +265,7 @@ func TestSQL_PushEvents(t *testing.T) {
 			sql := &SQL{
 				client: tt.fields.client.sqlClient,
 			}
-			err := sql.PushEvents(context.Background(), tt.args.aggregates...)
+			err := sql.PushAggregates(context.Background(), tt.args.aggregates...)
 			if err != nil && !tt.isError(err) {
 				t.Errorf("wrong error type = %v, errFunc %s", err, functionName(tt.isError))
 			}

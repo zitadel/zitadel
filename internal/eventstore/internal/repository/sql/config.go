@@ -3,7 +3,7 @@ package sql
 import (
 	"database/sql"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/caos/zitadel/internal/eventstore/internal/repository"
 )
 
 type Config struct {
