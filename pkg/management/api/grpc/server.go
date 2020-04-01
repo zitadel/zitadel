@@ -3,6 +3,7 @@ package grpc
 import (
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	"github.com/caos/zitadel/internal/management/repository"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
@@ -10,12 +11,14 @@ import (
 var _ ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
-	port string
+	port    string
+	project repository.ProjectRepository
 }
 
-func StartServer(conf grpc_util.ServerConfig) *Server {
+func StartServer(conf grpc_util.ServerConfig, repo repository.Repository) *Server {
 	return &Server{
-		port: conf.Port,
+		port:    conf.Port,
+		project: repo,
 	}
 }
 

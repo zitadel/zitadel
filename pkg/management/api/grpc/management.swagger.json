@@ -5027,7 +5027,7 @@
       "enum": [
         "PROJECTSTATE_UNSPECIFIED",
         "PROJECTSTATE_ACTIVE",
-        "PROJECTSSTATE_INACTIVE"
+        "PROJECTSTATE_INACTIVE"
       ],
       "default": "PROJECTSTATE_UNSPECIFIED"
     },

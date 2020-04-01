@@ -1646,7 +1646,7 @@ message Project {
 enum ProjectState {
     PROJECTSTATE_UNSPECIFIED = 0;
     PROJECTSTATE_ACTIVE = 1;
-    PROJECTSSTATE_INACTIVE = 2;
+    PROJECTSTATE_INACTIVE = 2;
 }
 
 enum ProjectType {
