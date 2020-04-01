@@ -1,8 +1,9 @@
-package eventsourcing
+package repository
 
 import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Config struct {
@@ -13,10 +14,10 @@ type Config struct {
 
 type Repository struct {
 	//spooler *es_spooler.Spooler
-	projectRepo
+	eventsourcing.ProjectRepo
 }
 
-func StartRepository(conf Config) (*Repository, error) {
+func Start(conf Config) (*Repository, error) {
 	es := es_int.Start(conf.Eventstore)
 
 	//view, sql, err := mgmt_view.StartView(conf.View)
@@ -29,13 +30,13 @@ func StartRepository(conf Config) (*Repository, error) {
 	//conf.Spooler.SQL = sql
 	//spool := spooler.StartSpooler(conf.Spooler)
 
-	project, err := eventstore.StartProject(eventstore.ProjectConfig{Eventstore: es})
+	project, err := es_proj.StartProject(es_proj.ProjectConfig{Eventstore: es})
 	if err != nil {
 		return nil, err
 	}
 
 	return &Repository{
-		projectRepo{project},
+		eventsourcing.ProjectRepo{project},
 	}, nil
 }
 

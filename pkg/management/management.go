@@ -8,10 +8,11 @@ import (
 )
 
 type Config struct {
-	App repository.Config
-	API api.Config
+	Repository repository.Config
+	API        api.Config
 }
 
 func Start(ctx context.Context, config Config, authZ auth.Config) {
 	api.Start(ctx, config.API)
+	repository.Start(config.Repository)
 }

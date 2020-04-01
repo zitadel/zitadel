@@ -66,30 +66,43 @@ func ProjectCreateEvents(ctx context.Context, aggCreator *es_models.AggregateCre
 	return createdProject(ctx, aggCreator, project)
 }
 
-func ProjectUpdateEvents(agg *es_models.Aggregate, project *model.ProjectChange) (*es_models.Aggregate, error) {
-	return updatedProject(agg, project)
+func ProjectUpdateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project, new *model.Project) (*es_models.Aggregate, error) {
+	return updatedProject(ctx, aggCreator, existing, new)
 }
 
-func projectAggregate(ctx context.Context, aggCreator es_models.AggregateCreator, p *model.Project) (*es_models.Aggregate, error) {
-	return aggCreator.NewAggregate(ctx, p.ID, model.ProjectAggregate, "v1", p.Sequence)
+func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
+	return aggCreator.NewAggregate(ctx, id, model.ProjectAggregate, "v1", sequence)
 }
 
 func createdProject(ctx context.Context, aggCreator *es_models.AggregateCreator, p *model.Project) (*es_models.Aggregate, error) {
-	agg, err := projectAggregate(ctx, aggCreator, p)
+	agg, err := ProjectAggregate(ctx, aggCreator, p.ID, p.Sequence)
 	if err != nil {
 		return nil, err
 	}
 	return agg.AppendEvent(model.AddedProject, p)
 }
 
-func updatedProject(agg *es_models.Aggregate, p *model.ProjectChange) (*es_models.Aggregate, error) {
-	return agg.AppendEvent(model.ChangedProject, p)
+func updatedProject(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project, new *model.Project) (*es_models.Aggregate, error) {
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	changes := existing.Changes(new)
+	return agg.AppendEvent(model.ChangedProject, changes)
 }
 
-func ProjectDeactivateEvents(agg *es_models.Aggregate) (*es_models.Aggregate, error) {
+func ProjectDeactivateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project) (*es_models.Aggregate, error) {
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
 	return agg.AppendEvent(model.DeactivatedProject, nil)
 }
 
-func ProjectReactivateEvents(agg *es_models.Aggregate) (*es_models.Aggregate, error) {
+func ProjectReactivateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project) (*es_models.Aggregate, error) {
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
 	return agg.AppendEvent(model.ReactivatedProject, nil)
 }

@@ -2,17 +2,16 @@ package eventsourcing
 
 import (
 	"context"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
-type projectRepo struct {
-	projectEvents *eventstore.ProjectEventstore
+type ProjectRepo struct {
+	ProjectEvents *proj_event.ProjectEventstore
 	//view      *view.View
 }
 
-func (repo *projectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
+func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
 	//viewProject, err := repo.view.OrgByID(id)
 	//if err != nil && !caos_errs.IsNotFound(err) {
 	//	return nil, err
@@ -22,64 +21,46 @@ func (repo *projectRepo) ProjectByID(ctx context.Context, id string) (project *p
 	//} else {
 	project = proj_model.NewProject(id)
 	//}
-	return project, repo.projectEvents.ProjectByID(ctx, project)
+	return project, repo.ProjectEvents.ProjectByID(ctx, project)
 }
 
-func (repo *projectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
-	id, err := repo.projectEvents.CreateProject(ctx, name)
+func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
+	id, err := repo.ProjectEvents.CreateProject(ctx, name)
 	if err != nil {
 		return nil, err
 	}
-
 	return repo.ProjectByID(ctx, id)
 }
 
-func (repo *projectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	currentProject, err := repo.ProjectByID(ctx, project.ID)
+func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
+	existingProject, err := repo.ProjectByID(ctx, project.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	changes := currentProject.Changes(project)
-	if len(changes) == 0 {
-		return currentProject, nil
-	}
-
-	project.Sequence = currentProject.Sequence
-
-	project.Sequence, err = repo.projectEvents.UpdateProject(ctx,
-		&proj_model.ProjectChange{ID: project.ID, Payload: changes, Sequence: currentOrg.Sequence},
-	)
+	project.Sequence, err = repo.ProjectEvents.UpdateProject(ctx, existingProject, project)
 	return repo.ProjectByID(ctx, project.ID)
 }
 
-func (repo *projectRepo) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
+func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
 	project, err := repo.ProjectByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, err := repo.projectEvents.IsProjectActive(ctx, project); err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-r2fw1", "active")
-	}
-
-	project.Sequence, err = repo.projectEvents.DeactivateProject(ctx, project.ID, project.Sequence)
+	project.Sequence, err = repo.ProjectEvents.DeactivateProject(ctx, project)
 	project.State = proj_model.Inactive
 
 	return project, err
 }
 
-func (repo *projectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
+func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
 	project, err := repo.ProjectByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, err := repo.projectEvents.IsProjectActive(ctx, project); err == nil {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-r2fw1", "active")
-	}
-
-	project.Sequence, err = repo.projectEvents.ReactivateOrg(ctx, project.ID, project.Sequence)
+	project.Sequence, err = repo.ProjectEvents.ReactivateProject(ctx, project)
 	project.State = proj_model.Active
 
 	return project, err

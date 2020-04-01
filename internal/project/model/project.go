@@ -27,3 +27,10 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 	}
 	return changes
 }
+
+func (p *Project) IsActive() bool {
+	if p.State == Active {
+		return true
+	}
+	return false
+}

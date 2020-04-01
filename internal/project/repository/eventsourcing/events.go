@@ -1,9 +1,10 @@
 package eventsourcing
 
 import (
+	"encoding/json"
+	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/proto"
 )
 
 func FromEvents(project *Project, events ...*es_models.Event) (*Project, error) {
@@ -28,8 +29,12 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 
 	switch event.Type {
 	case model.AddedProject, model.ChangedProject:
+		if err := json.Unmarshal(event.Data, p); err != nil {
+			logging.Log("EVEN-idl93").WithError(err).Error("could not unmarshal event data")
+			return err
+		}
 		p.State = model.ProjectStateToInt(model.Active)
-		return proto.FromPBStruct(p, event.Data)
+		return nil
 	case model.DeactivatedProject:
 		return p.appendDeactivatedEvent()
 	case model.ReactivatedProject:
