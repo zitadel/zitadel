@@ -17,6 +17,17 @@ Mgmt:
       GatewayPort: 50011
       CustomHeaders:
         - x-caos-
+  Repository:
+    Eventstore:
+      ServiceName: 'ManagementAPI'
+      Repository:
+        Address:
+          Host: $CR_HOST
+          Port: $CR_PORT
+          User: management
+          Dbname: management
+          Sslmode: disable
+
 
 Auth:
   API:

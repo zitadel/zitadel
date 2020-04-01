@@ -20,14 +20,6 @@ func NewProject(id string) *Project {
 	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: Active}
 }
 
-func (p *Project) Changes(changed *Project) map[string]interface{} {
-	changes := make(map[string]interface{}, 2)
-	if changed.Name != "" && p.Name != changed.Name {
-		changes["name"] = changed.Name
-	}
-	return changes
-}
-
 func (p *Project) IsActive() bool {
 	if p.State == Active {
 		return true

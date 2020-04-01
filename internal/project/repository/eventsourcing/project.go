@@ -16,6 +16,14 @@ type Project struct {
 	State int32  `json:"-"`
 }
 
+func (p *Project) Changes(changed *Project) map[string]interface{} {
+	changes := make(map[string]interface{}, 2)
+	if changed.Name != "" && p.Name != changed.Name {
+		changes["name"] = changed.Name
+	}
+	return changes
+}
+
 func ProjectFromModel(project *model.Project) *Project {
 	return &Project{
 		Name:  project.Name,
@@ -55,7 +63,11 @@ func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
 		LatestSequenceFilter(latestSequence)
 }
 
-func ProjectCreateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, project *model.Project) (*es_models.Aggregate, error) {
+func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
+	return aggCreator.NewAggregate(ctx, id, model.ProjectAggregate, "v1", sequence)
+}
+
+func ProjectCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, project *Project) (*es_models.Aggregate, error) {
 	var err error
 	id, err := idGenerator.NextID()
 	if err != nil {
@@ -63,26 +75,15 @@ func ProjectCreateEvents(ctx context.Context, aggCreator *es_models.AggregateCre
 	}
 	project.ID = strconv.FormatUint(id, 10)
 
-	return createdProject(ctx, aggCreator, project)
-}
-
-func ProjectUpdateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project, new *model.Project) (*es_models.Aggregate, error) {
-	return updatedProject(ctx, aggCreator, existing, new)
-}
-
-func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
-	return aggCreator.NewAggregate(ctx, id, model.ProjectAggregate, "v1", sequence)
-}
-
-func createdProject(ctx context.Context, aggCreator *es_models.AggregateCreator, p *model.Project) (*es_models.Aggregate, error) {
-	agg, err := ProjectAggregate(ctx, aggCreator, p.ID, p.Sequence)
+	agg, err := ProjectAggregate(ctx, aggCreator, project.ID, project.Sequence)
 	if err != nil {
 		return nil, err
 	}
-	return agg.AppendEvent(model.AddedProject, p)
+
+	return agg.AppendEvent(model.AddedProject, project)
 }
 
-func updatedProject(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project, new *model.Project) (*es_models.Aggregate, error) {
+func ProjectUpdateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, new *Project) (*es_models.Aggregate, error) {
 	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 	if err != nil {
 		return nil, err
@@ -91,7 +92,7 @@ func updatedProject(ctx context.Context, aggCreator *es_models.AggregateCreator,
 	return agg.AppendEvent(model.ChangedProject, changes)
 }
 
-func ProjectDeactivateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project) (*es_models.Aggregate, error) {
+func ProjectDeactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
 	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 	if err != nil {
 		return nil, err
@@ -99,7 +100,7 @@ func ProjectDeactivateEvents(ctx context.Context, aggCreator *es_models.Aggregat
 	return agg.AppendEvent(model.DeactivatedProject, nil)
 }
 
-func ProjectReactivateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project) (*es_models.Aggregate, error) {
+func ProjectReactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
 	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 	if err != nil {
 		return nil, err

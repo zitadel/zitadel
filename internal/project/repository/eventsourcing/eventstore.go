@@ -31,64 +31,66 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_mode
 	return err
 }
 
-func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (err error) {
-	projectAggregate, err := ProjectCreateEvents(ctx, es.Eventstore.AggregateCreator(), project)
+func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
+	repoProject := ProjectFromModel(project)
+	projectAggregate, err := ProjectCreateAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = es.PushAggregates(ctx, projectAggregate)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	project.ID = projectAggregate.ID
-	project.Sequence = projectAggregate.Events[len(projectAggregate.Events)-1].Sequence
-	return es.ProjectByID(ctx, project)
+
+	repoProject.AppendEvents(projectAggregate.Events...)
+	return ProjectToModel(repoProject), nil
 }
 
-func (es *ProjectEventstore) UpdateProject(ctx context.Context, existing *proj_model.Project, new *proj_model.Project) (err error) {
-	projectAggregate, err := ProjectUpdateEvents(ctx, es.AggregateCreator(), existing, new)
+func (es *ProjectEventstore) UpdateProject(ctx context.Context, existing *proj_model.Project, new *proj_model.Project) (*proj_model.Project, error) {
+	repoExisting := ProjectFromModel(existing)
+	repoNew := ProjectFromModel(new)
+	projectAggregate, err := ProjectUpdateAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = es.PushAggregates(ctx, projectAggregate)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	new.ID = existing.ID
-	new.Sequence = existing.Sequence
-	return es.ProjectByID(ctx, new)
+	repoExisting.AppendEvents(projectAggregate.Events...)
+	return ProjectToModel(repoExisting), nil
 }
 
-func (es *ProjectEventstore) DeactivateProject(ctx context.Context, existing *proj_model.Project) error {
+func (es *ProjectEventstore) DeactivateProject(ctx context.Context, existing *proj_model.Project) (*proj_model.Project, error) {
 	if !existing.IsActive() {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-die45", "project must be active")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-die45", "project must be active")
 	}
-	projectAggregate, err := ProjectDeactivateEvents(ctx, es.AggregateCreator(), existing)
+	repoExisting := ProjectFromModel(existing)
+	projectAggregate, err := ProjectDeactivateAggregate(ctx, es.AggregateCreator(), repoExisting)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = es.PushAggregates(ctx, projectAggregate)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	existing.Sequence = projectAggregate.Events[len(projectAggregate.Events)-1].Sequence
-	existing.State = proj_model.Inactive
-	return nil
+	repoExisting.AppendEvents(projectAggregate.Events...)
+	return ProjectToModel(repoExisting), nil
 }
 
-func (es *ProjectEventstore) ReactivateProject(ctx context.Context, existing *proj_model.Project) error {
+func (es *ProjectEventstore) ReactivateProject(ctx context.Context, existing *proj_model.Project) (*proj_model.Project, error) {
 	if existing.IsActive() {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-die45", "project must be inactive")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-die45", "project must be inactive")
 	}
-	projectAggregate, err := ProjectReactivateEvents(ctx, es.AggregateCreator(), existing)
+	repoExisting := ProjectFromModel(existing)
+	projectAggregate, err := ProjectReactivateAggregate(ctx, es.AggregateCreator(), repoExisting)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = es.PushAggregates(ctx, projectAggregate)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	existing.Sequence = projectAggregate.Events[len(projectAggregate.Events)-1].Sequence
-	existing.State = proj_model.Active
-	return nil
+	repoExisting.AppendEvents(projectAggregate.Events...)
+	return ProjectToModel(repoExisting), nil
 }

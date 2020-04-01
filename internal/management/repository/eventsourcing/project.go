@@ -26,7 +26,7 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *p
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
 	project := &proj_model.Project{Name: name}
-	err := repo.ProjectEvents.CreateProject(ctx, project)
+	project, err := repo.ProjectEvents.CreateProject(ctx, project)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.
 		return nil, err
 	}
 
-	err = repo.ProjectEvents.UpdateProject(ctx, existingProject, project)
+	project, err = repo.ProjectEvents.UpdateProject(ctx, existingProject, project)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*pro
 		return nil, err
 	}
 
-	err = repo.ProjectEvents.DeactivateProject(ctx, project)
+	project, err = repo.ProjectEvents.DeactivateProject(ctx, project)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 		return nil, err
 	}
 
-	err = repo.ProjectEvents.ReactivateProject(ctx, project)
+	project, err = repo.ProjectEvents.ReactivateProject(ctx, project)
 	if err != nil {
 		return nil, err
 	}
