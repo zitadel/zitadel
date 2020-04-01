@@ -26,29 +26,23 @@ func (es *eventstore) AggregateCreator() *models.AggregateCreator {
 	return es.aggregateCreator
 }
 
-func (es *eventstore) PushEvents(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
-	return errors.ThrowUnimplemented(nil, "EVENT-fLtHG", "needs improvement use PushAggregates instead")
-	// aggs := make([][]*models.Event, len(aggregates))
-	// for aggIdx, aggregate := range aggregates {
-	// 	aggs[aggIdx] = make([]*models.Event, len(aggregate.events))
-	// 	for eventIdx, event := range aggregate.events {
-	// 		aggs[aggIdx][eventIdx] = &models.Event{
-	// 			AggregateID:      event.AggregateID(),
-	// 			AggregateType:    models.AggregateType(event.AggregateType()),
-	// 			AggregateVersion: models.Version(event.AggregateVersion()),
-	// 			CreationDate:     event.CreationDate(),
-	// 			Data:             event.Data(),
-	// 			ModifierService:  event.ModifierService(),
-	// 			ModifierTenant:   event.ModifierOrg(),
-	// 			ModifierUser:     event.ModifierUser(),
-	// 			PreviousSequence: event.PreviousSequence(),
-	// 			ResourceOwner:    event.ResourceOwner(),
-	// 			Typ:              models.EventType(event.EventType()),
-	// 		}
-	// 	}
-	// }
+func (es *eventstore) PushEvents(ctx context.Context, aggregates ...[]*models.Event) (err error) {
+	if len(aggregates) == 0 {
+		return errors.ThrowInvalidArgument(nil, "EVENT-JCifQ", "no aggregates provided")
+	}
 
-	// return es.repo.PushEvents(ctx, aggs)
+	for _, events := range aggregates {
+		if len(events) == 0 {
+			return errors.ThrowInvalidArgument(nil, "EVENT-eci1Z", "no events provided")
+		}
+		for _, event := range events {
+			if err := event.Validate(); err != nil {
+				return errors.ThrowInvalidArgument(err, "EVENT-rsa2U", "event invalid")
+			}
+		}
+	}
+
+	return es.repo.PushEvents(ctx, aggregates)
 }
 
 func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {

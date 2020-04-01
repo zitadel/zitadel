@@ -29,15 +29,15 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 	}
 
 	ctxData := auth.GetCtxData(ctx)
-	if !c.ignoreCtxData && ctxData.IsZero() {
+	if ctxData.IsZero() && !c.ignoreCtxData {
 		return nil, errors.ThrowInvalidArgument(nil, "MODEL-lZkk9", "ctxData zero")
 	}
 
 	return &Aggregate{
-		ID:             id,
-		Type:           typ,
+		id:             id,
+		typ:            typ,
 		latestSequence: latestSequence,
-		Version:        version,
+		version:        version,
 		Events:         make([]*Event, 0, 2),
 		editorOrg:      ctxData.OrgID,
 		editorService:  c.serviceName,
