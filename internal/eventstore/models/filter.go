@@ -33,13 +33,13 @@ func (f *Filter) Validate() error {
 	if f == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-z6KcG", "filter is nil")
 	}
-	if f.field < 0 {
+	if f.field <= 0 {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-zw62U", "field not definded")
 	}
 	if f.value == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-GJ9ct", "no value definded")
 	}
-	if f.operation < 0 {
+	if f.operation <= 0 {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-RrQTy", "operation not definded")
 	}
 	return nil

@@ -3,17 +3,16 @@ package sql
 import (
 	"context"
 	"fmt"
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/lib/pq"
 	"strconv"
 	"strings"
-
-	caos_errs "github.com/caos/utils/errors"
-	"github.com/caos/utils/logging"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 )
 
-func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*es_models.Event, err error) {
+func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*models.Event, err error) {
 	query := "SELECT" +
 		" id" +
 		", creation_date" +
@@ -34,12 +33,12 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 	query += where
 
 	query += " ORDER BY event_sequence"
-	if searchQuery.OrderDesc() {
+	if searchQuery.Desc {
 		query += " DESC"
 	}
 
-	if searchQuery.Limit() > 0 {
-		values = append(values, searchQuery.Limit())
+	if searchQuery.Limit > 0 {
+		values = append(values, searchQuery.Limit)
 		query += " LIMIT ?"
 	}
 
@@ -48,30 +47,34 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 	rows, err := db.client.Query(query, values...)
 	if err != nil {
 		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
-		return nil, caos_errs.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
+		return nil, errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
 	}
+	defer rows.Close()
+
+	events = make([]*es_models.Event, 0, searchQuery.Limit)
 
 	for rows.Next() {
-		event := new(es_models.Event)
+		event := new(models.Event)
+		events = append(events, event)
+
 		rows.Scan(
 			&event.ID,
 			&event.CreationDate,
-			&event.Typ,
+			&event.Type,
 			&event.Sequence,
 			&event.PreviousSequence,
 			&event.Data,
-			&event.ModifierService,
-			&event.ModifierTenant,
-			&event.ModifierUser,
+			&event.EditorService,
+			&event.EditorOrg,
+			&event.EditorUser,
 			&event.ResourceOwner,
 			&event.AggregateType,
 			&event.AggregateID,
 			&event.AggregateVersion,
 		)
-		events = append(events, event)
 	}
 
-	return events, err
+	return events, nil
 }
 
 func numberPlaceholder(query, old, new string) string {
@@ -84,14 +87,14 @@ func numberPlaceholder(query, old, new string) string {
 }
 
 func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []interface{}) {
-	values = make([]interface{}, len(searchQuery.Filters()))
-	clauses := make([]string, len(searchQuery.Filters()))
+	values = make([]interface{}, len(searchQuery.Filters))
+	clauses := make([]string, len(searchQuery.Filters))
 
 	if len(values) == 0 {
 		return clause, values
 	}
 
-	for i, filter := range searchQuery.Filters() {
+	for i, filter := range searchQuery.Filters {
 		value := filter.GetValue()
 		switch value.(type) {
 		case []bool, []float64, []int64, []string, *[]bool, *[]float64, *[]int64, *[]string:
@@ -102,19 +105,6 @@ func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []i
 		values[i] = value
 	}
 	return " WHERE " + strings.Join(clauses, " AND "), values
-}
-
-func generateFilters(query *gorm.DB, searchQuery es_models.SearchQuery) *gorm.DB {
-	for _, f := range searchQuery.Filters() {
-		value := f.GetValue()
-		switch value.(type) {
-		case []bool, []float64, []int64, []string, *[]bool, *[]float64, *[]int64, *[]string:
-			value = pq.Array(value)
-		}
-		query = query.Where(getCondition(f), value)
-	}
-
-	return query
 }
 
 func getCondition(filter *es_models.Filter) string {
