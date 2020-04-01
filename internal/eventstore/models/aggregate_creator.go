@@ -29,7 +29,7 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 	}
 
 	ctxData := auth.GetCtxData(ctx)
-	if !c.ignoreCtxData && ctxData.IsZero() {
+	if ctxData.IsZero() && !c.ignoreCtxData {
 		return nil, errors.ThrowInvalidArgument(nil, "MODEL-lZkk9", "ctxData zero")
 	}
 
