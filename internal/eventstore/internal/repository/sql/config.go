@@ -10,11 +10,11 @@ import (
 )
 
 type Config struct {
-	types.SQL
+	SQL types.SQL
 }
 
 func Start(conf Config) (*SQL, error) {
-	client, err := sql.Open("postgres", conf.ConnectionString())
+	client, err := sql.Open("postgres", conf.SQL.ConnectionString())
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
 	}

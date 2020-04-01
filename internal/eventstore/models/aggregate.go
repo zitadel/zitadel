@@ -67,36 +67,27 @@ func (a *Aggregate) Validate() error {
 	if string(a.typ) == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-aj4t2", "type not set")
 	}
-	if len(a.Events) < 1 {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-PupjX", "no events set")
-	}
 	if err := a.version.Validate(); err != nil {
 		return errors.ThrowPreconditionFailed(err, "MODEL-PupjX", "invalid version")
 	}
-	for _, event := range a.Events {
-		if err := event.Validate(); err != nil {
-			return err
-		}
+
+	if a.editorOrg == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-di3x5", "editor org not set")
 	}
+	if a.editorService == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-clYbY", "editor service not set")
+	}
+	if a.editorUser == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-Xcssi", "editor user not set")
+	}
+	if a.resourceOwner == "" {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-eBYUW", "resource owner not set")
+	}
+
 	return nil
 }
 
 func (a *Aggregate) SetAppender(appendFn appender) *Aggregate {
 	a.Appender = appendFn
-	return a
-}
-
-func (a *Aggregate) OverwriteEditorOrg(orgID string) *Aggregate {
-	a.editorOrg = orgID
-	return a
-}
-
-func (a *Aggregate) OverwriteEditorUser(userID string) *Aggregate {
-	a.editorUser = userID
-	return a
-}
-
-func (a *Aggregate) OverwriteResourceOwner(resourceOwner string) *Aggregate {
-	a.resourceOwner = resourceOwner
 	return a
 }

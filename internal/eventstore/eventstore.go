@@ -26,29 +26,15 @@ func (es *eventstore) AggregateCreator() *models.AggregateCreator {
 	return es.aggregateCreator
 }
 
-func (es *eventstore) PushEvents(ctx context.Context, aggregates ...[]*models.Event) (err error) {
-	if len(aggregates) == 0 {
-		return errors.ThrowInvalidArgument(nil, "EVENT-JCifQ", "no aggregates provided")
-	}
-
-	for _, events := range aggregates {
-		if len(events) == 0 {
-			return errors.ThrowInvalidArgument(nil, "EVENT-eci1Z", "no events provided")
-		}
-		for _, event := range events {
-			if err := event.Validate(); err != nil {
-				return errors.ThrowInvalidArgument(err, "EVENT-rsa2U", "event invalid")
-			}
-		}
-	}
-
-	return es.repo.PushEvents(ctx, aggregates)
-}
-
 func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
 	for _, aggregate := range aggregates {
-		if err = aggregate.Validate(); err != nil {
-			return err
+		if len(aggregate.Events) == 0 {
+			return errors.ThrowInvalidArgument(nil, "EVENT-cNhIj", "no events in aggregate")
+		}
+		for _, event := range aggregate.Events {
+			if err = event.Validate(); err != nil {
+				return err
+			}
 		}
 	}
 	err = es.repo.PushAggregates(ctx, aggregates...)

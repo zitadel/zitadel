@@ -4,44 +4,61 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/errors"
 )
 
 type AggregateCreator struct {
 	serviceName string
-	//ignoreCtxData is needed to ignore ctxData.IsZero() in tests
-	ignoreCtxData bool
 }
 
 func NewAggregateCreator(serviceName string) *AggregateCreator {
 	return &AggregateCreator{serviceName: serviceName}
 }
 
-func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, latestSequence uint64) (*Aggregate, error) {
-	if id == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "MODEL-sPLP8", "no id")
-	}
-	if string(typ) == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "MODEL-yfmjm", "no type")
-	}
-	if err := version.Validate(); err != nil {
-		return nil, err
-	}
+type option func(*Aggregate)
 
+func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, latestSequence uint64, opts ...option) (*Aggregate, error) {
 	ctxData := auth.GetCtxData(ctx)
-	if ctxData.IsZero() && !c.ignoreCtxData {
-		return nil, errors.ThrowInvalidArgument(nil, "MODEL-lZkk9", "ctxData zero")
-	}
+	editorUser := ctxData.UserID
+	editorOrg := ctxData.OrgID
+	resourceOwner := ctxData.OrgID
 
-	return &Aggregate{
+	aggregate := &Aggregate{
 		id:             id,
 		typ:            typ,
 		latestSequence: latestSequence,
 		version:        version,
 		Events:         make([]*Event, 0, 2),
-		editorOrg:      ctxData.OrgID,
+		editorOrg:      editorOrg,
 		editorService:  c.serviceName,
-		editorUser:     ctxData.UserID,
-		resourceOwner:  ctxData.OrgID,
-	}, nil
+		editorUser:     editorUser,
+		resourceOwner:  resourceOwner,
+	}
+
+	for _, opt := range opts {
+		opt(aggregate)
+	}
+
+	if err := aggregate.Validate(); err != nil {
+		return nil, err
+	}
+
+	return aggregate, nil
+}
+
+func OverwriteEditorUser(userID string) func(*Aggregate) {
+	return func(a *Aggregate) {
+		a.editorUser = userID
+	}
+}
+
+func OverwriteEditorOrg(orgID string) func(*Aggregate) {
+	return func(a *Aggregate) {
+		a.editorOrg = orgID
+	}
+}
+
+func OverwriteResourceOwner(resourceOwner string) func(*Aggregate) {
+	return func(a *Aggregate) {
+		a.resourceOwner = resourceOwner
+	}
 }

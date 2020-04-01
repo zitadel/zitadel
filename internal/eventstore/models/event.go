@@ -66,12 +66,17 @@ func (e *Event) Validate() error {
 	if string(e.Type) == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-R2sB0", "type not defined")
 	}
+
 	if e.AggregateID == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-A6WwL", "aggregate id not set")
 	}
 	if e.AggregateType == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-EzdyK", "aggregate type not set")
 	}
+	if err := e.AggregateVersion.Validate(); err != nil {
+		return err
+	}
+
 	if e.EditorService == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-4Yqik", "editor service not set")
 	}
@@ -84,5 +89,5 @@ func (e *Event) Validate() error {
 	if e.ResourceOwner == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-omFVT", "resource ow")
 	}
-	return e.AggregateVersion.Validate()
+	return nil
 }

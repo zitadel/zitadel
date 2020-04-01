@@ -3,17 +3,18 @@ package sql
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/lib/pq"
-	"strconv"
-	"strings"
 )
 
-func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*models.Event, err error) {
-	query := "SELECT" +
+const (
+	selectStmt = "SELECT" +
 		" id" +
 		", creation_date" +
 		", event_type" +
@@ -28,9 +29,11 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 		", aggregate_id" +
 		", aggregate_version" +
 		" FROM eventstore.events"
+)
 
+func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*models.Event, err error) {
 	where, values := prepareWhere(searchQuery)
-	query += where
+	query := selectStmt + where
 
 	query += " ORDER BY event_sequence"
 	if searchQuery.Desc {
