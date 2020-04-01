@@ -12,12 +12,12 @@ type ProjectRepo struct {
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
-	//viewProject, err := repo.view.OrgByID(id)
+	//viewProject, err := repo.view.ProjectByID(id)
 	//if err != nil && !caos_errs.IsNotFound(err) {
 	//	return nil, err
 	//}
 	//if viewProject != nil {
-	//	project = org_view.OrgToModel(viewProject)
+	//	project = org_view.ProjectToModel(viewProject)
 	//} else {
 	project = proj_model.NewProject(id)
 	//}
