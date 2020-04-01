@@ -1,3 +1,3 @@
 package model
 
-type ProjectChange = pkg.Change
+type ProjectChange = es_models.Change

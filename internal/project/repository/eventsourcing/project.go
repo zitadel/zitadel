@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/sony/sonyflake"
@@ -44,19 +43,19 @@ func ProjectToModel(project *Project) *model.Project {
 }
 
 func ProjectByIDQuery(id string, latestSequence uint64) *es_models.SearchQuery {
-	return es_models.NewSearchQuery(0, false).
+	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.ProjectAggregate).
 		LatestSequenceFilter(latestSequence).
 		AggregateIDFilter(id)
 }
 
 func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
-	return es_models.NewSearchQuery(0, false).
+	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.ProjectAggregate).
 		LatestSequenceFilter(latestSequence)
 }
 
-func ProjectCreateEvents(ctx context.Context, aggCreator eventstore.AggregateCreator, project *model.Project) (*eventstore.Aggregate, error) {
+func ProjectCreateEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, project *model.Project) (*es_models.Aggregate, error) {
 	var err error
 	id, err := idGenerator.NextID()
 	if err != nil {
@@ -67,15 +66,15 @@ func ProjectCreateEvents(ctx context.Context, aggCreator eventstore.AggregateCre
 	return createdProject(ctx, aggCreator, project)
 }
 
-func ProjectUpdateEvents(project *model.ProjectChange) *pkg.SaveAggregate {
-	return updatedProject(project)
+func ProjectUpdateEvents(agg *es_models.Aggregate, project *model.ProjectChange) (*es_models.Aggregate, error) {
+	return updatedProject(agg, project)
 }
 
-func projectAggregate(ctx context.Context, aggCreator eventstore.AggregateCreator, p *model.Project) (*eventstore.Aggregate, error) {
+func projectAggregate(ctx context.Context, aggCreator es_models.AggregateCreator, p *model.Project) (*es_models.Aggregate, error) {
 	return aggCreator.NewAggregate(ctx, p.ID, model.ProjectAggregate, "v1", p.Sequence)
 }
 
-func createdProject(ctx context.Context, aggCreator eventstore.AggregateCreator, p *model.Project) (*eventstore.Aggregate, error) {
+func createdProject(ctx context.Context, aggCreator *es_models.AggregateCreator, p *model.Project) (*es_models.Aggregate, error) {
 	agg, err := projectAggregate(ctx, aggCreator, p)
 	if err != nil {
 		return nil, err
@@ -83,20 +82,14 @@ func createdProject(ctx context.Context, aggCreator eventstore.AggregateCreator,
 	return agg.AppendEvent(model.AddedProject, p)
 }
 
-func updatedProject(p *model.ProjectChange) *pkg.SaveAggregate {
-	return pkg.NewSaveAggregate(p.ID, model.ProjectAggregate, p.Sequence,
-		pkg.SaveEvent{Type: model.ChangedProject, Payload: p.Payload},
-	)
+func updatedProject(agg *es_models.Aggregate, p *model.ProjectChange) (*es_models.Aggregate, error) {
+	return agg.AppendEvent(model.ChangedProject, p)
 }
 
-func ProjectDeactivateEvents(id string, sequence uint64) *pkg.SaveAggregate {
-	return pkg.NewSaveAggregate(id, model.ProjectAggregate, sequence,
-		pkg.SaveEvent{model.DeactivatedProject, nil},
-	)
+func ProjectDeactivateEvents(agg *es_models.Aggregate) (*es_models.Aggregate, error) {
+	return agg.AppendEvent(model.DeactivatedProject, nil)
 }
 
-func ProjectReactivateEvents(id string, sequence uint64) *pkg.SaveAggregate {
-	return pkg.NewSaveAggregate(id, model.ProjectAggregate, sequence,
-		pkg.SaveEvent{model.ReactivatedProject, nil},
-	)
+func ProjectReactivateEvents(agg *es_models.Aggregate) (*es_models.Aggregate, error) {
+	return agg.AppendEvent(model.ReactivatedProject, nil)
 }

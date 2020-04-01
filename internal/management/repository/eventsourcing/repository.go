@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	Eventstore es.Config
+	Eventstore es_int.Config
 	//View       view.ViewConfig
 	//Spooler    spooler.SpoolerConfig
 }
@@ -18,7 +18,6 @@ type Repository struct {
 
 func StartRepository(conf Config) (*Repository, error) {
 	es := es_int.Start(conf.Eventstore)
-	aggregateCreator := es.NewAggregateCreator("mgmt")
 
 	//view, sql, err := mgmt_view.StartView(conf.View)
 	//if err != nil {
@@ -30,7 +29,7 @@ func StartRepository(conf Config) (*Repository, error) {
 	//conf.Spooler.SQL = sql
 	//spool := spooler.StartSpooler(conf.Spooler)
 
-	project, err := eventstore.StartProject(eventstore.ProjectConfig{App: es, AggregateCreator: aggregateCreator})
+	project, err := eventstore.StartProject(eventstore.ProjectConfig{Eventstore: es})
 	if err != nil {
 		return nil, err
 	}

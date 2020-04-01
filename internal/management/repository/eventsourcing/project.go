@@ -34,7 +34,7 @@ func (repo *projectRepo) CreateProject(ctx context.Context, name string) (*proj_
 	return repo.ProjectByID(ctx, id)
 }
 
-func (repo *projectRepo) UpdateOrg(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
+func (repo *projectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
 	currentProject, err := repo.ProjectByID(ctx, project.ID)
 	if err != nil {
 		return nil, err
@@ -48,51 +48,39 @@ func (repo *projectRepo) UpdateOrg(ctx context.Context, project *proj_model.Proj
 	project.Sequence = currentProject.Sequence
 
 	project.Sequence, err = repo.projectEvents.UpdateProject(ctx,
-		&org_model.OrgChange{ID: org.ID, Payload: changes, Sequence: currentOrg.Sequence},
-		uniqueDomain,
-		uniqueName,
+		&proj_model.ProjectChange{ID: project.ID, Payload: changes, Sequence: currentOrg.Sequence},
 	)
-	return repo.OrgByID(ctx, org.ID)
+	return repo.ProjectByID(ctx, project.ID)
 }
 
-func unique(ctx context.Context, id interface{}, isAvailable func(ctx context.Context, name string, sequence uint64) (uint64, error)) (uint64, error, bool) {
-	sequence := uint64(0)
-	if id == nil || id.(string) == "" {
-		return 0, nil, false
-	}
-	sequence, err := isAvailable(ctx, id.(string), sequence)
-	return sequence, err, true
-
-}
-
-func (repo *projectRepo) DeactivateOrg(ctx context.Context, id string) (*proj_model.Project, error) {
-	org, err := repo.OrgByID(ctx, id)
+func (repo *projectRepo) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
+	project, err := repo.ProjectByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, err := repo.orgEvents.IsOrgActive(ctx, org); err != nil {
+	if _, err := repo.projectEvents.IsProjectActive(ctx, project); err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-r2fw1", "active")
 	}
 
-	org.Sequence, err = repo.orgEvents.DeactivateOrg(ctx, org.ID, org.Sequence)
-	org.State = org_model.Inactive
+	project.Sequence, err = repo.projectEvents.DeactivateProject(ctx, project.ID, project.Sequence)
+	project.State = proj_model.Inactive
 
-	return org, err
+	return project, err
 }
 
-func (repo *projectRepo) ReactivateOrg(ctx context.Context, id string) (*proj_model.Project, error) {
-	org, err := repo.OrgByID(ctx, id)
+func (repo *projectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
+	project, err := repo.ProjectByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, err := repo.orgEvents.IsOrgActive(ctx, org); err == nil {
+	if _, err := repo.projectEvents.IsProjectActive(ctx, project); err == nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-r2fw1", "active")
 	}
 
-	org.Sequence, err = repo.orgEvents.ReactivateOrg(ctx, org.ID, org.Sequence)
-	org.State = org_model.Active
+	project.Sequence, err = repo.projectEvents.ReactivateOrg(ctx, project.ID, project.Sequence)
+	project.State = proj_model.Active
 
-	return org, err
+	return project, err
 }

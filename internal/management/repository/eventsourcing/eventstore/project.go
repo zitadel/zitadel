@@ -3,28 +3,26 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
-	es "github.com/caos/zitadel/internal/eventstore"
+	es_int "github.com/caos/zitadel/internal/eventstore"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_es "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type ProjectEventstore struct {
-	es.App
-	aggregateCreator es.AggregateCreator
+	es_int.Eventstore
 }
 
 type ProjectConfig struct {
-	es.App
-	aggregateCreator es.AggregateCreator
+	es_int.Eventstore
 }
 
 func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
-	return &ProjectEventstore{App: conf.App, aggregateCreator: conf.aggregateCreator}, nil
+	return &ProjectEventstore{Eventstore: conf.Eventstore}, nil
 }
 
 func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_model.Project) error {
 	filter := proj_es.ProjectByIDQuery(project.ID, project.Sequence)
-	events, err := es.App.FilterEvents(ctx, filter)
+	events, err := es.Eventstore.FilterEvents(ctx, filter)
 	if err != nil {
 		return err
 	}
@@ -37,11 +35,11 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_mode
 func (es *ProjectEventstore) CreateProject(ctx context.Context, name string) (id string, err error) {
 	project := proj_model.Project{Name: name}
 
-	projectAggregate, err := proj_es.ProjectCreateEvents(ctx, es.aggregateCreator, &project)
+	projectAggregate, err := proj_es.ProjectCreateEvents(ctx, es.Eventstore.AggregateCreator(), &project)
 	if err != nil {
 		return "", err
 	}
-	_, err := es.PushAggregates(ctx, projectAggregate)
+	err = es.PushAggregates(ctx, projectAggregate)
 	if err != nil {
 		return "", err
 	}
@@ -49,13 +47,14 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, name string) (id
 }
 
 func (es *ProjectEventstore) UpdateProject(ctx context.Context, changes *proj_model.ProjectChange) (sequence uint64, err error) {
-	orgAggregate := proj_es.ProjectUpdateEvents(changes)
+	projectAggregate := proj_es.ProjectUpdateEvents(changes)
 	save := pkg.PrepareSave(ctx, orgAggregate, uniqueAggregates...)
 	err = save(es.Client)
+	err = es.PushAggregates(ctx, projectAggregate)
 	if err != nil {
-		return changes.Sequence, err
+		return 0, err
 	}
-	return orgAggregate.Sequence, nil
+	return projectAggregate, nil
 }
 
 //

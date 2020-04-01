@@ -32,6 +32,7 @@ require (
 	github.com/nicksnyder/go-i18n/v2 v2.0.3
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.5.0 // indirect
+	github.com/sony/sonyflake v1.0.0
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3
 	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
