@@ -70,10 +70,10 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 			creator: &AggregateCreator{serviceName: "admin", ignoreCtxData: true},
 			wantErr: false,
 			want: &Aggregate{
-				ID:            "hodor",
+				id:            "hodor",
 				Events:        make([]*Event, 0, 2),
-				Type:          "user",
-				Version:       "v1.0.0",
+				typ:           "user",
+				version:       "v1.0.0",
 				editorService: "admin",
 			},
 			args: args{

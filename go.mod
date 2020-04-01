@@ -3,14 +3,14 @@ module github.com/caos/zitadel
 go 1.14
 
 require (
-	cloud.google.com/go v0.55.0 // indirect
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.0
+	cloud.google.com/go v0.56.0 // indirect
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.1
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.4.1
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/aws/aws-sdk-go v1.30.0 // indirect
+	github.com/aws/aws-sdk-go v1.30.1 // indirect
 	github.com/caos/logging v0.0.1
 	github.com/cockroachdb/cockroach-go v0.0.0-20200312223839-f565e4789405
 	github.com/envoyproxy/protoc-gen-validate v0.3.0
@@ -38,7 +38,7 @@ require (
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/sys v0.0.0-20200331124033-c3d80250170d // indirect
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20200331025713-a30bf2db82d4
+	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312
 	google.golang.org/genproto v0.0.0-20200331122359-1ee6d9798940
 	google.golang.org/grpc v1.28.0
 	google.golang.org/protobuf v1.20.1

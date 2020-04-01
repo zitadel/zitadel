@@ -15,10 +15,10 @@ func (at AggregateType) String() string {
 type Aggregates []*Aggregate
 
 type Aggregate struct {
-	ID             string
-	Type           AggregateType
+	id             string
+	typ            AggregateType
 	latestSequence uint64
-	Version        Version
+	version        Version
 
 	editorService string
 	editorUser    string
@@ -44,9 +44,9 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 		Data:             data,
 		Type:             typ,
 		PreviousSequence: a.latestSequence,
-		AggregateID:      a.ID,
-		AggregateType:    a.Type,
-		AggregateVersion: a.Version,
+		AggregateID:      a.id,
+		AggregateType:    a.typ,
+		AggregateVersion: a.version,
 		EditorOrg:        a.editorOrg,
 		EditorService:    a.editorService,
 		EditorUser:       a.editorUser,
@@ -61,16 +61,16 @@ func (a *Aggregate) Validate() error {
 	if a == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-yi5AC", "aggregate is nil")
 	}
-	if a.ID == "" {
+	if a.id == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-FSjKV", "id not set")
 	}
-	if string(a.Type) == "" {
+	if string(a.typ) == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-aj4t2", "type not set")
 	}
 	if len(a.Events) < 1 {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-PupjX", "no events set")
 	}
-	if err := a.Version.Validate(); err != nil {
+	if err := a.version.Validate(); err != nil {
 		return errors.ThrowPreconditionFailed(err, "MODEL-PupjX", "invalid version")
 	}
 	for _, event := range a.Events {

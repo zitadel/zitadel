@@ -34,10 +34,10 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 	}
 
 	return &Aggregate{
-		ID:             id,
-		Type:           typ,
+		id:             id,
+		typ:            typ,
 		latestSequence: latestSequence,
-		Version:        version,
+		version:        version,
 		Events:         make([]*Event, 0, 2),
 		editorOrg:      ctxData.OrgID,
 		editorService:  c.serviceName,
