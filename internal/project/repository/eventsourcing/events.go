@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/project/model"
 )
 
-func FromEvents(project *Project, events ...*es_models.Event) (*Project, error) {
+func ProjectFromEvents(project *Project, events ...*es_models.Event) (*Project, error) {
 	if project == nil {
 		project = &Project{}
 	}

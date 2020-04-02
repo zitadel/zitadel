@@ -7,6 +7,51 @@ import (
 	"testing"
 )
 
+func TestProjectFromEvents(t *testing.T) {
+	type args struct {
+		event   []*es_models.Event
+		project *Project
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Project
+	}{
+		{
+			name: "project from events, ok",
+			args: args{
+				event: []*es_models.Event{
+					&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.AddedProject},
+				},
+				project: &Project{Name: "ProjectName"},
+			},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Active), Name: "ProjectName"},
+		},
+		{
+			name: "project from events, nil project",
+			args: args{
+				event: []*es_models.Event{
+					&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.AddedProject},
+				},
+				project: nil,
+			},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Active)},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.project != nil {
+				data, _ := json.Marshal(tt.args.project)
+				tt.args.event[0].Data = data
+			}
+			result, _ := ProjectFromEvents(tt.args.project, tt.args.event...)
+			if result.Name != tt.result.Name {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.result.Name, result.Name)
+			}
+		})
+	}
+}
+
 func TestAppendEvent(t *testing.T) {
 	type args struct {
 		event   *es_models.Event

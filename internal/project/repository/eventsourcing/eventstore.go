@@ -31,7 +31,7 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_mode
 	if len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8due3", "Could not find project events")
 	}
-	foundProject, err := FromEvents(nil, events...)
+	foundProject, err := ProjectFromEvents(nil, events...)
 	if err != nil {
 		return nil, err
 	}
