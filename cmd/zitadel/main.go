@@ -33,9 +33,9 @@ func main() {
 	flag.Var(&configPaths, "config-files", "path to the config files")
 	managementEnabled := flag.Bool("management", true, "enable management api")
 	authEnabled := flag.Bool("auth", true, "enable auth api")
-	loginEnabled := flag.Bool("login", true, "enable login ui")
+	//loginEnabled := flag.Bool("login", true, "enable login ui")
 	adminEnabled := flag.Bool("admin", true, "enable admin api")
-	consoleEnabled := flag.Bool("console", true, "enable console ui")
+	//consoleEnabled := flag.Bool("console", true, "enable console ui")
 	flag.Parse()
 
 	conf := new(Config)
@@ -49,17 +49,17 @@ func main() {
 	if *authEnabled {
 		auth.Start(ctx, conf.Auth, conf.AuthZ)
 	}
-	if *loginEnabled {
-		err = login.Start(ctx, conf.Login)
-		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
-	}
+	//if *loginEnabled {
+	//	err = login.Start(ctx, conf.Login)
+	//	logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
+	//}
 	if *adminEnabled {
 		admin.Start(ctx, conf.Admin, conf.AuthZ)
 	}
-	if *consoleEnabled {
-		err = console.Start(ctx, conf.Console)
-		logging.Log("MAIN-3Dfuc").OnError(err).Fatal("error starting console ui")
-	}
+	//if *consoleEnabled {
+	//	err = console.Start(ctx, conf.Console)
+	//	logging.Log("MAIN-3Dfuc").OnError(err).Fatal("error starting console ui")
+	//}
 	<-ctx.Done()
 	logging.Log("MAIN-s8d2h").Info("stopping zitadel")
 }

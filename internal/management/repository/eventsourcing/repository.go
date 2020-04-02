@@ -17,7 +17,10 @@ type EsRepository struct {
 }
 
 func Start(conf Config) (*EsRepository, error) {
-	es := es_int.Start(conf.Eventstore)
+	es, err := es_int.Start(conf.Eventstore)
+	if err != nil {
+		return nil, err
+	}
 
 	//view, sql, err := mgmt_view.StartView(conf.View)
 	//if err != nil {

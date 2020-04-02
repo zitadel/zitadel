@@ -19,11 +19,14 @@ func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Conf
 			return handler(ctx, req)
 		}
 
-		authToken := grpc_util.GetAuthorizationHeader(ctx)
-		if authToken == "" {
-			return nil, status.Error(codes.Unauthenticated, "auth header missing")
+		authToken := ""
+		//TODO: Remoce check internal as soon as authentification is implemented
+		if !auth.CheckInternal(ctx) {
+			authToken = grpc_util.GetAuthorizationHeader(ctx)
+			if authToken == "" {
+				return nil, status.Error(codes.Unauthenticated, "auth header missing")
+			}
 		}
-
 		orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
 
 		ctx, err := auth.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)

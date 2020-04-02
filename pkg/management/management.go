@@ -17,6 +17,6 @@ func Start(ctx context.Context, config Config, authZ auth.Config) {
 	repo, err := eventsourcing.Start(config.Repository)
 	logging.Log("MAIN-9uBxp").OnError(err).Panic("unable to start app")
 
-	api.Start(ctx, config.API, repo)
+	api.Start(ctx, config.API, authZ, repo)
 	eventsourcing.Start(config.Repository)
 }

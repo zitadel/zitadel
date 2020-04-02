@@ -16,7 +16,7 @@ type testVerifier struct {
 }
 
 func (v *testVerifier) VerifyAccessToken(ctx context.Context, token string) (string, string, string, error) {
-	return "", "", "", nil
+	return "userID", "clientID", "agentID", nil
 }
 
 func (v *testVerifier) ResolveGrants(ctx context.Context, sub, orgID string) ([]*Grant, error) {

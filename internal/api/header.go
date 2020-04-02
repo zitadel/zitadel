@@ -8,5 +8,9 @@ const (
 	Location       = "location"
 	Origin         = "origin"
 
-	ZitadelOrgID = "x-zitadel-orgid"
+	ZitadelOrgID    = "x-zitadel-orgid"
+	ZitadelUserID   = "x-zitadel-userid"
+	ZitadelClientID = "x-zitadel-clientid"
+	ZitadelAgentID  = "x-zitadel-agentid"
+	LoginKey        = "x-zitadel-login"
 )
