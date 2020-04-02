@@ -1,0 +1,40 @@
+name: Release
+on: [push]
+
+jobs:
+
+  angular:
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+    - run: npm ci 
+    - run: npm run lint
+    - run: npm run prodbuild
+    #- run: npm test    
+  
+  golang:
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: '^1.13.1'
+    - run: go test -race ./...
+    - run: go build -o zitadel main.go
+
+  #docker:
+    #needs: [angular, golang]
+
+  # release:
+  #   runs-on: ubuntu-18.04
+  #   needs: [docker]
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   steps:
+  #   - name: Source checkout
+  #     uses: actions/checkout@v1
+  #     with:
+  #       fetch-depth: 1
+  #   - name: Create Version
+  #     uses: caos/semantic-release@v0.2.4
