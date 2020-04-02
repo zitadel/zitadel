@@ -59,7 +59,7 @@ jobs:
       with:
         username: ${GITHUB_ACTOR}
         password: ${GITHUB_TOKEN}
-        repository: docker.pkg.github.com/zitadel
+        repository: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}
         tag_with_ref: true
         tag_with_sha: true
 
