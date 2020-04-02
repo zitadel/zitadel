@@ -19,16 +19,20 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 	return &ProjectEventstore{Eventstore: conf.Eventstore}, nil
 }
 
-func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_model.Project) error {
+func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
 	filter := ProjectByIDQuery(project.ID, project.Sequence)
 	events, err := es.Eventstore.FilterEvents(ctx, filter)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8due3", "Could not find project events")
 	}
 	foundProject, err := FromEvents(nil, events...)
-
-	*project = *ProjectToModel(foundProject)
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return ProjectToModel(foundProject), nil
 }
 
 func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
