@@ -38,7 +38,7 @@ jobs:
     - run: go build -o zitadel main.go
     - uses: actions/upload-artifact@v1
       with:
-        name: golang
+        name: go
         path: zitadel
 
   container:
@@ -51,7 +51,7 @@ jobs:
         path: angular
     - uses: actions/download-artifact@v1
       with:
-        name: golang
+        name: go
         path: go
     - name: Source checkout
       uses: actions/checkout@v2
