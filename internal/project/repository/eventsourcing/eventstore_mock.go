@@ -25,12 +25,7 @@ func GetMockProjectByIDNoEvents(ctrl *gomock.Controller) *ProjectEventstore {
 	return &ProjectEventstore{Eventstore: mockEs}
 }
 
-func GetMockCreateProject(ctrl *gomock.Controller) *ProjectEventstore {
-	//data, _ := json.Marshal(Project{Name: "Name"})
-	//events := []*es_models.Event{
-	//	&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.AddedProject, Data: data},
-	//}
-	//agg := es_models.Aggregate{Events:events}
+func GetMockManipulateProject(ctrl *gomock.Controller) *ProjectEventstore {
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)

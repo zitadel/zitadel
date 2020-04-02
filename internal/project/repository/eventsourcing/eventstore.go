@@ -39,7 +39,7 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_mode
 }
 
 func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	if project.Name == "" {
+	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
 	}
 	project.State = proj_model.Active
@@ -58,6 +58,9 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 }
 
 func (es *ProjectEventstore) UpdateProject(ctx context.Context, existing *proj_model.Project, new *proj_model.Project) (*proj_model.Project, error) {
+	if !new.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
+	}
 	repoExisting := ProjectFromModel(existing)
 	repoNew := ProjectFromModel(new)
 	projectAggregate, err := ProjectUpdateAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew)
@@ -74,7 +77,7 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, existing *proj_m
 
 func (es *ProjectEventstore) DeactivateProject(ctx context.Context, existing *proj_model.Project) (*proj_model.Project, error) {
 	if !existing.IsActive() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-die45", "project must be active")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "project must be active")
 	}
 	repoExisting := ProjectFromModel(existing)
 	projectAggregate, err := ProjectDeactivateAggregate(ctx, es.AggregateCreator(), repoExisting)
@@ -91,7 +94,7 @@ func (es *ProjectEventstore) DeactivateProject(ctx context.Context, existing *pr
 
 func (es *ProjectEventstore) ReactivateProject(ctx context.Context, existing *proj_model.Project) (*proj_model.Project, error) {
 	if existing.IsActive() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-die45", "project must be inactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "project must be inactive")
 	}
 	repoExisting := ProjectFromModel(existing)
 	projectAggregate, err := ProjectReactivateAggregate(ctx, es.AggregateCreator(), repoExisting)

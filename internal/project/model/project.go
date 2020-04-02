@@ -26,3 +26,10 @@ func (p *Project) IsActive() bool {
 	}
 	return false
 }
+
+func (p *Project) IsValid() bool {
+	if p.Name == "" {
+		return false
+	}
+	return true
+}
