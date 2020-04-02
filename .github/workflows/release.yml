@@ -1,22 +1,34 @@
 name: Release
 on: push
 
+env:
+  #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  REGISTRY: docker.pkg.github.com
+  IMAGE: zitadel
+  NODE_VERSION: '12'
+  GO_VERSION: '^1.13.1'
+  RUNS_ON: ubuntu-18.04
+
 jobs:
 
   angular:
-    runs-on: ubuntu-18.04
+    runs-on: ${{ env.RUNS_ON }}
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
-        node-version: '12'
+        node-version: ${{ env.NODE_VERSION }}
     - run: npm ci 
     - run: npm run lint
     - run: npm run prodbuild
-    #- run: npm test    
+    - run: npm test
+    - uses: actions/upload-artifact@v1
+      with:
+        name: angular
+        path: /frontend/dist/console/
   
   golang:
-    runs-on: ubuntu-18.04
+    runs-on: ${{ env.RUNS_ON }}
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
@@ -24,19 +36,64 @@ jobs:
         go-version: '^1.13.1'
     - run: go test -race ./...
     - run: go build -o zitadel main.go
+    - uses: actions/upload-artifact@v1
+      with:
+        name: golang
+        path: zitadel
 
-  #docker:
-    #needs: [angular, golang]
+  container:
+    runs-on: ${{ env.RUNS_ON }}
+    needs: [angular, golang]
+    - uses: actions/download-artifact@v1
+      with:
+        name: angular
+        path: /app/console/
+    - uses: actions/download-artifact@v1
+      with:
+        name: golang
+        path: /app/
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - uses: docker/build-push-action@v1
+      with:
+        username: ${GITHUB_ACTOR}
+        password: ${GITHUB_TOKEN}
+        repository: docker.pkg.github.com/zitadel
+        tag_with_ref: true
+        tag_with_sha: true
 
-  # release:
-  #   runs-on: ubuntu-18.04
-  #   needs: [docker]
-  #   env:
-  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #   steps:
-  #   - name: Source checkout
-  #     uses: actions/checkout@v1
-  #     with:
-  #       fetch-depth: 1
-  #   - name: Create Version
-  #     uses: caos/semantic-release@v0.2.4
+  container-vulnerability-scan:
+    runs-on: ${{ env.RUNS_ON }}
+    needs: [container]
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - name: Docker Login
+      run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GITHUB_TOKEN}
+    - uses: anchore/scan-action@master
+      with:
+        image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ github.sha }}"
+        dockerfile-path: "./Dockerfile"
+        fail-build: false
+    - name: anchore inline scan JSON results
+      run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
+
+  container-test:
+    runs-on: ${{ env.RUNS_ON }}
+    needs: [container]
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - name: Docker Login
+      run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GITHUB_TOKEN}
+    - name: Docker Run Test
+      run: docker run $REGISTRY/${GITHUB_REPOSITORY}/$IMAGE:${{ github.sha }}
+
+  release:
+    runs-on: ubuntu-18.04
+    needs: [container-test]
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - name: Create Version
+      uses: caos/semantic-release@v0.2.4
