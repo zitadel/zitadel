@@ -48,11 +48,11 @@ jobs:
     - uses: actions/download-artifact@v1
       with:
         name: angular
-        path: /angular
+        path: angular
     - uses: actions/download-artifact@v1
       with:
         name: golang
-        path: /go
+        path: go
     - name: Source checkout
       uses: actions/checkout@v2
     - uses: docker/build-push-action@v1
