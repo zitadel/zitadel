@@ -20,6 +20,7 @@ func projectFromModel(project *proj_model.Project) *Project {
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Name:         project.Name,
+		Sequence:     project.Sequence,
 	}
 }
 

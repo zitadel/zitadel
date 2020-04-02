@@ -4314,6 +4314,10 @@
         },
         "grant_id": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

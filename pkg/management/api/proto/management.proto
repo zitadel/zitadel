@@ -1641,6 +1641,7 @@ message Project {
     string org_name = 9;
     string org_domain = 10;
     string grant_id = 11;
+    uint64 sequence = 12;
 }
 
 enum ProjectState {
