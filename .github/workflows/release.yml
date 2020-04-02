@@ -7,12 +7,12 @@ env:
   IMAGE: zitadel
   NODE_VERSION: '12'
   GO_VERSION: '^1.13.1'
-  RUNS_ON: ubuntu-18.04
+  #RUNS_ON: ubuntu-18.04
 
 jobs:
 
   angular:
-    runs-on: ${{ env.RUNS_ON }}
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
@@ -28,7 +28,7 @@ jobs:
         path: /frontend/dist/console/
   
   go:
-    runs-on: ${{ env.RUNS_ON }}
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
@@ -42,7 +42,7 @@ jobs:
         path: zitadel
 
   container:
-    runs-on: ${{ env.RUNS_ON }}
+    runs-on: ubuntu-18.04
     needs: [angular, go]
     steps:
     - uses: actions/download-artifact@v1
@@ -64,7 +64,7 @@ jobs:
         tag_with_sha: true
 
   container-vulnerability-scan:
-    runs-on: ${{ env.RUNS_ON }}
+    runs-on: ubuntu-18.04
     needs: [container]
     steps:
     - name: Source checkout
@@ -80,7 +80,7 @@ jobs:
       run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
 
   container-test:
-    runs-on: ${{ env.RUNS_ON }}
+    runs-on: ubuntu-18.04
     needs: [container]
     steps:
     - name: Source checkout
