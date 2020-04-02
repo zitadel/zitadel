@@ -1,0 +1,15 @@
+package types
+
+import (
+	"time"
+)
+
+type Duration struct {
+	time.Duration
+}
+
+func (d *Duration) UnmarshalText(data []byte) error {
+	var err error
+	d.Duration, err = time.ParseDuration(string(data))
+	return err
+}

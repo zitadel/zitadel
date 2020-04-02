@@ -1,0 +1,42 @@
+Tracing:
+  Type: google
+  Config:
+    ProjectID: $TRACING_PROJECT_ID
+    MetricPrefix: ZITADEL-V1
+    Fraction: 1
+
+Log:
+  Level: debug
+  Formatter:
+    Format: text
+
+Mgmt:
+  API:
+    GRPC:
+      ServerPort: 50010
+      GatewayPort: 50011
+      CustomHeaders:
+        - x-caos-
+
+Auth:
+  API:
+    GRPC:
+      ServerPort: 50020
+      GatewayPort: 50021
+      CustomHeaders:
+        - x-caos-
+
+Login:
+#  will get port range 5003x
+
+Admin:
+  API:
+    GRPC:
+      ServerPort: 50040
+      GatewayPort: 50041
+      CustomHeaders:
+        - x-caos-
+
+Console:
+  Port: 50050
+  StaticDir: /app/console/dist

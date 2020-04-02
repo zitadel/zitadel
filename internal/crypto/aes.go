@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-var _ EncryptionAlg = (*AESCrypto)(nil)
+var _ EncryptionAlgorithm = (*AESCrypto)(nil)
 
 type AESCrypto struct {
 	keys            map[string]string

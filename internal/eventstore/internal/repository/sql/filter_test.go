@@ -5,9 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/caos/utils/errors"
+	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/jinzhu/gorm"
 )
 
 func TestSQL_Filter(t *testing.T) {
@@ -33,7 +32,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(34, false),
+				searchQuery: es_models.NewSearchQuery().SetLimit(34),
 			},
 			eventsLen: 3,
 			wantErr:   false,
@@ -45,7 +44,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(0, true),
+				searchQuery: es_models.NewSearchQuery().OrderDesc(),
 			},
 			eventsLen: 34,
 			wantErr:   false,
@@ -53,7 +52,7 @@ func TestSQL_Filter(t *testing.T) {
 		{
 			name: "no events found",
 			fields: fields{
-				client: mockDB(t).expectFilterEventsError(gorm.ErrRecordNotFound),
+				client: mockDB(t).expectFilterEventsError(sql.ErrNoRows),
 			},
 			args: args{
 				events:      &mockEvents{t: t},
@@ -81,7 +80,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(5, false).AggregateIDFilter("hop"),
+				searchQuery: es_models.NewSearchQuery().SetLimit(5).AggregateIDFilter("hop"),
 			},
 			wantErr:   false,
 			isErrFunc: nil,
@@ -93,7 +92,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery(5, false).AggregateIDFilter("hop").AggregateTypeFilter("user"),
+				searchQuery: es_models.NewSearchQuery().SetLimit(5).AggregateIDFilter("hop").AggregateTypeFilter("user"),
 			},
 			wantErr:   false,
 			isErrFunc: nil,

@@ -4,9 +4,9 @@ import (
 	"os"
 
 	"github.com/caos/logging"
-	"github.com/caos/utils/errors"
 
 	"github.com/caos/zitadel/internal/config"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 const (
