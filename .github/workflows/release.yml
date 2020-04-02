@@ -4,6 +4,7 @@ on: push
 jobs:
 
   angular:
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
@@ -15,6 +16,7 @@ jobs:
     #- run: npm test    
   
   golang:
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
