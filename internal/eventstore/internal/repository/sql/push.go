@@ -25,32 +25,6 @@ const insertStmt = "insert into eventstore.events " +
 	"((select count(id) from eventstore.events where aggregate_type = $18 and aggregate_id = $19) = 0 AND $20 = 0)) " +
 	"RETURNING id, event_sequence, creation_date"
 
-func (db *SQL) PushEvents(ctx context.Context, aggregates [][]*models.Event) (err error) {
-	err = crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
-		stmt, err := tx.Prepare(insertStmt)
-		if err != nil {
-			tx.Rollback()
-			logging.Log("SQL-GAAPV").WithError(err).Warn("prepare failed")
-			return errors.ThrowInternal(err, "SQL-tWPyi", "prepare failed")
-		}
-
-		for _, events := range aggregates {
-			err = insertEvents(stmt, events)
-			if err != nil {
-				tx.Rollback()
-				return err
-			}
-		}
-		return nil
-	})
-
-	if _, ok := err.(*errors.CaosError); !ok && err != nil {
-		err = errors.ThrowInternal(err, "SQL-8svrl", "unable to store events")
-	}
-
-	return err
-}
-
 func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
 	err = crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		stmt, err := tx.Prepare(insertStmt)

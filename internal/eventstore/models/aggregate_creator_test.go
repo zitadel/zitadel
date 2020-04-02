@@ -12,6 +12,7 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 		id      string
 		typ     AggregateType
 		version Version
+		opts    []option
 	}
 	tests := []struct {
 		name    string
@@ -21,7 +22,7 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "invalid CtxData error",
+			name:    "no ctxdata and no options",
 			creator: &AggregateCreator{serviceName: "admin"},
 			wantErr: true,
 			want:    nil,
@@ -34,40 +35,55 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 		},
 		{
 			name:    "no id error",
-			creator: &AggregateCreator{serviceName: "admin", ignoreCtxData: true},
+			creator: &AggregateCreator{serviceName: "admin"},
 			wantErr: true,
 			want:    nil,
 			args: args{
 				ctx:     context.Background(),
 				typ:     "user",
 				version: "v1.0.0",
+				opts: []option{
+					OverwriteEditorOrg("org"),
+					OverwriteEditorUser("hodor"),
+					OverwriteResourceOwner("org"),
+				},
 			},
 		},
 		{
 			name:    "no type error",
-			creator: &AggregateCreator{serviceName: "admin", ignoreCtxData: true},
+			creator: &AggregateCreator{serviceName: "admin"},
 			wantErr: true,
 			want:    nil,
 			args: args{
 				ctx:     context.Background(),
 				id:      "hodor",
 				version: "v1.0.0",
+				opts: []option{
+					OverwriteEditorOrg("org"),
+					OverwriteEditorUser("hodor"),
+					OverwriteResourceOwner("org"),
+				},
 			},
 		},
 		{
 			name:    "invalid version error",
-			creator: &AggregateCreator{serviceName: "admin", ignoreCtxData: true},
+			creator: &AggregateCreator{serviceName: "admin"},
 			wantErr: true,
 			want:    nil,
 			args: args{
 				ctx: context.Background(),
 				id:  "hodor",
 				typ: "user",
+				opts: []option{
+					OverwriteEditorOrg("org"),
+					OverwriteEditorUser("hodor"),
+					OverwriteResourceOwner("org"),
+				},
 			},
 		},
 		{
 			name:    "create ok",
-			creator: &AggregateCreator{serviceName: "admin", ignoreCtxData: true},
+			creator: &AggregateCreator{serviceName: "admin"},
 			wantErr: false,
 			want: &Aggregate{
 				id:            "hodor",
@@ -75,18 +91,26 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 				typ:           "user",
 				version:       "v1.0.0",
 				editorService: "admin",
+				editorOrg:     "org",
+				editorUser:    "hodor",
+				resourceOwner: "org",
 			},
 			args: args{
 				ctx:     context.Background(),
 				id:      "hodor",
 				typ:     "user",
 				version: "v1.0.0",
+				opts: []option{
+					OverwriteEditorOrg("org"),
+					OverwriteEditorUser("hodor"),
+					OverwriteResourceOwner("org"),
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.creator.NewAggregate(tt.args.ctx, tt.args.id, tt.args.typ, tt.args.version, 0)
+			got, err := tt.creator.NewAggregate(tt.args.ctx, tt.args.id, tt.args.typ, tt.args.version, 0, tt.args.opts...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AggregateCreator.NewAggregate() error = %v, wantErr %v", err, tt.wantErr)
 				return
