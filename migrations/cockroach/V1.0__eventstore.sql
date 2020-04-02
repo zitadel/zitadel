@@ -15,6 +15,12 @@ COMMIT;
 
 BEGIN;
 
+CREATE SEQUENCE eventstore.event_seq;
+
+COMMIT;
+
+BEGIN;
+
 CREATE TABLE eventstore.events (
     id UUID DEFAULT gen_random_uuid(),
     
@@ -22,7 +28,7 @@ CREATE TABLE eventstore.events (
     aggregate_type TEXT NOT NULL,
     aggregate_id TEXT NOT NULL,
     aggregate_version TEXT NOT NULL,
-    event_sequence BIGSERIAL,
+    event_sequence BIGINT NOT NULL DEFAULT nextval('eventstore.event_seq'),
     previous_sequence BIGINT UNIQUE,
     creation_date TIMESTAMPTZ NOT NULL DEFAULT now(),
     event_data JSONB,
