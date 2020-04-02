@@ -1,0 +1,11 @@
+version: 1
+update_configs:
+  - package_manager: "go:modules"
+    directory: "/"
+    update_schedule: "daily"
+    # Apply default reviewer and label to created
+    # pull requests
+    # default_reviewers:
+      # - "github-username"
+    # default_labels:
+      # - "label-name"
