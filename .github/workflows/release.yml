@@ -53,6 +53,7 @@ jobs:
       with:
         name: go
         path: go
+    - run: ls -la
     - name: Source checkout
       uses: actions/checkout@v2
     - uses: docker/build-push-action@v1
