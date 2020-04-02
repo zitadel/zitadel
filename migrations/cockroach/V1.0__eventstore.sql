@@ -2,22 +2,14 @@ BEGIN;
 
 CREATE DATABASE eventstore;
 
-
 COMMIT;
+
 
 BEGIN;
 
 CREATE USER eventstore;
 
 GRANT SELECT, INSERT, UPDATE ON DATABASE eventstore TO eventstore;
-
-
-COMMIT;
-
-BEGIN;
-
-CREATE SEQUENCE eventstore.event_seq;
-
 
 COMMIT;
 
@@ -30,7 +22,7 @@ CREATE TABLE eventstore.events (
     aggregate_type TEXT NOT NULL,
     aggregate_id TEXT NOT NULL,
     aggregate_version TEXT NOT NULL,
-    event_sequence BIGINT NOT NULL DEFAULT nextval('eventstore.event_seq'),
+    event_sequence BIGSERIAL,
     previous_sequence BIGINT UNIQUE,
     creation_date TIMESTAMPTZ NOT NULL DEFAULT now(),
     event_data JSONB,
@@ -42,16 +34,11 @@ CREATE TABLE eventstore.events (
     PRIMARY KEY (id)
 );
 
-
-
 CREATE TABLE eventstore.locks (
     aggregate_type TEXT NOT NULL,
     aggregate_id TEXT NOT NULL,
     until TIMESTAMPTZ,
     UNIQUE (aggregate_type, aggregate_id)
 );
-
-
-
 
 COMMIT;

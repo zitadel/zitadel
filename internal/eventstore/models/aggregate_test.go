@@ -125,35 +125,6 @@ func TestAggregate_Validate(t *testing.T) {
 			}},
 		},
 		{
-			name:    "no events error",
-			wantErr: true,
-			fields: fields{aggregate: &Aggregate{
-				id:             "aggID",
-				typ:            "user",
-				version:        "v1.0.0",
-				editorOrg:      "org",
-				editorService:  "svc",
-				editorUser:     "hodor",
-				resourceOwner:  "org",
-				latestSequence: 5,
-			}},
-		},
-		{
-			name:    "invalid event error",
-			wantErr: true,
-			fields: fields{aggregate: &Aggregate{
-				id:             "aggID",
-				typ:            "user",
-				version:        "v1.0.0",
-				editorOrg:      "org",
-				editorService:  "svc",
-				editorUser:     "hodor",
-				resourceOwner:  "org",
-				latestSequence: 5,
-				Events:         []*Event{&Event{}},
-			}},
-		},
-		{
 			name:    "invalid version error",
 			wantErr: true,
 			fields: fields{aggregate: &Aggregate{
