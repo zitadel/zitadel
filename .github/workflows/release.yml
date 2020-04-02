@@ -27,7 +27,7 @@ jobs:
         name: angular
         path: /frontend/dist/console/
   
-  golang:
+  go:
     runs-on: ${{ env.RUNS_ON }}
     steps:
     - uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
 
   container:
     runs-on: ${{ env.RUNS_ON }}
-    needs: [angular, golang]
+    needs: [angular, go]
     - uses: actions/download-artifact@v1
       with:
         name: angular
