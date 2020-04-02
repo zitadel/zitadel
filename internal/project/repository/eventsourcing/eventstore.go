@@ -39,6 +39,9 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_mode
 }
 
 func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
+	if project.Name == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
+	}
 	project.State = proj_model.Active
 	repoProject := ProjectFromModel(project)
 	projectAggregate, err := ProjectCreateAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject)
