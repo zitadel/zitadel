@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -43,7 +44,7 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 		CreationDate:     time.Now(),
 		Data:             data,
 		Type:             typ,
-		PreviousSequence: a.latestSequence,
+		PreviousSequence: sql.NullInt64{Int64: int64(a.latestSequence), Valid: true},
 		AggregateID:      a.id,
 		AggregateType:    a.typ,
 		AggregateVersion: a.version,

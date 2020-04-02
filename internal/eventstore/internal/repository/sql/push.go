@@ -84,7 +84,7 @@ func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
 			return errors.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 		}
 
-		previousSequence = event.Sequence
+		previousSequence = sql.NullInt64{Int64: int64(event.Sequence), Valid: true}
 	}
 
 	return nil

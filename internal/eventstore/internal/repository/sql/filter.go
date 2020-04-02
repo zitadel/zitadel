@@ -60,7 +60,7 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 		event := new(models.Event)
 		events = append(events, event)
 
-		rows.Scan(
+		err := rows.Scan(
 			&event.ID,
 			&event.CreationDate,
 			&event.Type,
@@ -75,6 +75,9 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 			&event.AggregateID,
 			&event.AggregateVersion,
 		)
+		if err != nil {
+			logging.Log("SQL-eudi3").WithError(err).Error("could not scan event")
+		}
 	}
 
 	return events, nil
@@ -120,7 +123,7 @@ func getCondition(filter *es_models.Filter) string {
 
 func prepareConditionFormat(operation es_models.Operation) string {
 	if operation == es_models.Operation_In {
-		return "%s %s (?)"
+		return "%s %s any(?)"
 	}
 	return "%s %s ?"
 }
@@ -154,7 +157,7 @@ func getOperation(operation es_models.Operation) string {
 	case es_models.Operation_Less:
 		return "<"
 	case es_models.Operation_In:
-		return "IN"
+		return "="
 	}
 	return ""
 }
