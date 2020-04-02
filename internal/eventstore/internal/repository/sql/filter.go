@@ -58,14 +58,14 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 
 	for rows.Next() {
 		event := new(models.Event)
-		events = append(events, event)
+		var previousSequence Sequence
 
-		err := rows.Scan(
+		err = rows.Scan(
 			&event.ID,
 			&event.CreationDate,
 			&event.Type,
 			&event.Sequence,
-			&event.PreviousSequence,
+			&previousSequence,
 			&event.Data,
 			&event.EditorService,
 			&event.EditorOrg,
@@ -75,9 +75,14 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 			&event.AggregateID,
 			&event.AggregateVersion,
 		)
+
 		if err != nil {
-			logging.Log("SQL-eudi3").WithError(err).Error("could not scan event")
+			logging.Log("SQL-wHNPo").WithError(err).Warn("unable to scan row")
+			return nil, errors.ThrowInternal(err, "SQL-BfZwF", "unable to scan row")
 		}
+
+		event.PreviousSequence = uint64(previousSequence)
+		events = append(events, event)
 	}
 
 	return events, nil
@@ -123,7 +128,7 @@ func getCondition(filter *es_models.Filter) string {
 
 func prepareConditionFormat(operation es_models.Operation) string {
 	if operation == es_models.Operation_In {
-		return "%s %s any(?)"
+		return "%s %s ANY(?)"
 	}
 	return "%s %s ?"
 }
@@ -150,14 +155,12 @@ func getField(field es_models.Field) string {
 
 func getOperation(operation es_models.Operation) string {
 	switch operation {
-	case es_models.Operation_Equals:
+	case es_models.Operation_Equals, es_models.Operation_In:
 		return "="
 	case es_models.Operation_Greater:
 		return ">"
 	case es_models.Operation_Less:
 		return "<"
-	case es_models.Operation_In:
-		return "="
 	}
 	return ""
 }

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"encoding/json"
 	"reflect"
 	"time"
@@ -20,7 +19,7 @@ type Event struct {
 	Sequence         uint64
 	CreationDate     time.Time
 	Type             EventType
-	PreviousSequence sql.NullInt64
+	PreviousSequence uint64
 	Data             []byte
 
 	AggregateID      string
