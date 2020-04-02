@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/sony/sonyflake"
@@ -54,11 +55,14 @@ func ProjectToModel(project *Project) *model.Project {
 	}
 }
 
-func ProjectByIDQuery(id string, latestSequence uint64) *es_models.SearchQuery {
+func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
+	if id == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "id should be filled")
+	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.ProjectAggregate).
 		LatestSequenceFilter(latestSequence).
-		AggregateIDFilter(id)
+		AggregateIDFilter(id), nil
 }
 
 func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
@@ -72,6 +76,9 @@ func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreato
 }
 
 func ProjectCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, project *Project) (*es_models.Aggregate, error) {
+	if project == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
+	}
 	var err error
 	id, err := idGenerator.NextID()
 	if err != nil {
@@ -88,6 +95,12 @@ func ProjectCreateAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 }
 
 func ProjectUpdateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, new *Project) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
+	}
+	if new == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
+	}
 	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 	if err != nil {
 		return nil, err
@@ -97,6 +110,9 @@ func ProjectUpdateAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 }
 
 func ProjectDeactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ueh45", "existing project should not be nil")
+	}
 	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 	if err != nil {
 		return nil, err
@@ -105,6 +121,9 @@ func ProjectDeactivateAggregate(ctx context.Context, aggCreator *es_models.Aggre
 }
 
 func ProjectReactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
+	}
 	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 	if err != nil {
 		return nil, err
