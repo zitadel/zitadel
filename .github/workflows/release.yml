@@ -43,7 +43,7 @@ jobs:
 
   container:
     runs-on: ${{ env.RUNS_ON }}
-    needs: [angular]
+    needs: [angular, go]
     - uses: actions/download-artifact@v1
       with:
         name: angular
