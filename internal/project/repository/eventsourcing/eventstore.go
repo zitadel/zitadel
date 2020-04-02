@@ -20,7 +20,10 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 }
 
 func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	filter := ProjectByIDQuery(project.ID, project.Sequence)
+	filter, err := ProjectByIDQuery(project.ID, project.Sequence)
+	if err != nil {
+		return nil, err
+	}
 	events, err := es.Eventstore.FilterEvents(ctx, filter)
 	if err != nil {
 		return nil, err

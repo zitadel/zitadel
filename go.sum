@@ -54,6 +54,9 @@ github.com/aws/aws-sdk-go v1.30.0 h1:7NDwnnQrI1Ivk0bXLzMmuX5ozzOwteHOsAs4druW7gI
 github.com/aws/aws-sdk-go v1.30.0/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.30.1 h1:cUMxtoFvIHhScZgv17tGxw15r6rVKJHR1hsIFRx9hcA=
 github.com/aws/aws-sdk-go v1.30.1/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/bxcodec/faker v2.0.1+incompatible h1:P0KUpUw5w6WJXwrPfv35oc91i4d8nf40Nwln+M/+faA=
+github.com/bxcodec/faker/v3 v3.3.0 h1:w/GnJDXnn8b49hLqU948jZj1pqcb8y7sTE822KzO+xc=
+github.com/bxcodec/faker/v3 v3.3.0/go.mod h1:gF31YgnMSMKgkvl+fyEo1xuSMbEuieyqfeslGYFjneM=
 github.com/caos/logging v0.0.1 h1:YSGtO2/+5OWdwilBCou50akoDHAT/OhkbrolkVlR6U0=
 github.com/caos/logging v0.0.1 h1:YSGtO2/+5OWdwilBCou50akoDHAT/OhkbrolkVlR6U0=
 github.com/caos/logging v0.0.1/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX7Wp0=
