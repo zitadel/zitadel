@@ -21,7 +21,7 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *p
 	//} else {
 	project = proj_model.NewProject(id)
 	//}
-	return project, repo.ProjectEvents.ProjectByID(ctx, project)
+	return repo.ProjectEvents.ProjectByID(ctx, project)
 }
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {

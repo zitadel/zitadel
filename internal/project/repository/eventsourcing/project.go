@@ -10,6 +10,10 @@ import (
 
 var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
+const (
+	projectVersion = "v1"
+)
+
 type Project struct {
 	es_models.ObjectRoot
 	Name  string `json:"name,omitempty"`
@@ -64,7 +68,7 @@ func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
 }
 
 func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
-	return aggCreator.NewAggregate(ctx, id, model.ProjectAggregate, "v1", sequence)
+	return aggCreator.NewAggregate(ctx, id, model.ProjectAggregate, projectVersion, sequence)
 }
 
 func ProjectCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, project *Project) (*es_models.Aggregate, error) {

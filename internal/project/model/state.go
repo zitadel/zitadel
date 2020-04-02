@@ -14,6 +14,9 @@ const (
 )
 
 func ProjectStateToInt(s ProjectState) int32 {
+	if s == nil {
+		return 0
+	}
 	return int32(s.(state))
 }
 
