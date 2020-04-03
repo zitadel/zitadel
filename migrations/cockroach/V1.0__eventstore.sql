@@ -32,9 +32,8 @@ CREATE TABLE eventstore.events (
     previous_sequence BIGINT UNIQUE,
     creation_date TIMESTAMPTZ NOT NULL DEFAULT now(),
     event_data JSONB,
-    modifier_user TEXT NOT NULL, 
-    modifier_service TEXT NOT NULL,
-    modifier_tenant TEXT NOT NULL,
+    editor_user TEXT NOT NULL, 
+    editor_service TEXT NOT NULL,
     resource_owner TEXT NOT NULL,
 
     PRIMARY KEY (id)
