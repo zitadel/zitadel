@@ -123,20 +123,9 @@ jobs:
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-    - name: Create Version
-      uses: caos/semantic-release@v0.2.4
-    - name: Check if Version Tag is available
-      if: env.CAOS_NEXT_VERSION ==  ''
-      run: exit 1
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Pull short-sha
       run: docker pull $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }}
-    - name: Docker Tag Release
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:$CAOS_NEXT_VERSION
-    - name: Docker Tag Latest
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest
-    - name: Docker Push Release
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:$CAOS_NEXT_VERSION
-    - name: Docker Push Latest
-      run: docker push $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest
+    - name: Create Version
+      uses: caos/semantic-release@v1.0.0
