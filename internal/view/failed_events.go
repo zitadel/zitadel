@@ -23,7 +23,7 @@ func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error 
 		Error
 
 	if err != nil {
-		return errors.ThrowInternal(err, "VIEW-5kOhP", "unable to updated processed sequence")
+		return errors.ThrowInternal(err, "VIEW-5kOhP", "unable to updated failed events")
 	}
 	return nil
 }
@@ -46,6 +46,6 @@ func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*F
 		failedEvent.FailureCount = 0
 		return failedEvent, nil
 	}
-	return nil, errors.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
+	return nil, errors.ThrowInternalf(err, "VIEW-9LyCB", "unable to get failed events of %s", viewName)
 
 }

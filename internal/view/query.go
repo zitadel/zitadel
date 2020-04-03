@@ -19,6 +19,7 @@ type SearchQuery interface {
 	GetKey() ColumnKey
 	GetMethod() model.SearchMethod
 	GetValue() interface{}
+	GetCaseSensitiv() bool
 }
 
 type ColumnKey interface {
@@ -30,9 +31,9 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 		count := 0
 		query := db.Table(table)
 		if column := request.GetSortingColumn().ToColumnName(); column != "" {
-			order := "ASC"
-			if !request.GetAsc() {
-				order = "DESC"
+			order := "DESC"
+			if request.GetAsc() {
+				order = "ASC"
 			}
 			query = query.Order(fmt.Sprintf("%s %s", column, order))
 		}
