@@ -11,18 +11,18 @@ import (
 )
 
 const insertStmt = "insert into eventstore.events " +
-	"(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, editor_tenant, resource_owner, previous_sequence) " +
-	"select $1, $2, $3, $4, coalesce($5, now()), $6, $7, $8, $9, $10, " +
+	"(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_sequence) " +
+	"select $1, $2, $3, $4, coalesce($5, now()), $6, $7, $8, $9, " +
 	// case is to set the highest sequence or NULL in previous_sequence
-	"case (select exists(select event_sequence from eventstore.events where aggregate_type = $11 AND aggregate_id = $12)) " +
-	"WHEN true then (select event_sequence from eventstore.events where aggregate_type = $13 AND aggregate_id = $14 order by event_sequence desc limit 1) " +
+	"case (select exists(select event_sequence from eventstore.events where aggregate_type = $10 AND aggregate_id = $11)) " +
+	"WHEN true then (select event_sequence from eventstore.events where aggregate_type = $12 AND aggregate_id = $13 order by event_sequence desc limit 1) " +
 	"ELSE NULL " +
 	"end " +
 	"where (" +
 	// exactly one event of requested aggregate must have a >= sequence (last inserted event)
-	"(select count(id) from eventstore.events where event_sequence >= $15 AND aggregate_type = $16 AND aggregate_id = $17) = 1 OR " +
+	"(select count(id) from eventstore.events where event_sequence >= $14 AND aggregate_type = $15 AND aggregate_id = $16) = 1 OR " +
 	// previous sequence = 0, no events must exist for the requested aggregate
-	"((select count(id) from eventstore.events where aggregate_type = $18 and aggregate_id = $19) = 0 AND $20 = 0)) " +
+	"((select count(id) from eventstore.events where aggregate_type = $17 and aggregate_id = $18) = 0 AND $19 = 0)) " +
 	"RETURNING id, event_sequence, creation_date"
 
 func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
@@ -61,7 +61,7 @@ func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
 			event.Data = []byte("{}")
 		}
 
-		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.EditorUser, event.EditorService, event.EditorOrg, event.ResourceOwner,
+		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.EditorUser, event.EditorService, event.ResourceOwner,
 			event.AggregateType, event.AggregateID,
 			event.AggregateType, event.AggregateID,
 			event.PreviousSequence, event.AggregateType, event.AggregateID,

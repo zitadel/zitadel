@@ -86,7 +86,6 @@ func TestAggregate_Validate(t *testing.T) {
 			fields: fields{aggregate: &Aggregate{
 				typ:            "user",
 				version:        "v1.0.0",
-				editorOrg:      "org",
 				editorService:  "svc",
 				editorUser:     "hodor",
 				resourceOwner:  "org",
@@ -94,7 +93,6 @@ func TestAggregate_Validate(t *testing.T) {
 				Events: []*Event{&Event{
 					AggregateType:    "user",
 					AggregateVersion: "v1.0.0",
-					EditorOrg:        "org",
 					EditorService:    "management",
 					EditorUser:       "hodor",
 					ResourceOwner:    "org",
@@ -108,7 +106,6 @@ func TestAggregate_Validate(t *testing.T) {
 			fields: fields{aggregate: &Aggregate{
 				id:             "aggID",
 				version:        "v1.0.0",
-				editorOrg:      "org",
 				editorService:  "svc",
 				editorUser:     "hodor",
 				resourceOwner:  "org",
@@ -116,7 +113,6 @@ func TestAggregate_Validate(t *testing.T) {
 				Events: []*Event{&Event{
 					AggregateID:      "hodor",
 					AggregateVersion: "v1.0.0",
-					EditorOrg:        "org",
 					EditorService:    "management",
 					EditorUser:       "hodor",
 					ResourceOwner:    "org",
@@ -130,7 +126,6 @@ func TestAggregate_Validate(t *testing.T) {
 			fields: fields{aggregate: &Aggregate{
 				id:             "aggID",
 				typ:            "user",
-				editorOrg:      "org",
 				editorService:  "svc",
 				editorUser:     "hodor",
 				resourceOwner:  "org",
@@ -138,7 +133,6 @@ func TestAggregate_Validate(t *testing.T) {
 				Events: []*Event{&Event{
 					AggregateID:   "hodor",
 					AggregateType: "user",
-					EditorOrg:     "org",
 					EditorService: "management",
 					EditorUser:    "hodor",
 					ResourceOwner: "org",
@@ -153,7 +147,6 @@ func TestAggregate_Validate(t *testing.T) {
 				id:             "aggID",
 				typ:            "user",
 				version:        "v1.0.0",
-				editorOrg:      "org",
 				editorService:  "svc",
 				editorUser:     "hodor",
 				resourceOwner:  "org",
@@ -162,7 +155,6 @@ func TestAggregate_Validate(t *testing.T) {
 					AggregateID:      "hodor",
 					AggregateType:    "user",
 					AggregateVersion: "v1.0.0",
-					EditorOrg:        "org",
 					EditorService:    "management",
 					EditorUser:       "hodor",
 					ResourceOwner:    "org",
