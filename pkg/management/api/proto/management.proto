@@ -1269,6 +1269,7 @@ message User {
     string postal_code = 20;
     string region = 21;
     string street_address = 22;
+    uint64 sequence = 23;
 }
 
 enum UserState {
@@ -1337,6 +1338,7 @@ message UserProfile {
     string preferred_language = 7;
     Gender gender = 8;
     string user_name = 9;
+    uint64 sequence = 10;
 }
 
 message UpdateUserProfileRequest {
@@ -1353,6 +1355,7 @@ message UserEmail {
     string id = 1;
     string email = 2;
     bool is_email_verified = 3;
+    uint64 sequence = 4;
 }
 
 message UpdateUserEmailRequest {
@@ -1365,6 +1368,7 @@ message UserPhone {
     string id = 1;
     string phone = 2;
     bool is_phone_verified = 3;
+    uint64 sequence = 5;
 }
 
 message UpdateUserPhoneRequest {
@@ -1380,6 +1384,7 @@ message UserAddress {
     string postal_code = 4;
     string region = 5;
     string street_address = 6;
+    uint64 sequence = 7;
 }
 
 message UpdateUserAddressRequest {
@@ -1451,6 +1456,7 @@ message PasswordComplexityPolicy {
     bool has_uppercase = 8;
     bool has_number = 9;
     bool has_symbol = 10;
+    uint64 sequence = 11;
 }
 
 message PasswordComplexityPolicyCreate {
@@ -1484,6 +1490,7 @@ message PasswordAgePolicy {
     google.protobuf.Timestamp change_date = 5;
     uint64 max_age_days = 6;
     uint64 expire_warn_days = 7;
+    uint64 sequence = 8;
 }
 
 message PasswordAgePolicyCreate {
@@ -1511,6 +1518,7 @@ message PasswordLockoutPolicy {
     google.protobuf.Timestamp change_date = 5;
     uint64 max_attempts = 6;
     bool show_lock_out_failures = 7;
+    uint64 sequence = 8;
 }
 
 message PasswordLockoutPolicyCreate {
@@ -1548,6 +1556,7 @@ message Org {
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
     string domain = 6;
+    uint64 sequence = 7;
 }
 
 enum OrgState {
@@ -1569,6 +1578,7 @@ message OrgMember {
     repeated string roles = 6;
     google.protobuf.Timestamp change_date = 7;
     google.protobuf.Timestamp creation_date = 8;
+    uint64 sequence = 9;
 }
 
 message AddOrgMemberRequest {
@@ -1693,6 +1703,7 @@ message ProjectMember {
     repeated string roles = 6;
     google.protobuf.Timestamp change_date = 7;
     google.protobuf.Timestamp creation_date = 8;
+    uint64 sequence = 10;
 }
 
 message ProjectMemberAdd {
@@ -1725,6 +1736,7 @@ message ProjectRole {
     string display_name = 3;
     google.protobuf.Timestamp creation_date = 4;
     string group = 5;
+    uint64 sequence = 6;
 }
 
 message ProjectRoleRemove {
@@ -1801,6 +1813,7 @@ message Application {
     oneof app_config {
         OIDCConfig oidc_config = 8;
     }
+    uint64 sequence = 9;
 }
 
 message ApplicationUpdate {
@@ -1907,6 +1920,7 @@ message ProjectGrant {
     google.protobuf.Timestamp creation_date = 8;
     google.protobuf.Timestamp change_date = 9;
     string project_name = 10;
+    uint64 sequence = 11;
 }
 
 message ProjectGrantCreate {
@@ -1962,6 +1976,7 @@ message ProjectGrantMember {
     repeated string roles = 6;
     google.protobuf.Timestamp change_date = 7;
     google.protobuf.Timestamp creation_date = 8;
+    uint64 sequence = 9;
 }
 
 message ProjectGrantMemberAdd {
@@ -2029,6 +2044,7 @@ message UserGrant {
     string org_name = 13;
     string org_domain = 14;
     string project_name = 15;
+    uint64 sequence = 16;
 }
 
 message UserGrantCreate {

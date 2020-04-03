@@ -22,7 +22,7 @@ type Project struct {
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
-	changes := make(map[string]interface{}, 2)
+	changes := make(map[string]interface{}, 1)
 	if changed.Name != "" && p.Name != changed.Name {
 		changes["name"] = changed.Name
 	}
@@ -59,9 +59,7 @@ func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery,
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "id should be filled")
 	}
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.ProjectAggregate).
-		LatestSequenceFilter(latestSequence).
+	return ProjectQuery(latestSequence).
 		AggregateIDFilter(id), nil
 }
 
@@ -91,7 +89,7 @@ func ProjectCreateAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 		return nil, err
 	}
 
-	return agg.AppendEvent(model.AddedProject, project)
+	return agg.AppendEvent(model.ProjectAdded, project)
 }
 
 func ProjectUpdateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, new *Project) (*es_models.Aggregate, error) {
@@ -106,7 +104,7 @@ func ProjectUpdateAggregate(ctx context.Context, aggCreator *es_models.Aggregate
 		return nil, err
 	}
 	changes := existing.Changes(new)
-	return agg.AppendEvent(model.ChangedProject, changes)
+	return agg.AppendEvent(model.ProjectChanged, changes)
 }
 
 func ProjectDeactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
@@ -117,7 +115,7 @@ func ProjectDeactivateAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	if err != nil {
 		return nil, err
 	}
-	return agg.AppendEvent(model.DeactivatedProject, nil)
+	return agg.AppendEvent(model.ProjectDeactivated, nil)
 }
 
 func ProjectReactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
@@ -128,5 +126,5 @@ func ProjectReactivateAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	if err != nil {
 		return nil, err
 	}
-	return agg.AppendEvent(model.ReactivatedProject, nil)
+	return agg.AppendEvent(model.ProjectReactivated, nil)
 }

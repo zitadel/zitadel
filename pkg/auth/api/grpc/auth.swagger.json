@@ -886,6 +886,10 @@
         },
         "street_address": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -901,6 +905,10 @@
         "isEmailVerified": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -916,6 +924,10 @@
         "is_phone_verified": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -945,6 +957,10 @@
         },
         "gender": {
           "$ref": "#/definitions/v1Gender"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -974,6 +990,10 @@
         },
         "user_name": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

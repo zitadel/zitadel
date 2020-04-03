@@ -1,37 +1,35 @@
 package model
 
 const (
-	AddedProject       = "project.added"
-	ChangedProject     = "project.changed"
-	DeactivatedProject = "project.deactivated"
-	ReactivatedProject = "project.reactivated"
-
-	AddedMember   = "project.member.added"
-	ChangedMember = "project.member.changed"
-	RemovedMember = "project.member.removed"
-
-	AddedRole   = "project.role.added"
-	RemovedRole = "project.role.removed"
-
-	AddedProjectGrant       = "project.grant.added"
-	ChangedProjectGrant     = "project.grant.changed"
-	DeactivatedProjectGrant = "project.grant.deactivated"
-	ReactivatedProjectGrant = "project.grant.reactivated"
-
-	AddedGrantMember   = "project.grant.member.added"
-	ChangedGrantMember = "project.grant.member.changed"
-	RemovedGrantMember = "project.grant.member.removed"
-
-	AddedApplication       = "project.application.added"
-	ChangedApplication     = "project.application.changed"
-	DeactivatedApplication = "project.application.deactivated"
-	ReactivatedApplication = "project.application.reactivated"
-
-	AddedOIDCConfig         = "project.application.config.oidc.added"
-	ChangedOIDCConfig       = "project.application.config.oidc.changed"
-	ChangedOIDCConfigSecret = "project.application.config.oidc.secret.changed"
-)
-
-const (
 	ProjectAggregate = "project"
+
+	ProjectAdded       = "project.added"
+	ProjectChanged     = "project.changed"
+	ProjectDeactivated = "project.deactivated"
+	ProjectReactivated = "project.reactivated"
+
+	ProjectMemberAdded   = "project.member.added"
+	ProjectMemberChanged = "project.member.changed"
+	ProjectMemberRemoved = "project.member.removed"
+
+	ProjectRoleAdded   = "project.role.added"
+	ProjectRoleRemoved = "project.role.removed"
+
+	ProjectGrantAdded       = "project.grant.added"
+	ProjectGrantChanged     = "project.grant.changed"
+	ProjectGrantDeactivated = "project.grant.deactivated"
+	ProjectGrantReactivated = "project.grant.reactivated"
+
+	GrantMemberAdded   = "project.grant.member.added"
+	GrantMemberChanged = "project.grant.member.changed"
+	GrantMemberRemoved = "project.grant.member.removed"
+
+	ApplicationAdded       = "project.application.added"
+	ApplicationChanged     = "project.application.changed"
+	ApplicationDeactivated = "project.application.deactivated"
+	ApplicationReactivated = "project.application.reactivated"
+
+	OIDCConfigAdded         = "project.application.config.oidc.added"
+	OIDCConfigChanged       = "project.application.config.oidc.changed"
+	OIDCConfigSecretChanged = "project.application.config.oidc.secret.changed"
 )

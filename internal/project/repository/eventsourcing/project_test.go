@@ -213,7 +213,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.AddedProject,
+				eventType: model.ProjectAdded,
 			},
 		},
 		{
@@ -225,7 +225,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.AddedProject,
+				eventType: model.ProjectAdded,
 				wantErr:   true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsPreconditionFailed(err)
@@ -281,7 +281,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.ChangedProject,
+				eventType: model.ProjectChanged,
 			},
 		},
 		{
@@ -293,7 +293,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.ChangedProject,
+				eventType: model.ProjectChanged,
 				wantErr:   true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsPreconditionFailed(err)
@@ -310,7 +310,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.ChangedProject,
+				eventType: model.ProjectChanged,
 				wantErr:   true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsPreconditionFailed(err)
@@ -364,7 +364,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.DeactivatedProject,
+				eventType: model.ProjectDeactivated,
 			},
 		},
 		{
@@ -376,7 +376,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.DeactivatedProject,
+				eventType: model.ProjectDeactivated,
 				wantErr:   true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsPreconditionFailed(err)
@@ -427,7 +427,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.ReactivatedProject,
+				eventType: model.ProjectReactivated,
 			},
 		},
 		{
@@ -439,7 +439,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.ReactivatedProject,
+				eventType: model.ProjectReactivated,
 				wantErr:   true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsPreconditionFailed(err)

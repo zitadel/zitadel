@@ -69,6 +69,7 @@ func GetPermissionsFromCtx(ctx context.Context) []string {
 	return ctxPermission
 }
 
+//TODO: Remove as soon an authentification is implemented
 func CheckInternal(ctx context.Context) bool {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

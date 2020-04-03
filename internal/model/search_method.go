@@ -1,6 +1,5 @@
 package model
 
-// code below could be generated
 type SearchMethod Enum
 
 var methods = []string{"Equals", "StartsWith", "Contains"}

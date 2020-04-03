@@ -1,7 +1,5 @@
 package model
 
-// code below could be generated
-
 type state int32
 
 func (s state) String() string {

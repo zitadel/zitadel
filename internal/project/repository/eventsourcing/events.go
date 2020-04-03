@@ -28,16 +28,16 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
-	case model.AddedProject, model.ChangedProject:
+	case model.ProjectAdded, model.ProjectChanged:
 		if err := json.Unmarshal(event.Data, p); err != nil {
 			logging.Log("EVEN-idl93").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
 		p.State = model.ProjectStateToInt(model.Active)
 		return nil
-	case model.DeactivatedProject:
+	case model.ProjectDeactivated:
 		return p.appendDeactivatedEvent()
-	case model.ReactivatedProject:
+	case model.ProjectReactivated:
 		return p.appendReactivatedEvent()
 	}
 

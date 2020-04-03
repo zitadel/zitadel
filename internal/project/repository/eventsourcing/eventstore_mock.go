@@ -11,7 +11,7 @@ import (
 func GetMockProjectByIDOK(ctrl *gomock.Controller) *ProjectEventstore {
 	data, _ := json.Marshal(Project{Name: "Name"})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.AddedProject, Data: data},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
