@@ -34,12 +34,21 @@ jobs:
     - uses: actions/setup-go@v2-beta
       with:
         go-version: ${{ env.GO_VERSION }}
-    - run: go test -race ./...
+    - run: go test -race -v -coverprofile=profile.cov ./...
     - run: go build -o zitadel cmd/zitadel/main.go
+    - uses: actions/upload-artifact@v1
+      with:
+        name: go-coverage
+        path: profile.cov
     - uses: actions/upload-artifact@v1
       with:
         name: go
         path: zitadel
+    - name: Send coverage
+      uses: shogo82148/actions-goveralls@v1
+      with:
+        path-to-profile: profile.cov
+        parallel: true
 
   container: # Artifact paths need better place
     runs-on: ubuntu-18.04
