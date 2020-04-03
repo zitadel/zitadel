@@ -10,7 +10,7 @@ env:
 
 jobs:
 
-  angular:
+  angular: # TODO Implement proper build and cache
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -27,7 +27,7 @@ jobs:
         name: angular
         path: hodor.txt
   
-  go:
+  go: # TODO Implement proper build and cache
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -41,7 +41,7 @@ jobs:
         name: go
         path: zitadel
 
-  container:
+  container: # Artifact paths need better place
     runs-on: ubuntu-18.04
     needs: [angular, go]
     steps:
@@ -105,9 +105,9 @@ jobs:
     - name: Docker Run Test
       run: docker run $REGISTRY/${GITHUB_REPOSITORY}/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "./app/zitadel | cat /app/console/hodor.txt"
 
-  release: # TODO Implement Docker Push
+  release: # TODO Implement Docker Push and latest TAG
     runs-on: ubuntu-18.04
-    needs: [container-test]
+    needs: [container, container-test]
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
