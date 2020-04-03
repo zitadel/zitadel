@@ -65,7 +65,7 @@ jobs:
       with:
         name: go
         path: go
-     - uses: docker/build-push-action@v1
+    - uses: docker/build-push-action@v1
       with:
         username: ${{ github.actor }}
         password: ${{ github.token }}
