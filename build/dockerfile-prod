@@ -1,7 +1,7 @@
 # FROM sratch
 FROM alpine:latest
 
-RUN useradd -ms /bin/sh zitadel
+RUN useradd zitadel
 
 USER zitadel
 
