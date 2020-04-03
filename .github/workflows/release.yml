@@ -131,6 +131,3 @@ jobs:
       run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE 
     - name: Create Version
       uses: caos/semantic-release@v1.1.0
-      with:
-        entrypoint: npx
-        arg: semantic-release --dry-run
