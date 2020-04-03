@@ -10,7 +10,7 @@ env:
 
 jobs:
 
-  angular: # TODO Implement proper build and cache
+  angular: # TODO Implement proper build and cache and coverage upload
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
