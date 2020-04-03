@@ -27,7 +27,6 @@ type Event struct {
 	AggregateVersion Version
 	EditorService    string
 	EditorUser       string
-	EditorOrg        string
 	ResourceOwner    string
 }
 
@@ -82,9 +81,6 @@ func (e *Event) Validate() error {
 	}
 	if e.EditorUser == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-L3NHO", "editor user not set")
-	}
-	if e.EditorOrg == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-84fIw", "editor org not set")
 	}
 	if e.ResourceOwner == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-omFVT", "resource ow")

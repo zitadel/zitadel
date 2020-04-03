@@ -22,7 +22,6 @@ type Aggregate struct {
 
 	editorService string
 	editorUser    string
-	editorOrg     string
 	resourceOwner string
 	Events        []*Event
 	Appender      appender
@@ -47,7 +46,6 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 		AggregateID:      a.id,
 		AggregateType:    a.typ,
 		AggregateVersion: a.version,
-		EditorOrg:        a.editorOrg,
 		EditorService:    a.editorService,
 		EditorUser:       a.editorUser,
 		ResourceOwner:    a.resourceOwner,
@@ -71,9 +69,6 @@ func (a *Aggregate) Validate() error {
 		return errors.ThrowPreconditionFailed(err, "MODEL-PupjX", "invalid version")
 	}
 
-	if a.editorOrg == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-di3x5", "editor org not set")
-	}
 	if a.editorService == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-clYbY", "editor service not set")
 	}

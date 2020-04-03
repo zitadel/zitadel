@@ -19,7 +19,6 @@ type option func(*Aggregate)
 func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, latestSequence uint64, opts ...option) (*Aggregate, error) {
 	ctxData := auth.GetCtxData(ctx)
 	editorUser := ctxData.UserID
-	editorOrg := ctxData.OrgID
 	resourceOwner := ctxData.OrgID
 
 	aggregate := &Aggregate{
@@ -28,7 +27,6 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 		latestSequence: latestSequence,
 		version:        version,
 		Events:         make([]*Event, 0, 2),
-		editorOrg:      editorOrg,
 		editorService:  c.serviceName,
 		editorUser:     editorUser,
 		resourceOwner:  resourceOwner,
@@ -48,12 +46,6 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 func OverwriteEditorUser(userID string) func(*Aggregate) {
 	return func(a *Aggregate) {
 		a.editorUser = userID
-	}
-}
-
-func OverwriteEditorOrg(orgID string) func(*Aggregate) {
-	return func(a *Aggregate) {
-		a.editorOrg = orgID
 	}
 }
 

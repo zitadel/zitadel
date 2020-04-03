@@ -12,24 +12,28 @@ import (
 	"github.com/lib/pq"
 )
 
+const (
+	selectEscaped = `SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events`
+)
+
 var (
-	eventColumns                             = []string{"id", "creation_date", "event_type", "event_sequence", "previous_sequence", "event_data", "modifier_service", "modifier_tenant", "modifier_user", "resource_owner", "aggregate_type", "aggregate_id", "aggregate_version"}
-	expectedFilterEventsLimitFormat          = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events ORDER BY event_sequence LIMIT \$1`).String()
-	expectedFilterEventsDescFormat           = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events ORDER BY event_sequence DESC`).String()
-	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_id = \$1 ORDER BY event_sequence LIMIT \$2`).String()
-	expectedFilterEventsAggregateIDTypeLimit = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_id = \$1 AND aggregate_type = ANY\(\$2\) ORDER BY event_sequence LIMIT \$3`).String()
-	expectedGetAllEvents                     = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events ORDER BY event_sequence`).String()
+	eventColumns                             = []string{"id", "creation_date", "event_type", "event_sequence", "previous_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "aggregate_type", "aggregate_id", "aggregate_version"}
+	expectedFilterEventsLimitFormat          = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence LIMIT \$1`).String()
+	expectedFilterEventsDescFormat           = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence DESC`).String()
+	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(selectEscaped + ` WHERE aggregate_id = \$1 ORDER BY event_sequence LIMIT \$2`).String()
+	expectedFilterEventsAggregateIDTypeLimit = regexp.MustCompile(selectEscaped + ` WHERE aggregate_id = \$1 AND aggregate_type IN \(\$2\) ORDER BY event_sequence LIMIT \$3`).String()
+	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence`).String()
 
 	expectedInsertStatement = regexp.MustCompile(`insert into eventstore\.events ` +
-		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, modifier_user, modifier_service, modifier_tenant, resource_owner, previous_sequence\) ` +
-		`select \$1, \$2, \$3, \$4, coalesce\(\$5, now\(\)\), \$6, \$7, \$8, \$9, \$10, ` +
-		`case \(select exists\(select event_sequence from eventstore\.events where aggregate_type = \$11 AND aggregate_id = \$12\)\) ` +
-		`WHEN true then \(select event_sequence from eventstore\.events where aggregate_type = \$13 AND aggregate_id = \$14 order by event_sequence desc limit 1\) ` +
+		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_sequence\) ` +
+		`select \$1, \$2, \$3, \$4, coalesce\(\$5, now\(\)\), \$6, \$7, \$8, \$9, ` +
+		`case \(select exists\(select event_sequence from eventstore\.events where aggregate_type = \$10 AND aggregate_id = \$11\)\) ` +
+		`WHEN true then \(select event_sequence from eventstore\.events where aggregate_type = \$12 AND aggregate_id = \$13 order by event_sequence desc limit 1\) ` +
 		`ELSE NULL ` +
 		`end ` +
 		`where \(` +
-		`\(select count\(id\) from eventstore\.events where event_sequence >= COALESCE\(\$15\, 0\) AND aggregate_type = \$16 AND aggregate_id = \$17\) = 1 OR ` +
-		`\(\(select count\(id\) from eventstore\.events where aggregate_type = \$18 and aggregate_id = \$19\) = 0 AND COALESCE\(\$20, 0\) = 0\)\) RETURNING id, event_sequence, creation_date`).String()
+		`\(select count\(id\) from eventstore\.events where event_sequence >= COALESCE\(\$14, 0\) AND aggregate_type = \$15 AND aggregate_id = \$16\) = 1 OR ` +
+		`\(\(select count\(id\) from eventstore\.events where aggregate_type = \$17 and aggregate_id = \$18\) = 0 AND COALESCE\(\$19, 0\) = 0\)\) RETURNING id, event_sequence, creation_date`).String()
 )
 
 type dbMock struct {
@@ -101,7 +105,7 @@ func (db *dbMock) expectRollback(err error) *dbMock {
 func (db *dbMock) expectInsertEvent(e *models.Event, returnedID string, returnedSequence uint64) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), e.Data, e.EditorUser, e.EditorService, e.EditorOrg, e.ResourceOwner,
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), e.Data, e.EditorUser, e.EditorService, e.ResourceOwner,
 			e.AggregateType, e.AggregateID,
 			e.AggregateType, e.AggregateID,
 			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,
@@ -118,7 +122,7 @@ func (db *dbMock) expectInsertEvent(e *models.Event, returnedID string, returned
 func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), e.Data, e.EditorUser, e.EditorService, e.EditorOrg, e.ResourceOwner,
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), e.Data, e.EditorUser, e.EditorService, e.ResourceOwner,
 			e.AggregateType, e.AggregateID,
 			e.AggregateType, e.AggregateID,
 			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,

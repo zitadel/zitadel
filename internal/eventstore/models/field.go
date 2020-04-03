@@ -9,5 +9,4 @@ const (
 	Field_ResourceOwner
 	Field_ModifierService
 	Field_ModifierUser
-	Field_ModifierTenant
 )
