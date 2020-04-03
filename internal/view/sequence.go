@@ -1,14 +1,8 @@
 package view
 
 import (
-	"fmt"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/jinzhu/gorm"
-)
-
-const (
-	viewNameKey = "view_name"
 )
 
 type actualSequece struct {
@@ -20,10 +14,27 @@ type currentSequence struct {
 	CurrentSequence uint64 `gorm:"column:current_sequence`
 }
 
+type SequenceSearchKey int32
+
+const (
+	SEQUENCESEARCHKEY_UNDEFINED SequenceSearchKey = iota
+	SEQUENCESEARCHKEY_VIEW_NAME
+)
+
+type sequenceSearchKey SequenceSearchKey
+
+func (key sequenceSearchKey) ToColumnName() string {
+	switch SequenceSearchKey(key) {
+	case SEQUENCESEARCHKEY_VIEW_NAME:
+		return "view_name"
+	default:
+		return ""
+	}
+}
+
 func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) error {
-	err := db.Table(table).
-		Save(&currentSequence{viewName, sequence}).
-		Error
+	save := PrepareSave(table)
+	err := save(db, &currentSequence{viewName, sequence})
 
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "VIEW-5kOhP", "unable to updated processed sequence")
@@ -33,10 +44,8 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) e
 
 func LatestSequence(db *gorm.DB, table, viewName string) (uint64, error) {
 	sequence := actualSequece{}
-	err := db.Table(table).
-		Where(fmt.Sprintf("%s = ?", viewNameKey), viewName).
-		Scan(&sequence).
-		Error
+	query := PrepareGetByKey(table, sequenceSearchKey(SEQUENCESEARCHKEY_VIEW_NAME), viewName)
+	err := query(db, sequence)
 
 	if err == nil {
 		return sequence.ActualSequence, nil

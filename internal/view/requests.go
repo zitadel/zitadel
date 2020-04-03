@@ -48,7 +48,7 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 	}
 }
 
-func PreparePut(table string) func(db *gorm.DB, res interface{}) error {
+func PrepareSave(table string) func(db *gorm.DB, res interface{}) error {
 	return func(db *gorm.DB, object interface{}) error {
 		err := db.Table(table).Save(object).Error
 		if err != nil {

@@ -273,7 +273,7 @@ func TestPreparePut(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			getPut := PreparePut(tt.args.table)
+			getPut := PrepareSave(tt.args.table)
 			err := getPut(tt.db.db, tt.args.object)
 
 			if !tt.res.wantErr && err != nil {
