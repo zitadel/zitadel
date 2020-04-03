@@ -13,6 +13,7 @@ jobs:
   prepare:
     runs-on: ubuntu-18.04
     steps: 
+    - uses: actions/checkout@v2
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
