@@ -50,7 +50,7 @@ jobs:
         path-to-profile: profile.cov
         parallel: true
 
-  container: # Artifact paths need better place
+  container-prod: # Artifact paths need better place
     runs-on: ubuntu-18.04
     needs: [angular, go]
     steps:
@@ -66,16 +66,17 @@ jobs:
         path: .build/go
     - uses: docker/build-push-action@v1
       with:
+        dockerfile: build/dockerfile-prod
         username: ${{ github.actor }}
         password: ${{ github.token }}
         registry: ${{ env.REGISTRY }}
         repository: ${{ github.repository }}/${{ env.IMAGE }}
         tag_with_ref: true
         tag_with_sha: true
-
+  
   container-vulnerability-scan:
     runs-on: ubuntu-18.04
-    needs: [container]
+    needs: [container-prod]
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -89,7 +90,7 @@ jobs:
     - uses: anchore/scan-action@master
       with:
         image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ steps.vars.outputs.sha_short }}"
-        dockerfile-path: "./Dockerfile"
+        dockerfile-path: "./build/dockerfile-prod"
         fail-build: false
     - name: anchore inline scan JSON results
       run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
@@ -100,7 +101,7 @@ jobs:
 
   container-test: # TODO Implement proper test
     runs-on: ubuntu-18.04
-    needs: [container]
+    needs: [container-prod]
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -112,7 +113,7 @@ jobs:
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Run Test
-      run: docker run $REGISTRY/${GITHUB_REPOSITORY}/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "ls -la ./app/zitadel"
+      run: docker run $REGISTRY/${GITHUB_REPOSITORY}/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "ls -la ./app"
 
   release: # TODO Implement Docker Push and latest TAG
     runs-on: ubuntu-18.04
