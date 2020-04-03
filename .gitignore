@@ -25,3 +25,5 @@ debug
 # credential
 google-credentials
 key.json
+
+cockroach-data/*

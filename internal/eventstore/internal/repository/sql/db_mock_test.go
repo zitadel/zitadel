@@ -12,12 +12,16 @@ import (
 	"github.com/lib/pq"
 )
 
+const (
+	selectEscaped = `SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events`
+)
+
 var (
-	expectedFilterEventsLimitFormat          = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events ORDER BY event_sequence LIMIT \$1`).String()
-	expectedFilterEventsDescFormat           = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events ORDER BY event_sequence DESC`).String()
-	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_id = \$1 ORDER BY event_sequence LIMIT \$2`).String()
-	expectedFilterEventsAggregateIDTypeLimit = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_id = \$1 AND aggregate_type IN \(\$2\) ORDER BY event_sequence LIMIT \$3`).String()
-	expectedGetAllEvents                     = regexp.MustCompile(`SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events ORDER BY event_sequence`).String()
+	expectedFilterEventsLimitFormat          = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence LIMIT \$1`).String()
+	expectedFilterEventsDescFormat           = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence DESC`).String()
+	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(selectEscaped + ` WHERE aggregate_id = \$1 ORDER BY event_sequence LIMIT \$2`).String()
+	expectedFilterEventsAggregateIDTypeLimit = regexp.MustCompile(selectEscaped + ` WHERE aggregate_id = \$1 AND aggregate_type IN \(\$2\) ORDER BY event_sequence LIMIT \$3`).String()
+	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence`).String()
 
 	expectedInsertStatement = regexp.MustCompile(`insert into eventstore\.events ` +
 		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, modifier_user, modifier_service, modifier_tenant, resource_owner, previous_sequence\) ` +
