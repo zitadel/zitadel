@@ -58,8 +58,8 @@ jobs:
     - run: ls -la
     - uses: docker/build-push-action@v1
       with:
-        username: ${{ GITHUB_ACTOR }}
-        password: ${{ GITHUB_TOKEN }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
         registry: ${{ env.REGISTRY }}
         repository: ${{ github.repository }}/${{ env.IMAGE }}
         tag_with_ref: true
