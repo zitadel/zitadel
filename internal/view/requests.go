@@ -61,10 +61,10 @@ func PreparePut(table string) func(db *gorm.DB, res interface{}) error {
 func PrepareDelete(table string, key ColumnKey, id string) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		err := db.Table(table).
-			Where(fmt.Sprintf("%s = ?", key), id).
+			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
 			Delete(nil).
 			Error
-		if err == nil {
+		if err != nil {
 			return caos_errs.ThrowInternal(err, "VIEW-die73", "could not delete object")
 		}
 		return nil

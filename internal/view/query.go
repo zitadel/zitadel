@@ -19,7 +19,6 @@ type SearchQuery interface {
 	GetKey() ColumnKey
 	GetMethod() model.SearchMethod
 	GetValue() interface{}
-	GetCaseSensitiv() bool
 }
 
 type ColumnKey interface {
