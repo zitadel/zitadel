@@ -72,7 +72,7 @@ jobs:
     - name: Source checkout
       uses: actions/checkout@v2
     - name: Docker Login
-      run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GITHUB_TOKEN}
+      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - uses: anchore/scan-action@master
       with:
         image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ github.sha }}"
@@ -88,7 +88,7 @@ jobs:
     - name: Source checkout
       uses: actions/checkout@v2
     - name: Docker Login
-      run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GITHUB_TOKEN}
+      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Run Test
       run: docker run $REGISTRY/${GITHUB_REPOSITORY}/$IMAGE:${{ github.sha }} /bin/bash -c "./app/zitadel | cat /app/console/hodor.txt"
 
