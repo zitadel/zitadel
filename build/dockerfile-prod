@@ -1,7 +1,10 @@
 # FROM sratch
 FROM alpine:latest
 
+RUN useradd -ms /bin/sh zitadel
+
+USER zitadel
+
 COPY .build/angular /app/console
 COPY .build/go /app
 
-USER zitadel
