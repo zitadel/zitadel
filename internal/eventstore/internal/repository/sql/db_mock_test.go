@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	selectEscaped = `SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, modifier_service, modifier_tenant, modifier_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events`
+	selectEscaped = `SELECT id, creation_date, event_type, event_sequence, previous_sequence, event_data, editor_service, editor_tenant, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events`
 )
 
 var (
@@ -24,7 +24,7 @@ var (
 	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence`).String()
 
 	expectedInsertStatement = regexp.MustCompile(`insert into eventstore\.events ` +
-		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, modifier_user, modifier_service, modifier_tenant, resource_owner, previous_sequence\) ` +
+		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, editor_tenant, resource_owner, previous_sequence\) ` +
 		`select \$1, \$2, \$3, \$4, coalesce\(\$5, now\(\)\), \$6, \$7, \$8, \$9, \$10, ` +
 		`case \(select exists\(select event_sequence from eventstore\.events where aggregate_type = \$11 AND aggregate_id = \$12\)\) ` +
 		`WHEN true then \(select event_sequence from eventstore\.events where aggregate_type = \$13 AND aggregate_id = \$14 order by event_sequence desc limit 1\) ` +

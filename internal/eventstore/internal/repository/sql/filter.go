@@ -21,9 +21,9 @@ const (
 		", event_sequence" +
 		", previous_sequence" +
 		", event_data" +
-		", modifier_service" +
-		", modifier_tenant" +
-		", modifier_user" +
+		", editor_service" +
+		", editor_tenant" +
+		", editor_user" +
 		", resource_owner" +
 		", aggregate_type" +
 		", aggregate_id" +
@@ -136,11 +136,11 @@ func getField(field es_models.Field) string {
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
 	case es_models.Field_ModifierService:
-		return "modifier_service"
+		return "editor_service"
 	case es_models.Field_ModifierUser:
-		return "modifier_user"
+		return "editor_user"
 	case es_models.Field_ModifierOrg:
-		return "modifier_tenant"
+		return "editor_tenant"
 	}
 	return ""
 }

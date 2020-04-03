@@ -11,7 +11,7 @@ import (
 )
 
 const insertStmt = "insert into eventstore.events " +
-	"(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, modifier_user, modifier_service, modifier_tenant, resource_owner, previous_sequence) " +
+	"(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, editor_tenant, resource_owner, previous_sequence) " +
 	"select $1, $2, $3, $4, coalesce($5, now()), $6, $7, $8, $9, $10, " +
 	// case is to set the highest sequence or NULL in previous_sequence
 	"case (select exists(select event_sequence from eventstore.events where aggregate_type = $11 AND aggregate_id = $12)) " +
