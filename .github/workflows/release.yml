@@ -84,6 +84,10 @@ jobs:
         fail-build: false
     - name: anchore inline scan JSON results
       run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
+    - uses: actions/upload-artifact@v1
+      with:
+        name: anchore-reports
+        path: ./anchore-reports/
 
   container-test:
     runs-on: ubuntu-18.04
