@@ -44,11 +44,10 @@ jobs:
       with:
         name: go-binary
         path: zitadel
-    - name: Send coverage
-      uses: shogo82148/actions-goveralls@v1
+    - uses: codecov/codecov-action@v1
       with:
-        path-to-profile: profile.cov
-        parallel: true
+        file: ./profile.cov
+        name: codecov-go
 
   container-prod: # Artifact paths need better place
     runs-on: ubuntu-18.04
