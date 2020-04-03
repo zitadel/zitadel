@@ -42,7 +42,7 @@ jobs:
         path: profile.cov
     - uses: actions/upload-artifact@v1
       with:
-        name: go
+        name: go-binary
         path: zitadel
     - name: Send coverage
       uses: shogo82148/actions-goveralls@v1
@@ -59,11 +59,11 @@ jobs:
     - uses: actions/download-artifact@v1
       with:
         name: angular
-        path: angular
+        path: .build/angular
     - uses: actions/download-artifact@v1
       with:
-        name: go
-        path: go
+        name: go-binary
+        path: .build/go
     - uses: docker/build-push-action@v1
       with:
         username: ${{ github.actor }}
@@ -98,7 +98,7 @@ jobs:
         name: anchore-reports
         path: ./anchore-reports/
 
-  container-test:
+  container-test: # TODO Implement proper test
     runs-on: ubuntu-18.04
     needs: [container]
     steps:
@@ -112,7 +112,7 @@ jobs:
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Run Test
-      run: docker run $REGISTRY/${GITHUB_REPOSITORY}/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "./app/zitadel | cat /app/console/hodor.txt"
+      run: docker run $REGISTRY/${GITHUB_REPOSITORY}/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "ls -la ./app/zitadel"
 
   release: # TODO Implement Docker Push and latest TAG
     runs-on: ubuntu-18.04

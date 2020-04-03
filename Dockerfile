@@ -1,4 +1,4 @@
 FROM alpine:latest
 
-COPY angular /app/console
-COPY go /app
+COPY .build/angular /app/console
+COPY .build/go /app
