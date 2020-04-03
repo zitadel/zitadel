@@ -45,6 +45,8 @@ jobs:
     runs-on: ubuntu-18.04
     needs: [angular, go]
     steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
     - uses: actions/download-artifact@v1
       with:
         name: angular
@@ -54,8 +56,6 @@ jobs:
         name: go
         path: go
     - run: ls -la
-    - name: Source checkout
-      uses: actions/checkout@v2
     - uses: docker/build-push-action@v1
       with:
         username: ${GITHUB_ACTOR}
