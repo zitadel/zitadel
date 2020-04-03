@@ -117,7 +117,7 @@ jobs:
 
   release: # TODO Implement Docker Push and latest TAG
     runs-on: ubuntu-18.04
-    needs: [container, container-test]
+    needs: [container-prod, container-test]
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
