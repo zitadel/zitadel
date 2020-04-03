@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestPrepareGetByID(t *testing.T) {
+func TestPrepareGetByKey(t *testing.T) {
 	type args struct {
 		table string
 		key   ColumnKey
@@ -25,7 +25,7 @@ func TestPrepareGetByID(t *testing.T) {
 		res  res
 	}{
 		{
-			"get by id",
+			"ok",
 			mockDB(t).
 				expectGetByID("TESTTABLE", "test", "VALUE"),
 			args{
@@ -34,12 +34,12 @@ func TestPrepareGetByID(t *testing.T) {
 				value: "VALUE",
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: false,
 			},
 		},
 		{
-			"get by id not found",
+			"not found",
 			mockDB(t).
 				expectGetByIDErr("TESTTABLE", "test", "VALUE", gorm.ErrRecordNotFound),
 			args{
@@ -48,10 +48,27 @@ func TestPrepareGetByID(t *testing.T) {
 				value: "VALUE",
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsNotFound(err)
+				},
+			},
+		},
+		{
+			"db err",
+			mockDB(t).
+				expectGetByIDErr("TESTTABLE", "test", "VALUE", gorm.ErrUnaddressable),
+			args{
+				table: "TESTTABLE",
+				key:   TestSearchKey_TEST,
+				value: "VALUE",
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsInternal(err)
 				},
 			},
 		},
@@ -59,7 +76,7 @@ func TestPrepareGetByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			res := &Test{}
-			getByID := PrepareGetByID(tt.args.table, tt.args.key, tt.args.value)
+			getByID := PrepareGetByKey(tt.args.table, tt.args.key, tt.args.value)
 			err := getByID(tt.db.db, res)
 
 			if !tt.res.wantErr && err != nil {
@@ -103,7 +120,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.Equals, value: "VALUE"},
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: false,
 			},
 		},
@@ -116,7 +133,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.StartsWith, value: "VALUE"},
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: false,
 			},
 		},
@@ -129,12 +146,12 @@ func TestPrepareGetByQuery(t *testing.T) {
 				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.Contains, value: "VALUE"},
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: false,
 			},
 		},
 		{
-			"search expect err",
+			"search expect not found err",
 			mockDB(t).
 				expectGetByQueryErr("TESTTABLE", "test", "LIKE", "%VALUE%", gorm.ErrRecordNotFound),
 			args{
@@ -142,10 +159,26 @@ func TestPrepareGetByQuery(t *testing.T) {
 				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.Contains, value: "VALUE"},
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsNotFound(err)
+				},
+			},
+		},
+		{
+			"search expect internal err",
+			mockDB(t).
+				expectGetByQueryErr("TESTTABLE", "test", "LIKE", "%VALUE%", gorm.ErrUnaddressable),
+			args{
+				table:       "TESTTABLE",
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.Contains, value: "VALUE"},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsInternal(err)
 				},
 			},
 		},
@@ -158,7 +191,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				searchQuery: TestSearchQuery{key: TestSearchKey_UNDEFINED, method: model.Equals, value: "VALUE"},
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsErrorInvalidArgument(err)
@@ -205,18 +238,36 @@ func TestPreparePut(t *testing.T) {
 		res  res
 	}{
 		{
-			"put, ok",
+			"ok",
 			mockDB(t).
 				expectBegin(nil).
-				expectSave("TESTTABLE", Test{id: "ID", test: "VALUE"}).
+				expectSave("TESTTABLE", Test{ID: "ID", Test: "VALUE"}).
 				expectCommit(nil),
 			args{
 				table:  "TESTTABLE",
-				object: &Test{id: "ID", test: "VALUE"},
+				object: &Test{ID: "ID", Test: "VALUE"},
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: false,
+			},
+		},
+		{
+			"db error",
+			mockDB(t).
+				expectBegin(nil).
+				expectSaveErr("TESTTABLE", Test{ID: "ID", Test: "VALUE"}, gorm.ErrUnaddressable).
+				expectCommit(nil),
+			args{
+				table:  "TESTTABLE",
+				object: &Test{ID: "ID", Test: "VALUE"},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsInternal(err)
+				},
 			},
 		},
 	}
@@ -270,12 +321,12 @@ func TestPrepareDelete(t *testing.T) {
 				value: "VALUE",
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: false,
 			},
 		},
 		{
-			"delete failes",
+			"db error",
 			mockDB(t).
 				expectBegin(nil).
 				expectRemoveErr("TESTTABLE", "id", "VALUE", gorm.ErrUnaddressable).
@@ -286,7 +337,7 @@ func TestPrepareDelete(t *testing.T) {
 				value: "VALUE",
 			},
 			res{
-				result:  Test{id: "VALUE"},
+				result:  Test{ID: "VALUE"},
 				wantErr: true,
 				errFunc: func(err error) bool {
 					return caos_errs.IsInternal(err)

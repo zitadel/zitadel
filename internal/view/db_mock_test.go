@@ -9,11 +9,51 @@ import (
 )
 
 var (
-	expectedGetByID    = `SELECT \* FROM "%s" WHERE \(%s = \$1\) LIMIT 1`
-	expectedGetByQuery = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) LIMIT 1`
-	expectedSave       = `UPDATE "%s" SET "test" = \$1 WHERE "%s"."%s" = \$2`
-	expectedRemove     = `DELETE FROM "%s" WHERE \(%s = \$1\)`
+	expectedGetByID                  = `SELECT \* FROM "%s" WHERE \(%s = \$1\) LIMIT 1`
+	expectedGetByQuery               = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) LIMIT 1`
+	expectedSave                     = `UPDATE "%s" SET "test" = \$1 WHERE "%s"."%s" = \$2`
+	expectedRemove                   = `DELETE FROM "%s" WHERE \(%s = \$1\)`
+	expectedSearch                   = `SELECT \* FROM "%s" OFFSET 0`
+	expectedSearchCount              = `SELECT count\(\*\) FROM "%s"`
+	expectedSearchLimit              = `SELECT \* FROM "%s" LIMIT %v OFFSET 0`
+	expectedSearchLimitCount         = `SELECT count\(\*\) FROM "%s"`
+	expectedSearchOffset             = `SELECT \* FROM "%s" OFFSET %v`
+	expectedSearchOffsetCount        = `SELECT count\(\*\) FROM "%s"`
+	expectedSearchSorting            = `SELECT \* FROM "%s" ORDER BY %s %s OFFSET 0`
+	expectedSearchSortingCount       = `SELECT count\(\*\) FROM "%s"`
+	expectedSearchQuery              = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) OFFSET 0`
+	expectedSearchQueryCount         = `SELECT count\(\*\) FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\)`
+	expectedSearchQueryAllParams     = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) ORDER BY %s %s LIMIT %v OFFSET %v`
+	expectedSearchQueryAllParamCount = `SELECT count\(\*\) FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\)`
 )
+
+type TestSearchRequest struct {
+	limit         uint64
+	offset        uint64
+	sortingColumn ColumnKey
+	asc           bool
+	queries       []SearchQuery
+}
+
+func (req TestSearchRequest) GetLimit() uint64 {
+	return req.limit
+}
+
+func (req TestSearchRequest) GetOffset() uint64 {
+	return req.offset
+}
+
+func (req TestSearchRequest) GetSortingColumn() ColumnKey {
+	return req.sortingColumn
+}
+
+func (req TestSearchRequest) GetAsc() bool {
+	return req.asc
+}
+
+func (req TestSearchRequest) GetQueries() []SearchQuery {
+	return req.queries
+}
 
 type TestSearchQuery struct {
 	key    TestSearchKey
@@ -53,8 +93,8 @@ func (key TestSearchKey) ToColumnName() string {
 }
 
 type Test struct {
-	id   string `json:"-" gorm:"column:id;primary_key"`
-	test string `json:"test" gorm:"column:test"`
+	ID   string `json:"-" gorm:"column:id;primary_key"`
+	Test string `json:"test" gorm:"column:test"`
 }
 
 type dbMock struct {
@@ -152,7 +192,7 @@ func (db *dbMock) expectGetByQueryErr(table, key, method, value string, err erro
 func (db *dbMock) expectSave(table string, object Test) *dbMock {
 	query := fmt.Sprintf(expectedSave, table, table, "id")
 	db.mock.ExpectExec(query).
-		WithArgs(object.test, object.id).
+		WithArgs(object.Test, object.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	return db
@@ -161,7 +201,7 @@ func (db *dbMock) expectSave(table string, object Test) *dbMock {
 func (db *dbMock) expectSaveErr(table string, object Test, err error) *dbMock {
 	query := fmt.Sprintf(expectedSave, table, table, "id")
 	db.mock.ExpectExec(query).
-		WithArgs(object.test, object.id).
+		WithArgs(object.Test, object.ID).
 		WillReturnError(err)
 
 	return db
@@ -182,5 +222,121 @@ func (db *dbMock) expectRemoveErr(table, key, value string, err error) *dbMock {
 		WithArgs(value).
 		WillReturnError(err)
 
+	return db
+}
+
+func (db *dbMock) expectGetSearchRequestNoParams(table string, resultAmount, total int) *dbMock {
+	query := fmt.Sprintf(expectedSearch, table)
+	queryCount := fmt.Sprintf(expectedSearchCount, table)
+
+	rows := sqlmock.NewRows([]string{"id"})
+	for i := 0; i < resultAmount; i++ {
+		rows.AddRow(fmt.Sprintf("hodor-%d", i))
+	}
+
+	db.mock.ExpectQuery(queryCount).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
+	db.mock.ExpectQuery(query).
+		WillReturnRows(rows)
+	return db
+}
+
+func (db *dbMock) expectGetSearchRequestWithLimit(table string, limit, resultAmount, total int) *dbMock {
+	query := fmt.Sprintf(expectedSearchLimit, table, limit)
+	queryCount := fmt.Sprintf(expectedSearchLimitCount, table)
+
+	rows := sqlmock.NewRows([]string{"id"})
+	for i := 0; i < resultAmount; i++ {
+		rows.AddRow(fmt.Sprintf("hodor-%d", i))
+	}
+
+	db.mock.ExpectQuery(queryCount).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
+	db.mock.ExpectQuery(query).
+		WillReturnRows(rows)
+	return db
+}
+
+func (db *dbMock) expectGetSearchRequestWithOffset(table string, offset, resultAmount, total int) *dbMock {
+	query := fmt.Sprintf(expectedSearchOffset, table, offset)
+	queryCount := fmt.Sprintf(expectedSearchOffsetCount, table)
+
+	rows := sqlmock.NewRows([]string{"id"})
+	for i := 0; i < resultAmount; i++ {
+		rows.AddRow(fmt.Sprintf("hodor-%d", i))
+	}
+
+	db.mock.ExpectQuery(queryCount).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
+	db.mock.ExpectQuery(query).
+		WillReturnRows(rows)
+	return db
+}
+
+func (db *dbMock) expectGetSearchRequestWithSorting(table, sorting string, sortingColumn ColumnKey, resultAmount, total int) *dbMock {
+	query := fmt.Sprintf(expectedSearchSorting, table, sortingColumn.ToColumnName(), sorting)
+	queryCount := fmt.Sprintf(expectedSearchSortingCount, table)
+
+	rows := sqlmock.NewRows([]string{"id"})
+	for i := 0; i < resultAmount; i++ {
+		rows.AddRow(fmt.Sprintf("hodor-%d", i))
+	}
+
+	db.mock.ExpectQuery(queryCount).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
+	db.mock.ExpectQuery(query).
+		WillReturnRows(rows)
+	return db
+}
+
+func (db *dbMock) expectGetSearchRequestWithSearchQuery(table, key, method, value string, resultAmount, total int) *dbMock {
+	query := fmt.Sprintf(expectedSearchQuery, table, key, method)
+	queryCount := fmt.Sprintf(expectedSearchQueryCount, table, key, method)
+
+	rows := sqlmock.NewRows([]string{"id"})
+	for i := 0; i < resultAmount; i++ {
+		rows.AddRow(fmt.Sprintf("hodor-%d", i))
+	}
+
+	db.mock.ExpectQuery(queryCount).
+		WithArgs(value).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
+	db.mock.ExpectQuery(query).
+		WithArgs(value).
+		WillReturnRows(rows)
+	return db
+}
+
+func (db *dbMock) expectGetSearchRequestWithAllParams(table, key, method, value, sorting string, sortingColumn ColumnKey, limit, offset, resultAmount, total int) *dbMock {
+	query := fmt.Sprintf(expectedSearchQueryAllParams, table, key, method, sortingColumn.ToColumnName(), sorting, limit, offset)
+	queryCount := fmt.Sprintf(expectedSearchQueryAllParamCount, table, key, method)
+
+	rows := sqlmock.NewRows([]string{"id"})
+	for i := 0; i < resultAmount; i++ {
+		rows.AddRow(fmt.Sprintf("hodor-%d", i))
+	}
+
+	db.mock.ExpectQuery(queryCount).
+		WithArgs(value).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
+	db.mock.ExpectQuery(query).
+		WithArgs(value).
+		WillReturnRows(rows)
+	return db
+}
+
+func (db *dbMock) expectGetSearchRequestErr(table string, resultAmount, total int, err error) *dbMock {
+	query := fmt.Sprintf(expectedSearch, table)
+	queryCount := fmt.Sprintf(expectedSearchCount, table)
+
+	rows := sqlmock.NewRows([]string{"id"})
+	for i := 0; i < resultAmount; i++ {
+		rows.AddRow(fmt.Sprintf("hodor-%d", i))
+	}
+
+	db.mock.ExpectQuery(queryCount).
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(total))
+	db.mock.ExpectQuery(query).
+		WillReturnError(err)
 	return db
 }

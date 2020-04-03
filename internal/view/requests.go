@@ -8,7 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func PrepareGetByID(table string, key ColumnKey, id string) func(db *gorm.DB, res interface{}) error {
+func PrepareGetByKey(table string, key ColumnKey, id string) func(db *gorm.DB, res interface{}) error {
 	return func(db *gorm.DB, res interface{}) error {
 		err := db.Table(table).
 			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).

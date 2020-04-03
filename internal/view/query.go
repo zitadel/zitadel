@@ -29,12 +29,12 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 	return func(db *gorm.DB, res interface{}) (int, error) {
 		count := 0
 		query := db.Table(table)
-		if column := request.GetSortingColumn().ToColumnName(); column != "" {
+		if column := request.GetSortingColumn(); column != nil {
 			order := "DESC"
 			if request.GetAsc() {
 				order = "ASC"
 			}
-			query = query.Order(fmt.Sprintf("%s %s", column, order))
+			query = query.Order(fmt.Sprintf("%s %s", column.ToColumnName(), order))
 		}
 		for _, q := range request.GetQueries() {
 			var ok bool
