@@ -128,7 +128,7 @@ jobs:
     - name: Docker Pull short-sha
       run: docker pull $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }}
     - name: Docker Tag
-      run: docker Tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE 
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE 
     - name: Create Version
       uses: caos/semantic-release@v1.1.0
       with:
