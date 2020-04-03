@@ -11,7 +11,7 @@ import (
 var (
 	expectedGetByID    = `SELECT \* FROM "%s" WHERE \(%s = \$1\) LIMIT 1`
 	expectedGetByQuery = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) LIMIT 1`
-	expectedSave       = `INSERT INTO "%s" \("value"\) VALUES \(\$1) RETURNING "%s"\."id"`
+	expectedSave       = `UPDATE "%s" SET "test" = \$1 WHERE "%s"."%s" = \$2`
 	expectedRemove     = `DELETE FROM "%s" WHERE \(%s = \$1\)`
 )
 
@@ -53,8 +53,8 @@ func (key TestSearchKey) ToColumnName() string {
 }
 
 type Test struct {
-	id   string
-	test string
+	id   string `json:"-" gorm:"column:id;primary_key"`
+	test string `json:"test" gorm:"column:test"`
 }
 
 type dbMock struct {
@@ -150,19 +150,18 @@ func (db *dbMock) expectGetByQueryErr(table, key, method, value string, err erro
 }
 
 func (db *dbMock) expectSave(table string, object Test) *dbMock {
-	query := fmt.Sprintf(expectedSave, table, table)
-	db.mock.ExpectQuery(query).
-		WithArgs(object.test).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).
-			AddRow(object.id))
+	query := fmt.Sprintf(expectedSave, table, table, "id")
+	db.mock.ExpectExec(query).
+		WithArgs(object.test, object.id).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	return db
 }
 
 func (db *dbMock) expectSaveErr(table string, object Test, err error) *dbMock {
-	query := fmt.Sprintf(expectedSave, table, table)
-	db.mock.ExpectQuery(query).
-		WithArgs(object).
+	query := fmt.Sprintf(expectedSave, table, table, "id")
+	db.mock.ExpectExec(query).
+		WithArgs(object.test, object.id).
 		WillReturnError(err)
 
 	return db

@@ -205,7 +205,7 @@ func TestPreparePut(t *testing.T) {
 		res  res
 	}{
 		{
-			"search with equals",
+			"put, ok",
 			mockDB(t).
 				expectBegin(nil).
 				expectSave("TESTTABLE", Test{id: "ID", test: "VALUE"}).
