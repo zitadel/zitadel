@@ -139,7 +139,7 @@ func getField(field es_models.Field) string {
 		return "modifier_service"
 	case es_models.Field_ModifierUser:
 		return "modifier_user"
-	case es_models.Field_ModifierTenant:
+	case es_models.Field_ModifierOrg:
 		return "modifier_tenant"
 	}
 	return ""
