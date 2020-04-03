@@ -10,16 +10,6 @@ env:
 
 jobs:
 
-  prepare:
-    runs-on: ubuntu-18.04
-    steps: 
-    - uses: actions/checkout@v2
-    - name: Generate Short SHA Container Tag
-      id: vars
-      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-    - name: Check outputs
-      run: echo ${{ steps.vars.outputs.sha_short }}
-
   angular:
     runs-on: ubuntu-18.04
     steps:
@@ -80,6 +70,11 @@ jobs:
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
+    - name: Generate Short SHA Container Tag
+      id: vars
+      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Check outputs
+      run: echo ${{ steps.vars.outputs.sha_short }}
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - uses: anchore/scan-action@master
@@ -96,6 +91,11 @@ jobs:
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
+    - name: Generate Short SHA Container Tag
+      id: vars
+      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Check outputs
+      run: echo ${{ steps.vars.outputs.sha_short }}
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Run Test
