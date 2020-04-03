@@ -1,35 +1,37 @@
 package model
 
+import "github.com/caos/zitadel/internal/eventstore/models"
+
 const (
-	ProjectAggregate = "project"
+	ProjectAggregate models.AggregateType = "project"
 
-	ProjectAdded       = "project.added"
-	ProjectChanged     = "project.changed"
-	ProjectDeactivated = "project.deactivated"
-	ProjectReactivated = "project.reactivated"
+	ProjectAdded       models.EventType = "project.added"
+	ProjectChanged     models.EventType = "project.changed"
+	ProjectDeactivated models.EventType = "project.deactivated"
+	ProjectReactivated models.EventType = "project.reactivated"
 
-	ProjectMemberAdded   = "project.member.added"
-	ProjectMemberChanged = "project.member.changed"
-	ProjectMemberRemoved = "project.member.removed"
+	ProjectMemberAdded   models.EventType = "project.member.added"
+	ProjectMemberChanged models.EventType = "project.member.changed"
+	ProjectMemberRemoved models.EventType = "project.member.removed"
 
-	ProjectRoleAdded   = "project.role.added"
-	ProjectRoleRemoved = "project.role.removed"
+	ProjectRoleAdded   models.EventType = "project.role.added"
+	ProjectRoleRemoved models.EventType = "project.role.removed"
 
-	ProjectGrantAdded       = "project.grant.added"
-	ProjectGrantChanged     = "project.grant.changed"
-	ProjectGrantDeactivated = "project.grant.deactivated"
-	ProjectGrantReactivated = "project.grant.reactivated"
+	ProjectGrantAdded       models.EventType = "project.grant.added"
+	ProjectGrantChanged     models.EventType = "project.grant.changed"
+	ProjectGrantDeactivated models.EventType = "project.grant.deactivated"
+	ProjectGrantReactivated models.EventType = "project.grant.reactivated"
 
-	GrantMemberAdded   = "project.grant.member.added"
-	GrantMemberChanged = "project.grant.member.changed"
-	GrantMemberRemoved = "project.grant.member.removed"
+	GrantMemberAdded   models.EventType = "project.grant.member.added"
+	GrantMemberChanged models.EventType = "project.grant.member.changed"
+	GrantMemberRemoved models.EventType = "project.grant.member.removed"
 
-	ApplicationAdded       = "project.application.added"
-	ApplicationChanged     = "project.application.changed"
-	ApplicationDeactivated = "project.application.deactivated"
-	ApplicationReactivated = "project.application.reactivated"
+	ApplicationAdded       models.EventType = "project.application.added"
+	ApplicationChanged     models.EventType = "project.application.changed"
+	ApplicationDeactivated models.EventType = "project.application.deactivated"
+	ApplicationReactivated models.EventType = "project.application.reactivated"
 
-	OIDCConfigAdded         = "project.application.config.oidc.added"
-	OIDCConfigChanged       = "project.application.config.oidc.changed"
-	OIDCConfigSecretChanged = "project.application.config.oidc.secret.changed"
+	OIDCConfigAdded         models.EventType = "project.application.config.oidc.added"
+	OIDCConfigChanged       models.EventType = "project.application.config.oidc.changed"
+	OIDCConfigSecretChanged models.EventType = "project.application.config.oidc.secret.changed"
 )

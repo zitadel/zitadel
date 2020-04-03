@@ -65,7 +65,7 @@ func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery,
 
 func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.ProjectAggregate).
+		AggregateTypeFilter(model.ProjectAggregate.String()).
 		LatestSequenceFilter(latestSequence)
 }
 

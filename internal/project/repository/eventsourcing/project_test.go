@@ -152,7 +152,7 @@ func TestProjectAggregate(t *testing.T) {
 	}
 	type res struct {
 		eventLen int
-		aggType  string
+		aggType  models.AggregateType
 	}
 	tests := []struct {
 		name string
@@ -195,7 +195,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 	}
 	type res struct {
 		eventLen  int
-		eventType string
+		eventType models.EventType
 		wantErr   bool
 		errFunc   func(err error) bool
 	}
@@ -240,7 +240,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
-			if !tt.res.wantErr && agg.Events[0].Type.String() != tt.res.eventType {
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
 				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
 			}
 			if !tt.res.wantErr && agg.Events[0].Data == nil {
@@ -262,7 +262,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 	}
 	type res struct {
 		eventLen  int
-		eventType string
+		eventType models.EventType
 		wantErr   bool
 		errFunc   func(err error) bool
 	}
@@ -325,7 +325,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
-			if !tt.res.wantErr && agg.Events[0].Type.String() != tt.res.eventType {
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
 				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
 			}
 			if !tt.res.wantErr && agg.Events[0].Data == nil {
@@ -346,7 +346,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 	}
 	type res struct {
 		eventLen  int
-		eventType string
+		eventType models.EventType
 		wantErr   bool
 		errFunc   func(err error) bool
 	}
@@ -391,7 +391,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
-			if !tt.res.wantErr && agg.Events[0].Type.String() != tt.res.eventType {
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
 				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
@@ -409,7 +409,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 	}
 	type res struct {
 		eventLen  int
-		eventType string
+		eventType models.EventType
 		wantErr   bool
 		errFunc   func(err error) bool
 	}
@@ -454,7 +454,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
-			if !tt.res.wantErr && agg.Events[0].Type.String() != tt.res.eventType {
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
 				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
