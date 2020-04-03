@@ -1,7 +1,7 @@
 # FROM sratch
 FROM alpine:latest
 
-RUN useradd zitadel
+RUN addgroup -S appgroup && adduser -S zitadel -G zitadel
 
 USER zitadel
 
