@@ -2,4 +2,4 @@
 
 package migrations
 
-//go:generate flyway -url=jdbc:postgresql://ccockroachdb-public:26257/defaultdb -user=root -password= -locations=filesystem:./ clean
+//go:generate flyway -url=jdbc:postgresql://cockroachdb-public:26257/defaultdb -user=root -password= -locations=filesystem:./ clean
