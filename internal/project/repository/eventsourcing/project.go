@@ -32,14 +32,14 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 
 func ProjectFromModel(project *model.Project) *Project {
 	return &Project{
-		Name:  project.Name,
-		State: model.ProjectStateToInt(project.State),
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ObjectRoot.ID,
 			Sequence:     project.Sequence,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
 		},
+		Name:  project.Name,
+		State: model.ProjectStateToInt(project.State),
 	}
 }
 
