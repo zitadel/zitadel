@@ -2,11 +2,12 @@ package eventsourcing
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/sony/sonyflake"
-	"strconv"
 )
 
 var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
@@ -65,7 +66,7 @@ func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery,
 
 func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.ProjectAggregate.String()).
+		AggregateTypeFilter(model.ProjectAggregate).
 		LatestSequenceFilter(latestSequence)
 }
 

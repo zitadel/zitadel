@@ -106,7 +106,7 @@ func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []i
 	for i, filter := range searchQuery.Filters {
 		value := filter.GetValue()
 		switch value.(type) {
-		case []bool, []float64, []int64, []string, *[]bool, *[]float64, *[]int64, *[]string:
+		case []bool, []float64, []int64, []string, []models.AggregateType, *[]bool, *[]float64, *[]int64, *[]string, *[]models.AggregateType:
 			value = pq.Array(value)
 		}
 
