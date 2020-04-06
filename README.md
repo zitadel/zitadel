@@ -7,6 +7,7 @@
 [![license](https://badgen.net/github/license/caos/zitadel/)](https://github.com/caos/zitadel/blob/master/LICENSE)
 [![release](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
+[![codecov](https://codecov.io/gh/caos/zitadel/branch/master/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
 
 > This project is in alpha state. The API will continue breaking until version 1.0.0 is released
 

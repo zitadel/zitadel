@@ -10,8 +10,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/aws/aws-sdk-go v1.30.1 // indirect
-	github.com/bxcodec/faker/v3 v3.3.0
+	github.com/aws/aws-sdk-go v1.30.4 // indirect
 	github.com/caos/logging v0.0.1
 	github.com/cockroachdb/cockroach-go v0.0.0-20200312223839-f565e4789405
 	github.com/envoyproxy/protoc-gen-validate v0.3.0
@@ -36,10 +35,11 @@ require (
 	github.com/sony/sonyflake v1.0.0
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3
-	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
+	golang.org/x/crypto v0.0.0-20200403201458-baeed622b8d8
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20200331202046-9d5940d49312
-	google.golang.org/genproto v0.0.0-20200331122359-1ee6d9798940
+	golang.org/x/tools v0.0.0-20200403190813-44a64ad78b9b
+	google.golang.org/api v0.21.0 // indirect
+	google.golang.org/genproto v0.0.0-20200403120447-c50568487044
 	google.golang.org/grpc v1.28.0
 	google.golang.org/protobuf v1.20.1
 	gopkg.in/yaml.v2 v2.2.8 // indirect
