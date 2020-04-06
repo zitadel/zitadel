@@ -24,11 +24,11 @@ func (m *MockRepository) ExpectFilterFail(query *models.SearchQuery, err error) 
 }
 
 func (m *MockRepository) ExpectPush(aggregates ...*models.Aggregate) *MockRepository {
-	m.EXPECT().PushEvents(context.Background(), aggregates).Return(nil).MaxTimes(1)
+	m.EXPECT().PushAggregates(context.Background(), aggregates).Return(nil).MaxTimes(1)
 	return m
 }
 
 func (m *MockRepository) ExpectPushError(err error, aggregates ...*models.Aggregate) *MockRepository {
-	m.EXPECT().PushEvents(context.Background(), aggregates).Return(err).MaxTimes(1)
+	m.EXPECT().PushAggregates(context.Background(), aggregates).Return(err).MaxTimes(1)
 	return m
 }
