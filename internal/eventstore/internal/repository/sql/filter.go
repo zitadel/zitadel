@@ -141,9 +141,9 @@ func getField(field es_models.Field) string {
 		return "event_sequence"
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
-	case es_models.Field_ModifierService:
+	case es_models.Field_EditorService:
 		return "editor_service"
-	case es_models.Field_ModifierUser:
+	case es_models.Field_EditorUser:
 		return "editor_user"
 	}
 	return ""
