@@ -43,7 +43,6 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 				typ:     "user",
 				version: "v1.0.0",
 				opts: []option{
-					OverwriteEditorOrg("org"),
 					OverwriteEditorUser("hodor"),
 					OverwriteResourceOwner("org"),
 				},
@@ -59,7 +58,6 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 				id:      "hodor",
 				version: "v1.0.0",
 				opts: []option{
-					OverwriteEditorOrg("org"),
 					OverwriteEditorUser("hodor"),
 					OverwriteResourceOwner("org"),
 				},
@@ -75,7 +73,6 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 				id:  "hodor",
 				typ: "user",
 				opts: []option{
-					OverwriteEditorOrg("org"),
 					OverwriteEditorUser("hodor"),
 					OverwriteResourceOwner("org"),
 				},
@@ -91,7 +88,6 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 				typ:           "user",
 				version:       "v1.0.0",
 				editorService: "admin",
-				editorOrg:     "org",
 				editorUser:    "hodor",
 				resourceOwner: "org",
 			},
@@ -101,7 +97,6 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 				typ:     "user",
 				version: "v1.0.0",
 				opts: []option{
-					OverwriteEditorOrg("org"),
 					OverwriteEditorUser("hodor"),
 					OverwriteResourceOwner("org"),
 				},

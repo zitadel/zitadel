@@ -1196,7 +1196,7 @@ message Change {
     google.protobuf.Timestamp change_date = 1;
     string event_type = 2;
     uint64 sequence = 3;
-    string modifier = 4;
+    string editor = 4;
     google.protobuf.Struct data = 5;
 }
 

@@ -21,9 +21,8 @@ const (
 		", event_sequence" +
 		", previous_sequence" +
 		", event_data" +
-		", modifier_service" +
-		", modifier_tenant" +
-		", modifier_user" +
+		", editor_service" +
+		", editor_user" +
 		", resource_owner" +
 		", aggregate_type" +
 		", aggregate_id" +
@@ -68,7 +67,6 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 			&event.PreviousSequence,
 			&event.Data,
 			&event.EditorService,
-			&event.EditorOrg,
 			&event.EditorUser,
 			&event.ResourceOwner,
 			&event.AggregateType,
@@ -136,11 +134,9 @@ func getField(field es_models.Field) string {
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
 	case es_models.Field_ModifierService:
-		return "modifier_service"
+		return "editor_service"
 	case es_models.Field_ModifierUser:
-		return "modifier_user"
-	case es_models.Field_ModifierOrg:
-		return "modifier_tenant"
+		return "editor_user"
 	}
 	return ""
 }
