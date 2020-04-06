@@ -125,6 +125,19 @@ func TestPrepareGetByQuery(t *testing.T) {
 			},
 		},
 		{
+			"search with equals case sensitive",
+			mockDB(t).
+				expectGetByQueryCaseSensitive("TESTTABLE", "test", "=", "VALUE"),
+			args{
+				table:       "TESTTABLE",
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.EqualsCaseSensitive, value: "VALUE"},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: false,
+			},
+		},
+		{
 			"search with startswith",
 			mockDB(t).
 				expectGetByQuery("TESTTABLE", "test", "LIKE", "VALUE%"),
@@ -138,12 +151,38 @@ func TestPrepareGetByQuery(t *testing.T) {
 			},
 		},
 		{
+			"search with startswith case sensitive",
+			mockDB(t).
+				expectGetByQueryCaseSensitive("TESTTABLE", "test", "LIKE", "VALUE%"),
+			args{
+				table:       "TESTTABLE",
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.StartsWithCaseSensitive, value: "VALUE"},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: false,
+			},
+		},
+		{
 			"search with contains",
 			mockDB(t).
 				expectGetByQuery("TESTTABLE", "test", "LIKE", "%VALUE%"),
 			args{
 				table:       "TESTTABLE",
 				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.Contains, value: "VALUE"},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: false,
+			},
+		},
+		{
+			"search with contains case sensitive",
+			mockDB(t).
+				expectGetByQueryCaseSensitive("TESTTABLE", "test", "LIKE", "%VALUE%"),
+			args{
+				table:       "TESTTABLE",
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.ContainsCaseSensitive, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},

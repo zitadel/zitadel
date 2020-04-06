@@ -62,21 +62,36 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	if column == "" {
 		return nil, false
 	}
+
 	switch method {
 	case model.Equals:
 		query = query.Where("LOWER("+column+") = LOWER(?)", value)
+	case model.EqualsCaseSensitive:
+		query = query.Where(""+column+" = ?", value)
 	case model.StartsWith:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, false
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", valueText+"%")
+	case model.StartsWithCaseSensitive:
+		valueText, ok := value.(string)
+		if !ok {
+			return nil, false
+		}
+		query = query.Where(column+" LIKE ?", valueText+"%")
 	case model.Contains:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, false
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText+"%")
+	case model.ContainsCaseSensitive:
+		valueText, ok := value.(string)
+		if !ok {
+			return nil, false
+		}
+		query = query.Where(column+" LIKE ?", "%"+valueText+"%")
 	default:
 		return nil, false
 	}

@@ -3,7 +3,7 @@ package model
 // code below could be generated
 type SearchMethod Enum
 
-var methods = []string{"Equals", "StartsWith", "Contains"}
+var methods = []string{"Equals", "StartsWith", "Contains", "EqualsCaseSensitive", "StartsWithCaseSensitive", "ContainsCaseSensitive"}
 
 type method int32
 
@@ -15,6 +15,9 @@ const (
 	Equals method = iota
 	StartsWith
 	Contains
+	EqualsCaseSensitive
+	StartsWithCaseSensitive
+	ContainsCaseSensitive
 )
 
 func SearchMethodToInt(s SearchMethod) int32 {

@@ -11,6 +11,7 @@ import (
 var (
 	expectedGetByID                  = `SELECT \* FROM "%s" WHERE \(%s = \$1\) LIMIT 1`
 	expectedGetByQuery               = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) LIMIT 1`
+	expectedGetByQueryCaseSensitive  = `SELECT \* FROM "%s" WHERE \(%s %s \$1\) LIMIT 1`
 	expectedSave                     = `UPDATE "%s" SET "test" = \$1 WHERE "%s"."%s" = \$2`
 	expectedRemove                   = `DELETE FROM "%s" WHERE \(%s = \$1\)`
 	expectedSearch                   = `SELECT \* FROM "%s" OFFSET 0`
@@ -172,6 +173,16 @@ func (db *dbMock) expectGetByIDErr(table, key, value string, err error) *dbMock 
 
 func (db *dbMock) expectGetByQuery(table, key, method, value string) *dbMock {
 	query := fmt.Sprintf(expectedGetByQuery, table, key, method)
+	db.mock.ExpectQuery(query).
+		WithArgs(value).
+		WillReturnRows(sqlmock.NewRows([]string{key}).
+			AddRow(key))
+
+	return db
+}
+
+func (db *dbMock) expectGetByQueryCaseSensitive(table, key, method, value string) *dbMock {
+	query := fmt.Sprintf(expectedGetByQueryCaseSensitive, table, key, method)
 	db.mock.ExpectQuery(query).
 		WithArgs(value).
 		WillReturnRows(sqlmock.NewRows([]string{key}).
