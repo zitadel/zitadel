@@ -117,6 +117,9 @@ jobs:
   release: # TODO Implement Docker Push and latest TAG
     runs-on: ubuntu-18.04
     needs: [container-prod, container-test]
+    env:
+      DOCKER_USERNAME: ${{ github.actor }}
+      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
