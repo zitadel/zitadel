@@ -1,0 +1,133 @@
+name: Release
+on: push
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  REGISTRY: docker.pkg.github.com
+  IMAGE: zitadel
+  NODE_VERSION: '12'
+  GO_VERSION: '^1.14.1'
+
+jobs:
+
+  angular: # TODO Implement proper build and cache and coverage upload
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - run: echo "hodor" > hodor.txt
+    # - run: npm ci 
+    # - run: npm run lint
+    # - run: npm run prodbuild
+    # - run: npm test
+    - uses: actions/upload-artifact@v1
+      with:
+        name: angular
+        path: hodor.txt
+  
+  go: # TODO Implement proper build and cache
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - run: go test -race -v -coverprofile=profile.cov ./...
+    - run: go build -o zitadel cmd/zitadel/main.go
+    - uses: actions/upload-artifact@v1
+      with:
+        name: go-coverage
+        path: profile.cov
+    - uses: actions/upload-artifact@v1
+      with:
+        name: go-binary
+        path: zitadel
+    - uses: codecov/codecov-action@v1
+      with:
+        file: ./profile.cov
+        name: codecov-go
+
+  container-prod: # Artifact paths need better place
+    runs-on: ubuntu-18.04
+    needs: [angular, go]
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - uses: actions/download-artifact@v1
+      with:
+        name: angular
+        path: .build/angular
+    - uses: actions/download-artifact@v1
+      with:
+        name: go-binary
+        path: .build/go
+    - uses: docker/build-push-action@v1
+      with:
+        dockerfile: build/dockerfile-prod
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+        registry: ${{ env.REGISTRY }}
+        repository: ${{ github.repository }}/${{ env.IMAGE }}
+        tag_with_ref: true
+        tag_with_sha: true
+  
+  container-vulnerability-scan:
+    runs-on: ubuntu-18.04
+    needs: [container-prod]
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - name: Generate Short SHA Container Tag
+      id: vars
+      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Check outputs
+      run: echo ${{ steps.vars.outputs.sha_short }}
+    - name: Docker Login
+      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+    - uses: anchore/scan-action@master
+      with:
+        image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ steps.vars.outputs.sha_short }}"
+        dockerfile-path: "./build/dockerfile-prod"
+        fail-build: false
+    - name: anchore inline scan JSON results
+      run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
+    - uses: actions/upload-artifact@v1
+      with:
+        name: anchore-reports
+        path: ./anchore-reports/
+
+  container-test: # TODO Implement proper test
+    runs-on: ubuntu-18.04
+    needs: [container-prod]
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - name: Generate Short SHA Container Tag
+      id: vars
+      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Check outputs
+      run: echo ${{ steps.vars.outputs.sha_short }}
+    - name: Docker Login
+      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+    - name: Docker Run Test
+      run: docker run $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "ls -la ./app"
+
+  release: # TODO Implement Docker Push and latest TAG
+    runs-on: ubuntu-18.04
+    needs: [container-prod, container-test]
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@v2
+    - name: Generate Short SHA Container Tag
+      id: vars
+      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - name: Docker Login
+      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+    - name: Docker Pull short-sha
+      run: docker pull $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }}
+    - name: Docker Tag
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE 
+    - name: Create Version
+      uses: caos/semantic-release@v1.1.0
