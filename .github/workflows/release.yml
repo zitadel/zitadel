@@ -138,6 +138,5 @@ jobs:
         dry_run: false
         semantic_version: 17.0.4
         extra_plugins: |
-          @semantic-release/exec@v5.0.0
           semantic-release-docker@v2.2.0
           
