@@ -14,7 +14,7 @@ docker run -d \
 cockroachdb/cockroach:v19.2.2 start --insecure
 ```
 
-### local database migrationd
+### local database migrations
 
 #### local migrate
 
