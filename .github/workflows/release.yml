@@ -135,5 +135,4 @@ jobs:
     - name: Create Version
       uses: caos/semantic-release@v1.1.0
       with:
-        entrypoint: npx
-        args: semantic-release --dry-run
+        npx-arguments: semantic-release --help 
