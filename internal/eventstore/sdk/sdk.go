@@ -23,7 +23,7 @@ func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *
 	}
 	err = appender(events...)
 	if err != nil{
-		return ThrowAggregater(err, "SDK-awiWK", "appender failed")
+		return ThrowAppendEventError(err, "SDK-awiWK", "appender failed")
 	}
 	return nil
 }
@@ -54,7 +54,7 @@ func appendAggregates(appender appendFunc, aggregates []*models.Aggregate) error
 	for _, aggregate := range aggregates {
 		err := appender(aggregate.Events...)
 		if err != nil {
-			return ThrowAggregater(err, "SDK-o6kzK", "aggregator failed")
+			return ThrowAppendEventError(err, "SDK-o6kzK", "aggregator failed")
 		}
 	}
 	return nil
