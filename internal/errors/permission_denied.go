@@ -19,7 +19,7 @@ type PermissionDeniedError struct {
 }
 
 func ThrowPermissionDenied(parent error, id, message string) error {
-	return &PermissionDeniedError{createCaosError(parent, id, message)}
+	return &PermissionDeniedError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowPermissionDeniedf(parent error, id, format string, a ...interface{}) error {

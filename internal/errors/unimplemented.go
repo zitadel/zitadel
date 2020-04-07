@@ -19,7 +19,7 @@ type UnimplementedError struct {
 }
 
 func ThrowUnimplemented(parent error, id, message string) error {
-	return &UnimplementedError{createCaosError(parent, id, message)}
+	return &UnimplementedError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowUnimplementedf(parent error, id, format string, a ...interface{}) error {

@@ -19,7 +19,7 @@ type DeadlineExceededError struct {
 }
 
 func ThrowDeadlineExceeded(parent error, id, message string) error {
-	return &DeadlineExceededError{createCaosError(parent, id, message)}
+	return &DeadlineExceededError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowDeadlineExceededf(parent error, id, format string, a ...interface{}) error {

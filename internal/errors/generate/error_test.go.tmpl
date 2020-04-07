@@ -12,7 +12,7 @@ import (
 func Test{{.ErrorName}}Error(t *testing.T) {
 	var err interface{}
 	err = new(caos_errs.{{.ErrorName}}Error)
-	_, ok := err.(caos_errs.{{.ErrorName}})
+	_, ok := err.(*caos_errs.{{.ErrorName}})
 	assert.True(t, ok)
 }
 

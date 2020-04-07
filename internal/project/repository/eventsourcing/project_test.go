@@ -2,56 +2,13 @@ package eventsourcing
 
 import (
 	"context"
+	"testing"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"testing"
 )
-
-func TestChanges(t *testing.T) {
-	type args struct {
-		existing *Project
-		new      *Project
-	}
-	type res struct {
-		changesLen int
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "project name changes",
-			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "NameChanged"},
-			},
-			res: res{
-				changesLen: 1,
-			},
-		},
-		{
-			name: "no changes",
-			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "Name"},
-			},
-			res: res{
-				changesLen: 0,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
-			if len(changes) != tt.res.changesLen {
-				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
-			}
-		})
-	}
-}
 
 func TestProjectByIDQuery(t *testing.T) {
 	type args struct {
@@ -231,7 +188,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new)
+			agg, err := ProjectCreateAggregate(tt.args.aggCreator, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -312,7 +269,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectUpdateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
+			agg, err := ProjectUpdateAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -376,7 +333,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectDeactivateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing)
+			agg, err := ProjectDeactivateAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -437,7 +394,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectReactivateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing)
+			agg, err := ProjectReactivateAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

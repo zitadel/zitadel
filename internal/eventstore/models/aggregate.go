@@ -24,10 +24,7 @@ type Aggregate struct {
 	editorUser    string
 	resourceOwner string
 	Events        []*Event
-	Appender      appender
 }
-
-type appender func(...*Event)
 
 func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate, error) {
 	if string(typ) == "" {
@@ -80,9 +77,4 @@ func (a *Aggregate) Validate() error {
 	}
 
 	return nil
-}
-
-func (a *Aggregate) SetAppender(appendFn appender) *Aggregate {
-	a.Appender = appendFn
-	return a
 }

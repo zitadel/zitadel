@@ -5,56 +5,13 @@ import (
 	"strconv"
 
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/sony/sonyflake"
 )
 
 var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
-
-const (
-	projectVersion = "v1"
-)
-
-type Project struct {
-	es_models.ObjectRoot
-	Name  string `json:"name,omitempty"`
-	State int32  `json:"-"`
-}
-
-func (p *Project) Changes(changed *Project) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
-	if changed.Name != "" && p.Name != changed.Name {
-		changes["name"] = changed.Name
-	}
-	return changes
-}
-
-func ProjectFromModel(project *model.Project) *Project {
-	return &Project{
-		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ObjectRoot.ID,
-			Sequence:     project.Sequence,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-		},
-		Name:  project.Name,
-		State: model.ProjectStateToInt(project.State),
-	}
-}
-
-func ProjectToModel(project *Project) *model.Project {
-	return &model.Project{
-		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ID,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-			Sequence:     project.Sequence,
-		},
-		Name:  project.Name,
-		State: model.ProjectStateFromInt(project.State),
-	}
-}
 
 func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
@@ -74,58 +31,61 @@ func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreato
 	return aggCreator.NewAggregate(ctx, id, model.ProjectAggregate, projectVersion, sequence)
 }
 
-func ProjectCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, project *Project) (*es_models.Aggregate, error) {
-	if project == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
-	}
-	var err error
-	id, err := idGenerator.NextID()
-	if err != nil {
-		return nil, err
-	}
-	project.ID = strconv.FormatUint(id, 10)
+func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *Project) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if project == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
+		}
+		var err error
+		id, err := idGenerator.NextID()
+		if err != nil {
+			return nil, err
+		}
+		project.ID = strconv.FormatUint(id, 10)
 
-	agg, err := ProjectAggregate(ctx, aggCreator, project.ID, project.Sequence)
-	if err != nil {
-		return nil, err
-	}
+		agg, err := ProjectAggregate(ctx, aggCreator, project.ID, project.Sequence)
+		if err != nil {
+			return nil, err
+		}
 
-	return agg.AppendEvent(model.ProjectAdded, project)
+		return agg.AppendEvent(model.ProjectAdded, project)
+	}
 }
 
-func ProjectUpdateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, new *Project) (*es_models.Aggregate, error) {
-	if existing == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
+func ProjectUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *Project, new *Project) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if existing == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
+		}
+		if new == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.Changes(new)
+		return agg.AppendEvent(model.ProjectChanged, changes)
 	}
-	if new == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
-	}
-	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
-	if err != nil {
-		return nil, err
-	}
-	changes := existing.Changes(new)
-	return agg.AppendEvent(model.ProjectChanged, changes)
 }
 
-func ProjectDeactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
-	if existing == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ueh45", "existing project should not be nil")
-	}
-	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
-	if err != nil {
-		return nil, err
-	}
-	return agg.AppendEvent(model.ProjectDeactivated, nil)
+func ProjectDeactivateAggregate(aggCreator *es_models.AggregateCreator, project *Project) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return projectStateAggregate(aggCreator, project, model.ProjectDeactivated)
 }
 
-func ProjectReactivateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project) (*es_models.Aggregate, error) {
-	if existing == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
+func ProjectReactivateAggregate(aggCreator *es_models.AggregateCreator, project *Project) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return projectStateAggregate(aggCreator, project, model.ProjectReactivated)
+}
+
+func projectStateAggregate(aggCreator *es_models.AggregateCreator, project *Project, state models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if project == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, project.ID, project.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(state, nil)
 	}
-	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
-	if err != nil {
-		return nil, err
-	}
-	return agg.AppendEvent(model.ProjectReactivated, nil)
 }
