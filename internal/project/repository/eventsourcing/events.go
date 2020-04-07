@@ -39,6 +39,12 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendDeactivatedEvent()
 	case model.ProjectReactivated:
 		return p.appendReactivatedEvent()
+	case model.ProjectMemberAdded:
+		return p.appendAddMemberEvent(event)
+	case model.ProjectMemberChanged:
+		return p.appendChangeMemberEvent(event)
+	case model.ProjectMemberRemoved:
+		return p.appendRemoveMemberEvent(event)
 	}
 
 	return nil
@@ -52,4 +58,50 @@ func (p *Project) appendDeactivatedEvent() error {
 func (p *Project) appendReactivatedEvent() error {
 	p.State = model.ProjectStateToInt(model.Active)
 	return nil
+}
+
+func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
+	member, err := getMemberData(event)
+	if err != nil {
+		return nil
+	}
+	member.ObjectRoot.CreationDate = event.CreationDate
+	p.Members = append(p.Members, member)
+	return nil
+}
+
+func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
+	member, err := getMemberData(event)
+	if err != nil {
+		return nil
+	}
+	for i, m := range p.Members {
+		if m.UserID == member.UserID {
+			p.Members[i] = member
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
+	member, err := getMemberData(event)
+	if err != nil {
+		return nil
+	}
+	for i, m := range p.Members {
+		if m.UserID == member.UserID {
+			p.Members[i] = member
+		}
+	}
+	return nil
+}
+
+func getMemberData(event *es_models.Event) (*ProjectMember, error) {
+	member := &ProjectMember{}
+	member.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, member); err != nil {
+		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")
+		return nil, err
+	}
+	return member, nil
 }
