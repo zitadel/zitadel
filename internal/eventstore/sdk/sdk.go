@@ -21,7 +21,11 @@ func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *
 	if len(events) == 0 {
 		return errors.ThrowNotFound(nil, "EVENT-8due3", "no events found")
 	}
-	return appender(events...)
+	err = appender(events...)
+	if err != nil{
+		return ThrowAggregater(err, "SDK-awiWK", "appender failed")
+	}
+	return nil
 }
 
 // Push creates the aggregates from aggregater
@@ -41,6 +45,7 @@ func Push(ctx context.Context, push pushFunc, appender appendFunc, aggregaters .
 	if err != nil {
 		return err
 	}
+	
 
 	return appendAggregates(appender, aggregates)
 }
