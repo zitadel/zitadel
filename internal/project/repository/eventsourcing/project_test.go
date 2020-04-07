@@ -86,9 +86,7 @@ func TestProjectByIDQuery(t *testing.T) {
 			res: res{
 				filterLen: 3,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -227,9 +225,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectAdded,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -295,9 +291,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectChanged,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -312,9 +306,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectChanged,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -378,9 +370,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectDeactivated,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -441,9 +431,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectReactivated,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}

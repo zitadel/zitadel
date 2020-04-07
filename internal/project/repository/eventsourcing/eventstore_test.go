@@ -44,9 +44,7 @@ func TestProjectByID(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsNotFound(err)
-				},
+				errFunc: caos_errs.IsNotFound,
 			},
 		},
 		{
@@ -57,9 +55,7 @@ func TestProjectByID(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -114,9 +110,7 @@ func TestCreateProject(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -177,9 +171,7 @@ func TestUpdateProject(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -238,9 +230,7 @@ func TestDeactivateProject(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -299,9 +289,7 @@ func TestReactivateProject(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
