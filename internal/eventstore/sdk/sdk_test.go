@@ -16,7 +16,7 @@ func TestFilter(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantErr bool
+		wantErr func(error) bool
 	}{
 		{
 			name: "filter error",
@@ -26,7 +26,7 @@ func TestFilter(t *testing.T) {
 				},
 				appender: nil,
 			},
-			wantErr: true,
+			wantErr: errors.IsInternal,
 		},
 		{
 			name: "no events found",
@@ -36,7 +36,7 @@ func TestFilter(t *testing.T) {
 				},
 				appender: nil,
 			},
-			wantErr: true,
+			wantErr: errors.IsNotFound,
 		},
 		{
 			name: "append fails",
@@ -48,7 +48,7 @@ func TestFilter(t *testing.T) {
 					return errors.ThrowInvalidArgument(nil, "SDK-DhBzl", "test error")
 				},
 			},
-			wantErr: true,
+			wantErr: IsAppendEventError,
 		},
 		{
 			name: "filter correct",
@@ -60,13 +60,17 @@ func TestFilter(t *testing.T) {
 					return nil
 				},
 			},
-			wantErr: false,
+			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Filter(context.Background(), tt.args.filter, tt.args.appender, nil); (err != nil) != tt.wantErr {
-				t.Errorf("Filter() error = %v, wantErr %v", err, tt.wantErr)
+			err := Filter(context.Background(), tt.args.filter, tt.args.appender, nil)
+			if tt.wantErr == nil && err != nil {
+				t.Errorf("no error expected %v", err)
+			}
+			if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("no error has wrong type %v", err)
 			}
 		})
 	}
@@ -81,7 +85,7 @@ func TestPush(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantErr bool
+		wantErr func(error) bool
 	}{
 		{
 			name: "no aggregates",
@@ -90,7 +94,7 @@ func TestPush(t *testing.T) {
 				appender:    nil,
 				aggregaters: nil,
 			},
-			wantErr: true,
+			wantErr: errors.IsPreconditionFailed,
 		},
 		{
 			name: "aggregater fails",
@@ -103,7 +107,7 @@ func TestPush(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: errors.IsInternal,
 		},
 		{
 			name: "push fails",
@@ -118,7 +122,7 @@ func TestPush(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: errors.IsInternal,
 		},
 		{
 			name: "append aggregates fails",
@@ -135,7 +139,7 @@ func TestPush(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: IsAppendEventError,
 		},
 		{
 			name: "correct one aggregate",
@@ -152,7 +156,7 @@ func TestPush(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			wantErr: nil,
 		},
 		{
 			name: "correct multiple aggregate",
@@ -172,13 +176,17 @@ func TestPush(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Push(context.Background(), tt.args.push, tt.args.appender, tt.args.aggregaters...); (err != nil) != tt.wantErr {
-				t.Errorf("Push() error = %v, wantErr %v", err, tt.wantErr)
+			err := Push(context.Background(), tt.args.push, tt.args.appender, tt.args.aggregaters...)
+			if tt.wantErr == nil && err != nil {
+				t.Errorf("no error expected %v", err)
+			}
+			if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("no error has wrong type %v", err)
 			}
 		})
 	}
