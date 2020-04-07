@@ -1,6 +1,7 @@
 package eventsourcing
 
 import (
+	"context"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
@@ -43,5 +44,5 @@ func Start(conf Config) (*EsRepository, error) {
 }
 
 func (repo *EsRepository) Health() error {
-	return nil
+	return repo.ProjectEvents.Health(context.Background())
 }

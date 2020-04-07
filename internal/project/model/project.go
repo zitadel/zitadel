@@ -8,8 +8,9 @@ import (
 type Project struct {
 	es_models.ObjectRoot
 
-	State ProjectState
-	Name  string
+	State   ProjectState
+	Name    string
+	Members []*ProjectMember
 }
 
 type ProjectState in_model.Enum
@@ -32,4 +33,9 @@ func (p *Project) IsValid() bool {
 		return false
 	}
 	return true
+}
+
+func (p *Project) ContainsMember(member *ProjectMember) bool {
+	//TODO: Check if member containing
+	return false
 }

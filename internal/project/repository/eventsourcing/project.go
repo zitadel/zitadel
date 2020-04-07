@@ -63,6 +63,32 @@ func ProjectToModel(project *Project) *model.Project {
 	}
 }
 
+func ProjectMemberFromModel(member *model.ProjectMember) *ProjectMember {
+	return &ProjectMember{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           member.ObjectRoot.ID,
+			Sequence:     member.Sequence,
+			ChangeDate:   member.ChangeDate,
+			CreationDate: member.CreationDate,
+		},
+		UserID: member.UserID,
+		Roles:  member.Roles,
+	}
+}
+
+func ProjectMemberToModel(member *ProjectMember) *model.ProjectMember {
+	return &model.ProjectMember{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           member.ID,
+			ChangeDate:   member.ChangeDate,
+			CreationDate: member.CreationDate,
+			Sequence:     member.Sequence,
+		},
+		UserID: member.UserID,
+		Roles:  member.Roles,
+	}
+}
+
 func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "id should be filled")
@@ -135,4 +161,37 @@ func ProjectReactivateAggregate(ctx context.Context, aggCreator *es_models.Aggre
 		return nil, err
 	}
 	return agg.AppendEvent(model.ProjectReactivated, nil)
+}
+
+func ProjectMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, member *ProjectMember) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-di38f", "existing project should not be nil")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.ProjectMemberAdded, member)
+}
+
+func ProjectMemberChangedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, member *ProjectMember) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sle3d", "existing project should not be nil")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.ProjectMemberChanged, member)
+}
+
+func ProjectMemberRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, member *ProjectMember) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slo9e", "existing project should not be nil")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.ProjectMemberRemoved, member)
 }

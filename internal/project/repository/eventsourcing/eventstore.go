@@ -130,16 +130,20 @@ func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *pro
 			return ProjectMemberToModel(m), nil
 		}
 	}
-	//return caos_errs.ThrowInternal()
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
 }
 
-func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+func (es *ProjectEventstore) AddProjectMember(ctx context.Context, existing *proj_model.Project, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
-	project.State = proj_model.Active
-	repoProject := ProjectFromModel(project)
-	projectAggregate, err := ProjectCreateAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject)
+	if existing.ContainsMember(member) {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Project")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoMember := ProjectMemberFromModel(member)
+	projectAggregate, err := ProjectMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	if err != nil {
 		return nil, err
 	}
@@ -149,5 +153,34 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 	}
 
 	repoProject.AppendEvents(projectAggregate.Events...)
-	return ProjectToModel(repoProject), nil
+	for _, m := range repoProject.Members {
+		if m.UserID == member.UserID {
+			return ProjectMemberToModel(m), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
+}
+
+func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, existing *proj_model.Project, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	if !member.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoMember := ProjectMemberFromModel(member)
+	projectAggregate, err := ProjectMemberChangedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	if err != nil {
+		return nil, err
+	}
+	err = es.PushAggregates(ctx, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	repoProject.AppendEvents(projectAggregate.Events...)
+	for _, m := range repoProject.Members {
+		if m.UserID == member.UserID {
+			return ProjectMemberToModel(m), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
 }
