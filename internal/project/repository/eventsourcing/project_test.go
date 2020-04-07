@@ -10,50 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/project/model"
 )
 
-func TestChanges(t *testing.T) {
-	type args struct {
-		existing *Project
-		new      *Project
-	}
-	type res struct {
-		changesLen int
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "project name changes",
-			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "NameChanged"},
-			},
-			res: res{
-				changesLen: 1,
-			},
-		},
-		{
-			name: "no changes",
-			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "Name"},
-			},
-			res: res{
-				changesLen: 0,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
-			if len(changes) != tt.res.changesLen {
-				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
-			}
-		})
-	}
-}
-
 func TestProjectByIDQuery(t *testing.T) {
 	type args struct {
 		id       string
@@ -87,9 +43,7 @@ func TestProjectByIDQuery(t *testing.T) {
 			res: res{
 				filterLen: 3,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -228,9 +182,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectAdded,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -296,9 +248,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectChanged,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -313,9 +263,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectChanged,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -379,9 +327,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectDeactivated,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -442,9 +388,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 				eventLen:  1,
 				eventType: model.ProjectReactivated,
 				wantErr:   true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsPreconditionFailed(err)
-				},
+				errFunc:   caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
