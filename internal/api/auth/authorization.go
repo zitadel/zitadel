@@ -24,7 +24,6 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 	if CheckInternal(ctx) {
 		return ctx, nil
 	}
-
 	if requiredAuthOption.Permission == authenticated {
 		return ctx, nil
 	}
