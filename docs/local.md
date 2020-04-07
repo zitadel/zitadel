@@ -4,6 +4,8 @@
 ### start cockroach in docker
 
 ```bash
+docker rm -f zitadel-db &&
+rm -rf ${GOPATH}/src/github.com/caos/zitadel/cockroach-data &&
 docker run -d \
 --name=zitadel-db \
 --hostname=zitadel-db \
