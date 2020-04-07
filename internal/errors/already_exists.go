@@ -17,11 +17,11 @@ type AlreadyExistsError struct {
 }
 
 func ThrowAlreadyExists(parent error, id, message string) error {
-	return &AlreadyExistsError{createCaosError(parent, id, message)}
+	return &AlreadyExistsError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowAlreadyExistsf(parent error, id, format string, a ...interface{}) error {
-	return &AlreadyExistsError{createCaosError(parent, id, fmt.Sprintf(format, a...))}
+	return &AlreadyExistsError{CreateCaosError(parent, id, fmt.Sprintf(format, a...))}
 }
 
 func (err *AlreadyExistsError) IsAlreadyExists() {}

@@ -19,7 +19,7 @@ type InternalError struct {
 }
 
 func ThrowInternal(parent error, id, message string) error {
-	return &InternalError{createCaosError(parent, id, message)}
+	return &InternalError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowInternalf(parent error, id, format string, a ...interface{}) error {

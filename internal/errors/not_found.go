@@ -12,7 +12,7 @@ type NotFoundError struct {
 }
 
 func ThrowNotFound(parent error, id, message string) error {
-	return &NotFoundError{createCaosError(parent, id, message)}
+	return &NotFoundError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowNotFoundf(parent error, id, format string, a ...interface{}) error {

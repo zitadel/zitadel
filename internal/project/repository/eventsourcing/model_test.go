@@ -2,9 +2,10 @@ package eventsourcing
 
 import (
 	"encoding/json"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"testing"
 )
 
 func TestProjectFromEvents(t *testing.T) {

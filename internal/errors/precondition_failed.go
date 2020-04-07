@@ -19,7 +19,7 @@ type PreconditionFailedError struct {
 }
 
 func ThrowPreconditionFailed(parent error, id, message string) error {
-	return &PreconditionFailedError{createCaosError(parent, id, message)}
+	return &PreconditionFailedError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowPreconditionFailedf(parent error, id, format string, a ...interface{}) error {
