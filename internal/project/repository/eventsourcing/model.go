@@ -1,12 +1,9 @@
 package eventsourcing
 
 import (
-	"context"
 	"encoding/json"
-	"strconv"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 )
@@ -100,70 +97,4 @@ func (p *Project) appendDeactivatedEvent() error {
 func (p *Project) appendReactivatedEvent() error {
 	p.State = model.ProjectStateToInt(model.Active)
 	return nil
-}
-
-func (p *Project) ToCreateAggregate(aggCreator *es_models.AggregateCreator) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if p == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
-		}
-		var err error
-		id, err := idGenerator.NextID()
-		if err != nil {
-			return nil, err
-		}
-		p.ID = strconv.FormatUint(id, 10)
-
-		agg, err := ProjectAggregate(ctx, aggCreator, p.ID, p.Sequence)
-		if err != nil {
-			return nil, err
-		}
-
-		return agg.AppendEvent(model.ProjectAdded, p)
-	}
-}
-
-func (p *Project) ToUpdateAggregate(aggCreator *es_models.AggregateCreator, updatedProject *Project) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if p == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
-		}
-		if updatedProject == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
-		}
-		agg, err := ProjectAggregate(ctx, aggCreator, p.ID, p.Sequence)
-		if err != nil {
-			return nil, err
-		}
-		changes := p.Changes(updatedProject)
-		return agg.AppendEvent(model.ProjectChanged, changes)
-	}
-}
-
-func (p *Project) ToDeactivateAggregate(aggCreator *es_models.AggregateCreator) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if p == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
-		}
-		agg, err := ProjectAggregate(ctx, aggCreator, p.ID, p.Sequence)
-		if err != nil {
-			return nil, err
-		}
-
-		return agg.AppendEvent(model.ProjectDeactivated, nil)
-	}
-}
-
-func (p *Project) ToReactivateAggregate(aggCreator *es_models.AggregateCreator) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if p == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
-		}
-		agg, err := ProjectAggregate(ctx, aggCreator, p.ID, p.Sequence)
-		if err != nil {
-			return nil, err
-		}
-
-		return agg.AppendEvent(model.ProjectReactivated, nil)
-	}
 }

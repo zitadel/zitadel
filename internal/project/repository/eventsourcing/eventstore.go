@@ -3,14 +3,11 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 )
-
-var eventstore es_int.Eventstore
 
 type ProjectEventstore struct {
 	es_int.Eventstore
@@ -21,10 +18,6 @@ type ProjectConfig struct {
 }
 
 func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
-	eventstore = conf.Eventstore
-	if eventstore == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ye89h", "config must set eventstore")
-	}
 	return &ProjectEventstore{Eventstore: conf.Eventstore}, nil
 }
 
@@ -49,7 +42,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	project.State = proj_model.Active
 	repoProject := ProjectFromModel(project)
 
-	createAggregate := repoProject.ToCreateAggregate(es.AggregateCreator())
+	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject)
 	err := es_sdk.Save(ctx, es.PushAggregates, createAggregate, repoProject.AppendEvents)
 	if err != nil {
 		return nil, err
@@ -65,7 +58,7 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, existingProject 
 	repoExisting := ProjectFromModel(existingProject)
 	repoNew := ProjectFromModel(project)
 
-	updateAggregate := repoExisting.ToUpdateAggregate(es.AggregateCreator(), repoNew)
+	updateAggregate := ProjectUpdateAggregate(es.AggregateCreator(), repoExisting, repoNew)
 	err := es_sdk.Save(ctx, es.PushAggregates, updateAggregate, repoExisting.AppendEvents)
 	if err != nil {
 		return nil, err
@@ -80,7 +73,7 @@ func (es *ProjectEventstore) DeactivateProject(ctx context.Context, existing *pr
 	}
 
 	repoExisting := ProjectFromModel(existing)
-	es_sdk.Save(ctx, es.PushAggregates, repoExisting.ToDeactivateAggregate(es.AggregateCreator()), repoExisting.AppendEvents)
+	es_sdk.Save(ctx, es.PushAggregates, ProjectDeactivateAggregate(es.AggregateCreator(), repoExisting), repoExisting.AppendEvents)
 	return ProjectToModel(repoExisting), nil
 }
 
@@ -90,6 +83,6 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, existing *pr
 	}
 
 	repoExisting := ProjectFromModel(existing)
-	es_sdk.Save(ctx, es.PushAggregates, repoExisting.ToReactivateAggregate(es.AggregateCreator()), repoExisting.AppendEvents)
+	es_sdk.Save(ctx, es.PushAggregates, ProjectReactivateAggregate(es.AggregateCreator(), repoExisting), repoExisting.AppendEvents)
 	return ProjectToModel(repoExisting), nil
 }
