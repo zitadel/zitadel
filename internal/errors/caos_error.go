@@ -13,10 +13,10 @@ type CaosError struct {
 }
 
 func ThrowError(parent error, id, message string) error {
-	return createCaosError(parent, id, message)
+	return CreateCaosError(parent, id, message)
 }
 
-func createCaosError(parent error, id, message string) *CaosError {
+func CreateCaosError(parent error, id, message string) *CaosError {
 	return &CaosError{
 		Parent:  parent,
 		ID:      id,
