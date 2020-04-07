@@ -12,50 +12,6 @@ import (
 
 var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
-const (
-	projectVersion = "v1"
-)
-
-type Project struct {
-	es_models.ObjectRoot
-	Name  string `json:"name,omitempty"`
-	State int32  `json:"-"`
-}
-
-func (p *Project) Changes(changed *Project) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
-	if changed.Name != "" && p.Name != changed.Name {
-		changes["name"] = changed.Name
-	}
-	return changes
-}
-
-func ProjectFromModel(project *model.Project) *Project {
-	return &Project{
-		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ObjectRoot.ID,
-			Sequence:     project.Sequence,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-		},
-		Name:  project.Name,
-		State: model.ProjectStateToInt(project.State),
-	}
-}
-
-func ProjectToModel(project *Project) *model.Project {
-	return &model.Project{
-		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ID,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-			Sequence:     project.Sequence,
-		},
-		Name:  project.Name,
-		State: model.ProjectStateFromInt(project.State),
-	}
-}
-
 func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "id should be filled")
