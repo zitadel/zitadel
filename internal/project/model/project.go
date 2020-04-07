@@ -36,6 +36,10 @@ func (p *Project) IsValid() bool {
 }
 
 func (p *Project) ContainsMember(member *ProjectMember) bool {
-	//TODO: Check if member containing
+	for _, m := range p.Members {
+		if m.UserID == member.UserID {
+			return true
+		}
+	}
 	return false
 }
