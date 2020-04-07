@@ -27,7 +27,7 @@ cockroachdb/cockroach:v19.2.2 start --insecure
 
 ### Connect to Cockroach
 
-1. `docker exec -it "zitadel-db" /cockroach/cockroach sql --insecure`
-2. `use eventstore;`
-3. Show tables: `show tables;` (should list two entries: events, flyway_schema_history)
-4. Show entries of events: `select * from events;`
+`docker exec -it "zitadel-db" /cockroach/cockroach sql --insecure`
+
+#### Should show eventstore, management, admin, auth
+`show databases;`
