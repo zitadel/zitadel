@@ -90,7 +90,9 @@ func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	}
 	for i, m := range p.Members {
 		if m.UserID == member.UserID {
-			p.Members[i] = member
+			p.Members[i] = p.Members[len(p.Members)-1]
+			p.Members[len(p.Members)-1] = nil
+			p.Members = p.Members[:len(p.Members)-1]
 		}
 	}
 	return nil

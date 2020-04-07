@@ -110,6 +110,9 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, existing *pr
 }
 
 func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	if member.UserID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "userID missing")
+	}
 	filter, err := ProjectByIDQuery(member.ID, member.Sequence)
 	if err != nil {
 		return nil, err
@@ -134,7 +137,6 @@ func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *pro
 }
 
 func (es *ProjectEventstore) AddProjectMember(ctx context.Context, existing *proj_model.Project, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
-
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
@@ -165,6 +167,9 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, existing *
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
+	if !existing.ContainsMember(member) {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-oe39f", "User is already is not member of this project")
+	}
 	repoProject := ProjectFromModel(existing)
 	repoMember := ProjectMemberFromModel(member)
 	projectAggregate, err := ProjectMemberChangedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoMember)
@@ -183,4 +188,31 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, existing *
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
+}
+
+func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, existing *proj_model.Project, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	if !member.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d43fs", "UserID and Roles are required")
+	}
+	if !existing.ContainsMember(member) {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-swf34", "User is already is not member of this project")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoMember := ProjectMemberFromModel(member)
+	projectAggregate, err := ProjectMemberRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	if err != nil {
+		return nil, err
+	}
+	err = es.PushAggregates(ctx, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	repoProject.AppendEvents(projectAggregate.Events...)
+	for _, m := range repoProject.Members {
+		if m.UserID == member.UserID {
+			return ProjectMemberToModel(m), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sef34", "Could not find member in list")
 }

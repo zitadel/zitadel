@@ -38,6 +38,7 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 }
 
 func ProjectFromModel(project *model.Project) *Project {
+	members := ProjectMembersFromModel(project.Members)
 	return &Project{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ObjectRoot.ID,
@@ -45,12 +46,14 @@ func ProjectFromModel(project *model.Project) *Project {
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
 		},
-		Name:  project.Name,
-		State: model.ProjectStateToInt(project.State),
+		Name:    project.Name,
+		State:   model.ProjectStateToInt(project.State),
+		Members: members,
 	}
 }
 
 func ProjectToModel(project *Project) *model.Project {
+	members := ProjectMembersToModel(project.Members)
 	return &model.Project{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ID,
@@ -58,9 +61,26 @@ func ProjectToModel(project *Project) *model.Project {
 			CreationDate: project.CreationDate,
 			Sequence:     project.Sequence,
 		},
-		Name:  project.Name,
-		State: model.ProjectStateFromInt(project.State),
+		Name:    project.Name,
+		State:   model.ProjectStateFromInt(project.State),
+		Members: members,
 	}
+}
+
+func ProjectMembersToModel(members []*ProjectMember) []*model.ProjectMember {
+	convertedMembers := make([]*model.ProjectMember, len(members))
+	for i, m := range members {
+		convertedMembers[i] = ProjectMemberToModel(m)
+	}
+	return convertedMembers
+}
+
+func ProjectMembersFromModel(members []*model.ProjectMember) []*ProjectMember {
+	convertedMembers := make([]*ProjectMember, len(members))
+	for i, m := range members {
+		convertedMembers[i] = ProjectMemberFromModel(m)
+	}
+	return convertedMembers
 }
 
 func ProjectMemberFromModel(member *model.ProjectMember) *ProjectMember {

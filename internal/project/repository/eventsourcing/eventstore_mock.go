@@ -31,3 +31,15 @@ func GetMockManipulateProject(ctrl *gomock.Controller) *ProjectEventstore {
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return &ProjectEventstore{Eventstore: mockEs}
 }
+
+func GetMockProjectMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
+	projectData, _ := json.Marshal(Project{Name: "Name"})
+	memberData, _ := json.Marshal(ProjectMember{UserID: "UserID", Roles: []string{"Role"}})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectMemberAdded, Data: memberData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return &ProjectEventstore{Eventstore: mockEs}
+}

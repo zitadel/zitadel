@@ -321,3 +321,73 @@ func TestReactivateProject(t *testing.T) {
 		})
 	}
 }
+
+func TestProjectMemberByIDs(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *ProjectEventstore
+		member *model.ProjectMember
+	}
+	type res struct {
+		member  *model.ProjectMember
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "project member from events, ok",
+			args: args{
+				es:     GetMockProjectMemberByIDsOK(ctrl),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+			},
+			res: res{
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Role"}},
+			},
+		},
+		{
+			name: "project member from events, no events",
+			args: args{
+				es:     GetMockProjectByIDNoEvents(ctrl),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "project member from events, no id",
+			args: args{
+				es:     GetMockProjectByIDNoEvents(ctrl),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsPreconditionFailed(err)
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ProjectMemberByIDs(nil, tt.args.member)
+			if !tt.res.wantErr && result.ID != tt.res.member.ID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.member.ID, result.ID)
+			}
+			if !tt.res.wantErr && result.UserID != tt.res.member.UserID {
+				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.member.UserID, result.UserID)
+			}
+			if !tt.res.wantErr && len(result.Roles) != len(tt.res.member.Roles) {
+				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.member.Roles, result.Roles)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
