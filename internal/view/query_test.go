@@ -125,9 +125,7 @@ func TestPrepareSearchQuery(t *testing.T) {
 			res{
 				count:   1,
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsInternal(err)
-				},
+				errFunc: caos_errs.IsInternal,
 			},
 		},
 	}

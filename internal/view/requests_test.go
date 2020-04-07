@@ -50,9 +50,7 @@ func TestPrepareGetByKey(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsNotFound(err)
-				},
+				errFunc: caos_errs.IsNotFound,
 			},
 		},
 		{
@@ -67,9 +65,7 @@ func TestPrepareGetByKey(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsInternal(err)
-				},
+				errFunc: caos_errs.IsInternal,
 			},
 		},
 	}
@@ -200,9 +196,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsNotFound(err)
-				},
+				errFunc: caos_errs.IsNotFound,
 			},
 		},
 		{
@@ -216,9 +210,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsInternal(err)
-				},
+				errFunc: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -232,9 +224,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsErrorInvalidArgument(err)
-				},
+				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -304,9 +294,7 @@ func TestPreparePut(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsInternal(err)
-				},
+				errFunc: caos_errs.IsInternal,
 			},
 		},
 	}
@@ -378,9 +366,7 @@ func TestPrepareDelete(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: func(err error) bool {
-					return caos_errs.IsInternal(err)
-				},
+				errFunc: caos_errs.IsInternal,
 			},
 		},
 	}
