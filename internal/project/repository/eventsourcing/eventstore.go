@@ -108,3 +108,46 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, existing *pr
 	repoExisting.AppendEvents(projectAggregate.Events...)
 	return ProjectToModel(repoExisting), nil
 }
+
+func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	filter, err := ProjectByIDQuery(member.ID, member.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	events, err := es.Eventstore.FilterEvents(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8due3", "Could not find project events")
+	}
+	foundProject, err := ProjectFromEvents(nil, events...)
+	if err != nil {
+		return nil, err
+	}
+	for _, m := range foundProject.Members {
+		if m.UserID == member.UserID {
+			return ProjectMemberToModel(m), nil
+		}
+	}
+	//return caos_errs.ThrowInternal()
+}
+
+func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	if !member.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
+	}
+	project.State = proj_model.Active
+	repoProject := ProjectFromModel(project)
+	projectAggregate, err := ProjectCreateAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject)
+	if err != nil {
+		return nil, err
+	}
+	err = es.PushAggregates(ctx, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	repoProject.AppendEvents(projectAggregate.Events...)
+	return ProjectToModel(repoProject), nil
+}
