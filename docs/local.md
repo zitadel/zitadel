@@ -4,6 +4,8 @@
 ### start cockroach in docker
 
 ```bash
+docker rm -f zitadel-db &&
+rm -rf ${GOPATH}/src/github.com/caos/zitadel/cockroach-data &&
 docker run -d \
 --name=zitadel-db \
 --hostname=zitadel-db \
@@ -12,7 +14,7 @@ docker run -d \
 cockroachdb/cockroach:v19.2.2 start --insecure
 ```
 
-### local database migrationd
+### local database migrations
 
 #### local migrate
 
