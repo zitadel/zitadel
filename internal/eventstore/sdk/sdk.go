@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
@@ -23,17 +24,44 @@ func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *
 	return appender(events...)
 }
 
-func Save(ctx context.Context, push pushFunc, aggregater aggregateFunc, appender appendFunc) error {
-	aggregate, err := aggregater(ctx)
-	if err != nil {
-		return err
+// Push creates the aggregates from aggregater
+// and pushes the aggregates to the given pushFunc
+// the given events are appended by the appender
+func Push(ctx context.Context, push pushFunc, appender appendFunc, aggregaters ...aggregateFunc) (err error) {
+	if len(aggregaters) < 1 {
+		return errors.ThrowPreconditionFailed(nil, "SDK-q9wjp", "no aggregaters passed")
 	}
-	err = push(ctx, aggregate)
+
+	aggregates, err := makeAggregates(ctx, aggregaters)
 	if err != nil {
 		return err
 	}
 
-	//error is ignored because it would be confusing if events are saved and this method would return an error
-	appender(aggregate.Events...)
+	err = push(ctx, aggregates...)
+	if err != nil {
+		return err
+	}
+
+	return appendAggregates(appender, aggregates)
+}
+
+func appendAggregates(appender appendFunc, aggregates []*models.Aggregate) error {
+	for _, aggregate := range aggregates {
+		err := appender(aggregate.Events...)
+		if err != nil {
+			return ThrowAggregater(err, "SDK-o6kzK", "aggregator failed")
+		}
+	}
 	return nil
+}
+
+func makeAggregates(ctx context.Context, aggregaters []aggregateFunc) (aggregates []*models.Aggregate, err error) {
+	aggregates = make([]*models.Aggregate, len(aggregaters))
+	for i, aggregater := range aggregaters {
+		aggregates[i], err = aggregater(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return aggregates, nil
 }

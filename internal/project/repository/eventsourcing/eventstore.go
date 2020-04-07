@@ -43,7 +43,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	repoProject := ProjectFromModel(project)
 
 	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject)
-	err := es_sdk.Save(ctx, es.PushAggregates, createAggregate, repoProject.AppendEvents)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, existingProject 
 	repoNew := ProjectFromModel(project)
 
 	updateAggregate := ProjectUpdateAggregate(es.AggregateCreator(), repoExisting, repoNew)
-	err := es_sdk.Save(ctx, es.PushAggregates, updateAggregate, repoExisting.AppendEvents)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,8 @@ func (es *ProjectEventstore) DeactivateProject(ctx context.Context, existing *pr
 	}
 
 	repoExisting := ProjectFromModel(existing)
-	es_sdk.Save(ctx, es.PushAggregates, ProjectDeactivateAggregate(es.AggregateCreator(), repoExisting), repoExisting.AppendEvents)
+	aggregate := ProjectDeactivateAggregate(es.AggregateCreator(), repoExisting)
+	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 	return ProjectToModel(repoExisting), nil
 }
 
@@ -83,6 +84,7 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, existing *pr
 	}
 
 	repoExisting := ProjectFromModel(existing)
-	es_sdk.Save(ctx, es.PushAggregates, ProjectReactivateAggregate(es.AggregateCreator(), repoExisting), repoExisting.AppendEvents)
+	aggregate := ProjectReactivateAggregate(es.AggregateCreator(), repoExisting)
+	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 	return ProjectToModel(repoExisting), nil
 }
