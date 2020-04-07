@@ -18,15 +18,8 @@ const (
 
 type Project struct {
 	es_models.ObjectRoot
-	Name    string           `json:"name,omitempty"`
-	State   int32            `json:"-"`
-	Members []*ProjectMember `json:"-"`
-}
-
-type ProjectMember struct {
-	es_models.ObjectRoot
-	UserID string   `json:"userId,omitempty"`
-	Roles  []string `json:"roles,omitempty"`
+	Name  string `json:"name,omitempty"`
+	State int32  `json:"-"`
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
