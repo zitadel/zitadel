@@ -33,7 +33,7 @@ func (q *SearchQuery) AggregateIDFilter(id string) *SearchQuery {
 	return q.setFilter(NewFilter(Field_AggregateID, id, Operation_Equals))
 }
 
-func (q *SearchQuery) AggregateTypeFilter(types ...string) *SearchQuery {
+func (q *SearchQuery) AggregateTypeFilter(types ...AggregateType) *SearchQuery {
 	return q.setFilter(NewFilter(Field_AggregateType, types, Operation_In))
 }
 

@@ -19,11 +19,16 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 		return nil, err
 	}
 
+	var perms []string
+	//TODO: Remove as soon as authentification is implemented
+	if CheckInternal(ctx) {
+		return ctx, nil
+	}
 	if requiredAuthOption.Permission == authenticated {
 		return ctx, nil
 	}
 
-	ctx, perms, err := getUserMethodPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig)
+	ctx, perms, err = getUserMethodPermissions(ctx, verifier, requiredAuthOption.Permission, authConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -32,6 +37,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 	if err != nil {
 		return nil, err
 	}
+
 	return ctx, nil
 }
 

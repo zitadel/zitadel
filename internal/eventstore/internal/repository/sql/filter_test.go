@@ -105,7 +105,7 @@ func TestSQL_Filter(t *testing.T) {
 			}
 			events, err := sql.Filter(context.Background(), tt.args.searchQuery)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("SQL.UnlockAggregates() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("SQL.Filter() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.eventsLen != 0 && len(events) != tt.eventsLen {
 				t.Errorf("events has wrong length got: %d want %d", len(events), tt.eventsLen)
@@ -142,7 +142,7 @@ func Test_getCondition(t *testing.T) {
 			args: args{
 				filter: es_models.NewFilter(es_models.Field_AggregateType, []string{"a", "b"}, es_models.Operation_In),
 			},
-			want: "aggregate_type IN (?)",
+			want: "aggregate_type = ANY(?)",
 		},
 	}
 	for _, tt := range tests {

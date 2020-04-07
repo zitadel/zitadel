@@ -7,16 +7,32 @@ import (
 )
 
 func (s *Server) CreateProject(ctx context.Context, in *ProjectCreateRequest) (*Project, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mo34X", "Not implemented")
+	project, err := s.project.CreateProject(ctx, in.Name)
+	if err != nil {
+		return nil, err
+	}
+	return projectFromModel(project), nil
 }
 func (s *Server) UpdateProject(ctx context.Context, in *ProjectUpdateRequest) (*Project, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-0o4fB", "Not implemented")
+	project, err := s.project.UpdateProject(ctx, projectUpdateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return projectFromModel(project), nil
 }
 func (s *Server) DeactivateProject(ctx context.Context, in *ProjectID) (*Project, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-4Sck8", "Not implemented")
+	project, err := s.project.DeactivateProject(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return projectFromModel(project), nil
 }
 func (s *Server) ReactivateProject(ctx context.Context, in *ProjectID) (*Project, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-0oVre", "Not implemented")
+	project, err := s.project.ReactivateProject(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return projectFromModel(project), nil
 }
 
 func (s *Server) SearchProjects(ctx context.Context, in *ProjectSearchRequest) (*ProjectSearchResponse, error) {
@@ -24,7 +40,11 @@ func (s *Server) SearchProjects(ctx context.Context, in *ProjectSearchRequest) (
 }
 
 func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-plV5x", "Not implemented")
+	project, err := s.project.ProjectByID(ctx, id.Id)
+	if err != nil {
+		return nil, err
+	}
+	return projectFromModel(project), nil
 }
 
 func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, request *GrantedGrantID) (*ProjectGrant, error) {
