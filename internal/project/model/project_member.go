@@ -9,6 +9,10 @@ type ProjectMember struct {
 	Roles  []string
 }
 
+func NewProjectMember(projectID, userID string) *ProjectMember {
+	return &ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: projectID}, UserID: userID}
+}
+
 func (p *ProjectMember) IsValid() bool {
 	if p.ID == "" || p.UserID == "" || len(p.Roles) == 0 {
 		return false

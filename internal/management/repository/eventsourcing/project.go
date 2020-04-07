@@ -71,3 +71,43 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 	}
 	return project, err
 }
+
+func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
+	member = proj_model.NewProjectMember(projectID, userID)
+	return repo.ProjectEvents.ProjectMemberByIDs(ctx, member)
+}
+
+func (repo *ProjectRepo) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	existingProject, err := repo.ProjectByID(ctx, member.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	member, err = repo.ProjectEvents.AddProjectMember(ctx, existingProject, member)
+	if err != nil {
+		return nil, err
+	}
+	return member, err
+}
+
+func (repo *ProjectRepo) ChangeProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	existingProject, err := repo.ProjectByID(ctx, member.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	member, err = repo.ProjectEvents.ChangeProjectMember(ctx, existingProject, member)
+	if err != nil {
+		return nil, err
+	}
+	return member, err
+}
+
+func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, userID string) error {
+	existingProject, err := repo.ProjectByID(ctx, projectID)
+	if err != nil {
+		return err
+	}
+	member := proj_model.NewProjectMember(projectID, userID)
+	return repo.ProjectEvents.RemoveProjectMember(ctx, existingProject, member)
+}

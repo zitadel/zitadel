@@ -46,7 +46,6 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case model.ProjectMemberRemoved:
 		return p.appendRemoveMemberEvent(event)
 	}
-
 	return nil
 }
 
