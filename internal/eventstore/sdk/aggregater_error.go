@@ -8,8 +8,7 @@ import (
 
 var (
 	_ AggregaterError = (*aggregaterError)(nil)
-	_ errors.
-		Error = (*aggregaterError)(nil)
+	_ errors.Error    = (*aggregaterError)(nil)
 )
 
 type AggregaterError interface {
