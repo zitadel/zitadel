@@ -31,30 +31,15 @@ func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_
 }
 
 func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	existingProject, err := repo.ProjectByID(ctx, project.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return repo.ProjectEvents.UpdateProject(ctx, existingProject, project)
+	return repo.ProjectEvents.UpdateProject(ctx, project)
 }
 
 func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	project, err := repo.ProjectByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return repo.ProjectEvents.DeactivateProject(ctx, project)
+	return repo.ProjectEvents.DeactivateProject(ctx, id)
 }
 
 func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	project, err := repo.ProjectByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return repo.ProjectEvents.ReactivateProject(ctx, project)
+	return repo.ProjectEvents.ReactivateProject(ctx, id)
 }
 
 func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
@@ -63,36 +48,14 @@ func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userI
 }
 
 func (repo *ProjectRepo) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
-	existingProject, err := repo.ProjectByID(ctx, member.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	member, err = repo.ProjectEvents.AddProjectMember(ctx, existingProject, member)
-	if err != nil {
-		return nil, err
-	}
-	return member, err
+	return repo.ProjectEvents.AddProjectMember(ctx, member)
 }
 
 func (repo *ProjectRepo) ChangeProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
-	existingProject, err := repo.ProjectByID(ctx, member.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	member, err = repo.ProjectEvents.ChangeProjectMember(ctx, existingProject, member)
-	if err != nil {
-		return nil, err
-	}
-	return member, err
+	return repo.ProjectEvents.ChangeProjectMember(ctx, member)
 }
 
 func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, userID string) error {
-	existingProject, err := repo.ProjectByID(ctx, projectID)
-	if err != nil {
-		return err
-	}
 	member := proj_model.NewProjectMember(projectID, userID)
-	return repo.ProjectEvents.RemoveProjectMember(ctx, existingProject, member)
+	return repo.ProjectEvents.RemoveProjectMember(ctx, member)
 }
