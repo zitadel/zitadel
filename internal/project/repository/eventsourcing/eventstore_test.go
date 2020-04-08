@@ -134,10 +134,9 @@ func TestCreateProject(t *testing.T) {
 func TestUpdateProject(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *ProjectEventstore
-		ctx      context.Context
-		existing *model.Project
-		new      *model.Project
+		es  *ProjectEventstore
+		ctx context.Context
+		new *model.Project
 	}
 	type res struct {
 		project *model.Project
@@ -152,10 +151,9 @@ func TestUpdateProject(t *testing.T) {
 		{
 			name: "update project, ok",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name"},
-				new:      &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew"},
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				new: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew"},
 			},
 			res: res{
 				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew"},
@@ -164,20 +162,31 @@ func TestUpdateProject(t *testing.T) {
 		{
 			name: "update project no name",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name"},
-				new:      &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: ""},
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				new: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: ""},
 			},
 			res: res{
 				wantErr: true,
 				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				new: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.UpdateProject(tt.args.ctx, tt.args.existing, tt.args.new)
+			result, err := tt.args.es.UpdateProject(tt.args.ctx, tt.args.new)
 
 			if !tt.res.wantErr && result.ID == "" {
 				t.Errorf("result has no id")
@@ -224,7 +233,7 @@ func TestDeactivateProject(t *testing.T) {
 		{
 			name: "deactivate project with inactive state",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
+				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Inactive},
 			},
@@ -233,10 +242,22 @@ func TestDeactivateProject(t *testing.T) {
 				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
+		{
+			name: "existing not found",
+			args: args{
+				es:       GetMockManipulateProjectNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.DeactivateProject(tt.args.ctx, tt.args.existing)
+			result, err := tt.args.es.DeactivateProject(tt.args.ctx, tt.args.existing.ID)
 
 			if !tt.res.wantErr && result.ID == "" {
 				t.Errorf("result has no id")
@@ -272,7 +293,7 @@ func TestReactivateProject(t *testing.T) {
 		{
 			name: "reactivate project, ok",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
+				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Inactive},
 			},
@@ -292,10 +313,22 @@ func TestReactivateProject(t *testing.T) {
 				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
+		{
+			name: "existing not found",
+			args: args{
+				es:       GetMockManipulateProjectNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ReactivateProject(tt.args.ctx, tt.args.existing)
+			result, err := tt.args.es.ReactivateProject(tt.args.ctx, tt.args.existing.ID)
 
 			if !tt.res.wantErr && result.ID == "" {
 				t.Errorf("result has no id")
@@ -383,10 +416,9 @@ func TestProjectMemberByIDs(t *testing.T) {
 func TestAddProjectMember(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *ProjectEventstore
-		ctx      context.Context
-		existing *model.Project
-		member   *model.ProjectMember
+		es     *ProjectEventstore
+		ctx    context.Context
+		member *model.ProjectMember
 	}
 	type res struct {
 		result  *model.ProjectMember
@@ -401,10 +433,9 @@ func TestAddProjectMember(t *testing.T) {
 		{
 			name: "add project member, ok",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name"},
-				member:   &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				es:     GetMockManipulateProject(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
 				result: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
@@ -413,10 +444,9 @@ func TestAddProjectMember(t *testing.T) {
 		{
 			name: "no userid",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name"},
-				member:   &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Roles: []string{"Roles"}},
+				es:     GetMockManipulateProject(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Roles: []string{"Roles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -426,10 +456,9 @@ func TestAddProjectMember(t *testing.T) {
 		{
 			name: "no roles",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name"},
-				member:   &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+				es:     GetMockManipulateProject(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
 				wantErr: true,
@@ -439,20 +468,31 @@ func TestAddProjectMember(t *testing.T) {
 		{
 			name: "member already existing",
 			args: args{
-				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", Members: []*model.ProjectMember{&model.ProjectMember{UserID: "UserID"}}},
-				member:   &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				es:     GetMockManipulateProjectWithMember(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
 				wantErr: true,
 				errFunc: caos_errs.IsErrorAlreadyExists,
 			},
 		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:     GetMockManipulateProjectNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.AddProjectMember(tt.args.ctx, tt.args.existing, tt.args.member)
+			result, err := tt.args.es.AddProjectMember(tt.args.ctx, tt.args.member)
 
 			if !tt.res.wantErr && result.ID == "" {
 				t.Errorf("result has no id")
@@ -473,10 +513,9 @@ func TestAddProjectMember(t *testing.T) {
 func TestChangeProjectMember(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *ProjectEventstore
-		ctx      context.Context
-		existing *model.Project
-		member   *model.ProjectMember
+		es     *ProjectEventstore
+		ctx    context.Context
+		member *model.ProjectMember
 	}
 	type res struct {
 		result  *model.ProjectMember
@@ -491,13 +530,8 @@ func TestChangeProjectMember(t *testing.T) {
 		{
 			name: "add project member, ok",
 			args: args{
-				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{
-					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
-					Name:       "Name",
-					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
-				},
+				es:     GetMockManipulateProjectWithMember(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -507,13 +541,8 @@ func TestChangeProjectMember(t *testing.T) {
 		{
 			name: "no userid",
 			args: args{
-				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{
-					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
-					Name:       "Name",
-					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
-				},
+				es:     GetMockManipulateProject(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -524,13 +553,8 @@ func TestChangeProjectMember(t *testing.T) {
 		{
 			name: "no roles",
 			args: args{
-				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{
-					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
-					Name:       "Name",
-					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
-				},
+				es:     GetMockManipulateProject(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
@@ -541,12 +565,8 @@ func TestChangeProjectMember(t *testing.T) {
 		{
 			name: "member not existing",
 			args: args{
-				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{
-					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
-					Name:       "Name",
-				},
+				es:     GetMockManipulateProject(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -554,10 +574,22 @@ func TestChangeProjectMember(t *testing.T) {
 				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
+		{
+			name: "existing not found",
+			args: args{
+				es:     GetMockManipulateProjectNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ChangeProjectMember(tt.args.ctx, tt.args.existing, tt.args.member)
+			result, err := tt.args.es.ChangeProjectMember(tt.args.ctx, tt.args.member)
 
 			if !tt.res.wantErr && result.ID == "" {
 				t.Errorf("result has no id")
@@ -594,9 +626,9 @@ func TestRemoveProjectMember(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "add project member, ok",
+			name: "remove project member, ok",
 			args: args{
-				es:  GetMockManipulateProject(ctrl),
+				es:  GetMockManipulateProjectWithMember(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.Project{
 					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
@@ -642,10 +674,22 @@ func TestRemoveProjectMember(t *testing.T) {
 				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
+		{
+			name: "existing not found",
+			args: args{
+				es:     GetMockManipulateProjectNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.RemoveProjectMember(tt.args.ctx, tt.args.existing, tt.args.member)
+			err := tt.args.es.RemoveProjectMember(tt.args.ctx, tt.args.member)
 
 			if !tt.res.wantErr && err != nil {
 				t.Errorf("should not get err")
