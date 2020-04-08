@@ -20,9 +20,9 @@ const insertStmt = "insert into eventstore.events " +
 	"end " +
 	"where (" +
 	// exactly one event of requested aggregate must have a >= sequence (last inserted event)
-	"(select count(id) from eventstore.events where event_sequence >= $14 AND aggregate_type = $15 AND aggregate_id = $16) = 1 OR " +
+	"(select count(id) from eventstore.events where event_sequence >= COALESCE($14, 0) AND aggregate_type = $15 AND aggregate_id = $16) = 1 OR " +
 	// previous sequence = 0, no events must exist for the requested aggregate
-	"((select count(id) from eventstore.events where aggregate_type = $17 and aggregate_id = $18) = 0 AND $19 = 0)) " +
+	"((select count(id) from eventstore.events where aggregate_type = $17 and aggregate_id = $18) = 0 AND COALESCE($19, 0) = 0)) " +
 	"RETURNING id, event_sequence, creation_date"
 
 func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
@@ -52,10 +52,8 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 }
 
 func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
-	previousSequence := events[0].PreviousSequence
+	currentSequence := Sequence(events[0].PreviousSequence)
 	for _, event := range events {
-		event.PreviousSequence = previousSequence
-
 		if event.Data == nil || len(event.Data) == 0 {
 			//json decoder failes with EOF if json text is empty
 			event.Data = []byte("{}")
@@ -64,8 +62,8 @@ func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
 		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.EditorUser, event.EditorService, event.ResourceOwner,
 			event.AggregateType, event.AggregateID,
 			event.AggregateType, event.AggregateID,
-			event.PreviousSequence, event.AggregateType, event.AggregateID,
-			event.AggregateType, event.AggregateID, event.PreviousSequence)
+			currentSequence, event.AggregateType, event.AggregateID,
+			event.AggregateType, event.AggregateID, currentSequence)
 
 		if err != nil {
 			logging.Log("SQL-EXA0q").WithError(err).Info("query failed")
@@ -76,7 +74,7 @@ func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
 		rowInserted := false
 		for rows.Next() {
 			rowInserted = true
-			err = rows.Scan(&event.ID, &event.Sequence, &event.CreationDate)
+			err = rows.Scan(&event.ID, &currentSequence, &event.CreationDate)
 			logging.Log("SQL-rAvLD").OnError(err).Info("unable to scan result into event")
 		}
 
@@ -84,7 +82,7 @@ func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
 			return errors.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 		}
 
-		previousSequence = event.Sequence
+		event.Sequence = uint64(currentSequence)
 	}
 
 	return nil

@@ -3280,6 +3280,10 @@
         },
         "oidc_config": {
           "$ref": "#/definitions/v1OIDCConfig"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -3832,6 +3836,10 @@
         },
         "domain": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -3874,6 +3882,10 @@
         "creation_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -3994,6 +4006,10 @@
         "expire_warn_days": {
           "type": "string",
           "format": "uint64"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4071,6 +4087,10 @@
         "has_symbol": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4160,6 +4180,10 @@
         "show_lock_out_failures": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4256,6 +4280,10 @@
         },
         "grant_id": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4304,6 +4332,10 @@
         },
         "project_name": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4366,6 +4398,10 @@
         "creation_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4676,6 +4712,10 @@
         "creation_date": {
           "type": "string",
           "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4812,6 +4852,10 @@
         },
         "group": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4969,7 +5013,7 @@
       "enum": [
         "PROJECTSTATE_UNSPECIFIED",
         "PROJECTSTATE_ACTIVE",
-        "PROJECTSSTATE_INACTIVE"
+        "PROJECTSTATE_INACTIVE"
       ],
       "default": "PROJECTSTATE_UNSPECIFIED"
     },
@@ -5231,6 +5275,10 @@
         },
         "street_address": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -5254,6 +5302,10 @@
         },
         "street_address": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -5269,6 +5321,10 @@
         "is_email_verified": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -5324,6 +5380,10 @@
         },
         "project_name": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -5470,6 +5530,10 @@
         "is_phone_verified": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -5502,6 +5566,10 @@
         },
         "user_name": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

@@ -16,7 +16,17 @@ Mgmt:
       ServerPort: 50010
       GatewayPort: 50011
       CustomHeaders:
-        - x-caos-
+        - x-zitadel-
+  Repository:
+    Eventstore:
+      ServiceName: 'ManagementAPI'
+      Repository:
+        SQL:
+          Host: $CR_HOST
+          Port: $CR_PORT
+          User: 'management'
+          Database: 'management'
+          SSLmode: disable
 
 Auth:
   API:
@@ -24,7 +34,7 @@ Auth:
       ServerPort: 50020
       GatewayPort: 50021
       CustomHeaders:
-        - x-caos-
+        - x-zitadel-
 
 Login:
 #  will get port range 5003x
@@ -35,7 +45,7 @@ Admin:
       ServerPort: 50040
       GatewayPort: 50041
       CustomHeaders:
-        - x-caos-
+        - x-zitadel-
 
 Console:
   Port: 50050

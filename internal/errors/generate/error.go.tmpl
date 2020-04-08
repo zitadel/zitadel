@@ -19,7 +19,7 @@ type {{.ErrorName}}Error struct {
 }
 
 func Throw{{.ErrorName}}(parent error, id, message string) error {
-	return &{{.ErrorName}}Error{createCaosError(parent, id, message)}
+	return &{{.ErrorName}}Error{CreateCaosError(parent, id, message)}
 }
 
 func Throw{{.ErrorName}}f(parent error, id, format string, a ...interface{}) error {

@@ -7,6 +7,6 @@ const (
 	Field_AggregateID
 	Field_LatestSequence
 	Field_ResourceOwner
-	Field_ModifierService
-	Field_ModifierUser
+	Field_EditorService
+	Field_EditorUser
 )

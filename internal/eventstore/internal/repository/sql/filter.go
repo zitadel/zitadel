@@ -57,14 +57,14 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 
 	for rows.Next() {
 		event := new(models.Event)
-		events = append(events, event)
+		var previousSequence Sequence
 
-		rows.Scan(
+		err = rows.Scan(
 			&event.ID,
 			&event.CreationDate,
 			&event.Type,
 			&event.Sequence,
-			&event.PreviousSequence,
+			&previousSequence,
 			&event.Data,
 			&event.EditorService,
 			&event.EditorUser,
@@ -73,6 +73,14 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 			&event.AggregateID,
 			&event.AggregateVersion,
 		)
+
+		if err != nil {
+			logging.Log("SQL-wHNPo").WithError(err).Warn("unable to scan row")
+			return nil, errors.ThrowInternal(err, "SQL-BfZwF", "unable to scan row")
+		}
+
+		event.PreviousSequence = uint64(previousSequence)
+		events = append(events, event)
 	}
 
 	return events, nil
@@ -98,7 +106,7 @@ func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []i
 	for i, filter := range searchQuery.Filters {
 		value := filter.GetValue()
 		switch value.(type) {
-		case []bool, []float64, []int64, []string, *[]bool, *[]float64, *[]int64, *[]string:
+		case []bool, []float64, []int64, []string, []models.AggregateType, *[]bool, *[]float64, *[]int64, *[]string, *[]models.AggregateType:
 			value = pq.Array(value)
 		}
 
@@ -118,7 +126,7 @@ func getCondition(filter *es_models.Filter) string {
 
 func prepareConditionFormat(operation es_models.Operation) string {
 	if operation == es_models.Operation_In {
-		return "%s %s (?)"
+		return "%s %s ANY(?)"
 	}
 	return "%s %s ?"
 }
@@ -133,9 +141,9 @@ func getField(field es_models.Field) string {
 		return "event_sequence"
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
-	case es_models.Field_ModifierService:
+	case es_models.Field_EditorService:
 		return "editor_service"
-	case es_models.Field_ModifierUser:
+	case es_models.Field_EditorUser:
 		return "editor_user"
 	}
 	return ""
@@ -143,14 +151,12 @@ func getField(field es_models.Field) string {
 
 func getOperation(operation es_models.Operation) string {
 	switch operation {
-	case es_models.Operation_Equals:
+	case es_models.Operation_Equals, es_models.Operation_In:
 		return "="
 	case es_models.Operation_Greater:
 		return ">"
 	case es_models.Operation_Less:
 		return "<"
-	case es_models.Operation_In:
-		return "IN"
 	}
 	return ""
 }

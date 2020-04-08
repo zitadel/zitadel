@@ -81,17 +81,3 @@ func (mr *MockRepositoryMockRecorder) PushAggregates(arg0 interface{}, arg1 ...i
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushAggregates", reflect.TypeOf((*MockRepository)(nil).PushAggregates), varargs...)
 }
-
-// PushEvents mocks base method
-func (m *MockRepository) PushEvents(arg0 context.Context, arg1 [][]*models.Event) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PushEvents", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// PushEvents indicates an expected call of PushEvents
-func (mr *MockRepositoryMockRecorder) PushEvents(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PushEvents", reflect.TypeOf((*MockRepository)(nil).PushEvents), arg0, arg1)
-}

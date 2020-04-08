@@ -1,5 +1,5 @@
 module.exports = {
-    branch: 'master',
+    branches: ["master"],
     plugins: [
         "@semantic-release/commit-analyzer",
         "@semantic-release/release-notes-generator",
@@ -8,12 +8,9 @@ module.exports = {
             "prepareCmd": "echo '::set-env name=CAOS_NEXT_VERSION::v${nextRelease.version}'"
         }],
         ["semantic-release-docker", {
-            "verifyConditions": {
-                "registryUrl": "docker.pkg.github.com"
-            },
-            "publish": {
-                "name": "caos/zitadel/zitadel"
+            "registryUrl": "docker.pkg.github.com",
+            "name": "caos/zitadel/zitadel"
             }
-        }],
+        ],
     ]
 };

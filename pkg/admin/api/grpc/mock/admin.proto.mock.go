@@ -8,9 +8,9 @@ import (
 	context "context"
 	grpc "github.com/caos/zitadel/pkg/admin/api/grpc"
 	gomock "github.com/golang/mock/gomock"
-	empty "github.com/golang/protobuf/ptypes/empty"
-	struct0 "github.com/golang/protobuf/ptypes/struct"
 	grpc0 "google.golang.org/grpc"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 )
 
@@ -58,14 +58,14 @@ func (mr *MockAdminServiceClientMockRecorder) GetOrgByID(arg0, arg1 interface{},
 }
 
 // Healthz mocks base method
-func (m *MockAdminServiceClient) Healthz(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAdminServiceClient) Healthz(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Healthz", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -98,14 +98,14 @@ func (mr *MockAdminServiceClientMockRecorder) IsOrgUnique(arg0, arg1 interface{}
 }
 
 // Ready mocks base method
-func (m *MockAdminServiceClient) Ready(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*empty.Empty, error) {
+func (m *MockAdminServiceClient) Ready(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Ready", varargs...)
-	ret0, _ := ret[0].(*empty.Empty)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -158,14 +158,14 @@ func (mr *MockAdminServiceClientMockRecorder) SetUpOrg(arg0, arg1 interface{}, a
 }
 
 // Validate mocks base method
-func (m *MockAdminServiceClient) Validate(arg0 context.Context, arg1 *empty.Empty, arg2 ...grpc0.CallOption) (*struct0.Struct, error) {
+func (m *MockAdminServiceClient) Validate(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*structpb.Struct, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Validate", varargs...)
-	ret0, _ := ret[0].(*struct0.Struct)
+	ret0, _ := ret[0].(*structpb.Struct)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -297,6 +297,7 @@ message UserSessionView {
     UserSessionState auth_state = 3;
     string user_id = 4;
     string user_name = 5;
+    uint64 sequence = 6;
 }
 
 enum UserSessionState {
@@ -336,6 +337,7 @@ message User {
     string region = 22;
     string street_address = 23;
     bool password_change_required = 24;
+    uint64 sequence = 25;
 }
 
 enum UserState {
@@ -364,6 +366,7 @@ message UserProfile {
     string display_name = 6;
     string preferred_language = 7;
     Gender gender = 8;
+    uint64 sequence = 26;
 }
 
 message UpdateUserProfileRequest {
@@ -379,6 +382,7 @@ message UserEmail {
     string id = 1;
     string email = 2;
     bool isEmailVerified = 3;
+    uint64 sequence = 4;
 }
 
 message VerifyMyUserEmailRequest {
@@ -398,6 +402,7 @@ message UserPhone {
     string id = 1;
     string phone = 2;
     bool is_phone_verified = 3;
+    uint64 sequence = 4;
 }
 
 message UpdateUserPhoneRequest {
@@ -415,6 +420,7 @@ message UserAddress {
     string postal_code = 4;
     string region = 5;
     string street_address = 6;
+    uint64 sequence = 7;
 }
 
 message UpdateUserAddressRequest {

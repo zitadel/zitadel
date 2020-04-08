@@ -46,10 +46,6 @@ func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Emp
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-dh69i", "Not implemented")
 }
 
-func (s *Server) ResendEmailVerificationMail(ctx context.Context, id *UserID) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mAq23", "Not implemented")
-}
-
 func (s *Server) ChangeMyUserPhone(ctx context.Context, request *UpdateUserPhoneRequest) (*UserPhone, error) {
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-dk45g", "Not implemented")
 }
@@ -84,8 +80,4 @@ func (s *Server) VerifyMfaOTP(ctx context.Context, request *VerifyMfaOtp) (_ *Mf
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-9k46d", "Not implemented")
-}
-
-func (s *Server) ResendUserInitMail(ctx context.Context, request *UserID) (_ *empty.Empty, err error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dk467", "Not implemented")
 }

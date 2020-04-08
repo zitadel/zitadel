@@ -9,4 +9,9 @@ const (
 	Origin         = "origin"
 
 	ZitadelOrgID = "x-zitadel-orgid"
+	//TODO: Remove as soon an authentification is implemented
+	ZitadelUserID   = "x-zitadel-userid"
+	ZitadelClientID = "x-zitadel-clientid"
+	ZitadelAgentID  = "x-zitadel-agentid"
+	LoginKey        = "x-zitadel-login"
 )

@@ -33,19 +33,13 @@ func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.
 		}
 		for _, event := range aggregate.Events {
 			if err = event.Validate(); err != nil {
-				return err
+				return errors.ThrowInvalidArgument(err, "EVENT-tzIhl", "validate event failed")
 			}
 		}
 	}
 	err = es.repo.PushAggregates(ctx, aggregates...)
 	if err != nil {
 		return err
-	}
-
-	for _, aggregate := range aggregates {
-		if aggregate.Appender != nil {
-			aggregate.Appender(aggregate.Events...)
-		}
 	}
 
 	return nil
@@ -56,4 +50,8 @@ func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.Sear
 		return nil, err
 	}
 	return es.repo.Filter(ctx, searchQuery)
+}
+
+func (es *eventstore) Health(ctx context.Context) error {
+	return es.repo.Health(ctx)
 }
