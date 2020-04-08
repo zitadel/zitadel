@@ -26,6 +26,7 @@ require (
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/jackc/pgconn v1.5.0 // indirect
+	github.com/jinzhu/gorm v1.9.12 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
