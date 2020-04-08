@@ -19,7 +19,7 @@ type UnavailableError struct {
 }
 
 func ThrowUnavailable(parent error, id, message string) error {
-	return &UnavailableError{createCaosError(parent, id, message)}
+	return &UnavailableError{CreateCaosError(parent, id, message)}
 }
 
 func ThrowUnavailablef(parent error, id, format string, a ...interface{}) error {

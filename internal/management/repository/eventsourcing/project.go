@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
@@ -26,11 +27,7 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *p
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
 	project := &proj_model.Project{Name: name}
-	project, err := repo.ProjectEvents.CreateProject(ctx, project)
-	if err != nil {
-		return nil, err
-	}
-	return project, nil
+	return repo.ProjectEvents.CreateProject(ctx, project)
 }
 
 func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
@@ -39,11 +36,7 @@ func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.
 		return nil, err
 	}
 
-	project, err = repo.ProjectEvents.UpdateProject(ctx, existingProject, project)
-	if err != nil {
-		return nil, err
-	}
-	return project, err
+	return repo.ProjectEvents.UpdateProject(ctx, existingProject, project)
 }
 
 func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
@@ -52,11 +45,7 @@ func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*pro
 		return nil, err
 	}
 
-	project, err = repo.ProjectEvents.DeactivateProject(ctx, project)
-	if err != nil {
-		return nil, err
-	}
-	return project, err
+	return repo.ProjectEvents.DeactivateProject(ctx, project)
 }
 
 func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
@@ -65,11 +54,7 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 		return nil, err
 	}
 
-	project, err = repo.ProjectEvents.ReactivateProject(ctx, project)
-	if err != nil {
-		return nil, err
-	}
-	return project, err
+	return repo.ProjectEvents.ReactivateProject(ctx, project)
 }
 
 func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {

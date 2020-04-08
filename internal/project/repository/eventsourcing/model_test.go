@@ -2,9 +2,10 @@ package eventsourcing
 
 import (
 	"encoding/json"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"testing"
 )
 
 func TestProjectFromEvents(t *testing.T) {
@@ -167,6 +168,51 @@ func TestAppendReactivatedEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestChanges(t *testing.T) {
+	type args struct {
+		existing *Project
+		new      *Project
+	}
+	type res struct {
+		changesLen int
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "project name changes",
+			args: args{
+				existing: &Project{Name: "Name"},
+				new:      &Project{Name: "NameChanged"},
+			},
+			res: res{
+				changesLen: 1,
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				existing: &Project{Name: "Name"},
+				new:      &Project{Name: "Name"},
+			},
+			res: res{
+				changesLen: 0,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			changes := tt.args.existing.Changes(tt.args.new)
+			if len(changes) != tt.res.changesLen {
+				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
+			}
+		})
+	}
+}
+
 
 func TestAppendAddMemberEvent(t *testing.T) {
 	type args struct {
