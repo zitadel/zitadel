@@ -11,8 +11,8 @@ import (
 
 func GetMockCache(ctrl *gomock.Controller) *ProjectCache {
 	mockCache := mock_cache.NewMockCache(ctrl)
-	mockCache.EXPECT().Get(gomock.Any(), gomock.Any()).Return(nil)
-	mockCache.EXPECT().Set(gomock.Any(), gomock.Any()).Return(nil)
+	mockCache.EXPECT().Get(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	mockCache.EXPECT().Set(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return &ProjectCache{projectCache: mockCache}
 }
 
