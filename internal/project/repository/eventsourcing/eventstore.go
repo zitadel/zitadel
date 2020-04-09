@@ -2,8 +2,7 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/models"
-
+	"github.com/caos/zitadel/internal/cache/config"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
@@ -12,28 +11,38 @@ import (
 
 type ProjectEventstore struct {
 	es_int.Eventstore
+	projectCache *ProjectCache
 }
 
 type ProjectConfig struct {
 	es_int.Eventstore
+	Cache *config.CacheConfig
 }
 
 func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
-	return &ProjectEventstore{Eventstore: conf.Eventstore}, nil
+	projectCache, err := StartCache(conf.Cache)
+	if err != nil {
+		return nil, err
+	}
+	return &ProjectEventstore{
+		Eventstore:   conf.Eventstore,
+		projectCache: projectCache,
+	}, nil
 }
 
-func (es *ProjectEventstore) ProjectByID(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	query, err := ProjectByIDQuery(project.ID, project.Sequence)
-	if err != nil {
-		return nil, err
-	}
+func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_model.Project, error) {
+	project, sequence := es.projectCache.getProject(id)
 
-	p := ProjectFromModel(project)
-	err = es_sdk.Filter(ctx, es.FilterEvents, p.AppendEvents, query)
+	query, err := ProjectByIDQuery(project.ID, sequence)
 	if err != nil {
 		return nil, err
 	}
-	return ProjectToModel(p), nil
+	err = es_sdk.Filter(ctx, es.FilterEvents, project.AppendEvents, query)
+	if err != nil {
+		return nil, err
+	}
+	es.projectCache.cacheProject(project)
+	return ProjectToModel(project), nil
 }
 
 func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
@@ -49,6 +58,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 		return nil, err
 	}
 
+	es.projectCache.cacheProject(repoProject)
 	return ProjectToModel(repoProject), nil
 }
 
@@ -56,7 +66,7 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, project *proj_mo
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
 	}
-	existingProject, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: project.ID, Sequence: 0}})
+	existingProject, err := es.ProjectByID(ctx, project.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,11 +79,12 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, project *proj_mo
 		return nil, err
 	}
 
+	es.projectCache.cacheProject(repoExisting)
 	return ProjectToModel(repoExisting), nil
 }
 
 func (es *ProjectEventstore) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	existing, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: id, Sequence: 0}})
+	existing, err := es.ProjectByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -84,11 +95,13 @@ func (es *ProjectEventstore) DeactivateProject(ctx context.Context, id string) (
 	repoExisting := ProjectFromModel(existing)
 	aggregate := ProjectDeactivateAggregate(es.AggregateCreator(), repoExisting)
 	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
+
+	es.projectCache.cacheProject(repoExisting)
 	return ProjectToModel(repoExisting), nil
 }
 
 func (es *ProjectEventstore) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	existing, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: id, Sequence: 0}})
+	existing, err := es.ProjectByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +112,8 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, id string) (
 	repoExisting := ProjectFromModel(existing)
 	aggregate := ProjectReactivateAggregate(es.AggregateCreator(), repoExisting)
 	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
+
+	es.projectCache.cacheProject(repoExisting)
 	return ProjectToModel(repoExisting), nil
 }
 
@@ -121,11 +136,14 @@ func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *pro
 	if err != nil {
 		return nil, err
 	}
+
+	es.projectCache.cacheProject(foundProject)
 	for _, m := range foundProject.Members {
 		if m.UserID == member.UserID {
 			return ProjectMemberToModel(m), nil
 		}
 	}
+
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
 }
 
@@ -133,7 +151,7 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
-	existing, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: member.ID, Sequence: 0}})
+	existing, err := es.ProjectByID(ctx, member.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +170,7 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 	}
 
 	repoProject.AppendEvents(projectAggregate.Events...)
+	es.projectCache.cacheProject(repoProject)
 	for _, m := range repoProject.Members {
 		if m.UserID == member.UserID {
 			return ProjectMemberToModel(m), nil
@@ -164,7 +183,7 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
-	existing, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: member.ID, Sequence: 0}})
+	existing, err := es.ProjectByID(ctx, member.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -183,6 +202,7 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 	}
 
 	repoProject.AppendEvents(projectAggregate.Events...)
+	es.projectCache.cacheProject(repoProject)
 	for _, m := range repoProject.Members {
 		if m.UserID == member.UserID {
 			return ProjectMemberToModel(m), nil
@@ -195,7 +215,7 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	if member.UserID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-d43fs", "UserID and Roles are required")
 	}
-	existing, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: member.ID, Sequence: 0}})
+	existing, err := es.ProjectByID(ctx, member.ID)
 	if err != nil {
 		return err
 	}
@@ -214,5 +234,6 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	}
 
 	repoProject.AppendEvents(projectAggregate.Events...)
+	es.projectCache.cacheProject(repoProject)
 	return nil
 }
