@@ -736,7 +736,7 @@ service ManagementService {
 
     rpc ChangeProjectRole(ProjectRoleChange) returns (ProjectRole) {
         option (google.api.http) = {
-            post: "/projects/{id}/roles/{key}"
+            put: "/projects/{id}/roles/{key}"
             body: "*"
         };
 

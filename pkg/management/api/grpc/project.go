@@ -59,7 +59,7 @@ func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*Proje
 	return projectRoleFromModel(role), nil
 }
 func (s *Server) ChangeProjectRole(ctx context.Context, in *ProjectRoleChange) (*ProjectRole, error) {
-	role, err := s.project.AddProjectRole(ctx, projectRoleChangeToModel(in))
+	role, err := s.project.ChangeProjectRole(ctx, projectRoleChangeToModel(in))
 	if err != nil {
 		return nil, err
 	}

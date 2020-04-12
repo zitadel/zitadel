@@ -1372,7 +1372,7 @@
           "ManagementService"
         ]
       },
-      "post": {
+      "put": {
         "operationId": "ChangeProjectRole",
         "responses": {
           "200": {
