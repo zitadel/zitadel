@@ -27,6 +27,11 @@ Mgmt:
           User: 'management'
           Database: 'management'
           SSLmode: disable
+      Cache:
+        Type: 'fastcache'
+        ID: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
 
 Auth:
   API:
