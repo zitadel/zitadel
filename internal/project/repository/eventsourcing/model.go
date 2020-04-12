@@ -17,12 +17,20 @@ type Project struct {
 	Name    string           `json:"name,omitempty"`
 	State   int32            `json:"-"`
 	Members []*ProjectMember `json:"-"`
+	Roles   []*ProjectRole   `json:"-"`
 }
 
 type ProjectMember struct {
 	es_models.ObjectRoot
 	UserID string   `json:"userId,omitempty"`
 	Roles  []string `json:"roles,omitempty"`
+}
+
+type ProjectRole struct {
+	es_models.ObjectRoot
+	Key         string `json:"key,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	Group       string `json:"group,omitempty"`
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
@@ -35,6 +43,7 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 
 func ProjectFromModel(project *model.Project) *Project {
 	members := ProjectMembersFromModel(project.Members)
+	roles := ProjectRolesFromModel(project.Roles)
 	return &Project{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ObjectRoot.ID,
@@ -45,6 +54,7 @@ func ProjectFromModel(project *model.Project) *Project {
 		Name:    project.Name,
 		State:   model.ProjectStateToInt(project.State),
 		Members: members,
+		Roles:   roles,
 	}
 }
 
@@ -105,6 +115,50 @@ func ProjectMemberToModel(member *ProjectMember) *model.ProjectMember {
 	}
 }
 
+func ProjectRolesToModel(roles []*ProjectRole) []*model.ProjectRole {
+	convertedRoles := make([]*model.ProjectRole, len(roles))
+	for i, r := range roles {
+		convertedRoles[i] = ProjectRoleToModel(r)
+	}
+	return convertedRoles
+}
+
+func ProjectRolesFromModel(roles []*model.ProjectRole) []*ProjectRole {
+	convertedRoles := make([]*ProjectRole, len(roles))
+	for i, r := range roles {
+		convertedRoles[i] = ProjectRoleFromModel(r)
+	}
+	return convertedRoles
+}
+
+func ProjectRoleFromModel(role *model.ProjectRole) *ProjectRole {
+	return &ProjectRole{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           role.ObjectRoot.ID,
+			Sequence:     role.Sequence,
+			ChangeDate:   role.ChangeDate,
+			CreationDate: role.CreationDate,
+		},
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
+	}
+}
+
+func ProjectRoleToModel(role *ProjectRole) *model.ProjectRole {
+	return &model.ProjectRole{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           role.ID,
+			ChangeDate:   role.ChangeDate,
+			CreationDate: role.CreationDate,
+			Sequence:     role.Sequence,
+		},
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
+	}
+}
+
 func ProjectFromEvents(project *Project, events ...*es_models.Event) (*Project, error) {
 	if project == nil {
 		project = &Project{}
@@ -143,6 +197,12 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendChangeMemberEvent(event)
 	case model.ProjectMemberRemoved:
 		return p.appendRemoveMemberEvent(event)
+	case model.ProjectRoleAdded:
+		return p.appendAddRoleEvent(event)
+	case model.ProjectRoleChanged:
+		return p.appendChangeRoleEvent(event)
+	case model.ProjectRoleRemoved:
+		return p.appendRemoveRoleEvent(event)
 	}
 	return nil
 }
@@ -203,4 +263,52 @@ func getMemberData(event *es_models.Event) (*ProjectMember, error) {
 		return nil, err
 	}
 	return member, nil
+}
+
+func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
+	role, err := getRoleData(event)
+	if err != nil {
+		return nil
+	}
+	role.ObjectRoot.CreationDate = event.CreationDate
+	p.Roles = append(p.Roles, role)
+	return nil
+}
+
+func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
+	role, err := getRoleData(event)
+	if err != nil {
+		return nil
+	}
+	for i, r := range p.Roles {
+		if r.Key == role.Key {
+			p.Roles[i] = role
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
+	role, err := getRoleData(event)
+	if err != nil {
+		return nil
+	}
+	for i, r := range p.Roles {
+		if r.Key == role.Key {
+			p.Roles[i] = p.Roles[len(p.Roles)-1]
+			p.Roles[len(p.Roles)-1] = nil
+			p.Roles = p.Roles[:len(p.Roles)-1]
+		}
+	}
+	return nil
+}
+
+func getRoleData(event *es_models.Event) (*ProjectRole, error) {
+	role := &ProjectRole{}
+	role.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, role); err != nil {
+		logging.Log("EVEN-d9euw").WithError(err).Error("could not unmarshal event data")
+		return nil, err
+	}
+	return role, nil
 }

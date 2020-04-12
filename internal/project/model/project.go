@@ -11,6 +11,7 @@ type Project struct {
 	State   ProjectState
 	Name    string
 	Members []*ProjectMember
+	Roles   []*ProjectRole
 }
 
 type ProjectState in_model.Enum
@@ -38,6 +39,15 @@ func (p *Project) IsValid() bool {
 func (p *Project) ContainsMember(member *ProjectMember) bool {
 	for _, m := range p.Members {
 		if m.UserID == member.UserID {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Project) ContainsRole(role *ProjectRole) bool {
+	for _, r := range p.Roles {
+		if r.Key == role.Key {
 			return true
 		}
 	}

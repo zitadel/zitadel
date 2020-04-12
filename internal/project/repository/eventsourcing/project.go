@@ -122,3 +122,36 @@ func ProjectMemberRemovedAggregate(ctx context.Context, aggCreator *es_models.Ag
 	}
 	return agg.AppendEvent(model.ProjectMemberRemoved, member)
 }
+
+func ProjectRoleAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, role *ProjectRole) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37due", "existing project should not be nil")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.ProjectRoleAdded, role)
+}
+
+func ProjectRoleChangedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, role *ProjectRole) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pso8e", "existing project should not be nil")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.ProjectRoleChanged, role)
+}
+
+func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Project, role *ProjectRole) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkei2", "existing project should not be nil")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.ProjectRoleRemoved, role)
+}
