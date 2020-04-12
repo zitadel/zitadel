@@ -72,6 +72,20 @@ func GetMockManipulateProjectWithMember(ctrl *gomock.Controller) *ProjectEventst
 	return &ProjectEventstore{Eventstore: mockEs, projectCache: GetMockCache(ctrl)}
 }
 
+func GetMockManipulateProjectWithRole(ctrl *gomock.Controller) *ProjectEventstore {
+	data, _ := json.Marshal(Project{Name: "Name"})
+	roleData, _ := json.Marshal(ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectRoleAdded, Data: roleData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return &ProjectEventstore{Eventstore: mockEs, projectCache: GetMockCache(ctrl)}
+}
+
 func GetMockManipulateProjectNoEvents(ctrl *gomock.Controller) *ProjectEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)

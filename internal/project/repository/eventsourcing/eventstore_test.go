@@ -700,3 +700,245 @@ func TestRemoveProjectMember(t *testing.T) {
 		})
 	}
 }
+
+func TestAddProjectRole(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es   *ProjectEventstore
+		ctx  context.Context
+		role *model.ProjectRole
+	}
+	type res struct {
+		result  *model.ProjectRole
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add project role, ok",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				result: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+		},
+		{
+			name: "no key",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role already existing",
+			args: args{
+				es:   GetMockManipulateProjectWithRole(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:   GetMockManipulateProjectNoEvents(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddProjectRole(tt.args.ctx, tt.args.role)
+
+			if !tt.res.wantErr && result.ID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.Key != tt.res.result.Key {
+				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Key, result.Key)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeProjectRole(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es   *ProjectEventstore
+		ctx  context.Context
+		role *model.ProjectRole
+	}
+	type res struct {
+		result  *model.ProjectRole
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change project role, ok",
+			args: args{
+				es:   GetMockManipulateProjectWithRole(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayNameChanged", Group: "Group"},
+			},
+			res: res{
+				result: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayNameChanged", Group: "Group"},
+			},
+		},
+		{
+			name: "no key",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role not existing",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:   GetMockManipulateProjectNoEvents(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeProjectRole(tt.args.ctx, tt.args.role)
+
+			if !tt.res.wantErr && result.ID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.Key != tt.res.result.Key {
+				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Key, result.Key)
+			}
+			if !tt.res.wantErr && result.DisplayName != tt.res.result.DisplayName {
+				t.Errorf("got wrong result displayName: expected: %v, actual: %v ", tt.res.result.DisplayName, result.DisplayName)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveProjectRole(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es   *ProjectEventstore
+		ctx  context.Context
+		role *model.ProjectRole
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove project role, ok",
+			args: args{
+				es:   GetMockManipulateProjectWithRole(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key"},
+			},
+		},
+		{
+			name: "no key",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role not existing",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:   GetMockManipulateProjectNoEvents(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveProjectRole(tt.args.ctx, tt.args.role)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

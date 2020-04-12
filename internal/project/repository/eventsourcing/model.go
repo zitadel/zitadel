@@ -60,6 +60,7 @@ func ProjectFromModel(project *model.Project) *Project {
 
 func ProjectToModel(project *Project) *model.Project {
 	members := ProjectMembersToModel(project.Members)
+	roles := ProjectRolesToModel(project.Roles)
 	return &model.Project{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ID,
@@ -70,6 +71,7 @@ func ProjectToModel(project *Project) *model.Project {
 		Name:    project.Name,
 		State:   model.ProjectStateFromInt(project.State),
 		Members: members,
+		Roles:   roles,
 	}
 }
 

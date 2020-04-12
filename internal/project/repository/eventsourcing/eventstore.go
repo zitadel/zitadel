@@ -237,3 +237,94 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	es.projectCache.cacheProject(repoProject)
 	return nil
 }
+
+func (es *ProjectEventstore) AddProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	if !role.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Key is required")
+	}
+	existing, err := es.ProjectByID(ctx, role.ID)
+	if err != nil {
+		return nil, err
+	}
+	if existing.ContainsRole(role) {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Project contains role with same key")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoRole := ProjectRoleFromModel(role)
+	projectAggregate, err := ProjectRoleAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	if err != nil {
+		return nil, err
+	}
+	err = es.PushAggregates(ctx, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	repoProject.AppendEvents(projectAggregate.Events...)
+	es.projectCache.cacheProject(repoProject)
+	for _, r := range repoProject.Roles {
+		if r.Key == role.Key {
+			return ProjectRoleToModel(r), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sie83", "Could not find role in list")
+}
+
+func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	if !role.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9die3", "Key is required")
+	}
+	existing, err := es.ProjectByID(ctx, role.ID)
+	if err != nil {
+		return nil, err
+	}
+	if !existing.ContainsRole(role) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die34", "Role doesn't exist on this project")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoRole := ProjectRoleFromModel(role)
+	projectAggregate, err := ProjectRoleChangedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	if err != nil {
+		return nil, err
+	}
+	err = es.PushAggregates(ctx, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	repoProject.AppendEvents(projectAggregate.Events...)
+	es.projectCache.cacheProject(repoProject)
+	for _, r := range repoProject.Roles {
+		if r.Key == role.Key {
+			return ProjectRoleToModel(r), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sl1or", "Could not find role in list")
+}
+
+func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) error {
+	if role.Key == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Key is required")
+	}
+	existing, err := es.ProjectByID(ctx, role.ID)
+	if err != nil {
+		return err
+	}
+	if !existing.ContainsRole(role) {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Role doesn't exist on project")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoRole := ProjectRoleFromModel(role)
+	projectAggregate, err := ProjectRoleRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	if err != nil {
+		return err
+	}
+	err = es.PushAggregates(ctx, projectAggregate)
+	if err != nil {
+		return err
+	}
+
+	repoProject.AppendEvents(projectAggregate.Events...)
+	es.projectCache.cacheProject(repoProject)
+	return nil
+}
