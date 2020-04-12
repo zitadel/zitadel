@@ -251,16 +251,12 @@ func (es *ProjectEventstore) AddProjectRole(ctx context.Context, role *proj_mode
 	}
 	repoProject := ProjectFromModel(existing)
 	repoRole := ProjectRoleFromModel(role)
-	projectAggregate, err := ProjectRoleAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole)
-	if err != nil {
-		return nil, err
-	}
-	err = es.PushAggregates(ctx, projectAggregate)
+	projectAggregate := ProjectRoleAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
 	}
 
-	repoProject.AppendEvents(projectAggregate.Events...)
 	es.projectCache.cacheProject(repoProject)
 	for _, r := range repoProject.Roles {
 		if r.Key == role.Key {
@@ -283,16 +279,12 @@ func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_m
 	}
 	repoProject := ProjectFromModel(existing)
 	repoRole := ProjectRoleFromModel(role)
-	projectAggregate, err := ProjectRoleChangedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole)
-	if err != nil {
-		return nil, err
-	}
-	err = es.PushAggregates(ctx, projectAggregate)
+	projectAggregate := ProjectRoleChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
 	}
 
-	repoProject.AppendEvents(projectAggregate.Events...)
 	es.projectCache.cacheProject(repoProject)
 	for _, r := range repoProject.Roles {
 		if r.Key == role.Key {
@@ -315,16 +307,11 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	}
 	repoProject := ProjectFromModel(existing)
 	repoRole := ProjectRoleFromModel(role)
-	projectAggregate, err := ProjectRoleRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	projectAggregate := ProjectRoleRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return err
 	}
-	err = es.PushAggregates(ctx, projectAggregate)
-	if err != nil {
-		return err
-	}
-
-	repoProject.AppendEvents(projectAggregate.Events...)
 	es.projectCache.cacheProject(repoProject)
 	return nil
 }
