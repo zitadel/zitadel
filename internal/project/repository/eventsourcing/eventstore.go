@@ -142,16 +142,9 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 	}
 	repoProject := ProjectFromModel(existing)
 	repoMember := ProjectMemberFromModel(member)
-	projectAggregate, err := ProjectMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoMember)
-	if err != nil {
-		return nil, err
-	}
-	err = es.PushAggregates(ctx, projectAggregate)
-	if err != nil {
-		return nil, err
-	}
 
-	repoProject.AppendEvents(projectAggregate.Events...)
+	addAggregate := ProjectMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
 	for _, m := range repoProject.Members {
 		if m.UserID == member.UserID {
 			return ProjectMemberToModel(m), nil
@@ -173,16 +166,10 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 	}
 	repoProject := ProjectFromModel(existing)
 	repoMember := ProjectMemberFromModel(member)
-	projectAggregate, err := ProjectMemberChangedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoMember)
-	if err != nil {
-		return nil, err
-	}
-	err = es.PushAggregates(ctx, projectAggregate)
-	if err != nil {
-		return nil, err
-	}
 
-	repoProject.AppendEvents(projectAggregate.Events...)
+	projectAggregate := ProjectMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+
 	for _, m := range repoProject.Members {
 		if m.UserID == member.UserID {
 			return ProjectMemberToModel(m), nil
@@ -204,15 +191,8 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	}
 	repoProject := ProjectFromModel(existing)
 	repoMember := ProjectMemberFromModel(member)
-	projectAggregate, err := ProjectMemberRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoMember)
-	if err != nil {
-		return err
-	}
-	err = es.PushAggregates(ctx, projectAggregate)
-	if err != nil {
-		return err
-	}
 
-	repoProject.AppendEvents(projectAggregate.Events...)
-	return nil
+	projectAggregate := ProjectMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	return err
 }
