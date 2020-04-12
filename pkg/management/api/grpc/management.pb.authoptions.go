@@ -325,6 +325,11 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "Id",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeProjectRole": utils_auth.Option{
+		Permission: "project.role.write",
+		CheckParam: "Id",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectRole": utils_auth.Option{
 		Permission: "project.role.delete",
 		CheckParam: "Id",

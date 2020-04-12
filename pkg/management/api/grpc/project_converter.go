@@ -43,3 +43,42 @@ func projectUpdateToModel(project *ProjectUpdateRequest) *proj_model.Project {
 		Name: project.Name,
 	}
 }
+
+func projectRoleFromModel(role *proj_model.ProjectRole) *ProjectRole {
+	creationDate, err := ptypes.TimestampProto(role.CreationDate)
+	logging.Log("GRPC-due83").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(role.ChangeDate)
+	logging.Log("GRPC-id93s").OnError(err).Debug("unable to parse timestamp")
+
+	return &ProjectRole{
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
+		Sequence:     role.Sequence,
+		Key:          role.Key,
+		DisplayName:  role.DisplayName,
+		Group:        role.Group,
+	}
+}
+
+func projectRoleAddToModel(role *ProjectRoleAdd) *proj_model.ProjectRole {
+	return &proj_model.ProjectRole{
+		ObjectRoot: models.ObjectRoot{
+			ID: role.Id,
+		},
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
+	}
+}
+
+func projectRoleChangeToModel(role *ProjectRoleChange) *proj_model.ProjectRole {
+	return &proj_model.ProjectRole{
+		ObjectRoot: models.ObjectRoot{
+			ID: role.Id,
+		},
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
+	}
+}

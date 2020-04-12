@@ -16,4 +16,8 @@ type ProjectRepository interface {
 	AddProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)
 	ChangeProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)
 	RemoveProjectMember(ctx context.Context, projectID, userID string) error
+
+	AddProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
+	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
+	RemoveProjectRole(ctx context.Context, projectID, key string) error
 }

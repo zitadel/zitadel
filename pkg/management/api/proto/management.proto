@@ -722,7 +722,7 @@ service ManagementService {
         };
     }
 
-    rpc AddProjectRole(ProjectRoleAdd) returns (google.protobuf.Empty) {
+    rpc AddProjectRole(ProjectRoleAdd) returns (ProjectRole) {
         option (google.api.http) = {
             post: "/projects/{id}/roles"
             body: "*"
@@ -734,9 +734,21 @@ service ManagementService {
         };
     }
 
+    rpc ChangeProjectRole(ProjectRoleChange) returns (ProjectRole) {
+        option (google.api.http) = {
+            post: "/projects/{id}/roles/{key}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.role.write"
+            check_field_name: "Id"
+        };
+    }
+
     rpc RemoveProjectRole(ProjectRoleRemove) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/projects/{id}/roles/{name}"
+            delete: "/projects/{id}/roles/{key}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1724,24 +1736,32 @@ message ProjectMemberRemove {
 }
 
 message ProjectRoleAdd {
+     string id = 1;
+     string key = 2;
+     string display_name = 3;
+     string group = 4;
+}
+
+message ProjectRoleChange {
     string id = 1;
-    string name = 2;
+    string key = 2;
     string display_name = 3;
     string group = 4;
 }
 
 message ProjectRole {
     string project_id = 1;
-    string name = 2;
+    string key = 2;
     string display_name = 3;
     google.protobuf.Timestamp creation_date = 4;
-    string group = 5;
-    uint64 sequence = 6;
+    google.protobuf.Timestamp change_date = 5;
+    string group = 6;
+    uint64 sequence = 7;
 }
 
 message ProjectRoleRemove {
     string id = 1;
-    string name = 2;
+    string key = 2;
 }
 
 message ProjectRoleSearchResponse {
@@ -1766,7 +1786,7 @@ message ProjectRoleSearchQuery {
 
 enum ProjectRoleSearchKey {
     PROJECTROLESEARCHKEY_UNSPECIFIED = 0;
-    PROJECTROLESEARCHKEY_NAME = 1;
+    PROJECTROLESEARCHKEY_KEY = 1;
     PROJECTROLESEARCHKEY_DISPLAY_NAME = 2;
 }
 

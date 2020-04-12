@@ -50,3 +50,16 @@ func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, use
 	member := proj_model.NewProjectMember(projectID, userID)
 	return repo.ProjectEvents.RemoveProjectMember(ctx, member)
 }
+
+func (repo *ProjectRepo) AddProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	return repo.ProjectEvents.AddProjectRole(ctx, member)
+}
+
+func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	return repo.ProjectEvents.ChangeProjectRole(ctx, member)
+}
+
+func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key string) error {
+	member := proj_model.NewProjectRole(projectID, key)
+	return repo.ProjectEvents.RemoveProjectRole(ctx, member)
+}

@@ -10,8 +10,8 @@ type ProjectRole struct {
 	Group       string
 }
 
-func NewRole(projectID, key, displayName, group string) *ProjectRole {
-	return &ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: projectID}, Key: key, DisplayName: displayName, Group: group}
+func NewProjectRole(projectID, key string) *ProjectRole {
+	return &ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: projectID}, Key: key}
 }
 
 func (p *ProjectRole) IsValid() bool {
