@@ -14,8 +14,5 @@ func NewProjectMember(projectID, userID string) *ProjectMember {
 }
 
 func (p *ProjectMember) IsValid() bool {
-	if p.ID == "" || p.UserID == "" || len(p.Roles) == 0 {
-		return false
-	}
-	return true
+	return p.ID != "" && p.UserID != "" && len(p.Roles) != 0
 }
