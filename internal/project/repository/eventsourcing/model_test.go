@@ -595,3 +595,85 @@ func TestAppendAppStateEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestAppendAddOIDCConfigEvent(t *testing.T) {
+	type args struct {
+		project *Project
+		config  *OIDCConfig
+		event   *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Project
+	}{
+		{
+			name: "append add application event",
+			args: args{
+				project: &Project{Applications: []*Application{&Application{AppID: "AppID"}}},
+				config:  &OIDCConfig{AppID: "AppID", ClientID: "ClientID"},
+				event:   &es_models.Event{},
+			},
+			result: &Project{Applications: []*Application{&Application{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID"}}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.config != nil {
+				data, _ := json.Marshal(tt.args.config)
+				tt.args.event.Data = data
+			}
+			tt.args.project.appendAddOIDCConfigEvent(tt.args.event)
+			if len(tt.args.project.Applications) != 1 {
+				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.project.Applications))
+			}
+			if tt.args.project.Applications[0].OIDCConfig == nil {
+				t.Errorf("got wrong result should have oidc config actual: %v ", tt.args.project.Applications[0].OIDCConfig)
+			}
+			if tt.args.project.Applications[0] == tt.result.Applications[0] {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.Applications[0], tt.args.project.Applications[0])
+			}
+		})
+	}
+}
+
+func TestAppendChangeOIDCConfigEvent(t *testing.T) {
+	type args struct {
+		project *Project
+		config  *OIDCConfig
+		event   *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Project
+	}{
+		{
+			name: "append change application event",
+			args: args{
+				project: &Project{Applications: []*Application{&Application{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID"}}}},
+				config:  &OIDCConfig{AppID: "AppID", ClientID: "ClientID Changed"},
+				event:   &es_models.Event{},
+			},
+			result: &Project{Applications: []*Application{&Application{AppID: "AppID", OIDCConfig: &OIDCConfig{AppID: "AppID", ClientID: "ClientID Changed"}}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.config != nil {
+				data, _ := json.Marshal(tt.args.config)
+				tt.args.event.Data = data
+			}
+			tt.args.project.appendChangeOIDCConfigEvent(tt.args.event)
+			if len(tt.args.project.Applications) != 1 {
+				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.project.Applications))
+			}
+			if tt.args.project.Applications[0].OIDCConfig == nil {
+				t.Errorf("got wrong result should have oidc config actual: %v ", tt.args.project.Applications[0].OIDCConfig)
+			}
+			if tt.args.project.Applications[0] == tt.result.Applications[0] {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.Applications[0], tt.args.project.Applications[0])
+			}
+		})
+	}
+}

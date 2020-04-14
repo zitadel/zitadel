@@ -5,6 +5,7 @@ import (
 	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
+	"reflect"
 )
 
 const (
@@ -63,6 +64,37 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if changed.Name != "" && p.Name != changed.Name {
 		changes["name"] = changed.Name
+	}
+	return changes
+}
+
+func (a *Application) Changes(changed *Application) map[string]interface{} {
+	changes := make(map[string]interface{}, 1)
+	if changed.Name != "" && a.Name != changed.Name {
+		changes["name"] = changed.Name
+	}
+	return changes
+}
+
+func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
+	changes := make(map[string]interface{}, 1)
+	if !reflect.DeepEqual(c.RedirectUris, changed.RedirectUris) {
+		changes["redirectUris"] = c.RedirectUris
+	}
+	if !reflect.DeepEqual(c.ResponseTypes, changed.ResponseTypes) {
+		changes["responseTypes"] = c.ResponseTypes
+	}
+	if !reflect.DeepEqual(c.GrantTypes, changed.GrantTypes) {
+		changes["grantTypes"] = c.GrantTypes
+	}
+	if c.ApplicationType != changed.ApplicationType {
+		changes["applicationType"] = c.ApplicationType
+	}
+	if c.AuthMethodType != changed.AuthMethodType {
+		changes["authMethodType"] = c.AuthMethodType
+	}
+	if !reflect.DeepEqual(c.PostLogoutRedirectUris, changed.PostLogoutRedirectUris) {
+		changes["postLogoutRedirectUris"] = c.PostLogoutRedirectUris
 	}
 	return changes
 }
@@ -234,11 +266,17 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case model.ApplicationAdded:
 		return p.appendAddAppEvent(event)
 	case model.ApplicationChanged:
-		return p.appendChangeRoleEvent(event)
+		return p.appendAddAppEvent(event)
+	case model.ApplicationRemoved:
+		return p.appendRemoveAppEvent(event)
 	case model.ApplicationDeactivated:
 		return p.appendAppStateEvent(event, model.APPSTATE_INACTIVE)
 	case model.ApplicationReactivated:
 		return p.appendAppStateEvent(event, model.APPSTATE_ACTIVE)
+	case model.OIDCConfigAdded:
+		return p.appendAddOIDCConfigEvent(event)
+	case model.OIDCConfigChanged, model.OIDCConfigSecretChanged:
+		return p.appendChangeOIDCConfigEvent(event)
 	}
 	return nil
 }
@@ -254,7 +292,8 @@ func (p *Project) appendReactivatedEvent() error {
 }
 
 func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
-	member, err := getMemberData(event)
+	member := &ProjectMember{}
+	err := member.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -264,7 +303,8 @@ func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
-	member, err := getMemberData(event)
+	member := &ProjectMember{}
+	err := member.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -277,7 +317,8 @@ func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
-	member, err := getMemberData(event)
+	member := &ProjectMember{}
+	err := member.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -291,18 +332,18 @@ func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func getMemberData(event *es_models.Event) (*ProjectMember, error) {
-	member := &ProjectMember{}
-	member.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, member); err != nil {
+func (m *ProjectMember) getData(event *es_models.Event) error {
+	m.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, m); err != nil {
 		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")
-		return nil, err
+		return err
 	}
-	return member, nil
+	return nil
 }
 
 func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
-	role, err := getRoleData(event)
+	role := new(ProjectRole)
+	err := role.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -312,7 +353,8 @@ func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
-	role, err := getRoleData(event)
+	role := new(ProjectRole)
+	err := role.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -325,7 +367,8 @@ func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
-	role, err := getRoleData(event)
+	role := new(ProjectRole)
+	err := role.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -339,18 +382,18 @@ func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
 	return nil
 }
 
-func getRoleData(event *es_models.Event) (*ProjectRole, error) {
-	role := new(ProjectRole)
-	role.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, role); err != nil {
+func (r *ProjectRole) getData(event *es_models.Event) error {
+	r.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-d9euw").WithError(err).Error("could not unmarshal event data")
-		return nil, err
+		return err
 	}
-	return role, nil
+	return nil
 }
 
 func (p *Project) appendAddAppEvent(event *es_models.Event) error {
-	app, err := getAppData(event)
+	app := new(Application)
+	err := app.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -360,20 +403,22 @@ func (p *Project) appendAddAppEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendChangeAppEvent(event *es_models.Event) error {
-	app, err := getAppData(event)
+	app := new(Application)
+	err := app.getData(event)
 	if err != nil {
 		return nil
 	}
 	for i, a := range p.Applications {
 		if a.AppID == app.AppID {
-			p.Applications[i] = app
+			p.Applications[i].getData(event)
 		}
 	}
 	return nil
 }
 
 func (p *Project) appendRemoveAppEvent(event *es_models.Event) error {
-	app, err := getAppData(event)
+	app := new(Application)
+	err := app.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -388,7 +433,8 @@ func (p *Project) appendRemoveAppEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppState) error {
-	app, err := getAppData(event)
+	app := new(Application)
+	err := app.getData(event)
 	if err != nil {
 		return nil
 	}
@@ -401,22 +447,49 @@ func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppSta
 	return nil
 }
 
-func getAppData(event *es_models.Event) (*Application, error) {
-	app := new(Application)
-	app.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, app); err != nil {
+func (a *Application) getData(event *es_models.Event) error {
+	a.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-8die3").WithError(err).Error("could not unmarshal event data")
-		return nil, err
+		return err
 	}
-	return app, nil
+	return nil
 }
 
-func getOIDCConfigData(event *es_models.Event) (*OIDCConfig, error) {
-	oidc := new(OIDCConfig)
-	oidc.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, oidc); err != nil {
-		logging.Log("EVEN-d8e3s").WithError(err).Error("could not unmarshal event data")
-		return nil, err
+func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
+	config := new(OIDCConfig)
+	err := config.getData(event)
+	if err != nil {
+		return nil
 	}
-	return oidc, nil
+	config.ObjectRoot.CreationDate = event.CreationDate
+	for i, a := range p.Applications {
+		if a.AppID == config.AppID {
+			p.Applications[i].OIDCConfig = config
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendChangeOIDCConfigEvent(event *es_models.Event) error {
+	config := new(OIDCConfig)
+	err := config.getData(event)
+	if err != nil {
+		return nil
+	}
+	for i, a := range p.Applications {
+		if a.AppID == config.AppID {
+			p.Applications[i].OIDCConfig.getData(event)
+		}
+	}
+	return nil
+}
+
+func (o *OIDCConfig) getData(event *es_models.Event) error {
+	o.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, o); err != nil {
+		logging.Log("EVEN-d8e3s").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }
