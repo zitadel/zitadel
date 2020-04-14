@@ -29,10 +29,10 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 	return func(db *gorm.DB, res interface{}) error {
 		query := db.Table(table)
 		for _, q := range queries {
-			var ok bool
-			query, ok = SetQuery(query, q.GetKey(), q.GetValue(), q.GetMethod())
-			if !ok {
-				return caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "query is invalid")
+			var err error
+			query, err = SetQuery(query, q.GetKey(), q.GetValue(), q.GetMethod())
+			if err != nil {
+				return caos_errs.ThrowInvalidArgument(err, "VIEW-KaGue", "query is invalid")
 			}
 		}
 

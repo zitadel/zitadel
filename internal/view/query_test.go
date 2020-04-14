@@ -94,7 +94,7 @@ func TestPrepareSearchQuery(t *testing.T) {
 				expectGetSearchRequestWithSearchQuery("TESTTABLE", TestSearchKey_ID.ToColumnName(), "=", "ID", 2, 2),
 			args{
 				table:         "TESTTABLE",
-				searchRequest: TestSearchRequest{queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.Equals, value: "ID"}}},
+				searchRequest: TestSearchRequest{queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "ID"}}},
 			},
 			res{
 				count:   2,
@@ -107,7 +107,7 @@ func TestPrepareSearchQuery(t *testing.T) {
 				expectGetSearchRequestWithAllParams("TESTTABLE", TestSearchKey_ID.ToColumnName(), "=", "ID", "ASC", TestSearchKey_ID, 2, 2, 2, 5),
 			args{
 				table:         "TESTTABLE",
-				searchRequest: TestSearchRequest{limit: 2, offset: 2, sortingColumn: TestSearchKey_ID, asc: true, queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.Equals, value: "ID"}}},
+				searchRequest: TestSearchRequest{limit: 2, offset: 2, sortingColumn: TestSearchKey_ID, asc: true, queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "ID"}}},
 			},
 			res{
 				count:   5,
