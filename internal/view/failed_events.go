@@ -68,7 +68,7 @@ func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error 
 }
 
 func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*FailedEvent, error) {
-	failedEvent := &FailedEvent{}
+	failedEvent := new(FailedEvent)
 	queries := []SearchQuery{
 		FailedEventSearchQuery{Key: FAILEDEVENTKEY_VIEW_NAME, Method: model.Equals, Value: viewName},
 		FailedEventSearchQuery{Key: FAILEDEVENTKEY_FAILED_SEQUENCE, Method: model.Equals, Value: string(sequence)},

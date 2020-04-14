@@ -43,7 +43,7 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) e
 }
 
 func LatestSequence(db *gorm.DB, table, viewName string) (uint64, error) {
-	sequence := actualSequece{}
+	sequence := new(actualSequece)
 	query := PrepareGetByKey(table, sequenceSearchKey(SEQUENCESEARCHKEY_VIEW_NAME), viewName)
 	err := query(db, sequence)
 
