@@ -67,7 +67,11 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	case model.SEARCHMETHOD_EQUALS:
 		query = query.Where(""+column+" = ?", value)
 	case model.SEARCHMETHOD_EQUALS_IGNORE_CASE:
-		query = query.Where("LOWER("+column+") = LOWER(?)", value)
+		valueText, ok := value.(string)
+		if !ok {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-idu8e", "Starts with only possible for strings")
+		}
+		query = query.Where("LOWER("+column+") = LOWER(?)", valueText)
 	case model.SEARCHMETHOD_STARTS_WITH:
 		valueText, ok := value.(string)
 		if !ok {
