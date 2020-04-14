@@ -106,24 +106,13 @@ func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *pro
 	if member.UserID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "userID missing")
 	}
-	filter, err := ProjectByIDQuery(member.ID, member.Sequence)
+	project, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: member.ID, Sequence: 0}})
 	if err != nil {
 		return nil, err
 	}
-	events, err := es.Eventstore.FilterEvents(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-	if len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8due3", "Could not find project events")
-	}
-	foundProject, err := ProjectFromEvents(nil, events...)
-	if err != nil {
-		return nil, err
-	}
-	for _, m := range foundProject.Members {
+	for _, m := range project.Members {
 		if m.UserID == member.UserID {
-			return ProjectMemberToModel(m), nil
+			return m, nil
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
