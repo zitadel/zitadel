@@ -224,10 +224,10 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew", State: model.Inactive},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew", State: model.PROJECTSTATE_INACTIVE},
 			},
 		},
 		{
@@ -235,7 +235,7 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Inactive},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_INACTIVE},
 			},
 			res: res{
 				wantErr: true,
@@ -247,7 +247,7 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
 				wantErr: true,
@@ -295,10 +295,10 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Inactive},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_INACTIVE},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew", State: model.Active},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew", State: model.PROJECTSTATE_ACTIVE},
 			},
 		},
 		{
@@ -306,7 +306,7 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
 				wantErr: true,
@@ -318,7 +318,7 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
 				wantErr: true,

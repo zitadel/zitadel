@@ -26,9 +26,9 @@ func projectFromModel(project *proj_model.Project) *Project {
 
 func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 	switch state {
-	case proj_model.Active:
+	case proj_model.PROJECTSTATE_ACTIVE:
 		return ProjectState_PROJECTSTATE_ACTIVE
-	case proj_model.Inactive:
+	case proj_model.PROJECTSTATE_INACTIVE:
 		return ProjectState_PROJECTSTATE_INACTIVE
 	default:
 		return ProjectState_PROJECTSTATE_UNSPECIFIED

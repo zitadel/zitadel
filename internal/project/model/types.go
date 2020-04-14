@@ -29,6 +29,7 @@ const (
 
 	ApplicationAdded       models.EventType = "project.application.added"
 	ApplicationChanged     models.EventType = "project.application.changed"
+	ApplicationRemoved     models.EventType = "project.application.removed"
 	ApplicationDeactivated models.EventType = "project.application.deactivated"
 	ApplicationReactivated models.EventType = "project.application.reactivated"
 

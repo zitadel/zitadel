@@ -26,7 +26,7 @@ func TestProjectFromEvents(t *testing.T) {
 				},
 				project: &Project{Name: "ProjectName"},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Active), Name: "ProjectName"},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.PROJECTSTATE_ACTIVE), Name: "ProjectName"},
 		},
 		{
 			name: "project from events, nil project",
@@ -36,7 +36,7 @@ func TestProjectFromEvents(t *testing.T) {
 				},
 				project: nil,
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Active)},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.PROJECTSTATE_ACTIVE)},
 		},
 	}
 	for _, tt := range tests {
@@ -69,7 +69,7 @@ func TestAppendEvent(t *testing.T) {
 				event:   &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded},
 				project: &Project{Name: "ProjectName"},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Active), Name: "ProjectName"},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.PROJECTSTATE_ACTIVE), Name: "ProjectName"},
 		},
 		{
 			name: "append change event",
@@ -77,21 +77,21 @@ func TestAppendEvent(t *testing.T) {
 				event:   &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectChanged},
 				project: &Project{Name: "ProjectName"},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Active), Name: "ProjectName"},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.PROJECTSTATE_ACTIVE), Name: "ProjectName"},
 		},
 		{
 			name: "append deactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectDeactivated},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Inactive)},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.PROJECTSTATE_INACTIVE)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectReactivated},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.Active)},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{ID: "ID"}, State: int32(model.PROJECTSTATE_ACTIVE)},
 		},
 	}
 	for _, tt := range tests {
@@ -100,7 +100,7 @@ func TestAppendEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.project)
 				tt.args.event.Data = data
 			}
-			result := &Project{}
+			result := new(Project)
 			result.AppendEvent(tt.args.event)
 			if result.State != tt.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.result.State, result.State)
@@ -129,7 +129,7 @@ func TestAppendDeactivatedEvent(t *testing.T) {
 			args: args{
 				project: &Project{},
 			},
-			result: &Project{State: int32(model.Inactive)},
+			result: &Project{State: int32(model.PROJECTSTATE_INACTIVE)},
 		},
 	}
 	for _, tt := range tests {
@@ -156,7 +156,7 @@ func TestAppendReactivatedEvent(t *testing.T) {
 			args: args{
 				project: &Project{},
 			},
-			result: &Project{State: int32(model.Active)},
+			result: &Project{State: int32(model.PROJECTSTATE_ACTIVE)},
 		},
 	}
 	for _, tt := range tests {
@@ -430,6 +430,167 @@ func TestAppendRemoveRoleEvent(t *testing.T) {
 			tt.args.project.appendRemoveRoleEvent(tt.args.event)
 			if len(tt.args.project.Roles) != 0 {
 				t.Errorf("got wrong result should have no role actual: %v ", len(tt.args.project.Roles))
+			}
+		})
+	}
+}
+
+func TestAppendAddAppEvent(t *testing.T) {
+	type args struct {
+		project *Project
+		app     *Application
+		event   *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Project
+	}{
+		{
+			name: "append add application event",
+			args: args{
+				project: &Project{},
+				app:     &Application{Name: "Application"},
+				event:   &es_models.Event{},
+			},
+			result: &Project{Applications: []*Application{&Application{Name: "Application"}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.app != nil {
+				data, _ := json.Marshal(tt.args.app)
+				tt.args.event.Data = data
+			}
+			tt.args.project.appendAddAppEvent(tt.args.event)
+			if len(tt.args.project.Applications) != 1 {
+				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.project.Applications))
+			}
+			if tt.args.project.Applications[0] == tt.result.Applications[0] {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.Applications[0], tt.args.project.Applications[0])
+			}
+		})
+	}
+}
+
+func TestAppendChangeAppEvent(t *testing.T) {
+	type args struct {
+		project *Project
+		app     *Application
+		event   *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Project
+	}{
+		{
+			name: "append change application event",
+			args: args{
+				project: &Project{Applications: []*Application{&Application{Name: "Application"}}},
+				app:     &Application{Name: "Application Change"},
+				event:   &es_models.Event{},
+			},
+			result: &Project{Applications: []*Application{&Application{Name: "Application Change"}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.app != nil {
+				data, _ := json.Marshal(tt.args.app)
+				tt.args.event.Data = data
+			}
+			tt.args.project.appendChangeAppEvent(tt.args.event)
+			if len(tt.args.project.Applications) != 1 {
+				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.project.Applications))
+			}
+			if tt.args.project.Applications[0] == tt.result.Applications[0] {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.Applications[0], tt.args.project.Applications[0])
+			}
+		})
+	}
+}
+
+func TestAppendRemoveAppEvent(t *testing.T) {
+	type args struct {
+		project *Project
+		app     *Application
+		event   *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Project
+	}{
+		{
+			name: "append remove application event",
+			args: args{
+				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application"}}},
+				app:     &Application{AppID: "AppID", Name: "Application"},
+				event:   &es_models.Event{},
+			},
+			result: &Project{Applications: []*Application{}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.app != nil {
+				data, _ := json.Marshal(tt.args.app)
+				tt.args.event.Data = data
+			}
+			tt.args.project.appendRemoveAppEvent(tt.args.event)
+			if len(tt.args.project.Applications) != 0 {
+				t.Errorf("got wrong result should have no apps actual: %v ", len(tt.args.project.Applications))
+			}
+		})
+	}
+}
+
+func TestAppendAppStateEvent(t *testing.T) {
+	type args struct {
+		project *Project
+		app     *ApplicationID
+		event   *es_models.Event
+		state   model.AppState
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *Project
+	}{
+		{
+			name: "append deactivate application event",
+			args: args{
+				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: model.AppStateToInt(model.APPSTATE_ACTIVE)}}},
+				app:     &ApplicationID{AppID: "AppID"},
+				event:   &es_models.Event{},
+				state:   model.APPSTATE_INACTIVE,
+			},
+			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: model.AppStateToInt(model.APPSTATE_INACTIVE)}}},
+		},
+		{
+			name: "append reactivate application event",
+			args: args{
+				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: model.AppStateToInt(model.APPSTATE_INACTIVE)}}},
+				app:     &ApplicationID{AppID: "AppID"},
+				event:   &es_models.Event{},
+				state:   model.APPSTATE_ACTIVE,
+			},
+			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: model.AppStateToInt(model.APPSTATE_ACTIVE)}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.app != nil {
+				data, _ := json.Marshal(tt.args.app)
+				tt.args.event.Data = data
+			}
+			tt.args.project.appendAppStateEvent(tt.args.event, tt.args.state)
+			if len(tt.args.project.Applications) != 1 {
+				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.project.Applications))
+			}
+			if tt.args.project.Applications[0] == tt.result.Applications[0] {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.Applications[0], tt.args.project.Applications[0])
 			}
 		})
 	}

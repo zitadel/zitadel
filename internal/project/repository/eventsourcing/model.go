@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"encoding/json"
-
 	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
@@ -14,10 +13,11 @@ const (
 
 type Project struct {
 	es_models.ObjectRoot
-	Name    string           `json:"name,omitempty"`
-	State   int32            `json:"-"`
-	Members []*ProjectMember `json:"-"`
-	Roles   []*ProjectRole   `json:"-"`
+	Name         string           `json:"name,omitempty"`
+	State        int32            `json:"-"`
+	Members      []*ProjectMember `json:"-"`
+	Roles        []*ProjectRole   `json:"-"`
+	Applications []*Application   `json:"-"`
 }
 
 type ProjectMember struct {
@@ -31,6 +31,32 @@ type ProjectRole struct {
 	Key         string `json:"key,omitempty"`
 	DisplayName string `json:"displayName,omitempty"`
 	Group       string `json:"group,omitempty"`
+}
+
+type Application struct {
+	es_models.ObjectRoot
+	AppID      string      `json:"appId"`
+	State      int32       `json:"-"`
+	Name       string      `json:"name,omitempty"`
+	OIDCConfig *OIDCConfig `json:"-"`
+}
+
+type ApplicationID struct {
+	es_models.ObjectRoot
+	AppID string `json:"appId"`
+}
+
+type OIDCConfig struct {
+	es_models.ObjectRoot
+	AppID                  string   `json:"appId"`
+	ClientID               string   `json:"clientId,omitempty"`
+	ClientSecret           []byte   `json:"clientSecret,omitempty"`
+	RedirectUris           []string `json:"redirectUris,omitempty"`
+	ResponseTypes          []int32  `json:"responseTypes,omitempty"`
+	GrantTypes             []int32  `json:"grantTypes,omitempty"`
+	ApplicationType        int32    `json:"applicationType,omitempty"`
+	AuthMethodType         int32    `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris []string `json:"postLogoutRedirectUris,omitempty"`
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
@@ -187,7 +213,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 			logging.Log("EVEN-idl93").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
-		p.State = model.ProjectStateToInt(model.Active)
+		p.State = model.ProjectStateToInt(model.PROJECTSTATE_ACTIVE)
 		return nil
 	case model.ProjectDeactivated:
 		return p.appendDeactivatedEvent()
@@ -205,17 +231,25 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendChangeRoleEvent(event)
 	case model.ProjectRoleRemoved:
 		return p.appendRemoveRoleEvent(event)
+	case model.ApplicationAdded:
+		return p.appendAddAppEvent(event)
+	case model.ApplicationChanged:
+		return p.appendChangeRoleEvent(event)
+	case model.ApplicationDeactivated:
+		return p.appendAppStateEvent(event, model.APPSTATE_INACTIVE)
+	case model.ApplicationReactivated:
+		return p.appendAppStateEvent(event, model.APPSTATE_ACTIVE)
 	}
 	return nil
 }
 
 func (p *Project) appendDeactivatedEvent() error {
-	p.State = model.ProjectStateToInt(model.Inactive)
+	p.State = model.ProjectStateToInt(model.PROJECTSTATE_INACTIVE)
 	return nil
 }
 
 func (p *Project) appendReactivatedEvent() error {
-	p.State = model.ProjectStateToInt(model.Active)
+	p.State = model.ProjectStateToInt(model.PROJECTSTATE_ACTIVE)
 	return nil
 }
 
@@ -306,11 +340,83 @@ func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
 }
 
 func getRoleData(event *es_models.Event) (*ProjectRole, error) {
-	role := &ProjectRole{}
+	role := new(ProjectRole)
 	role.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, role); err != nil {
 		logging.Log("EVEN-d9euw").WithError(err).Error("could not unmarshal event data")
 		return nil, err
 	}
 	return role, nil
+}
+
+func (p *Project) appendAddAppEvent(event *es_models.Event) error {
+	app, err := getAppData(event)
+	if err != nil {
+		return nil
+	}
+	app.ObjectRoot.CreationDate = event.CreationDate
+	p.Applications = append(p.Applications, app)
+	return nil
+}
+
+func (p *Project) appendChangeAppEvent(event *es_models.Event) error {
+	app, err := getAppData(event)
+	if err != nil {
+		return nil
+	}
+	for i, a := range p.Applications {
+		if a.AppID == app.AppID {
+			p.Applications[i] = app
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendRemoveAppEvent(event *es_models.Event) error {
+	app, err := getAppData(event)
+	if err != nil {
+		return nil
+	}
+	for i, a := range p.Applications {
+		if a.AppID == app.AppID {
+			p.Applications[i] = p.Applications[len(p.Applications)-1]
+			p.Applications[len(p.Applications)-1] = nil
+			p.Applications = p.Applications[:len(p.Applications)-1]
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppState) error {
+	app, err := getAppData(event)
+	if err != nil {
+		return nil
+	}
+	for i, a := range p.Applications {
+		if a.AppID == app.AppID {
+			a.State = model.AppStateToInt(state)
+			p.Applications[i] = a
+		}
+	}
+	return nil
+}
+
+func getAppData(event *es_models.Event) (*Application, error) {
+	app := new(Application)
+	app.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, app); err != nil {
+		logging.Log("EVEN-8die3").WithError(err).Error("could not unmarshal event data")
+		return nil, err
+	}
+	return app, nil
+}
+
+func getOIDCConfigData(event *es_models.Event) (*OIDCConfig, error) {
+	oidc := new(OIDCConfig)
+	oidc.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, oidc); err != nil {
+		logging.Log("EVEN-d8e3s").WithError(err).Error("could not unmarshal event data")
+		return nil, err
+	}
+	return oidc, nil
 }

@@ -49,7 +49,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
 	}
-	project.State = proj_model.Active
+	project.State = proj_model.PROJECTSTATE_ACTIVE
 	repoProject := ProjectFromModel(project)
 
 	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject)
@@ -302,3 +302,28 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	es.projectCache.cacheProject(repoProject)
 	return nil
 }
+
+//
+//func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
+//	if !app.IsValid() {
+//		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9eidw", "Some required fields are missing")
+//	}
+//	existing, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: app.ID, Sequence: 0}})
+//	if err != nil {
+//		return nil, err
+//	}
+//	if existing.ContainsMember(member) {
+//		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Project")
+//	}
+//	repoProject := ProjectFromModel(existing)
+//	repoMember := ProjectMemberFromModel(member)
+//
+//	addAggregate := ProjectMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+//	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+//	for _, m := range repoProject.Members {
+//		if m.UserID == member.UserID {
+//			return ProjectMemberToModel(m), nil
+//		}
+//	}
+//	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
+//}

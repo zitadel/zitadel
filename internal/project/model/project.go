@@ -2,7 +2,6 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	in_model "github.com/caos/zitadel/internal/model"
 )
 
 type Project struct {
@@ -14,16 +13,19 @@ type Project struct {
 	Roles   []*ProjectRole
 }
 
-type ProjectState in_model.Enum
+type ProjectState int32
 
-var states = []string{"Active", "Inactive"}
+const (
+	PROJECTSTATE_ACTIVE ProjectState = iota
+	PROJECTSTATE_INACTIVE
+)
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: Active}
+	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: PROJECTSTATE_ACTIVE}
 }
 
 func (p *Project) IsActive() bool {
-	if p.State == Active {
+	if p.State == PROJECTSTATE_ACTIVE {
 		return true
 	}
 	return false
@@ -52,4 +54,12 @@ func (p *Project) ContainsRole(role *ProjectRole) bool {
 		}
 	}
 	return false
+}
+
+func ProjectStateToInt(s ProjectState) int32 {
+	return int32(s)
+}
+
+func ProjectStateFromInt(index int32) ProjectState {
+	return ProjectState(index)
 }
