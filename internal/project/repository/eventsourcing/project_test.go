@@ -408,3 +408,489 @@ func TestProjectReactivateAggregate(t *testing.T) {
 		})
 	}
 }
+
+func TestProjectMemberAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *ProjectMember
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		wantErr   bool
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "projectmember added ok",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        &ProjectMember{ObjectRoot: models.ObjectRoot{ID: "ID"}, UserID: "UserID", Roles: []string{"Roles"}},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberAdded,
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberAdded,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberAdded,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := ProjectMemberAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if !tt.res.wantErr && agg.Events[0].Data == nil {
+				t.Errorf("should have data in event")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestProjectMemberChangedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *ProjectMember
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		wantErr   bool
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "projectmember changed ok",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        &ProjectMember{ObjectRoot: models.ObjectRoot{ID: "ID"}, UserID: "UserID", Roles: []string{"Roles"}},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberChanged,
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberChanged,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberChanged,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := ProjectMemberChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if !tt.res.wantErr && agg.Events[0].Data == nil {
+				t.Errorf("should have data in event")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestProjectMemberRemovedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *ProjectMember
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		wantErr   bool
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "projectmember removed ok",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        &ProjectMember{ObjectRoot: models.ObjectRoot{ID: "ID"}, UserID: "UserID", Roles: []string{"Roles"}},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberRemoved,
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberRemoved,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectMemberRemoved,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := ProjectMemberRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if !tt.res.wantErr && agg.Events[0].Data == nil {
+				t.Errorf("should have data in event")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestProjectRoleAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *ProjectRole
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		wantErr   bool
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "projectrole added ok",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        &ProjectRole{ObjectRoot: models.ObjectRoot{ID: "ID"}, Key: "Key"},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleAdded,
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleAdded,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleAdded,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := ProjectRoleAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if !tt.res.wantErr && agg.Events[0].Data == nil {
+				t.Errorf("should have data in event")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestProjectRoleChangedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *ProjectRole
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		wantErr   bool
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "projectmember changed ok",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        &ProjectRole{ObjectRoot: models.ObjectRoot{ID: "ID"}, Key: "Key"},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleChanged,
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleChanged,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleChanged,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := ProjectRoleChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if !tt.res.wantErr && agg.Events[0].Data == nil {
+				t.Errorf("should have data in event")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestProjectRoleRemovedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *ProjectRole
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		wantErr   bool
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "projectrole changed ok",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        &ProjectRole{ObjectRoot: models.ObjectRoot{ID: "ID"}, Key: "Key"},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleRemoved,
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleRemoved,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.ProjectRoleRemoved,
+				wantErr:   true,
+				errFunc:   caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := ProjectRoleRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if !tt.res.wantErr && agg.Events[0].Data == nil {
+				t.Errorf("should have data in event")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

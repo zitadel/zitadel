@@ -95,6 +95,9 @@ func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existin
 		if existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-di38f", "existing project should not be nil")
 		}
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ie34f", "member should not be nil")
+		}
 		agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 		if err != nil {
 			return nil, err
@@ -107,6 +110,9 @@ func ProjectMemberChangedAggregate(aggCreator *es_models.AggregateCreator, exist
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sle3d", "existing project should not be nil")
+		}
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "member should not be nil")
 		}
 
 		agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
@@ -122,6 +128,9 @@ func ProjectMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, exist
 		if existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slo9e", "existing project should not be nil")
 		}
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member should not be nil")
+		}
 		agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 		if err != nil {
 			return nil, err
@@ -134,6 +143,9 @@ func ProjectRoleAddedAggregate(aggCreator *es_models.AggregateCreator, existing 
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37due", "existing project should not be nil")
+		}
+		if role == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sleo9", "role should not be nil")
 		}
 		agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 		if err != nil {
@@ -148,6 +160,9 @@ func ProjectRoleChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 		if existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pso8e", "existing project should not be nil")
 		}
+		if role == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oe8sf", "member should not be nil")
+		}
 		agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 		if err != nil {
 			return nil, err
@@ -161,7 +176,9 @@ func ProjectRoleRemovedAggregate(aggCreator *es_models.AggregateCreator, existin
 		if existing == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkei2", "existing project should not be nil")
 		}
-
+		if role == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8eis", "member should not be nil")
+		}
 		agg, err := ProjectAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
 		if err != nil {
 			return nil, err
