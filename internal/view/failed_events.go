@@ -21,7 +21,7 @@ type FailedEvent struct {
 type FailedEventSearchQuery struct {
 	Key    FailedEventSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 func (req FailedEventSearchQuery) GetKey() ColumnKey {
@@ -71,7 +71,7 @@ func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*F
 	failedEvent := new(FailedEvent)
 	queries := []SearchQuery{
 		FailedEventSearchQuery{Key: FAILEDEVENTKEY_VIEW_NAME, Method: model.Equals, Value: viewName},
-		FailedEventSearchQuery{Key: FAILEDEVENTKEY_FAILED_SEQUENCE, Method: model.Equals, Value: string(sequence)},
+		FailedEventSearchQuery{Key: FAILEDEVENTKEY_FAILED_SEQUENCE, Method: model.Equals, Value: sequence},
 	}
 	query := PrepareGetByQuery(table, queries...)
 	err := query(db, sequence)
