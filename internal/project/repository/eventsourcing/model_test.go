@@ -8,6 +8,184 @@ import (
 	"github.com/caos/zitadel/internal/project/model"
 )
 
+func TestProjectChanges(t *testing.T) {
+	type args struct {
+		existing *Project
+		new      *Project
+	}
+	type res struct {
+		changesLen int
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "project name changes",
+			args: args{
+				existing: &Project{Name: "Name"},
+				new:      &Project{Name: "NameChanged"},
+			},
+			res: res{
+				changesLen: 1,
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				existing: &Project{Name: "Name"},
+				new:      &Project{Name: "Name"},
+			},
+			res: res{
+				changesLen: 0,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			changes := tt.args.existing.Changes(tt.args.new)
+			if len(changes) != tt.res.changesLen {
+				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
+			}
+		})
+	}
+}
+
+func TestApplicationChanges(t *testing.T) {
+	type args struct {
+		existing *Application
+		new      *Application
+	}
+	type res struct {
+		changesLen int
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "application name changes",
+			args: args{
+				existing: &Application{Name: "Name"},
+				new:      &Application{Name: "NameChanged"},
+			},
+			res: res{
+				changesLen: 1,
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				existing: &Application{Name: "Name"},
+				new:      &Application{Name: "Name"},
+			},
+			res: res{
+				changesLen: 0,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			changes := tt.args.existing.Changes(tt.args.new)
+			if len(changes) != tt.res.changesLen {
+				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
+			}
+		})
+	}
+}
+
+func TestOIDCConfigChanges(t *testing.T) {
+	type args struct {
+		existing *OIDCConfig
+		new      *OIDCConfig
+	}
+	type res struct {
+		changesLen int
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "all possible values change",
+			args: args{
+				existing: &OIDCConfig{
+					RedirectUris:           []string{"RedirectUris"},
+					ResponseTypes:          []int32{1},
+					GrantTypes:             []int32{1},
+					ApplicationType:        1,
+					AuthMethodType:         1,
+					PostLogoutRedirectUris: []string{"PostLogoutRedirectUris"},
+				},
+				new: &OIDCConfig{
+					RedirectUris:           []string{"RedirectUrisChanged"},
+					ResponseTypes:          []int32{2},
+					GrantTypes:             []int32{2},
+					ApplicationType:        2,
+					AuthMethodType:         2,
+					PostLogoutRedirectUris: []string{"PostLogoutRedirectUrisChanged"},
+				},
+			},
+			res: res{
+				changesLen: 6,
+			},
+		},
+		{
+			name: "no changes",
+			args: args{
+				existing: &OIDCConfig{
+					RedirectUris:           []string{"RedirectUris"},
+					ResponseTypes:          []int32{1},
+					GrantTypes:             []int32{1},
+					ApplicationType:        1,
+					AuthMethodType:         1,
+					PostLogoutRedirectUris: []string{"PostLogoutRedirectUris"},
+				},
+				new: &OIDCConfig{
+					RedirectUris:           []string{"RedirectUris"},
+					ResponseTypes:          []int32{1},
+					GrantTypes:             []int32{1},
+					ApplicationType:        1,
+					AuthMethodType:         1,
+					PostLogoutRedirectUris: []string{"PostLogoutRedirectUris"},
+				},
+			},
+			res: res{
+				changesLen: 0,
+			},
+		},
+		{
+			name: "change not changeable attributes",
+			args: args{
+				existing: &OIDCConfig{
+					AppID:        "AppID",
+					ClientID:     "ClientID",
+					ClientSecret: []byte{'A'},
+				},
+				new: &OIDCConfig{
+					AppID:        "AppIDChange",
+					ClientID:     "ClientIDChange",
+					ClientSecret: []byte{'B'},
+				},
+			},
+			res: res{
+				changesLen: 0,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			changes := tt.args.existing.Changes(tt.args.new)
+			if len(changes) != tt.res.changesLen {
+				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
+			}
+		})
+	}
+}
+
 func TestProjectFromEvents(t *testing.T) {
 	type args struct {
 		event   []*es_models.Event
@@ -164,50 +342,6 @@ func TestAppendReactivatedEvent(t *testing.T) {
 			tt.args.project.appendReactivatedEvent()
 			if tt.args.project.State != tt.result.State {
 				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result, tt.args.project)
-			}
-		})
-	}
-}
-
-func TestChanges(t *testing.T) {
-	type args struct {
-		existing *Project
-		new      *Project
-	}
-	type res struct {
-		changesLen int
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "project name changes",
-			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "NameChanged"},
-			},
-			res: res{
-				changesLen: 1,
-			},
-		},
-		{
-			name: "no changes",
-			args: args{
-				existing: &Project{Name: "Name"},
-				new:      &Project{Name: "Name"},
-			},
-			res: res{
-				changesLen: 0,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
-			if len(changes) != tt.res.changesLen {
-				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
 			}
 		})
 	}
