@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -18,5 +19,7 @@ func (s *Server) IsOrgUnique(ctx context.Context, request *UniqueOrgRequest) (or
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *OrgSetUpRequest) (_ *OrgSetUpResponse, err error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-hdj5D", "Not implemented")
+	_, err = s.org.SetUpOrg(ctx, setUpRequestToModel(orgSetUp))
+	return nil, err
+	// return nil, errors.ThrowUnimplemented(nil, "GRPC-hdj5D", "Not implemented")
 }

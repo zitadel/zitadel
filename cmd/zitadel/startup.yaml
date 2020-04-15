@@ -24,8 +24,8 @@ Mgmt:
         SQL:
           Host: $CR_HOST
           Port: $CR_PORT
-          User: 'management'
-          Database: 'management'
+          User: 'eventstore'
+          Database: 'eventstore'
           SSLmode: disable
       Cache:
         Type: 'fastcache'
@@ -58,6 +58,16 @@ Admin:
       GatewayPort: 50041
       CustomHeaders:
         - x-zitadel-
+  Repository:
+    Eventstore:
+      ServiceName: 'Admin'
+      Repository:
+        SQL:
+          Host: $CR_HOST
+          Port: $CR_PORT
+          User: 'eventstore'
+          Database: 'eventstore'
+          SSLmode: disable
 
 Console:
   Port: 50050

@@ -8,8 +8,9 @@ import (
 type Org struct {
 	es_models.ObjectRoot
 
-	State OrgState
-	Name  string
+	State  OrgState
+	Name   string
+	Domain string
 }
 
 type OrgState in_model.Enum
@@ -20,16 +21,10 @@ func NewOrg(id string) *Org {
 	return &Org{ObjectRoot: es_models.ObjectRoot{ID: id}, State: Active}
 }
 
-func (p *Org) IsActive() bool {
-	if p.State == Active {
-		return true
-	}
-	return false
+func (o *Org) IsActive() bool {
+	return o.State == Active
 }
 
-func (p *Org) IsValid() bool {
-	if p.Name == "" {
-		return false
-	}
-	return true
+func (o *Org) IsValid() bool {
+	return o.Name != "" && o.Domain != ""
 }
