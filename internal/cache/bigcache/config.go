@@ -8,7 +8,7 @@ import (
 type Config struct {
 	MaxCacheSizeInMB int
 	// CacheLifetimeSeconds if set, cache makes cleanup every minute
-	CacheLifetimeSeconds time.Duration
+	CacheLifetime time.Duration
 }
 
 func (c *Config) NewCache() (cache.Cache, error) {
