@@ -94,9 +94,10 @@ func TestSQL_PushAggregates(t *testing.T) {
 			},
 			args: args{
 				aggregates: []*models.Aggregate{
-					&models.Aggregate{
+					{
+						PreviousSequence: 34,
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -104,9 +105,8 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr",
 								ResourceOwner:    "ro",
 								Type:             "eventTyp",
-								PreviousSequence: 34,
 							},
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -114,7 +114,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr2",
 								ResourceOwner:    "ro2",
 								Type:             "eventTyp",
-								PreviousSequence: 0,
 							},
 						},
 					},
@@ -157,9 +156,10 @@ func TestSQL_PushAggregates(t *testing.T) {
 			},
 			args: args{
 				aggregates: []*models.Aggregate{
-					&models.Aggregate{
+					{
+						PreviousSequence: 34,
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -167,13 +167,13 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr",
 								ResourceOwner:    "ro",
 								Type:             "eventTyp",
-								PreviousSequence: 34,
 							},
 						},
 					},
-					&models.Aggregate{
+					{
+						PreviousSequence: 40,
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID2",
 								AggregateType:    "aggType2",
 								AggregateVersion: "v0.0.1",
@@ -181,7 +181,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr",
 								ResourceOwner:    "ro",
 								Type:             "eventTyp",
-								PreviousSequence: 40,
 							},
 						},
 					},
