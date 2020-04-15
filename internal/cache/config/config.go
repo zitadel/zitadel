@@ -29,7 +29,6 @@ func (c *CacheConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	c.Type = rc.Type
-	c.ID = rc.ID
 
 	var err error
 	c.Config, err = newCacheConfig(c.Type, rc.Config)

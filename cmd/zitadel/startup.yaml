@@ -29,7 +29,6 @@ Mgmt:
           SSLmode: disable
       Cache:
         Type: 'fastcache'
-        ID: 'fastcache'
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
 
