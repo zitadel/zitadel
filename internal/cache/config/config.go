@@ -11,7 +11,6 @@ import (
 )
 
 type CacheConfig struct {
-	ID     string
 	Type   string
 	Config cache.Config
 }
