@@ -345,7 +345,7 @@ func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
 	role := new(ProjectRole)
 	err := role.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	role.ObjectRoot.CreationDate = event.CreationDate
 	p.Roles = append(p.Roles, role)
@@ -356,7 +356,7 @@ func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
 	role := new(ProjectRole)
 	err := role.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, r := range p.Roles {
 		if r.Key == role.Key {
@@ -370,7 +370,7 @@ func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
 	role := new(ProjectRole)
 	err := role.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, r := range p.Roles {
 		if r.Key == role.Key {
@@ -395,7 +395,7 @@ func (p *Project) appendAddAppEvent(event *es_models.Event) error {
 	app := new(Application)
 	err := app.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	app.ObjectRoot.CreationDate = event.CreationDate
 	p.Applications = append(p.Applications, app)
@@ -406,7 +406,7 @@ func (p *Project) appendChangeAppEvent(event *es_models.Event) error {
 	app := new(Application)
 	err := app.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, a := range p.Applications {
 		if a.AppID == app.AppID {
@@ -420,7 +420,7 @@ func (p *Project) appendRemoveAppEvent(event *es_models.Event) error {
 	app := new(Application)
 	err := app.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, a := range p.Applications {
 		if a.AppID == app.AppID {
@@ -436,7 +436,7 @@ func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppSta
 	app := new(Application)
 	err := app.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, a := range p.Applications {
 		if a.AppID == app.AppID {
@@ -460,7 +460,7 @@ func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
 	config := new(OIDCConfig)
 	err := config.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	config.ObjectRoot.CreationDate = event.CreationDate
 	for i, a := range p.Applications {
@@ -475,7 +475,7 @@ func (p *Project) appendChangeOIDCConfigEvent(event *es_models.Event) error {
 	config := new(OIDCConfig)
 	err := config.getData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, a := range p.Applications {
 		if a.AppID == config.AppID {
