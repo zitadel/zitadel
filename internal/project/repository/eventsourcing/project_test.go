@@ -975,7 +975,7 @@ func TestProjectAppAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ApplicationAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := ApplicationAddedAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -1478,9 +1478,8 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 						&Application{AppID: "AppID", Name: "Name", OIDCConfig: &OIDCConfig{AppID: "AppID", AuthMethodType: 1}},
 					}},
 				new: &OIDCConfig{
-					ObjectRoot:   models.ObjectRoot{ID: "ID"},
-					AppID:        "AppID",
-					ClientSecret: []byte{'A'},
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1495,9 +1494,8 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 				ctx:      auth.NewMockContext("orgID", "userID"),
 				existing: nil,
 				new: &OIDCConfig{
-					ObjectRoot:   models.ObjectRoot{ID: "ID"},
-					AppID:        "AppID",
-					ClientSecret: []byte{'A'},
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1509,7 +1507,7 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := OIDCConfigSecretChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new.AppID, tt.args.new.ClientSecret)(tt.args.ctx)
+			agg, err := OIDCConfigSecretChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new.AppID)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

@@ -2,13 +2,13 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
+	"github.com/sethvargo/go-password/password"
 	"github.com/sony/sonyflake"
+	"strconv"
 )
 
 var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
@@ -166,7 +166,7 @@ func ProjectRoleRemovedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, app *Application) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, app *Application, pwGenerator password.PasswordGenerator) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if app == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-09du7", "app should not be nil")
@@ -175,6 +175,14 @@ func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing 
 		if err != nil {
 			return nil, err
 		}
+		id, err := idGenerator.NextID()
+		if err != nil {
+			return nil, err
+		}
+		app.AppID = strconv.FormatUint(id, 10)
+
+		//TODO: generate client id
+		//TODO: generate client secret
 		agg.AppendEvent(model.ApplicationAdded, app)
 		if app.OIDCConfig != nil {
 			agg.AppendEvent(model.OIDCConfigAdded, app.OIDCConfig)
@@ -272,13 +280,14 @@ func OIDCConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing
 	}
 }
 
-func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, appID string, secret []byte) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, appID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := ProjectAggregate(ctx, aggCreator, existing)
 		if err != nil {
 			return nil, err
 		}
-		config := &OIDCConfig{AppID: appID, ClientSecret: secret}
+		//TODO: generate client secret
+		config := &OIDCConfig{AppID: appID}
 		agg.AppendEvent(model.OIDCConfigSecretChanged, config)
 
 		return agg, nil

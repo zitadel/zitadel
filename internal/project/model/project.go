@@ -7,10 +7,11 @@ import (
 type Project struct {
 	es_models.ObjectRoot
 
-	State   ProjectState
-	Name    string
-	Members []*ProjectMember
-	Roles   []*ProjectRole
+	State        ProjectState
+	Name         string
+	Members      []*ProjectMember
+	Roles        []*ProjectRole
+	Applications []*Application
 }
 
 type ProjectState int32
@@ -50,6 +51,15 @@ func (p *Project) ContainsMember(member *ProjectMember) bool {
 func (p *Project) ContainsRole(role *ProjectRole) bool {
 	for _, r := range p.Roles {
 		if r.Key == role.Key {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Project) ContainsApp(app *Application) bool {
+	for _, a := range p.Applications {
+		if a.AppID == app.AppID {
 			return true
 		}
 	}

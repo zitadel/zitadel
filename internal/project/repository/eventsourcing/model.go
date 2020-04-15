@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"reflect"
@@ -49,15 +50,15 @@ type ApplicationID struct {
 
 type OIDCConfig struct {
 	es_models.ObjectRoot
-	AppID                  string   `json:"appId"`
-	ClientID               string   `json:"clientId,omitempty"`
-	ClientSecret           []byte   `json:"clientSecret,omitempty"`
-	RedirectUris           []string `json:"redirectUris,omitempty"`
-	ResponseTypes          []int32  `json:"responseTypes,omitempty"`
-	GrantTypes             []int32  `json:"grantTypes,omitempty"`
-	ApplicationType        int32    `json:"applicationType,omitempty"`
-	AuthMethodType         int32    `json:"authMethodType,omitempty"`
-	PostLogoutRedirectUris []string `json:"postLogoutRedirectUris,omitempty"`
+	AppID                  string              `json:"appId"`
+	ClientID               string              `json:"clientId,omitempty"`
+	ClientSecret           *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	RedirectUris           []string            `json:"redirectUris,omitempty"`
+	ResponseTypes          []int32             `json:"responseTypes,omitempty"`
+	GrantTypes             []int32             `json:"grantTypes,omitempty"`
+	ApplicationType        int32               `json:"applicationType,omitempty"`
+	AuthMethodType         int32               `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris []string            `json:"postLogoutRedirectUris,omitempty"`
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
@@ -104,6 +105,7 @@ func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 func ProjectFromModel(project *model.Project) *Project {
 	members := ProjectMembersFromModel(project.Members)
 	roles := ProjectRolesFromModel(project.Roles)
+	apps := AppsFromModel(project.Applications)
 	return &Project{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ObjectRoot.ID,
@@ -111,16 +113,18 @@ func ProjectFromModel(project *model.Project) *Project {
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
 		},
-		Name:    project.Name,
-		State:   model.ProjectStateToInt(project.State),
-		Members: members,
-		Roles:   roles,
+		Name:         project.Name,
+		State:        model.ProjectStateToInt(project.State),
+		Members:      members,
+		Roles:        roles,
+		Applications: apps,
 	}
 }
 
 func ProjectToModel(project *Project) *model.Project {
 	members := ProjectMembersToModel(project.Members)
 	roles := ProjectRolesToModel(project.Roles)
+	apps := AppsToModel(project.Applications)
 	return &model.Project{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           project.ID,
@@ -128,10 +132,11 @@ func ProjectToModel(project *Project) *model.Project {
 			CreationDate: project.CreationDate,
 			Sequence:     project.Sequence,
 		},
-		Name:    project.Name,
-		State:   model.ProjectStateFromInt(project.State),
-		Members: members,
-		Roles:   roles,
+		Name:         project.Name,
+		State:        model.ProjectStateFromInt(project.State),
+		Members:      members,
+		Roles:        roles,
+		Applications: apps,
 	}
 }
 
@@ -218,6 +223,100 @@ func ProjectRoleToModel(role *ProjectRole) *model.ProjectRole {
 		Key:         role.Key,
 		DisplayName: role.DisplayName,
 		Group:       role.Group,
+	}
+}
+
+func AppsToModel(apps []*Application) []*model.Application {
+	convertedApps := make([]*model.Application, len(apps))
+	for i, a := range apps {
+		convertedApps[i] = AppToModel(a)
+	}
+	return convertedApps
+}
+
+func AppsFromModel(apps []*model.Application) []*Application {
+	convertedApps := make([]*Application, len(apps))
+	for i, a := range apps {
+		convertedApps[i] = AppFromModel(a)
+	}
+	return convertedApps
+}
+
+func AppFromModel(app *model.Application) *Application {
+	oidc := new(OIDCConfig)
+	if app.OIDCConfig != nil {
+		oidc = OIDCConfigFromModel(app.OIDCConfig)
+	}
+	return &Application{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           app.ObjectRoot.ID,
+			Sequence:     app.Sequence,
+			ChangeDate:   app.ChangeDate,
+			CreationDate: app.CreationDate,
+		},
+		AppID:      app.AppID,
+		Name:       app.Name,
+		OIDCConfig: oidc,
+	}
+}
+
+func AppToModel(app *Application) *model.Application {
+	oidc := new(model.OIDCConfig)
+	if app.OIDCConfig != nil {
+		oidc = OIDCConfigToModel(app.OIDCConfig)
+	}
+	return &model.Application{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           app.ID,
+			ChangeDate:   app.ChangeDate,
+			CreationDate: app.CreationDate,
+			Sequence:     app.Sequence,
+		},
+		AppID:      app.AppID,
+		Name:       app.Name,
+		OIDCConfig: oidc,
+	}
+}
+
+func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
+	responseTypes := make([]int32, len(config.ResponseTypes))
+	for i, rt := range config.ResponseTypes {
+		responseTypes[i] = int32(rt)
+	}
+	grantTypes := make([]int32, len(config.GrantTypes))
+	for i, rt := range config.GrantTypes {
+		grantTypes[i] = int32(rt)
+	}
+	return &OIDCConfig{
+		ClientID:               config.ClientID,
+		ClientSecret:           config.ClientSecret,
+		RedirectUris:           config.RedirectUris,
+		ResponseTypes:          responseTypes,
+		GrantTypes:             grantTypes,
+		ApplicationType:        int32(config.ApplicationType),
+		AuthMethodType:         int32(config.AuthMethodType),
+		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+	}
+}
+
+func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
+	responseTypes := make([]model.OIDCResponseType, len(config.ResponseTypes))
+	for i, rt := range config.ResponseTypes {
+		responseTypes[i] = model.OIDCResponseType(rt)
+	}
+	grantTypes := make([]model.OIDCGrantType, len(config.GrantTypes))
+	for i, rt := range config.GrantTypes {
+		grantTypes[i] = model.OIDCGrantType(rt)
+	}
+	return &model.OIDCConfig{
+		ClientID:               config.ClientID,
+		ClientSecret:           config.ClientSecret,
+		RedirectUris:           config.RedirectUris,
+		ResponseTypes:          responseTypes,
+		GrantTypes:             grantTypes,
+		ApplicationType:        model.OIDCApplicationType(config.ApplicationType),
+		AuthMethodType:         model.OIDCAuthMethodType(config.AuthMethodType),
+		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
 	}
 }
 

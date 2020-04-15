@@ -165,14 +165,12 @@ func TestOIDCConfigChanges(t *testing.T) {
 			name: "change not changeable attributes",
 			args: args{
 				existing: &OIDCConfig{
-					AppID:        "AppID",
-					ClientID:     "ClientID",
-					ClientSecret: []byte{'A'},
+					AppID:    "AppID",
+					ClientID: "ClientID",
 				},
 				new: &OIDCConfig{
-					AppID:        "AppIDChange",
-					ClientID:     "ClientIDChange",
-					ClientSecret: []byte{'B'},
+					AppID:    "AppIDChange",
+					ClientID: "ClientIDChange",
 				},
 			},
 			res: res{

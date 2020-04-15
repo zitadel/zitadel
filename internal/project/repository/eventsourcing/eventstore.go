@@ -3,20 +3,25 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/cache/config"
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/sethvargo/go-password/password"
 )
 
 type ProjectEventstore struct {
 	es_int.Eventstore
 	projectCache *ProjectCache
+	pwGenerator  password.PasswordGenerator
+	PasswordAlg  crypto.HashAlgorithm
 }
 
 type ProjectConfig struct {
 	es_int.Eventstore
-	Cache *config.CacheConfig
+	Cache            *config.CacheConfig
+	PasswordSaltCost int
 }
 
 func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
@@ -24,9 +29,16 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 	if err != nil {
 		return nil, err
 	}
+	pwGenerator, err := password.NewGenerator(&password.GeneratorInput{})
+	if err != nil {
+		return nil, err
+	}
+	passwordAlg := crypto.NewBCrypt(conf.PasswordSaltCost)
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
 		projectCache: projectCache,
+		pwGenerator:  pwGenerator,
+		PasswordAlg:  passwordAlg,
 	}, nil
 }
 
@@ -281,27 +293,36 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	return nil
 }
 
-//
-//func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
-//	if !app.IsValid() {
-//		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9eidw", "Some required fields are missing")
-//	}
-//	existing, err := es.ProjectByID(ctx, &proj_model.Project{ObjectRoot: models.ObjectRoot{ID: app.ID, Sequence: 0}})
-//	if err != nil {
-//		return nil, err
-//	}
-//	if existing.ContainsMember(member) {
-//		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Project")
-//	}
-//	repoProject := ProjectFromModel(existing)
-//	repoMember := ProjectMemberFromModel(member)
-//
-//	addAggregate := ProjectMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
-//	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
-//	for _, m := range repoProject.Members {
-//		if m.UserID == member.UserID {
-//			return ProjectMemberToModel(m), nil
-//		}
-//	}
-//	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
-//}
+func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
+	project, err := es.ProjectByID(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	for _, a := range project.Applications {
+		if a.AppID == appID {
+			return a, nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-8ei2s", "Could not find app in list")
+}
+
+func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
+	if !app.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9eidw", "Some required fields are missing")
+	}
+	existing, err := es.ProjectByID(ctx, app.ID)
+	if err != nil {
+		return nil, err
+	}
+	repoProject := ProjectFromModel(existing)
+	repoApp := AppFromModel(app)
+
+	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp, es.pwGenerator)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	for _, a := range repoProject.Applications {
+		if a.AppID == app.AppID {
+			return AppToModel(a), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
+}

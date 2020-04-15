@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"time"
 )
@@ -8,18 +9,18 @@ import (
 type Application struct {
 	es_models.ObjectRoot
 
-	ApplicationID string
-	State         AppState
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ProjectID     string
-	Name          string
-	OIDCConfig    *OIDCConfig
+	AppID        string
+	State        AppState
+	CreationDate time.Time
+	ChangeDate   time.Time
+	ProjectID    string
+	Name         string
+	OIDCConfig   *OIDCConfig
 }
 
 type OIDCConfig struct {
 	ClientID               string
-	ClientSecret           []byte
+	ClientSecret           *crypto.CryptoValue
 	ClientSecretString     string
 	RedirectUris           []string
 	ResponseTypes          []OIDCResponseType
@@ -76,7 +77,7 @@ const (
 )
 
 func NewApp(projectID, appID string) *Application {
-	return &Application{ObjectRoot: es_models.ObjectRoot{ID: projectID}, ApplicationID: appID, State: APPSTATE_ACTIVE}
+	return &Application{ObjectRoot: es_models.ObjectRoot{ID: projectID}, AppID: appID, State: APPSTATE_ACTIVE}
 }
 
 func (a *Application) IsValid() bool {
