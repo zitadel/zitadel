@@ -131,13 +131,12 @@ jobs:
     - name: Docker Pull short-sha
       run: docker pull $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }}
     - name: Docker Tag
-      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE 
+      run: docker tag $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest 
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
       with:
         dry_run: false
         semantic_version: 17.0.4
         extra_plugins: |
-          @semantic-release/exec@v5.0.0
           semantic-release-docker@v2.2.0
           

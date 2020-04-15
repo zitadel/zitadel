@@ -1,26 +1,20 @@
 package model
 
-// code below could be generated
-type SearchMethod Enum
-
-var methods = []string{"Equals", "StartsWith", "Contains"}
-
-type method int32
-
-func (s method) String() string {
-	return methods[s]
-}
+type SearchMethod int32
 
 const (
-	Equals method = iota
-	StartsWith
-	Contains
+	SEARCHMETHOD_EQUALS SearchMethod = iota
+	SEARCHMETHOD_STARTS_WITH
+	SEARCHMETHOD_CONTAINS
+	SEARCHMETHOD_EQUALS_IGNORE_CASE
+	SEARCHMETHOD_STARTS_WITH_IGNORE_CASE
+	SEARCHMETHOD_CONTAINS_IGNORE_CASE
 )
 
 func SearchMethodToInt(s SearchMethod) int32 {
-	return int32(s.(method))
+	return int32(s)
 }
 
 func SearchMethodFromInt(index int32) SearchMethod {
-	return method(index)
+	return SearchMethod(index)
 }
