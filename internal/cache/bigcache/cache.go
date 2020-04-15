@@ -2,13 +2,13 @@ package bigcache
 
 import (
 	"encoding/json"
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/errors"
 	"time"
 
+	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/errors"
+
 	a_cache "github.com/allegro/bigcache"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type Bigcache struct {
@@ -42,7 +42,7 @@ func (c *Bigcache) Set(key string, object interface{}) error {
 func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
 	value, err := c.cache.Get(key)
 	if err == a_cache.ErrEntryNotFound {
-		return status.Error(codes.NotFound, "not in cache")
+		return errors.ThrowNotFound(err, "BIGCA-we32s", "not in cache")
 	}
 	if err != nil {
 		logging.Log("BIGCA-ftofbc").WithError(err).Info("read from cache failed")
