@@ -16,20 +16,20 @@ func NewAggregateCreator(serviceName string) *AggregateCreator {
 
 type option func(*Aggregate)
 
-func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, latestSequence uint64, opts ...option) (*Aggregate, error) {
+func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, previousSequence uint64, opts ...option) (*Aggregate, error) {
 	ctxData := auth.GetCtxData(ctx)
 	editorUser := ctxData.UserID
 	resourceOwner := ctxData.OrgID
 
 	aggregate := &Aggregate{
-		id:             id,
-		typ:            typ,
-		latestSequence: latestSequence,
-		version:        version,
-		Events:         make([]*Event, 0, 2),
-		editorService:  c.serviceName,
-		editorUser:     editorUser,
-		resourceOwner:  resourceOwner,
+		id:               id,
+		typ:              typ,
+		PreviousSequence: previousSequence,
+		version:          version,
+		Events:           make([]*Event, 0, 2),
+		editorService:    c.serviceName,
+		editorUser:       editorUser,
+		resourceOwner:    resourceOwner,
 	}
 
 	for _, opt := range opts {
