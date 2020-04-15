@@ -70,6 +70,7 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 
 func (a *Application) Changes(changed *Application) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
+	changes["appId"] = a.AppID
 	if changed.Name != "" && a.Name != changed.Name {
 		changes["name"] = changed.Name
 	}
@@ -78,6 +79,7 @@ func (a *Application) Changes(changed *Application) map[string]interface{} {
 
 func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
+	changes["appId"] = c.AppID
 	if !reflect.DeepEqual(c.RedirectUris, changed.RedirectUris) {
 		changes["redirectUris"] = c.RedirectUris
 	}

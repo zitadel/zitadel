@@ -68,21 +68,21 @@ func TestApplicationChanges(t *testing.T) {
 		{
 			name: "application name changes",
 			args: args{
-				existing: &Application{Name: "Name"},
-				new:      &Application{Name: "NameChanged"},
+				existing: &Application{AppID: "AppID", Name: "Name"},
+				new:      &Application{AppID: "AppID", Name: "NameChanged"},
 			},
 			res: res{
-				changesLen: 1,
+				changesLen: 2,
 			},
 		},
 		{
 			name: "no changes",
 			args: args{
-				existing: &Application{Name: "Name"},
-				new:      &Application{Name: "Name"},
+				existing: &Application{AppID: "AppID", Name: "Name"},
+				new:      &Application{AppID: "AppID", Name: "Name"},
 			},
 			res: res{
-				changesLen: 0,
+				changesLen: 1,
 			},
 		},
 	}
@@ -113,6 +113,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 			name: "all possible values change",
 			args: args{
 				existing: &OIDCConfig{
+					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUris"},
 					ResponseTypes:          []int32{1},
 					GrantTypes:             []int32{1},
@@ -121,6 +122,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 					PostLogoutRedirectUris: []string{"PostLogoutRedirectUris"},
 				},
 				new: &OIDCConfig{
+					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUrisChanged"},
 					ResponseTypes:          []int32{2},
 					GrantTypes:             []int32{2},
@@ -130,13 +132,14 @@ func TestOIDCConfigChanges(t *testing.T) {
 				},
 			},
 			res: res{
-				changesLen: 6,
+				changesLen: 7,
 			},
 		},
 		{
 			name: "no changes",
 			args: args{
 				existing: &OIDCConfig{
+					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUris"},
 					ResponseTypes:          []int32{1},
 					GrantTypes:             []int32{1},
@@ -145,6 +148,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 					PostLogoutRedirectUris: []string{"PostLogoutRedirectUris"},
 				},
 				new: &OIDCConfig{
+					AppID:                  "AppID",
 					RedirectUris:           []string{"RedirectUris"},
 					ResponseTypes:          []int32{1},
 					GrantTypes:             []int32{1},
@@ -154,7 +158,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 				},
 			},
 			res: res{
-				changesLen: 0,
+				changesLen: 1,
 			},
 		},
 		{
@@ -172,7 +176,7 @@ func TestOIDCConfigChanges(t *testing.T) {
 				},
 			},
 			res: res{
-				changesLen: 0,
+				changesLen: 1,
 			},
 		},
 	}
