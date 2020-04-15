@@ -106,3 +106,18 @@ func GetMockProjectMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	return &ProjectEventstore{Eventstore: mockEs, projectCache: GetMockCache(ctrl)}
 }
+
+func GetMockProjectAppsByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
+	projectData, _ := json.Marshal(Project{Name: "Name"})
+	appData, _ := json.Marshal(Application{AppID: "AppID", Name: "Name"})
+	oidcData, _ := json.Marshal(OIDCConfig{ClientID: "ClientID"})
+
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ApplicationAdded, Data: appData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OIDCConfigAdded, Data: oidcData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return &ProjectEventstore{Eventstore: mockEs, projectCache: GetMockCache(ctrl)}
+}

@@ -317,7 +317,8 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	repoProject := ProjectFromModel(existing)
 	repoApp := AppFromModel(app)
 
-	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp, es.pwGenerator)
+	//TODO: Create client id client secret
+	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
 	for _, a := range repoProject.Applications {
 		if a.AppID == app.AppID {
@@ -325,4 +326,29 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
+}
+
+func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
+	if !app.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dieuw", "some required fields missing")
+	}
+	existing, err := es.ProjectByID(ctx, app.ID)
+	if err != nil {
+		return nil, err
+	}
+	if !existing.ContainsApp(app) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "App is not in this project")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoApp := AppFromModel(app)
+
+	projectAggregate := ApplicationChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	es.projectCache.cacheProject(repoProject)
+	for _, a := range repoProject.Applications {
+		if a.AppID == app.AppID {
+			return AppToModel(a), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
 }

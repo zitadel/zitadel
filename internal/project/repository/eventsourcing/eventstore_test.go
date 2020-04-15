@@ -942,3 +942,73 @@ func TestRemoveProjectRole(t *testing.T) {
 		})
 	}
 }
+
+func TestApplicationByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		app *model.Application
+	}
+	type res struct {
+		app     *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "app from events",
+			args: args{
+				es:  GetMockProjectAppsByIDsOK(ctrl),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, AppID: "AppID"},
+			},
+			res: res{
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					AppID:      "AppID",
+					Name:       "Name",
+					OIDCConfig: &model.OIDCConfig{ClientID: "ClientID"}},
+			},
+		},
+		{
+			name: "app from events, no events",
+			args: args{
+				es:  GetMockProjectByIDNoEvents(ctrl),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, AppID: "AppID"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "app from events, no name",
+			args: args{
+				es:  GetMockProjectByIDNoEvents(ctrl),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, AppID: "AppID"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsPreconditionFailed(err)
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ApplicationByIDs(nil, tt.args.app.ID, tt.args.app.AppID)
+			if !tt.res.wantErr && result.ID != tt.res.app.ID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.app.ID, result.ID)
+			}
+			if !tt.res.wantErr && result != tt.res.app {
+				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.app, result)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"github.com/sethvargo/go-password/password"
 	"github.com/sony/sonyflake"
 	"strconv"
 )
@@ -166,7 +165,7 @@ func ProjectRoleRemovedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, app *Application, pwGenerator password.PasswordGenerator) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, app *Application) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if app == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-09du7", "app should not be nil")
