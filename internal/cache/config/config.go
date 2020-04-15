@@ -22,7 +22,6 @@ var caches = map[string]func() cache.Config{
 
 func (c *CacheConfig) UnmarshalJSON(data []byte) error {
 	var rc struct {
-		ID     string
 		Type   string
 		Config json.RawMessage
 	}
