@@ -15,7 +15,7 @@ type Bigcache struct {
 }
 
 func NewBigcache(c *Config) (*Bigcache, error) {
-	cacheConfig := a_cache.DefaultConfig(c.CacheLifetimeSeconds * time.Second) // Only clean if HardMaxCacheSize is reached
+	cacheConfig := a_cache.DefaultConfig(c.CacheLifetime)
 	cacheConfig.HardMaxCacheSize = c.MaxCacheSizeInMB
 	if c.CacheLifetimeSeconds > 0 {
 		cacheConfig.CleanWindow = 1 * time.Minute
