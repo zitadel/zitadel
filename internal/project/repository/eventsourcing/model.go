@@ -160,7 +160,7 @@ func (p *Project) appendReactivatedEvent() error {
 func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 	member, err := getMemberData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	member.ObjectRoot.CreationDate = event.CreationDate
 	p.Members = append(p.Members, member)
@@ -170,7 +170,7 @@ func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 	member, err := getMemberData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, m := range p.Members {
 		if m.UserID == member.UserID {
@@ -183,7 +183,7 @@ func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	member, err := getMemberData(event)
 	if err != nil {
-		return nil
+		return err
 	}
 	for i, m := range p.Members {
 		if m.UserID == member.UserID {
