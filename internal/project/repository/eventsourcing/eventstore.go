@@ -31,9 +31,9 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 }
 
 func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_model.Project, error) {
-	project, sequence := es.projectCache.getProject(id)
+	project := es.projectCache.getProject(id)
 
-	query, err := ProjectByIDQuery(project.ID, sequence)
+	query, err := ProjectByIDQuery(project.ID, project.Sequence)
 	if err != nil {
 		return nil, err
 	}

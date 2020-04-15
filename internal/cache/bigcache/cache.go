@@ -1,6 +1,8 @@
 package bigcache
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
@@ -25,18 +27,19 @@ func NewBigcache(c *Config) (*Bigcache, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &Bigcache{
 		cache: cache,
 	}, nil
 }
 
 func (c *Bigcache) Set(key string, object interface{}) error {
-	marshalled, err := json.Marshal(object)
-	if err != nil {
-		logging.Log("BIGCA-j6Vkhm").Debug("unable to marshall object into json")
-		return errors.ThrowInvalidArgument(err, "BIGCA-ie83s", "unable to marshall object into json")
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	if err := enc.Encode(object); err != nil {
+		return errors.ThrowInvalidArgument(err, "FASTC-RUyxI", "unable to encode object")
 	}
-	return c.cache.Set(key, marshalled)
+	return c.cache.Set(key, b.Bytes())
 }
 
 func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
