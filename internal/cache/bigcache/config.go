@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	MaxCacheSizeInMB int
-	// CacheLifetimeSeconds if set, cache makes cleanup every minute
+	//CacheLifetime if set, entries older than the lifetime will be deleted on cleanup (every minute)
 	CacheLifetime time.Duration
 }
 
