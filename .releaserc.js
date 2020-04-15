@@ -1,5 +1,5 @@
 module.exports = {
-    branches: ["master"],
+    branches: ["master", "docker-semrel"],
     plugins: [
         "@semantic-release/commit-analyzer",
         "@semantic-release/release-notes-generator",
