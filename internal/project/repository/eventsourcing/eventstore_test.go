@@ -984,10 +984,10 @@ func TestApplicationByID(t *testing.T) {
 			},
 		},
 		{
-			name: "app from events, no name",
+			name: "app from events, no id",
 			args: args{
 				es:  GetMockProjectByIDNoEvents(ctrl),
-				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, AppID: "AppID"},
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -1003,8 +1003,8 @@ func TestApplicationByID(t *testing.T) {
 			if !tt.res.wantErr && result.ID != tt.res.app.ID {
 				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.app.ID, result.ID)
 			}
-			if !tt.res.wantErr && result != tt.res.app {
-				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.app, result)
+			if !tt.res.wantErr && result.AppID != tt.res.app.AppID {
+				t.Errorf("got wrong result appid: expected: %v, actual: %v ", tt.res.app.AppID, result.AppID)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)

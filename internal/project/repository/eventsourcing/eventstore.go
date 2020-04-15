@@ -294,6 +294,9 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 }
 
 func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
+	if projectID == "" || appID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "project oder app ID missing")
+	}
 	project, err := es.ProjectByID(ctx, projectID)
 	if err != nil {
 		return nil, err
