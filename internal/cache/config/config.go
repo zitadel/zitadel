@@ -5,9 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/cache"
 	"github.com/caos/zitadel/internal/cache/bigcache"
 	"github.com/caos/zitadel/internal/cache/fastcache"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 type CacheConfig struct {
@@ -29,7 +27,7 @@ func (c *CacheConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	if err := json.Unmarshal(data, &rc); err != nil {
-		return status.Errorf(codes.Internal, "%v parse config: %v", "CACHE-vmjS", err)
+		return errors.ThrowInternal(err, "CONFI-98ejs", "unable to unmarshal config")
 	}
 
 	c.Type = rc.Type
@@ -38,7 +36,7 @@ func (c *CacheConfig) UnmarshalJSON(data []byte) error {
 	var err error
 	c.Config, err = newCacheConfig(c.Type, rc.Config)
 	if err != nil {
-		return status.Errorf(codes.Internal, "%v parse config: %v", "CACHE-Ws9E", err)
+		return errors.ThrowInternal(err, "CONFI-do9es", "unable create config")
 	}
 
 	return nil
@@ -47,7 +45,7 @@ func (c *CacheConfig) UnmarshalJSON(data []byte) error {
 func newCacheConfig(cacheType string, configData []byte) (cache.Config, error) {
 	t, ok := caches[cacheType]
 	if !ok {
-		return nil, status.Errorf(codes.Internal, "%v No config: %v", "CACHE-HMEJ", cacheType)
+		return nil, errors.ThrowInternal(nil, "CONFI-di328s", "no config")
 	}
 
 	cacheConfig := t()
@@ -56,7 +54,7 @@ func newCacheConfig(cacheType string, configData []byte) (cache.Config, error) {
 	}
 
 	if err := json.Unmarshal(configData, cacheConfig); err != nil {
-		return nil, status.Errorf(codes.Internal, "%v Could not read conifg: %v", "CACHE-1tSS", err)
+		return nil, errors.ThrowInternal(nil, "CONFI-skei3", "could not read config")
 	}
 
 	return cacheConfig, nil

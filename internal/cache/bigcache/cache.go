@@ -3,6 +3,7 @@ package bigcache
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
 	"time"
 
 	a_cache "github.com/allegro/bigcache"
@@ -33,7 +34,7 @@ func (c *Bigcache) Set(key string, object interface{}) error {
 	marshalled, err := json.Marshal(object)
 	if err != nil {
 		logging.Log("BIGCA-j6Vkhm").Debug("unable to marshall object into json")
-		return status.Error(codes.InvalidArgument, "unable to marshall object into json")
+		return errors.ThrowInvalidArgument(err, "BIGCA-ie83s", "unable to marshall object into json")
 	}
 	return c.cache.Set(key, marshalled)
 }
@@ -45,7 +46,7 @@ func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
 	}
 	if err != nil {
 		logging.Log("BIGCA-ftofbc").WithError(err).Info("read from cache failed")
-		return status.Error(codes.Internal, "error in reading from cache")
+		return errors.ThrowInvalidArgument(err, "BIGCA-3idls", "error in reading from cache")
 	}
 	return json.Unmarshal(value, ptrToObject)
 }
