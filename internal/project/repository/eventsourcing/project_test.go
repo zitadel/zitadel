@@ -1357,3 +1357,175 @@ func TestProjectAppReactivatedAggregate(t *testing.T) {
 		})
 	}
 }
+
+func TestOIDCConfigchangAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *OIDCConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "deactivate app",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &Project{
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					Name:       "ProjectName",
+					State:      int32(model.PROJECTSTATE_ACTIVE),
+					Applications: []*Application{
+						&Application{AppID: "AppID", Name: "Name", OIDCConfig: &OIDCConfig{AppID: "AppID", AuthMethodType: 1}},
+					}},
+				new: &OIDCConfig{
+					ObjectRoot:     models.ObjectRoot{ID: "ID"},
+					AppID:          "AppID",
+					AuthMethodType: 2,
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.OIDCConfigChanged},
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				existing:   &Project{ObjectRoot: models.ObjectRoot{ID: "ID"}, Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := OIDCConfigChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *Project
+		new        *OIDCConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "deactivate app",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &Project{
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					Name:       "ProjectName",
+					State:      int32(model.PROJECTSTATE_ACTIVE),
+					Applications: []*Application{
+						&Application{AppID: "AppID", Name: "Name", OIDCConfig: &OIDCConfig{AppID: "AppID", AuthMethodType: 1}},
+					}},
+				new: &OIDCConfig{
+					ObjectRoot:   models.ObjectRoot{ID: "ID"},
+					AppID:        "AppID",
+					ClientSecret: []byte{'A'},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.OIDCConfigSecretChanged},
+			},
+		},
+		{
+			name: "existing project nil",
+			args: args{
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: nil,
+				new: &OIDCConfig{
+					ObjectRoot:   models.ObjectRoot{ID: "ID"},
+					AppID:        "AppID",
+					ClientSecret: []byte{'A'},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := OIDCConfigSecretChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new.AppID, tt.args.new.ClientSecret)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

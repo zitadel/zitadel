@@ -248,3 +248,39 @@ func ApplicationReactivatedAggregate(aggCreator *es_models.AggregateCreator, exi
 		return agg, nil
 	}
 }
+
+func OIDCConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, config *OIDCConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if config == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slf32", "config should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		var changes map[string]interface{}
+		for _, a := range existing.Applications {
+			if a.AppID == config.AppID {
+				if a.OIDCConfig != nil {
+					changes = a.OIDCConfig.Changes(config)
+				}
+			}
+		}
+		agg.AppendEvent(model.OIDCConfigChanged, changes)
+
+		return agg, nil
+	}
+}
+
+func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, appID string, secret []byte) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		config := &OIDCConfig{AppID: appID, ClientSecret: secret}
+		agg.AppendEvent(model.OIDCConfigSecretChanged, config)
+
+		return agg, nil
+	}
+}
