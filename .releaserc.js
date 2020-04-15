@@ -1,9 +1,10 @@
 module.exports = {
     branches: ["master", "docker-semrel"],
-    extends:  [
-        "semantic-release-docker", {
+    verifyConditions: [
+        ["semantic-release-docker", {
             "registryUrl": "docker.pkg.github.com",
-        }
+            }
+        ]
     ],
     plugins: [
         "@semantic-release/commit-analyzer",
