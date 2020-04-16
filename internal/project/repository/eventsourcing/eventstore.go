@@ -342,7 +342,11 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 			return nil, err
 		}
 		app.OIDCConfig.ClientSecret = crypto
-		//TODO: generate client id
+		clientID, err := generateNewClientID(es.idGenerator, existing)
+		if err != nil {
+			return nil, err
+		}
+		app.OIDCConfig.ClientID = clientID
 	}
 	repoProject := ProjectFromModel(existing)
 	repoApp := AppFromModel(app)

@@ -1094,7 +1094,10 @@ func TestAddApplication(t *testing.T) {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientSecretString == "" {
-				t.Errorf("result has no secret")
+				t.Errorf("result has no client secret")
+			}
+			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientID == "" {
+				t.Errorf("result has no clientid")
 			}
 			if !tt.res.wantErr && result.Name != tt.res.result.Name {
 				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
