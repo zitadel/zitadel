@@ -3,7 +3,6 @@ package bigcache
 import (
 	"bytes"
 	"encoding/gob"
-	"encoding/json"
 	"time"
 
 	"github.com/caos/logging"
@@ -51,7 +50,11 @@ func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
 		logging.Log("BIGCA-ftofbc").WithError(err).Info("read from cache failed")
 		return errors.ThrowInvalidArgument(err, "BIGCA-3idls", "error in reading from cache")
 	}
-	return json.Unmarshal(value, ptrToObject)
+
+	b := bytes.NewBuffer(value)
+	dec := gob.NewDecoder(b)
+
+	return dec.Decode(ptrToObject)
 }
 
 func (c *Bigcache) Delete(key string) error {
