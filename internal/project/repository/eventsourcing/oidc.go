@@ -28,7 +28,7 @@ import (
 //	return fmt.Sprintf("%v@%v.%v", rndID, strings.ReplaceAll(project.Name, " ", "_"), domain.Name), nil
 //}
 
-func generateNewClientSecret(pwGenerator password.Generator, alg crypto.HashAlgorithm) (string, *crypto.CryptoValue, error) {
+func generateNewClientSecret(pwGenerator password.PasswordGenerator, alg crypto.HashAlgorithm) (string, *crypto.CryptoValue, error) {
 	stringSecret, err := pwGenerator.Generate(64, 10, 10, false, false)
 	if err != nil {
 		logging.Log("APP-UpnTI").OnError(err).Error("unable to create client secret")

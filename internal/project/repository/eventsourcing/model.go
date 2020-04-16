@@ -288,6 +288,7 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 		grantTypes[i] = int32(rt)
 	}
 	return &OIDCConfig{
+		AppID:                  config.AppID,
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
 		RedirectUris:           config.RedirectUris,
@@ -309,6 +310,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		grantTypes[i] = model.OIDCGrantType(rt)
 	}
 	return &model.OIDCConfig{
+		AppID:                  config.AppID,
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
 		RedirectUris:           config.RedirectUris,

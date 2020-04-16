@@ -9,6 +9,8 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/sethvargo/go-password/password"
+	"github.com/sony/sonyflake"
+	"strconv"
 )
 
 type ProjectEventstore struct {
@@ -16,6 +18,7 @@ type ProjectEventstore struct {
 	projectCache *ProjectCache
 	pwGenerator  password.PasswordGenerator
 	PasswordAlg  crypto.HashAlgorithm
+	idGenerator  *sonyflake.Sonyflake
 }
 
 type ProjectConfig struct {
@@ -34,11 +37,13 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 		return nil, err
 	}
 	passwordAlg := crypto.NewBCrypt(conf.PasswordSaltCost)
+	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
 		projectCache: projectCache,
 		pwGenerator:  pwGenerator,
 		PasswordAlg:  passwordAlg,
+		idGenerator:  idGenerator,
 	}, nil
 }
 
@@ -61,11 +66,16 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
 	}
+	id, err := es.idGenerator.NextID()
+	if err != nil {
+		return nil, err
+	}
+	project.ID = strconv.FormatUint(id, 10)
 	project.State = proj_model.PROJECTSTATE_ACTIVE
 	repoProject := ProjectFromModel(project)
 
 	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject)
-	err := es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, createAggregate)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -310,22 +320,40 @@ func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, ap
 }
 
 func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
-	if !app.IsValid() {
+	if app == nil || !app.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9eidw", "Some required fields are missing")
 	}
 	existing, err := es.ProjectByID(ctx, app.ID)
 	if err != nil {
 		return nil, err
 	}
+	id, err := es.idGenerator.NextID()
+	if err != nil {
+		return nil, err
+	}
+	app.AppID = strconv.FormatUint(id, 10)
+
+	var stringPw string
+	var crypto *crypto.CryptoValue
+	if app.OIDCConfig != nil {
+		app.OIDCConfig.AppID = strconv.FormatUint(id, 10)
+		stringPw, crypto, err = generateNewClientSecret(es.pwGenerator, es.PasswordAlg)
+		if err != nil {
+			return nil, err
+		}
+		app.OIDCConfig.ClientSecret = crypto
+		//TODO: generate client id
+	}
 	repoProject := ProjectFromModel(existing)
 	repoApp := AppFromModel(app)
 
-	//TODO: Create client id client secret
 	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
 	for _, a := range repoProject.Applications {
 		if a.AppID == app.AppID {
-			return AppToModel(a), nil
+			converted := AppToModel(a)
+			converted.OIDCConfig.ClientSecretString = stringPw
+			return converted, nil
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")

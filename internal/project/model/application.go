@@ -19,6 +19,7 @@ type Application struct {
 }
 
 type OIDCConfig struct {
+	AppID                  string
 	ClientID               string
 	ClientSecret           *crypto.CryptoValue
 	ClientSecretString     string

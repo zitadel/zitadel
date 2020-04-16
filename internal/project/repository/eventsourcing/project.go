@@ -6,11 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	"github.com/sony/sonyflake"
-	"strconv"
 )
-
-var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
 func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
@@ -38,12 +34,6 @@ func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *Pro
 		if project == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
 		}
-		var err error
-		id, err := idGenerator.NextID()
-		if err != nil {
-			return nil, err
-		}
-		project.ID = strconv.FormatUint(id, 10)
 
 		agg, err := ProjectAggregate(ctx, aggCreator, project)
 		if err != nil {
@@ -174,14 +164,6 @@ func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing 
 		if err != nil {
 			return nil, err
 		}
-		id, err := idGenerator.NextID()
-		if err != nil {
-			return nil, err
-		}
-		app.AppID = strconv.FormatUint(id, 10)
-
-		//TODO: generate client id
-		//TODO: generate client secret
 		agg.AppendEvent(model.ApplicationAdded, app)
 		if app.OIDCConfig != nil {
 			agg.AppendEvent(model.OIDCConfigAdded, app.OIDCConfig)
