@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -261,15 +262,17 @@ func OIDCConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing
 	}
 }
 
-func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, appID string) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, appID string, crypto *crypto.CryptoValue) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := ProjectAggregate(ctx, aggCreator, existing)
 		if err != nil {
 			return nil, err
 		}
-		//TODO: generate client secret
-		config := &OIDCConfig{AppID: appID}
-		agg.AppendEvent(model.OIDCConfigSecretChanged, config)
+		changes := make(map[string]interface{}, 1)
+		changes["appId"] = appID
+		changes["clientSecret"] = crypto
+
+		agg.AppendEvent(model.OIDCConfigSecretChanged, changes)
 
 		return agg, nil
 	}

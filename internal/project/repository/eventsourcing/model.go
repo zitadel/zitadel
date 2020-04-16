@@ -40,6 +40,7 @@ type Application struct {
 	AppID      string      `json:"appId"`
 	State      int32       `json:"-"`
 	Name       string      `json:"name,omitempty"`
+	Type       int32       `json:"appType,omitempty"`
 	OIDCConfig *OIDCConfig `json:"-"`
 }
 
@@ -257,6 +258,7 @@ func AppFromModel(app *model.Application) *Application {
 		AppID:      app.AppID,
 		Name:       app.Name,
 		State:      model.AppStateToInt(app.State),
+		Type:       model.AppTypeToInt(app.Type),
 		OIDCConfig: oidc,
 	}
 }
@@ -276,6 +278,7 @@ func AppToModel(app *Application) *model.Application {
 		AppID:      app.AppID,
 		Name:       app.Name,
 		State:      model.AppStateFromInt(app.State),
+		Type:       model.AppTypeFromInt(app.Type),
 		OIDCConfig: oidc,
 	}
 }
@@ -582,6 +585,7 @@ func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
 	config.ObjectRoot.CreationDate = event.CreationDate
 	for i, a := range p.Applications {
 		if a.AppID == config.AppID {
+			p.Applications[i].Type = int32(model.APPTYPE_OIDC)
 			p.Applications[i].OIDCConfig = config
 		}
 	}

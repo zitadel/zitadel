@@ -128,6 +128,21 @@ func GetMockManipulateProjectWithOIDCApp(ctrl *gomock.Controller) *ProjectEvents
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockManipulateProjectWithSAMLApp(ctrl *gomock.Controller) *ProjectEventstore {
+	data, _ := json.Marshal(Project{Name: "Name"})
+	appData, _ := json.Marshal(Application{AppID: "AppID", Name: "Name"})
+
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ApplicationAdded, Data: appData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockManipulateProjectNoEvents(ctrl *gomock.Controller) *ProjectEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)

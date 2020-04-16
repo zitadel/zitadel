@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/crypto"
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/auth"
@@ -1467,7 +1468,7 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "deactivate app",
+			name: "change client secret",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &Project{
@@ -1478,8 +1479,9 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 						&Application{AppID: "AppID", Name: "Name", OIDCConfig: &OIDCConfig{AppID: "AppID", AuthMethodType: 1}},
 					}},
 				new: &OIDCConfig{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
-					AppID:      "AppID",
+					ObjectRoot:   models.ObjectRoot{ID: "ID"},
+					AppID:        "AppID",
+					ClientSecret: &crypto.CryptoValue{},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1507,7 +1509,7 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := OIDCConfigSecretChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new.AppID)(tt.args.ctx)
+			agg, err := OIDCConfigSecretChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new.AppID, tt.args.new.ClientSecret)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

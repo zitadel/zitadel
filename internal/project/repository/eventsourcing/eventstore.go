@@ -475,7 +475,7 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 	if ok, app = existing.ContainsApp(&proj_model.Application{AppID: config.AppID}); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dkso8", "App is not in this project")
 	}
-	if app.OIDCConfig == nil {
+	if app.Type != proj_model.APPTYPE_OIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-98uje", "App is not an oidc application")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -487,6 +487,42 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 	for _, a := range repoProject.Applications {
 		if a.AppID == app.AppID {
 			return OIDCConfigToModel(a.OIDCConfig), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Could not find app in list")
+}
+
+func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
+	if appID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ue34", "some required fields missing")
+	}
+	existing, err := es.ProjectByID(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	var ok bool
+	var app *proj_model.Application
+	if ok, app = existing.ContainsApp(&proj_model.Application{AppID: appID}); !ok {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9odi4", "App is not in this project")
+	}
+	if app.Type != proj_model.APPTYPE_OIDC {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dile4", "App is not an oidc application")
+	}
+	repoProject := ProjectFromModel(existing)
+
+	stringPw, crypto, err := generateNewClientSecret(es.pwGenerator, es.PasswordAlg)
+	if err != nil {
+		return nil, err
+	}
+
+	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, crypto)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	es.projectCache.cacheProject(repoProject)
+	for _, a := range repoProject.Applications {
+		if a.AppID == app.AppID {
+			config := OIDCConfigToModel(a.OIDCConfig)
+			config.ClientSecretString = stringPw
+			return config, nil
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Could not find app in list")

@@ -15,6 +15,7 @@ type Application struct {
 	ChangeDate   time.Time
 	ProjectID    string
 	Name         string
+	Type         AppType
 	OIDCConfig   *OIDCConfig
 }
 
@@ -42,7 +43,8 @@ const (
 type AppType int32
 
 const (
-	APPTYPE_OIDC AppType = iota
+	APPTYPE_UNDEFINED AppType = iota
+	APPTYPE_OIDC
 	APPTYPE_SAML
 )
 
@@ -150,4 +152,12 @@ func AppStateToInt(s AppState) int32 {
 
 func AppStateFromInt(index int32) AppState {
 	return AppState(index)
+}
+
+func AppTypeToInt(s AppType) int32 {
+	return int32(s)
+}
+
+func AppTypeFromInt(index int32) AppType {
+	return AppType(index)
 }
