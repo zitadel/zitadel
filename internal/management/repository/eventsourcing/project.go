@@ -93,6 +93,6 @@ func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_mode
 	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
 }
 
-func (repo *ProjectRepo) ChangeOIDCconfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
+func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
 }

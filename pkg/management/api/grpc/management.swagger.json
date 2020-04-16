@@ -1509,6 +1509,34 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveApplication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "put": {
         "operationId": "UpdateApplication",
         "responses": {

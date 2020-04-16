@@ -28,19 +28,23 @@ func appFromModel(app *proj_model.Application) *Application {
 func appConfigFromModel(app *proj_model.Application) isApplication_AppConfig {
 	if app.Type == proj_model.APPTYPE_OIDC {
 		return &Application_OidcConfig{
-			OidcConfig: &OIDCConfig{
-				RedirectUris:           app.OIDCConfig.RedirectUris,
-				ResponseTypes:          oidcResponseTypesFromModel(app.OIDCConfig.ResponseTypes),
-				GrantTypes:             oidcGrantTypesFromModel(app.OIDCConfig.GrantTypes),
-				ApplicationType:        oidcApplicationTypeFromModel(app.OIDCConfig.ApplicationType),
-				ClientId:               app.OIDCConfig.ClientID,
-				ClientSecret:           app.OIDCConfig.ClientSecretString,
-				AuthMethodType:         oidcAuthMethodTypeFromModel(app.OIDCConfig.AuthMethodType),
-				PostLogoutRedirectUris: app.OIDCConfig.PostLogoutRedirectUris,
-			},
+			OidcConfig: oidcConfigFromModel(app.OIDCConfig),
 		}
 	}
 	return nil
+}
+
+func oidcConfigFromModel(config *proj_model.OIDCConfig) *OIDCConfig {
+	return &OIDCConfig{
+		RedirectUris:           config.RedirectUris,
+		ResponseTypes:          oidcResponseTypesFromModel(config.ResponseTypes),
+		GrantTypes:             oidcGrantTypesFromModel(config.GrantTypes),
+		ApplicationType:        oidcApplicationTypeFromModel(config.ApplicationType),
+		ClientId:               config.ClientID,
+		ClientSecret:           config.ClientSecretString,
+		AuthMethodType:         oidcAuthMethodTypeFromModel(config.AuthMethodType),
+		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+	}
 }
 
 func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
@@ -66,6 +70,21 @@ func appUpdateToModel(app *ApplicationUpdate) *proj_model.Application {
 			ID: app.Id,
 		},
 		Name: app.Name,
+	}
+}
+
+func oidcConfigUpdateToModel(app *OIDCConfigUpdate) *proj_model.OIDCConfig {
+	return &proj_model.OIDCConfig{
+		ObjectRoot: models.ObjectRoot{
+			ID: app.ProjectId,
+		},
+		AppID:                  app.ApplicationId,
+		RedirectUris:           app.RedirectUris,
+		ResponseTypes:          oidcResponseTypesToModel(app.ResponseTypes),
+		GrantTypes:             oidcGrantTypesToModel(app.GrantTypes),
+		ApplicationType:        oidcApplicationTypeToModel(app.ApplicationType),
+		AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
+		PostLogoutRedirectUris: app.PostLogoutRedirectUris,
 	}
 }
 

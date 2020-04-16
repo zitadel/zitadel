@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) SearchApplications(ctx context.Context, in *ApplicationSearchRequest) (*ApplicationSearchResponse, error) {
@@ -46,11 +47,25 @@ func (s *Server) ReactivateApplication(ctx context.Context, in *ApplicationID) (
 	return appFromModel(app), nil
 }
 
-func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *OIDCConfigUpdate) (*OIDCConfig, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-xm56g", "Not implemented")
+func (s *Server) RemoveApplication(ctx context.Context, in *ApplicationID) (*empty.Empty, error) {
+	err := s.project.RemoveApplication(ctx, in.ProjectId, in.Id)
+	return &empty.Empty{}, err
 }
+
+func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *OIDCConfigUpdate) (*OIDCConfig, error) {
+	config, err := s.project.ChangeOIDCConfig(ctx, oidcConfigUpdateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return oidcConfigFromModel(config), nil
+}
+
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *ApplicationID) (*ClientSecret, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dlwp3", "Not implemented")
+	config, err := s.project.ChangeOIDConfigSecret(ctx, in.ProjectId, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &ClientSecret{ClientSecret: config.ClientSecretString}, nil
 }
 
 func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {

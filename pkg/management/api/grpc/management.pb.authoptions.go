@@ -365,6 +365,11 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "ProjectId",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveApplication": utils_auth.Option{
+		Permission: "project.app.delete",
+		CheckParam: "ProjectId",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/UpdateApplicationOIDCConfig": utils_auth.Option{
 		Permission: "project.app.write",
 		CheckParam: "ProjectId",

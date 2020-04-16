@@ -829,6 +829,17 @@ service ManagementService {
         };
     }
 
+    rpc RemoveApplication(ApplicationID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/applications/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.app.delete"
+            check_field_name: "ProjectId"
+        };
+    }
+
     rpc UpdateApplicationOIDCConfig(OIDCConfigUpdate) returns (OIDCConfig) {
         option (google.api.http) = {
             put: "/projects/{project_id}/applications/{application_id}/oidcconfig"

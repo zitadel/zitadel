@@ -28,5 +28,5 @@ type ProjectRepository interface {
 	ReactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)
 	RemoveApplication(ctx context.Context, projectID, appID string) error
 	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
-	ChangeOIDCConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
+	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 }
