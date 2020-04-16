@@ -8,10 +8,10 @@ import (
 )
 
 func appFromModel(app *proj_model.Application) *Application {
-	creationDate, err := ptypes.TimestampProto(app.ObjectRoot.CreationDate)
+	creationDate, err := ptypes.TimestampProto(app.CreationDate)
 	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
 
-	changeDate, err := ptypes.TimestampProto(app.ObjectRoot.ChangeDate)
+	changeDate, err := ptypes.TimestampProto(app.ChangeDate)
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
 	return &Application{

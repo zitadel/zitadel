@@ -3,20 +3,17 @@ package model
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"time"
 )
 
 type Application struct {
 	es_models.ObjectRoot
 
-	AppID        string
-	State        AppState
-	CreationDate time.Time
-	ChangeDate   time.Time
-	ProjectID    string
-	Name         string
-	Type         AppType
-	OIDCConfig   *OIDCConfig
+	AppID      string
+	State      AppState
+	ProjectID  string
+	Name       string
+	Type       AppType
+	OIDCConfig *OIDCConfig
 }
 
 type OIDCConfig struct {

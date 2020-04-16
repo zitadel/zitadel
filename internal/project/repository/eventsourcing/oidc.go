@@ -11,17 +11,14 @@ import (
 	"strings"
 )
 
-////ClientID random_number@project.domain (eg. 495894098234@citadel.caos.ch)
+////ClientID random_number@projectname (eg. 495894098234@zitadel)
 func generateNewClientID(idGenerator *sonyflake.Sonyflake, project *model.Project) (string, error) {
 	rndID, err := idGenerator.NextID()
 	if err != nil {
 		return "", err
 	}
-	//TODO: How To Get domain
-	var domainName string
-	domainName = "domain.cd"
 
-	return fmt.Sprintf("%v@%v.%v", rndID, strings.ReplaceAll(project.Name, " ", "_"), domainName), nil
+	return fmt.Sprintf("%v@%v", rndID, strings.ReplaceAll(strings.ToLower(project.Name), " ", "_")), nil
 }
 
 func generateNewClientSecret(pwGenerator password.PasswordGenerator, alg crypto.HashAlgorithm) (string, *crypto.CryptoValue, error) {
