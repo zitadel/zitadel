@@ -1,6 +1,9 @@
 package model
 
-import "testing"
+import (
+	"github.com/caos/zitadel/internal/eventstore/models"
+	"testing"
+)
 
 func TestApplicationValid(t *testing.T) {
 	type args struct {
@@ -15,8 +18,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_CODE},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_AUTHORIZATION_CODE},
@@ -29,8 +34,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "invalid oidc application: responsetype code",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_CODE},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_IMPLICIT},
@@ -43,8 +50,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype id_token",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_ID_TOKEN},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_IMPLICIT},
@@ -57,8 +66,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "invalid oidc application: responsetype id_token",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_ID_TOKEN},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_AUTHORIZATION_CODE},
@@ -71,8 +82,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype token_id_token",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_TOKEN_ID_TOKEN},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_IMPLICIT},
@@ -85,8 +98,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "invalid oidc application: responsetype token_id_token",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_TOKEN_ID_TOKEN},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_AUTHORIZATION_CODE},
@@ -99,8 +114,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code & id_token",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_CODE, OIDCRESPONSETYPE_ID_TOKEN},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_AUTHORIZATION_CODE, OIDCGRANTTYPE_IMPLICIT},
@@ -113,8 +130,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code & token_id_token",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_CODE, OIDCRESPONSETYPE_TOKEN_ID_TOKEN},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_AUTHORIZATION_CODE, OIDCGRANTTYPE_IMPLICIT},
@@ -127,8 +146,10 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code & id_token & token_id_token",
 			args: args{
 				app: &Application{
-					AppID: "AppID",
-					Name:  "Name",
+					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					AppID:      "AppID",
+					Name:       "Name",
+					Type:       APPTYPE_OIDC,
 					OIDCConfig: &OIDCConfig{
 						ResponseTypes: []OIDCResponseType{OIDCRESPONSETYPE_CODE, OIDCRESPONSETYPE_ID_TOKEN, OIDCRESPONSETYPE_TOKEN_ID_TOKEN},
 						GrantTypes:    []OIDCGrantType{OIDCGRANTTYPE_AUTHORIZATION_CODE, OIDCGRANTTYPE_IMPLICIT},

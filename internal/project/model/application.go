@@ -82,7 +82,7 @@ func NewApplication(projectID, appID string) *Application {
 }
 
 func (a *Application) IsValid(includeConfig bool) bool {
-	if a.Name == "" && a.ID == "" {
+	if a.Name == "" || a.ID == "" {
 		return false
 	}
 	if !includeConfig {

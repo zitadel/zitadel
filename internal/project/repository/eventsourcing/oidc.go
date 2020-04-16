@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-////ClientID random_number@projectname (eg. 495894098234@zitadel)
+//ClientID random_number@projectname (eg. 495894098234@zitadel)
 func generateNewClientID(idGenerator *sonyflake.Sonyflake, project *model.Project) (string, error) {
 	rndID, err := idGenerator.NextID()
 	if err != nil {
