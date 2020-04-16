@@ -80,7 +80,7 @@ const (
 	OIDCAUTHMETHODTYPE_NONE
 )
 
-func NewApp(projectID, appID string) *Application {
+func NewApplication(projectID, appID string) *Application {
 	return &Application{ObjectRoot: es_models.ObjectRoot{ID: projectID}, AppID: appID, State: APPSTATE_ACTIVE}
 }
 

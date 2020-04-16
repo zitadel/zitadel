@@ -20,4 +20,13 @@ type ProjectRepository interface {
 	AddProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
+
+	ApplicationByID(ctx context.Context, projectID, appID string) (*model.Application, error)
+	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
+	ChangeApplication(ctx context.Context, app *model.Application) (*model.Application, error)
+	DeactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)
+	ReactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)
+	RemoveApplication(ctx context.Context, projectID, appID string) error
+	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
+	ChangeOIDCConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 }
