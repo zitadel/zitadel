@@ -256,6 +256,7 @@ func AppFromModel(app *model.Application) *Application {
 		},
 		AppID:      app.AppID,
 		Name:       app.Name,
+		State:      model.AppStateToInt(app.State),
 		OIDCConfig: oidc,
 	}
 }
@@ -274,6 +275,7 @@ func AppToModel(app *Application) *model.Application {
 		},
 		AppID:      app.AppID,
 		Name:       app.Name,
+		State:      model.AppStateFromInt(app.State),
 		OIDCConfig: oidc,
 	}
 }

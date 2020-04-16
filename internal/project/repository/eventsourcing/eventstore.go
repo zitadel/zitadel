@@ -387,3 +387,77 @@ func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_mo
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
 }
+
+func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_model.Application) error {
+	if app.AppID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-id832", "AppID is required")
+	}
+	existing, err := es.ProjectByID(ctx, app.ID)
+	if err != nil {
+		return err
+	}
+	if !existing.ContainsApp(app) {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "Application doesn't exist on project")
+	}
+	repoProject := ProjectFromModel(existing)
+	appRepo := AppFromModel(app)
+	projectAggregate := ApplicationRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, appRepo)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
+	es.projectCache.cacheProject(repoProject)
+	return nil
+}
+
+func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
+	if appID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dlp9e", "appID missing")
+	}
+	existing, err := es.ProjectByID(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	app := &proj_model.Application{AppID: appID}
+	if !existing.ContainsApp(app) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-slpe9", "App is not in this project")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoApp := AppFromModel(app)
+
+	projectAggregate := ApplicationDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	es.projectCache.cacheProject(repoProject)
+	for _, a := range repoProject.Applications {
+		if a.AppID == app.AppID {
+			return AppToModel(a), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sie83", "Could not find app in list")
+}
+
+func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
+	if appID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-0odi2", "appID missing")
+	}
+	existing, err := es.ProjectByID(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+	app := &proj_model.Application{AppID: appID}
+	if !existing.ContainsApp(app) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld92d", "App is not in this project")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoApp := AppFromModel(app)
+
+	projectAggregate := ApplicationReactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	es.projectCache.cacheProject(repoProject)
+	for _, a := range repoProject.Applications {
+		if a.AppID == app.AppID {
+			return AppToModel(a), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sld93", "Could not find app in list")
+}
