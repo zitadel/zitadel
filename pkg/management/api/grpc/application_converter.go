@@ -15,7 +15,7 @@ func appFromModel(app *proj_model.Application) *Application {
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
 	return &Application{
-		Id:           app.ID,
+		Id:           app.AppID,
 		State:        appStateFromModel(app.State),
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
