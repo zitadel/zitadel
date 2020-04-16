@@ -1108,3 +1108,114 @@ func TestAddApplication(t *testing.T) {
 		})
 	}
 }
+
+func TestChangeApp(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		ctx context.Context
+		app *model.Application
+	}
+	type res struct {
+		result  *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change app, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "NameChanged",
+				},
+			},
+			res: res{
+				result: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "NameChanged",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid app",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					AppID: "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeApplication(tt.args.ctx, tt.args.app)
+
+			if !tt.res.wantErr && result.ID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.result.AppID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
+			}
+			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

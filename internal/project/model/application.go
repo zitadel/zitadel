@@ -81,9 +81,12 @@ func NewApp(projectID, appID string) *Application {
 	return &Application{ObjectRoot: es_models.ObjectRoot{ID: projectID}, AppID: appID, State: APPSTATE_ACTIVE}
 }
 
-func (a *Application) IsValid() bool {
+func (a *Application) IsValid(includeConfig bool) bool {
 	if a.Name == "" && a.ID == "" {
 		return false
+	}
+	if !includeConfig {
+		return true
 	}
 	if a.OIDCConfig == nil || !a.OIDCConfig.IsValid() {
 		return false

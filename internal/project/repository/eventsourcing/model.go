@@ -369,7 +369,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case model.ApplicationAdded:
 		return p.appendAddAppEvent(event)
 	case model.ApplicationChanged:
-		return p.appendAddAppEvent(event)
+		return p.appendChangeAppEvent(event)
 	case model.ApplicationRemoved:
 		return p.appendRemoveAppEvent(event)
 	case model.ApplicationDeactivated:

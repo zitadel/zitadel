@@ -320,7 +320,7 @@ func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, ap
 }
 
 func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
-	if app == nil || !app.IsValid() {
+	if app == nil || !app.IsValid(true) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9eidw", "Some required fields are missing")
 	}
 	existing, err := es.ProjectByID(ctx, app.ID)
@@ -364,7 +364,7 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 }
 
 func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
-	if !app.IsValid() {
+	if app == nil || !app.IsValid(false) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dieuw", "some required fields missing")
 	}
 	existing, err := es.ProjectByID(ctx, app.ID)
