@@ -91,7 +91,7 @@ func (a *Application) IsValid(includeConfig bool) bool {
 	if !includeConfig {
 		return true
 	}
-	if a.OIDCConfig == nil || !a.OIDCConfig.IsValid() {
+	if a.Type == APPTYPE_OIDC && !a.OIDCConfig.IsValid() {
 		return false
 	}
 	return true

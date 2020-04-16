@@ -8,10 +8,10 @@ import (
 )
 
 func appFromModel(app *proj_model.Application) *Application {
-	creationDate, err := ptypes.TimestampProto(app.CreationDate)
+	creationDate, err := ptypes.TimestampProto(app.ObjectRoot.CreationDate)
 	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
 
-	changeDate, err := ptypes.TimestampProto(app.ChangeDate)
+	changeDate, err := ptypes.TimestampProto(app.ObjectRoot.ChangeDate)
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
 	return &Application{
@@ -53,6 +53,7 @@ func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 			ID: app.ProjectId,
 		},
 		Name: app.Name,
+		Type: proj_model.APPTYPE_OIDC,
 		OIDCConfig: &proj_model.OIDCConfig{
 			RedirectUris:           app.RedirectUris,
 			ResponseTypes:          oidcResponseTypesToModel(app.ResponseTypes),
