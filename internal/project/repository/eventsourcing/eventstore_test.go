@@ -960,7 +960,7 @@ func TestApplicationByID(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "app from events",
+			name: "get app",
 			args: args{
 				es:  GetMockProjectAppsByIDsOK(ctrl),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, AppID: "AppID"},
@@ -973,7 +973,7 @@ func TestApplicationByID(t *testing.T) {
 			},
 		},
 		{
-			name: "app from events, no events",
+			name: "no events for project",
 			args: args{
 				es:  GetMockProjectByIDNoEvents(ctrl),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, AppID: "AppID"},
@@ -984,7 +984,7 @@ func TestApplicationByID(t *testing.T) {
 			},
 		},
 		{
-			name: "app from events, no id",
+			name: "app has no id",
 			args: args{
 				es:  GetMockProjectByIDNoEvents(ctrl),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
@@ -1012,3 +1012,89 @@ func TestApplicationByID(t *testing.T) {
 		})
 	}
 }
+
+//
+//func TestAddApplication(t *testing.T) {
+//	ctrl := gomock.NewController(t)
+//	type args struct {
+//		es   *ProjectEventstore
+//		ctx  context.Context
+//		app *model.Application
+//	}
+//	type res struct {
+//		result  *model.Application
+//		wantErr bool
+//		errFunc func(err error) bool
+//	}
+//	tests := []struct {
+//		name string
+//		args args
+//		res  res
+//	}{
+//		{
+//			name: "add app, ok",
+//			args: args{
+//				es:   GetMockManipulateProject(ctrl),
+//				ctx:  auth.NewMockContext("orgID", "userID"),
+//				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+//					AppID:      "AppID",
+//					Name:       "Name",
+//					OIDCConfig: &model.OIDCConfig{ClientID: "ClientID"}},
+//			},
+//			res: res{
+//				result: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+//			},
+//		},
+//		{
+//			name: "no key",
+//			args: args{
+//				es:   GetMockManipulateProject(ctrl),
+//				ctx:  auth.NewMockContext("orgID", "userID"),
+//				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+//			},
+//			res: res{
+//				wantErr: true,
+//				errFunc: caos_errs.IsPreconditionFailed,
+//			},
+//		},
+//		{
+//			name: "role already existing",
+//			args: args{
+//				es:   GetMockManipulateProjectWithRole(ctrl),
+//				ctx:  auth.NewMockContext("orgID", "userID"),
+//				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+//			},
+//			res: res{
+//				wantErr: true,
+//				errFunc: caos_errs.IsErrorAlreadyExists,
+//			},
+//		},
+//		{
+//			name: "existing project not found",
+//			args: args{
+//				es:   GetMockManipulateProjectNoEvents(ctrl),
+//				ctx:  auth.NewMockContext("orgID", "userID"),
+//				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+//			},
+//			res: res{
+//				wantErr: true,
+//				errFunc: caos_errs.IsNotFound,
+//			},
+//		},
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			result, err := tt.args.es.AddProjectRole(tt.args.ctx, tt.args.role)
+//
+//			if !tt.res.wantErr && result.ID == "" {
+//				t.Errorf("result has no id")
+//			}
+//			if !tt.res.wantErr && result.Key != tt.res.result.Key {
+//				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Key, result.Key)
+//			}
+//			if tt.res.wantErr && !tt.res.errFunc(err) {
+//				t.Errorf("got wrong err: %v ", err)
+//			}
+//		})
+//	}
+//}

@@ -81,15 +81,62 @@ func NewApp(projectID, appID string) *Application {
 }
 
 func (a *Application) IsValid() bool {
-	if a.Name == "" && a.ID == "" && a.OIDCConfig == nil && a.OIDCConfig.IsValid() {
+	if a.Name == "" && a.ID == "" {
+		return false
+	}
+	if a.OIDCConfig == nil || !a.OIDCConfig.IsValid() {
 		return false
 	}
 	return true
 }
 
 func (c *OIDCConfig) IsValid() bool {
-	//TODO: Implement Validation check
+	code, idToken, tokenIdToken := c.getChosenResponseTypes()
+	if code {
+		ok := c.containsGrantType(OIDCGRANTTYPE_AUTHORIZATION_CODE)
+		if !ok {
+			return false
+		}
+	}
+	if idToken {
+		ok := c.containsGrantType(OIDCGRANTTYPE_IMPLICIT)
+		if !ok {
+			return false
+		}
+	}
+	if tokenIdToken {
+		ok := c.containsGrantType(OIDCGRANTTYPE_IMPLICIT)
+		if !ok {
+			return false
+		}
+	}
 	return true
+}
+
+func (c *OIDCConfig) getChosenResponseTypes() (bool, bool, bool) {
+	code := false
+	idToken := false
+	tokenIdToken := false
+	for _, r := range c.ResponseTypes {
+		switch r {
+		case OIDCRESPONSETYPE_CODE:
+			code = true
+		case OIDCRESPONSETYPE_ID_TOKEN:
+			idToken = true
+		case OIDCRESPONSETYPE_TOKEN_ID_TOKEN:
+			tokenIdToken = true
+		}
+	}
+	return code, idToken, tokenIdToken
+}
+
+func (c *OIDCConfig) containsGrantType(grantType OIDCGrantType) bool {
+	for _, t := range c.GrantTypes {
+		if t == grantType {
+			return true
+		}
+	}
+	return false
 }
 
 func AppStateToInt(s AppState) int32 {
