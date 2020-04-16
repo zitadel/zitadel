@@ -57,13 +57,13 @@ func (p *Project) ContainsRole(role *ProjectRole) bool {
 	return false
 }
 
-func (p *Project) ContainsApp(app *Application) bool {
+func (p *Project) ContainsApp(app *Application) (bool, *Application) {
 	for _, a := range p.Applications {
 		if a.AppID == app.AppID {
-			return true
+			return true, a
 		}
 	}
-	return false
+	return false, nil
 }
 
 func ProjectStateToInt(s ProjectState) int32 {

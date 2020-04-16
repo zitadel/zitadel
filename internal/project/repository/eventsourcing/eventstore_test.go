@@ -1520,3 +1520,112 @@ func TestReactivateApp(t *testing.T) {
 		})
 	}
 }
+
+func TestChangeOIDCConfig(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *ProjectEventstore
+		ctx    context.Context
+		config *model.OIDCConfig
+	}
+	type res struct {
+		result  *model.OIDCConfig
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change oidc config, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{ID: "ID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+			res: res{
+				result: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{ID: "ID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+		},
+		{
+			name: "invalid config",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{ID: "ID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{ID: "ID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{ID: "ID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeOIDCConfig(tt.args.ctx, tt.args.config)
+
+			if !tt.res.wantErr && result.ID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.result.AppID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
+			}
+			if !tt.res.wantErr && result.ResponseTypes[0] != tt.res.result.ResponseTypes[0] {
+				t.Errorf("got wrong result responsetype: expected: %v, actual: %v ", tt.res.result.ResponseTypes[0], result.ResponseTypes[0])
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

@@ -82,22 +82,22 @@ func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	changes["appId"] = c.AppID
 	if !reflect.DeepEqual(c.RedirectUris, changed.RedirectUris) {
-		changes["redirectUris"] = c.RedirectUris
+		changes["redirectUris"] = changed.RedirectUris
 	}
 	if !reflect.DeepEqual(c.ResponseTypes, changed.ResponseTypes) {
-		changes["responseTypes"] = c.ResponseTypes
+		changes["responseTypes"] = changed.ResponseTypes
 	}
 	if !reflect.DeepEqual(c.GrantTypes, changed.GrantTypes) {
-		changes["grantTypes"] = c.GrantTypes
+		changes["grantTypes"] = changed.GrantTypes
 	}
 	if c.ApplicationType != changed.ApplicationType {
-		changes["applicationType"] = c.ApplicationType
+		changes["applicationType"] = changed.ApplicationType
 	}
 	if c.AuthMethodType != changed.AuthMethodType {
-		changes["authMethodType"] = c.AuthMethodType
+		changes["authMethodType"] = changed.AuthMethodType
 	}
 	if !reflect.DeepEqual(c.PostLogoutRedirectUris, changed.PostLogoutRedirectUris) {
-		changes["postLogoutRedirectUris"] = c.PostLogoutRedirectUris
+		changes["postLogoutRedirectUris"] = changed.PostLogoutRedirectUris
 	}
 	return changes
 }
@@ -290,6 +290,12 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 		grantTypes[i] = int32(rt)
 	}
 	return &OIDCConfig{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           config.ObjectRoot.ID,
+			Sequence:     config.Sequence,
+			ChangeDate:   config.ChangeDate,
+			CreationDate: config.CreationDate,
+		},
 		AppID:                  config.AppID,
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
@@ -312,6 +318,12 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		grantTypes[i] = model.OIDCGrantType(rt)
 	}
 	return &model.OIDCConfig{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           config.ObjectRoot.ID,
+			Sequence:     config.Sequence,
+			ChangeDate:   config.ChangeDate,
+			CreationDate: config.CreationDate,
+		},
 		AppID:                  config.AppID,
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,

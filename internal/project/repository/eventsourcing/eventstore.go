@@ -371,7 +371,7 @@ func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_mo
 	if err != nil {
 		return nil, err
 	}
-	if !existing.ContainsApp(app) {
+	if ok, _ := existing.ContainsApp(app); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "App is not in this project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -396,7 +396,7 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	if err != nil {
 		return err
 	}
-	if !existing.ContainsApp(app) {
+	if ok, _ := existing.ContainsApp(app); !ok {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "Application doesn't exist on project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -419,7 +419,7 @@ func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectI
 		return nil, err
 	}
 	app := &proj_model.Application{AppID: appID}
-	if !existing.ContainsApp(app) {
+	if ok, _ := existing.ContainsApp(app); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-slpe9", "App is not in this project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -445,7 +445,7 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 		return nil, err
 	}
 	app := &proj_model.Application{AppID: appID}
-	if !existing.ContainsApp(app) {
+	if ok, _ := existing.ContainsApp(app); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld92d", "App is not in this project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -460,4 +460,34 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sld93", "Could not find app in list")
+}
+
+func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
+	if config == nil || !config.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-du834", "some required fields missing")
+	}
+	existing, err := es.ProjectByID(ctx, config.ID)
+	if err != nil {
+		return nil, err
+	}
+	var ok bool
+	var app *proj_model.Application
+	if ok, app = existing.ContainsApp(&proj_model.Application{AppID: config.AppID}); !ok {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dkso8", "App is not in this project")
+	}
+	if app.OIDCConfig == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-98uje", "App is not an oidc application")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoConfig := OIDCConfigFromModel(config)
+
+	projectAggregate := OIDCConfigChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoConfig)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	es.projectCache.cacheProject(repoProject)
+	for _, a := range repoProject.Applications {
+		if a.AppID == app.AppID {
+			return OIDCConfigToModel(a.OIDCConfig), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Could not find app in list")
 }

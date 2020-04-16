@@ -19,6 +19,7 @@ type Application struct {
 }
 
 type OIDCConfig struct {
+	es_models.ObjectRoot
 	AppID                  string
 	ClientID               string
 	ClientSecret           *crypto.CryptoValue
