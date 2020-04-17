@@ -85,6 +85,15 @@ func (p *Project) ContainsGrantForOrg(orgID string) bool {
 	return false
 }
 
+func (p *Project) ContainsRoles(roleKeys []string) bool {
+	for _, r := range roleKeys {
+		if !p.ContainsRole(&ProjectRole{Key: r}) {
+			return false
+		}
+	}
+	return true
+}
+
 func ProjectStateToInt(s ProjectState) int32 {
 	return int32(s)
 }

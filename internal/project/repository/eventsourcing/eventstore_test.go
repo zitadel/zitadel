@@ -1856,7 +1856,7 @@ func TestAddProjectGrant(t *testing.T) {
 		{
 			name: "add grant, ok",
 			args: args{
-				es:  GetMockManipulateProject(ctrl),
+				es:  GetMockManipulateProjectWithRole(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
@@ -1894,6 +1894,22 @@ func TestAddProjectGrant(t *testing.T) {
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role not existing on project",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					GrantID:      "GrantID",
+					GrantedOrgID: "GrantedOrgID",
+					RoleKeys:     []string{"Key"},
 				},
 			},
 			res: res{
@@ -1952,19 +1968,19 @@ func TestChangeProjectGrant(t *testing.T) {
 		{
 			name: "change grant, ok",
 			args: args{
-				es:  GetMockManipulateProjectWithGrant(ctrl),
+				es:  GetMockManipulateProjectWithGrantExistingRole(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"Key Changed"},
+					RoleKeys:     []string{"KeyChanged"},
 				},
 			},
 			res: res{
 				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"Key Changed"},
+					RoleKeys:     []string{"KeyChanged"},
 				},
 			},
 		},
@@ -1975,7 +1991,7 @@ func TestChangeProjectGrant(t *testing.T) {
 				ctx: auth.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					GrantID:  "GrantID",
-					RoleKeys: []string{"Key Changed"},
+					RoleKeys: []string{"KeyChanged"},
 				},
 			},
 			res: res{
@@ -1991,7 +2007,23 @@ func TestChangeProjectGrant(t *testing.T) {
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"Key Changed"},
+					RoleKeys:     []string{"KeyChanged"},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role not existing",
+			args: args{
+				es:  GetMockManipulateProjectWithGrant(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					GrantID:      "GrantID",
+					GrantedOrgID: "GrantedOrgID",
+					RoleKeys:     []string{"KeyChanged"},
 				},
 			},
 			res: res{
@@ -2007,7 +2039,7 @@ func TestChangeProjectGrant(t *testing.T) {
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"Key Changed"},
+					RoleKeys:     []string{"KeyChanged"},
 				},
 			},
 			res: res{

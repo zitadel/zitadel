@@ -555,6 +555,9 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	if existing.ContainsGrantForOrg(grant.GrantedOrgID) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-7ug4g", "Grant for org already exists")
 	}
+	if !existing.ContainsRoles(grant.RoleKeys) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
+	}
 	id, err := es.idGenerator.NextID()
 	if err != nil {
 		return nil, err
@@ -584,6 +587,9 @@ func (es *ProjectEventstore) ChangeProjectGrant(ctx context.Context, grant *proj
 	}
 	if !existing.ContainsGrant(grant) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "Grant not existing on project")
+	}
+	if !existing.ContainsRoles(grant.RoleKeys) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
 	}
 	repoProject := ProjectFromModel(existing)
 	repoGrant := GrantFromModel(grant)
