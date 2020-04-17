@@ -32,17 +32,8 @@ func (p *ProjectGrant) IsActive() bool {
 }
 
 func (p *ProjectGrant) IsValid() bool {
-	if p.GrantedOrgID != "" {
+	if p.GrantedOrgID == "" {
 		return false
 	}
 	return true
-}
-
-func (p *ProjectGrant) ContainsRole(roleKey string) bool {
-	for _, r := range p.RoleKeys {
-		if r == roleKey {
-			return true
-		}
-	}
-	return false
 }

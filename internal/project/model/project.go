@@ -67,6 +67,24 @@ func (p *Project) ContainsApp(app *Application) (bool, *Application) {
 	return false, nil
 }
 
+func (p *Project) ContainsGrant(grant *ProjectGrant) bool {
+	for _, g := range p.Grants {
+		if g.GrantID == grant.GrantID {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Project) ContainsGrantForOrg(orgID string) bool {
+	for _, g := range p.Grants {
+		if g.GrantedOrgID == orgID {
+			return true
+		}
+	}
+	return false
+}
+
 func ProjectStateToInt(s ProjectState) int32 {
 	return int32(s)
 }

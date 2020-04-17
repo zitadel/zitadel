@@ -143,6 +143,20 @@ func GetMockManipulateProjectWithSAMLApp(ctrl *gomock.Controller) *ProjectEvents
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockManipulateProjectWithGrant(ctrl *gomock.Controller) *ProjectEventstore {
+	data, _ := json.Marshal(Project{Name: "Name"})
+	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockManipulateProjectNoEvents(ctrl *gomock.Controller) *ProjectEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
@@ -173,6 +187,19 @@ func GetMockProjectAppsByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ApplicationAdded, Data: appData},
 		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OIDCConfigAdded, Data: oidcData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockProjectGrantByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
+	projectData, _ := json.Marshal(Project{Name: "Name"})
+	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
+
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
