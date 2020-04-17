@@ -1760,7 +1760,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v1ProjectGrantMember"
             }
           }
         },
@@ -1870,7 +1870,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v1ProjectGrantMember"
             }
           }
         },

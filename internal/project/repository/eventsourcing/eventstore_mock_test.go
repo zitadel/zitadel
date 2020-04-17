@@ -239,3 +239,18 @@ func GetMockProjectGrantByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	return GetMockedEventstore(ctrl, mockEs)
 }
+
+func GetMockProjectGrantMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
+	projectData, _ := json.Marshal(Project{Name: "Name"})
+	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
+	memberData, _ := json.Marshal(ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}})
+
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantMemberAdded, Data: memberData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}

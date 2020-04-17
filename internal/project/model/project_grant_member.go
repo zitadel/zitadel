@@ -9,8 +9,8 @@ type ProjectGrantMember struct {
 	Roles   []string
 }
 
-func NewProjectGrantMember(projectID, userID string) *ProjectGrantMember {
-	return &ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: projectID}, UserID: userID}
+func NewProjectGrantMember(projectID, grantID, userID string) *ProjectGrantMember {
+	return &ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: projectID}, GrantID: grantID, UserID: userID}
 }
 
 func (p *ProjectGrantMember) IsValid() bool {

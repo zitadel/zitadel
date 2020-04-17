@@ -36,4 +36,9 @@ type ProjectRepository interface {
 	DeactivateProjectGrant(ctx context.Context, projectID, appID string) (*model.ProjectGrant, error)
 	ReactivateProjectGrant(ctx context.Context, projectID, appID string) (*model.ProjectGrant, error)
 	RemoveProjectGrant(ctx context.Context, projectID, appID string) error
+
+	ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (*model.ProjectGrantMember, error)
+	AddProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
+	ChangeProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
+	RemoveProjectGrantMember(ctx context.Context, projectID, grantID, userID string) error
 }

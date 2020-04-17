@@ -121,3 +121,21 @@ func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, appI
 	app := proj_model.NewProjectGrant(projectID, appID)
 	return repo.ProjectEvents.RemoveProjectGrant(ctx, app)
 }
+
+func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (member *proj_model.ProjectGrantMember, err error) {
+	member = proj_model.NewProjectGrantMember(projectID, grantID, userID)
+	return repo.ProjectEvents.ProjectGrantMemberByIDs(ctx, member)
+}
+
+func (repo *ProjectRepo) AddProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {
+	return repo.ProjectEvents.AddProjectGrantMember(ctx, member)
+}
+
+func (repo *ProjectRepo) ChangeProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {
+	return repo.ProjectEvents.ChangeProjectGrantMember(ctx, member)
+}
+
+func (repo *ProjectRepo) RemoveProjectGrantMember(ctx context.Context, projectID, grantID, userID string) error {
+	member := proj_model.NewProjectGrantMember(projectID, grantID, userID)
+	return repo.ProjectEvents.RemoveProjectGrantMember(ctx, member)
+}

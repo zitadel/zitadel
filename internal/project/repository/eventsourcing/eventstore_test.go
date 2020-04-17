@@ -2337,6 +2337,76 @@ func TestReactivateProjectGrant(t *testing.T) {
 	}
 }
 
+func TestProjectGrantMemberByIDs(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *ProjectEventstore
+		member *model.ProjectGrantMember
+	}
+	type res struct {
+		member  *model.ProjectGrantMember
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "projectgrant  member from events, ok",
+			args: args{
+				es:     GetMockProjectGrantMemberByIDsOK(ctrl),
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
+			},
+			res: res{
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}},
+			},
+		},
+		{
+			name: "no project events",
+			args: args{
+				es:     GetMockProjectByIDNoEvents(ctrl),
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "member id missing",
+			args: args{
+				es:     GetMockProjectByIDNoEvents(ctrl),
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsPreconditionFailed(err)
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ProjectGrantMemberByIDs(nil, tt.args.member)
+			if !tt.res.wantErr && result.ID != tt.res.member.ID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.member.ID, result.ID)
+			}
+			if !tt.res.wantErr && result.UserID != tt.res.member.UserID {
+				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.member.UserID, result.UserID)
+			}
+			if !tt.res.wantErr && len(result.Roles) != len(tt.res.member.Roles) {
+				t.Errorf("got wrong result roles: expected: %v, actual: %v ", tt.res.member.Roles, result.Roles)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestAddProjectGrantMember(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {

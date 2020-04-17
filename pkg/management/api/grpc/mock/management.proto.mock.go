@@ -58,14 +58,14 @@ func (mr *MockManagementServiceClientMockRecorder) AddOrgMember(arg0, arg1 inter
 }
 
 // AddProjectGrantMember mocks base method
-func (m *MockManagementServiceClient) AddProjectGrantMember(arg0 context.Context, arg1 *grpc.ProjectGrantMemberAdd, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+func (m *MockManagementServiceClient) AddProjectGrantMember(arg0 context.Context, arg1 *grpc.ProjectGrantMemberAdd, arg2 ...grpc0.CallOption) (*grpc.ProjectGrantMember, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddProjectGrantMember", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
+	ret0, _ := ret[0].(*grpc.ProjectGrantMember)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -178,14 +178,14 @@ func (mr *MockManagementServiceClientMockRecorder) ChangeOrgMember(arg0, arg1 in
 }
 
 // ChangeProjectGrantMember mocks base method
-func (m *MockManagementServiceClient) ChangeProjectGrantMember(arg0 context.Context, arg1 *grpc.ProjectGrantMemberChange, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+func (m *MockManagementServiceClient) ChangeProjectGrantMember(arg0 context.Context, arg1 *grpc.ProjectGrantMemberChange, arg2 ...grpc0.CallOption) (*grpc.ProjectGrantMember, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ChangeProjectGrantMember", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
+	ret0, _ := ret[0].(*grpc.ProjectGrantMember)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
