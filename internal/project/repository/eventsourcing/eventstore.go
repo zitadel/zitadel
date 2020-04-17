@@ -316,7 +316,7 @@ func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, ap
 			return a, nil
 		}
 	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-8ei2s", "Could not find app in list")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-8ei2s", "Could not find app")
 }
 
 func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
@@ -353,6 +353,7 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 
 	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	es.projectCache.cacheProject(repoProject)
 	for _, a := range repoProject.Applications {
 		if a.AppID == app.AppID {
 			converted := AppToModel(a)
@@ -464,7 +465,7 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 
 func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
 	if config == nil || !config.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-du834", "some required fields missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-du834", "invalid oidc config")
 	}
 	existing, err := es.ProjectByID(ctx, config.ID)
 	if err != nil {

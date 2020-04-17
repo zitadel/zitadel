@@ -10,7 +10,6 @@ type Application struct {
 
 	AppID      string
 	State      AppState
-	ProjectID  string
 	Name       string
 	Type       AppType
 	OIDCConfig *OIDCConfig

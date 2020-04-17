@@ -68,9 +68,10 @@ func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 func appUpdateToModel(app *ApplicationUpdate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
-			ID: app.Id,
+			ID: app.ProjectId,
 		},
-		Name: app.Name,
+		AppID: app.Id,
+		Name:  app.Name,
 	}
 }
 
