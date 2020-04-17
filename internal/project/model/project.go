@@ -12,6 +12,7 @@ type Project struct {
 	Members      []*ProjectMember
 	Roles        []*ProjectRole
 	Applications []*Application
+	Grants       []*ProjectGrant
 }
 
 type ProjectState int32

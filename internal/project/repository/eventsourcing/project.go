@@ -277,3 +277,83 @@ func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 		return agg, nil
 	}
 }
+
+func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, grant *ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kd89w", "grant should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.ProjectGrantAdded, grant)
+		return agg, nil
+	}
+}
+
+func ProjectGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, grant *ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d9ie2", "grant should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		var changes map[string]interface{}
+		for _, g := range existing.Grants {
+			if g.GrantID == grant.GrantID {
+				changes = g.Changes(grant)
+			}
+		}
+		agg.AppendEvent(model.ProjectGrantChanged, changes)
+
+		return agg, nil
+	}
+}
+
+func ProjectGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, grant *ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kci8d", "grant should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.ProjectGrantRemoved, &ProjectGrantID{GrantID: grant.GrantID})
+
+		return agg, nil
+	}
+}
+
+func ProjectGrantDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, grant *ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-id832", "grant should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.ProjectGrantDeactivated, &ProjectGrantID{GrantID: grant.GrantID})
+
+		return agg, nil
+	}
+}
+
+func ProjectGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, grant *ProjectGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8diw2", "grant should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.ProjectGrantReactivated, &ProjectGrantID{GrantID: grant.GrantID})
+
+		return agg, nil
+	}
+}
