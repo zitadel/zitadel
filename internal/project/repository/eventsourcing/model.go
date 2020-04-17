@@ -65,15 +65,23 @@ type OIDCConfig struct {
 
 type ProjectGrant struct {
 	es_models.ObjectRoot
-	State        int32    `json:"-"`
-	GrantID      string   `json:"grantId,omitempty"`
-	GrantedOrgID string   `json:"grantedOrgId,omitempty"`
-	RoleKeys     []string `json:"roleKeys,omitempty"`
+	State        int32                 `json:"-"`
+	GrantID      string                `json:"grantId,omitempty"`
+	GrantedOrgID string                `json:"grantedOrgId,omitempty"`
+	RoleKeys     []string              `json:"roleKeys,omitempty"`
+	Members      []*ProjectGrantMember `json:"-"`
 }
 
 type ProjectGrantID struct {
 	es_models.ObjectRoot
 	GrantID string `json:"grantId"`
+}
+
+type ProjectGrantMember struct {
+	es_models.ObjectRoot
+	GrantID string   `json:"grantId,omitempty"`
+	UserID  string   `json:"userId,omitempty"`
+	Roles   []string `json:"roles,omitempty"`
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
@@ -383,6 +391,7 @@ func GrantsFromModel(grants []*model.ProjectGrant) []*ProjectGrant {
 }
 
 func GrantFromModel(grant *model.ProjectGrant) *ProjectGrant {
+	members := GrantMembersFromModel(grant.Members)
 	return &ProjectGrant{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           grant.ObjectRoot.ID,
@@ -394,10 +403,12 @@ func GrantFromModel(grant *model.ProjectGrant) *ProjectGrant {
 		GrantedOrgID: grant.GrantedOrgID,
 		State:        int32(grant.State),
 		RoleKeys:     grant.RoleKeys,
+		Members:      members,
 	}
 }
 
 func GrantToModel(grant *ProjectGrant) *model.ProjectGrant {
+	members := GrantMembersToModel(grant.Members)
 	return &model.ProjectGrant{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           grant.ID,
@@ -409,8 +420,54 @@ func GrantToModel(grant *ProjectGrant) *model.ProjectGrant {
 		GrantedOrgID: grant.GrantedOrgID,
 		State:        model.ProjectGrantState(grant.State),
 		RoleKeys:     grant.RoleKeys,
+		Members:      members,
 	}
 }
+
+func GrantMembersToModel(members []*ProjectGrantMember) []*model.ProjectGrantMember {
+	convertedMembers := make([]*model.ProjectGrantMember, len(members))
+	for i, g := range members {
+		convertedMembers[i] = GrantMemberToModel(g)
+	}
+	return convertedMembers
+}
+
+func GrantMembersFromModel(members []*model.ProjectGrantMember) []*ProjectGrantMember {
+	convertedMembers := make([]*ProjectGrantMember, len(members))
+	for i, g := range members {
+		convertedMembers[i] = GrantMemberFromModel(g)
+	}
+	return convertedMembers
+}
+
+func GrantMemberFromModel(member *model.ProjectGrantMember) *ProjectGrantMember {
+	return &ProjectGrantMember{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           member.ObjectRoot.ID,
+			Sequence:     member.Sequence,
+			ChangeDate:   member.ChangeDate,
+			CreationDate: member.CreationDate,
+		},
+		GrantID: member.GrantID,
+		UserID:  member.UserID,
+		Roles:   member.Roles,
+	}
+}
+
+func GrantMemberToModel(member *ProjectGrantMember) *model.ProjectGrantMember {
+	return &model.ProjectGrantMember{
+		ObjectRoot: es_models.ObjectRoot{
+			ID:           member.ID,
+			ChangeDate:   member.ChangeDate,
+			CreationDate: member.CreationDate,
+			Sequence:     member.Sequence,
+		},
+		GrantID: member.GrantID,
+		UserID:  member.UserID,
+		Roles:   member.Roles,
+	}
+}
+
 func ProjectFromEvents(project *Project, events ...*es_models.Event) (*Project, error) {
 	if project == nil {
 		project = &Project{}
@@ -478,6 +535,12 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case model.ProjectGrantReactivated:
 		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_ACTIVE)
 	case model.ProjectGrantRemoved:
+		return p.appendRemoveGrantEvent(event)
+	case model.ProjectGrantMemberAdded:
+		return p.appendAddGrantEvent(event)
+	case model.ProjectGrantMemberChanged:
+		return p.appendChangeGrantEvent(event)
+	case model.ProjectGrantMemberRemoved:
 		return p.appendRemoveGrantEvent(event)
 	}
 	return nil
@@ -757,6 +820,68 @@ func (g *ProjectGrant) getData(event *es_models.Event) error {
 	g.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, g); err != nil {
 		logging.Log("EVEN-4h6gd").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
+}
+
+func (p *Project) appendAddGrantMemberEvent(event *es_models.Event) error {
+	member := &ProjectGrantMember{}
+	err := member.getData(event)
+	if err != nil {
+		return err
+	}
+	member.ObjectRoot.CreationDate = event.CreationDate
+	for _, g := range p.Grants {
+		if g.GrantID == member.GrantID {
+			g.Members = append(g.Members, member)
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendChangeGrantMemberEvent(event *es_models.Event) error {
+	member := &ProjectGrantMember{}
+	err := member.getData(event)
+	if err != nil {
+		return err
+	}
+	for _, g := range p.Grants {
+		if g.GrantID == member.GrantID {
+			for i, m := range g.Members {
+				if m.UserID == member.UserID {
+					g.Members[i].getData(event)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendRemoveGrantMemberEvent(event *es_models.Event) error {
+	member := &ProjectGrantMember{}
+	err := member.getData(event)
+	if err != nil {
+		return err
+	}
+	for _, g := range p.Grants {
+		if g.GrantID == member.GrantID {
+			for i, m := range g.Members {
+				if m.UserID == member.UserID {
+					g.Members[i] = g.Members[len(g.Members)-1]
+					g.Members[len(g.Members)-1] = nil
+					g.Members = g.Members[:len(g.Members)-1]
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (m *ProjectGrantMember) getData(event *es_models.Event) error {
+	m.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, m); err != nil {
+		logging.Log("EVEN-8die2").WithError(err).Error("could not unmarshal event data")
 		return err
 	}
 	return nil

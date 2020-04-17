@@ -11,6 +11,7 @@ type ProjectGrant struct {
 	GrantedOrgID string
 	State        ProjectGrantState
 	RoleKeys     []string
+	Members      []*ProjectGrantMember
 }
 
 type ProjectGrantState int32
