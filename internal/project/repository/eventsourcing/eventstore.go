@@ -678,3 +678,99 @@ func (es *ProjectEventstore) ReactivateProjectGrant(ctx context.Context, project
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-9osjw", "Could not find grant in list")
 }
+
+func (es *ProjectEventstore) ProjectGrantMemberByIDs(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {
+	if member.GrantID == "" || member.UserID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8diw2", "userID missing")
+	}
+	project, err := es.ProjectByID(ctx, member.ID)
+	if err != nil {
+		return nil, err
+	}
+	for _, g := range project.Grants {
+		if g.GrantID == member.GrantID {
+			for _, m := range g.Members {
+				return m, nil
+			}
+		}
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-3udjs", "member not found")
+}
+
+func (es *ProjectEventstore) AddProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {
+	if !member.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-0dor4", "invalid member")
+	}
+	existing, err := es.ProjectByID(ctx, member.ID)
+	if err != nil {
+		return nil, err
+	}
+	if existing.ContainsGrantMember(member) {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-8die3", "User is already member of this ProjectGrant")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoMember := GrantMemberFromModel(member)
+
+	addAggregate := ProjectGrantMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	es.projectCache.cacheProject(repoProject)
+	for _, g := range repoProject.Grants {
+		if g.GrantID == member.GrantID {
+			for _, m := range g.Members {
+				if m.UserID == member.UserID {
+					return GrantMemberToModel(m), nil
+				}
+			}
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
+}
+
+func (es *ProjectEventstore) ChangeProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {
+	if !member.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dkw35", "member is not valid")
+	}
+	existing, err := es.ProjectByID(ctx, member.ID)
+	if err != nil {
+		return nil, err
+	}
+	if !existing.ContainsGrantMember(member) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8dj4s", "User is not member of this grant")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoMember := GrantMemberFromModel(member)
+
+	projectAggregate := ProjectGrantMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	es.projectCache.cacheProject(repoProject)
+	for _, g := range repoProject.Grants {
+		if g.GrantID == member.GrantID {
+			for _, m := range g.Members {
+				if m.UserID == member.UserID {
+					return GrantMemberToModel(m), nil
+				}
+			}
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-s8ur3", "Could not find member in list")
+}
+
+func (es *ProjectEventstore) RemoveProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) error {
+	if member.UserID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-8su4r", "member is not valid")
+	}
+	existing, err := es.ProjectByID(ctx, member.ID)
+	if err != nil {
+		return err
+	}
+	if !existing.ContainsGrantMember(member) {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-9ode4", "User is not member of this grant")
+	}
+	repoProject := ProjectFromModel(existing)
+	repoMember := GrantMemberFromModel(member)
+
+	projectAggregate := ProjectGrantMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	es.projectCache.cacheProject(repoProject)
+	return err
+}

@@ -94,6 +94,17 @@ func (p *Project) ContainsRoles(roleKeys []string) bool {
 	return true
 }
 
+func (p *Project) ContainsGrantMember(member *ProjectGrantMember) bool {
+	for _, g := range p.Grants {
+		if g.GrantID == member.GrantID {
+			if g.ContainsMember(member) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func ProjectStateToInt(s ProjectState) int32 {
 	return int32(s)
 }

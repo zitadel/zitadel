@@ -38,3 +38,12 @@ func (p *ProjectGrant) IsValid() bool {
 	}
 	return true
 }
+
+func (p *ProjectGrant) ContainsMember(member *ProjectGrantMember) bool {
+	for _, m := range p.Members {
+		if m.UserID == member.UserID {
+			return true
+		}
+	}
+	return false
+}

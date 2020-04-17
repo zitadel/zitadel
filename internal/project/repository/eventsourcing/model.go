@@ -537,11 +537,11 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case model.ProjectGrantRemoved:
 		return p.appendRemoveGrantEvent(event)
 	case model.ProjectGrantMemberAdded:
-		return p.appendAddGrantEvent(event)
+		return p.appendAddGrantMemberEvent(event)
 	case model.ProjectGrantMemberChanged:
-		return p.appendChangeGrantEvent(event)
+		return p.appendChangeGrantMemberEvent(event)
 	case model.ProjectGrantMemberRemoved:
-		return p.appendRemoveGrantEvent(event)
+		return p.appendRemoveGrantMemberEvent(event)
 	}
 	return nil
 }
