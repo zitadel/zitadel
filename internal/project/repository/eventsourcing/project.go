@@ -357,3 +357,49 @@ func ProjectGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, ex
 		return agg, nil
 	}
 }
+
+func ProjectGrantMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, member *ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-4ufh6", "grant should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.ProjectGrantMemberAdded, member)
+		return agg, nil
+	}
+}
+
+func ProjectGrantMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, member *ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8i4h", "member should not be nil")
+		}
+
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := make(map[string]interface{}, 1)
+		changes["grantId"] = member.GrantID
+		changes["userId"] = member.UserID
+		changes["roles"] = member.Roles
+
+		return agg.AppendEvent(model.ProjectGrantMemberChanged, changes)
+	}
+}
+
+func ProjectGrantMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, member *ProjectGrantMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slp0r", "member should not be nil")
+		}
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.ProjectGrantMemberRemoved, member)
+	}
+}
