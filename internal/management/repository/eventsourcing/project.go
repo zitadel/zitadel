@@ -96,3 +96,28 @@ func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_mode
 func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
 }
+
+func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, projectID, appID string) (app *proj_model.ProjectGrant, err error) {
+	return repo.ProjectEvents.ProjectGrantByIDs(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, app *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.AddProjectGrant(ctx, app)
+}
+
+func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, app *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.ChangeProjectGrant(ctx, app)
+}
+
+func (repo *ProjectRepo) DeactivateProjectGrant(ctx context.Context, projectID, appID string) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.DeactivateProjectGrant(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) ReactivateProjectGrant(ctx context.Context, projectID, appID string) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.ReactivateProjectGrant(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, appID string) error {
+	app := proj_model.NewProjectGrant(projectID, appID)
+	return repo.ProjectEvents.RemoveProjectGrant(ctx, app)
+}

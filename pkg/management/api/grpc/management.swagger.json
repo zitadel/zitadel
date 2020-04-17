@@ -1936,6 +1936,34 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveProjectGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "put": {
         "operationId": "UpdateProjectGrant",
         "responses": {
@@ -4435,7 +4463,7 @@
         "granted_org_domain": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4470,7 +4498,7 @@
         "granted_org_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4708,7 +4736,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4731,7 +4759,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4787,7 +4815,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5228,7 +5256,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5486,7 +5514,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5542,7 +5570,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5645,7 +5673,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"

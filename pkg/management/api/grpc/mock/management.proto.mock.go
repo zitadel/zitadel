@@ -1417,6 +1417,26 @@ func (mr *MockManagementServiceClientMockRecorder) RegenerateOIDCClientSecret(ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateOIDCClientSecret", reflect.TypeOf((*MockManagementServiceClient)(nil).RegenerateOIDCClientSecret), varargs...)
 }
 
+// RemoveApplication mocks base method
+func (m *MockManagementServiceClient) RemoveApplication(arg0 context.Context, arg1 *grpc.ApplicationID, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveApplication", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveApplication indicates an expected call of RemoveApplication
+func (mr *MockManagementServiceClientMockRecorder) RemoveApplication(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveApplication", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveApplication), varargs...)
+}
+
 // RemoveOrgMember mocks base method
 func (m *MockManagementServiceClient) RemoveOrgMember(arg0 context.Context, arg1 *grpc.RemoveOrgMemberRequest, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -1435,6 +1455,26 @@ func (mr *MockManagementServiceClientMockRecorder) RemoveOrgMember(arg0, arg1 in
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveOrgMember", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveOrgMember), varargs...)
+}
+
+// RemoveProjectGrant mocks base method
+func (m *MockManagementServiceClient) RemoveProjectGrant(arg0 context.Context, arg1 *grpc.ProjectGrantID, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveProjectGrant", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveProjectGrant indicates an expected call of RemoveProjectGrant
+func (mr *MockManagementServiceClientMockRecorder) RemoveProjectGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProjectGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveProjectGrant), varargs...)
 }
 
 // RemoveProjectGrantMember mocks base method
