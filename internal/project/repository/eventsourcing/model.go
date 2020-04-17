@@ -477,6 +477,8 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_INACTIVE)
 	case model.ProjectGrantReactivated:
 		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_ACTIVE)
+	case model.ProjectGrantRemoved:
+		return p.appendRemoveGrantEvent(event)
 	}
 	return nil
 }

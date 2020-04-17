@@ -578,7 +578,7 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 }
 
 func (es *ProjectEventstore) ChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
-	if grant == nil || !grant.IsValid() {
+	if grant == nil && grant.GrantID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8sie3", "invalid grant")
 	}
 	existing, err := es.ProjectByID(ctx, grant.ID)

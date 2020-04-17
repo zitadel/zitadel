@@ -40,6 +40,7 @@ func projectGrantUpdateToModel(grant *ProjectGrantUpdate) *proj_model.ProjectGra
 		ObjectRoot: models.ObjectRoot{
 			ID: grant.ProjectId,
 		},
+		GrantID:  grant.Id,
 		RoleKeys: grant.RoleKeys,
 	}
 }
