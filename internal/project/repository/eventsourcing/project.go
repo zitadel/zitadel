@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 )
@@ -67,7 +66,7 @@ func ProjectReactivateAggregate(aggCreator *es_models.AggregateCreator, project 
 	return projectStateAggregate(aggCreator, project, model.ProjectReactivated)
 }
 
-func projectStateAggregate(aggCreator *es_models.AggregateCreator, project *Project, state models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
+func projectStateAggregate(aggCreator *es_models.AggregateCreator, project *Project, state es_models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := ProjectAggregate(ctx, aggCreator, project)
 		if err != nil {

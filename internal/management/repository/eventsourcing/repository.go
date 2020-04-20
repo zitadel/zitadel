@@ -4,6 +4,7 @@ import (
 	"context"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
@@ -15,6 +16,7 @@ type Config struct {
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
 	ProjectRepo
+	UserRepo
 }
 
 func Start(conf Config) (*EsRepository, error) {
@@ -37,9 +39,13 @@ func Start(conf Config) (*EsRepository, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	user, err := es_usr.StartUser(es_usr.UserConfig{Eventstore: es, Cache: conf.Eventstore.Cache})
+	if err != nil {
+		return nil, err
+	}
 	return &EsRepository{
 		ProjectRepo{project},
+		UserRepo{user},
 	}, nil
 }
 
