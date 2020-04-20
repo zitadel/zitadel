@@ -3,10 +3,8 @@ package bigcache
 import (
 	"bytes"
 	"encoding/gob"
-	"reflect"
-	"time"
-
 	"github.com/caos/logging"
+	"reflect"
 
 	"github.com/caos/zitadel/internal/errors"
 
@@ -20,9 +18,6 @@ type Bigcache struct {
 func NewBigcache(c *Config) (*Bigcache, error) {
 	cacheConfig := a_cache.DefaultConfig(c.CacheLifetime)
 	cacheConfig.HardMaxCacheSize = c.MaxCacheSizeInMB
-	if c.CacheLifetime > 0 {
-		cacheConfig.CleanWindow = 1 * time.Minute
-	}
 	cache, err := a_cache.NewBigCache(cacheConfig)
 	if err != nil {
 		return nil, err
