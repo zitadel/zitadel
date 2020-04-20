@@ -61,7 +61,7 @@ func TestProjectByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProjectByID(nil, tt.args.project)
+			result, err := tt.args.es.ProjectByID(nil, tt.args.project.ID)
 
 			if !tt.res.wantErr && result.ID != tt.res.project.ID {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.project.ID, result.ID)

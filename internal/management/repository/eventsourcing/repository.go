@@ -33,7 +33,7 @@ func Start(conf Config) (*EsRepository, error) {
 	//conf.Spooler.SQL = sql
 	//spool := spooler.StartSpooler(conf.Spooler)
 
-	project, err := es_proj.StartProject(es_proj.ProjectConfig{Eventstore: es})
+	project, err := es_proj.StartProject(es_proj.ProjectConfig{Eventstore: es, Cache: conf.Eventstore.Cache})
 	if err != nil {
 		return nil, err
 	}

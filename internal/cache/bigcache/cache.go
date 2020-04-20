@@ -1,0 +1,67 @@
+package bigcache
+
+import (
+	"bytes"
+	"encoding/gob"
+	"github.com/caos/logging"
+	"reflect"
+
+	"github.com/caos/zitadel/internal/errors"
+
+	a_cache "github.com/allegro/bigcache"
+)
+
+type Bigcache struct {
+	cache *a_cache.BigCache
+}
+
+func NewBigcache(c *Config) (*Bigcache, error) {
+	cacheConfig := a_cache.DefaultConfig(c.CacheLifetime)
+	cacheConfig.HardMaxCacheSize = c.MaxCacheSizeInMB
+	cache, err := a_cache.NewBigCache(cacheConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Bigcache{
+		cache: cache,
+	}, nil
+}
+
+func (c *Bigcache) Set(key string, object interface{}) error {
+	if key == "" || reflect.ValueOf(object).IsNil() {
+		return errors.ThrowInvalidArgument(nil, "FASTC-du73s", "key or value should not be empty")
+	}
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	if err := enc.Encode(object); err != nil {
+		return errors.ThrowInvalidArgument(err, "FASTC-RUyxI", "unable to encode object")
+	}
+	return c.cache.Set(key, b.Bytes())
+}
+
+func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
+	if key == "" || reflect.ValueOf(ptrToObject).IsNil() {
+		return errors.ThrowInvalidArgument(nil, "FASTC-dksoe", "key or value should not be empty")
+	}
+	value, err := c.cache.Get(key)
+	if err == a_cache.ErrEntryNotFound {
+		return errors.ThrowNotFound(err, "BIGCA-we32s", "not in cache")
+	}
+	if err != nil {
+		logging.Log("BIGCA-ftofbc").WithError(err).Info("read from cache failed")
+		return errors.ThrowInvalidArgument(err, "BIGCA-3idls", "error in reading from cache")
+	}
+
+	b := bytes.NewBuffer(value)
+	dec := gob.NewDecoder(b)
+
+	return dec.Decode(ptrToObject)
+}
+
+func (c *Bigcache) Delete(key string) error {
+	if key == "" {
+		return errors.ThrowInvalidArgument(nil, "FASTC-clsi2", "key should not be empty")
+	}
+	return c.cache.Delete(key)
+}
