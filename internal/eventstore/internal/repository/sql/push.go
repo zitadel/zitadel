@@ -3,9 +3,10 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/cockroachdb/cockroach-go/crdb"
 )
@@ -31,20 +32,14 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		if err != nil {
 			tx.Rollback()
 			logging.Log("SQL-9ctx5").WithError(err).Warn("prepare failed")
-			return errors.ThrowInternal(err, "SQL-juCgA", "prepare failed")
+			return caos_errs.ThrowInternal(err, "SQL-juCgA", "prepare failed")
 		}
 
 		for _, aggregate := range aggregates {
-			if aggregate.Precondition != nil {
-				events, err := filter(tx, aggregate.Precondition.Query)
-				if err != nil {
-					return errors.ThrowPreconditionFailed(err, "SQL-oBPxB", "filter failed")
-				}
-				err = aggregate.Precondition.Precondition(events...)
-				if err != nil {
-					tx.Rollback()
-					return errors.ThrowPreconditionFailed(err, "SQL-s6hqU", "validation failed")
-				}
+			err = precondtion(tx, aggregate)
+			if err != nil {
+				tx.Rollback()
+				return err
 			}
 			err = insertEvents(stmt, Sequence(aggregate.PreviousSequence), aggregate.Events)
 			if err != nil {
@@ -55,11 +50,26 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		return nil
 	})
 
-	if _, ok := err.(*errors.CaosError); !ok && err != nil {
-		err = errors.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
+	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
+		err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
 	}
 
 	return err
+}
+
+func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
+	if aggregate.Precondition == nil {
+		return nil
+	}
+	events, err := filter(tx, aggregate.Precondition.Query)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(err, "SQL-oBPxB", "filter failed")
+	}
+	err = aggregate.Precondition.Precondition(events...)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(err, "SQL-s6hqU", "validation failed")
+	}
+	return nil
 }
 
 func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Event) error {
@@ -77,7 +87,7 @@ func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Ev
 
 		if err != nil {
 			logging.Log("SQL-EXA0q").WithError(err).Info("query failed")
-			return errors.ThrowInternal(err, "SQL-SBP37", "unable to create event")
+			return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 		}
 		defer rows.Close()
 
@@ -89,7 +99,7 @@ func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Ev
 		}
 
 		if !rowInserted {
-			return errors.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
+			return caos_errs.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 		}
 
 		event.Sequence = uint64(previousSequence)
