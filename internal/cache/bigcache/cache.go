@@ -1,13 +1,14 @@
 package bigcache
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/gob"
 	"github.com/caos/logging"
-	"time"
+	"reflect"
+
+	"github.com/caos/zitadel/internal/errors"
 
 	a_cache "github.com/allegro/bigcache"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type Bigcache struct {
@@ -15,41 +16,52 @@ type Bigcache struct {
 }
 
 func NewBigcache(c *Config) (*Bigcache, error) {
-	cacheConfig := a_cache.DefaultConfig(c.CacheLifetimeSeconds * time.Second) // Only clean if HardMaxCacheSize is reached
+	cacheConfig := a_cache.DefaultConfig(c.CacheLifetime)
 	cacheConfig.HardMaxCacheSize = c.MaxCacheSizeInMB
-	if c.CacheLifetimeSeconds > 0 {
-		cacheConfig.CleanWindow = 1 * time.Minute
-	}
 	cache, err := a_cache.NewBigCache(cacheConfig)
 	if err != nil {
 		return nil, err
 	}
+
 	return &Bigcache{
 		cache: cache,
 	}, nil
 }
 
 func (c *Bigcache) Set(key string, object interface{}) error {
-	marshalled, err := json.Marshal(object)
-	if err != nil {
-		logging.Log("BIGCA-j6Vkhm").Debug("unable to marshall object into json")
-		return status.Error(codes.InvalidArgument, "unable to marshall object into json")
+	if key == "" || reflect.ValueOf(object).IsNil() {
+		return errors.ThrowInvalidArgument(nil, "FASTC-du73s", "key or value should not be empty")
 	}
-	return c.cache.Set(key, marshalled)
+	var b bytes.Buffer
+	enc := gob.NewEncoder(&b)
+	if err := enc.Encode(object); err != nil {
+		return errors.ThrowInvalidArgument(err, "FASTC-RUyxI", "unable to encode object")
+	}
+	return c.cache.Set(key, b.Bytes())
 }
 
 func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
+	if key == "" || reflect.ValueOf(ptrToObject).IsNil() {
+		return errors.ThrowInvalidArgument(nil, "FASTC-dksoe", "key or value should not be empty")
+	}
 	value, err := c.cache.Get(key)
 	if err == a_cache.ErrEntryNotFound {
-		return status.Error(codes.NotFound, "not in cache")
+		return errors.ThrowNotFound(err, "BIGCA-we32s", "not in cache")
 	}
 	if err != nil {
 		logging.Log("BIGCA-ftofbc").WithError(err).Info("read from cache failed")
-		return status.Error(codes.Internal, "error in reading from cache")
+		return errors.ThrowInvalidArgument(err, "BIGCA-3idls", "error in reading from cache")
 	}
-	return json.Unmarshal(value, ptrToObject)
+
+	b := bytes.NewBuffer(value)
+	dec := gob.NewDecoder(b)
+
+	return dec.Decode(ptrToObject)
 }
 
 func (c *Bigcache) Delete(key string) error {
+	if key == "" {
+		return errors.ThrowInvalidArgument(nil, "FASTC-clsi2", "key should not be empty")
+	}
 	return c.cache.Delete(key)
 }

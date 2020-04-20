@@ -48,9 +48,9 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 }
 
 func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_model.Project, error) {
-	project, sequence := es.projectCache.getProject(id)
+	project := es.projectCache.getProject(id)
 
-	query, err := ProjectByIDQuery(project.ID, sequence)
+	query, err := ProjectByIDQuery(project.ID, project.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -171,6 +171,9 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 
 	addAggregate := ProjectMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	for _, m := range repoProject.Members {
 		if m.UserID == member.UserID {
