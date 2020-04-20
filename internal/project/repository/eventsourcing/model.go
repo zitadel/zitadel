@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -200,7 +201,7 @@ func getMemberData(event *es_models.Event) (*ProjectMember, error) {
 	member.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, member); err != nil {
 		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")
-		return nil, err
+		return nil, errors.ThrowInternal(err, "EVENT-83js6", "could not unmarshal event data")
 	}
 	return member, nil
 }

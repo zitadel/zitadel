@@ -3,6 +3,7 @@ package bigcache
 import (
 	"bytes"
 	"encoding/gob"
+	"reflect"
 	"time"
 
 	"github.com/caos/logging"
@@ -33,6 +34,9 @@ func NewBigcache(c *Config) (*Bigcache, error) {
 }
 
 func (c *Bigcache) Set(key string, object interface{}) error {
+	if key == "" || reflect.ValueOf(object).IsNil() {
+		return errors.ThrowInvalidArgument(nil, "FASTC-du73s", "key or value should not be empty")
+	}
 	var b bytes.Buffer
 	enc := gob.NewEncoder(&b)
 	if err := enc.Encode(object); err != nil {
@@ -42,6 +46,9 @@ func (c *Bigcache) Set(key string, object interface{}) error {
 }
 
 func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
+	if key == "" || reflect.ValueOf(ptrToObject).IsNil() {
+		return errors.ThrowInvalidArgument(nil, "FASTC-dksoe", "key or value should not be empty")
+	}
 	value, err := c.cache.Get(key)
 	if err == a_cache.ErrEntryNotFound {
 		return errors.ThrowNotFound(err, "BIGCA-we32s", "not in cache")
@@ -58,5 +65,8 @@ func (c *Bigcache) Get(key string, ptrToObject interface{}) error {
 }
 
 func (c *Bigcache) Delete(key string) error {
+	if key == "" {
+		return errors.ThrowInvalidArgument(nil, "FASTC-clsi2", "key should not be empty")
+	}
 	return c.cache.Delete(key)
 }
