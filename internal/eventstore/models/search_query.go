@@ -64,6 +64,9 @@ func (q *SearchQuery) Validate() error {
 	if q == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-J5xQi", "search query is nil")
 	}
+	if len(q.Filters) == 0 {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-pF3DR", "no filters set")
+	}
 	for _, filter := range q.Filters {
 		if err := filter.Validate(); err != nil {
 			return err

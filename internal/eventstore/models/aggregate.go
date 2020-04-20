@@ -85,8 +85,8 @@ func (a *Aggregate) Validate() error {
 	if a.resourceOwner == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-eBYUW", "resource owner not set")
 	}
-	if a.Precondition != nil && (a.Precondition.Query == nil || a.Precondition.Precondition == nil) {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-EEUvA", "validation not set correctly")
+	if a.Precondition != nil && (a.Precondition.Query == nil || a.Precondition.Query.Validate() != nil || a.Precondition.Precondition == nil) {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-EEUvA", "invalid precondition")
 	}
 
 	return nil
