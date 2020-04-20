@@ -64,12 +64,7 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 
 func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Event) error {
 	for _, event := range events {
-		if event.Data == nil || len(event.Data) == 0 {
-			//json decoder failes with EOF if json text is empty
-			event.Data = []byte("{}")
-		}
-
-		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.EditorUser, event.EditorService, event.ResourceOwner,
+		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner,
 			event.AggregateType, event.AggregateID,
 			event.AggregateType, event.AggregateID,
 			previousSequence, event.AggregateType, event.AggregateID,
