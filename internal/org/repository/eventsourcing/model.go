@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/org/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
 const (
@@ -18,12 +18,9 @@ type Org struct {
 	Name   string `json:"name"`
 	Domain string `json:"domain"`
 	State  int32  `json:"-"`
-
-	isNameUnique   bool `json:"-"`
-	isDomainUnique bool `json:"-"`
 }
 
-func OrgFromModel(org *model.Org) *Org {
+func OrgFromModel(org *org_model.Org) *Org {
 	return &Org{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           org.ID,
@@ -33,12 +30,12 @@ func OrgFromModel(org *model.Org) *Org {
 		},
 		Domain: org.Domain,
 		Name:   org.Name,
-		State:  model.ProjectStateToInt(org.State),
+		State:  org_model.ProjectStateToInt(org.State),
 	}
 }
 
-func OrgToModel(org *Org) *model.Org {
-	return &model.Org{
+func OrgToModel(org *Org) *org_model.Org {
+	return &org_model.Org{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           org.ID,
 			Sequence:     org.Sequence,
@@ -47,7 +44,7 @@ func OrgToModel(org *Org) *model.Org {
 		},
 		Domain: org.Domain,
 		Name:   org.Name,
-		State:  model.ProjectStateFromInt(org.State),
+		State:  org_model.ProjectStateFromInt(org.State),
 	}
 }
 
@@ -73,15 +70,15 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 	o.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
-	case model.OrgAdded, model.OrgChanged:
+	case org_model.OrgAdded, org_model.OrgChanged:
 		err := json.Unmarshal(event.Data, o)
 		if err != nil {
 			return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
 		}
-	case model.OrgDeactivated:
-		o.State = model.ProjectStateToInt(model.Inactive)
-	case model.OrgReactivated:
-		o.State = model.ProjectStateToInt(model.Active)
+	case org_model.OrgDeactivated:
+		o.State = org_model.ProjectStateToInt(org_model.Inactive)
+	case org_model.OrgReactivated:
+		o.State = org_model.ProjectStateToInt(org_model.Active)
 	}
 
 	return nil
@@ -98,8 +95,4 @@ func (o *Org) Changes(changed *Org) map[string]interface{} {
 	}
 
 	return changes
-}
-
-func (o *Org) IsValid() bool {
-	return o.isDomainUnique && o.isNameUnique
 }

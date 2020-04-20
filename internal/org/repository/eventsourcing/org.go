@@ -20,6 +20,22 @@ func OrgByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, err
 		AggregateIDFilter(id), nil
 }
 
+func OrgDomainUniqueQuery(domain string) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(org_model.OrgDomainAggregate).
+		AggregateIDFilter(domain).
+		OrderDesc().
+		SetLimit(1)
+}
+
+func OrgNameUniqueQuery(name string) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(org_model.OrgNameAggregate).
+		AggregateIDFilter(name).
+		OrderDesc().
+		SetLimit(1)
+}
+
 func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(org_model.OrgAggregate).
@@ -55,7 +71,10 @@ func OrgCreateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 	if err != nil {
 		return nil, err
 	}
-	agg.AppendEvent(org_model.OrgAdded, org)
+	agg, err = agg.AppendEvent(org_model.OrgAdded, org)
+	if err != nil {
+		return nil, err
+	}
 
 	return []*es_models.Aggregate{
 		domainAgrregate,
@@ -96,7 +115,11 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 	if err != nil {
 		return nil, err
 	}
-	orgAggregate.AppendEvent(org_model.OrgChanged, changes)
+
+	orgAggregate, err = orgAggregate.AppendEvent(org_model.OrgChanged, changes)
+	if err != nil {
+		return nil, err
+	}
 	aggregates = append(aggregates, orgAggregate)
 
 	return aggregates, nil
@@ -133,25 +156,7 @@ func uniqueDomainAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		return nil, err
 	}
 
-	query := es_models.NewSearchQuery().
-		AggregateIDFilter(domain).
-		AggregateTypeFilter(org_model.OrgDomainAggregate).
-		OrderDesc().
-		SetLimit(1)
-
-	validation := func(events ...*es_models.Event) error {
-		if len(events) == 0 {
-			aggregate.PreviousSequence = 0
-			return nil
-		}
-		if events[0].Type == org_model.OrgDomainReserved {
-			return errors.ThrowPreconditionFailed(nil, "EVENT-WMKO4", "domain already reseved")
-		}
-		aggregate.PreviousSequence = events[0].Sequence
-		return nil
-	}
-
-	aggregate.SetPrecondition(query, validation)
+	aggregate.SetPrecondition(OrgDomainUniqueQuery(domain), validation(aggregate, org_model.OrgDomainReserved))
 
 	return aggregate, nil
 }
@@ -166,25 +171,21 @@ func uniqueNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 		return nil, err
 	}
 
-	query := es_models.NewSearchQuery().
-		AggregateIDFilter(name).
-		AggregateTypeFilter(org_model.OrgNameAggregate).
-		OrderDesc().
-		SetLimit(1)
+	aggregate.SetPrecondition(OrgNameUniqueQuery(name), validation(aggregate, org_model.OrgNameReserved))
 
-	validation := func(events ...*es_models.Event) error {
+	return aggregate, nil
+}
+
+func validation(aggregate *es_models.Aggregate, eventType es_models.EventType) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
 		if len(events) == 0 {
 			aggregate.PreviousSequence = 0
 			return nil
 		}
-		if events[0].Type == org_model.OrgNameReserved {
+		if events[0].Type == eventType {
 			return errors.ThrowPreconditionFailed(nil, "EVENT-WMKO4", "domain already reseved")
 		}
 		aggregate.PreviousSequence = events[0].Sequence
 		return nil
 	}
-
-	aggregate.SetPrecondition(query, validation)
-
-	return aggregate, nil
 }

@@ -2,9 +2,11 @@ package eventsourcing
 
 import (
 	"context"
+	"strings"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -14,18 +16,6 @@ import (
 type OrgRepo struct {
 	*org_es.OrgEventstore
 }
-
-func (s *OrgRepo) GetOrgByID(ctx context.Context, orgID string) (_ *org_model.Org, err error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mvn3R", "Not implemented")
-}
-
-// func (s *OrgRepo) SearchOrgs(ctx context.Context, request *OrgSearchRequest) (_ *OrgSearchResponse, err error) {
-// 	return nil, errors.ThrowUnimplemented(nil, "GRPC-Po9Hd", "Not implemented")
-// }
-
-// func (s *OrgRepo) IsOrgUnique(ctx context.Context, request *UniqueOrgRequest) (org *UniqueOrgResponse, err error) {
-// 	return nil, errors.ThrowUnimplemented(nil, "GRPC-0p6Fw", "Not implemented")
-// }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
 	eventstoreOrg := eventsourcing.OrgFromModel(setUp.Org)
@@ -43,4 +33,38 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 
 	setUp.Org = eventsourcing.OrgToModel(eventstoreOrg)
 	return setUp, nil
+}
+
+func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
+	return repo.OrgEventstore.OrgByID(ctx, org_model.NewOrg(id))
+}
+
+func (repo *OrgRepo) SearchOrgs(ctx context.Context) ([]*org_model.Org, error) {
+	return nil, errors.ThrowUnimplemented(nil, "EVENT-hFIHK", "search not implemented")
+}
+
+func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
+	var found bool
+	err = sdk.Filter(ctx, repo.FilterEvents, isUniqueValidation(&found), eventsourcing.OrgNameUniqueQuery(name))
+	if err != nil && !errors.IsNotFound(err) {
+		return false, err
+	}
+
+	err = sdk.Filter(ctx, repo.FilterEvents, isUniqueValidation(&found), eventsourcing.OrgDomainUniqueQuery(domain))
+	if err != nil && !errors.IsNotFound(err) {
+		return false, err
+	}
+
+	return !found, nil
+}
+
+func isUniqueValidation(unique *bool) func(events ...*models.Event) error {
+	return func(events ...*models.Event) error {
+		if len(events) == 0 {
+			return nil
+		}
+		*unique = *unique || strings.HasSuffix(string(events[0].Type), "reserved")
+
+		return nil
+	}
 }
