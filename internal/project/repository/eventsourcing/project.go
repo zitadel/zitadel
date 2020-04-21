@@ -27,7 +27,7 @@ func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreato
 	if project == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-doe93", "existing project should not be nil")
 	}
-	return aggCreator.NewAggregate(ctx, project.ID, model.ProjectAggregate, projectVersion, project.Sequence)
+	return aggCreator.NewAggregate(ctx, project.AggregateID, model.ProjectAggregate, projectVersion, project.Sequence)
 }
 
 func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *Project) func(ctx context.Context) (*es_models.Aggregate, error) {

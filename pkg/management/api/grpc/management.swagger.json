@@ -1760,7 +1760,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrantMember"
+              "properties": {}
             }
           }
         },
@@ -1870,7 +1870,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrantMember"
+              "properties": {}
             }
           }
         },
@@ -1915,34 +1915,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrant"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "delete": {
-        "operationId": "RemoveProjectGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
             }
           }
         },
@@ -3960,7 +3932,7 @@
       "enum": [
         "OIDCRESPONSETYPE_CODE",
         "OIDCRESPONSETYPE_ID_TOKEN",
-        "OIDCRESPONSETYPE_TOKEN_ID_TOKEN"
+        "OIDCRESPONSETYPE_TOKEN"
       ],
       "default": "OIDCRESPONSETYPE_CODE"
     },
@@ -4463,7 +4435,7 @@
         "granted_org_domain": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4498,7 +4470,7 @@
         "granted_org_id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4736,7 +4708,7 @@
         "id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4759,7 +4731,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4815,7 +4787,7 @@
         "id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5256,7 +5228,7 @@
         "id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5514,7 +5486,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5570,7 +5542,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5673,7 +5645,7 @@
         "id": {
           "type": "string"
         },
-        "role_keys": {
+        "role_names": {
           "type": "array",
           "items": {
             "type": "string"

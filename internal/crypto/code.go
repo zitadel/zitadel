@@ -4,15 +4,25 @@ import (
 	"crypto/rand"
 	"time"
 
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/errors"
 )
 
 var (
-	LowerLetters = []rune("abcdefghijklmnopqrstuvwxyz")
-	UpperLetters = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	Digits       = []rune("0123456789")
-	Symbols      = []rune("~!@#$^&*()_+`-={}|[]:<>?,./")
+	lowerLetters = []rune("abcdefghijklmnopqrstuvwxyz")
+	upperLetters = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	digits       = []rune("0123456789")
+	symbols      = []rune("~!@#$^&*()_+`-={}|[]:<>?,./")
 )
+
+type GeneratorConfig struct {
+	Length              uint
+	Expiry              types.Duration
+	IncludeLowerLetters bool
+	IncludeUpperLetters bool
+	IncludeDigits       bool
+	IncludeSymbols      bool
+}
 
 type Generator interface {
 	Length() uint
@@ -21,66 +31,73 @@ type Generator interface {
 	Runes() []rune
 }
 
-type EncryptionGenerator struct {
+type generator struct {
 	length uint
 	expiry time.Duration
-	alg    EncryptionAlgorithm
 	runes  []rune
 }
 
-func (g *EncryptionGenerator) Length() uint {
+func (g *generator) Length() uint {
 	return g.length
 }
 
-func (g *EncryptionGenerator) Expiry() time.Duration {
+func (g *generator) Expiry() time.Duration {
 	return g.expiry
 }
 
-func (g *EncryptionGenerator) Alg() Crypto {
-	return g.alg
-}
-
-func (g *EncryptionGenerator) Runes() []rune {
+func (g *generator) Runes() []rune {
 	return g.runes
 }
 
-func NewEncryptionGenerator(length uint, expiry time.Duration, alg EncryptionAlgorithm, runes []rune) *EncryptionGenerator {
-	return &EncryptionGenerator{
-		length: length,
-		expiry: expiry,
-		alg:    alg,
-		runes:  runes,
+type encryptionGenerator struct {
+	generator
+	alg EncryptionAlgorithm
+}
+
+func (g *encryptionGenerator) Alg() Crypto {
+	return g.alg
+}
+
+func NewEncryptionGenerator(config GeneratorConfig, algorithm EncryptionAlgorithm) Generator {
+	return &encryptionGenerator{
+		newGenerator(config),
+		algorithm,
 	}
 }
 
-type HashGenerator struct {
-	length uint
-	expiry time.Duration
-	alg    HashAlgorithm
-	runes  []rune
+type hashGenerator struct {
+	generator
+	alg HashAlgorithm
 }
 
-func (g *HashGenerator) Length() uint {
-	return g.length
-}
-
-func (g *HashGenerator) Expiry() time.Duration {
-	return g.expiry
-}
-
-func (g *HashGenerator) Alg() Crypto {
+func (g *hashGenerator) Alg() Crypto {
 	return g.alg
 }
 
-func (g *HashGenerator) Runes() []rune {
-	return g.runes
+func NewHashGenerator(config GeneratorConfig, algorithm HashAlgorithm) Generator {
+	return &hashGenerator{
+		newGenerator(config),
+		algorithm,
+	}
 }
 
-func NewHashGenerator(length uint, expiry time.Duration, alg HashAlgorithm, runes []rune) *HashGenerator {
-	return &HashGenerator{
-		length: length,
-		expiry: expiry,
-		alg:    alg,
+func newGenerator(config GeneratorConfig) generator {
+	var runes []rune
+	if config.IncludeLowerLetters {
+		runes = append(runes, lowerLetters...)
+	}
+	if config.IncludeUpperLetters {
+		runes = append(runes, upperLetters...)
+	}
+	if config.IncludeDigits {
+		runes = append(runes, digits...)
+	}
+	if config.IncludeSymbols {
+		runes = append(runes, symbols...)
+	}
+	return generator{
+		length: config.Length,
+		expiry: config.Expiry.Duration,
 		runes:  runes,
 	}
 }
@@ -98,6 +115,9 @@ func NewCode(g Generator) (*CryptoValue, string, error) {
 }
 
 func IsCodeExpired(creationDate time.Time, expiry time.Duration) bool {
+	if expiry == 0 {
+		return false
+	}
 	return creationDate.Add(expiry).Before(time.Now().UTC())
 }
 

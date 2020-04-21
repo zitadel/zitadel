@@ -23,21 +23,15 @@ const (
 )
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: PROJECTSTATE_ACTIVE}
+	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: PROJECTSTATE_ACTIVE}
 }
 
 func (p *Project) IsActive() bool {
-	if p.State == PROJECTSTATE_ACTIVE {
-		return true
-	}
-	return false
+	return p.State == PROJECTSTATE_ACTIVE
 }
 
 func (p *Project) IsValid() bool {
-	if p.Name == "" {
-		return false
-	}
-	return true
+	return p.Name != ""
 }
 
 func (p *Project) ContainsMember(member *ProjectMember) bool {
