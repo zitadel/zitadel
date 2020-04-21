@@ -6,8 +6,8 @@ import (
 
 type AuthSession struct {
 	es_models.ObjectRoot
-	SessionID             string
-	Type                  AuthSessionType
+	SessionID string
+	//Type                  AuthSessionType
 	BrowserInfo           *BrowserInfo
 	ApplicationID         string   //clientID
 	CallbackURI           string   //redirectURi
@@ -20,18 +20,19 @@ type AuthSession struct {
 	PreselectedUserID     string
 	MaxAuthAge            uint32
 	ProjectApplicationIDs []string //aud?
-	OIDC                  *AuthSessionOIDC
-	UserSession           UserSession
-	PossibleSteps         []*NextStep
+	//OIDC                  *AuthSessionOIDC
+	Request       Request
+	UserSession   UserSession
+	PossibleSteps []*NextStep
 }
 
-func NewAuthSession(agentID, sessionID string, sessionType AuthSessionType, info *BrowserInfo,
+func NewAuthSession(agentID, sessionID string, info *BrowserInfo,
 	applicationID, callbackURI, transferState string, prompt Prompt, requestedPossibleLOAs, requestedUiLocales []string,
-	loginHint, preselectedUserID string, maxAuthAge uint32, oidc *AuthSessionOIDC) *AuthSession {
+	loginHint, preselectedUserID string, maxAuthAge uint32, request Request) *AuthSession {
 	return &AuthSession{
-		ObjectRoot:            es_models.ObjectRoot{ID: agentID},
-		SessionID:             sessionID,
-		Type:                  sessionType,
+		ObjectRoot: es_models.ObjectRoot{ID: agentID},
+		SessionID:  sessionID,
+		//Type:                  sessionType,
 		BrowserInfo:           info,
 		ApplicationID:         applicationID,
 		CallbackURI:           callbackURI,
@@ -42,8 +43,13 @@ func NewAuthSession(agentID, sessionID string, sessionType AuthSessionType, info
 		LoginHint:             loginHint,
 		PreselectedUserID:     preselectedUserID,
 		MaxAuthAge:            maxAuthAge,
-		OIDC:                  oidc,
+		Request:               request,
 	}
+}
+
+type Request interface {
+	Type() AuthSessionType
+	IsValid() bool
 }
 
 func (a *AuthSession) IsValid() bool {
@@ -52,7 +58,7 @@ func (a *AuthSession) IsValid() bool {
 		a.BrowserInfo != nil && a.BrowserInfo.IsValid() &&
 		a.ApplicationID != "" &&
 		a.CallbackURI != "" &&
-		true //todo oidc?
+		a.Request != nil && a.Request.IsValid()
 }
 
 type AuthSessionType int32
@@ -79,6 +85,13 @@ type AuthSessionOIDC struct {
 	CodeChallenge *OIDCCodeChallenge
 }
 
+func (a *AuthSessionOIDC) Type() AuthSessionType {
+	return AuthSessionTypeOIDC
+}
+func (a *AuthSessionOIDC) IsValid() bool {
+	return true
+}
+
 type OIDCResponseType int32
 
 const (
@@ -98,6 +111,16 @@ const (
 	CodeChallengeMethodPlain OIDCCodeChallengeMethod = iota
 	CodeChallengeMethodS256
 )
+
+type AuthSessionSAML struct {
+}
+
+func (a *AuthSessionSAML) Type() AuthSessionType {
+	return AuthSessionTypeSAML
+}
+func (a *AuthSessionSAML) IsValid() bool {
+	return true
+}
 
 type NextStep interface {
 	Type() NextStepType

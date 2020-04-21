@@ -21,7 +21,7 @@ type UserAgentState int32
 
 const (
 	UserAgentStateActive UserAgentState = iota
-	UserAgentStateInctive
+	UserAgentStateRevoked
 )
 
 func NewUserAgent(id, userAgent, acceptLanguage string, remoteIP net.IP) *UserAgent {

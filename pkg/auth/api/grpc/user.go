@@ -7,6 +7,7 @@ import (
 )
 
 func (s *Server) GetMyUserProfile(ctx context.Context, _ *empty.Empty) (*UserProfile, error) {
+	s.repo.GetUserProfile
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-fis93", "Not implemented")
 }
 

@@ -1,7 +1,9 @@
 package repository
 
+import "context"
+
 type Repository interface {
-	Health() error
+	Health(context.Context) error
 	UserAgentRepository
 	UserRepository
 }
