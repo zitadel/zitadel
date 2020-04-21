@@ -102,6 +102,9 @@ func appStateFromModel(state proj_model.AppState) AppState {
 }
 
 func oidcResponseTypesToModel(responseTypes []OIDCResponseType) []proj_model.OIDCResponseType {
+	if len(responseTypes) == 0 {
+		return []proj_model.OIDCResponseType{proj_model.OIDCRESPONSETYPE_CODE}
+	}
 	oidcResponseTypes := make([]proj_model.OIDCResponseType, len(responseTypes))
 
 	for i, responseType := range responseTypes {
@@ -136,6 +139,9 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []O
 }
 
 func oidcGrantTypesToModel(grantTypes []OIDCGrantType) []proj_model.OIDCGrantType {
+	if len(grantTypes) == 0 {
+		return []proj_model.OIDCGrantType{proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE}
+	}
 	oidcGrantTypes := make([]proj_model.OIDCGrantType, len(grantTypes))
 
 	for i, grantType := range grantTypes {
