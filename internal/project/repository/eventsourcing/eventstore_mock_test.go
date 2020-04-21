@@ -41,7 +41,7 @@ func GetSonyFlacke() *sonyflake.Sonyflake {
 func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {
 	generator := crypto.NewMockGenerator(ctrl)
 	generator.EXPECT().Length().Return(uint(10))
-	generator.EXPECT().Runes().Return(crypto.LowerLetters)
+	generator.EXPECT().Runes().Return([]rune("abcdefghijklmnopqrstuvwxyz"))
 	generator.EXPECT().Alg().Return(crypto.NewBCrypt(10))
 	return generator
 }
