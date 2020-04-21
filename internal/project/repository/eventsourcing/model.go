@@ -115,7 +115,7 @@ func ProjectFromModel(project *model.Project) *Project {
 			CreationDate: project.CreationDate,
 		},
 		Name:         project.Name,
-		State:        model.ProjectStateToInt(project.State),
+		State:        int32(project.State),
 		Members:      members,
 		Roles:        roles,
 		Applications: apps,
@@ -134,7 +134,7 @@ func ProjectToModel(project *Project) *model.Project {
 			Sequence:     project.Sequence,
 		},
 		Name:         project.Name,
-		State:        model.ProjectStateFromInt(project.State),
+		State:        model.ProjectState(project.State),
 		Members:      members,
 		Roles:        roles,
 		Applications: apps,
@@ -363,7 +363,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 			logging.Log("EVEN-idl93").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
-		p.State = model.ProjectStateToInt(model.PROJECTSTATE_ACTIVE)
+		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		return nil
 	case model.ProjectDeactivated:
 		return p.appendDeactivatedEvent()
@@ -400,12 +400,12 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendDeactivatedEvent() error {
-	p.State = model.ProjectStateToInt(model.PROJECTSTATE_INACTIVE)
+	p.State = int32(model.PROJECTSTATE_INACTIVE)
 	return nil
 }
 
 func (p *Project) appendReactivatedEvent() error {
-	p.State = model.ProjectStateToInt(model.PROJECTSTATE_ACTIVE)
+	p.State = int32(model.PROJECTSTATE_ACTIVE)
 	return nil
 }
 

@@ -59,11 +59,3 @@ func (p *Project) ContainsApp(app *Application) (*Application, bool) {
 	}
 	return nil, false
 }
-
-func ProjectStateToInt(s ProjectState) int32 {
-	return int32(s)
-}
-
-func ProjectStateFromInt(index int32) ProjectState {
-	return ProjectState(index)
-}
