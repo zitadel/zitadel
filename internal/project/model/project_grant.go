@@ -22,7 +22,7 @@ const (
 )
 
 func NewProjectGrant(projectID, grantID string) *ProjectGrant {
-	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: projectID}, GrantID: grantID, State: PROJECTGRANTSTATE_ACTIVE}
+	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, GrantID: grantID, State: PROJECTGRANTSTATE_ACTIVE}
 }
 
 func (p *ProjectGrant) IsActive() bool {

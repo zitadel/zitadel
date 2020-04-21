@@ -392,7 +392,7 @@ func GrantFromModel(grant *model.ProjectGrant) *ProjectGrant {
 	members := GrantMembersFromModel(grant.Members)
 	return &ProjectGrant{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           grant.ObjectRoot.ID,
+			AggregateID:  grant.ObjectRoot.AggregateID,
 			Sequence:     grant.Sequence,
 			ChangeDate:   grant.ChangeDate,
 			CreationDate: grant.CreationDate,
@@ -409,7 +409,7 @@ func GrantToModel(grant *ProjectGrant) *model.ProjectGrant {
 	members := GrantMembersToModel(grant.Members)
 	return &model.ProjectGrant{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           grant.ID,
+			AggregateID:  grant.AggregateID,
 			ChangeDate:   grant.ChangeDate,
 			CreationDate: grant.CreationDate,
 			Sequence:     grant.Sequence,
@@ -441,7 +441,7 @@ func GrantMembersFromModel(members []*model.ProjectGrantMember) []*ProjectGrantM
 func GrantMemberFromModel(member *model.ProjectGrantMember) *ProjectGrantMember {
 	return &ProjectGrantMember{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           member.ObjectRoot.ID,
+			AggregateID:  member.ObjectRoot.AggregateID,
 			Sequence:     member.Sequence,
 			ChangeDate:   member.ChangeDate,
 			CreationDate: member.CreationDate,
@@ -455,7 +455,7 @@ func GrantMemberFromModel(member *model.ProjectGrantMember) *ProjectGrantMember 
 func GrantMemberToModel(member *ProjectGrantMember) *model.ProjectGrantMember {
 	return &model.ProjectGrantMember{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           member.ID,
+			AggregateID:  member.AggregateID,
 			ChangeDate:   member.ChangeDate,
 			CreationDate: member.CreationDate,
 			Sequence:     member.Sequence,

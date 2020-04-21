@@ -1785,10 +1785,10 @@ func TestProjectGrantByID(t *testing.T) {
 			name: "get grant",
 			args: args{
 				es:    GetMockProjectGrantByIDsOK(ctrl),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID"},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID"},
 			},
 			res: res{
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
@@ -1799,7 +1799,7 @@ func TestProjectGrantByID(t *testing.T) {
 			name: "no events for project",
 			args: args{
 				es:    GetMockProjectByIDNoEvents(ctrl),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID"},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID"},
 			},
 			res: res{
 				wantErr: true,
@@ -1810,7 +1810,7 @@ func TestProjectGrantByID(t *testing.T) {
 			name: "grant has no id",
 			args: args{
 				es:    GetMockProjectByIDNoEvents(ctrl),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -1822,9 +1822,9 @@ func TestProjectGrantByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProjectGrantByIDs(nil, tt.args.grant.ID, tt.args.grant.GrantID)
-			if !tt.res.wantErr && result.ID != tt.res.grant.ID {
-				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.grant.ID, result.ID)
+			result, err := tt.args.es.ProjectGrantByIDs(nil, tt.args.grant.AggregateID, tt.args.grant.GrantID)
+			if !tt.res.wantErr && result.AggregateID != tt.res.grant.AggregateID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.grant.AggregateID, result.AggregateID)
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.grant.GrantID {
 				t.Errorf("got wrong result grantid: expected: %v, actual: %v ", tt.res.grant.GrantID, result.GrantID)
@@ -1858,14 +1858,14 @@ func TestAddProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithRole(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
 				},
 			},
 			res: res{
-				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
@@ -1877,7 +1877,7 @@ func TestAddProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -1891,7 +1891,7 @@ func TestAddProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 				},
@@ -1906,7 +1906,7 @@ func TestAddProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
@@ -1922,7 +1922,7 @@ func TestAddProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"Key"},
@@ -1970,14 +1970,14 @@ func TestChangeProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrantExistingRole(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"KeyChanged"},
 				},
 			},
 			res: res{
-				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"KeyChanged"},
@@ -1989,7 +1989,7 @@ func TestChangeProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:  "GrantID",
 					RoleKeys: []string{"KeyChanged"},
 				},
@@ -2004,7 +2004,7 @@ func TestChangeProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"KeyChanged"},
@@ -2020,7 +2020,7 @@ func TestChangeProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"KeyChanged"},
@@ -2036,7 +2036,7 @@ func TestChangeProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
 					RoleKeys:     []string{"KeyChanged"},
@@ -2052,7 +2052,7 @@ func TestChangeProjectGrant(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeProjectGrant(tt.args.ctx, tt.args.grant)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
@@ -2089,7 +2089,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -2099,7 +2099,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -2111,7 +2111,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -2125,7 +2125,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -2171,12 +2171,12 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
 			res: res{
-				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					State:   model.PROJECTGRANTSTATE_INACTIVE,
 				},
@@ -2187,7 +2187,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -2199,7 +2199,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -2213,7 +2213,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -2225,9 +2225,9 @@ func TestDeactivateProjectGrant(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.DeactivateProjectGrant(tt.args.ctx, tt.args.grant.ID, tt.args.grant.GrantID)
+			result, err := tt.args.es.DeactivateProjectGrant(tt.args.ctx, tt.args.grant.AggregateID, tt.args.grant.GrantID)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
@@ -2265,12 +2265,12 @@ func TestReactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
 			res: res{
-				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					State:   model.PROJECTGRANTSTATE_ACTIVE,
 				},
@@ -2281,7 +2281,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -2293,7 +2293,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -2307,7 +2307,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
 			},
@@ -2319,9 +2319,9 @@ func TestReactivateProjectGrant(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ReactivateProjectGrant(tt.args.ctx, tt.args.grant.ID, tt.args.grant.GrantID)
+			result, err := tt.args.es.ReactivateProjectGrant(tt.args.ctx, tt.args.grant.AggregateID, tt.args.grant.GrantID)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
@@ -2357,17 +2357,17 @@ func TestProjectGrantMemberByIDs(t *testing.T) {
 			name: "projectgrant  member from events, ok",
 			args: args{
 				es:     GetMockProjectGrantMemberByIDsOK(ctrl),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
 			},
 			res: res{
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}},
 			},
 		},
 		{
 			name: "no project events",
 			args: args{
 				es:     GetMockProjectByIDNoEvents(ctrl),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID", UserID: "UserID"},
 			},
 			res: res{
 				wantErr: true,
@@ -2378,7 +2378,7 @@ func TestProjectGrantMemberByIDs(t *testing.T) {
 			name: "member id missing",
 			args: args{
 				es:     GetMockProjectByIDNoEvents(ctrl),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -2391,8 +2391,8 @@ func TestProjectGrantMemberByIDs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ProjectGrantMemberByIDs(nil, tt.args.member)
-			if !tt.res.wantErr && result.ID != tt.res.member.ID {
-				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.member.ID, result.ID)
+			if !tt.res.wantErr && result.AggregateID != tt.res.member.AggregateID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.member.AggregateID, result.AggregateID)
 			}
 			if !tt.res.wantErr && result.UserID != tt.res.member.UserID {
 				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.member.UserID, result.UserID)
@@ -2429,14 +2429,14 @@ func TestAddProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrantExistingRole(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
 				},
 			},
 			res: res{
-				result: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				result: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
@@ -2448,7 +2448,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					Roles: []string{"Role"},
 				},
 			},
@@ -2462,7 +2462,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
@@ -2478,7 +2478,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
@@ -2494,7 +2494,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddProjectGrantMember(tt.args.ctx, tt.args.member)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
@@ -2529,14 +2529,14 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"RoleChanged"},
 				},
 			},
 			res: res{
-				result: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				result: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"RoleChanged"},
@@ -2548,7 +2548,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					Roles: []string{"Role"},
 				},
 			},
@@ -2562,7 +2562,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
@@ -2578,7 +2578,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
@@ -2594,7 +2594,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeProjectGrantMember(tt.args.ctx, tt.args.member)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
@@ -2628,7 +2628,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"RoleChanged"},
@@ -2640,7 +2640,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					Roles: []string{"Role"},
 				},
 			},
@@ -2654,7 +2654,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},
@@ -2670,7 +2670,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
 					Roles:   []string{"Role"},

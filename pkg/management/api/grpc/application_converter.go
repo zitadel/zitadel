@@ -51,7 +51,6 @@ func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
-			ID: app.ProjectId,
 		},
 		Name: app.Name,
 		Type: proj_model.APPTYPE_OIDC,
