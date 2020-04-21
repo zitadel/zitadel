@@ -26,17 +26,11 @@ func NewProject(id string) *Project {
 }
 
 func (p *Project) IsActive() bool {
-	if p.State == PROJECTSTATE_ACTIVE {
-		return true
-	}
-	return false
+	return p.State == PROJECTSTATE_ACTIVE
 }
 
 func (p *Project) IsValid() bool {
-	if p.Name == "" {
-		return false
-	}
-	return true
+	return p.Name != ""
 }
 
 func (p *Project) ContainsMember(member *ProjectMember) bool {
@@ -57,13 +51,13 @@ func (p *Project) ContainsRole(role *ProjectRole) bool {
 	return false
 }
 
-func (p *Project) ContainsApp(app *Application) (bool, *Application) {
+func (p *Project) ContainsApp(app *Application) (*Application, bool) {
 	for _, a := range p.Applications {
 		if a.AppID == app.AppID {
-			return true, a
+			return a, true
 		}
 	}
-	return false, nil
+	return nil, false
 }
 
 func ProjectStateToInt(s ProjectState) int32 {

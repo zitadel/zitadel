@@ -244,43 +244,41 @@ func AppsFromModel(apps []*model.Application) []*Application {
 }
 
 func AppFromModel(app *model.Application) *Application {
-	oidc := new(OIDCConfig)
-	if app.OIDCConfig != nil {
-		oidc = OIDCConfigFromModel(app.OIDCConfig)
-	}
-	return &Application{
+	converted := &Application{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           app.ObjectRoot.ID,
 			Sequence:     app.Sequence,
 			ChangeDate:   app.ChangeDate,
 			CreationDate: app.CreationDate,
 		},
-		AppID:      app.AppID,
-		Name:       app.Name,
-		State:      model.AppStateToInt(app.State),
-		Type:       model.AppTypeToInt(app.Type),
-		OIDCConfig: oidc,
+		AppID: app.AppID,
+		Name:  app.Name,
+		State: int32(app.State),
+		Type:  int32(app.Type),
 	}
+	if app.OIDCConfig != nil {
+		converted.OIDCConfig = OIDCConfigFromModel(app.OIDCConfig)
+	}
+	return converted
 }
 
 func AppToModel(app *Application) *model.Application {
-	oidc := new(model.OIDCConfig)
-	if app.OIDCConfig != nil {
-		oidc = OIDCConfigToModel(app.OIDCConfig)
-	}
-	return &model.Application{
+	converted := &model.Application{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           app.ID,
 			ChangeDate:   app.ChangeDate,
 			CreationDate: app.CreationDate,
 			Sequence:     app.Sequence,
 		},
-		AppID:      app.AppID,
-		Name:       app.Name,
-		State:      model.AppStateFromInt(app.State),
-		Type:       model.AppTypeFromInt(app.Type),
-		OIDCConfig: oidc,
+		AppID: app.AppID,
+		Name:  app.Name,
+		State: model.AppState(app.State),
+		Type:  model.AppType(app.Type),
 	}
+	if app.OIDCConfig != nil {
+		converted.OIDCConfig = OIDCConfigToModel(app.OIDCConfig)
+	}
+	return converted
 }
 
 func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
@@ -560,7 +558,7 @@ func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppSta
 	}
 	for i, a := range p.Applications {
 		if a.AppID == app.AppID {
-			a.State = model.AppStateToInt(state)
+			a.State = int32(state)
 			p.Applications[i] = a
 		}
 	}

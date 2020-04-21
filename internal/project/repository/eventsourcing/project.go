@@ -262,7 +262,7 @@ func OIDCConfigChangedAggregate(aggCreator *es_models.AggregateCreator, existing
 	}
 }
 
-func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, appID string, crypto *crypto.CryptoValue) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, existing *Project, appID string, secret *crypto.CryptoValue) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := ProjectAggregate(ctx, aggCreator, existing)
 		if err != nil {
@@ -270,7 +270,7 @@ func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 		}
 		changes := make(map[string]interface{}, 1)
 		changes["appId"] = appID
-		changes["clientSecret"] = crypto
+		changes["clientSecret"] = secret
 
 		agg.AppendEvent(model.OIDCConfigSecretChanged, changes)
 

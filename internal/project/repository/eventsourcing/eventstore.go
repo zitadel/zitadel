@@ -375,7 +375,7 @@ func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_mo
 	if err != nil {
 		return nil, err
 	}
-	if ok, _ := existing.ContainsApp(app); !ok {
+	if _, ok := existing.ContainsApp(app); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "App is not in this project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -400,7 +400,7 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	if err != nil {
 		return err
 	}
-	if ok, _ := existing.ContainsApp(app); !ok {
+	if _, ok := existing.ContainsApp(app); !ok {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "Application doesn't exist on project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -423,7 +423,7 @@ func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectI
 		return nil, err
 	}
 	app := &proj_model.Application{AppID: appID}
-	if ok, _ := existing.ContainsApp(app); !ok {
+	if _, ok := existing.ContainsApp(app); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-slpe9", "App is not in this project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -449,7 +449,7 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 		return nil, err
 	}
 	app := &proj_model.Application{AppID: appID}
-	if ok, _ := existing.ContainsApp(app); !ok {
+	if _, ok := existing.ContainsApp(app); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld92d", "App is not in this project")
 	}
 	repoProject := ProjectFromModel(existing)
@@ -476,7 +476,7 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 	}
 	var ok bool
 	var app *proj_model.Application
-	if ok, app = existing.ContainsApp(&proj_model.Application{AppID: config.AppID}); !ok {
+	if app, ok = existing.ContainsApp(&proj_model.Application{AppID: config.AppID}); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dkso8", "App is not in this project")
 	}
 	if app.Type != proj_model.APPTYPE_OIDC {
@@ -506,7 +506,7 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	}
 	var ok bool
 	var app *proj_model.Application
-	if ok, app = existing.ContainsApp(&proj_model.Application{AppID: appID}); !ok {
+	if app, ok = existing.ContainsApp(&proj_model.Application{AppID: appID}); !ok {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9odi4", "App is not in this project")
 	}
 	if app.Type != proj_model.APPTYPE_OIDC {

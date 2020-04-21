@@ -129,8 +129,6 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []O
 			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN
 		case proj_model.OIDCRESPONSETYPE_TOKEN_ID_TOKEN:
 			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_TOKEN_ID_TOKEN
-		default:
-			oidcResponseTypes[i] = OIDCResponseType(99)
 		}
 	}
 
@@ -164,8 +162,6 @@ func oidcGrantTypesFromModel(grantTypes []proj_model.OIDCGrantType) []OIDCGrantT
 			oidcGrantTypes[i] = OIDCGrantType_OIDCGRANTTYPE_IMPLICIT
 		case proj_model.OIDCGRANTTYPE_REFRESH_TOKEN:
 			oidcGrantTypes[i] = OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN
-		default:
-			oidcGrantTypes[i] = 99
 		}
 	}
 	return oidcGrantTypes
@@ -180,7 +176,7 @@ func oidcApplicationTypeToModel(appType OIDCApplicationType) proj_model.OIDCAppl
 	case OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE:
 		return proj_model.OIDCAPPLICATIONTYPE_NATIVE
 	}
-	return 99
+	return proj_model.OIDCAPPLICATIONTYPE_WEB
 }
 
 func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) OIDCApplicationType {
@@ -192,7 +188,7 @@ func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) OIDCAp
 	case proj_model.OIDCAPPLICATIONTYPE_NATIVE:
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE
 	}
-	return 99
+	return OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
 }
 
 func oidcAuthMethodTypeToModel(authType OIDCAuthMethodType) proj_model.OIDCAuthMethodType {
