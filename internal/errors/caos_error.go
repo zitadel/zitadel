@@ -26,9 +26,9 @@ func CreateCaosError(parent error, id, message string) *CaosError {
 
 func (err *CaosError) Error() string {
 	if err.Parent != nil {
-		return fmt.Sprintf("ID=%s Message=%s Parent=(%v)", err.ID, err.Message, err.Parent)
+		return fmt.Sprintf("AggregateID=%s Message=%s Parent=(%v)", err.ID, err.Message, err.Parent)
 	}
-	return fmt.Sprintf("ID=%s Message=%s", err.ID, err.Message)
+	return fmt.Sprintf("AggregateID=%s Message=%s", err.ID, err.Message)
 }
 
 func (err *CaosError) Unwrap() error {

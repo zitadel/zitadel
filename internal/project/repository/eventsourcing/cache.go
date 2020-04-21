@@ -19,7 +19,7 @@ func StartCache(conf *config.CacheConfig) (*ProjectCache, error) {
 }
 
 func (c *ProjectCache) getProject(ID string) (project *Project) {
-	project = &Project{ObjectRoot: models.ObjectRoot{ID: ID}}
+	project = &Project{ObjectRoot: models.ObjectRoot{AggregateID: ID}}
 	if err := c.projectCache.Get(ID, project); err != nil {
 		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
 	}
@@ -27,7 +27,7 @@ func (c *ProjectCache) getProject(ID string) (project *Project) {
 }
 
 func (c *ProjectCache) cacheProject(project *Project) {
-	err := c.projectCache.Set(project.ID, project)
+	err := c.projectCache.Set(project.AggregateID, project)
 	if err != nil {
 		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting project cache")
 	}

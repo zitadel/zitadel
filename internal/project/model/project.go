@@ -22,7 +22,7 @@ const (
 )
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: PROJECTSTATE_ACTIVE}
+	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: PROJECTSTATE_ACTIVE}
 }
 
 func (p *Project) IsActive() bool {

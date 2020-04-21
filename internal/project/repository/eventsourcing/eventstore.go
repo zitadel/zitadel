@@ -47,7 +47,7 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_model.Project, error) {
 	project := es.projectCache.getProject(id)
 
-	query, err := ProjectByIDQuery(project.ID, project.Sequence)
+	query, err := ProjectByIDQuery(project.AggregateID, project.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	if err != nil {
 		return nil, err
 	}
-	project.ID = strconv.FormatUint(id, 10)
+	project.AggregateID = strconv.FormatUint(id, 10)
 	project.State = proj_model.PROJECTSTATE_ACTIVE
 	repoProject := ProjectFromModel(project)
 
@@ -85,7 +85,7 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, project *proj_mo
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
 	}
-	existingProject, err := es.ProjectByID(ctx, project.ID)
+	existingProject, err := es.ProjectByID(ctx, project.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *pro
 	if member.UserID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "userID missing")
 	}
-	project, err := es.ProjectByID(ctx, member.ID)
+	project, err := es.ProjectByID(ctx, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
-	existing, err := es.ProjectByID(ctx, member.ID)
+	existing, err := es.ProjectByID(ctx, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
-	existing, err := es.ProjectByID(ctx, member.ID)
+	existing, err := es.ProjectByID(ctx, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	if member.UserID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-d43fs", "UserID and Roles are required")
 	}
-	existing, err := es.ProjectByID(ctx, member.ID)
+	existing, err := es.ProjectByID(ctx, member.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -229,7 +229,7 @@ func (es *ProjectEventstore) AddProjectRole(ctx context.Context, role *proj_mode
 	if !role.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Key is required")
 	}
-	existing, err := es.ProjectByID(ctx, role.ID)
+	existing, err := es.ProjectByID(ctx, role.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +257,7 @@ func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_m
 	if !role.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9die3", "Key is required")
 	}
-	existing, err := es.ProjectByID(ctx, role.ID)
+	existing, err := es.ProjectByID(ctx, role.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -285,7 +285,7 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	if role.Key == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Key is required")
 	}
-	existing, err := es.ProjectByID(ctx, role.ID)
+	existing, err := es.ProjectByID(ctx, role.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -305,7 +305,7 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 
 func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "project oder app ID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "project oder app AggregateID missing")
 	}
 	project, err := es.ProjectByID(ctx, projectID)
 	if err != nil {
@@ -323,7 +323,7 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	if app == nil || !app.IsValid(true) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9eidw", "Some required fields are missing")
 	}
-	existing, err := es.ProjectByID(ctx, app.ID)
+	existing, err := es.ProjectByID(ctx, app.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +368,7 @@ func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_mo
 	if app == nil || !app.IsValid(false) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dieuw", "some required fields missing")
 	}
-	existing, err := es.ProjectByID(ctx, app.ID)
+	existing, err := es.ProjectByID(ctx, app.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +393,7 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	if app.AppID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-id832", "AppID is required")
 	}
-	existing, err := es.ProjectByID(ctx, app.ID)
+	existing, err := es.ProjectByID(ctx, app.AggregateID)
 	if err != nil {
 		return err
 	}
@@ -467,7 +467,7 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 	if config == nil || !config.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-du834", "invalid oidc config")
 	}
-	existing, err := es.ProjectByID(ctx, config.ID)
+	existing, err := es.ProjectByID(ctx, config.AggregateID)
 	if err != nil {
 		return nil, err
 	}

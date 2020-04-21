@@ -52,21 +52,9 @@ const (
 )
 
 func (c *OIDCConfig) IsValid() bool {
-	code, idToken, tokenIdToken := c.getChosenResponseTypes()
-	if code {
-		ok := c.containsGrantType(OIDCGRANTTYPE_AUTHORIZATION_CODE)
-		if !ok {
-			return false
-		}
-	}
-	if idToken {
-		ok := c.containsGrantType(OIDCGRANTTYPE_IMPLICIT)
-		if !ok {
-			return false
-		}
-	}
-	if tokenIdToken {
-		ok := c.containsGrantType(OIDCGRANTTYPE_IMPLICIT)
+	grantTypes := c.getRequiredGrantTypes()
+	for _, grantType := range grantTypes {
+		ok := c.containsGrantType(grantType)
 		if !ok {
 			return false
 		}
@@ -74,21 +62,20 @@ func (c *OIDCConfig) IsValid() bool {
 	return true
 }
 
-func (c *OIDCConfig) getChosenResponseTypes() (bool, bool, bool) {
-	code := false
-	idToken := false
-	tokenIdToken := false
+func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
+	grantTypes := make([]OIDCGrantType, 0)
+	implicit := false
 	for _, r := range c.ResponseTypes {
 		switch r {
 		case OIDCRESPONSETYPE_CODE:
-			code = true
-		case OIDCRESPONSETYPE_ID_TOKEN:
-			idToken = true
-		case OIDCRESPONSETYPE_TOKEN:
-			tokenIdToken = true
+			grantTypes = append(grantTypes, OIDCGRANTTYPE_AUTHORIZATION_CODE)
+		case OIDCRESPONSETYPE_ID_TOKEN, OIDCRESPONSETYPE_TOKEN:
+			if !implicit {
+				grantTypes = append(grantTypes, OIDCGRANTTYPE_IMPLICIT)
+			}
 		}
 	}
-	return code, idToken, tokenIdToken
+	return grantTypes
 }
 
 func (c *OIDCConfig) containsGrantType(grantType OIDCGrantType) bool {

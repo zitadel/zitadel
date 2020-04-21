@@ -91,10 +91,10 @@ func TestPrepareSearchQuery(t *testing.T) {
 		{
 			"search with search query",
 			mockDB(t).
-				expectGetSearchRequestWithSearchQuery("TESTTABLE", TestSearchKey_ID.ToColumnName(), "=", "ID", 2, 2),
+				expectGetSearchRequestWithSearchQuery("TESTTABLE", TestSearchKey_ID.ToColumnName(), "=", "AggregateID", 2, 2),
 			args{
 				table:         "TESTTABLE",
-				searchRequest: TestSearchRequest{queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "ID"}}},
+				searchRequest: TestSearchRequest{queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "AggregateID"}}},
 			},
 			res{
 				count:   2,
@@ -104,10 +104,10 @@ func TestPrepareSearchQuery(t *testing.T) {
 		{
 			"search with all params",
 			mockDB(t).
-				expectGetSearchRequestWithAllParams("TESTTABLE", TestSearchKey_ID.ToColumnName(), "=", "ID", "ASC", TestSearchKey_ID, 2, 2, 2, 5),
+				expectGetSearchRequestWithAllParams("TESTTABLE", TestSearchKey_ID.ToColumnName(), "=", "AggregateID", "ASC", TestSearchKey_ID, 2, 2, 2, 5),
 			args{
 				table:         "TESTTABLE",
-				searchRequest: TestSearchRequest{limit: 2, offset: 2, sortingColumn: TestSearchKey_ID, asc: true, queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "ID"}}},
+				searchRequest: TestSearchRequest{limit: 2, offset: 2, sortingColumn: TestSearchKey_ID, asc: true, queries: []SearchQuery{TestSearchQuery{key: TestSearchKey_ID, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "AggregateID"}}},
 			},
 			res{
 				count:   5,

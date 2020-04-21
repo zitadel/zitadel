@@ -50,7 +50,7 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *OIDCConfig {
 func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
-			ID: app.ProjectId,
+			AggregateID: app.ProjectId,
 		},
 		Name: app.Name,
 		Type: proj_model.APPTYPE_OIDC,
@@ -68,7 +68,7 @@ func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 func appUpdateToModel(app *ApplicationUpdate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
-			ID: app.ProjectId,
+			AggregateID: app.ProjectId,
 		},
 		AppID: app.Id,
 		Name:  app.Name,
@@ -78,7 +78,7 @@ func appUpdateToModel(app *ApplicationUpdate) *proj_model.Application {
 func oidcConfigUpdateToModel(app *OIDCConfigUpdate) *proj_model.OIDCConfig {
 	return &proj_model.OIDCConfig{
 		ObjectRoot: models.ObjectRoot{
-			ID: app.ProjectId,
+			AggregateID: app.ProjectId,
 		},
 		AppID:                  app.ApplicationId,
 		RedirectUris:           app.RedirectUris,
@@ -102,7 +102,7 @@ func appStateFromModel(state proj_model.AppState) AppState {
 }
 
 func oidcResponseTypesToModel(responseTypes []OIDCResponseType) []proj_model.OIDCResponseType {
-	if len(responseTypes) == 0 {
+	if responseTypes == nil || len(responseTypes) == 0 {
 		return []proj_model.OIDCResponseType{proj_model.OIDCRESPONSETYPE_CODE}
 	}
 	oidcResponseTypes := make([]proj_model.OIDCResponseType, len(responseTypes))
@@ -139,7 +139,7 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []O
 }
 
 func oidcGrantTypesToModel(grantTypes []OIDCGrantType) []proj_model.OIDCGrantType {
-	if len(grantTypes) == 0 {
+	if grantTypes == nil || len(grantTypes) == 0 {
 		return []proj_model.OIDCGrantType{proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE}
 	}
 	oidcGrantTypes := make([]proj_model.OIDCGrantType, len(grantTypes))
@@ -193,8 +193,9 @@ func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) OIDCAp
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT
 	case proj_model.OIDCAPPLICATIONTYPE_NATIVE:
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE
+	default:
+		return OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
 	}
-	return OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
 }
 
 func oidcAuthMethodTypeToModel(authType OIDCAuthMethodType) proj_model.OIDCAuthMethodType {
@@ -205,8 +206,9 @@ func oidcAuthMethodTypeToModel(authType OIDCAuthMethodType) proj_model.OIDCAuthM
 		return proj_model.OIDCAUTHMETHODTYPE_POST
 	case OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
 		return proj_model.OIDCAUTHMETHODTYPE_NONE
+	default:
+		return proj_model.OIDCAUTHMETHODTYPE_BASIC
 	}
-	return proj_model.OIDCAUTHMETHODTYPE_BASIC
 }
 
 func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) OIDCAuthMethodType {
@@ -217,6 +219,7 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) OIDCAut
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
 	case proj_model.OIDCAUTHMETHODTYPE_NONE:
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
+	default:
+		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 	}
-	return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 }

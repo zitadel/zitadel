@@ -109,7 +109,7 @@ func ProjectFromModel(project *model.Project) *Project {
 	apps := AppsFromModel(project.Applications)
 	return &Project{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ObjectRoot.ID,
+			AggregateID:  project.ObjectRoot.AggregateID,
 			Sequence:     project.Sequence,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
@@ -128,7 +128,7 @@ func ProjectToModel(project *Project) *model.Project {
 	apps := AppsToModel(project.Applications)
 	return &model.Project{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ID,
+			AggregateID:  project.AggregateID,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
 			Sequence:     project.Sequence,
@@ -160,7 +160,7 @@ func ProjectMembersFromModel(members []*model.ProjectMember) []*ProjectMember {
 func ProjectMemberFromModel(member *model.ProjectMember) *ProjectMember {
 	return &ProjectMember{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           member.ObjectRoot.ID,
+			AggregateID:  member.ObjectRoot.AggregateID,
 			Sequence:     member.Sequence,
 			ChangeDate:   member.ChangeDate,
 			CreationDate: member.CreationDate,
@@ -173,7 +173,7 @@ func ProjectMemberFromModel(member *model.ProjectMember) *ProjectMember {
 func ProjectMemberToModel(member *ProjectMember) *model.ProjectMember {
 	return &model.ProjectMember{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           member.ID,
+			AggregateID:  member.AggregateID,
 			ChangeDate:   member.ChangeDate,
 			CreationDate: member.CreationDate,
 			Sequence:     member.Sequence,
@@ -202,7 +202,7 @@ func ProjectRolesFromModel(roles []*model.ProjectRole) []*ProjectRole {
 func ProjectRoleFromModel(role *model.ProjectRole) *ProjectRole {
 	return &ProjectRole{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           role.ObjectRoot.ID,
+			AggregateID:  role.ObjectRoot.AggregateID,
 			Sequence:     role.Sequence,
 			ChangeDate:   role.ChangeDate,
 			CreationDate: role.CreationDate,
@@ -216,7 +216,7 @@ func ProjectRoleFromModel(role *model.ProjectRole) *ProjectRole {
 func ProjectRoleToModel(role *ProjectRole) *model.ProjectRole {
 	return &model.ProjectRole{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           role.ID,
+			AggregateID:  role.AggregateID,
 			ChangeDate:   role.ChangeDate,
 			CreationDate: role.CreationDate,
 			Sequence:     role.Sequence,
@@ -246,7 +246,7 @@ func AppsFromModel(apps []*model.Application) []*Application {
 func AppFromModel(app *model.Application) *Application {
 	converted := &Application{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           app.ObjectRoot.ID,
+			AggregateID:  app.ObjectRoot.AggregateID,
 			Sequence:     app.Sequence,
 			ChangeDate:   app.ChangeDate,
 			CreationDate: app.CreationDate,
@@ -265,7 +265,7 @@ func AppFromModel(app *model.Application) *Application {
 func AppToModel(app *Application) *model.Application {
 	converted := &model.Application{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           app.ID,
+			AggregateID:  app.AggregateID,
 			ChangeDate:   app.ChangeDate,
 			CreationDate: app.CreationDate,
 			Sequence:     app.Sequence,
@@ -292,7 +292,7 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 	}
 	return &OIDCConfig{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           config.ObjectRoot.ID,
+			AggregateID:  config.ObjectRoot.AggregateID,
 			Sequence:     config.Sequence,
 			ChangeDate:   config.ChangeDate,
 			CreationDate: config.CreationDate,
@@ -320,7 +320,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 	}
 	return &model.OIDCConfig{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           config.ObjectRoot.ID,
+			AggregateID:  config.ObjectRoot.AggregateID,
 			Sequence:     config.Sequence,
 			ChangeDate:   config.ChangeDate,
 			CreationDate: config.CreationDate,
@@ -411,7 +411,7 @@ func (p *Project) appendReactivatedEvent() error {
 
 func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 	member := &ProjectMember{}
-	err := member.getData(event)
+	err := member.setData(event)
 	if err != nil {
 		return err
 	}
@@ -422,7 +422,7 @@ func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 
 func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 	member := &ProjectMember{}
-	err := member.getData(event)
+	err := member.setData(event)
 	if err != nil {
 		return err
 	}
@@ -436,7 +436,7 @@ func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 
 func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	member := &ProjectMember{}
-	err := member.getData(event)
+	err := member.setData(event)
 	if err != nil {
 		return err
 	}
@@ -450,7 +450,7 @@ func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (m *ProjectMember) getData(event *es_models.Event) error {
+func (m *ProjectMember) setData(event *es_models.Event) error {
 	m.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, m); err != nil {
 		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")
@@ -461,7 +461,7 @@ func (m *ProjectMember) getData(event *es_models.Event) error {
 
 func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
 	role := new(ProjectRole)
-	err := role.getData(event)
+	err := role.setData(event)
 	if err != nil {
 		return err
 	}
@@ -472,7 +472,7 @@ func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
 
 func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
 	role := new(ProjectRole)
-	err := role.getData(event)
+	err := role.setData(event)
 	if err != nil {
 		return err
 	}
@@ -486,7 +486,7 @@ func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
 
 func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
 	role := new(ProjectRole)
-	err := role.getData(event)
+	err := role.setData(event)
 	if err != nil {
 		return err
 	}
@@ -500,7 +500,7 @@ func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (r *ProjectRole) getData(event *es_models.Event) error {
+func (r *ProjectRole) setData(event *es_models.Event) error {
 	r.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-d9euw").WithError(err).Error("could not unmarshal event data")
@@ -511,7 +511,7 @@ func (r *ProjectRole) getData(event *es_models.Event) error {
 
 func (p *Project) appendAddAppEvent(event *es_models.Event) error {
 	app := new(Application)
-	err := app.getData(event)
+	err := app.setData(event)
 	if err != nil {
 		return err
 	}
@@ -522,13 +522,13 @@ func (p *Project) appendAddAppEvent(event *es_models.Event) error {
 
 func (p *Project) appendChangeAppEvent(event *es_models.Event) error {
 	app := new(Application)
-	err := app.getData(event)
+	err := app.setData(event)
 	if err != nil {
 		return err
 	}
 	for i, a := range p.Applications {
 		if a.AppID == app.AppID {
-			p.Applications[i].getData(event)
+			p.Applications[i].setData(event)
 		}
 	}
 	return nil
@@ -536,7 +536,7 @@ func (p *Project) appendChangeAppEvent(event *es_models.Event) error {
 
 func (p *Project) appendRemoveAppEvent(event *es_models.Event) error {
 	app := new(Application)
-	err := app.getData(event)
+	err := app.setData(event)
 	if err != nil {
 		return err
 	}
@@ -552,7 +552,7 @@ func (p *Project) appendRemoveAppEvent(event *es_models.Event) error {
 
 func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppState) error {
 	app := new(Application)
-	err := app.getData(event)
+	err := app.setData(event)
 	if err != nil {
 		return err
 	}
@@ -565,7 +565,7 @@ func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppSta
 	return nil
 }
 
-func (a *Application) getData(event *es_models.Event) error {
+func (a *Application) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-8die3").WithError(err).Error("could not unmarshal event data")
@@ -576,7 +576,7 @@ func (a *Application) getData(event *es_models.Event) error {
 
 func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
 	config := new(OIDCConfig)
-	err := config.getData(event)
+	err := config.setData(event)
 	if err != nil {
 		return err
 	}
@@ -592,19 +592,19 @@ func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
 
 func (p *Project) appendChangeOIDCConfigEvent(event *es_models.Event) error {
 	config := new(OIDCConfig)
-	err := config.getData(event)
+	err := config.setData(event)
 	if err != nil {
 		return err
 	}
 	for i, a := range p.Applications {
 		if a.AppID == config.AppID {
-			p.Applications[i].OIDCConfig.getData(event)
+			p.Applications[i].OIDCConfig.setData(event)
 		}
 	}
 	return nil
 }
 
-func (o *OIDCConfig) getData(event *es_models.Event) error {
+func (o *OIDCConfig) setData(event *es_models.Event) error {
 	o.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, o); err != nil {
 		logging.Log("EVEN-d8e3s").WithError(err).Error("could not unmarshal event data")

@@ -10,10 +10,10 @@ import (
 
 func TestErrorMethod(t *testing.T) {
 	err := caos_errs.ThrowError(nil, "id", "msg")
-	expected := "ID=id Message=msg"
+	expected := "AggregateID=id Message=msg"
 	assert.Equal(t, expected, err.Error())
 
 	err = caos_errs.ThrowError(err, "subID", "subMsg")
-	subExptected := "ID=subID Message=subMsg Parent=(ID=id Message=msg)"
+	subExptected := "AggregateID=subID Message=subMsg Parent=(AggregateID=id Message=msg)"
 	assert.Equal(t, subExptected, err.Error())
 }

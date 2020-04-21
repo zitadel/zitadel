@@ -26,7 +26,7 @@ func projectMemberFromModel(member *proj_model.ProjectMember) *ProjectMember {
 func projectMemberAddToModel(member *ProjectMemberAdd) *proj_model.ProjectMember {
 	return &proj_model.ProjectMember{
 		ObjectRoot: models.ObjectRoot{
-			ID: member.Id,
+			AggregateID: member.Id,
 		},
 		UserID: member.UserId,
 		Roles:  member.Roles,
@@ -36,7 +36,7 @@ func projectMemberAddToModel(member *ProjectMemberAdd) *proj_model.ProjectMember
 func projectMemberChangeToModel(member *ProjectMemberChange) *proj_model.ProjectMember {
 	return &proj_model.ProjectMember{
 		ObjectRoot: models.ObjectRoot{
-			ID: member.Id,
+			AggregateID: member.Id,
 		},
 		UserID: member.UserId,
 		Roles:  member.Roles,

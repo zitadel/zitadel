@@ -18,7 +18,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -34,7 +34,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "invalid oidc application: responsetype code",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -50,7 +50,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype id_token",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -66,7 +66,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "invalid oidc application: responsetype id_token",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -82,7 +82,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype token_id_token",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -98,7 +98,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "invalid oidc application: responsetype token_id_token",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -114,7 +114,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code & id_token",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -130,7 +130,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code & token_id_token",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,
@@ -146,7 +146,7 @@ func TestApplicationValid(t *testing.T) {
 			name: "valid oidc application: responsetype code & id_token & token_id_token",
 			args: args{
 				app: &Application{
-					ObjectRoot: models.ObjectRoot{ID: "ID"},
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppID",
 					Name:       "Name",
 					Type:       APPTYPE_OIDC,

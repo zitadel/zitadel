@@ -10,9 +10,9 @@ type ProjectMember struct {
 }
 
 func NewProjectMember(projectID, userID string) *ProjectMember {
-	return &ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: projectID}, UserID: userID}
+	return &ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, UserID: userID}
 }
 
 func (p *ProjectMember) IsValid() bool {
-	return p.ID != "" && p.UserID != "" && len(p.Roles) != 0
+	return p.AggregateID != "" && p.UserID != "" && len(p.Roles) != 0
 }

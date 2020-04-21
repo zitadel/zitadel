@@ -30,11 +30,11 @@ const (
 )
 
 func NewApplication(projectID, appID string) *Application {
-	return &Application{ObjectRoot: es_models.ObjectRoot{ID: projectID}, AppID: appID, State: APPSTATE_ACTIVE}
+	return &Application{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, AppID: appID, State: APPSTATE_ACTIVE}
 }
 
 func (a *Application) IsValid(includeConfig bool) bool {
-	if a.Name == "" || a.ID == "" {
+	if a.Name == "" || a.AggregateID == "" {
 		return false
 	}
 	if !includeConfig {
