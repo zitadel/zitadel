@@ -2,14 +2,16 @@ package eventsourcing
 
 import (
 	"context"
+	"strconv"
+
+	"github.com/sony/sonyflake"
+
 	"github.com/caos/zitadel/internal/cache/config"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/sony/sonyflake"
-	"strconv"
 )
 
 type ProjectEventstore struct {
@@ -21,8 +23,9 @@ type ProjectEventstore struct {
 
 type ProjectConfig struct {
 	es_int.Eventstore
-	Cache            *config.CacheConfig
-	PasswordSaltCost int
+	Cache                 *config.CacheConfig
+	PasswordSaltCost      int
+	ClientSecretGenerator crypto.GeneratorConfig
 }
 
 func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
@@ -31,11 +34,7 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 		return nil, err
 	}
 	passwordAlg := crypto.NewBCrypt(conf.PasswordSaltCost)
-	runes := crypto.LowerLetters
-	runes = append(runes, crypto.UpperLetters...)
-	runes = append(runes, crypto.Digits...)
-	runes = append(runes, crypto.Symbols...)
-	pwGenerator := crypto.NewHashGenerator(20, 0, passwordAlg, runes)
+	pwGenerator := crypto.NewHashGenerator(conf.ClientSecretGenerator, passwordAlg)
 	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
@@ -335,14 +334,14 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	app.AppID = strconv.FormatUint(id, 10)
 
 	var stringPw string
-	var crypto *crypto.CryptoValue
+	var cryptoPw *crypto.CryptoValue
 	if app.OIDCConfig != nil {
 		app.OIDCConfig.AppID = strconv.FormatUint(id, 10)
-		stringPw, crypto, err = generateNewClientSecret(es.pwGenerator)
+		stringPw, cryptoPw, err = generateNewClientSecret(es.pwGenerator)
 		if err != nil {
 			return nil, err
 		}
-		app.OIDCConfig.ClientSecret = crypto
+		app.OIDCConfig.ClientSecret = cryptoPw
 		clientID, err := generateNewClientID(es.idGenerator, existing)
 		if err != nil {
 			return nil, err
