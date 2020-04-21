@@ -1,4 +1,4 @@
-package eventsourcing
+package model
 
 import "github.com/caos/zitadel/internal/eventstore/models"
 

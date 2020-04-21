@@ -22,7 +22,7 @@ type AuthSession struct {
 	ProjectApplicationIDs []string //aud?
 	//OIDC                  *AuthSessionOIDC
 	Request       Request
-	UserSession   UserSession
+	UserSession   *UserSession
 	PossibleSteps []*NextStep
 }
 
@@ -47,11 +47,6 @@ func NewAuthSession(agentID, sessionID string, info *BrowserInfo,
 	}
 }
 
-type Request interface {
-	Type() AuthSessionType
-	IsValid() bool
-}
-
 func (a *AuthSession) IsValid() bool {
 	return a.ID != "" &&
 		a.SessionID != "" &&
@@ -60,13 +55,6 @@ func (a *AuthSession) IsValid() bool {
 		a.CallbackURI != "" &&
 		a.Request != nil && a.Request.IsValid()
 }
-
-type AuthSessionType int32
-
-const (
-	AuthSessionTypeOIDC AuthSessionType = iota
-	AuthSessionTypeSAML
-)
 
 type Prompt int32
 
@@ -78,20 +66,6 @@ const (
 	PromptSelectAccount
 )
 
-type AuthSessionOIDC struct {
-	Scopes        []string
-	ResponseTypes OIDCResponseType
-	Nonce         string
-	CodeChallenge *OIDCCodeChallenge
-}
-
-func (a *AuthSessionOIDC) Type() AuthSessionType {
-	return AuthSessionTypeOIDC
-}
-func (a *AuthSessionOIDC) IsValid() bool {
-	return true
-}
-
 type OIDCResponseType int32
 
 const (
@@ -99,123 +73,3 @@ const (
 	ID_TOKEN
 	ID_TOKEN_TOKEN
 )
-
-type OIDCCodeChallenge struct {
-	Challenge string
-	Method    OIDCCodeChallengeMethod
-}
-
-type OIDCCodeChallengeMethod int32
-
-const (
-	CodeChallengeMethodPlain OIDCCodeChallengeMethod = iota
-	CodeChallengeMethodS256
-)
-
-type AuthSessionSAML struct {
-}
-
-func (a *AuthSessionSAML) Type() AuthSessionType {
-	return AuthSessionTypeSAML
-}
-func (a *AuthSessionSAML) IsValid() bool {
-	return true
-}
-
-type NextStep interface {
-	Type() NextStepType
-}
-
-type NextStepType int32
-
-const (
-	NextStepUnspecified NextStepType = iota
-	NextStepLogin
-	NextStepUserSelection
-	NextStepPassword
-	NextStepChangePassword
-	NextStepInitPassword
-	NextStepVerifyEmail
-	NextStepMfaPrompt
-	NextStepMfaVerify
-	NextStepRedirectToCallback
-)
-
-type LoginStep struct {
-	ErrMsg string
-}
-
-func (s *LoginStep) Type() NextStepType {
-	return NextStepLogin
-}
-
-type SelectUserStep struct {
-	Users []UserSelection
-}
-
-func (s *SelectUserStep) Type() NextStepType {
-	return NextStepUserSelection
-}
-
-type UserSelection struct {
-	SessionID        string
-	UserID           string
-	UserName         string
-	UserSessionState UserSessionState
-}
-
-type PasswordStep struct {
-	ErrMsg       string
-	FailureCount uint16
-}
-
-func (s *PasswordStep) Type() NextStepType {
-	return NextStepPassword
-}
-
-type ChangePasswordStep struct {
-}
-
-func (s *ChangePasswordStep) Type() NextStepType {
-	return NextStepChangePassword
-}
-
-type InitPasswordStep struct {
-}
-
-func (s *InitPasswordStep) Type() NextStepType {
-	return NextStepInitPassword
-}
-
-type VerifyEMailStep struct {
-}
-
-func (s *VerifyEMailStep) Type() NextStepType {
-	return NextStepVerifyEmail
-}
-
-type MfaPromptStep struct {
-	Required     bool
-	MfaProviders []MfaType
-}
-
-func (s *MfaPromptStep) Type() NextStepType {
-	return NextStepMfaPrompt
-}
-
-type MfaVerificationStep struct {
-	ErrMsg       string
-	FailureCount uint16
-	MfaProviders []MfaType
-}
-
-func (s *MfaVerificationStep) Type() NextStepType {
-	return NextStepMfaVerify
-}
-
-type RedirectToCallbackStep struct {
-}
-
-func (s *RedirectToCallbackStep) Type() NextStepType {
-	return NextStepRedirectToCallback
-}

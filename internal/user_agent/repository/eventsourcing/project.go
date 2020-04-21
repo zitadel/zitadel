@@ -13,20 +13,6 @@ import (
 
 var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
-func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
-	if id == "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "id should be filled")
-	}
-	return ProjectQuery(latestSequence).
-		AggregateIDFilter(id), nil
-}
-
-func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.ProjectAggregate).
-		LatestSequenceFilter(latestSequence)
-}
-
 func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, id string, sequence uint64) (*es_models.Aggregate, error) {
 	return aggCreator.NewAggregate(ctx, id, model.ProjectAggregate, projectVersion, sequence)
 }

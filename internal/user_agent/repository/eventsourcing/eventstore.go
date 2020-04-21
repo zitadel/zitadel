@@ -7,10 +7,13 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	agent_model "github.com/caos/zitadel/internal/user_agent/model"
+	"github.com/caos/zitadel/internal/user_agent/repository/eventsourcing/model"
 )
 
 type UserAgentEventstore struct {
 	es_int.Eventstore
+	agentCache *UserAgentCache
 }
 
 type UserAgentConfig struct {
@@ -22,18 +25,20 @@ func StartUserAgent(conf UserAgentConfig) (*UserAgentEventstore, error) {
 	return &UserAgentEventstore{Eventstore: conf.Eventstore}, nil
 }
 
-func (es *UserAgentEventstore) UserAgentByID(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	query, err := ProjectByIDQuery(project.ID, project.Sequence)
+func (es *UserAgentEventstore) UserAgentByID(ctx context.Context, id string) (*agent_model.UserAgent, error) {
+	userAgent, sequence := es.agentCache.getUserAgent(id)
+
+	query, err := UserAgentByIDQuery(userAgent.ID, userAgent.Sequence)
 	if err != nil {
 		return nil, err
 	}
 
-	p := ProjectFromModel(project)
-	err = es_sdk.Filter(ctx, es.FilterEvents, p.AppendEvents, query)
+	agent := model.UserAgentFromModel(userAgent)
+	err = es_sdk.Filter(ctx, es.FilterEvents, agent.AppendEvents, query)
 	if err != nil {
 		return nil, err
 	}
-	return ProjectToModel(p), nil
+	return model.UserAgentToModel(agent), nil
 }
 
 func (es *UserAgentEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
