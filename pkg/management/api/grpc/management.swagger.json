@@ -1318,7 +1318,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v1ProjectRole"
             }
           }
         },
@@ -1343,7 +1343,7 @@
         ]
       }
     },
-    "/projects/{id}/roles/{name}": {
+    "/projects/{id}/roles/{key}": {
       "delete": {
         "operationId": "RemoveProjectRole",
         "responses": {
@@ -1362,10 +1362,46 @@
             "type": "string"
           },
           {
-            "name": "name",
+            "name": "key",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ChangeProjectRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProjectRole"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectRoleChange"
+            }
           }
         ],
         "tags": [
@@ -1452,6 +1488,34 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1Application"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "RemoveApplication",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
             }
           }
         },
@@ -3868,7 +3932,7 @@
       "enum": [
         "OIDCRESPONSETYPE_CODE",
         "OIDCRESPONSETYPE_ID_TOKEN",
-        "OIDCRESPONSETYPE_TOKEN_ID_TOKEN"
+        "OIDCRESPONSETYPE_TOKEN"
       ],
       "default": "OIDCRESPONSETYPE_CODE"
     },
@@ -4898,13 +4962,17 @@
         "project_id": {
           "type": "string"
         },
-        "name": {
+        "key": {
           "type": "string"
         },
         "display_name": {
           "type": "string"
         },
         "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
           "type": "string",
           "format": "date-time"
         },
@@ -4923,7 +4991,24 @@
         "id": {
           "type": "string"
         },
-        "name": {
+        "key": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProjectRoleChange": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "key": {
           "type": "string"
         },
         "display_name": {
@@ -4938,7 +5023,7 @@
       "type": "string",
       "enum": [
         "PROJECTROLESEARCHKEY_UNSPECIFIED",
-        "PROJECTROLESEARCHKEY_NAME",
+        "PROJECTROLESEARCHKEY_KEY",
         "PROJECTROLESEARCHKEY_DISPLAY_NAME"
       ],
       "default": "PROJECTROLESEARCHKEY_UNSPECIFIED"

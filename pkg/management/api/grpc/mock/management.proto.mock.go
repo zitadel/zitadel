@@ -98,14 +98,14 @@ func (mr *MockManagementServiceClientMockRecorder) AddProjectMember(arg0, arg1 i
 }
 
 // AddProjectRole mocks base method
-func (m *MockManagementServiceClient) AddProjectRole(arg0 context.Context, arg1 *grpc.ProjectRoleAdd, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+func (m *MockManagementServiceClient) AddProjectRole(arg0 context.Context, arg1 *grpc.ProjectRoleAdd, arg2 ...grpc0.CallOption) (*grpc.ProjectRole, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddProjectRole", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
+	ret0, _ := ret[0].(*grpc.ProjectRole)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -215,6 +215,26 @@ func (mr *MockManagementServiceClientMockRecorder) ChangeProjectMember(arg0, arg
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeProjectMember", reflect.TypeOf((*MockManagementServiceClient)(nil).ChangeProjectMember), varargs...)
+}
+
+// ChangeProjectRole mocks base method
+func (m *MockManagementServiceClient) ChangeProjectRole(arg0 context.Context, arg1 *grpc.ProjectRoleChange, arg2 ...grpc0.CallOption) (*grpc.ProjectRole, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ChangeProjectRole", varargs...)
+	ret0, _ := ret[0].(*grpc.ProjectRole)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ChangeProjectRole indicates an expected call of ChangeProjectRole
+func (mr *MockManagementServiceClientMockRecorder) ChangeProjectRole(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeProjectRole", reflect.TypeOf((*MockManagementServiceClient)(nil).ChangeProjectRole), varargs...)
 }
 
 // ChangeUserEmail mocks base method

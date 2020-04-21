@@ -30,17 +30,17 @@ func TestProjectByID(t *testing.T) {
 			name: "project from events, ok",
 			args: args{
 				es:      GetMockProjectByIDOK(ctrl),
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 		},
 		{
 			name: "project from events, no events",
 			args: args{
 				es:      GetMockProjectByIDNoEvents(ctrl),
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -51,7 +51,7 @@ func TestProjectByID(t *testing.T) {
 			name: "project from events, no id",
 			args: args{
 				es:      GetMockProjectByIDNoEvents(ctrl),
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "", Sequence: 1}},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -61,10 +61,10 @@ func TestProjectByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProjectByID(nil, tt.args.project.ID)
+			result, err := tt.args.es.ProjectByID(nil, tt.args.project.AggregateID)
 
-			if !tt.res.wantErr && result.ID != tt.res.project.ID {
-				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.project.ID, result.ID)
+			if !tt.res.wantErr && result.AggregateID != tt.res.project.AggregateID {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.project.AggregateID, result.AggregateID)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -95,10 +95,10 @@ func TestCreateProject(t *testing.T) {
 			args: args{
 				es:      GetMockManipulateProject(ctrl),
 				ctx:     auth.NewMockContext("orgID", "userID"),
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name"},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name"},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name"},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name"},
 			},
 		},
 		{
@@ -106,7 +106,7 @@ func TestCreateProject(t *testing.T) {
 			args: args{
 				es:      GetMockManipulateProject(ctrl),
 				ctx:     auth.NewMockContext("orgID", "userID"),
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -118,7 +118,7 @@ func TestCreateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.CreateProject(tt.args.ctx, tt.args.project)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.Name != tt.res.project.Name {
@@ -153,10 +153,10 @@ func TestUpdateProject(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew"},
+				new: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew"},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew"},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew"},
 			},
 		},
 		{
@@ -164,7 +164,7 @@ func TestUpdateProject(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: ""},
+				new: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: ""},
 			},
 			res: res{
 				wantErr: true,
@@ -176,7 +176,7 @@ func TestUpdateProject(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew"},
+				new: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew"},
 			},
 			res: res{
 				wantErr: true,
@@ -188,7 +188,7 @@ func TestUpdateProject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.UpdateProject(tt.args.ctx, tt.args.new)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.Name != tt.res.project.Name {
@@ -224,10 +224,10 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew", State: model.Inactive},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew", State: model.PROJECTSTATE_INACTIVE},
 			},
 		},
 		{
@@ -235,7 +235,7 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Inactive},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_INACTIVE},
 			},
 			res: res{
 				wantErr: true,
@@ -247,7 +247,7 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
 				wantErr: true,
@@ -257,9 +257,9 @@ func TestDeactivateProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.DeactivateProject(tt.args.ctx, tt.args.existing.ID)
+			result, err := tt.args.es.DeactivateProject(tt.args.ctx, tt.args.existing.AggregateID)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.State != tt.res.project.State {
@@ -295,10 +295,10 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Inactive},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_INACTIVE},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "NameNew", State: model.Active},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew", State: model.PROJECTSTATE_ACTIVE},
 			},
 		},
 		{
@@ -306,7 +306,7 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
 				wantErr: true,
@@ -318,7 +318,7 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Name: "Name", State: model.Active},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
 			},
 			res: res{
 				wantErr: true,
@@ -328,9 +328,9 @@ func TestReactivateProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ReactivateProject(tt.args.ctx, tt.args.existing.ID)
+			result, err := tt.args.es.ReactivateProject(tt.args.ctx, tt.args.existing.AggregateID)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.State != tt.res.project.State {
@@ -363,17 +363,17 @@ func TestProjectMemberByIDs(t *testing.T) {
 			name: "project member from events, ok",
 			args: args{
 				es:     GetMockProjectMemberByIDsOK(ctrl),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Role"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Role"}},
 			},
 		},
 		{
 			name: "project member from events, no events",
 			args: args{
 				es:     GetMockProjectByIDNoEvents(ctrl),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
 				wantErr: true,
@@ -384,7 +384,7 @@ func TestProjectMemberByIDs(t *testing.T) {
 			name: "project member from events, no id",
 			args: args{
 				es:     GetMockProjectByIDNoEvents(ctrl),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -397,8 +397,8 @@ func TestProjectMemberByIDs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ProjectMemberByIDs(nil, tt.args.member)
-			if !tt.res.wantErr && result.ID != tt.res.member.ID {
-				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.member.ID, result.ID)
+			if !tt.res.wantErr && result.AggregateID != tt.res.member.AggregateID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.member.AggregateID, result.AggregateID)
 			}
 			if !tt.res.wantErr && result.UserID != tt.res.member.UserID {
 				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.member.UserID, result.UserID)
@@ -435,10 +435,10 @@ func TestAddProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
-				result: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				result: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 		},
 		{
@@ -446,7 +446,7 @@ func TestAddProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Roles: []string{"Roles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"Roles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -458,7 +458,7 @@ func TestAddProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
 				wantErr: true,
@@ -470,7 +470,7 @@ func TestAddProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProjectWithMember(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -482,7 +482,7 @@ func TestAddProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProjectNoEvents(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -494,7 +494,7 @@ func TestAddProjectMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.AddProjectMember(tt.args.ctx, tt.args.member)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.UserID != tt.res.result.UserID {
@@ -532,10 +532,10 @@ func TestChangeProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProjectWithMember(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
-				result: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				result: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 		},
 		{
@@ -543,7 +543,7 @@ func TestChangeProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -555,7 +555,7 @@ func TestChangeProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
 				wantErr: true,
@@ -567,7 +567,7 @@ func TestChangeProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -579,7 +579,7 @@ func TestChangeProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProjectNoEvents(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -591,7 +591,7 @@ func TestChangeProjectMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.ChangeProjectMember(tt.args.ctx, tt.args.member)
 
-			if !tt.res.wantErr && result.ID == "" {
+			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.UserID != tt.res.result.UserID {
@@ -631,14 +631,14 @@ func TestRemoveProjectMember(t *testing.T) {
 				es:  GetMockManipulateProjectWithMember(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.Project{
-					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name:       "Name",
 					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
 				},
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID"},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
-				result: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				result: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 		},
 		{
@@ -647,11 +647,11 @@ func TestRemoveProjectMember(t *testing.T) {
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.Project{
-					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name:       "Name",
 					Members:    []*model.ProjectMember{&model.ProjectMember{UserID: "UserID", Roles: []string{"Roles"}}},
 				},
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -664,10 +664,10 @@ func TestRemoveProjectMember(t *testing.T) {
 				es:  GetMockManipulateProject(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.Project{
-					ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name:       "Name",
 				},
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -679,7 +679,7 @@ func TestRemoveProjectMember(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateProjectNoEvents(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
-				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
 				wantErr: true,
@@ -693,6 +693,1069 @@ func TestRemoveProjectMember(t *testing.T) {
 
 			if !tt.res.wantErr && err != nil {
 				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddProjectRole(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es   *ProjectEventstore
+		ctx  context.Context
+		role *model.ProjectRole
+	}
+	type res struct {
+		result  *model.ProjectRole
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add project role, ok",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				result: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+		},
+		{
+			name: "no key",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role already existing",
+			args: args{
+				es:   GetMockManipulateProjectWithRole(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:   GetMockManipulateProjectNoEvents(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddProjectRole(tt.args.ctx, tt.args.role)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.Key != tt.res.result.Key {
+				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Key, result.Key)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeProjectRole(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es   *ProjectEventstore
+		ctx  context.Context
+		role *model.ProjectRole
+	}
+	type res struct {
+		result  *model.ProjectRole
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change project role, ok",
+			args: args{
+				es:   GetMockManipulateProjectWithRole(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayNameChanged", Group: "Group"},
+			},
+			res: res{
+				result: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayNameChanged", Group: "Group"},
+			},
+		},
+		{
+			name: "no key",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role not existing",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:   GetMockManipulateProjectNoEvents(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeProjectRole(tt.args.ctx, tt.args.role)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.Key != tt.res.result.Key {
+				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Key, result.Key)
+			}
+			if !tt.res.wantErr && result.DisplayName != tt.res.result.DisplayName {
+				t.Errorf("got wrong result displayName: expected: %v, actual: %v ", tt.res.result.DisplayName, result.DisplayName)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveProjectRole(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es   *ProjectEventstore
+		ctx  context.Context
+		role *model.ProjectRole
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove project role, ok",
+			args: args{
+				es:   GetMockManipulateProjectWithRole(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key"},
+			},
+		},
+		{
+			name: "no key",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "role not existing",
+			args: args{
+				es:   GetMockManipulateProject(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:   GetMockManipulateProjectNoEvents(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveProjectRole(tt.args.ctx, tt.args.role)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestApplicationByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		app *model.Application
+	}
+	type res struct {
+		app     *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "get app",
+			args: args{
+				es:  GetMockProjectAppsByIDsOK(ctrl),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, AppID: "AppID"},
+			},
+			res: res{
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID:      "AppID",
+					Name:       "Name",
+					OIDCConfig: &model.OIDCConfig{ClientID: "ClientID"}},
+			},
+		},
+		{
+			name: "no events for project",
+			args: args{
+				es:  GetMockProjectByIDNoEvents(ctrl),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, AppID: "AppID"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "app has no id",
+			args: args{
+				es:  GetMockProjectByIDNoEvents(ctrl),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsPreconditionFailed(err)
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ApplicationByIDs(nil, tt.args.app.AggregateID, tt.args.app.AppID)
+			if !tt.res.wantErr && result.AggregateID != tt.res.app.AggregateID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.app.AggregateID, result.AggregateID)
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.app.AppID {
+				t.Errorf("got wrong result appid: expected: %v, actual: %v ", tt.res.app.AppID, result.AppID)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddApplication(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		ctx context.Context
+		app *model.Application
+	}
+	type res struct {
+		result  *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add app, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithPw(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					Name: "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid app",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddApplication(tt.args.ctx, tt.args.app)
+
+			if !tt.res.wantErr && result.AppID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientSecretString == "" {
+				t.Errorf("result has no client secret")
+			}
+			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientID == "" {
+				t.Errorf("result has no clientid")
+			}
+			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeApp(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		ctx context.Context
+		app *model.Application
+	}
+	type res struct {
+		result  *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change app, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "NameChanged",
+				},
+			},
+			res: res{
+				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "NameChanged",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid app",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeApplication(tt.args.ctx, tt.args.app)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.result.AppID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
+			}
+			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveApp(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		ctx context.Context
+		app *model.Application
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove app, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+				},
+			},
+		},
+		{
+			name: "no appID",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveApplication(tt.args.ctx, tt.args.app)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestDeactivateApp(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		ctx context.Context
+		app *model.Application
+	}
+	type res struct {
+		result  *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "deactivate, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+				},
+			},
+			res: res{
+				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					State: model.APPSTATE_INACTIVE,
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+		},
+		{
+			name: "no app id",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.DeactivateApplication(tt.args.ctx, tt.args.app.AggregateID, tt.args.app.AppID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.result.AppID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
+			}
+			if !tt.res.wantErr && result.State != tt.res.result.State {
+				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestReactivateApp(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *ProjectEventstore
+		ctx context.Context
+		app *model.Application
+	}
+	type res struct {
+		result  *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "reactivate, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+				},
+			},
+			res: res{
+				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					State: model.APPSTATE_ACTIVE,
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+		},
+		{
+			name: "no app id",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ReactivateApplication(tt.args.ctx, tt.args.app.AggregateID, tt.args.app.AppID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.result.AppID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
+			}
+			if !tt.res.wantErr && result.State != tt.res.result.State {
+				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeOIDCConfig(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *ProjectEventstore
+		ctx    context.Context
+		config *model.OIDCConfig
+	}
+	type res struct {
+		result  *model.OIDCConfig
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change oidc config, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+			res: res{
+				result: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+		},
+		{
+			name: "invalid config",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app is not oidc",
+			args: args{
+				es:  GetMockManipulateProjectWithSAMLApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeOIDCConfig(tt.args.ctx, tt.args.config)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.result.AppID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
+			}
+			if !tt.res.wantErr && result.ResponseTypes[0] != tt.res.result.ResponseTypes[0] {
+				t.Errorf("got wrong result responsetype: expected: %v, actual: %v ", tt.res.result.ResponseTypes[0], result.ResponseTypes[0])
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeOIDCConfigSecret(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *ProjectEventstore
+		ctx    context.Context
+		config *model.OIDCConfig
+	}
+	type res struct {
+		result  *model.OIDCConfig
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change oidc config secret, ok",
+			args: args{
+				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:      "AppID",
+				},
+			},
+			res: res{
+				result: &model.OIDCConfig{
+					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:         "AppID",
+					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+				},
+			},
+		},
+		{
+			name: "no appID",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:      "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app is not oidc",
+			args: args{
+				es:  GetMockManipulateProjectWithSAMLApp(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:      "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "app not existing",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:      "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				config: &model.OIDCConfig{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
+					AppID:      "AppID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeOIDCConfigSecret(tt.args.ctx, tt.args.config.AggregateID, tt.args.config.AppID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.AppID != tt.res.result.AppID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.AppID, result.AppID)
+			}
+			if !tt.res.wantErr && result.ClientSecretString == "" {
+				t.Errorf("got wrong result should habe client secret")
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)

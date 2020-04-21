@@ -55,7 +55,7 @@ func TestObjectRoot_AppendEvent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			o := &ObjectRoot{
-				ID:           tt.fields.ID,
+				AggregateID:  tt.fields.ID,
 				Sequence:     tt.fields.Sequence,
 				CreationDate: tt.fields.CreationDate,
 				ChangeDate:   tt.fields.ChangeDate,

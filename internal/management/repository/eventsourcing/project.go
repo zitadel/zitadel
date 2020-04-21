@@ -50,3 +50,49 @@ func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, use
 	member := proj_model.NewProjectMember(projectID, userID)
 	return repo.ProjectEvents.RemoveProjectMember(ctx, member)
 }
+
+func (repo *ProjectRepo) AddProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	return repo.ProjectEvents.AddProjectRole(ctx, member)
+}
+
+func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	return repo.ProjectEvents.ChangeProjectRole(ctx, member)
+}
+
+func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key string) error {
+	member := proj_model.NewProjectRole(projectID, key)
+	return repo.ProjectEvents.RemoveProjectRole(ctx, member)
+}
+
+func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (app *proj_model.Application, err error) {
+	return repo.ProjectEvents.ApplicationByIDs(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
+	return repo.ProjectEvents.AddApplication(ctx, app)
+}
+
+func (repo *ProjectRepo) ChangeApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
+	return repo.ProjectEvents.ChangeApplication(ctx, app)
+}
+
+func (repo *ProjectRepo) DeactivateApplication(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
+	return repo.ProjectEvents.DeactivateApplication(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) ReactivateApplication(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
+	return repo.ProjectEvents.ReactivateApplication(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) RemoveApplication(ctx context.Context, projectID, appID string) error {
+	app := proj_model.NewApplication(projectID, appID)
+	return repo.ProjectEvents.RemoveApplication(ctx, app)
+}
+
+func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
+	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
+}
+
+func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*proj_model.OIDCConfig, error) {
+	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
+}

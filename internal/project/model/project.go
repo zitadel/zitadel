@@ -2,37 +2,35 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	in_model "github.com/caos/zitadel/internal/model"
 )
 
 type Project struct {
 	es_models.ObjectRoot
 
-	State   ProjectState
-	Name    string
-	Members []*ProjectMember
+	State        ProjectState
+	Name         string
+	Members      []*ProjectMember
+	Roles        []*ProjectRole
+	Applications []*Application
 }
 
-type ProjectState in_model.Enum
+type ProjectState int32
 
-var states = []string{"Active", "Inactive"}
+const (
+	PROJECTSTATE_ACTIVE ProjectState = iota
+	PROJECTSTATE_INACTIVE
+)
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: Active}
+	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: PROJECTSTATE_ACTIVE}
 }
 
 func (p *Project) IsActive() bool {
-	if p.State == Active {
-		return true
-	}
-	return false
+	return p.State == PROJECTSTATE_ACTIVE
 }
 
 func (p *Project) IsValid() bool {
-	if p.Name == "" {
-		return false
-	}
-	return true
+	return p.Name != ""
 }
 
 func (p *Project) ContainsMember(member *ProjectMember) bool {
@@ -42,4 +40,22 @@ func (p *Project) ContainsMember(member *ProjectMember) bool {
 		}
 	}
 	return false
+}
+
+func (p *Project) ContainsRole(role *ProjectRole) bool {
+	for _, r := range p.Roles {
+		if r.Key == role.Key {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Project) ContainsApp(app *Application) (*Application, bool) {
+	for _, a := range p.Applications {
+		if a.AppID == app.AppID {
+			return a, true
+		}
+	}
+	return nil, false
 }

@@ -15,6 +15,7 @@ const (
 	ProjectMemberRemoved models.EventType = "project.member.removed"
 
 	ProjectRoleAdded   models.EventType = "project.role.added"
+	ProjectRoleChanged models.EventType = "project.role.changed"
 	ProjectRoleRemoved models.EventType = "project.role.removed"
 
 	ProjectGrantAdded       models.EventType = "project.grant.added"
@@ -28,6 +29,7 @@ const (
 
 	ApplicationAdded       models.EventType = "project.application.added"
 	ApplicationChanged     models.EventType = "project.application.changed"
+	ApplicationRemoved     models.EventType = "project.application.removed"
 	ApplicationDeactivated models.EventType = "project.application.deactivated"
 	ApplicationReactivated models.EventType = "project.application.reactivated"
 

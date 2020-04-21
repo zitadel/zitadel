@@ -270,11 +270,11 @@ func TestPreparePut(t *testing.T) {
 			"ok",
 			mockDB(t).
 				expectBegin(nil).
-				expectSave("TESTTABLE", Test{ID: "ID", Test: "VALUE"}).
+				expectSave("TESTTABLE", Test{ID: "AggregateID", Test: "VALUE"}).
 				expectCommit(nil),
 			args{
 				table:  "TESTTABLE",
-				object: &Test{ID: "ID", Test: "VALUE"},
+				object: &Test{ID: "AggregateID", Test: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -285,11 +285,11 @@ func TestPreparePut(t *testing.T) {
 			"db error",
 			mockDB(t).
 				expectBegin(nil).
-				expectSaveErr("TESTTABLE", Test{ID: "ID", Test: "VALUE"}, gorm.ErrUnaddressable).
+				expectSaveErr("TESTTABLE", Test{ID: "AggregateID", Test: "VALUE"}, gorm.ErrUnaddressable).
 				expectCommit(nil),
 			args{
 				table:  "TESTTABLE",
-				object: &Test{ID: "ID", Test: "VALUE"},
+				object: &Test{ID: "AggregateID", Test: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},

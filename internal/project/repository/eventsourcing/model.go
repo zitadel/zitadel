@@ -2,11 +2,11 @@ package eventsourcing
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/errors"
-
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
+	"reflect"
 )
 
 const (
@@ -15,15 +15,51 @@ const (
 
 type Project struct {
 	es_models.ObjectRoot
-	Name    string           `json:"name,omitempty"`
-	State   int32            `json:"-"`
-	Members []*ProjectMember `json:"-"`
+	Name         string           `json:"name,omitempty"`
+	State        int32            `json:"-"`
+	Members      []*ProjectMember `json:"-"`
+	Roles        []*ProjectRole   `json:"-"`
+	Applications []*Application   `json:"-"`
 }
 
 type ProjectMember struct {
 	es_models.ObjectRoot
 	UserID string   `json:"userId,omitempty"`
 	Roles  []string `json:"roles,omitempty"`
+}
+
+type ProjectRole struct {
+	es_models.ObjectRoot
+	Key         string `json:"key,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+	Group       string `json:"group,omitempty"`
+}
+
+type Application struct {
+	es_models.ObjectRoot
+	AppID      string      `json:"appId"`
+	State      int32       `json:"-"`
+	Name       string      `json:"name,omitempty"`
+	Type       int32       `json:"appType,omitempty"`
+	OIDCConfig *OIDCConfig `json:"-"`
+}
+
+type ApplicationID struct {
+	es_models.ObjectRoot
+	AppID string `json:"appId"`
+}
+
+type OIDCConfig struct {
+	es_models.ObjectRoot
+	AppID                  string              `json:"appId"`
+	ClientID               string              `json:"clientId,omitempty"`
+	ClientSecret           *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	RedirectUris           []string            `json:"redirectUris,omitempty"`
+	ResponseTypes          []int32             `json:"responseTypes,omitempty"`
+	GrantTypes             []int32             `json:"grantTypes,omitempty"`
+	ApplicationType        int32               `json:"applicationType,omitempty"`
+	AuthMethodType         int32               `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris []string            `json:"postLogoutRedirectUris,omitempty"`
 }
 
 func (p *Project) Changes(changed *Project) map[string]interface{} {
@@ -34,33 +70,74 @@ func (p *Project) Changes(changed *Project) map[string]interface{} {
 	return changes
 }
 
+func (a *Application) Changes(changed *Application) map[string]interface{} {
+	changes := make(map[string]interface{}, 1)
+	changes["appId"] = a.AppID
+	if changed.Name != "" && a.Name != changed.Name {
+		changes["name"] = changed.Name
+	}
+	return changes
+}
+
+func (c *OIDCConfig) Changes(changed *OIDCConfig) map[string]interface{} {
+	changes := make(map[string]interface{}, 1)
+	changes["appId"] = c.AppID
+	if !reflect.DeepEqual(c.RedirectUris, changed.RedirectUris) {
+		changes["redirectUris"] = changed.RedirectUris
+	}
+	if !reflect.DeepEqual(c.ResponseTypes, changed.ResponseTypes) {
+		changes["responseTypes"] = changed.ResponseTypes
+	}
+	if !reflect.DeepEqual(c.GrantTypes, changed.GrantTypes) {
+		changes["grantTypes"] = changed.GrantTypes
+	}
+	if c.ApplicationType != changed.ApplicationType {
+		changes["applicationType"] = changed.ApplicationType
+	}
+	if c.AuthMethodType != changed.AuthMethodType {
+		changes["authMethodType"] = changed.AuthMethodType
+	}
+	if !reflect.DeepEqual(c.PostLogoutRedirectUris, changed.PostLogoutRedirectUris) {
+		changes["postLogoutRedirectUris"] = changed.PostLogoutRedirectUris
+	}
+	return changes
+}
+
 func ProjectFromModel(project *model.Project) *Project {
 	members := ProjectMembersFromModel(project.Members)
+	roles := ProjectRolesFromModel(project.Roles)
+	apps := AppsFromModel(project.Applications)
 	return &Project{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ObjectRoot.ID,
+			AggregateID:  project.ObjectRoot.AggregateID,
 			Sequence:     project.Sequence,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
 		},
-		Name:    project.Name,
-		State:   model.ProjectStateToInt(project.State),
-		Members: members,
+		Name:         project.Name,
+		State:        int32(project.State),
+		Members:      members,
+		Roles:        roles,
+		Applications: apps,
 	}
 }
 
 func ProjectToModel(project *Project) *model.Project {
 	members := ProjectMembersToModel(project.Members)
+	roles := ProjectRolesToModel(project.Roles)
+	apps := AppsToModel(project.Applications)
 	return &model.Project{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ID,
+			AggregateID:  project.AggregateID,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
 			Sequence:     project.Sequence,
 		},
-		Name:    project.Name,
-		State:   model.ProjectStateFromInt(project.State),
-		Members: members,
+		Name:         project.Name,
+		State:        model.ProjectState(project.State),
+		Members:      members,
+		Roles:        roles,
+		Applications: apps,
 	}
 }
 
@@ -83,7 +160,7 @@ func ProjectMembersFromModel(members []*model.ProjectMember) []*ProjectMember {
 func ProjectMemberFromModel(member *model.ProjectMember) *ProjectMember {
 	return &ProjectMember{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           member.ObjectRoot.ID,
+			AggregateID:  member.ObjectRoot.AggregateID,
 			Sequence:     member.Sequence,
 			ChangeDate:   member.ChangeDate,
 			CreationDate: member.CreationDate,
@@ -96,13 +173,167 @@ func ProjectMemberFromModel(member *model.ProjectMember) *ProjectMember {
 func ProjectMemberToModel(member *ProjectMember) *model.ProjectMember {
 	return &model.ProjectMember{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           member.ID,
+			AggregateID:  member.AggregateID,
 			ChangeDate:   member.ChangeDate,
 			CreationDate: member.CreationDate,
 			Sequence:     member.Sequence,
 		},
 		UserID: member.UserID,
 		Roles:  member.Roles,
+	}
+}
+
+func ProjectRolesToModel(roles []*ProjectRole) []*model.ProjectRole {
+	convertedRoles := make([]*model.ProjectRole, len(roles))
+	for i, r := range roles {
+		convertedRoles[i] = ProjectRoleToModel(r)
+	}
+	return convertedRoles
+}
+
+func ProjectRolesFromModel(roles []*model.ProjectRole) []*ProjectRole {
+	convertedRoles := make([]*ProjectRole, len(roles))
+	for i, r := range roles {
+		convertedRoles[i] = ProjectRoleFromModel(r)
+	}
+	return convertedRoles
+}
+
+func ProjectRoleFromModel(role *model.ProjectRole) *ProjectRole {
+	return &ProjectRole{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  role.ObjectRoot.AggregateID,
+			Sequence:     role.Sequence,
+			ChangeDate:   role.ChangeDate,
+			CreationDate: role.CreationDate,
+		},
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
+	}
+}
+
+func ProjectRoleToModel(role *ProjectRole) *model.ProjectRole {
+	return &model.ProjectRole{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  role.AggregateID,
+			ChangeDate:   role.ChangeDate,
+			CreationDate: role.CreationDate,
+			Sequence:     role.Sequence,
+		},
+		Key:         role.Key,
+		DisplayName: role.DisplayName,
+		Group:       role.Group,
+	}
+}
+
+func AppsToModel(apps []*Application) []*model.Application {
+	convertedApps := make([]*model.Application, len(apps))
+	for i, a := range apps {
+		convertedApps[i] = AppToModel(a)
+	}
+	return convertedApps
+}
+
+func AppsFromModel(apps []*model.Application) []*Application {
+	convertedApps := make([]*Application, len(apps))
+	for i, a := range apps {
+		convertedApps[i] = AppFromModel(a)
+	}
+	return convertedApps
+}
+
+func AppFromModel(app *model.Application) *Application {
+	converted := &Application{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  app.ObjectRoot.AggregateID,
+			Sequence:     app.Sequence,
+			ChangeDate:   app.ChangeDate,
+			CreationDate: app.CreationDate,
+		},
+		AppID: app.AppID,
+		Name:  app.Name,
+		State: int32(app.State),
+		Type:  int32(app.Type),
+	}
+	if app.OIDCConfig != nil {
+		converted.OIDCConfig = OIDCConfigFromModel(app.OIDCConfig)
+	}
+	return converted
+}
+
+func AppToModel(app *Application) *model.Application {
+	converted := &model.Application{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  app.AggregateID,
+			ChangeDate:   app.ChangeDate,
+			CreationDate: app.CreationDate,
+			Sequence:     app.Sequence,
+		},
+		AppID: app.AppID,
+		Name:  app.Name,
+		State: model.AppState(app.State),
+		Type:  model.AppType(app.Type),
+	}
+	if app.OIDCConfig != nil {
+		converted.OIDCConfig = OIDCConfigToModel(app.OIDCConfig)
+	}
+	return converted
+}
+
+func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
+	responseTypes := make([]int32, len(config.ResponseTypes))
+	for i, rt := range config.ResponseTypes {
+		responseTypes[i] = int32(rt)
+	}
+	grantTypes := make([]int32, len(config.GrantTypes))
+	for i, rt := range config.GrantTypes {
+		grantTypes[i] = int32(rt)
+	}
+	return &OIDCConfig{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  config.ObjectRoot.AggregateID,
+			Sequence:     config.Sequence,
+			ChangeDate:   config.ChangeDate,
+			CreationDate: config.CreationDate,
+		},
+		AppID:                  config.AppID,
+		ClientID:               config.ClientID,
+		ClientSecret:           config.ClientSecret,
+		RedirectUris:           config.RedirectUris,
+		ResponseTypes:          responseTypes,
+		GrantTypes:             grantTypes,
+		ApplicationType:        int32(config.ApplicationType),
+		AuthMethodType:         int32(config.AuthMethodType),
+		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
+	}
+}
+
+func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
+	responseTypes := make([]model.OIDCResponseType, len(config.ResponseTypes))
+	for i, rt := range config.ResponseTypes {
+		responseTypes[i] = model.OIDCResponseType(rt)
+	}
+	grantTypes := make([]model.OIDCGrantType, len(config.GrantTypes))
+	for i, rt := range config.GrantTypes {
+		grantTypes[i] = model.OIDCGrantType(rt)
+	}
+	return &model.OIDCConfig{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  config.ObjectRoot.AggregateID,
+			Sequence:     config.Sequence,
+			ChangeDate:   config.ChangeDate,
+			CreationDate: config.CreationDate,
+		},
+		AppID:                  config.AppID,
+		ClientID:               config.ClientID,
+		ClientSecret:           config.ClientSecret,
+		RedirectUris:           config.RedirectUris,
+		ResponseTypes:          responseTypes,
+		GrantTypes:             grantTypes,
+		ApplicationType:        model.OIDCApplicationType(config.ApplicationType),
+		AuthMethodType:         model.OIDCAuthMethodType(config.AuthMethodType),
+		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
 	}
 }
 
@@ -132,7 +363,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 			logging.Log("EVEN-idl93").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
-		p.State = model.ProjectStateToInt(model.Active)
+		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		return nil
 	case model.ProjectDeactivated:
 		return p.appendDeactivatedEvent()
@@ -144,22 +375,43 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendChangeMemberEvent(event)
 	case model.ProjectMemberRemoved:
 		return p.appendRemoveMemberEvent(event)
+	case model.ProjectRoleAdded:
+		return p.appendAddRoleEvent(event)
+	case model.ProjectRoleChanged:
+		return p.appendChangeRoleEvent(event)
+	case model.ProjectRoleRemoved:
+		return p.appendRemoveRoleEvent(event)
+	case model.ApplicationAdded:
+		return p.appendAddAppEvent(event)
+	case model.ApplicationChanged:
+		return p.appendChangeAppEvent(event)
+	case model.ApplicationRemoved:
+		return p.appendRemoveAppEvent(event)
+	case model.ApplicationDeactivated:
+		return p.appendAppStateEvent(event, model.APPSTATE_INACTIVE)
+	case model.ApplicationReactivated:
+		return p.appendAppStateEvent(event, model.APPSTATE_ACTIVE)
+	case model.OIDCConfigAdded:
+		return p.appendAddOIDCConfigEvent(event)
+	case model.OIDCConfigChanged, model.OIDCConfigSecretChanged:
+		return p.appendChangeOIDCConfigEvent(event)
 	}
 	return nil
 }
 
 func (p *Project) appendDeactivatedEvent() error {
-	p.State = model.ProjectStateToInt(model.Inactive)
+	p.State = int32(model.PROJECTSTATE_INACTIVE)
 	return nil
 }
 
 func (p *Project) appendReactivatedEvent() error {
-	p.State = model.ProjectStateToInt(model.Active)
+	p.State = int32(model.PROJECTSTATE_ACTIVE)
 	return nil
 }
 
 func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
-	member, err := getMemberData(event)
+	member := &ProjectMember{}
+	err := member.setData(event)
 	if err != nil {
 		return err
 	}
@@ -169,7 +421,8 @@ func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
-	member, err := getMemberData(event)
+	member := &ProjectMember{}
+	err := member.setData(event)
 	if err != nil {
 		return err
 	}
@@ -182,7 +435,8 @@ func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 }
 
 func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
-	member, err := getMemberData(event)
+	member := &ProjectMember{}
+	err := member.setData(event)
 	if err != nil {
 		return err
 	}
@@ -196,12 +450,165 @@ func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func getMemberData(event *es_models.Event) (*ProjectMember, error) {
-	member := &ProjectMember{}
-	member.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, member); err != nil {
+func (m *ProjectMember) setData(event *es_models.Event) error {
+	m.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, m); err != nil {
 		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")
-		return nil, errors.ThrowInternal(err, "EVENT-83js6", "could not unmarshal event data")
+		return err
 	}
-	return member, nil
+	return nil
+}
+
+func (p *Project) appendAddRoleEvent(event *es_models.Event) error {
+	role := new(ProjectRole)
+	err := role.setData(event)
+	if err != nil {
+		return err
+	}
+	role.ObjectRoot.CreationDate = event.CreationDate
+	p.Roles = append(p.Roles, role)
+	return nil
+}
+
+func (p *Project) appendChangeRoleEvent(event *es_models.Event) error {
+	role := new(ProjectRole)
+	err := role.setData(event)
+	if err != nil {
+		return err
+	}
+	for i, r := range p.Roles {
+		if r.Key == role.Key {
+			p.Roles[i] = role
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendRemoveRoleEvent(event *es_models.Event) error {
+	role := new(ProjectRole)
+	err := role.setData(event)
+	if err != nil {
+		return err
+	}
+	for i, r := range p.Roles {
+		if r.Key == role.Key {
+			p.Roles[i] = p.Roles[len(p.Roles)-1]
+			p.Roles[len(p.Roles)-1] = nil
+			p.Roles = p.Roles[:len(p.Roles)-1]
+		}
+	}
+	return nil
+}
+
+func (r *ProjectRole) setData(event *es_models.Event) error {
+	r.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, r); err != nil {
+		logging.Log("EVEN-d9euw").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
+}
+
+func (p *Project) appendAddAppEvent(event *es_models.Event) error {
+	app := new(Application)
+	err := app.setData(event)
+	if err != nil {
+		return err
+	}
+	app.ObjectRoot.CreationDate = event.CreationDate
+	p.Applications = append(p.Applications, app)
+	return nil
+}
+
+func (p *Project) appendChangeAppEvent(event *es_models.Event) error {
+	app := new(Application)
+	err := app.setData(event)
+	if err != nil {
+		return err
+	}
+	for i, a := range p.Applications {
+		if a.AppID == app.AppID {
+			p.Applications[i].setData(event)
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendRemoveAppEvent(event *es_models.Event) error {
+	app := new(Application)
+	err := app.setData(event)
+	if err != nil {
+		return err
+	}
+	for i, a := range p.Applications {
+		if a.AppID == app.AppID {
+			p.Applications[i] = p.Applications[len(p.Applications)-1]
+			p.Applications[len(p.Applications)-1] = nil
+			p.Applications = p.Applications[:len(p.Applications)-1]
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendAppStateEvent(event *es_models.Event, state model.AppState) error {
+	app := new(Application)
+	err := app.setData(event)
+	if err != nil {
+		return err
+	}
+	for i, a := range p.Applications {
+		if a.AppID == app.AppID {
+			a.State = int32(state)
+			p.Applications[i] = a
+		}
+	}
+	return nil
+}
+
+func (a *Application) setData(event *es_models.Event) error {
+	a.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, a); err != nil {
+		logging.Log("EVEN-8die3").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
+}
+
+func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
+	config := new(OIDCConfig)
+	err := config.setData(event)
+	if err != nil {
+		return err
+	}
+	config.ObjectRoot.CreationDate = event.CreationDate
+	for i, a := range p.Applications {
+		if a.AppID == config.AppID {
+			p.Applications[i].Type = int32(model.APPTYPE_OIDC)
+			p.Applications[i].OIDCConfig = config
+		}
+	}
+	return nil
+}
+
+func (p *Project) appendChangeOIDCConfigEvent(event *es_models.Event) error {
+	config := new(OIDCConfig)
+	err := config.setData(event)
+	if err != nil {
+		return err
+	}
+	for i, a := range p.Applications {
+		if a.AppID == config.AppID {
+			p.Applications[i].OIDCConfig.setData(event)
+		}
+	}
+	return nil
+}
+
+func (o *OIDCConfig) setData(event *es_models.Event) error {
+	o.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, o); err != nil {
+		logging.Log("EVEN-d8e3s").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }
