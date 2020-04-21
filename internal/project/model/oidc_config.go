@@ -24,7 +24,7 @@ type OIDCResponseType int32
 const (
 	OIDCRESPONSETYPE_CODE OIDCResponseType = iota
 	OIDCRESPONSETYPE_ID_TOKEN
-	OIDCRESPONSETYPE_TOKEN_ID_TOKEN
+	OIDCRESPONSETYPE_TOKEN
 )
 
 type OIDCGrantType int32
@@ -84,7 +84,7 @@ func (c *OIDCConfig) getChosenResponseTypes() (bool, bool, bool) {
 			code = true
 		case OIDCRESPONSETYPE_ID_TOKEN:
 			idToken = true
-		case OIDCRESPONSETYPE_TOKEN_ID_TOKEN:
+		case OIDCRESPONSETYPE_TOKEN:
 			tokenIdToken = true
 		}
 	}

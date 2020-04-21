@@ -3932,7 +3932,7 @@
       "enum": [
         "OIDCRESPONSETYPE_CODE",
         "OIDCRESPONSETYPE_ID_TOKEN",
-        "OIDCRESPONSETYPE_TOKEN_ID_TOKEN"
+        "OIDCRESPONSETYPE_TOKEN"
       ],
       "default": "OIDCRESPONSETYPE_CODE"
     },
