@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
@@ -19,6 +20,8 @@ type Config struct {
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
 	ProjectRepo
+	OrgRepository
+	OrgMemberRepository
 }
 
 func Start(conf Config) (*EsRepository, error) {
@@ -46,9 +49,12 @@ func Start(conf Config) (*EsRepository, error) {
 	if err != nil {
 		return nil, err
 	}
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
 
 	return &EsRepository{
 		ProjectRepo{project},
+		OrgRepository{org},
+		OrgMemberRepository{org},
 	}, nil
 }
 

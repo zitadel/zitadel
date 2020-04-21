@@ -32,10 +32,7 @@ func Start(conf Config) (*EsRepository, error) {
 	//conf.Spooler.SQL = sql
 	//spool := spooler.StartSpooler(conf.Spooler)
 
-	org, err := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
-	if err != nil {
-		return nil, err
-	}
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
 
 	return &EsRepository{
 		OrgRepo{org},

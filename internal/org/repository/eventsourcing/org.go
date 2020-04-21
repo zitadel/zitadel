@@ -81,7 +81,6 @@ func OrgCreateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 		nameAggregate,
 		agg,
 	}, nil
-
 }
 
 func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Org, updated *Org) ([]*es_models.Aggregate, error) {
@@ -125,24 +124,35 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 	return aggregates, nil
 }
 
-func OrgDeactivateAggregate(aggCreator *es_models.AggregateCreator, project *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return projectStateAggregate(aggCreator, project, org_model.OrgDeactivated)
-}
-
-func OrgReactivateAggregate(aggCreator *es_models.AggregateCreator, project *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return projectStateAggregate(aggCreator, project, org_model.OrgReactivated)
-}
-
-func projectStateAggregate(aggCreator *es_models.AggregateCreator, org *Org, state es_models.EventType) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
+		}
+		if org.State == int32(org_model.Inactive) {
+			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already inactive")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, org.ID, org.Sequence)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(state, nil)
+		return agg.AppendEvent(org_model.OrgDeactivated, nil)
+	}
+}
+
+func OrgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if org == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
+		}
+		if org.State == int32(org_model.Active) {
+			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already active")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, org.ID, org.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(org_model.OrgReactivated, nil)
 	}
 }
 

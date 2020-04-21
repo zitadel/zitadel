@@ -11,7 +11,7 @@ const (
 	Inactive
 )
 
-func ProjectStateToInt(s OrgState) int32 {
+func OrgStateToInt(s OrgState) int32 {
 	if s == nil {
 		return 0
 	}

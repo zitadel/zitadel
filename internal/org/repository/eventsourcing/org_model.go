@@ -15,12 +15,16 @@ const (
 type Org struct {
 	es_models.ObjectRoot `json:"-"`
 
-	Name   string `json:"name"`
-	Domain string `json:"domain"`
+	Name   string `json:"name,omitempty"`
+	Domain string `json:"domain,omitempty"`
 	State  int32  `json:"-"`
+
+	Members []*OrgMember `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
+	members := OrgMembersFromModel(org.Members)
+
 	return &Org{
 		ObjectRoot: es_models.ObjectRoot{
 			ID:           org.ID,
@@ -28,9 +32,10 @@ func OrgFromModel(org *org_model.Org) *Org {
 			ChangeDate:   org.ChangeDate,
 			CreationDate: org.CreationDate,
 		},
-		Domain: org.Domain,
-		Name:   org.Name,
-		State:  org_model.ProjectStateToInt(org.State),
+		Domain:  org.Domain,
+		Name:    org.Name,
+		State:   org_model.OrgStateToInt(org.State),
+		Members: members,
 	}
 }
 
@@ -42,9 +47,10 @@ func OrgToModel(org *Org) *org_model.Org {
 			ChangeDate:   org.ChangeDate,
 			CreationDate: org.CreationDate,
 		},
-		Domain: org.Domain,
-		Name:   org.Name,
-		State:  org_model.ProjectStateFromInt(org.State),
+		Domain:  org.Domain,
+		Name:    org.Name,
+		State:   org_model.ProjectStateFromInt(org.State),
+		Members: OrgMembersToModel(org.Members),
 	}
 }
 
@@ -76,9 +82,15 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 			return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
 		}
 	case org_model.OrgDeactivated:
-		o.State = org_model.ProjectStateToInt(org_model.Inactive)
+		o.State = org_model.OrgStateToInt(org_model.Inactive)
 	case org_model.OrgReactivated:
-		o.State = org_model.ProjectStateToInt(org_model.Active)
+		o.State = org_model.OrgStateToInt(org_model.Active)
+	case org_model.OrgMemberAdded:
+		member, err := OrgMemberFromEvent(nil, event)
+		if err != nil {
+			return err
+		}
+		o.Members = append(o.Members, member)
 	}
 
 	return nil

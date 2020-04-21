@@ -52,7 +52,7 @@ func filter(querier interface {
 	for rows.Next() {
 		event := new(models.Event)
 		var previousSequence Sequence
-		data := new(Data)
+		data := make(Data, 0)
 
 		err = rows.Scan(
 			&event.ID,
@@ -60,7 +60,7 @@ func filter(querier interface {
 			&event.Type,
 			&event.Sequence,
 			&previousSequence,
-			data,
+			&data,
 			&event.EditorService,
 			&event.EditorUser,
 			&event.ResourceOwner,
@@ -75,7 +75,10 @@ func filter(querier interface {
 		}
 
 		event.PreviousSequence = uint64(previousSequence)
-		event.Data = []byte(*data)
+
+		event.Data = make([]byte, len(data))
+		copy(event.Data, data)
+
 		events = append(events, event)
 	}
 

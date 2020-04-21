@@ -11,6 +11,8 @@ type Org struct {
 	State  OrgState
 	Name   string
 	Domain string
+
+	Members []*OrgMember
 }
 
 type OrgState in_model.Enum
@@ -27,4 +29,13 @@ func (o *Org) IsActive() bool {
 
 func (o *Org) IsValid() bool {
 	return o.Name != "" && o.Domain != ""
+}
+
+func (o *Org) ContainsMember(userID string) bool {
+	for _, member := range o.Members {
+		if member.UserID == userID {
+			return true
+		}
+	}
+	return false
 }
