@@ -13,16 +13,7 @@ type ProjectRepo struct {
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
-	//viewProject, err := repo.view.ProjectByID(id)
-	//if err != nil && !caos_errs.IsNotFound(err) {
-	//	return nil, err
-	//}
-	//if viewProject != nil {
-	//	project = org_view.ProjectToModel(viewProject)
-	//} else {
-	project = proj_model.NewProject(id)
-	//}
-	return repo.ProjectEvents.ProjectByID(ctx, project)
+	return repo.ProjectEvents.ProjectByID(ctx, id)
 }
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
@@ -31,28 +22,31 @@ func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_
 }
 
 func (repo *ProjectRepo) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
-	existingProject, err := repo.ProjectByID(ctx, project.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return repo.ProjectEvents.UpdateProject(ctx, existingProject, project)
+	return repo.ProjectEvents.UpdateProject(ctx, project)
 }
 
 func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	project, err := repo.ProjectByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return repo.ProjectEvents.DeactivateProject(ctx, project)
+	return repo.ProjectEvents.DeactivateProject(ctx, id)
 }
 
 func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
-	project, err := repo.ProjectByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
+	return repo.ProjectEvents.ReactivateProject(ctx, id)
+}
 
-	return repo.ProjectEvents.ReactivateProject(ctx, project)
+func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
+	member = proj_model.NewProjectMember(projectID, userID)
+	return repo.ProjectEvents.ProjectMemberByIDs(ctx, member)
+}
+
+func (repo *ProjectRepo) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	return repo.ProjectEvents.AddProjectMember(ctx, member)
+}
+
+func (repo *ProjectRepo) ChangeProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
+	return repo.ProjectEvents.ChangeProjectMember(ctx, member)
+}
+
+func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, userID string) error {
+	member := proj_model.NewProjectMember(projectID, userID)
+	return repo.ProjectEvents.RemoveProjectMember(ctx, member)
 }

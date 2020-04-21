@@ -674,7 +674,7 @@ service ManagementService {
         };
     }
 
-    rpc AddProjectMember(ProjectMemberAdd) returns (google.protobuf.Empty) {
+    rpc AddProjectMember(ProjectMemberAdd) returns (ProjectMember) {
         option (google.api.http) = {
             post: "/projects/{id}/members"
             body: "*"
@@ -686,7 +686,7 @@ service ManagementService {
         };
     }
 
-    rpc ChangeProjectMember(ProjectMemberChange) returns (google.protobuf.Empty) {
+    rpc ChangeProjectMember(ProjectMemberChange) returns (ProjectMember) {
         option (google.api.http) = {
             put: "/projects/{id}/members/{user_id}"
             body: "*"

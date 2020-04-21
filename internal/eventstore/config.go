@@ -1,6 +1,7 @@
 package eventstore
 
 import (
+	"github.com/caos/zitadel/internal/cache/config"
 	"github.com/caos/zitadel/internal/eventstore/internal/repository/sql"
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
@@ -8,6 +9,7 @@ import (
 type Config struct {
 	Repository  sql.Config
 	ServiceName string
+	Cache       *config.CacheConfig
 }
 
 func Start(conf Config) (Eventstore, error) {
