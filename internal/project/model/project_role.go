@@ -15,8 +15,5 @@ func NewProjectRole(projectID, key string) *ProjectRole {
 }
 
 func (p *ProjectRole) IsValid() bool {
-	if p.ID == "" || p.Key == "" {
-		return false
-	}
-	return true
+	return p.ID != "" && p.Key != ""
 }
