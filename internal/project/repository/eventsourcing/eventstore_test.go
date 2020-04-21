@@ -1033,7 +1033,7 @@ func TestAddApplication(t *testing.T) {
 		{
 			name: "add app, ok",
 			args: args{
-				es:  GetMockManipulateProject(ctrl),
+				es:  GetMockManipulateProjectWithPw(ctrl),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
 					AppID: "AppID",
@@ -1054,37 +1054,37 @@ func TestAddApplication(t *testing.T) {
 				},
 			},
 		},
-		//{
-		//	name: "invalid app",
-		//	args: args{
-		//		es:  GetMockManipulateProject(ctrl),
-		//		ctx: auth.NewMockContext("orgID", "userID"),
-		//		app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
-		//	},
-		//	res: res{
-		//		wantErr: true,
-		//		errFunc: caos_errs.IsPreconditionFailed,
-		//	},
-		//},
-		//{
-		//	name: "existing project not found",
-		//	args: args{
-		//		es:  GetMockManipulateProjectNoEvents(ctrl),
-		//		ctx: auth.NewMockContext("orgID", "userID"),
-		//		app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
-		//			AppID: "AppID",
-		//			Name:  "Name",
-		//			OIDCConfig: &model.OIDCConfig{
-		//				ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-		//				GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
-		//			},
-		//		},
-		//	},
-		//	res: res{
-		//		wantErr: true,
-		//		errFunc: caos_errs.IsNotFound,
-		//	},
-		//},
+		{
+			name: "invalid app",
+			args: args{
+				es:  GetMockManipulateProject(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateProjectNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				app: &model.Application{ObjectRoot: es_models.ObjectRoot{ID: "ID", Sequence: 1},
+					AppID: "AppID",
+					Name:  "Name",
+					OIDCConfig: &model.OIDCConfig{
+						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

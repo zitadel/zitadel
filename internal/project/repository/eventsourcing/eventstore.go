@@ -8,7 +8,6 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/sethvargo/go-password/password"
 	"github.com/sony/sonyflake"
 	"strconv"
 )
@@ -16,8 +15,7 @@ import (
 type ProjectEventstore struct {
 	es_int.Eventstore
 	projectCache *ProjectCache
-	pwGenerator  password.PasswordGenerator
-	PasswordAlg  crypto.HashAlgorithm
+	pwGenerator  crypto.Generator
 	idGenerator  *sonyflake.Sonyflake
 }
 
@@ -32,17 +30,17 @@ func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
 	if err != nil {
 		return nil, err
 	}
-	pwGenerator, err := password.NewGenerator(&password.GeneratorInput{})
-	if err != nil {
-		return nil, err
-	}
 	passwordAlg := crypto.NewBCrypt(conf.PasswordSaltCost)
+	runes := crypto.LowerLetters
+	runes = append(runes, crypto.UpperLetters...)
+	runes = append(runes, crypto.Digits...)
+	runes = append(runes, crypto.Symbols...)
+	pwGenerator := crypto.NewHashGenerator(20, 0, passwordAlg, runes)
 	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
 		projectCache: projectCache,
 		pwGenerator:  pwGenerator,
-		PasswordAlg:  passwordAlg,
 		idGenerator:  idGenerator,
 	}, nil
 }
@@ -340,7 +338,7 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	var crypto *crypto.CryptoValue
 	if app.OIDCConfig != nil {
 		app.OIDCConfig.AppID = strconv.FormatUint(id, 10)
-		stringPw, crypto, err = generateNewClientSecret(es.pwGenerator, es.PasswordAlg)
+		stringPw, crypto, err = generateNewClientSecret(es.pwGenerator)
 		if err != nil {
 			return nil, err
 		}
@@ -514,7 +512,7 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	}
 	repoProject := ProjectFromModel(existing)
 
-	stringPw, crypto, err := generateNewClientSecret(es.pwGenerator, es.PasswordAlg)
+	stringPw, crypto, err := generateNewClientSecret(es.pwGenerator)
 	if err != nil {
 		return nil, err
 	}

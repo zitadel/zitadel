@@ -8,19 +8,23 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/golang/mock/gomock"
-	"github.com/sethvargo/go-password/password"
 	"github.com/sony/sonyflake"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *ProjectEventstore {
-	passwordAlg := crypto.NewBCrypt(14)
-
 	return &ProjectEventstore{
 		Eventstore:   mockEs,
 		projectCache: GetMockCache(ctrl),
 		idGenerator:  GetSonyFlacke(),
-		pwGenerator:  GetMockPwGenerator(),
-		PasswordAlg:  passwordAlg,
+	}
+}
+
+func GetMockedEventstoreWithPw(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *ProjectEventstore {
+	return &ProjectEventstore{
+		Eventstore:   mockEs,
+		projectCache: GetMockCache(ctrl),
+		idGenerator:  GetSonyFlacke(),
+		pwGenerator:  GetMockPwGenerator(ctrl),
 	}
 }
 func GetMockCache(ctrl *gomock.Controller) *ProjectCache {
@@ -34,8 +38,12 @@ func GetSonyFlacke() *sonyflake.Sonyflake {
 	return sonyflake.NewSonyflake(sonyflake.Settings{})
 }
 
-func GetMockPwGenerator() password.PasswordGenerator {
-	return password.NewMockGenerator("password", nil)
+func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {
+	generator := crypto.NewMockGenerator(ctrl)
+	generator.EXPECT().Length().Return(uint(10))
+	generator.EXPECT().Runes().Return(crypto.LowerLetters)
+	generator.EXPECT().Alg().Return(crypto.NewBCrypt(10))
+	return generator
 }
 
 func GetMockProjectByIDOK(ctrl *gomock.Controller) *ProjectEventstore {
@@ -65,6 +73,18 @@ func GetMockManipulateProject(ctrl *gomock.Controller) *ProjectEventstore {
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateProjectWithPw(ctrl *gomock.Controller) *ProjectEventstore {
+	data, _ := json.Marshal(Project{Name: "Name"})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs)
 }
 
 func GetMockManipulateInactiveProject(ctrl *gomock.Controller) *ProjectEventstore {
@@ -125,7 +145,7 @@ func GetMockManipulateProjectWithOIDCApp(ctrl *gomock.Controller) *ProjectEvents
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
-	return GetMockedEventstore(ctrl, mockEs)
+	return GetMockedEventstoreWithPw(ctrl, mockEs)
 }
 
 func GetMockManipulateProjectWithSAMLApp(ctrl *gomock.Controller) *ProjectEventstore {
