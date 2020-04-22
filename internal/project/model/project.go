@@ -98,11 +98,3 @@ func (p *Project) ContainsGrantMember(member *ProjectGrantMember) bool {
 	}
 	return false
 }
-
-func ProjectStateToInt(s ProjectState) int32 {
-	return int32(s)
-}
-
-func ProjectStateFromInt(index int32) ProjectState {
-	return ProjectState(index)
-}
