@@ -13,7 +13,7 @@ func AddOrgMemberAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "members must not be nil")
 	}
 
-	aggregate, err := aggCreator.NewAggregate(ctx, existingOrg.ID, model.OrgAggregate, orgVersion, existingOrg.Sequence)
+	aggregate, err := aggCreator.NewAggregate(ctx, existingOrg.AggregateID, model.OrgAggregate, orgVersion, existingOrg.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func ChangeOrgMemberAggregate(ctx context.Context, aggCreator *es_models.Aggrega
 	}
 	changes := existingMember.Changes(updatedMember)
 
-	aggregate, err := aggCreator.NewAggregate(ctx, existingMember.ID, model.OrgAggregate, orgVersion, existingMember.Sequence)
+	aggregate, err := aggCreator.NewAggregate(ctx, existingMember.AggregateID, model.OrgAggregate, orgVersion, existingMember.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func RemoveOrgMemberAggregate(ctx context.Context, aggCreator *es_models.Aggrega
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-knnVI", "member must not be nil")
 	}
 
-	aggregate, err := aggCreator.NewAggregate(ctx, existingMember.ID, model.OrgAggregate, orgVersion, existingMember.Sequence)
+	aggregate, err := aggCreator.NewAggregate(ctx, existingMember.AggregateID, model.OrgAggregate, orgVersion, existingMember.Sequence)
 	if err != nil {
 		return nil, err
 	}

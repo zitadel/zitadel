@@ -65,9 +65,9 @@ func OrgCreateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 	if err != nil {
 		return nil, err
 	}
-	org.ID = strconv.FormatUint(id, 10)
+	org.AggregateID = strconv.FormatUint(id, 10)
 
-	agg, err := OrgAggregate(ctx, aggCreator, org.ID, org.Sequence)
+	agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 		aggregates = append(aggregates, domainAggregate)
 	}
 
-	orgAggregate, err := OrgAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+	orgAggregate, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func OrgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 		if org.State == int32(org_model.Inactive) {
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already inactive")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, org.ID, org.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 		if err != nil {
 			return nil, err
 		}
@@ -148,7 +148,7 @@ func OrgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 		if org.State == int32(org_model.Active) {
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already active")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, org.ID, org.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 		if err != nil {
 			return nil, err
 		}

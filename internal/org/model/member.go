@@ -9,9 +9,9 @@ type OrgMember struct {
 }
 
 func NewOrgMember(orgID, userID string) *OrgMember {
-	return &OrgMember{ObjectRoot: es_models.ObjectRoot{ID: orgID}, UserID: userID}
+	return &OrgMember{ObjectRoot: es_models.ObjectRoot{AggregateID: orgID}, UserID: userID}
 }
 
 func (member *OrgMember) IsValid() bool {
-	return member.ID != "" && member.UserID != "" && len(member.Roles) != 0
+	return member.AggregateID != "" && member.UserID != "" && len(member.Roles) != 0
 }

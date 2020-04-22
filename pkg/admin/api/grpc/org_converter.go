@@ -45,7 +45,7 @@ func orgFromModel(org *org_model.Org) *Org {
 		Domain:       org.Domain,
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
-		Id:           org.ID,
+		Id:           org.AggregateID,
 		Name:         org.Name,
 		State:        orgStateFromModel(org.State),
 	}

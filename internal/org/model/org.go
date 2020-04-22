@@ -20,7 +20,7 @@ type OrgState in_model.Enum
 var states = []string{"Active", "Inactive"}
 
 func NewOrg(id string) *Org {
-	return &Org{ObjectRoot: es_models.ObjectRoot{ID: id}, State: Active}
+	return &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: Active}
 }
 
 func (o *Org) IsActive() bool {

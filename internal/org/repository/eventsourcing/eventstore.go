@@ -22,7 +22,7 @@ func StartOrg(conf OrgConfig) *OrgEventstore {
 }
 
 func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
-	query, err := OrgByIDQuery(org.ID, org.Sequence)
+	query, err := OrgByIDQuery(org.AggregateID, org.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ld93d", "userID missing")
 	}
 
-	org, err := es.OrgByID(ctx, org_model.NewOrg(member.ID))
+	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.ID))
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 	if !member.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.ID))
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	if member.UserID == "" {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-d43fs", "UserID and Roles are required")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.ID))
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
 	if err != nil {
 		return err
 	}

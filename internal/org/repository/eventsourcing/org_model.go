@@ -26,31 +26,21 @@ func OrgFromModel(org *org_model.Org) *Org {
 	members := OrgMembersFromModel(org.Members)
 
 	return &Org{
-		ObjectRoot: es_models.ObjectRoot{
-			ID:           org.ID,
-			Sequence:     org.Sequence,
-			ChangeDate:   org.ChangeDate,
-			CreationDate: org.CreationDate,
-		},
-		Domain:  org.Domain,
-		Name:    org.Name,
-		State:   org_model.OrgStateToInt(org.State),
-		Members: members,
+		ObjectRoot: org.ObjectRoot,
+		Domain:     org.Domain,
+		Name:       org.Name,
+		State:      org_model.OrgStateToInt(org.State),
+		Members:    members,
 	}
 }
 
 func OrgToModel(org *Org) *org_model.Org {
 	return &org_model.Org{
-		ObjectRoot: es_models.ObjectRoot{
-			ID:           org.ID,
-			Sequence:     org.Sequence,
-			ChangeDate:   org.ChangeDate,
-			CreationDate: org.CreationDate,
-		},
-		Domain:  org.Domain,
-		Name:    org.Name,
-		State:   org_model.ProjectStateFromInt(org.State),
-		Members: OrgMembersToModel(org.Members),
+		ObjectRoot: org.ObjectRoot,
+		Domain:     org.Domain,
+		Name:       org.Name,
+		State:      org_model.ProjectStateFromInt(org.State),
+		Members:    OrgMembersToModel(org.Members),
 	}
 }
 

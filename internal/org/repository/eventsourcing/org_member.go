@@ -13,7 +13,7 @@ func OrgMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *O
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ie34f", "member should not be nil")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err
 		}
@@ -27,7 +27,7 @@ func OrgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing 
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "member should not be nil")
 		}
 
-		agg, err := OrgAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +40,7 @@ func OrgMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing 
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member should not be nil")
 		}
-		agg, err := OrgAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err
 		}
