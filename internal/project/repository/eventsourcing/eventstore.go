@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"strconv"
 
 	"github.com/sony/sonyflake"
@@ -56,7 +57,7 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_
 		return nil, err
 	}
 	es.projectCache.cacheProject(project)
-	return ProjectToModel(project), nil
+	return model.ProjectToModel(project), nil
 }
 
 func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
@@ -69,7 +70,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	}
 	project.AggregateID = strconv.FormatUint(id, 10)
 	project.State = proj_model.PROJECTSTATE_ACTIVE
-	repoProject := ProjectFromModel(project)
+	repoProject := model.ProjectFromModel(project)
 
 	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, createAggregate)
@@ -78,7 +79,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	}
 
 	es.projectCache.cacheProject(repoProject)
-	return ProjectToModel(repoProject), nil
+	return model.ProjectToModel(repoProject), nil
 }
 
 func (es *ProjectEventstore) UpdateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
@@ -89,8 +90,8 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, project *proj_mo
 	if err != nil {
 		return nil, err
 	}
-	repoExisting := ProjectFromModel(existingProject)
-	repoNew := ProjectFromModel(project)
+	repoExisting := model.ProjectFromModel(existingProject)
+	repoNew := model.ProjectFromModel(project)
 
 	updateAggregate := ProjectUpdateAggregate(es.AggregateCreator(), repoExisting, repoNew)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
@@ -99,7 +100,7 @@ func (es *ProjectEventstore) UpdateProject(ctx context.Context, project *proj_mo
 	}
 
 	es.projectCache.cacheProject(repoExisting)
-	return ProjectToModel(repoExisting), nil
+	return model.ProjectToModel(repoExisting), nil
 }
 
 func (es *ProjectEventstore) DeactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
@@ -111,12 +112,12 @@ func (es *ProjectEventstore) DeactivateProject(ctx context.Context, id string) (
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "project must be active")
 	}
 
-	repoExisting := ProjectFromModel(existing)
+	repoExisting := model.ProjectFromModel(existing)
 	aggregate := ProjectDeactivateAggregate(es.AggregateCreator(), repoExisting)
 	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 
 	es.projectCache.cacheProject(repoExisting)
-	return ProjectToModel(repoExisting), nil
+	return model.ProjectToModel(repoExisting), nil
 }
 
 func (es *ProjectEventstore) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
@@ -128,12 +129,12 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, id string) (
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "project must be inactive")
 	}
 
-	repoExisting := ProjectFromModel(existing)
+	repoExisting := model.ProjectFromModel(existing)
 	aggregate := ProjectReactivateAggregate(es.AggregateCreator(), repoExisting)
 	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 
 	es.projectCache.cacheProject(repoExisting)
-	return ProjectToModel(repoExisting), nil
+	return model.ProjectToModel(repoExisting), nil
 }
 
 func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
@@ -144,10 +145,9 @@ func (es *ProjectEventstore) ProjectMemberByIDs(ctx context.Context, member *pro
 	if err != nil {
 		return nil, err
 	}
-	for _, m := range project.Members {
-		if m.UserID == member.UserID {
-			return m, nil
-		}
+
+	if _, m := project.GetMember(member.UserID); m != nil {
+		return m, nil
 	}
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-3udjs", "member not found")
 }
@@ -160,11 +160,11 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 	if err != nil {
 		return nil, err
 	}
-	if existing.ContainsMember(member) {
+	if _, m := existing.GetMember(member.UserID); m != nil {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoMember := ProjectMemberFromModel(member)
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.ProjectMemberFromModel(member)
 
 	addAggregate := ProjectMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
@@ -172,10 +172,9 @@ func (es *ProjectEventstore) AddProjectMember(ctx context.Context, member *proj_
 		return nil, err
 	}
 	es.projectCache.cacheProject(repoProject)
-	for _, m := range repoProject.Members {
-		if m.UserID == member.UserID {
-			return ProjectMemberToModel(m), nil
-		}
+
+	if _, m := model.GetProjectMember(repoProject.Members, member.UserID); m != nil {
+		return model.ProjectMemberToModel(m), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
 }
@@ -188,19 +187,18 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 	if err != nil {
 		return nil, err
 	}
-	if !existing.ContainsMember(member) {
+	if _, m := existing.GetMember(member.UserID); m == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe39f", "User is not member of this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoMember := ProjectMemberFromModel(member)
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.ProjectMemberFromModel(member)
 
 	projectAggregate := ProjectMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, m := range repoProject.Members {
-		if m.UserID == member.UserID {
-			return ProjectMemberToModel(m), nil
-		}
+
+	if _, m := model.GetProjectMember(repoProject.Members, member.UserID); m != nil {
+		return model.ProjectMemberToModel(m), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
 }
@@ -213,11 +211,11 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	if err != nil {
 		return err
 	}
-	if !existing.ContainsMember(member) {
+	if _, m := existing.GetMember(member.UserID); m == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-swf34", "User is not member of this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoMember := ProjectMemberFromModel(member)
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.ProjectMemberFromModel(member)
 
 	projectAggregate := ProjectMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
@@ -236,8 +234,8 @@ func (es *ProjectEventstore) AddProjectRole(ctx context.Context, role *proj_mode
 	if existing.ContainsRole(role) {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Project contains role with same key")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoRole := ProjectRoleFromModel(role)
+	repoProject := model.ProjectFromModel(existing)
+	repoRole := model.ProjectRoleFromModel(role)
 	projectAggregate := ProjectRoleAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
@@ -245,10 +243,9 @@ func (es *ProjectEventstore) AddProjectRole(ctx context.Context, role *proj_mode
 	}
 
 	es.projectCache.cacheProject(repoProject)
-	for _, r := range repoProject.Roles {
-		if r.Key == role.Key {
-			return ProjectRoleToModel(r), nil
-		}
+
+	if _, r := model.GetProjectRole(repoProject.Roles, role.Key); r != nil {
+		return model.ProjectRoleToModel(r), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sie83", "Could not find role in list")
 }
@@ -264,8 +261,8 @@ func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_m
 	if !existing.ContainsRole(role) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die34", "Role doesn't exist on this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoRole := ProjectRoleFromModel(role)
+	repoProject := model.ProjectFromModel(existing)
+	repoRole := model.ProjectRoleFromModel(role)
 	projectAggregate := ProjectRoleChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
@@ -273,10 +270,9 @@ func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_m
 	}
 
 	es.projectCache.cacheProject(repoProject)
-	for _, r := range repoProject.Roles {
-		if r.Key == role.Key {
-			return ProjectRoleToModel(r), nil
-		}
+
+	if _, r := model.GetProjectRole(repoProject.Roles, role.Key); r != nil {
+		return model.ProjectRoleToModel(r), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sl1or", "Could not find role in list")
 }
@@ -292,8 +288,8 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	if !existing.ContainsRole(role) {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Role doesn't exist on project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoRole := ProjectRoleFromModel(role)
+	repoProject := model.ProjectFromModel(existing)
+	repoRole := model.ProjectRoleFromModel(role)
 	projectAggregate := ProjectRoleRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
@@ -311,10 +307,9 @@ func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, ap
 	if err != nil {
 		return nil, err
 	}
-	for _, a := range project.Applications {
-		if a.AppID == appID {
-			return a, nil
-		}
+
+	if _, a := project.GetApp(appID); a != nil {
+		return a, nil
 	}
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-8ei2s", "Could not find app")
 }
@@ -348,18 +343,16 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 		}
 		app.OIDCConfig.ClientID = clientID
 	}
-	repoProject := ProjectFromModel(existing)
-	repoApp := AppFromModel(app)
+	repoProject := model.ProjectFromModel(existing)
+	repoApp := model.AppFromModel(app)
 
 	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, a := range repoProject.Applications {
-		if a.AppID == app.AppID {
-			converted := AppToModel(a)
-			converted.OIDCConfig.ClientSecretString = stringPw
-			return converted, nil
-		}
+	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
+		converted := model.AppToModel(a)
+		converted.OIDCConfig.ClientSecretString = stringPw
+		return converted, nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
 }
@@ -372,19 +365,17 @@ func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_mo
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := existing.ContainsApp(app); !ok {
+	if _, app := existing.GetApp(app.AppID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "App is not in this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoApp := AppFromModel(app)
+	repoProject := model.ProjectFromModel(existing)
+	repoApp := model.AppFromModel(app)
 
 	projectAggregate := ApplicationChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, a := range repoProject.Applications {
-		if a.AppID == app.AppID {
-			return AppToModel(a), nil
-		}
+	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
+		return model.AppToModel(a), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
 }
@@ -397,11 +388,11 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	if err != nil {
 		return err
 	}
-	if _, ok := existing.ContainsApp(app); !ok {
+	if _, app := existing.GetApp(app.AppID); app == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "Application doesn't exist on project")
 	}
-	repoProject := ProjectFromModel(existing)
-	appRepo := AppFromModel(app)
+	repoProject := model.ProjectFromModel(existing)
+	appRepo := model.AppFromModel(app)
 	projectAggregate := ApplicationRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, appRepo)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
@@ -420,19 +411,17 @@ func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectI
 		return nil, err
 	}
 	app := &proj_model.Application{AppID: appID}
-	if _, ok := existing.ContainsApp(app); !ok {
+	if _, app := existing.GetApp(app.AppID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-slpe9", "App is not in this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoApp := AppFromModel(app)
+	repoProject := model.ProjectFromModel(existing)
+	repoApp := model.AppFromModel(app)
 
 	projectAggregate := ApplicationDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, a := range repoProject.Applications {
-		if a.AppID == app.AppID {
-			return AppToModel(a), nil
-		}
+	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
+		return model.AppToModel(a), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sie83", "Could not find app in list")
 }
@@ -446,19 +435,17 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 		return nil, err
 	}
 	app := &proj_model.Application{AppID: appID}
-	if _, ok := existing.ContainsApp(app); !ok {
+	if _, app := existing.GetApp(app.AppID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld92d", "App is not in this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoApp := AppFromModel(app)
+	repoProject := model.ProjectFromModel(existing)
+	repoApp := model.AppFromModel(app)
 
 	projectAggregate := ApplicationReactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, a := range repoProject.Applications {
-		if a.AppID == app.AppID {
-			return AppToModel(a), nil
-		}
+	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
+		return model.AppToModel(a), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sld93", "Could not find app in list")
 }
@@ -471,24 +458,21 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 	if err != nil {
 		return nil, err
 	}
-	var ok bool
 	var app *proj_model.Application
-	if app, ok = existing.ContainsApp(&proj_model.Application{AppID: config.AppID}); !ok {
+	if _, app = existing.GetApp(config.AppID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dkso8", "App is not in this project")
 	}
 	if app.Type != proj_model.APPTYPE_OIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-98uje", "App is not an oidc application")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoConfig := OIDCConfigFromModel(config)
+	repoProject := model.ProjectFromModel(existing)
+	repoConfig := model.OIDCConfigFromModel(config)
 
 	projectAggregate := OIDCConfigChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoConfig)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, a := range repoProject.Applications {
-		if a.AppID == app.AppID {
-			return OIDCConfigToModel(a.OIDCConfig), nil
-		}
+	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
+		return model.OIDCConfigToModel(a.OIDCConfig), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Could not find app in list")
 }
@@ -501,15 +485,14 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	if err != nil {
 		return nil, err
 	}
-	var ok bool
 	var app *proj_model.Application
-	if app, ok = existing.ContainsApp(&proj_model.Application{AppID: appID}); !ok {
+	if _, app = existing.GetApp(appID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9odi4", "App is not in this project")
 	}
 	if app.Type != proj_model.APPTYPE_OIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dile4", "App is not an oidc application")
 	}
-	repoProject := ProjectFromModel(existing)
+	repoProject := model.ProjectFromModel(existing)
 
 	stringPw, crypto, err := generateNewClientSecret(es.pwGenerator)
 	if err != nil {
@@ -519,13 +502,13 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, crypto)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, a := range repoProject.Applications {
-		if a.AppID == app.AppID {
-			config := OIDCConfigToModel(a.OIDCConfig)
-			config.ClientSecretString = stringPw
-			return config, nil
-		}
+
+	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
+		config := model.OIDCConfigToModel(a.OIDCConfig)
+		config.ClientSecretString = stringPw
+		return config, nil
 	}
+
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Could not find app in list")
 }
 
@@ -537,10 +520,8 @@ func (es *ProjectEventstore) ProjectGrantByIDs(ctx context.Context, projectID, g
 	if err != nil {
 		return nil, err
 	}
-	for _, g := range project.Grants {
-		if g.GrantID == grantID {
-			return g, nil
-		}
+	if _, g := project.GetGrant(grantID); g != nil {
+		return g, nil
 	}
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-slo45", "grant not found")
 }
@@ -565,15 +546,14 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	}
 	grant.GrantID = strconv.FormatUint(id, 10)
 
-	repoProject := ProjectFromModel(existing)
-	repoGrant := GrantFromModel(grant)
+	repoProject := model.ProjectFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
 
 	addAggregate := ProjectGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
-	for _, g := range repoProject.Grants {
-		if g.GrantID == grant.GrantID {
-			return GrantToModel(g), nil
-		}
+
+	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sk3t5", "Could not find grant in list")
 }
@@ -586,22 +566,21 @@ func (es *ProjectEventstore) ChangeProjectGrant(ctx context.Context, grant *proj
 	if err != nil {
 		return nil, err
 	}
-	if !existing.ContainsGrant(grant) {
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "Grant not existing on project")
 	}
 	if !existing.ContainsRoles(grant.RoleKeys) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoGrant := GrantFromModel(grant)
+	repoProject := model.ProjectFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
 
 	projectAggregate := ProjectGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, g := range repoProject.Grants {
-		if g.GrantID == grant.GrantID {
-			return GrantToModel(g), nil
-		}
+
+	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
 }
@@ -614,11 +593,11 @@ func (es *ProjectEventstore) RemoveProjectGrant(ctx context.Context, grant *proj
 	if err != nil {
 		return err
 	}
-	if !existing.ContainsGrant(grant) {
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-9ie3s", "Grant doesn't exist on project")
 	}
-	repoProject := ProjectFromModel(existing)
-	grantRepo := GrantFromModel(grant)
+	repoProject := model.ProjectFromModel(existing)
+	grantRepo := model.GrantFromModel(grant)
 	projectAggregate := ProjectGrantRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, grantRepo)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
@@ -637,19 +616,17 @@ func (es *ProjectEventstore) DeactivateProjectGrant(ctx context.Context, project
 		return nil, err
 	}
 	grant := &proj_model.ProjectGrant{GrantID: grantID}
-	if !existing.ContainsGrant(grant) {
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-slpe9", "Grant is not in this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoGrant := GrantFromModel(grant)
+	repoProject := model.ProjectFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
 
 	projectAggregate := ProjectGrantDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, g := range repoProject.Grants {
-		if g.GrantID == grant.GrantID {
-			return GrantToModel(g), nil
-		}
+	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sie83", "Could not find grant in list")
 }
@@ -663,19 +640,18 @@ func (es *ProjectEventstore) ReactivateProjectGrant(ctx context.Context, project
 		return nil, err
 	}
 	grant := &proj_model.ProjectGrant{GrantID: grantID}
-	if !existing.ContainsGrant(grant) {
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-0spew", "Grant is not in this project")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoGrant := GrantFromModel(grant)
+	repoProject := model.ProjectFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
 
 	projectAggregate := ProjectGrantReactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, g := range repoProject.Grants {
-		if g.GrantID == grant.GrantID {
-			return GrantToModel(g), nil
-		}
+
+	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-9osjw", "Could not find grant in list")
 }
@@ -688,11 +664,9 @@ func (es *ProjectEventstore) ProjectGrantMemberByIDs(ctx context.Context, member
 	if err != nil {
 		return nil, err
 	}
-	for _, g := range project.Grants {
-		if g.GrantID == member.GrantID {
-			for _, m := range g.Members {
-				return m, nil
-			}
+	if _, g := project.GetGrant(member.GrantID); g != nil {
+		if _, m := g.GetMember(member.UserID); m != nil {
+			return m, nil
 		}
 	}
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-3udjs", "member not found")
@@ -709,19 +683,15 @@ func (es *ProjectEventstore) AddProjectGrantMember(ctx context.Context, member *
 	if existing.ContainsGrantMember(member) {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-8die3", "User is already member of this ProjectGrant")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoMember := GrantMemberFromModel(member)
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.GrantMemberFromModel(member)
 
 	addAggregate := ProjectGrantMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, g := range repoProject.Grants {
-		if g.GrantID == member.GrantID {
-			for _, m := range g.Members {
-				if m.UserID == member.UserID {
-					return GrantMemberToModel(m), nil
-				}
-			}
+	if _, g := model.GetProjectGrant(repoProject.Grants, member.GrantID); g != nil {
+		if _, m := model.GetProjectGrantMember(g.Members, member.UserID); m != nil {
+			return model.GrantMemberToModel(m), nil
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
@@ -738,19 +708,15 @@ func (es *ProjectEventstore) ChangeProjectGrantMember(ctx context.Context, membe
 	if !existing.ContainsGrantMember(member) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8dj4s", "User is not member of this grant")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoMember := GrantMemberFromModel(member)
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.GrantMemberFromModel(member)
 
 	projectAggregate := ProjectGrantMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	es.projectCache.cacheProject(repoProject)
-	for _, g := range repoProject.Grants {
-		if g.GrantID == member.GrantID {
-			for _, m := range g.Members {
-				if m.UserID == member.UserID {
-					return GrantMemberToModel(m), nil
-				}
-			}
+	if _, g := model.GetProjectGrant(repoProject.Grants, member.GrantID); g != nil {
+		if _, m := model.GetProjectGrantMember(g.Members, member.UserID); m != nil {
+			return model.GrantMemberToModel(m), nil
 		}
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-s8ur3", "Could not find member in list")
@@ -767,8 +733,8 @@ func (es *ProjectEventstore) RemoveProjectGrantMember(ctx context.Context, membe
 	if !existing.ContainsGrantMember(member) {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-9ode4", "User is not member of this grant")
 	}
-	repoProject := ProjectFromModel(existing)
-	repoMember := GrantMemberFromModel(member)
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.GrantMemberFromModel(member)
 
 	projectAggregate := ProjectGrantMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)

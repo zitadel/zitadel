@@ -34,13 +34,13 @@ func (p *Project) IsValid() bool {
 	return p.Name != ""
 }
 
-func (p *Project) ContainsMember(member *ProjectMember) bool {
-	for _, m := range p.Members {
-		if m.UserID == member.UserID {
-			return true
+func (p *Project) GetMember(userID string) (int, *ProjectMember) {
+	for i, m := range p.Members {
+		if m.UserID == userID {
+			return i, m
 		}
 	}
-	return false
+	return -1, nil
 }
 
 func (p *Project) ContainsRole(role *ProjectRole) bool {
@@ -52,22 +52,22 @@ func (p *Project) ContainsRole(role *ProjectRole) bool {
 	return false
 }
 
-func (p *Project) ContainsApp(app *Application) (*Application, bool) {
-	for _, a := range p.Applications {
-		if a.AppID == app.AppID {
-			return a, true
+func (p *Project) GetApp(appID string) (int, *Application) {
+	for i, a := range p.Applications {
+		if a.AppID == appID {
+			return i, a
 		}
 	}
-	return nil, false
+	return -1, nil
 }
 
-func (p *Project) ContainsGrant(grant *ProjectGrant) bool {
-	for _, g := range p.Grants {
-		if g.GrantID == grant.GrantID {
-			return true
+func (p *Project) GetGrant(grantID string) (int, *ProjectGrant) {
+	for i, g := range p.Grants {
+		if g.GrantID == grantID {
+			return i, g
 		}
 	}
-	return false
+	return -1, nil
 }
 
 func (p *Project) ContainsGrantForOrg(orgID string) bool {
@@ -91,7 +91,7 @@ func (p *Project) ContainsRoles(roleKeys []string) bool {
 func (p *Project) ContainsGrantMember(member *ProjectGrantMember) bool {
 	for _, g := range p.Grants {
 		if g.GrantID == member.GrantID {
-			if g.ContainsMember(member) {
+			if _, m := g.GetMember(member.UserID); m != nil {
 				return true
 			}
 		}

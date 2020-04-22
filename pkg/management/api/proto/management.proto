@@ -937,7 +937,7 @@ service ManagementService {
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.delete"
+            permission: "project.grant.delete"
         };
     }
 

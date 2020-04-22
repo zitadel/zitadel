@@ -39,11 +39,11 @@ func (p *ProjectGrant) IsValid() bool {
 	return true
 }
 
-func (p *ProjectGrant) ContainsMember(member *ProjectGrantMember) bool {
-	for _, m := range p.Members {
-		if m.UserID == member.UserID {
-			return true
+func (p *ProjectGrant) GetMember(userID string) (int, *ProjectGrantMember) {
+	for i, m := range p.Members {
+		if m.UserID == userID {
+			return i, m
 		}
 	}
-	return false
+	return -1, nil
 }
