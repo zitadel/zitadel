@@ -3,8 +3,8 @@ package model
 import "github.com/caos/zitadel/internal/eventstore/models"
 
 const (
-	PolicyAggregate models.AggregateType = "policy"
+	PasswordComplexityPolicyAggregate models.AggregateType = "policy.password.complexity"
 
-	PolicyAdded   models.EventType = "policy.added"
-	PolicyChanged models.EventType = "policy.changed"
+	PasswordComplexityPolicyAdded   models.EventType = "policy.password.complexity.added"
+	PasswordComplexityPolicyChanged models.EventType = "policy.password.complexity.changed"
 )

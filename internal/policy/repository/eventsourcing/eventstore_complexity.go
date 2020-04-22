@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/cache/config"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -34,48 +35,58 @@ func StartPolicy(conf PolicyConfig) (*PolicyEventstore, error) {
 func (es *PolicyEventstore) GetPasswordComplexityPolicy(ctx context.Context, id string) (*pol_model.PasswordComplexityPolicy, error) {
 	policy := es.policyCache.getPolicy(id)
 
-	query := PolicyQuery(policy.Sequence)
+	query := PasswordComplexityPolicyQuery(id, policy.Sequence)
 	err := es_sdk.Filter(ctx, es.FilterEvents, policy.AppendEvents, query)
 	if err != nil {
 		return nil, err
 	}
 	es.policyCache.cachePolicy(policy)
-	return PolicyToModel(policy), nil
+	return PasswordComplexityPolicyToModel(policy), nil
 }
 
 func (es *PolicyEventstore) CreatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	if !policy.IsValid() { // Brauchts das????? war bei Project ob Name vorganden
+	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Description is required")
 	}
-	repoPolicy := PolicyFromModel(policy)
+	ctxData := auth.GetCtxData(ctx)
+	existingPolicy, err := es.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if existingPolicy != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
+	}
 
-	createAggregate := PolicyCreateAggregate(es.AggregateCreator(), repoPolicy)
-	err := es_sdk.Push(ctx, es.PushAggregates, repoPolicy.AppendEvents, createAggregate)
+	repoPolicy := PasswordComplexityPolicyFromModel(policy)
+
+	createAggregate := PasswordComplexityPolicyCreateAggregate(es.AggregateCreator(), repoPolicy)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoPolicy.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err
 	}
 
 	es.policyCache.cachePolicy(repoPolicy)
-	return PolicyToModel(repoPolicy), nil
+	return PasswordComplexityPolicyToModel(repoPolicy), nil
 }
 
 func (es *PolicyEventstore) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	if !policy.IsValid() { // Brauchts das?????  war bei Project ob Name vorganden
+	if !policy.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Description is required")
 	}
-	existingPolicy, err := es.GetPasswordComplexityPolicy(ctx, policy.ID)
+	ctxData := auth.GetCtxData(ctx)
+	existingPolicy, err := es.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
-	repoExisting := PolicyFromModel(existingPolicy)
-	repoNew := PolicyFromModel(policy)
+	repoExisting := PasswordComplexityPolicyFromModel(existingPolicy)
+	repoNew := PasswordComplexityPolicyFromModel(policy)
 
-	updateAggregate := PolicyUpdateAggregate(es.AggregateCreator(), repoExisting, repoNew)
+	updateAggregate := PasswordComplexityPolicyUpdateAggregate(es.AggregateCreator(), repoExisting, repoNew)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
 		return nil, err
 	}
 
 	es.policyCache.cachePolicy(repoExisting)
-	return PolicyToModel(repoExisting), nil
+	return PasswordComplexityPolicyToModel(repoExisting), nil
 }

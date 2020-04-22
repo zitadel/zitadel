@@ -368,7 +368,7 @@ service ManagementService {
 
     rpc UpdatePasswordComplexityPolicy(PasswordComplexityPolicyUpdate) returns (PasswordComplexityPolicy) {
         option (google.api.http) = {
-            put: "/policies/passwords/complexity/{id}"
+            put: "/policies/passwords/complexity"
             body: "*"
         };
 
@@ -379,7 +379,7 @@ service ManagementService {
 
     rpc DeletePasswordComplexityPolicy(PasswordComplexityPolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/passwords/complexity/{id}"
+            delete: "/policies/passwords/complexity"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -411,7 +411,7 @@ service ManagementService {
 
     rpc UpdatePasswordAgePolicy(PasswordAgePolicyUpdate) returns (PasswordAgePolicy) {
         option (google.api.http) = {
-            put: "/policies/passwords/age/{id}"
+            put: "/policies/passwords/age"
             body: "*"
         };
 
@@ -422,7 +422,7 @@ service ManagementService {
 
     rpc DeletePasswordAgePolicy(PasswordAgePolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/passwords/age/{id}"
+            delete: "/policies/passwords/age"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -454,7 +454,7 @@ service ManagementService {
 
     rpc UpdatePasswordLockoutPolicy(PasswordLockoutPolicyUpdate) returns (PasswordLockoutPolicy) {
         option (google.api.http) = {
-            put: "/policies/passwords/lockout/{id}"
+            put: "/policies/passwords/lockout"
             body: "*"
         };
 
@@ -465,7 +465,7 @@ service ManagementService {
 
     rpc DeletePasswordLockoutPolicy(PasswordLockoutPolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/passwords/lockout/{id}"
+            delete: "/policies/passwords/lockout"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {

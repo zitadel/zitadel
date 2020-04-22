@@ -19,7 +19,7 @@ func StartCache(conf *config.CacheConfig) (*PolicyCache, error) {
 }
 
 func (c *PolicyCache) getPolicy(ID string) (policy *PasswordComplexityPolicy) {
-	policy = &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{ID: ID}}
+	policy = &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{}}
 	if err := c.policyCache.Get(ID, policy); err != nil {
 		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
 	}
