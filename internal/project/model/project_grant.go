@@ -30,10 +30,7 @@ func (p *ProjectGrant) IsActive() bool {
 }
 
 func (p *ProjectGrant) IsValid() bool {
-	if p.GrantedOrgID == "" {
-		return false
-	}
-	return true
+	return p.GrantedOrgID != ""
 }
 
 func (p *ProjectGrant) ContainsMember(member *ProjectGrantMember) bool {
