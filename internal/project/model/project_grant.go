@@ -26,17 +26,11 @@ func NewProjectGrant(projectID, grantID string) *ProjectGrant {
 }
 
 func (p *ProjectGrant) IsActive() bool {
-	if p.State == PROJECTGRANTSTATE_ACTIVE {
-		return true
-	}
-	return false
+	return p.State == PROJECTGRANTSTATE_ACTIVE
 }
 
 func (p *ProjectGrant) IsValid() bool {
-	if p.GrantedOrgID == "" {
-		return false
-	}
-	return true
+	return p.GrantedOrgID != ""
 }
 
 func (p *ProjectGrant) GetMember(userID string) (int, *ProjectGrantMember) {
