@@ -15,12 +15,12 @@ type PolicyEventstore struct {
 	policyCache *PolicyCache
 }
 
-type ProjectConfig struct {
+type PolicyConfig struct {
 	es_int.Eventstore
 	Cache *config.CacheConfig
 }
 
-func StartProject(conf ProjectConfig) (*PolicyEventstore, error) {
+func StartPolicy(conf PolicyConfig) (*PolicyEventstore, error) {
 	policyCache, err := StartCache(conf.Cache)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (es *PolicyEventstore) CreatePasswordComplexityPolicy(ctx context.Context, 
 	return PolicyToModel(repoPolicy), nil
 }
 
-func (es *PolicyEventstore) UpdatUpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
+func (es *PolicyEventstore) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
 	if !policy.IsValid() { // Brauchts das?????  war bei Project ob Name vorganden
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Description is required")
 	}

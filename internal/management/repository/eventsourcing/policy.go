@@ -13,14 +13,13 @@ type PolicyRepo struct {
 	//view      *view.View
 }
 
-type policyRepository struct{}
-
-func (repo *policyRepository) GetPasswordComplexityPolicy(ctx context.Context) (*pol_model.PasswordComplexityPolicy, error) {
+func (repo *PolicyRepo) GetPasswordComplexityPolicy(ctx context.Context) (*pol_model.PasswordComplexityPolicy, error) {
+	//	repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, )
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-sdo5g", "Not implemented")
 }
-func (repo *policyRepository) CreatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-sdo5g", "Not implemented")
+func (repo *PolicyRepo) CreatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
+	return repo.PolicyEvents.CreatePasswordComplexityPolicy(ctx, policy)
 }
-func (repo *policyRepository) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-sdo5g", "Not implemented")
+func (repo *PolicyRepo) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
+	return repo.PolicyEvents.UpdatePasswordComplexityPolicy(ctx, policy)
 }
