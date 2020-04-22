@@ -2,20 +2,36 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) GetPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*PasswordComplexityPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-swe5v", "Not implemented")
+	policy, err := s.policy.GetPasswordComplexityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordComplexityPolicyFromModel(policy), nil
 }
 
 func (s *Server) CreatePasswordComplexityPolicy(ctx context.Context, policy *PasswordComplexityPolicyCreate) (*PasswordComplexityPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-lo34s", "Not implemented")
+	policyresp, err := s.policy.CreatePasswordComplexityPolicy(ctx, passwordComplexityPolicyCreateToModel(policy))
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordComplexityPolicyFromModel(policyresp), nil
 }
 
 func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, policy *PasswordComplexityPolicyUpdate) (*PasswordComplexityPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-pl8fs", "Not implemented")
+	policyresp, err := s.policy.UpdatePasswordComplexityPolicy(ctx, passwordComplexityPolicyUpdateToModel(policy))
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordComplexityPolicyFromModel(policyresp), nil
 }
 
 func (s *Server) DeletePasswordComplexityPolicy(ctx context.Context, ID *PasswordComplexityPolicyID) (*empty.Empty, error) {

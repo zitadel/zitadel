@@ -2,9 +2,11 @@ package eventsourcing
 
 import (
 	"context"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_pol "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
@@ -17,6 +19,7 @@ type Config struct {
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
 	ProjectRepo
+	PolicyRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -42,9 +45,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+	policy, err := es_pol.StartPolicy(es_pol.PolicyConfig{Eventstore: es, Cache: conf.Eventstore.Cache})
+	if err != nil {
+		return nil, err
+	}
 
 	return &EsRepository{
 		ProjectRepo{project},
+		PolicyRepo{policy},
 	}, nil
 }
 

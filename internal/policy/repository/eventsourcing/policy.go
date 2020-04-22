@@ -32,9 +32,9 @@ func PolicyCreateAggregate(aggCreator *es_models.AggregateCreator, project *Pass
 		if err != nil {
 			return nil, err
 		}
-		project.ID = strconv.FormatUint(id, 10)
+		project.AggregateID = strconv.FormatUint(id, 10)
 
-		agg, err := PolicyAggregate(ctx, aggCreator, project.ID, project.Sequence)
+		agg, err := PolicyAggregate(ctx, aggCreator, project.AggregateID, project.Sequence)
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +51,7 @@ func PolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *Pas
 		if new == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
 		}
-		agg, err := PolicyAggregate(ctx, aggCreator, existing.ID, existing.Sequence)
+		agg, err := PolicyAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err
 		}

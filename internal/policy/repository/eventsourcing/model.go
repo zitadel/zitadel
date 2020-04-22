@@ -35,12 +35,7 @@ func (p *PasswordComplexityPolicy) Changes(changed *PasswordComplexityPolicy) ma
 
 func PolicyFromModel(policy *model.PasswordComplexityPolicy) *PasswordComplexityPolicy {
 	return &PasswordComplexityPolicy{
-		ObjectRoot: models.ObjectRoot{
-			ID:           policy.ObjectRoot.ID,
-			ChangeDate:   policy.ChangeDate,
-			CreationDate: policy.CreationDate,
-			Sequence:     policy.Sequence,
-		},
+		ObjectRoot:   policy.ObjectRoot,
 		Description:  policy.Description,
 		State:        policy.State,
 		MinLength:    policy.MinLength,
@@ -53,12 +48,7 @@ func PolicyFromModel(policy *model.PasswordComplexityPolicy) *PasswordComplexity
 
 func PolicyToModel(policy *PasswordComplexityPolicy) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
-		ObjectRoot: models.ObjectRoot{
-			ID:           policy.ID,
-			ChangeDate:   policy.ChangeDate,
-			CreationDate: policy.CreationDate,
-			Sequence:     policy.Sequence,
-		},
+		ObjectRoot:   policy.ObjectRoot,
 		Description:  policy.Description,
 		State:        policy.State,
 		MinLength:    policy.MinLength,
