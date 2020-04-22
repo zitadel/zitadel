@@ -90,10 +90,11 @@ func (p *Project) ContainsRoles(roleKeys []string) bool {
 
 func (p *Project) ContainsGrantMember(member *ProjectGrantMember) bool {
 	for _, g := range p.Grants {
-		if g.GrantID == member.GrantID {
-			if g.ContainsMember(member) {
-				return true
-			}
+		if g.GrantID != member.GrantID {
+			continue
+		}
+		if g.ContainsMember(member) {
+			return true
 		}
 	}
 	return false
