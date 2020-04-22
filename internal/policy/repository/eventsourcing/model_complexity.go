@@ -30,10 +30,11 @@ func (p *PasswordComplexityPolicy) Changes(changed *PasswordComplexityPolicy) ma
 	if changed.Description != "" && p.Description != changed.Description {
 		changes["description"] = changed.Description
 	}
+	// todo
 	return changes
 }
 
-func PolicyFromModel(policy *model.PasswordComplexityPolicy) *PasswordComplexityPolicy {
+func PasswordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *PasswordComplexityPolicy {
 	return &PasswordComplexityPolicy{
 		ObjectRoot:   policy.ObjectRoot,
 		Description:  policy.Description,
@@ -46,7 +47,7 @@ func PolicyFromModel(policy *model.PasswordComplexityPolicy) *PasswordComplexity
 	}
 }
 
-func PolicyToModel(policy *PasswordComplexityPolicy) *model.PasswordComplexityPolicy {
+func PasswordComplexityPolicyToModel(policy *PasswordComplexityPolicy) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
 		ObjectRoot:   policy.ObjectRoot,
 		Description:  policy.Description,
@@ -72,7 +73,7 @@ func (p *PasswordComplexityPolicy) AppendEvent(event *es_models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
-	case model.PolicyAdded, model.PolicyChanged:
+	case model.PasswordComplexityPolicyAdded, model.PasswordComplexityPolicyChanged:
 		if err := json.Unmarshal(event.Data, p); err != nil {
 			logging.Log("EVEN-idl93").WithError(err).Error("could not unmarshal event data")
 			return err
