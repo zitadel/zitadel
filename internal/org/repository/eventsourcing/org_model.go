@@ -75,15 +75,31 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		o.State = org_model.OrgStateToInt(org_model.Inactive)
 	case org_model.OrgReactivated:
 		o.State = org_model.OrgStateToInt(org_model.Active)
-	case org_model.OrgMemberAdded:
+	case org_model.OrgMemberAdded, org_model.GrantMemberChanged:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
 			return err
 		}
 		o.Members = append(o.Members, member)
+	case org_model.OrgMemberRemoved:
+		member, err := OrgMemberFromEvent(nil, event)
+		if err != nil {
+			return err
+		}
+		o.removeMember(member.UserID)
 	}
 
 	return nil
+}
+
+func (o *Org) removeMember(userID string) {
+	for i, member := range o.Members {
+		if member.UserID == userID {
+			copy(o.Members[i:], o.Members[i+1:])
+			o.Members[len(o.Members)-1] = nil
+			o.Members = o.Members[:len(o.Members)-1]
+		}
+	}
 }
 
 func (o *Org) Changes(changed *Org) map[string]interface{} {
