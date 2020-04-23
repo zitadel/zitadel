@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 
 	"github.com/caos/logging"
 
@@ -23,9 +24,10 @@ type Config struct {
 	Admin   admin.Config
 	Console console.Config
 
-	Log     logging.Config
-	Tracing tracing.TracingConfig
-	AuthZ   authz.Config
+	Log            logging.Config
+	Tracing        tracing.TracingConfig
+	AuthZ          authz.Config
+	SystemDefaults sd.SystemDefaults
 }
 
 func main() {
@@ -44,10 +46,10 @@ func main() {
 
 	ctx := context.Background()
 	if *managementEnabled {
-		management.Start(ctx, conf.Mgmt, conf.AuthZ)
+		management.Start(ctx, conf.Mgmt, conf.AuthZ, conf.SystemDefaults)
 	}
 	if *authEnabled {
-		auth.Start(ctx, conf.Auth, conf.AuthZ)
+		auth.Start(ctx, conf.Auth, conf.AuthZ, conf.SystemDefaults)
 	}
 	if *loginEnabled {
 		err = login.Start(ctx, conf.Login)
