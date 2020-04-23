@@ -11,10 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/user_agent/model"
 )
 
-const (
-	userAgentVersion = "v1"
-)
-
 func UserAgentFromEvents(userAgent *UserAgent, events ...*es_models.Event) (*UserAgent, error) {
 	if userAgent == nil {
 		userAgent = &UserAgent{}

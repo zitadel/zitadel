@@ -25,6 +25,23 @@ type UserSession struct {
 	AuthTime             time.Time
 }
 
+type UserSessionID struct {
+	es_models.ObjectRoot
+	UserSessionID string `json:"userSessionID"`
+}
+
+type MfaUserSession struct {
+	es_models.ObjectRoot
+	UserSessionID string `json:"userSessionID"`
+	MfaType       int32  `json:"mfaType"`
+}
+
+type SetUserSession struct {
+	es_models.ObjectRoot
+	UserSessionID string `json:"userSessionID"`
+	AuthSessionID string `json:"authSessionID"`
+}
+
 func UserSessionsFromModel(sessions []*model.UserSession) []*UserSession {
 	convertedSessions := make([]*UserSession, len(sessions))
 	for i, session := range sessions {
@@ -69,6 +86,15 @@ func UserSessionToModel(userSession *UserSession) *model.UserSession {
 		MfaFailureCount:      userSession.MfaFailureCount,
 		AuthTime:             userSession.AuthTime,
 	}
+}
+
+func GetUserSession(sessions []*UserSession, id string) (int, *UserSession) {
+	for i, s := range sessions {
+		if s.SessionID == id {
+			return i, s
+		}
+	}
+	return -1, nil
 }
 
 func (s *UserSession) Changes(changed *UserSession) map[string]interface{} {
