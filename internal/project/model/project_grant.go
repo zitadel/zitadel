@@ -22,28 +22,22 @@ const (
 )
 
 func NewProjectGrant(projectID, grantID string) *ProjectGrant {
-	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{ID: projectID}, GrantID: grantID, State: PROJECTGRANTSTATE_ACTIVE}
+	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, GrantID: grantID, State: PROJECTGRANTSTATE_ACTIVE}
 }
 
 func (p *ProjectGrant) IsActive() bool {
-	if p.State == PROJECTGRANTSTATE_ACTIVE {
-		return true
-	}
-	return false
+	return p.State == PROJECTGRANTSTATE_ACTIVE
 }
 
 func (p *ProjectGrant) IsValid() bool {
-	if p.GrantedOrgID == "" {
-		return false
-	}
-	return true
+	return p.GrantedOrgID != ""
 }
 
-func (p *ProjectGrant) ContainsMember(member *ProjectGrantMember) bool {
-	for _, m := range p.Members {
-		if m.UserID == member.UserID {
-			return true
+func (p *ProjectGrant) GetMember(userID string) (int, *ProjectGrantMember) {
+	for i, m := range p.Members {
+		if m.UserID == userID {
+			return i, m
 		}
 	}
-	return false
+	return -1, nil
 }

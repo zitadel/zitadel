@@ -15,7 +15,7 @@ func projectFromModel(project *proj_model.Project) *Project {
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
 	return &Project{
-		Id:           project.ID,
+		Id:           project.AggregateID,
 		State:        projectStateFromModel(project.State),
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
@@ -38,7 +38,7 @@ func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 func projectUpdateToModel(project *ProjectUpdateRequest) *proj_model.Project {
 	return &proj_model.Project{
 		ObjectRoot: models.ObjectRoot{
-			ID: project.Id,
+			AggregateID: project.Id,
 		},
 		Name: project.Name,
 	}
@@ -64,7 +64,7 @@ func projectRoleFromModel(role *proj_model.ProjectRole) *ProjectRole {
 func projectRoleAddToModel(role *ProjectRoleAdd) *proj_model.ProjectRole {
 	return &proj_model.ProjectRole{
 		ObjectRoot: models.ObjectRoot{
-			ID: role.Id,
+			AggregateID: role.Id,
 		},
 		Key:         role.Key,
 		DisplayName: role.DisplayName,
@@ -75,7 +75,7 @@ func projectRoleAddToModel(role *ProjectRoleAdd) *proj_model.ProjectRole {
 func projectRoleChangeToModel(role *ProjectRoleChange) *proj_model.ProjectRole {
 	return &proj_model.ProjectRole{
 		ObjectRoot: models.ObjectRoot{
-			ID: role.Id,
+			AggregateID: role.Id,
 		},
 		Key:         role.Key,
 		DisplayName: role.DisplayName,

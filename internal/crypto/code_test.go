@@ -80,6 +80,14 @@ func TestIsCodeExpired(t *testing.T) {
 			false,
 		},
 		{
+			"never expires",
+			args{
+				creationDate: time.Now().Add(-5 * time.Minute),
+				expiry:       0,
+			},
+			false,
+		},
+		{
 			"expired",
 			args{
 				creationDate: time.Now().Add(-5 * time.Minute),

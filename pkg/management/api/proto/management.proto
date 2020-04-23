@@ -937,7 +937,7 @@ service ManagementService {
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "project.app.delete"
+            permission: "project.grant.delete"
         };
     }
 
@@ -1898,7 +1898,7 @@ message OIDCConfigUpdate {
 enum OIDCResponseType {
     OIDCRESPONSETYPE_CODE = 0;
     OIDCRESPONSETYPE_ID_TOKEN = 1;
-    OIDCRESPONSETYPE_TOKEN_ID_TOKEN = 2;
+    OIDCRESPONSETYPE_TOKEN = 2;
 }
 
 enum OIDCGrantType {

@@ -6,21 +6,26 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/project/model"
+	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
-	"github.com/sethvargo/go-password/password"
 	"github.com/sony/sonyflake"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *ProjectEventstore {
-	passwordAlg := crypto.NewBCrypt(14)
-
 	return &ProjectEventstore{
 		Eventstore:   mockEs,
 		projectCache: GetMockCache(ctrl),
 		idGenerator:  GetSonyFlacke(),
-		pwGenerator:  GetMockPwGenerator(),
-		PasswordAlg:  passwordAlg,
+	}
+}
+
+func GetMockedEventstoreWithPw(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *ProjectEventstore {
+	return &ProjectEventstore{
+		Eventstore:   mockEs,
+		projectCache: GetMockCache(ctrl),
+		idGenerator:  GetSonyFlacke(),
+		pwGenerator:  GetMockPwGenerator(ctrl),
 	}
 }
 func GetMockCache(ctrl *gomock.Controller) *ProjectCache {
@@ -34,14 +39,18 @@ func GetSonyFlacke() *sonyflake.Sonyflake {
 	return sonyflake.NewSonyflake(sonyflake.Settings{})
 }
 
-func GetMockPwGenerator() password.PasswordGenerator {
-	return password.NewMockGenerator("password", nil)
+func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {
+	generator := crypto.NewMockGenerator(ctrl)
+	generator.EXPECT().Length().Return(uint(10))
+	generator.EXPECT().Runes().Return([]rune("abcdefghijklmnopqrstuvwxyz"))
+	generator.EXPECT().Alg().Return(crypto.NewBCrypt(10))
+	return generator
 }
 
 func GetMockProjectByIDOK(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -56,9 +65,9 @@ func GetMockProjectByIDNoEvents(ctrl *gomock.Controller) *ProjectEventstore {
 }
 
 func GetMockManipulateProject(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -67,11 +76,23 @@ func GetMockManipulateProject(ctrl *gomock.Controller) *ProjectEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockManipulateInactiveProject(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
+func GetMockManipulateProjectWithPw(ctrl *gomock.Controller) *ProjectEventstore {
+	data, _ := json.Marshal(model.Project{Name: "Name"})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 2, Type: model.ProjectDeactivated, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs)
+}
+
+func GetMockManipulateInactiveProject(ctrl *gomock.Controller) *ProjectEventstore {
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 2, Type: proj_model.ProjectDeactivated, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -81,11 +102,11 @@ func GetMockManipulateInactiveProject(ctrl *gomock.Controller) *ProjectEventstor
 }
 
 func GetMockManipulateProjectWithMember(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
-	memberData, _ := json.Marshal(ProjectMember{UserID: "UserID", Roles: []string{"Role"}})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	memberData, _ := json.Marshal(model.ProjectMember{UserID: "UserID", Roles: []string{"Role"}})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectMemberAdded, Data: memberData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectMemberAdded, Data: memberData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -95,11 +116,11 @@ func GetMockManipulateProjectWithMember(ctrl *gomock.Controller) *ProjectEventst
 }
 
 func GetMockManipulateProjectWithRole(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
-	roleData, _ := json.Marshal(ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	roleData, _ := json.Marshal(model.ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectRoleAdded, Data: roleData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectRoleAdded, Data: roleData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -109,32 +130,32 @@ func GetMockManipulateProjectWithRole(ctrl *gomock.Controller) *ProjectEventstor
 }
 
 func GetMockManipulateProjectWithOIDCApp(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
-	appData, _ := json.Marshal(Application{AppID: "AppID", Name: "Name"})
-	oidcData, _ := json.Marshal(OIDCConfig{
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	appData, _ := json.Marshal(model.Application{AppID: "AppID", Name: "Name"})
+	oidcData, _ := json.Marshal(model.OIDCConfig{
 		AppID:         "AppID",
-		ResponseTypes: []int32{int32(model.OIDCRESPONSETYPE_CODE)},
-		GrantTypes:    []int32{int32(model.OIDCGRANTTYPE_AUTHORIZATION_CODE)},
+		ResponseTypes: []int32{int32(proj_model.OIDCRESPONSETYPE_CODE)},
+		GrantTypes:    []int32{int32(proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE)},
 	})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ApplicationAdded, Data: appData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OIDCConfigAdded, Data: oidcData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ApplicationAdded, Data: appData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.OIDCConfigAdded, Data: oidcData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
-	return GetMockedEventstore(ctrl, mockEs)
+	return GetMockedEventstoreWithPw(ctrl, mockEs)
 }
 
 func GetMockManipulateProjectWithSAMLApp(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
-	appData, _ := json.Marshal(Application{AppID: "AppID", Name: "Name"})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	appData, _ := json.Marshal(model.Application{AppID: "AppID", Name: "Name"})
 
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ApplicationAdded, Data: appData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ApplicationAdded, Data: appData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -144,11 +165,11 @@ func GetMockManipulateProjectWithSAMLApp(ctrl *gomock.Controller) *ProjectEvents
 }
 
 func GetMockManipulateProjectWithGrant(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
-	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectGrantAdded, Data: grantData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -158,15 +179,15 @@ func GetMockManipulateProjectWithGrant(ctrl *gomock.Controller) *ProjectEventsto
 }
 
 func GetMockManipulateProjectWithGrantExistingRole(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
-	roleData, _ := json.Marshal(ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})
-	roleData2, _ := json.Marshal(ProjectRole{Key: "KeyChanged", DisplayName: "DisplayName", Group: "Group"})
-	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	roleData, _ := json.Marshal(model.ProjectRole{Key: "Key", DisplayName: "DisplayName", Group: "Group"})
+	roleData2, _ := json.Marshal(model.ProjectRole{Key: "KeyChanged", DisplayName: "DisplayName", Group: "Group"})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectRoleAdded, Data: roleData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectRoleAdded, Data: roleData2},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectRoleAdded, Data: roleData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectRoleAdded, Data: roleData2},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectGrantAdded, Data: grantData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -176,13 +197,13 @@ func GetMockManipulateProjectWithGrantExistingRole(ctrl *gomock.Controller) *Pro
 }
 
 func GetMockManipulateProjectWithGrantMember(ctrl *gomock.Controller) *ProjectEventstore {
-	data, _ := json.Marshal(Project{Name: "Name"})
-	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
-	memberData, _ := json.Marshal(ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}})
+	data, _ := json.Marshal(model.Project{Name: "Name"})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}})
+	memberData, _ := json.Marshal(model.ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: data},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantMemberAdded, Data: memberData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectAdded, Data: data},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectGrantAdded, Data: grantData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectGrantMemberAdded, Data: memberData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -201,11 +222,11 @@ func GetMockManipulateProjectNoEvents(ctrl *gomock.Controller) *ProjectEventstor
 }
 
 func GetMockProjectMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
-	projectData, _ := json.Marshal(Project{Name: "Name"})
-	memberData, _ := json.Marshal(ProjectMember{UserID: "UserID", Roles: []string{"Role"}})
+	projectData, _ := json.Marshal(model.Project{Name: "Name"})
+	memberData, _ := json.Marshal(model.ProjectMember{UserID: "UserID", Roles: []string{"Role"}})
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectMemberAdded, Data: memberData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectMemberAdded, Data: memberData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -213,14 +234,14 @@ func GetMockProjectMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 }
 
 func GetMockProjectAppsByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
-	projectData, _ := json.Marshal(Project{Name: "Name"})
-	appData, _ := json.Marshal(Application{AppID: "AppID", Name: "Name"})
-	oidcData, _ := json.Marshal(OIDCConfig{ClientID: "ClientID"})
+	projectData, _ := json.Marshal(model.Project{Name: "Name"})
+	appData, _ := json.Marshal(model.Application{AppID: "AppID", Name: "Name"})
+	oidcData, _ := json.Marshal(model.OIDCConfig{ClientID: "ClientID"})
 
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ApplicationAdded, Data: appData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OIDCConfigAdded, Data: oidcData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.ApplicationAdded, Data: appData},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: proj_model.OIDCConfigAdded, Data: oidcData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -228,12 +249,12 @@ func GetMockProjectAppsByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 }
 
 func GetMockProjectGrantByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
-	projectData, _ := json.Marshal(Project{Name: "Name"})
-	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
+	projectData, _ := json.Marshal(model.Project{Name: "Name"})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
 
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectGrantAdded, Data: grantData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -241,14 +262,14 @@ func GetMockProjectGrantByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
 }
 
 func GetMockProjectGrantMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstore {
-	projectData, _ := json.Marshal(Project{Name: "Name"})
-	grantData, _ := json.Marshal(ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
-	memberData, _ := json.Marshal(ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}})
+	projectData, _ := json.Marshal(model.Project{Name: "Name"})
+	grantData, _ := json.Marshal(model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantID", RoleKeys: []string{"Key"}})
+	memberData, _ := json.Marshal(model.ProjectGrantMember{GrantID: "GrantID", UserID: "UserID", Roles: []string{"Role"}})
 
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectAdded, Data: projectData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantAdded, Data: grantData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.ProjectGrantMemberAdded, Data: memberData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectAdded, Data: projectData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectGrantAdded, Data: grantData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: proj_model.ProjectGrantMemberAdded, Data: memberData},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
