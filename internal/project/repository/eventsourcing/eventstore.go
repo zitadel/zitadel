@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"strconv"
 
@@ -24,18 +25,16 @@ type ProjectEventstore struct {
 
 type ProjectConfig struct {
 	es_int.Eventstore
-	Cache                 *config.CacheConfig
-	PasswordSaltCost      int
-	ClientSecretGenerator crypto.GeneratorConfig
+	Cache *config.CacheConfig
 }
 
-func StartProject(conf ProjectConfig) (*ProjectEventstore, error) {
+func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*ProjectEventstore, error) {
 	projectCache, err := StartCache(conf.Cache)
 	if err != nil {
 		return nil, err
 	}
-	passwordAlg := crypto.NewBCrypt(conf.PasswordSaltCost)
-	pwGenerator := crypto.NewHashGenerator(conf.ClientSecretGenerator, passwordAlg)
+	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerator.PasswordSaltCost)
+	pwGenerator := crypto.NewHashGenerator(systemDefaults.SecretGenerator.ClientSecretGenerator, passwordAlg)
 	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
