@@ -83,7 +83,7 @@ const (
 )
 
 func (u *User) IsValid() bool {
-	if u.FirstName == "" || u.LastName == "" || u.UserName == "" || u.Email == nil || u.EmailAddress == "" {
+	if u.Profile == nil || u.FirstName == "" || u.LastName == "" || u.UserName == "" || u.Email == nil || u.EmailAddress == "" {
 		return false
 	}
 	return true

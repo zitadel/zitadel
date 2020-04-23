@@ -2,18 +2,17 @@ package eventsourcing
 
 import (
 	"context"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 
-	"github.com/caos/zitadel/internal/crypto"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
 	Eventstore es_int.Config
 	//View       view.ViewConfig
 	//Spooler    spooler.SpoolerConfig
-	PasswordSaltCost      int
-	ClientSecretGenerator crypto.GeneratorConfig
 }
 
 type EsRepository struct {
@@ -22,7 +21,7 @@ type EsRepository struct {
 	UserRepo
 }
 
-func Start(conf Config) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -39,19 +38,16 @@ func Start(conf Config) (*EsRepository, error) {
 	//spool := spooler.StartSpooler(conf.Spooler)
 
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
-		Eventstore:            es,
-		Cache:                 conf.Eventstore.Cache,
-		PasswordSaltCost:      conf.PasswordSaltCost,
-		ClientSecretGenerator: conf.ClientSecretGenerator,
-	})
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
 	if err != nil {
 		return nil, err
 	}
 	user, err := es_usr.StartUser(es_usr.UserConfig{
-		Eventstore:       es,
-		Cache:            conf.Eventstore.Cache,
-		PasswordSaltCost: conf.PasswordSaltCost,
-	})
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
 	if err != nil {
 		return nil, err
 	}

@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/cache/config"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -30,19 +31,29 @@ type UserConfig struct {
 	PasswordSaltCost int
 }
 
-func StartUser(conf UserConfig) (*UserEventstore, error) {
+func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventstore, error) {
 	userCache, err := StartCache(conf.Cache)
 	if err != nil {
 		return nil, err
 	}
 	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
-	passwordAlg := crypto.NewBCrypt(conf.PasswordSaltCost)
-	//TODO: init code generators
+	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	initCodeGen := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
+	emailVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
+	phoneVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
+	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
+
 	return &UserEventstore{
-		Eventstore:  conf.Eventstore,
-		userCache:   userCache,
-		idGenerator: idGenerator,
-		PasswordAlg: passwordAlg,
+		Eventstore:               conf.Eventstore,
+		userCache:                userCache,
+		idGenerator:              idGenerator,
+		InitializeUserCode:       initCodeGen,
+		EmailVerificationCode:    emailVerificationCode,
+		PhoneVerificationCode:    phoneVerificationCode,
+		PasswordVerificationCode: passwordVerificationCode,
 	}, nil
 }
 
@@ -62,7 +73,7 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 }
 
 func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	if user.UserName == "" && user.Email != nil {
+	if user.Profile != nil && user.UserName == "" && user.Email != nil {
 		user.UserName = user.EmailAddress
 	}
 	if !user.IsValid() {
@@ -79,11 +90,12 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 		if err != nil {
 			return nil, err
 		}
-		user.Password = &usr_model.Password{SecretCrypto: secret, ChangeRequired: true}
+		user.Password.SecretCrypto = secret
+		user.Password.ChangeRequired = true
 	}
 
 	repoUser := model.UserFromModel(user)
-	var initCode *model.InitUserCode
+	initCode := new(model.InitUserCode)
 	if user.Email == nil || !user.IsEmailVerified || user.Password == nil || user.SecretString == "" {
 		initCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
 		if err != nil {
@@ -93,7 +105,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 		initCode.Expiry = es.InitializeUserCode.Expiry()
 	}
 
-	var phoneCode *model.PhoneCode
+	phoneCode := new(model.PhoneCode)
 	if user.Phone != nil && !user.IsPhoneVerified {
 		phoneCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
 		if err != nil {
