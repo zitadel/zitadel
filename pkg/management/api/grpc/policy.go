@@ -69,18 +69,33 @@ func (s *Server) DeletePasswordAgePolicy(ctx context.Context, ID *PasswordAgePol
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-plo67", "Not implemented")
 }
 
-func (s *Server) GetPasswordLockoutPolicy(ctx context.Context, _ *empty.Empty) (*PasswordLockoutPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-GHkd9", "Not implemented")
+func (s *Server) CreatePasswordLockoutPolicy(ctx context.Context, policy *PasswordLockoutPolicyCreate) (*PasswordLockoutPolicy, error) {
+	policyresp, err := s.policy.CreatePasswordLockoutPolicy(ctx, passwordLockoutPolicyCreateToModel(policy))
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordLockoutPolicyFromModel(policyresp), nil
 }
 
-func (s *Server) CreatePasswordLockoutPolicy(ctx context.Context, policy *PasswordLockoutPolicyCreate) (*PasswordLockoutPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mdk3c", "Not implemented")
+func (s *Server) GetPasswordLockoutPolicy(ctx context.Context, _ *empty.Empty) (*PasswordLockoutPolicy, error) {
+	policy, err := s.policy.GetPasswordLockoutPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordLockoutPolicyFromModel(policy), nil
 }
 
 func (s *Server) UpdatePasswordLockoutPolicy(ctx context.Context, policy *PasswordLockoutPolicyUpdate) (*PasswordLockoutPolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-8dbN4", "Not implemented")
+	policyresp, err := s.policy.UpdatePasswordLockoutPolicy(ctx, passwordLockoutPolicyUpdateToModel(policy))
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordLockoutPolicyFromModel(policyresp), nil
 }
 
 func (s *Server) DeletePasswordLockoutPolicy(ctx context.Context, ID *PasswordLockoutPolicyID) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-plV53", "Not implemented")
+	return nil, errors.ThrowUnimplemented(nil, "GRPC-GHkd9", "Not implemented")
 }

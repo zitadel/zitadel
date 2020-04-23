@@ -33,3 +33,13 @@ func (repo *PolicyRepo) GetPasswordAgePolicy(ctx context.Context) (*pol_model.Pa
 func (repo *PolicyRepo) UpdatePasswordAgePolicy(ctx context.Context, policy *pol_model.PasswordAgePolicy) (*pol_model.PasswordAgePolicy, error) {
 	return repo.PolicyEvents.UpdatePasswordAgePolicy(ctx, policy)
 }
+func (repo *PolicyRepo) CreatePasswordLockoutPolicy(ctx context.Context, policy *pol_model.PasswordLockoutPolicy) (*pol_model.PasswordLockoutPolicy, error) {
+	return repo.PolicyEvents.CreatePasswordLockoutPolicy(ctx, policy)
+}
+func (repo *PolicyRepo) GetPasswordLockoutPolicy(ctx context.Context) (*pol_model.PasswordLockoutPolicy, error) {
+	ctxData := auth.GetCtxData(ctx)
+	return repo.PolicyEvents.GetPasswordLockoutPolicy(ctx, ctxData.OrgID)
+}
+func (repo *PolicyRepo) UpdatePasswordLockoutPolicy(ctx context.Context, policy *pol_model.PasswordLockoutPolicy) (*pol_model.PasswordLockoutPolicy, error) {
+	return repo.PolicyEvents.UpdatePasswordLockoutPolicy(ctx, policy)
+}

@@ -13,6 +13,7 @@ type PasswordAgePolicy struct {
 	models.ObjectRoot
 
 	Description    string
+	State          int32
 	MaxAgeDays     uint64
 	ExpireWarnDays uint64
 }
@@ -30,6 +31,7 @@ func PasswordAgePolicyFromModel(policy *model.PasswordAgePolicy) *PasswordAgePol
 	return &PasswordAgePolicy{
 		ObjectRoot:     policy.ObjectRoot,
 		Description:    policy.Description,
+		State:          policy.State,
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
 	}
@@ -39,6 +41,7 @@ func PasswordAgePolicyToModel(policy *PasswordAgePolicy) *model.PasswordAgePolic
 	return &model.PasswordAgePolicy{
 		ObjectRoot:     policy.ObjectRoot,
 		Description:    policy.Description,
+		State:          policy.State,
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
 	}
