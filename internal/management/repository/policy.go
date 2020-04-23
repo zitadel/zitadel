@@ -7,7 +7,10 @@ import (
 )
 
 type PolicyRepository interface {
-	GetPasswordComplexityPolicy(ctx context.Context) (*model.PasswordComplexityPolicy, error)
 	CreatePasswordComplexityPolicy(ctx context.Context, policy *model.PasswordComplexityPolicy) (*model.PasswordComplexityPolicy, error)
+	GetPasswordComplexityPolicy(ctx context.Context) (*model.PasswordComplexityPolicy, error)
 	UpdatePasswordComplexityPolicy(ctx context.Context, policy *model.PasswordComplexityPolicy) (*model.PasswordComplexityPolicy, error)
+	CreatePasswordAgePolicy(ctx context.Context, policy *model.PasswordAgePolicy) (*model.PasswordAgePolicy, error)
+	GetPasswordAgePolicy(ctx context.Context) (*model.PasswordAgePolicy, error)
+	UpdatePasswordAgePolicy(ctx context.Context, policy *model.PasswordAgePolicy) (*model.PasswordAgePolicy, error)
 }

@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
