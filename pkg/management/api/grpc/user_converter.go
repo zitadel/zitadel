@@ -15,7 +15,7 @@ func userFromModel(user *usr_model.User) *User {
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
 	converted := &User{
-		Id:                user.ID,
+		Id:                user.AggregateID,
 		State:             userStateFromModel(user.State),
 		CreationDate:      creationDate,
 		ChangeDate:        changeDate,

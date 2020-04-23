@@ -23,30 +23,24 @@ const (
 )
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{ID: id}, State: PROJECTSTATE_ACTIVE}
+	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: PROJECTSTATE_ACTIVE}
 }
 
 func (p *Project) IsActive() bool {
-	if p.State == PROJECTSTATE_ACTIVE {
-		return true
-	}
-	return false
+	return p.State == PROJECTSTATE_ACTIVE
 }
 
 func (p *Project) IsValid() bool {
-	if p.Name == "" {
-		return false
-	}
-	return true
+	return p.Name != ""
 }
 
-func (p *Project) ContainsMember(member *ProjectMember) bool {
-	for _, m := range p.Members {
-		if m.UserID == member.UserID {
-			return true
+func (p *Project) GetMember(userID string) (int, *ProjectMember) {
+	for i, m := range p.Members {
+		if m.UserID == userID {
+			return i, m
 		}
 	}
-	return false
+	return -1, nil
 }
 
 func (p *Project) ContainsRole(role *ProjectRole) bool {
@@ -58,22 +52,22 @@ func (p *Project) ContainsRole(role *ProjectRole) bool {
 	return false
 }
 
-func (p *Project) ContainsApp(app *Application) (bool, *Application) {
-	for _, a := range p.Applications {
-		if a.AppID == app.AppID {
-			return true, a
+func (p *Project) GetApp(appID string) (int, *Application) {
+	for i, a := range p.Applications {
+		if a.AppID == appID {
+			return i, a
 		}
 	}
-	return false, nil
+	return -1, nil
 }
 
-func (p *Project) ContainsGrant(grant *ProjectGrant) bool {
-	for _, g := range p.Grants {
-		if g.GrantID == grant.GrantID {
-			return true
+func (p *Project) GetGrant(grantID string) (int, *ProjectGrant) {
+	for i, g := range p.Grants {
+		if g.GrantID == grantID {
+			return i, g
 		}
 	}
-	return false
+	return -1, nil
 }
 
 func (p *Project) ContainsGrantForOrg(orgID string) bool {
@@ -96,19 +90,12 @@ func (p *Project) ContainsRoles(roleKeys []string) bool {
 
 func (p *Project) ContainsGrantMember(member *ProjectGrantMember) bool {
 	for _, g := range p.Grants {
-		if g.GrantID == member.GrantID {
-			if g.ContainsMember(member) {
-				return true
-			}
+		if g.GrantID != member.GrantID {
+			continue
+		}
+		if _, m := g.GetMember(member.UserID); m != nil {
+			return true
 		}
 	}
 	return false
-}
-
-func ProjectStateToInt(s ProjectState) int32 {
-	return int32(s)
-}
-
-func ProjectStateFromInt(index int32) ProjectState {
-	return ProjectState(index)
 }

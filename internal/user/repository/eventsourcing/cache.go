@@ -20,7 +20,7 @@ func StartCache(conf *config.CacheConfig) (*UserCache, error) {
 }
 
 func (c *UserCache) getUser(ID string) *model.User {
-	user := &model.User{ObjectRoot: models.ObjectRoot{ID: ID}}
+	user := &model.User{ObjectRoot: models.ObjectRoot{AggregateID: ID}}
 	if err := c.userCache.Get(ID, user); err != nil {
 		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
 	}
@@ -28,7 +28,7 @@ func (c *UserCache) getUser(ID string) *model.User {
 }
 
 func (c *UserCache) cacheUser(user *model.User) {
-	err := c.userCache.Set(user.ID, user)
+	err := c.userCache.Set(user.AggregateID, user)
 	if err != nil {
 		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting project cache")
 	}

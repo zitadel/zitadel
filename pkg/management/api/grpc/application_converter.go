@@ -50,7 +50,7 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *OIDCConfig {
 func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
-			ID: app.ProjectId,
+			AggregateID: app.ProjectId,
 		},
 		Name: app.Name,
 		Type: proj_model.APPTYPE_OIDC,
@@ -68,16 +68,17 @@ func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 func appUpdateToModel(app *ApplicationUpdate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
-			ID: app.Id,
+			AggregateID: app.ProjectId,
 		},
-		Name: app.Name,
+		AppID: app.Id,
+		Name:  app.Name,
 	}
 }
 
 func oidcConfigUpdateToModel(app *OIDCConfigUpdate) *proj_model.OIDCConfig {
 	return &proj_model.OIDCConfig{
 		ObjectRoot: models.ObjectRoot{
-			ID: app.ProjectId,
+			AggregateID: app.ProjectId,
 		},
 		AppID:                  app.ApplicationId,
 		RedirectUris:           app.RedirectUris,
@@ -101,6 +102,9 @@ func appStateFromModel(state proj_model.AppState) AppState {
 }
 
 func oidcResponseTypesToModel(responseTypes []OIDCResponseType) []proj_model.OIDCResponseType {
+	if responseTypes == nil || len(responseTypes) == 0 {
+		return []proj_model.OIDCResponseType{proj_model.OIDCRESPONSETYPE_CODE}
+	}
 	oidcResponseTypes := make([]proj_model.OIDCResponseType, len(responseTypes))
 
 	for i, responseType := range responseTypes {
@@ -109,8 +113,8 @@ func oidcResponseTypesToModel(responseTypes []OIDCResponseType) []proj_model.OID
 			oidcResponseTypes[i] = proj_model.OIDCRESPONSETYPE_CODE
 		case OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN:
 			oidcResponseTypes[i] = proj_model.OIDCRESPONSETYPE_ID_TOKEN
-		case OIDCResponseType_OIDCRESPONSETYPE_TOKEN_ID_TOKEN:
-			oidcResponseTypes[i] = proj_model.OIDCRESPONSETYPE_TOKEN_ID_TOKEN
+		case OIDCResponseType_OIDCRESPONSETYPE_TOKEN:
+			oidcResponseTypes[i] = proj_model.OIDCRESPONSETYPE_TOKEN
 		}
 	}
 
@@ -126,10 +130,8 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []O
 			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_CODE
 		case proj_model.OIDCRESPONSETYPE_ID_TOKEN:
 			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN
-		case proj_model.OIDCRESPONSETYPE_TOKEN_ID_TOKEN:
-			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_TOKEN_ID_TOKEN
-		default:
-			oidcResponseTypes[i] = OIDCResponseType(99)
+		case proj_model.OIDCRESPONSETYPE_TOKEN:
+			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_TOKEN
 		}
 	}
 
@@ -137,6 +139,9 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []O
 }
 
 func oidcGrantTypesToModel(grantTypes []OIDCGrantType) []proj_model.OIDCGrantType {
+	if grantTypes == nil || len(grantTypes) == 0 {
+		return []proj_model.OIDCGrantType{proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE}
+	}
 	oidcGrantTypes := make([]proj_model.OIDCGrantType, len(grantTypes))
 
 	for i, grantType := range grantTypes {
@@ -163,8 +168,6 @@ func oidcGrantTypesFromModel(grantTypes []proj_model.OIDCGrantType) []OIDCGrantT
 			oidcGrantTypes[i] = OIDCGrantType_OIDCGRANTTYPE_IMPLICIT
 		case proj_model.OIDCGRANTTYPE_REFRESH_TOKEN:
 			oidcGrantTypes[i] = OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN
-		default:
-			oidcGrantTypes[i] = 99
 		}
 	}
 	return oidcGrantTypes
@@ -179,7 +182,7 @@ func oidcApplicationTypeToModel(appType OIDCApplicationType) proj_model.OIDCAppl
 	case OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE:
 		return proj_model.OIDCAPPLICATIONTYPE_NATIVE
 	}
-	return 99
+	return proj_model.OIDCAPPLICATIONTYPE_WEB
 }
 
 func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) OIDCApplicationType {
@@ -190,8 +193,9 @@ func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) OIDCAp
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT
 	case proj_model.OIDCAPPLICATIONTYPE_NATIVE:
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE
+	default:
+		return OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
 	}
-	return 99
 }
 
 func oidcAuthMethodTypeToModel(authType OIDCAuthMethodType) proj_model.OIDCAuthMethodType {
@@ -202,8 +206,9 @@ func oidcAuthMethodTypeToModel(authType OIDCAuthMethodType) proj_model.OIDCAuthM
 		return proj_model.OIDCAUTHMETHODTYPE_POST
 	case OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
 		return proj_model.OIDCAUTHMETHODTYPE_NONE
+	default:
+		return proj_model.OIDCAUTHMETHODTYPE_BASIC
 	}
-	return proj_model.OIDCAUTHMETHODTYPE_BASIC
 }
 
 func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) OIDCAuthMethodType {
@@ -214,6 +219,7 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) OIDCAut
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
 	case proj_model.OIDCAUTHMETHODTYPE_NONE:
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
+	default:
+		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 	}
-	return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 }

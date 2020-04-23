@@ -26,7 +26,7 @@ func UserAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, 
 	if user == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing user should not be nil")
 	}
-	return aggCreator.NewAggregate(ctx, user.ID, usr_model.UserAggregate, model.UserVersion, user.Sequence)
+	return aggCreator.NewAggregate(ctx, user.AggregateID, usr_model.UserAggregate, model.UserVersion, user.Sequence)
 }
 
 func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwnerID string, userID string) (*es_models.Aggregate, error) {
@@ -34,7 +34,7 @@ func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Ag
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing user should not be nil")
 	}
 
-	return aggCreator.NewAggregate(ctx, user.ID, usr_model.UserAggregate, model.UserVersion, user.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
+	return aggCreator.NewAggregate(ctx, user.AggregateID, usr_model.UserAggregate, model.UserVersion, user.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
 }
 
 func UserCreateAggregate(aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode) func(ctx context.Context) (*es_models.Aggregate, error) {
@@ -82,7 +82,7 @@ func UserRegisterAggregate(aggCreator *es_models.AggregateCreator, user *model.U
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user and resourceowner should not be nothing")
 		}
 
-		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.ID)
+		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
 		if err != nil {
 			return nil, err
 		}

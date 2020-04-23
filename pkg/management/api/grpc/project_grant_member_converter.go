@@ -26,7 +26,7 @@ func projectGrantMemberFromModel(member *proj_model.ProjectGrantMember) *Project
 func projectGrantMemberAddToModel(member *ProjectGrantMemberAdd) *proj_model.ProjectGrantMember {
 	return &proj_model.ProjectGrantMember{
 		ObjectRoot: models.ObjectRoot{
-			ID: member.ProjectId,
+			AggregateID: member.ProjectId,
 		},
 		GrantID: member.GrantId,
 		UserID:  member.UserId,
@@ -37,7 +37,7 @@ func projectGrantMemberAddToModel(member *ProjectGrantMemberAdd) *proj_model.Pro
 func projectGrantMemberChangeToModel(member *ProjectGrantMemberChange) *proj_model.ProjectGrantMember {
 	return &proj_model.ProjectGrantMember{
 		ObjectRoot: models.ObjectRoot{
-			ID: member.ProjectId,
+			AggregateID: member.ProjectId,
 		},
 		GrantID: member.GrantId,
 		UserID:  member.UserId,

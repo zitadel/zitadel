@@ -49,7 +49,7 @@ func StartUser(conf UserConfig) (*UserEventstore, error) {
 func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.User, error) {
 	user := es.userCache.getUser(id)
 
-	query, err := UserByIDQuery(user.ID, user.Sequence)
+	query, err := UserByIDQuery(user.AggregateID, user.Sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 	if err != nil {
 		return nil, err
 	}
-	user.ID = strconv.FormatUint(id, 10)
+	user.AggregateID = strconv.FormatUint(id, 10)
 	if user.Password != nil && user.SecretString != "" {
 		secret, err := crypto.Hash([]byte(user.SecretString), es.PasswordAlg)
 		if err != nil {
@@ -125,7 +125,7 @@ func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User
 	if err != nil {
 		return nil, err
 	}
-	user.ID = strconv.FormatUint(id, 10)
+	user.AggregateID = strconv.FormatUint(id, 10)
 
 	secret, err := crypto.Hash([]byte(user.SecretString), es.PasswordAlg)
 	if err != nil {

@@ -46,7 +46,7 @@ func (p *Profile) Changes(changed *Profile) map[string]interface{} {
 func ProfileFromModel(project *model.Profile) *Profile {
 	return &Profile{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ObjectRoot.ID,
+			AggregateID:  project.ObjectRoot.AggregateID,
 			Sequence:     project.Sequence,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,
@@ -64,7 +64,7 @@ func ProfileFromModel(project *model.Profile) *Profile {
 func ProfileToModel(project *Profile) *model.Profile {
 	return &model.Profile{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           project.ObjectRoot.ID,
+			AggregateID:  project.ObjectRoot.AggregateID,
 			Sequence:     project.Sequence,
 			ChangeDate:   project.ChangeDate,
 			CreationDate: project.CreationDate,

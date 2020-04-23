@@ -121,7 +121,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "user create aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -149,7 +149,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with init code",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				initCode:   &model2.InitUserCode{},
@@ -164,7 +164,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with phone code",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				phoneCode:  &model2.PhoneCode{},
@@ -220,7 +220,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "user register aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("", ""),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				resourceOwner: "newResourceowner",
@@ -247,7 +247,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "create with email code",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				resourceOwner: "newResourceowner",
@@ -263,7 +263,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "create no resourceowner",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				emailCode:  &model2.EmailCode{},
@@ -316,7 +316,7 @@ func TestUserDeactivateAggregate(t *testing.T) {
 			name: "user deactivate aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -375,7 +375,7 @@ func TestUserReactivateAggregate(t *testing.T) {
 			name: "user reactivate aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -434,7 +434,7 @@ func TestUserLockedAggregate(t *testing.T) {
 			name: "user locked aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -493,7 +493,7 @@ func TestUserUnlockedAggregate(t *testing.T) {
 			name: "user unlocked aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{ID: "ID"},
+				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model2.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),

@@ -28,7 +28,7 @@ func projectGrantFromModel(grant *proj_model.ProjectGrant) *ProjectGrant {
 func projectGrantCreateToModel(grant *ProjectGrantCreate) *proj_model.ProjectGrant {
 	return &proj_model.ProjectGrant{
 		ObjectRoot: models.ObjectRoot{
-			ID: grant.ProjectId,
+			AggregateID: grant.ProjectId,
 		},
 		GrantedOrgID: grant.GrantedOrgId,
 		RoleKeys:     grant.RoleKeys,
@@ -38,7 +38,7 @@ func projectGrantCreateToModel(grant *ProjectGrantCreate) *proj_model.ProjectGra
 func projectGrantUpdateToModel(grant *ProjectGrantUpdate) *proj_model.ProjectGrant {
 	return &proj_model.ProjectGrant{
 		ObjectRoot: models.ObjectRoot{
-			ID: grant.ProjectId,
+			AggregateID: grant.ProjectId,
 		},
 		GrantID:  grant.Id,
 		RoleKeys: grant.RoleKeys,

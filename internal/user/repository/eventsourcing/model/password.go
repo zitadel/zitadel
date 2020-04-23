@@ -16,7 +16,7 @@ type Password struct {
 func PasswordFromModel(password *model.Password) *Password {
 	return &Password{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           password.ObjectRoot.ID,
+			AggregateID:  password.ObjectRoot.AggregateID,
 			Sequence:     password.Sequence,
 			ChangeDate:   password.ChangeDate,
 			CreationDate: password.CreationDate,
@@ -29,7 +29,7 @@ func PasswordFromModel(password *model.Password) *Password {
 func PasswordToModel(password *Password) *model.Password {
 	return &model.Password{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           password.ObjectRoot.ID,
+			AggregateID:  password.ObjectRoot.AggregateID,
 			Sequence:     password.Sequence,
 			ChangeDate:   password.ChangeDate,
 			CreationDate: password.CreationDate,

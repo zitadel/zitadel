@@ -32,7 +32,7 @@ func (p *Phone) Changes(changed *Phone) map[string]interface{} {
 func PhoneFromModel(phone *model.Phone) *Phone {
 	return &Phone{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           phone.ObjectRoot.ID,
+			AggregateID:  phone.ObjectRoot.AggregateID,
 			Sequence:     phone.Sequence,
 			ChangeDate:   phone.ChangeDate,
 			CreationDate: phone.CreationDate,
@@ -45,7 +45,7 @@ func PhoneFromModel(phone *model.Phone) *Phone {
 func PhoneToModel(phone *Phone) *model.Phone {
 	return &model.Phone{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           phone.ObjectRoot.ID,
+			AggregateID:  phone.ObjectRoot.AggregateID,
 			Sequence:     phone.Sequence,
 			ChangeDate:   phone.ChangeDate,
 			CreationDate: phone.CreationDate,

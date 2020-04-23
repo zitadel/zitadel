@@ -18,8 +18,8 @@ func TestPhoneChanges(t *testing.T) {
 		{
 			name: "all fields changed",
 			args: args{
-				existing: &Phone{Phone: "Phone", IsPhoneVerified: true},
-				new:      &Phone{Phone: "PhoneChanged", IsPhoneVerified: false},
+				existing: &Phone{PhoneNumber: "Phone", IsPhoneVerified: true},
+				new:      &Phone{PhoneNumber: "PhoneChanged", IsPhoneVerified: false},
 			},
 			res: res{
 				changesLen: 1,
@@ -28,8 +28,8 @@ func TestPhoneChanges(t *testing.T) {
 		{
 			name: "no fields changed",
 			args: args{
-				existing: &Phone{Phone: "Phone", IsPhoneVerified: true},
-				new:      &Phone{Phone: "Phone", IsPhoneVerified: false},
+				existing: &Phone{PhoneNumber: "Phone", IsPhoneVerified: true},
+				new:      &Phone{PhoneNumber: "Phone", IsPhoneVerified: false},
 			},
 			res: res{
 				changesLen: 0,

@@ -40,7 +40,7 @@ func UserFromEvents(user *User, events ...*es_models.Event) (*User, error) {
 func UserFromModel(user *model.User) *User {
 	converted := &User{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           user.ObjectRoot.ID,
+			AggregateID:  user.ObjectRoot.AggregateID,
 			Sequence:     user.Sequence,
 			ChangeDate:   user.ChangeDate,
 			CreationDate: user.CreationDate,
@@ -67,7 +67,7 @@ func UserFromModel(user *model.User) *User {
 func UserToModel(user *User) *model.User {
 	converted := &model.User{
 		ObjectRoot: es_models.ObjectRoot{
-			ID:           user.ObjectRoot.ID,
+			AggregateID:  user.ObjectRoot.AggregateID,
 			Sequence:     user.Sequence,
 			ChangeDate:   user.ChangeDate,
 			CreationDate: user.CreationDate,

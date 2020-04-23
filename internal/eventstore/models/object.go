@@ -5,15 +5,15 @@ import (
 )
 
 type ObjectRoot struct {
-	ID           string    `json:"-"`
+	AggregateID  string    `json:"-"`
 	Sequence     uint64    `json:"-"`
 	CreationDate time.Time `json:"-"`
 	ChangeDate   time.Time `json:"-"`
 }
 
 func (o *ObjectRoot) AppendEvent(event *Event) {
-	if o.ID == "" {
-		o.ID = event.AggregateID
+	if o.AggregateID == "" {
+		o.AggregateID = event.AggregateID
 	}
 
 	o.ChangeDate = event.CreationDate
