@@ -87,6 +87,8 @@ func userStateFromModel(state usr_model.UserState) UserState {
 		return UserState_USERSTATE_ACTIVE
 	case usr_model.USERSTATE_INACTIVE:
 		return UserState_USERSTATE_INACTIVE
+	case usr_model.USERSTATE_LOCKED:
+		return UserState_USERSTATE_LOCKED
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
 	}

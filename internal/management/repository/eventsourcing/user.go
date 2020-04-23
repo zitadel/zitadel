@@ -23,18 +23,18 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
 }
 
-func (repo *UserRepo) ReactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
-	return repo.UserEvents.DeactivateUser(ctx, id)
-}
-
 func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
 	return repo.UserEvents.DeactivateUser(ctx, id)
 }
 
+func (repo *UserRepo) ReactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
+	return repo.UserEvents.ReactivateUser(ctx, id)
+}
+
 func (repo *UserRepo) LockUser(ctx context.Context, id string) (*usr_model.User, error) {
-	return repo.UserEvents.DeactivateUser(ctx, id)
+	return repo.UserEvents.LockUser(ctx, id)
 }
 
 func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.User, error) {
-	return repo.UserEvents.DeactivateUser(ctx, id)
+	return repo.UserEvents.UnlockUser(ctx, id)
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"golang.org/x/text/language"
+	"time"
 )
 
 type User struct {
@@ -15,6 +16,7 @@ type User struct {
 	*Email
 	*Phone
 	*Address
+	InitCode *InitUserCode
 }
 
 type Password struct {
@@ -59,6 +61,13 @@ type Address struct {
 	PostalCode    string
 	Region        string
 	StreetAddress string
+}
+
+type InitUserCode struct {
+	es_models.ObjectRoot
+
+	Code   *crypto.CryptoValue
+	Expiry time.Duration
 }
 
 type UserState int32

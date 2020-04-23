@@ -127,3 +127,34 @@ func userStateAggregate(aggCreator *es_models.AggregateCreator, user *model.User
 		return agg.AppendEvent(state, nil)
 	}
 }
+
+func UserInitCodeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, code *model.InitUserCode) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if code == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8i23", "code should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(usr_model.InitializedUserCodeCreated, code)
+		if err != nil {
+			return nil, err
+		}
+		return agg, err
+	}
+}
+
+func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(usr_model.MfaInitSkipped, nil)
+		if err != nil {
+			return nil, err
+		}
+		return agg, err
+	}
+}

@@ -21,6 +21,7 @@ type User struct {
 	*Email
 	*Phone
 	*Address
+	InitCode *InitUserCode
 }
 
 type InitUserCode struct {
@@ -90,6 +91,9 @@ func UserToModel(user *User) *model.User {
 	if user.Address != nil {
 		converted.Address = AddressToModel(user.Address)
 	}
+	if user.InitCode != nil {
+		converted.InitCode = InitCodeToModel(user.InitCode)
+	}
 	return converted
 }
 
@@ -119,6 +123,8 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		u.appendLockedEvent()
 	case model.UserUnlocked:
 		u.appendUnlockedEvent()
+	case model.InitializedUserCodeCreated:
+		u.appendInitUsercodeCreatedEvent(event)
 	}
 	u.ComputeState()
 	return nil
@@ -151,5 +157,25 @@ func (u *User) appendLockedEvent() error {
 
 func (u *User) appendUnlockedEvent() error {
 	u.State = int32(model.USERSTATE_ACTIVE)
+	return nil
+}
+
+func (u *User) appendInitUsercodeCreatedEvent(event *es_models.Event) error {
+	initCode := new(InitUserCode)
+	err := initCode.setData(event)
+	if err != nil {
+		return err
+	}
+	initCode.ObjectRoot.CreationDate = event.CreationDate
+	u.InitCode = initCode
+	return nil
+}
+
+func (c *InitUserCode) setData(event *es_models.Event) error {
+	c.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, c); err != nil {
+		logging.Log("EVEN-7duwe").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
 	return nil
 }

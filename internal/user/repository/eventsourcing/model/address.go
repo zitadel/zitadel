@@ -66,3 +66,16 @@ func AddressToModel(address *Address) *model.Address {
 		StreetAddress: address.StreetAddress,
 	}
 }
+
+func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
+	return &model.InitUserCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
+}

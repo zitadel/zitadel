@@ -158,6 +158,26 @@ func GetMockManipulateLockedUser(ctrl *gomock.Controller) *UserEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+	}
+	code := model.InitUserCode{Expiry: time.Hour * 30}
+	dataUser, _ := json.Marshal(user)
+	dataCode, _ := json.Marshal(code)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.InitializedUserCodeCreated, Data: dataCode},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockManipulateUserNoEvents(ctrl *gomock.Controller) *UserEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)

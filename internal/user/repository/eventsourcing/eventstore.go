@@ -242,3 +242,64 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	es.userCache.cacheUser(repoExisting)
 	return model.UserToModel(repoExisting), nil
 }
+
+func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d8diw", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.InitCode != nil {
+		return user.InitCode, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "init code not found")
+}
+
+func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	initCode := new(model.InitUserCode)
+	initCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+	if err != nil {
+		return nil, err
+	}
+	initCode.Code = initCodeCrypto
+	initCode.Expiry = es.InitializeUserCode.Expiry()
+
+	repoUser := model.UserFromModel(user)
+	agg := UserInitCodeAggregate(es.AggregateCreator(), repoUser, initCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return nil, err
+	}
+	es.userCache.cacheUser(repoUser)
+	return model.InitCodeToModel(repoUser.InitCode), nil
+}
+
+func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := SkipMfaAggregate(es.AggregateCreator(), repoUser)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}

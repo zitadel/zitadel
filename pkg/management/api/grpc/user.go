@@ -47,7 +47,7 @@ func (s *Server) DeactivateUser(ctx context.Context, in *UserID) (*User, error) 
 }
 
 func (s *Server) ReactivateUser(ctx context.Context, in *UserID) (*User, error) {
-	user, err := s.user.DeactivateUser(ctx, in.Id)
+	user, err := s.user.ReactivateUser(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}

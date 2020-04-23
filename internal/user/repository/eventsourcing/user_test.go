@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/user/model"
 	model2 "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"testing"
+	"time"
 )
 
 func TestUserByIDQuery(t *testing.T) {
@@ -518,6 +519,118 @@ func TestUserUnlockedAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := UserUnlockAggregate(tt.args.aggCreator, tt.args.new)(tt.args.ctx)
+
+			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if tt.res.errFunc == nil && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestUserInitCodeAggregate(t *testing.T) {
+	type args struct {
+		ctx      context.Context
+		existing *model2.User
+		code     *model2.InitUserCode
+
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "user unlocked aggregate ok",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model2.Profile{UserName: "UserName"},
+				},
+				code:       &model2.InitUserCode{Expiry: time.Hour * 1},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.InitializedUserCodeCreated,
+			},
+		},
+		{
+			name: "code nil",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model2.Profile{UserName: "UserName"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := UserInitCodeAggregate(tt.args.aggCreator, tt.args.existing, tt.args.code)(tt.args.ctx)
+
+			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if tt.res.errFunc == nil && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestSkipMfaAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model2.User
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "user unlocked aggregate ok",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model2.Profile{UserName: "UserName"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: model.MfaInitSkipped,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := SkipMfaAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
