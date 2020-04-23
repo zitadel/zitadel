@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {

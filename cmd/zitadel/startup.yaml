@@ -38,30 +38,6 @@ Mgmt:
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: true
-    InitializeUserCode:
-      Length: 6
-      IncludeLowerLetters: false
-      IncludeUpperLetters: true
-      IncludeDigits: true
-      IncludeSymbols: false
-    EmailVerificationCode:
-      Length: 6
-      IncludeLowerLetters: false
-      IncludeUpperLetters: true
-      IncludeDigits: true
-      IncludeSymbols: false
-    PasswordVerificationCode:
-      Length: 6
-      IncludeLowerLetters: false
-      IncludeUpperLetters: true
-      IncludeDigits: true
-      IncludeSymbols: false
-    PhoneVerificationCode:
-      Length: 6
-      IncludeLowerLetters: false
-      IncludeUpperLetters: true
-      IncludeDigits: true
-      IncludeSymbols: false
 
 Auth:
   API:
