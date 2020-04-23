@@ -7,15 +7,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) GetPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*PasswordComplexityPolicy, error) {
-	policy, err := s.policy.GetPasswordComplexityPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return passwordComplexityPolicyFromModel(policy), nil
-}
-
 func (s *Server) CreatePasswordComplexityPolicy(ctx context.Context, policy *PasswordComplexityPolicyCreate) (*PasswordComplexityPolicy, error) {
 	policyresp, err := s.policy.CreatePasswordComplexityPolicy(ctx, passwordComplexityPolicyCreateToModel(policy))
 	if err != nil {
@@ -23,6 +14,15 @@ func (s *Server) CreatePasswordComplexityPolicy(ctx context.Context, policy *Pas
 	}
 
 	return passwordComplexityPolicyFromModel(policyresp), nil
+}
+
+func (s *Server) GetPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*PasswordComplexityPolicy, error) {
+	policy, err := s.policy.GetPasswordComplexityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordComplexityPolicyFromModel(policy), nil
 }
 
 func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, policy *PasswordComplexityPolicyUpdate) (*PasswordComplexityPolicy, error) {
@@ -38,16 +38,31 @@ func (s *Server) DeletePasswordComplexityPolicy(ctx context.Context, ID *Passwor
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-skw3f", "Not implemented")
 }
 
-func (s *Server) GetPasswordAgePolicy(ctx context.Context, _ *empty.Empty) (*PasswordAgePolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-po9vb", "Not implemented")
+func (s *Server) CreatePasswordAgePolicy(ctx context.Context, policy *PasswordAgePolicyCreate) (*PasswordAgePolicy, error) {
+	policyresp, err := s.policy.CreatePasswordAgePolicy(ctx, passwordAgePolicyCreateToModel(policy))
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordAgePolicyFromModel(policyresp), nil
 }
 
-func (s *Server) CreatePasswordAgePolicy(ctx context.Context, policy *PasswordAgePolicyCreate) (*PasswordAgePolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-ldp3v", "Not implemented")
+func (s *Server) GetPasswordAgePolicy(ctx context.Context, _ *empty.Empty) (*PasswordAgePolicy, error) {
+	policy, err := s.policy.GetPasswordAgePolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordAgePolicyFromModel(policy), nil
 }
 
 func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, policy *PasswordAgePolicyUpdate) (*PasswordAgePolicy, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-ckep3", "Not implemented")
+	policyresp, err := s.policy.UpdatePasswordAgePolicy(ctx, passwordAgePolicyUpdateToModel(policy))
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordAgePolicyFromModel(policyresp), nil
 }
 
 func (s *Server) DeletePasswordAgePolicy(ctx context.Context, ID *PasswordAgePolicyID) (*empty.Empty, error) {

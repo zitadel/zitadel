@@ -7,10 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/policy/model"
-	"github.com/sony/sonyflake"
 )
-
-var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
 func PasswordComplexityPolicyQuery(recourceOwner string, latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
@@ -56,7 +53,7 @@ func PasswordComplexityPolicyUpdateAggregate(aggCreator *es_models.AggregateCrea
 		if err != nil {
 			return nil, err
 		}
-		changes := existing.Changes(new)
+		changes := existing.ComplexityChanges(new)
 		return agg.AppendEvent(model.PasswordComplexityPolicyChanged, changes)
 	}
 }

@@ -9,10 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/policy/model"
 )
 
-const (
-	projectVersion = "v1"
-)
-
 type PasswordComplexityPolicy struct {
 	models.ObjectRoot
 
@@ -25,7 +21,7 @@ type PasswordComplexityPolicy struct {
 	HasSymbol    bool
 }
 
-func (p *PasswordComplexityPolicy) Changes(changed *PasswordComplexityPolicy) map[string]interface{} {
+func (p *PasswordComplexityPolicy) ComplexityChanges(changed *PasswordComplexityPolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if changed.Description != "" && p.Description != changed.Description {
 		changes["description"] = changed.Description
