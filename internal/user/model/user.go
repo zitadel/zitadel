@@ -93,7 +93,11 @@ func (u *User) IsActive() bool {
 	return u.State == USERSTATE_ACTIVE
 }
 
-func (u *User) IsInctive() bool {
+func (u *User) IsInitial() bool {
+	return u.State == USERSTATE_INITIAL
+}
+
+func (u *User) IsInactive() bool {
 	return u.State == USERSTATE_INACTIVE
 }
 

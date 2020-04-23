@@ -45,6 +45,7 @@ func UserFromModel(user *model.User) *User {
 			ChangeDate:   user.ChangeDate,
 			CreationDate: user.CreationDate,
 		},
+		State: int32(user.State),
 	}
 	if user.Password != nil {
 		converted.Password = PasswordFromModel(user.Password)
@@ -72,6 +73,7 @@ func UserToModel(user *User) *model.User {
 			ChangeDate:   user.ChangeDate,
 			CreationDate: user.CreationDate,
 		},
+		State: model.UserState(user.State),
 	}
 	if user.Password != nil {
 		converted.Password = PasswordToModel(user.Password)
@@ -109,7 +111,6 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 			logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
-		return nil
 	case model.UserDeactivated:
 		u.appendDeactivatedEvent()
 	case model.UserReactivated:
@@ -125,7 +126,7 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 
 func (u *User) ComputeState() {
 	if u.State == 0 {
-		if u.IsEmailVerified {
+		if u.Email != nil && u.IsEmailVerified {
 			u.State = int32(model.USERSTATE_ACTIVE)
 		} else {
 			u.State = int32(model.USERSTATE_INITIAL)

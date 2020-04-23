@@ -126,7 +126,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 }
 
 func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	if user.UserName == "" && user.Email != nil {
+	if user.Profile != nil && user.UserName == "" && user.Email != nil {
 		user.UserName = user.EmailAddress
 	}
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
@@ -143,13 +143,13 @@ func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User
 	if err != nil {
 		return nil, err
 	}
-	user.Password = &usr_model.Password{SecretCrypto: secret, ChangeRequired: true}
+	user.Password = &usr_model.Password{SecretCrypto: secret, ChangeRequired: false}
 
 	repoUser := model.UserFromModel(user)
 
-	var emailCode *model.EmailCode
+	emailCode := new(model.EmailCode)
 	if user.Email != nil && !user.IsEmailVerified {
-		emailCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+		emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
 		if err != nil {
 			return nil, err
 		}
@@ -172,8 +172,8 @@ func (es *UserEventstore) DeactivateUser(ctx context.Context, id string) (*usr_m
 	if err != nil {
 		return nil, err
 	}
-	if !existing.IsActive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "project must be active")
+	if existing.IsInactive() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "cant deactivate inactive user")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -191,8 +191,8 @@ func (es *UserEventstore) ReactivateUser(ctx context.Context, id string) (*usr_m
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsInctive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do94s", "project must be active")
+	if !existing.IsInactive() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do94s", "user must be inactive")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -210,8 +210,8 @@ func (es *UserEventstore) LockUser(ctx context.Context, id string) (*usr_model.U
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsActive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "project must be active")
+	if !existing.IsActive() && !existing.IsInitial() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "user must be active or initial")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -229,8 +229,8 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsLocked() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dks83", "project must be active")
+	if !existing.IsLocked() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dks83", "user must be locked")
 	}
 
 	repoExisting := model.UserFromModel(existing)

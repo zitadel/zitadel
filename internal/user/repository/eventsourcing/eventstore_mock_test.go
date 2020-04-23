@@ -121,3 +121,48 @@ func GetMockManipulateUserWithPW(ctrl *gomock.Controller, init, email, phone, pa
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstoreWithPw(ctrl, mockEs, init, email, phone, password)
 }
+
+func GetMockManipulateInactiveUser(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+	}
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 2, Type: usr_model.UserDeactivated},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateLockedUser(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+	}
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserLocked},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateUserNoEvents(ctrl *gomock.Controller) *UserEventstore {
+	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
