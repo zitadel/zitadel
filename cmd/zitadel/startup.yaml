@@ -31,13 +31,6 @@ Mgmt:
         Type: 'fastcache'
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
-    PasswordSaltCost: 14
-    ClientSecretGenerator:
-      Length: 64
-      IncludeLowerLetters: true
-      IncludeUpperLetters: true
-      IncludeDigits: true
-      IncludeSymbols: true
 
 
 Auth:

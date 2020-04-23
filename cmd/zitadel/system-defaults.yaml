@@ -1,0 +1,8 @@
+SecretGenerators:
+  PasswordSaltCost: 14
+  ClientSecretGenerator:
+    Length: 64
+    IncludeLowerLetters: true
+    IncludeUpperLetters: true
+    IncludeDigits: true
+    IncludeSymbols: true
