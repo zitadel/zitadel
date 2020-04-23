@@ -7,33 +7,33 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func passwordAgePolicyFromModel(policy *model.PasswordAgePolicy) *PasswordAgePolicy {
+func passwordLockoutPolicyFromModel(policy *model.PasswordLockoutPolicy) *PasswordLockoutPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
-	return &PasswordAgePolicy{
+	return &PasswordLockoutPolicy{
 		Id:           policy.ID,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Sequence:     policy.Sequence,
-		//	State:          policy.State,
-		Description:    policy.Description,
-		ExpireWarnDays: policy.ExpireWarnDays,
-		MaxAgeDays:     policy.MaxAgeDays,
+		Description:  policy.Description,
+		//		State:               policy.State,
+		MaxAttempts:         policy.MaxAttempts,
+		ShowLockOutFailures: policy.ShowLockOutFailures,
 	}
 }
 
-func passwordAgePolicyToModel(policy *PasswordAgePolicy) *model.PasswordAgePolicy {
+func passwordLockoutPolicyToModel(policy *PasswordLockoutPolicy) *model.PasswordLockoutPolicy {
 	creationDate, err := ptypes.Timestamp(policy.CreationDate)
 	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.Timestamp(policy.ChangeDate)
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
-	return &model.PasswordAgePolicy{
+	return &model.PasswordLockoutPolicy{
 		ObjectRoot: models.ObjectRoot{
 			ID:           policy.Id,
 			CreationDate: creationDate,
@@ -42,28 +42,28 @@ func passwordAgePolicyToModel(policy *PasswordAgePolicy) *model.PasswordAgePolic
 		},
 		Description: policy.Description,
 		//	State:          policy.State,
-		ExpireWarnDays: policy.ExpireWarnDays,
-		MaxAgeDays:     policy.MaxAgeDays,
+		MaxAttempts:         policy.MaxAttempts,
+		ShowLockOutFailures: policy.ShowLockOutFailures,
 	}
 }
 
-func passwordAgePolicyCreateToModel(policy *PasswordAgePolicyCreate) *model.PasswordAgePolicy {
-	return &model.PasswordAgePolicy{
+func passwordLockoutPolicyCreateToModel(policy *PasswordLockoutPolicyCreate) *model.PasswordLockoutPolicy {
+	return &model.PasswordLockoutPolicy{
 		Description: policy.Description,
 		//	State:          policy.State,
-		ExpireWarnDays: policy.ExpireWarnDays,
-		MaxAgeDays:     policy.MaxAgeDays,
+		MaxAttempts:         policy.MaxAttempts,
+		ShowLockOutFailures: policy.ShowLockOutFailures,
 	}
 }
 
-func passwordAgePolicyUpdateToModel(policy *PasswordAgePolicyUpdate) *model.PasswordAgePolicy {
-	return &model.PasswordAgePolicy{
+func passwordLockoutPolicyUpdateToModel(policy *PasswordLockoutPolicyUpdate) *model.PasswordLockoutPolicy {
+	return &model.PasswordLockoutPolicy{
 		ObjectRoot: models.ObjectRoot{
 			ID: policy.Id,
 		},
 		Description: policy.Description,
 		//		State:          policy.State,
-		ExpireWarnDays: policy.ExpireWarnDays,
-		MaxAgeDays:     policy.MaxAgeDays,
+		MaxAttempts:         policy.MaxAttempts,
+		ShowLockOutFailures: policy.ShowLockOutFailures,
 	}
 }

@@ -15,9 +15,9 @@ const (
 	PasswordAgePolicyAdded   models.EventType = "policy.password.age.added"
 	PasswordAgePolicyChanged models.EventType = "policy.password.age.changed"
 
-	// lokout
-	PasswordLokoutPolicyAggregate models.AggregateType = "policy.password.lokout"
+	// lockout
+	PasswordLockoutPolicyAggregate models.AggregateType = "policy.password.lockout"
 
-	PasswordLokoutPolicyAdded   models.EventType = "policy.password.age.lokout"
-	PasswordLokoutPolicyChanged models.EventType = "policy.password.age.lokout"
+	PasswordLockoutPolicyAdded   models.EventType = "policy.password.lockout.added"
+	PasswordLockoutPolicyChanged models.EventType = "policy.password.lockout.changed"
 )
