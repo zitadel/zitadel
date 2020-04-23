@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/cache"
 	"github.com/caos/zitadel/internal/cache/config"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 type ProjectCache struct {
@@ -18,16 +19,16 @@ func StartCache(conf *config.CacheConfig) (*ProjectCache, error) {
 	return &ProjectCache{projectCache: projectCache}, nil
 }
 
-func (c *ProjectCache) getProject(ID string) (project *Project) {
-	project = &Project{ObjectRoot: models.ObjectRoot{ID: ID}}
+func (c *ProjectCache) getProject(ID string) (project *model.Project) {
+	project = &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: ID}}
 	if err := c.projectCache.Get(ID, project); err != nil {
 		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
 	}
 	return project
 }
 
-func (c *ProjectCache) cacheProject(project *Project) {
-	err := c.projectCache.Set(project.ID, project)
+func (c *ProjectCache) cacheProject(project *model.Project) {
+	err := c.projectCache.Set(project.AggregateID, project)
 	if err != nil {
 		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting project cache")
 	}

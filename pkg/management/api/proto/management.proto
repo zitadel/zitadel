@@ -722,7 +722,7 @@ service ManagementService {
         };
     }
 
-    rpc AddProjectRole(ProjectRoleAdd) returns (google.protobuf.Empty) {
+    rpc AddProjectRole(ProjectRoleAdd) returns (ProjectRole) {
         option (google.api.http) = {
             post: "/projects/{id}/roles"
             body: "*"
@@ -734,9 +734,21 @@ service ManagementService {
         };
     }
 
+    rpc ChangeProjectRole(ProjectRoleChange) returns (ProjectRole) {
+        option (google.api.http) = {
+            put: "/projects/{id}/roles/{key}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.role.write"
+            check_field_name: "Id"
+        };
+    }
+
     rpc RemoveProjectRole(ProjectRoleRemove) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/projects/{id}/roles/{name}"
+            delete: "/projects/{id}/roles/{key}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -813,6 +825,17 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.app.write"
+            check_field_name: "ProjectId"
+        };
+    }
+
+    rpc RemoveApplication(ApplicationID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/applications/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.app.delete"
             check_field_name: "ProjectId"
         };
     }
@@ -908,6 +931,15 @@ service ManagementService {
         };
     }
 
+    rpc RemoveProjectGrant(ProjectGrantID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/grants/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.grant.delete"
+        };
+    }
 
     //PROJECT_GRANT_MEMBER
     rpc GetProjectGrantMemberRoles(google.protobuf.Empty) returns (ProjectGrantMemberRoles) {
@@ -930,7 +962,7 @@ service ManagementService {
         };
     }
 
-    rpc AddProjectGrantMember(ProjectGrantMemberAdd) returns (google.protobuf.Empty) {
+    rpc AddProjectGrantMember(ProjectGrantMemberAdd) returns (ProjectGrantMember) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members"
             body: "*"
@@ -941,7 +973,7 @@ service ManagementService {
         };
     }
 
-    rpc ChangeProjectGrantMember(ProjectGrantMemberChange) returns (google.protobuf.Empty) {
+    rpc ChangeProjectGrantMember(ProjectGrantMemberChange) returns (ProjectGrantMember) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
             body: "*"
@@ -1724,24 +1756,32 @@ message ProjectMemberRemove {
 }
 
 message ProjectRoleAdd {
+     string id = 1;
+     string key = 2;
+     string display_name = 3;
+     string group = 4;
+}
+
+message ProjectRoleChange {
     string id = 1;
-    string name = 2;
+    string key = 2;
     string display_name = 3;
     string group = 4;
 }
 
 message ProjectRole {
     string project_id = 1;
-    string name = 2;
+    string key = 2;
     string display_name = 3;
     google.protobuf.Timestamp creation_date = 4;
-    string group = 5;
-    uint64 sequence = 6;
+    google.protobuf.Timestamp change_date = 5;
+    string group = 6;
+    uint64 sequence = 7;
 }
 
 message ProjectRoleRemove {
     string id = 1;
-    string name = 2;
+    string key = 2;
 }
 
 message ProjectRoleSearchResponse {
@@ -1766,7 +1806,7 @@ message ProjectRoleSearchQuery {
 
 enum ProjectRoleSearchKey {
     PROJECTROLESEARCHKEY_UNSPECIFIED = 0;
-    PROJECTROLESEARCHKEY_NAME = 1;
+    PROJECTROLESEARCHKEY_KEY = 1;
     PROJECTROLESEARCHKEY_DISPLAY_NAME = 2;
 }
 
@@ -1859,7 +1899,7 @@ message OIDCConfigUpdate {
 enum OIDCResponseType {
     OIDCRESPONSETYPE_CODE = 0;
     OIDCRESPONSETYPE_ID_TOKEN = 1;
-    OIDCRESPONSETYPE_TOKEN_ID_TOKEN = 2;
+    OIDCRESPONSETYPE_TOKEN = 2;
 }
 
 enum OIDCGrantType {
@@ -1915,7 +1955,7 @@ message ProjectGrant {
     string granted_org_id = 3;
     string granted_org_name = 4;
     string granted_org_domain = 5;
-    repeated string role_names = 6;
+    repeated string role_keys = 6;
     ProjectGrantState state = 7;
     google.protobuf.Timestamp creation_date = 8;
     google.protobuf.Timestamp change_date = 9;
@@ -1926,13 +1966,13 @@ message ProjectGrant {
 message ProjectGrantCreate {
     string project_id = 1;
     string granted_org_id = 2;
-    repeated string role_names = 3;
+    repeated string role_keys = 3;
 }
 
 message ProjectGrantUpdate {
     string project_id = 1;
     string id = 2;
-    repeated string role_names = 3;
+    repeated string role_keys = 3;
 }
 
 message ProjectGrantID {
@@ -2033,7 +2073,7 @@ message UserGrant {
     string user_id = 2;
     string org_id = 3;
     string project_id = 4;
-    repeated string role_names = 5;
+    repeated string role_keys = 5;
     UserGrantState state = 6;
     google.protobuf.Timestamp creation_date = 7;
     google.protobuf.Timestamp change_date = 8;
@@ -2051,13 +2091,13 @@ message UserGrantCreate {
     string user_id = 1;
     string org_id = 2;
     string project_id = 3;
-    repeated string role_names = 4;
+    repeated string role_keys = 4;
 }
 
 message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
-    repeated string role_names = 3;
+    repeated string role_keys = 3;
 }
 
 message UserGrantID {
@@ -2075,7 +2115,7 @@ message ProjectUserGrantUpdate {
     string project_id = 1;
     string user_id = 2;
     string id = 3;
-    repeated string role_names = 4;
+    repeated string role_keys = 4;
 }
 
 message ProjectGrantUserGrantID {
@@ -2089,14 +2129,14 @@ message ProjectGrantUserGrantCreate {
     string org_id = 2;
     string project_grant_id = 3;
     string project_id = 4 [(validate.rules).string.min_len = 1];
-    repeated string role_names = 5;
+    repeated string role_keys = 5;
 }
 
 message ProjectGrantUserGrantUpdate {
     string project_grant_id = 1;
     string user_id = 2;
     string id = 3;
-    repeated string role_names = 4;
+    repeated string role_keys = 4;
 }
 
 enum UserGrantState {
