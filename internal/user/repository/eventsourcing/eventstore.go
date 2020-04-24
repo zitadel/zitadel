@@ -303,3 +303,77 @@ func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error 
 	es.userCache.cacheUser(repoUser)
 	return nil
 }
+
+func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (*usr_model.Password, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Password != nil {
+		return user.Password, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "password not found")
+}
+
+func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+	return es.changedPassword(ctx, password, true)
+}
+
+func (es *UserEventstore) SetPassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+	return es.changedPassword(ctx, password, false)
+}
+
+func (es *UserEventstore) changedPassword(ctx context.Context, password *usr_model.Password, onetime bool) (*usr_model.Password, error) {
+	if !password.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dosi3", "password invalid")
+	}
+	user, err := es.UserByID(ctx, password.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	secret, err := crypto.Hash([]byte(password.SecretString), es.PasswordAlg)
+	if err != nil {
+		return nil, err
+	}
+	repoPassword := &model.Password{Secret: secret, ChangeRequired: onetime}
+	repoUser := model.UserFromModel(user)
+	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return nil, err
+	}
+	es.userCache.cacheUser(repoUser)
+
+	return model.PasswordToModel(repoUser.Password), nil
+}
+
+func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string, notifyType usr_model.NotificationType) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	request := &model.RequestPasswordSet{NotificationType: int32(notifyType), Expiry: es.PasswordVerificationCode.Expiry()}
+	pwCode, _, err := crypto.NewCode(es.PasswordVerificationCode)
+	if err != nil {
+		return err
+	}
+	request.Code = pwCode
+
+	repoUser := model.UserFromModel(user)
+	agg := RequestSetPassword(es.AggregateCreator(), repoUser, request)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}

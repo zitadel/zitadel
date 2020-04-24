@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
@@ -79,6 +80,24 @@ func userCreateToModel(u *CreateUserRequest) *usr_model.User {
 		user.Phone = &usr_model.Phone{PhoneNumber: u.Phone, IsPhoneVerified: u.IsPhoneVerified}
 	}
 	return user
+}
+
+func passwordRequestToModel(r *PasswordRequest) *usr_model.Password {
+	return &usr_model.Password{
+		ObjectRoot:   models.ObjectRoot{AggregateID: r.Id},
+		SecretString: r.Password,
+	}
+}
+
+func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
+	switch state {
+	case NotificationType_NOTIFICATIONTYPE_EMAIL:
+		return usr_model.NOTIFICATIONTYPE_EMAIL
+	case NotificationType_NOTIFICATIONTYPE_SMS:
+		return usr_model.NOTIFICATIONTYPE_SMS
+	default:
+		return usr_model.NOTIFICATIONTYPE_EMAIL
+	}
 }
 
 func userStateFromModel(state usr_model.UserState) UserState {

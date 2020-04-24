@@ -13,4 +13,7 @@ type UserRepository interface {
 	ReactivateUser(ctx context.Context, id string) (*model.User, error)
 	LockUser(ctx context.Context, id string) (*model.User, error)
 	UnlockUser(ctx context.Context, id string) (*model.User, error)
+
+	SetOneTimePassword(ctx context.Context, password *model.Password) (*model.Password, error)
+	RequestSetPassword(ctx context.Context, id string, notifyType model.NotificationType) error
 }

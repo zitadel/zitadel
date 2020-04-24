@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
@@ -37,4 +36,12 @@ func (repo *UserRepo) LockUser(ctx context.Context, id string) (*usr_model.User,
 
 func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.User, error) {
 	return repo.UserEvents.UnlockUser(ctx, id)
+}
+
+func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+	return repo.UserEvents.SetOneTimePassword(ctx, password)
+}
+
+func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {
+	return repo.UserEvents.RequestSetPassword(ctx, id, notifyType)
 }

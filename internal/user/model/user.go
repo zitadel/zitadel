@@ -19,14 +19,6 @@ type User struct {
 	InitCode *InitUserCode
 }
 
-type Password struct {
-	es_models.ObjectRoot
-
-	SecretString   string
-	SecretCrypto   *crypto.CryptoValue
-	ChangeRequired bool
-}
-
 type Profile struct {
 	es_models.ObjectRoot
 
@@ -92,10 +84,7 @@ const (
 )
 
 func (u *User) IsValid() bool {
-	if u.Profile == nil || u.FirstName == "" || u.LastName == "" || u.UserName == "" || u.Email == nil || u.EmailAddress == "" {
-		return false
-	}
-	return true
+	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.UserName != "" && u.Email != nil && u.EmailAddress != ""
 }
 
 func (u *User) IsActive() bool {

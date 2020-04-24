@@ -115,11 +115,13 @@ func (s *Server) UpdateUserAddress(ctx context.Context, request *UpdateUserAddre
 }
 
 func (s *Server) SendSetPasswordNotification(ctx context.Context, request *SetPasswordNotificationRequest) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-LSe7s", "Not implemented")
+	err := s.user.RequestSetPassword(ctx, request.Id, notifyTypeToModel(request.Type))
+	return &empty.Empty{}, err
 }
 
 func (s *Server) SetInitialPassword(ctx context.Context, request *PasswordRequest) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-ldo3s", "Not implemented")
+	_, err := s.user.SetOneTimePassword(ctx, passwordRequestToModel(request))
+	return &empty.Empty{}, err
 }
 
 func (s *Server) GetUserMfas(ctx context.Context, userID *UserID) (*MultiFactors, error) {

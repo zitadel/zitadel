@@ -105,7 +105,7 @@ func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockManipulateUserWithPW(ctrl *gomock.Controller, init, email, phone, password bool) *UserEventstore {
+func GetMockManipulateUserWithPWGenerator(ctrl *gomock.Controller, init, email, phone, password bool) *UserEventstore {
 	user := model.User{
 		Profile: &model.Profile{
 			UserName: "UserName",
@@ -170,6 +170,27 @@ func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller) *UserEventstore 
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.InitializedUserCodeCreated, Data: dataCode},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+		Password: &model.Password{
+			Secret:         &crypto.CryptoValue{Algorithm: "bcrypt", KeyID: "KeyID"},
+			ChangeRequired: true,
+		},
+	}
+	dataUser, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

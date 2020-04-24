@@ -158,3 +158,37 @@ func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.Us
 		return agg, err
 	}
 }
+
+func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, password *model.Password) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if password == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d9832", "password should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(usr_model.UserPasswordChanged, password)
+		if err != nil {
+			return nil, err
+		}
+		return agg, err
+	}
+}
+
+func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.User, request *model.RequestPasswordSet) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if request == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8ei2", "password set request should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(usr_model.UserPasswordSetRequested, request)
+		if err != nil {
+			return nil, err
+		}
+		return agg, err
+	}
+}

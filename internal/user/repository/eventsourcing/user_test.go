@@ -5,8 +5,8 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/user/model"
-	model2 "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"testing"
 	"time"
 )
@@ -102,9 +102,9 @@ func TestUserQuery(t *testing.T) {
 func TestUserCreateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model2.User
-		initCode   *model2.InitUserCode
-		phoneCode  *model2.PhoneCode
+		new        *model.User
+		initCode   *model.InitUserCode
+		phoneCode  *model.PhoneCode
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -122,14 +122,14 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "user create aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserAdded},
+				eventTypes: []models.EventType{usr_model.UserAdded},
 			},
 		},
 		{
@@ -141,7 +141,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserAdded},
+				eventTypes: []models.EventType{usr_model.UserAdded},
 				wantErr:    true,
 				errFunc:    caos_errs.IsPreconditionFailed,
 			},
@@ -150,30 +150,30 @@ func TestUserCreateAggregate(t *testing.T) {
 			name: "create with init code",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
-				initCode:   &model2.InitUserCode{},
+				initCode:   &model.InitUserCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserAdded, model.InitializedUserCodeCreated},
+				eventTypes: []models.EventType{usr_model.UserAdded, usr_model.InitializedUserCodeCreated},
 			},
 		},
 		{
 			name: "create with phone code",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
-				phoneCode:  &model2.PhoneCode{},
+				phoneCode:  &model.PhoneCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserAdded, model.UserPhoneCodeAdded},
+				eventTypes: []models.EventType{usr_model.UserAdded, usr_model.UserPhoneCodeAdded},
 			},
 		},
 	}
@@ -202,8 +202,8 @@ func TestUserCreateAggregate(t *testing.T) {
 func TestUserRegisterAggregate(t *testing.T) {
 	type args struct {
 		ctx           context.Context
-		new           *model2.User
-		emailCode     *model2.EmailCode
+		new           *model.User
+		emailCode     *model.EmailCode
 		resourceOwner string
 		aggCreator    *models.AggregateCreator
 	}
@@ -221,15 +221,15 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "user register aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("", ""),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				resourceOwner: "newResourceowner",
 				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{model.UserRegistered},
+				eventTypes: []models.EventType{usr_model.UserRegistered},
 			},
 		},
 		{
@@ -248,26 +248,26 @@ func TestUserRegisterAggregate(t *testing.T) {
 			name: "create with email code",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				resourceOwner: "newResourceowner",
-				emailCode:     &model2.EmailCode{},
+				emailCode:     &model.EmailCode{},
 				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserRegistered, model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{usr_model.UserRegistered, usr_model.UserEmailCodeAdded},
 			},
 		},
 		{
 			name: "create no resourceowner",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
-				emailCode:  &model2.EmailCode{},
+				emailCode:  &model.EmailCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -300,7 +300,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 func TestUserDeactivateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model2.User
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -317,14 +317,14 @@ func TestUserDeactivateAggregate(t *testing.T) {
 			name: "user deactivate aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.UserDeactivated,
+				eventType: usr_model.UserDeactivated,
 			},
 		},
 		{
@@ -359,7 +359,7 @@ func TestUserDeactivateAggregate(t *testing.T) {
 func TestUserReactivateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model2.User
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -376,14 +376,14 @@ func TestUserReactivateAggregate(t *testing.T) {
 			name: "user reactivate aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.UserReactivated,
+				eventType: usr_model.UserReactivated,
 			},
 		},
 		{
@@ -418,7 +418,7 @@ func TestUserReactivateAggregate(t *testing.T) {
 func TestUserLockedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model2.User
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -435,14 +435,14 @@ func TestUserLockedAggregate(t *testing.T) {
 			name: "user locked aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.UserLocked,
+				eventType: usr_model.UserLocked,
 			},
 		},
 		{
@@ -477,7 +477,7 @@ func TestUserLockedAggregate(t *testing.T) {
 func TestUserUnlockedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		new        *model2.User
+		new        *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -494,14 +494,14 @@ func TestUserUnlockedAggregate(t *testing.T) {
 			name: "user unlocked aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.UserUnlocked,
+				eventType: usr_model.UserUnlocked,
 			},
 		},
 		{
@@ -536,8 +536,8 @@ func TestUserUnlockedAggregate(t *testing.T) {
 func TestUserInitCodeAggregate(t *testing.T) {
 	type args struct {
 		ctx      context.Context
-		existing *model2.User
-		code     *model2.InitUserCode
+		existing *model.User
+		code     *model.InitUserCode
 
 		aggCreator *models.AggregateCreator
 	}
@@ -555,23 +555,23 @@ func TestUserInitCodeAggregate(t *testing.T) {
 			name: "user unlocked aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				existing: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
-				code:       &model2.InitUserCode{Expiry: time.Hour * 1},
+				code:       &model.InitUserCode{Expiry: time.Hour * 1},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.InitializedUserCodeCreated,
+				eventType: usr_model.InitializedUserCodeCreated,
 			},
 		},
 		{
 			name: "code nil",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				existing: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -600,7 +600,7 @@ func TestUserInitCodeAggregate(t *testing.T) {
 func TestSkipMfaAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		existing   *model2.User
+		existing   *model.User
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -617,20 +617,146 @@ func TestSkipMfaAggregate(t *testing.T) {
 			name: "user unlocked aggregate ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
-				existing: &model2.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model2.Profile{UserName: "UserName"},
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
-				eventType: model.MfaInitSkipped,
+				eventType: usr_model.MfaInitSkipped,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			agg, err := SkipMfaAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
+
+			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if tt.res.errFunc == nil && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangePasswordAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.User
+		password   *model.Password
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "user password aggregate ok",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
+				},
+				password:   &model.Password{ChangeRequired: true},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: usr_model.UserPasswordChanged,
+			},
+		},
+		{
+			name: "password nil",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PasswordChangeAggregate(tt.args.aggCreator, tt.args.existing, tt.args.password)(tt.args.ctx)
+
+			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			if tt.res.errFunc == nil && agg.Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRequestSetPasswordAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.User
+		request    *model.RequestPasswordSet
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen  int
+		eventType models.EventType
+		errFunc   func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "user password aggregate ok",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
+				},
+				request:    &model.RequestPasswordSet{Expiry: time.Hour * 1},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  1,
+				eventType: usr_model.UserPasswordSetRequested,
+			},
+		},
+		{
+			name: "request nil",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := RequestSetPassword(tt.args.aggCreator, tt.args.existing, tt.args.request)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

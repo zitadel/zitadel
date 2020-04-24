@@ -125,18 +125,35 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		u.appendUnlockedEvent()
 	case model.InitializedUserCodeCreated:
 		u.appendInitUsercodeCreatedEvent(event)
+	case model.UserPasswordChanged:
+		u.appendUserPasswordChangedEvent(event)
 	}
-	u.ComputeState()
+	u.ComputeObject()
 	return nil
 }
 
-func (u *User) ComputeState() {
+func (u *User) ComputeObject() {
 	if u.State == 0 {
 		if u.Email != nil && u.IsEmailVerified {
 			u.State = int32(model.USERSTATE_ACTIVE)
 		} else {
 			u.State = int32(model.USERSTATE_INITIAL)
 		}
+	}
+	if u.Password != nil && u.Password.ObjectRoot.AggregateID == "" {
+		u.Password.ObjectRoot = u.ObjectRoot
+	}
+	if u.Profile != nil && u.Profile.ObjectRoot.AggregateID == "" {
+		u.Profile.ObjectRoot = u.ObjectRoot
+	}
+	if u.Email != nil && u.Email.ObjectRoot.AggregateID == "" {
+		u.Email.ObjectRoot = u.ObjectRoot
+	}
+	if u.Phone != nil && u.Phone.ObjectRoot.AggregateID == "" {
+		u.Phone.ObjectRoot = u.ObjectRoot
+	}
+	if u.Address != nil && u.Address.ObjectRoot.AggregateID == "" {
+		u.Address.ObjectRoot = u.ObjectRoot
 	}
 }
 
