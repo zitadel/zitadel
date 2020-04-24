@@ -1182,3 +1182,143 @@ func TestRequestSetPassword(t *testing.T) {
 		})
 	}
 }
+
+func TestProfileByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		profile *model.Profile
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "get by id, ok",
+			args: args{
+				es:       GetMockManipulateUserFull(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserName: "UserName"},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ProfileByID(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.UserName != tt.res.profile.UserName {
+				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.profile.UserName, result.UserName)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeProfile(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es      *UserEventstore
+		ctx     context.Context
+		profile *model.Profile
+	}
+	type res struct {
+		profile *model.Profile
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "get by id, ok",
+			args: args{
+				es:      GetMockManipulateUserFull(ctrl),
+				ctx:     auth.NewMockContext("orgID", "userID"),
+				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, FirstName: "FirstName Changed", LastName: "LastName Changed"},
+			},
+			res: res{
+				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, FirstName: "FirstName Changed", LastName: "LastName Changed"},
+			},
+		},
+		{
+			name: "invalid profile",
+			args: args{
+				es:      GetMockManipulateUser(ctrl),
+				ctx:     auth.NewMockContext("orgID", "userID"),
+				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:      GetMockManipulateUserNoEvents(ctrl),
+				ctx:     auth.NewMockContext("orgID", "userID"),
+				profile: &model.Profile{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, FirstName: "FirstName Changed", LastName: "LastName Changed"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeProfile(tt.args.ctx, tt.args.profile)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.FirstName != tt.res.profile.FirstName {
+				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.profile.FirstName, result.FirstName)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

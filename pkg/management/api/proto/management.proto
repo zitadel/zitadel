@@ -1361,15 +1361,16 @@ enum SearchMethod {
 
 message UserProfile {
     string id = 1;
-    UserState state = 2;
-    string first_name = 3;
-    string last_name = 4;
-    string nick_name = 5;
-    string display_name = 6;
-    string preferred_language = 7;
-    Gender gender = 8;
-    string user_name = 9;
-    uint64 sequence = 10;
+    string first_name = 2;
+    string last_name = 3;
+    string nick_name = 4;
+    string display_name = 5;
+    string preferred_language = 6;
+    Gender gender = 7;
+    string user_name = 8;
+    uint64 sequence = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp change_date = 11;
 }
 
 message UpdateUserProfileRequest {

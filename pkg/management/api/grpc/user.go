@@ -70,16 +70,24 @@ func (s *Server) UnlockUser(ctx context.Context, in *UserID) (*User, error) {
 	return userFromModel(user), nil
 }
 
-func (s *Server) DeleteUser(ctx context.Context, ID *UserID) (*empty.Empty, error) {
+func (s *Server) DeleteUser(ctx context.Context, in *UserID) (*empty.Empty, error) {
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-as4fg", "Not implemented")
 }
 
-func (s *Server) GetUserProfile(ctx context.Context, ID *UserID) (*UserProfile, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mT67d", "Not implemented")
+func (s *Server) GetUserProfile(ctx context.Context, in *UserID) (*UserProfile, error) {
+	profile, err := s.user.ProfileByID(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return profileFromModel(profile), nil
 }
 
 func (s *Server) UpdateUserProfile(ctx context.Context, request *UpdateUserProfileRequest) (*UserProfile, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-asje3", "Not implemented")
+	profile, err := s.user.ChangeProfile(ctx, updateProfileToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return profileFromModel(profile), nil
 }
 
 func (s *Server) GetUserEmail(ctx context.Context, ID *UserID) (*UserEmail, error) {

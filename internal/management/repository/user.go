@@ -16,4 +16,7 @@ type UserRepository interface {
 
 	SetOneTimePassword(ctx context.Context, password *model.Password) (*model.Password, error)
 	RequestSetPassword(ctx context.Context, id string, notifyType model.NotificationType) error
+
+	ProfileByID(ctx context.Context, userID string) (*model.Profile, error)
+	ChangeProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 }

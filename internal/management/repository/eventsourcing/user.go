@@ -45,3 +45,11 @@ func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_mode
 func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {
 	return repo.UserEvents.RequestSetPassword(ctx, id, notifyType)
 }
+
+func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
+	return repo.UserEvents.ProfileByID(ctx, userID)
+}
+
+func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
+	return repo.UserEvents.ChangeProfile(ctx, profile)
+}

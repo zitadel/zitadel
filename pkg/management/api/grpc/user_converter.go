@@ -89,6 +89,44 @@ func passwordRequestToModel(r *PasswordRequest) *usr_model.Password {
 	}
 }
 
+func profileFromModel(profile *usr_model.Profile) *UserProfile {
+	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
+	logging.Log("GRPC-dkso3").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
+	logging.Log("GRPC-ski8d").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserProfile{
+		Id:                profile.AggregateID,
+		CreationDate:      creationDate,
+		ChangeDate:        changeDate,
+		Sequence:          profile.Sequence,
+		UserName:          profile.UserName,
+		FirstName:         profile.FirstName,
+		LastName:          profile.LastName,
+		DisplayName:       profile.DisplayName,
+		NickName:          profile.NickName,
+		PreferredLanguage: profile.PreferredLanguage.String(),
+		Gender:            genderFromModel(profile.Gender),
+	}
+	return converted
+}
+
+func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
+	preferredLanguage, err := language.Parse(u.PreferredLanguage)
+	logging.Log("GRPC-d8k2s").OnError(err).Debug("language malformed")
+
+	return &usr_model.Profile{
+		ObjectRoot:        models.ObjectRoot{AggregateID: u.Id},
+		FirstName:         u.FirstName,
+		LastName:          u.LastName,
+		NickName:          u.NickName,
+		DisplayName:       u.DisplayName,
+		PreferredLanguage: preferredLanguage,
+		Gender:            genderToModel(u.Gender),
+	}
+}
+
 func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
 	switch state {
 	case NotificationType_NOTIFICATIONTYPE_EMAIL:

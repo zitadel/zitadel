@@ -181,7 +181,9 @@ func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller) *UserEventstore 
 func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 	user := model.User{
 		Profile: &model.Profile{
-			UserName: "UserName",
+			UserName:  "UserName",
+			FirstName: "FirstName",
+			LastName:  "LastName",
 		},
 		Password: &model.Password{
 			Secret:         &crypto.CryptoValue{Algorithm: "bcrypt", KeyID: "KeyID"},

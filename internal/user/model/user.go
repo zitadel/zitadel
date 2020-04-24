@@ -3,7 +3,6 @@ package model
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"golang.org/x/text/language"
 	"time"
 )
 
@@ -17,18 +16,6 @@ type User struct {
 	*Phone
 	*Address
 	InitCode *InitUserCode
-}
-
-type Profile struct {
-	es_models.ObjectRoot
-
-	UserName          string
-	FirstName         string
-	LastName          string
-	NickName          string
-	DisplayName       string
-	PreferredLanguage language.Tag
-	Gender            Gender
 }
 
 type Email struct {
