@@ -20,10 +20,15 @@ type PasswordAgePolicy struct {
 
 func (p *PasswordAgePolicy) AgeChanges(changed *PasswordAgePolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
-	// if changed.Description != "" && p.Description != changed.Description {
-	// 	changes["description"] = changed.Description
-	// }
-	// todo
+	if changed.Description != "" && p.Description != changed.Description {
+		changes["Description"] = changed.Description
+	}
+	if p.MaxAgeDays != changed.MaxAgeDays {
+		changes["MaxAgeDays"] = changed.MaxAgeDays
+	}
+	if p.ExpireWarnDays != changed.ExpireWarnDays {
+		changes["ExpireWarnDays"] = changed.ExpireWarnDays
+	}
 	return changes
 }
 

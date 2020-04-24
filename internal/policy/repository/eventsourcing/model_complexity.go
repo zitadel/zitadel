@@ -24,9 +24,23 @@ type PasswordComplexityPolicy struct {
 func (p *PasswordComplexityPolicy) ComplexityChanges(changed *PasswordComplexityPolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if changed.Description != "" && p.Description != changed.Description {
-		changes["description"] = changed.Description
+		changes["Description"] = changed.Description
 	}
-	// todo
+	if p.MinLength != changed.MinLength {
+		changes["MinLength"] = changed.MinLength
+	}
+	if p.HasLowercase != changed.HasLowercase {
+		changes["HasLowercase"] = changed.HasLowercase
+	}
+	if p.HasUppercase != changed.HasUppercase {
+		changes["HasUppercase"] = changed.HasUppercase
+	}
+	if p.HasNumber != changed.HasNumber {
+		changes["HasNumber"] = changed.HasNumber
+	}
+	if p.HasSymbol != changed.HasSymbol {
+		changes["HasSymbol"] = changed.HasSymbol
+	}
 	return changes
 }
 
