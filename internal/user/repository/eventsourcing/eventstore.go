@@ -377,3 +377,39 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 	es.userCache.cacheUser(repoUser)
 	return nil
 }
+
+func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Profile != nil {
+		return user.Profile, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dk23f", "profile not found")
+}
+
+func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
+	if !profile.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "profile is invalid")
+	}
+	existing, err := es.UserByID(ctx, profile.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.ProfileFromModel(profile)
+
+	updateAggregate := ProfileChangeAggregate(es.AggregateCreator(), repoExisting, repoNew)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return model.ProfileToModel(repoExisting.Profile), nil
+}

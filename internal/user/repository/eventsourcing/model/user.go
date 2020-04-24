@@ -110,7 +110,7 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
-	case model.UserAdded, model.UserRegistered:
+	case model.UserAdded, model.UserRegistered, model.UserProfileChanged:
 		if err := json.Unmarshal(event.Data, u); err != nil {
 			logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
 			return err

@@ -192,3 +192,17 @@ func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.
 		return agg, err
 	}
 }
+
+func ProfileChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, new *model.Profile) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if new == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := existing.Profile.Changes(new)
+		return agg.AppendEvent(usr_model.UserProfileChanged, changes)
+	}
+}
