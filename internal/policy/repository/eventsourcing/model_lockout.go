@@ -21,9 +21,14 @@ type PasswordLockoutPolicy struct {
 func (p *PasswordLockoutPolicy) LockoutChanges(changed *PasswordLockoutPolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if changed.Description != "" && p.Description != changed.Description {
-		changes["description"] = changed.Description
+		changes["Description"] = changed.Description
 	}
-	// todo
+	if p.MaxAttempts != changed.MaxAttempts {
+		changes["MaxAttempts"] = changed.MaxAttempts
+	}
+	if p.ShowLockOutFailures != changed.ShowLockOutFailures {
+		changes["ShowLockOutFailures"] = changed.ShowLockOutFailures
+	}
 	return changes
 }
 
