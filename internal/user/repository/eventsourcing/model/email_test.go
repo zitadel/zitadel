@@ -1,6 +1,11 @@
 package model
 
-import "testing"
+import (
+	"encoding/json"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"testing"
+	"time"
+)
 
 func TestEmailChanges(t *testing.T) {
 	type args struct {
@@ -41,6 +46,106 @@ func TestEmailChanges(t *testing.T) {
 			changes := tt.args.existing.Changes(tt.args.new)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
+			}
+		})
+	}
+}
+
+func TestAppendUserEmailChangedEvent(t *testing.T) {
+	type args struct {
+		user  *User
+		email *Email
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *User
+	}{
+		{
+			name: "append user email event",
+			args: args{
+				user:  &User{Email: &Email{EmailAddress: "EmailAddress"}},
+				email: &Email{EmailAddress: "EmailAddressChanged"},
+				event: &es_models.Event{},
+			},
+			result: &User{Email: &Email{EmailAddress: "EmailAddressChanged"}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.email != nil {
+				data, _ := json.Marshal(tt.args.email)
+				tt.args.event.Data = data
+			}
+			tt.args.user.appendUserEmailChangedEvent(tt.args.event)
+			if tt.args.user.Email.EmailAddress != tt.result.Email.EmailAddress {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result, tt.args.user)
+			}
+		})
+	}
+}
+
+func TestAppendUserEmailCodeAddedEvent(t *testing.T) {
+	type args struct {
+		user  *User
+		code  *EmailCode
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *User
+	}{
+		{
+			name: "append user email code added event",
+			args: args{
+				user:  &User{Email: &Email{EmailAddress: "EmailAddress"}},
+				code:  &EmailCode{Expiry: time.Hour * 1},
+				event: &es_models.Event{},
+			},
+			result: &User{EmailCode: &EmailCode{Expiry: time.Hour * 1}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.args.code != nil {
+				data, _ := json.Marshal(tt.args.code)
+				tt.args.event.Data = data
+			}
+			tt.args.user.appendUserEmailCodeAddedEvent(tt.args.event)
+			if tt.args.user.EmailCode.Expiry != tt.result.EmailCode.Expiry {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result, tt.args.user)
+			}
+		})
+	}
+}
+
+func TestAppendUserEmailVerifiedEvent(t *testing.T) {
+	type args struct {
+		user  *User
+		event *es_models.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result *User
+	}{
+		{
+			name: "append user email event",
+			args: args{
+				user:  &User{Email: &Email{EmailAddress: "EmailAddress"}},
+				event: &es_models.Event{},
+			},
+			result: &User{Email: &Email{EmailAddress: "EmailAddress", IsEmailVerified: true}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			tt.args.user.appendUserEmailVerifiedEvent()
+			if tt.args.user.Email.IsEmailVerified != tt.result.Email.IsEmailVerified {
+				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result, tt.args.user)
 			}
 		})
 	}

@@ -41,10 +41,10 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	if err != nil {
 		return nil, err
 	}
-	initCodeGen := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
-	emailVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
-	phoneVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
-	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, aesCrypto)
+	initCodeGen := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.InitializeUserCode, aesCrypto)
+	emailVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.EmailVerificationCode, aesCrypto)
+	phoneVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PhoneVerificationCode, aesCrypto)
+	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
@@ -412,4 +412,111 @@ func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.
 
 	es.userCache.cacheUser(repoExisting)
 	return model.ProfileToModel(repoExisting.Profile), nil
+}
+
+func (es *UserEventstore) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Email != nil {
+		return user.Email, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dki89", "email not found")
+}
+
+func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
+	if !email.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "email is invalid")
+	}
+	existing, err := es.UserByID(ctx, email.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.EmailFromModel(email)
+
+	emailCode := new(model.EmailCode)
+	if !email.IsEmailVerified {
+		emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
+		if err != nil {
+			return nil, err
+		}
+		emailCode.Code = emailCodeCrypto
+		emailCode.Expiry = es.EmailVerificationCode.Expiry()
+	}
+
+	updateAggregate := EmailChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, emailCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return model.EmailToModel(repoExisting.Email), nil
+}
+
+func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationCode string) error {
+	if userID == "" || verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "userId or Code empty")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	repoExisting := model.UserFromModel(existing)
+
+	if repoExisting.EmailCode == nil {
+		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "code not found")
+	}
+	if err := crypto.VerifyCode(repoExisting.EmailCode.CreationDate, repoExisting.EmailCode.Expiry, repoExisting.EmailCode.Code, verificationCode, es.EmailVerificationCode); err != nil {
+		return err
+	}
+
+	updateAggregate := EmailVerifiedAggregate(es.AggregateCreator(), repoExisting)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "userID missing")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	repoExisting := model.UserFromModel(existing)
+	if repoExisting.Email == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "no email existing")
+	}
+	if repoExisting.IsEmailVerified {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "email already verified")
+	}
+
+	emailCode := new(model.EmailCode)
+	emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
+	if err != nil {
+		return err
+	}
+	emailCode.Code = emailCodeCrypto
+	emailCode.Expiry = es.EmailVerificationCode.Expiry()
+
+	updateAggregate := EmailVerificationCodeAggregate(es.AggregateCreator(), repoExisting, emailCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
 }

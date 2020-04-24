@@ -21,7 +21,10 @@ type User struct {
 	*Email
 	*Phone
 	*Address
-	InitCode *InitUserCode
+	InitCode     *InitUserCode
+	EmailCode    *EmailCode
+	PhoneCode    *PhoneCode
+	PasswordCode *RequestPasswordSet
 }
 
 type InitUserCode struct {
@@ -97,6 +100,19 @@ func UserToModel(user *User) *model.User {
 	return converted
 }
 
+func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
+	return &model.InitUserCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
+}
+
 func (p *User) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
 		if err := p.AppendEvent(event); err != nil {
@@ -108,25 +124,46 @@ func (p *User) AppendEvents(events ...*es_models.Event) error {
 
 func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
-
+	var err error
 	switch event.Type {
-	case model.UserAdded, model.UserRegistered, model.UserProfileChanged:
+	case model.UserAdded,
+		model.UserRegistered,
+		model.UserProfileChanged:
 		if err := json.Unmarshal(event.Data, u); err != nil {
 			logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
 	case model.UserDeactivated:
-		u.appendDeactivatedEvent()
+		err = u.appendDeactivatedEvent()
 	case model.UserReactivated:
-		u.appendReactivatedEvent()
+		err = u.appendReactivatedEvent()
 	case model.UserLocked:
-		u.appendLockedEvent()
+		err = u.appendLockedEvent()
 	case model.UserUnlocked:
-		u.appendUnlockedEvent()
+		err = u.appendUnlockedEvent()
 	case model.InitializedUserCodeCreated:
-		u.appendInitUsercodeCreatedEvent(event)
+		err = u.appendInitUsercodeCreatedEvent(event)
 	case model.UserPasswordChanged:
-		u.appendUserPasswordChangedEvent(event)
+		err = u.appendUserPasswordChangedEvent(event)
+	case model.UserPasswordSetRequested:
+		err = u.appendPasswordSetRequestedEvent(event)
+	case model.UserEmailChanged:
+		err = u.appendUserEmailChangedEvent(event)
+	case model.UserEmailCodeAdded:
+		err = u.appendUserEmailCodeAddedEvent(event)
+	case model.UserEmailVerified:
+		err = u.appendUserEmailVerifiedEvent()
+	case model.UserPhoneChanged:
+		err = u.appendUserPhoneChangedEvent(event)
+	case model.UserPhoneCodeAdded:
+		err = u.appendUserPhoneCodeAddedEvent(event)
+	case model.UserPhoneVerified:
+		err = u.appendUserPhoneVerifiedEvent()
+	case model.UserAddressChanged:
+		err = u.appendUserAddressChangedEvent(event)
+	}
+	if err != nil {
+		return err
 	}
 	u.ComputeObject()
 	return nil

@@ -61,10 +61,25 @@ func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
 	return nil
 }
 
+func (u *User) appendPasswordSetRequestedEvent(event *es_models.Event) error {
+	u.PasswordCode = new(RequestPasswordSet)
+	u.PasswordCode.setData(event)
+	return nil
+}
+
 func (pw *Password) setData(event *es_models.Event) error {
 	pw.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, pw); err != nil {
 		logging.Log("EVEN-dks93").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
+}
+
+func (a *RequestPasswordSet) setData(event *es_models.Event) error {
+	a.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, a); err != nil {
+		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")
 		return err
 	}
 	return nil

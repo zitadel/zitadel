@@ -90,16 +90,25 @@ func (s *Server) UpdateUserProfile(ctx context.Context, request *UpdateUserProfi
 	return profileFromModel(profile), nil
 }
 
-func (s *Server) GetUserEmail(ctx context.Context, ID *UserID) (*UserEmail, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-peo9d", "Not implemented")
+func (s *Server) GetUserEmail(ctx context.Context, in *UserID) (*UserEmail, error) {
+	email, err := s.user.EmailByID(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return emailFromModel(email), nil
 }
 
 func (s *Server) ChangeUserEmail(ctx context.Context, request *UpdateUserEmailRequest) (*UserEmail, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-cloeS", "Not implemented")
+	email, err := s.user.ChangeEmail(ctx, updateEmailToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return emailFromModel(email), nil
 }
 
-func (s *Server) ResendEmailVerificationMail(ctx context.Context, ID *UserID) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dwsP9", "Not implemented")
+func (s *Server) ResendEmailVerificationMail(ctx context.Context, in *UserID) (*empty.Empty, error) {
+	err := s.user.CreateEmailVerificationCode(ctx, in.Id)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) GetUserPhone(ctx context.Context, ID *UserID) (*UserPhone, error) {

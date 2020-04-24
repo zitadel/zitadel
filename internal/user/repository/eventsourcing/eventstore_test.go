@@ -1322,3 +1322,314 @@ func TestChangeProfile(t *testing.T) {
 		})
 	}
 }
+
+func TestEmailByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		email   *model.Email
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "get by id, ok",
+			args: args{
+				es:       GetMockManipulateUserFull(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddress"},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.EmailByID(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.EmailAddress != tt.res.email.EmailAddress {
+				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.email.EmailAddress, result.EmailAddress)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeEmail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es    *UserEventstore
+		ctx   context.Context
+		email *model.Email
+	}
+	type res struct {
+		email   *model.Email
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change verified email ok",
+			args: args{
+				es:    GetMockManipulateUserFull(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: true},
+			},
+			res: res{
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: true},
+			},
+		},
+		{
+			name: "change email with code",
+			args: args{
+				es:    GetMockManipulateUserWithPWGenerator(ctrl, false, true, false, false),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: false},
+			},
+			res: res{
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: false},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:    GetMockManipulateUser(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: true},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:    GetMockManipulateUserNoEvents(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				email: &model.Email{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, EmailAddress: "EmailAddressChanged", IsEmailVerified: true},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeEmail(tt.args.ctx, tt.args.email)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.EmailAddress != tt.res.email.EmailAddress {
+				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.email.EmailAddress, result.EmailAddress)
+			}
+			if !tt.res.wantErr && result.IsEmailVerified != tt.res.email.IsEmailVerified {
+				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.email.IsEmailVerified, result.IsEmailVerified)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestVerifyEmail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+		code   string
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		//{
+		//	name: "change verified email ok",
+		//	args: args{
+		//		es:       GetMockManipulateUserWithEmailCode(ctrl),
+		//		ctx:      auth.NewMockContext("orgID", "userID"),
+		//		userID: "AggregateID",
+		//		code: "Code",
+		//	},
+		//	res: res{},
+		//},
+		{
+			name: "no userid",
+			args: args{
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				code: "Code",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "no code",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "Code",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.VerifyEmail(tt.args.ctx, tt.args.userID, tt.args.code)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("should not get err %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCreateEmailVerificationCode(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "create email verification code okk",
+			args: args{
+				es:     GetMockManipulateUserWithPWGenerator(ctrl, false, true, false, false),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+			},
+			res: res{},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "no email found",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "already verified",
+			args: args{
+				es:     GetMockManipulateUserVerifiedEmail(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.CreateEmailVerificationCode(tt.args.ctx, tt.args.userID)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("should not ger err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

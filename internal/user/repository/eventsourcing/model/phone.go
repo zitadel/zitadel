@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -53,4 +55,40 @@ func PhoneToModel(phone *Phone) *model.Phone {
 		PhoneNumber:     phone.PhoneNumber,
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
+}
+
+func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {
+	u.Phone = new(Phone)
+	u.Phone.setData(event)
+	u.IsPhoneVerified = false
+	return nil
+}
+
+func (u *User) appendUserPhoneCodeAddedEvent(event *es_models.Event) error {
+	u.PhoneCode = new(PhoneCode)
+	u.PhoneCode.setData(event)
+	return nil
+}
+
+func (u *User) appendUserPhoneVerifiedEvent() error {
+	u.IsPhoneVerified = true
+	return nil
+}
+
+func (a *Phone) setData(event *es_models.Event) error {
+	a.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, a); err != nil {
+		logging.Log("EVEN-lco9s").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
+}
+
+func (a *PhoneCode) setData(event *es_models.Event) error {
+	a.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, a); err != nil {
+		logging.Log("EVEN-sk8ws").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }

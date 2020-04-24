@@ -18,30 +18,6 @@ type User struct {
 	InitCode *InitUserCode
 }
 
-type Email struct {
-	es_models.ObjectRoot
-
-	EmailAddress    string
-	IsEmailVerified bool
-}
-
-type Phone struct {
-	es_models.ObjectRoot
-
-	PhoneNumber     string
-	IsPhoneVerified bool
-}
-
-type Address struct {
-	es_models.ObjectRoot
-
-	Country       string
-	Locality      string
-	PostalCode    string
-	Region        string
-	StreetAddress string
-}
-
 type InitUserCode struct {
 	es_models.ObjectRoot
 

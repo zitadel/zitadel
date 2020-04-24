@@ -127,6 +127,32 @@ func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
 	}
 }
 
+func emailFromModel(email *usr_model.Email) *UserEmail {
+	creationDate, err := ptypes.TimestampProto(email.CreationDate)
+	logging.Log("GRPC-d9ow2").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
+	logging.Log("GRPC-s0dkw").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserEmail{
+		Id:              email.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        email.Sequence,
+		Email:           email.EmailAddress,
+		IsEmailVerified: email.IsEmailVerified,
+	}
+	return converted
+}
+
+func updateEmailToModel(e *UpdateUserEmailRequest) *usr_model.Email {
+	return &usr_model.Email{
+		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
+		EmailAddress:    e.Email,
+		IsEmailVerified: e.IsEmailVerified,
+	}
+}
+
 func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
 	switch state {
 	case NotificationType_NOTIFICATIONTYPE_EMAIL:
