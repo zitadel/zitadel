@@ -114,6 +114,9 @@ func GetMockManipulateUserWithPWGenerator(ctrl *gomock.Controller, init, email, 
 		Email: &model.Email{
 			EmailAddress: "EmailAddress",
 		},
+		Phone: &model.Phone{
+			PhoneNumber: "PhoneNumber",
+		},
 	}
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
@@ -225,6 +228,26 @@ func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+		Phone: &model.Phone{
+			PhoneNumber: "PhoneNumber",
+		},
+	}
+	dataUser, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserPhoneVerified},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
 func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 	user := model.User{
 		Profile: &model.Profile{
@@ -238,6 +261,12 @@ func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 		},
 		Email: &model.Email{
 			EmailAddress: "EmailAddress",
+		},
+		Phone: &model.Phone{
+			PhoneNumber: "PhoneNumber",
+		},
+		Address: &model.Address{
+			Country: "Country",
 		},
 	}
 	dataUser, _ := json.Marshal(user)

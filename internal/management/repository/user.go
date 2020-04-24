@@ -22,6 +22,12 @@ type UserRepository interface {
 
 	EmailByID(ctx context.Context, userID string) (*model.Email, error)
 	ChangeEmail(ctx context.Context, email *model.Email) (*model.Email, error)
-	VerifyEmail(ctx context.Context, userID, code string) error
 	CreateEmailVerificationCode(ctx context.Context, userID string) error
+
+	PhoneByID(ctx context.Context, userID string) (*model.Phone, error)
+	ChangePhone(ctx context.Context, email *model.Phone) (*model.Phone, error)
+	CreatePhoneVerificationCode(ctx context.Context, userID string) error
+
+	AddressByID(ctx context.Context, userID string) (*model.Address, error)
+	ChangeAddress(ctx context.Context, address *model.Address) (*model.Address, error)
 }

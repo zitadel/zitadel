@@ -62,10 +62,26 @@ func (repo *UserRepo) ChangeEmail(ctx context.Context, email *usr_model.Email) (
 	return repo.UserEvents.ChangeEmail(ctx, email)
 }
 
-func (repo *UserRepo) VerifyEmail(ctx context.Context, userID, code string) error {
-	return repo.UserEvents.VerifyEmail(ctx, userID, code)
-}
-
 func (repo *UserRepo) CreateEmailVerificationCode(ctx context.Context, userID string) error {
 	return repo.UserEvents.CreateEmailVerificationCode(ctx, userID)
+}
+
+func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.Phone, error) {
+	return repo.UserEvents.PhoneByID(ctx, userID)
+}
+
+func (repo *UserRepo) ChangePhone(ctx context.Context, email *usr_model.Phone) (*usr_model.Phone, error) {
+	return repo.UserEvents.ChangePhone(ctx, email)
+}
+
+func (repo *UserRepo) CreatePhoneVerificationCode(ctx context.Context, userID string) error {
+	return repo.UserEvents.CreatePhoneVerificationCode(ctx, userID)
+}
+
+func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
+	return repo.UserEvents.AddressByID(ctx, userID)
+}
+
+func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
+	return repo.UserEvents.ChangeAddress(ctx, address)
 }

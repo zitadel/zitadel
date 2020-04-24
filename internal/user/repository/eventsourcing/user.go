@@ -273,10 +273,16 @@ func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 		if err != nil {
 			return nil, err
 		}
+		if existing.Phone == nil {
+			existing.Phone = new(model.Phone)
+		}
 		changes := existing.Phone.Changes(phone)
 		agg, err = agg.AppendEvent(usr_model.UserPhoneChanged, changes)
 		if err != nil {
 			return nil, err
+		}
+		if phone.IsPhoneVerified {
+			return agg.AppendEvent(usr_model.UserPhoneVerified, code)
 		}
 		if code != nil {
 			return agg.AppendEvent(usr_model.UserPhoneCodeAdded, code)
@@ -316,6 +322,9 @@ func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 		agg, err := UserAggregate(ctx, aggCreator, existing)
 		if err != nil {
 			return nil, err
+		}
+		if existing.Address == nil {
+			existing.Address = new(model.Address)
 		}
 		changes := existing.Address.Changes(address)
 		agg, err = agg.AppendEvent(usr_model.UserAddressChanged, changes)

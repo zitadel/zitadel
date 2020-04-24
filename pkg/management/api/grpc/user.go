@@ -111,24 +111,41 @@ func (s *Server) ResendEmailVerificationMail(ctx context.Context, in *UserID) (*
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetUserPhone(ctx context.Context, ID *UserID) (*UserPhone, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-wlf7f", "Not implemented")
+func (s *Server) GetUserPhone(ctx context.Context, in *UserID) (*UserPhone, error) {
+	phone, err := s.user.PhoneByID(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return phoneFromModel(phone), nil
 }
 
 func (s *Server) ChangeUserPhone(ctx context.Context, request *UpdateUserPhoneRequest) (*UserPhone, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-pld5g", "Not implemented")
+	phone, err := s.user.ChangePhone(ctx, updatePhoneToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return phoneFromModel(phone), nil
 }
 
-func (s *Server) ResendPhoneVerificationCode(ctx context.Context, ID *UserID) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-98hdE", "Not implemented")
+func (s *Server) ResendPhoneVerificationCode(ctx context.Context, in *UserID) (*empty.Empty, error) {
+	err := s.user.CreatePhoneVerificationCode(ctx, in.Id)
+	return &empty.Empty{}, err
 }
 
-func (s *Server) GetUserAddress(ctx context.Context, ID *UserID) (*UserAddress, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-plt67", "Not implemented")
+func (s *Server) GetUserAddress(ctx context.Context, in *UserID) (*UserAddress, error) {
+	address, err := s.user.AddressByID(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return addressFromModel(address), nil
 }
 
 func (s *Server) UpdateUserAddress(ctx context.Context, request *UpdateUserAddressRequest) (*UserAddress, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dleo3", "Not implemented")
+	address, err := s.user.ChangeAddress(ctx, updateAddressToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return addressFromModel(address), nil
 }
 
 func (s *Server) SendSetPasswordNotification(ctx context.Context, request *SetPasswordNotificationRequest) (*empty.Empty, error) {

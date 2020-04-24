@@ -153,6 +153,64 @@ func updateEmailToModel(e *UpdateUserEmailRequest) *usr_model.Email {
 	}
 }
 
+func phoneFromModel(phone *usr_model.Phone) *UserPhone {
+	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
+	logging.Log("GRPC-ps9ws").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
+	logging.Log("GRPC-09ewq").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserPhone{
+		Id:              phone.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        phone.Sequence,
+		Phone:           phone.PhoneNumber,
+		IsPhoneVerified: phone.IsPhoneVerified,
+	}
+	return converted
+}
+
+func updatePhoneToModel(e *UpdateUserPhoneRequest) *usr_model.Phone {
+	return &usr_model.Phone{
+		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
+		PhoneNumber:     e.Phone,
+		IsPhoneVerified: e.IsPhoneVerified,
+	}
+}
+
+func addressFromModel(address *usr_model.Address) *UserAddress {
+	creationDate, err := ptypes.TimestampProto(address.CreationDate)
+	logging.Log("GRPC-ud8w7").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
+	logging.Log("GRPC-si9ws").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserAddress{
+		Id:            address.AggregateID,
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Sequence:      address.Sequence,
+		Country:       address.Country,
+		StreetAddress: address.StreetAddress,
+		Region:        address.Region,
+		PostalCode:    address.PostalCode,
+		Locality:      address.Locality,
+	}
+	return converted
+}
+
+func updateAddressToModel(address *UpdateUserAddressRequest) *usr_model.Address {
+	return &usr_model.Address{
+		ObjectRoot:    models.ObjectRoot{AggregateID: address.Id},
+		Country:       address.Country,
+		StreetAddress: address.StreetAddress,
+		Region:        address.Region,
+		PostalCode:    address.PostalCode,
+		Locality:      address.Locality,
+	}
+}
+
 func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
 	switch state {
 	case NotificationType_NOTIFICATIONTYPE_EMAIL:
