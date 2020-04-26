@@ -97,6 +97,15 @@ func UserToModel(user *User) *model.User {
 	if user.InitCode != nil {
 		converted.InitCode = InitCodeToModel(user.InitCode)
 	}
+	if user.EmailCode != nil {
+		converted.EmailCode = EmailCodeToModel(user.EmailCode)
+	}
+	if user.PhoneCode != nil {
+		converted.PhoneCode = PhoneCodeToModel(user.PhoneCode)
+	}
+	if user.PasswordCode != nil {
+		converted.PasswordCode = PasswordCodeToModel(user.PasswordCode)
+	}
 	return converted
 }
 
@@ -113,6 +122,44 @@ func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
 	}
 }
 
+func EmailCodeToModel(code *EmailCode) *model.EmailCode {
+	return &model.EmailCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
+}
+
+func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
+	return &model.PhoneCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
+}
+func PasswordCodeToModel(code *RequestPasswordSet) *model.RequestPasswordSet {
+	return &model.RequestPasswordSet{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry:           code.Expiry,
+		Code:             code.Code,
+		NotificationType: model.NotificationType(code.NotificationType),
+	}
+}
 func (p *User) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
 		if err := p.AppendEvent(event); err != nil {

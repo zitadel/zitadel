@@ -1490,17 +1490,16 @@ func TestVerifyEmail(t *testing.T) {
 		args args
 		res  res
 	}{
-		//TODO: Verify Test
-		//{
-		//	name: "change verified email ok",
-		//	args: args{
-		//		es:       GetMockManipulateUserWithEmailCode(ctrl),
-		//		ctx:      auth.NewMockContext("orgID", "userID"),
-		//		userID: "AggregateID",
-		//		code: "Code",
-		//	},
-		//	res: res{},
-		//},
+		{
+			name: "verify email code ok",
+			args: args{
+				es:     GetMockManipulateUserWithEmailCode(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "code",
+			},
+			res: res{},
+		},
 		{
 			name: "no userid",
 			args: args{
@@ -1796,17 +1795,16 @@ func TestVerifyPhone(t *testing.T) {
 		args args
 		res  res
 	}{
-		//TODO: Verify Test
-		//{
-		//	name: "change verified email ok",
-		//	args: args{
-		//		es:       GetMockManipulateUserWithEmailCode(ctrl),
-		//		ctx:      auth.NewMockContext("orgID", "userID"),
-		//		userID: "AggregateID",
-		//		code: "Code",
-		//	},
-		//	res: res{},
-		//},
+		{
+			name: "verify code ok",
+			args: args{
+				es:     GetMockManipulateUserWithPhoneCode(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "code",
+			},
+			res: res{},
+		},
 		{
 			name: "no userid",
 			args: args{

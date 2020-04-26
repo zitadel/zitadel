@@ -334,3 +334,24 @@ func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 		return agg, nil
 	}
 }
+
+func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, address *model.Address) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if address == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkx9s", "address should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		if existing.Address == nil {
+			existing.Address = new(model.Address)
+		}
+		changes := existing.Address.Changes(address)
+		agg, err = agg.AppendEvent(usr_model.UserAddressChanged, changes)
+		if err != nil {
+			return nil, err
+		}
+		return agg, nil
+	}
+}

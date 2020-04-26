@@ -468,15 +468,14 @@ func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationC
 	if err != nil {
 		return err
 	}
-	repoExisting := model.UserFromModel(existing)
-
-	if repoExisting.EmailCode == nil {
+	if existing.EmailCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "code not found")
 	}
-	if err := crypto.VerifyCode(repoExisting.EmailCode.CreationDate, repoExisting.EmailCode.Expiry, repoExisting.EmailCode.Code, verificationCode, es.EmailVerificationCode); err != nil {
+	if err := crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, verificationCode, es.EmailVerificationCode); err != nil {
 		return err
 	}
 
+	repoExisting := model.UserFromModel(existing)
 	updateAggregate := EmailVerifiedAggregate(es.AggregateCreator(), repoExisting)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -575,15 +574,14 @@ func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationC
 	if err != nil {
 		return err
 	}
-	repoExisting := model.UserFromModel(existing)
-
-	if repoExisting.PhoneCode == nil {
+	if existing.PhoneCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-slp0s", "code not found")
 	}
-	if err := crypto.VerifyCode(repoExisting.PhoneCode.CreationDate, repoExisting.PhoneCode.Expiry, repoExisting.PhoneCode.Code, verificationCode, es.PhoneVerificationCode); err != nil {
+	if err := crypto.VerifyCode(existing.PhoneCode.CreationDate, existing.PhoneCode.Expiry, existing.PhoneCode.Code, verificationCode, es.PhoneVerificationCode); err != nil {
 		return err
 	}
 
+	repoExisting := model.UserFromModel(existing)
 	updateAggregate := PhoneVerifiedAggregate(es.AggregateCreator(), repoExisting)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {

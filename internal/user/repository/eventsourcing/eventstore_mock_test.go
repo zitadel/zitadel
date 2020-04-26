@@ -31,8 +31,8 @@ func GetMockedEventstoreWithPw(ctrl *gomock.Controller, mockEs *mock.MockEventst
 		es.InitializeUserCode = GetMockPwGenerator(ctrl)
 	}
 	if email {
-		es.EmailVerificationCode = GetMockPwGenerator(ctrl)
 
+		es.EmailVerificationCode = GetMockPwGenerator(ctrl)
 	}
 	if phone {
 		es.PhoneVerificationCode = GetMockPwGenerator(ctrl)
@@ -59,10 +59,11 @@ func GetSonyFlacke() *sonyflake.Sonyflake {
 }
 
 func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {
+	alg := crypto.CreateMockEncryptionAlg(ctrl)
 	generator := crypto.NewMockGenerator(ctrl)
 	generator.EXPECT().Length().Return(uint(10))
 	generator.EXPECT().Runes().Return([]rune("abcdefghijklmnopqrstuvwxyz"))
-	generator.EXPECT().Alg().Return(crypto.NewBCrypt(10))
+	generator.EXPECT().Alg().AnyTimes().Return(alg)
 	generator.EXPECT().Expiry().Return(time.Hour * 1)
 	return generator
 }
@@ -194,7 +195,12 @@ func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore
 			EmailAddress: "EmailAddress",
 		},
 	}
-	code := model.EmailCode{Expiry: time.Hour * 30}
+	code := model.EmailCode{Code: &crypto.CryptoValue{
+		CryptoType: crypto.TypeEncryption,
+		Algorithm:  "enc",
+		KeyID:      "id",
+		Crypted:    []byte("code"),
+	}}
 	dataUser, _ := json.Marshal(user)
 	dataCode, _ := json.Marshal(code)
 	events := []*es_models.Event{
@@ -205,7 +211,7 @@ func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
-	return GetMockedEventstore(ctrl, mockEs)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, false, true, false, false)
 }
 func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore {
 	user := model.User{
@@ -226,6 +232,34 @@ func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateUserWithPhoneCode(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+		Phone: &model.Phone{
+			PhoneNumber: "PhoneNumber",
+		},
+	}
+	code := model.PhoneCode{Code: &crypto.CryptoValue{
+		CryptoType: crypto.TypeEncryption,
+		Algorithm:  "enc",
+		KeyID:      "id",
+		Crypted:    []byte("code"),
+	}}
+	dataUser, _ := json.Marshal(user)
+	dataCode, _ := json.Marshal(code)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserPhoneCodeAdded, Data: dataCode},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, false, false, true, false)
 }
 
 func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore {

@@ -3,7 +3,9 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"time"
 )
 
 type Phone struct {
@@ -11,6 +13,13 @@ type Phone struct {
 
 	PhoneNumber     string
 	IsPhoneVerified bool
+}
+
+type PhoneCode struct {
+	es_models.ObjectRoot
+
+	Code   *crypto.CryptoValue
+	Expiry time.Duration
 }
 
 func (p *Phone) IsValid() bool {

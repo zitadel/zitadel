@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"time"
 )
 
 type Password struct {
@@ -11,6 +12,14 @@ type Password struct {
 	SecretString   string
 	SecretCrypto   *crypto.CryptoValue
 	ChangeRequired bool
+}
+
+type RequestPasswordSet struct {
+	es_models.ObjectRoot
+
+	Code             *crypto.CryptoValue
+	Expiry           time.Duration
+	NotificationType NotificationType
 }
 
 type NotificationType int32

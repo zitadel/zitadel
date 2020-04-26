@@ -15,7 +15,10 @@ type User struct {
 	*Email
 	*Phone
 	*Address
-	InitCode *InitUserCode
+	InitCode     *InitUserCode
+	EmailCode    *EmailCode
+	PhoneCode    *PhoneCode
+	PasswordCode *RequestPasswordSet
 }
 
 type InitUserCode struct {
