@@ -24,9 +24,8 @@ const (
 	UserAgentStateRevoked
 )
 
-func NewUserAgent(id, userAgent, acceptLanguage string, remoteIP net.IP) *UserAgent {
+func NewUserAgent(userAgent, acceptLanguage string, remoteIP net.IP) *UserAgent {
 	return &UserAgent{
-		ObjectRoot:     es_models.ObjectRoot{ID: id},
 		UserAgent:      userAgent,
 		AcceptLanguage: acceptLanguage,
 		RemoteIP:       remoteIP,

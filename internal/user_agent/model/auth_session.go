@@ -48,7 +48,7 @@ func NewAuthSession(agentID, sessionID string, info *BrowserInfo,
 }
 
 func (a *AuthSession) IsValid() bool {
-	return a.ID != "" &&
+	return a.AggregateID != "" &&
 		a.SessionID != "" &&
 		a.BrowserInfo != nil && a.BrowserInfo.IsValid() &&
 		a.ApplicationID != "" &&

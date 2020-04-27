@@ -23,6 +23,7 @@ type UserSession struct {
 	MfaVerified          bool
 	MfaFailureCount      uint16
 	AuthTime             time.Time
+	AuthSessions         []*AuthSession
 }
 
 type UserSessionID struct {
@@ -97,19 +98,146 @@ func GetUserSession(sessions []*UserSession, id string) (int, *UserSession) {
 	return -1, nil
 }
 
-func (s *UserSession) Changes(changed *UserSession) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
-	if changed.Name != "" && p.Name != changed.Name {
-		changes["name"] = changed.Name
-	}
-	return changes
-}
+//func (s *UserSession) Changes(changed *UserSession) map[string]interface{} {
+//	changes := make(map[string]interface{}, 1)
+//	if changed.Name != "" && p.Name != changed.Name {
+//		changes["name"] = changed.Name
+//	}
+//	return changes
+//}
 
-func (s *UserSession) getData(event *es_models.Event) error {
+func (s *UserSession) setData(event *es_models.Event) error {
 	s.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, s); err != nil {
 		logging.Log("MODEL-s231F").WithError(err).Debug("could not unmarshal event data")
 		return err
 	}
 	return nil
+}
+
+func (a *UserAgent) appendUserSessionAddedEvent(event *es_models.Event) error {
+	s := new(UserSession)
+	if err := s.setData(event); err != nil {
+		return err
+	}
+	s.State = int32(model.UserSessionStateActive)
+	a.UserSessions = append(a.UserSessions, s)
+	return nil
+}
+
+func (a *UserAgent) appendUserSessionTerminatedEvent(event *es_models.Event) error {
+	id, err := userSessionIDFromEvent(event)
+	if err != nil {
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, id.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateTerminated)
+	}
+	return nil
+}
+
+func (a *UserAgent) appendUserNameCheckSucceededEvent(event *es_models.Event) error {
+	id, err := userSessionIDFromEvent(event)
+	if err != nil {
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, id.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateActive)
+		s.PasswordFailureCount = 0
+		s.PasswordVerified = true
+	}
+	return nil
+}
+
+func (a *UserAgent) appendUserNameCheckFailedEvent(event *es_models.Event) error {
+	id, err := userSessionIDFromEvent(event)
+	if err != nil {
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, id.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateActive)
+		s.PasswordFailureCount++
+		s.PasswordVerified = false
+	}
+	return nil
+}
+
+func (a *UserAgent) appendPasswordCheckSucceededEvent(event *es_models.Event) error {
+	id, err := userSessionIDFromEvent(event)
+	if err != nil {
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, id.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateActive)
+		s.PasswordFailureCount = 0
+		s.PasswordVerified = true
+	}
+	return nil
+}
+
+func (a *UserAgent) appendPasswordCheckFailedEvent(event *es_models.Event) error {
+	id, err := userSessionIDFromEvent(event)
+	if err != nil {
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, id.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateActive)
+		s.PasswordFailureCount++
+		s.PasswordVerified = false
+	}
+	return nil
+}
+
+func (a *UserAgent) appendMfaCheckSucceededEvent(event *es_models.Event) error {
+	mfaSession := new(MfaUserSession)
+	if err := json.Unmarshal(event.Data, mfaSession); err != nil {
+		logging.Log("MODEL-s2gyx").WithError(err).Debug("could not unmarshal event data")
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, mfaSession.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateActive)
+		s.MfaFailureCount = 0
+		s.MfaVerified = true
+		s.Mfa = mfaSession.MfaType
+	}
+	return nil
+}
+
+func (a *UserAgent) appendMfaCheckFailedEvent(event *es_models.Event) error {
+	mfaSession := new(MfaUserSession)
+	if err := json.Unmarshal(event.Data, mfaSession); err != nil {
+		logging.Log("MODEL-s2gyx").WithError(err).Debug("could not unmarshal event data")
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, mfaSession.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateActive)
+		s.MfaFailureCount++
+		s.MfaVerified = false
+		s.Mfa = mfaSession.MfaType
+	}
+	return nil
+}
+
+func (a *UserAgent) appendReAuthRequestedEvent(event *es_models.Event) error {
+	id, err := userSessionIDFromEvent(event)
+	if err != nil {
+		return err
+	}
+	if _, s := GetUserSession(a.UserSessions, id.UserSessionID); s != nil {
+		s.State = int32(model.UserSessionStateActive)
+		s.PasswordVerified = false
+		s.PasswordFailureCount = 0
+		s.MfaVerified = false
+		s.MfaFailureCount = 0
+	}
+	return nil
+}
+
+func userSessionIDFromEvent(event *es_models.Event) (*UserSessionID, error) {
+	id := new(UserSessionID)
+	if err := json.Unmarshal(event.Data, id); err != nil {
+		logging.Log("MODEL-s231F").WithError(err).Debug("could not unmarshal event data")
+		return nil, err
+	}
+	return id, nil
 }

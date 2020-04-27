@@ -19,6 +19,7 @@ type UserSession struct {
 	MfaVerified          bool
 	MfaFailureCount      uint16
 	AuthTime             time.Time
+	AuthSessions         []*AuthSession
 }
 
 type UserSessionState int32
@@ -38,7 +39,7 @@ const (
 
 func NewUserSession(agentID, sessionID string) *UserSession {
 	return &UserSession{
-		ObjectRoot: es_models.ObjectRoot{ID: agentID},
+		ObjectRoot: es_models.ObjectRoot{AggregateID: agentID},
 		SessionID:  sessionID,
 		State:      UserSessionStateActive,
 	}

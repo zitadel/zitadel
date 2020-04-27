@@ -67,3 +67,12 @@ func AuthSessionToModel(authSession *AuthSession) *model.AuthSession {
 		UserSession:           UserSessionToModel(authSession.UserSession),
 	}
 }
+
+func GetAuthSession(sessions []*AuthSession, id string) (int, *AuthSession) {
+	for i, s := range sessions {
+		if s.SessionID == id {
+			return i, s
+		}
+	}
+	return -1, nil
+}

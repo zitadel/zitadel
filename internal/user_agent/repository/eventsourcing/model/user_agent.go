@@ -1,7 +1,10 @@
 package model
 
 import (
+	"encoding/json"
 	"net"
+
+	"github.com/caos/logging"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user_agent/model"
@@ -62,92 +65,42 @@ func (p *UserAgent) AppendEvents(events ...*es_models.Event) error {
 func (p *UserAgent) AppendEvent(event *es_models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
-	//switch event.Type {
-	//case UserAgentAdded, UserAgentChanged:
-	//	if err := json.Unmarshal(event.Data, p); err != nil {
-	//		logging.Log("EVEN-46ss2").WithError(err).Error("could not unmarshal event data")
-	//		return err
-	//	}
-	//	p.State = int32(model.UserAgentStateActive)
-	//	return nil
-	//case UserAgentRevoked:
-	//	p.State = int32(model.UserAgentStateRevoked)
-	//	return nil
-	//case UserSessionAdded:
-	//	return p.appendUserSessionAddedEvent(event)
-	//case UserSessionTerminated:
-	//	return p.appendUserSessionTerminatedEvent(event)
-	//case UserNameCheckSucceeded:
-	//	return p.appendUserNameCheckSucceededEvent(event)
-	//case UserNameCheckFailed:
-	//	return p.appendUserNameCheckFailedEvent(event)
-	//case PasswordCheckSucceeded:
-	//	return p.appendPasswordCheckSucceededEvent(event)
-	//case PasswordCheckFailed:
-	//	return p.appendPasswordCheckFailedEvent(event)
-	//case MfaCheckSucceeded:
-	//	return p.appendMfaCheckSucceededEvent(event)
-	//case MfaCheckFailed:
-	//	return p.appendMfaCheckFailedEvent(event)
-	//case ReAuthRequested:
-	//	return p.appendReAuthRequestedEvent(event)
-	//case AuthSessionAdded:
-	//	return p.appendAuthSessionAddedEvent(event)
-	//case AuthSessionSet:
-	//	return p.appendAuthSessionSetEvent(event)
-	//case TokenAdded:
-	//	return p.appendTokenAddedEvent(event)
-	//}
-	return nil
-}
-
-func (a *UserAgent) appendUserSessionAddedEvent(event *es_models.Event) error {
-	s := new(UserSession)
-	if err := s.getData(event); err != nil {
-		return err
+	switch event.Type {
+	case UserAgentAdded:
+		if err := json.Unmarshal(event.Data, p); err != nil {
+			logging.Log("EVEN-46ss2").WithError(err).Error("could not unmarshal event data")
+			return err
+		}
+		p.State = int32(model.UserAgentStateActive)
+		return nil
+	case UserAgentRevoked:
+		p.State = int32(model.UserAgentStateRevoked)
+		return nil
+	case UserSessionAdded:
+		return p.appendUserSessionAddedEvent(event)
+	case UserSessionTerminated:
+		return p.appendUserSessionTerminatedEvent(event)
+	case UserNameCheckSucceeded:
+		return p.appendUserNameCheckSucceededEvent(event)
+	case UserNameCheckFailed:
+		return p.appendUserNameCheckFailedEvent(event)
+	case PasswordCheckSucceeded:
+		return p.appendPasswordCheckSucceededEvent(event)
+	case PasswordCheckFailed:
+		return p.appendPasswordCheckFailedEvent(event)
+	case MfaCheckSucceeded:
+		return p.appendMfaCheckSucceededEvent(event)
+	case MfaCheckFailed:
+		return p.appendMfaCheckFailedEvent(event)
+	case ReAuthRequested:
+		return p.appendReAuthRequestedEvent(event)
+	case AuthSessionAdded:
+		return p.appendAuthSessionAddedEvent(event)
+	case AuthSessionSet:
+		return p.appendAuthSessionSetEvent(event)
+	case TokenAdded:
+		return p.appendTokenAddedEvent(event)
 	}
-	s.State = int32(model.UserSessionStateActive)
-	a.UserSessions = append(a.UserSessions, s)
-	return nil
-}
-
-func (p *UserAgent) appendUserSessionTerminatedEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendUserNameCheckSucceededEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendUserNameCheckFailedEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendPasswordCheckSucceededEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendPasswordCheckFailedEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendMfaCheckSucceededEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendMfaCheckFailedEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendReAuthRequestedEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
 	return nil
 }
 
