@@ -164,7 +164,7 @@ func TestAggregate_Validate(t *testing.T) {
 				resourceOwner:    "org",
 				PreviousSequence: 5,
 				Precondition: &precondition{
-					Precondition: func(...*Event) error { return nil },
+					Validation: func(...*Event) error { return nil },
 				},
 				Events: []*Event{
 					{
@@ -239,8 +239,8 @@ func TestAggregate_Validate(t *testing.T) {
 				resourceOwner:    "org",
 				PreviousSequence: 5,
 				Precondition: &precondition{
-					Precondition: func(...*Event) error { return nil },
-					Query:        NewSearchQuery().AggregateIDFilter("hodor"),
+					Validation: func(...*Event) error { return nil },
+					Query:      NewSearchQuery().AggregateIDFilter("hodor"),
 				},
 				Events: []*Event{
 					{
@@ -302,7 +302,7 @@ func TestAggregate_SetPrecondition(t *testing.T) {
 			if got.Precondition.Query == nil {
 				t.Error("query of precondition must not be nil")
 			}
-			if got.Precondition.Precondition == nil {
+			if got.Precondition.Validation == nil {
 				t.Error("precondition func must not be nil")
 			}
 		})

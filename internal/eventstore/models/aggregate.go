@@ -28,8 +28,8 @@ type Aggregate struct {
 }
 
 type precondition struct {
-	Query        *SearchQuery
-	Precondition func(...*Event) error
+	Query      *SearchQuery
+	Validation func(...*Event) error
 }
 
 func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate, error) {
@@ -58,7 +58,7 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 }
 
 func (a *Aggregate) SetPrecondition(query *SearchQuery, validateFunc func(...*Event) error) *Aggregate {
-	a.Precondition = &precondition{Query: query, Precondition: validateFunc}
+	a.Precondition = &precondition{Query: query, Validation: validateFunc}
 	return a
 }
 
@@ -85,7 +85,7 @@ func (a *Aggregate) Validate() error {
 	if a.resourceOwner == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-eBYUW", "resource owner not set")
 	}
-	if a.Precondition != nil && (a.Precondition.Query == nil || a.Precondition.Query.Validate() != nil || a.Precondition.Precondition == nil) {
+	if a.Precondition != nil && (a.Precondition.Query == nil || a.Precondition.Query.Validate() != nil || a.Precondition.Validation == nil) {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-EEUvA", "invalid precondition")
 	}
 

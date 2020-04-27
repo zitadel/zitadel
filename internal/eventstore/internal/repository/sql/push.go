@@ -65,7 +65,7 @@ func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "SQL-oBPxB", "filter failed")
 	}
-	err = aggregate.Precondition.Precondition(events...)
+	err = aggregate.Precondition.Validation(events...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "SQL-s6hqU", "validation failed")
 	}
