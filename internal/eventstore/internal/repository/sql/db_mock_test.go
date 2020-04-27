@@ -105,7 +105,7 @@ func (db *dbMock) expectRollback(err error) *dbMock {
 func (db *dbMock) expectInsertEvent(e *models.Event, returnedID string, returnedSequence uint64) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), e.Data, e.EditorUser, e.EditorService, e.ResourceOwner,
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner,
 			e.AggregateType, e.AggregateID,
 			e.AggregateType, e.AggregateID,
 			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,
@@ -122,7 +122,7 @@ func (db *dbMock) expectInsertEvent(e *models.Event, returnedID string, returned
 func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), e.Data, e.EditorUser, e.EditorService, e.ResourceOwner,
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner,
 			e.AggregateType, e.AggregateID,
 			e.AggregateType, e.AggregateID,
 			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,
