@@ -22,6 +22,9 @@ func StartOrg(conf OrgConfig) *OrgEventstore {
 }
 
 func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
+	if org == nil {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-gQTYP", "org not set")
+	}
 	query, err := OrgByIDQuery(org.AggregateID, org.Sequence)
 	if err != nil {
 		return nil, err
@@ -38,20 +41,24 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 
 func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
 	org := OrgFromModel(orgModel)
+
 	aggregate := OrgDeactivateAggregate(es.AggregateCreator(), org)
 	err := es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 	}
+
 	return OrgToModel(org), nil
 }
 
 func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
 	org := OrgFromModel(orgModel)
+
 	aggregate := OrgReactivateAggregate(es.AggregateCreator(), org)
 	err := es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
+
 	}
 	return OrgToModel(org), nil
 }
@@ -80,16 +87,16 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
 	if err != nil {
 		return nil, err
 	}
 
-	if existing.ContainsMember(member.UserID) {
+	if org.ContainsMember(member.UserID) {
 		return nil, errors.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Org")
 	}
 
-	repoOrg := OrgFromModel(existing)
+	repoOrg := OrgFromModel(org)
 	repoMember := OrgMemberFromModel(member)
 
 	addAggregate := OrgMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
@@ -97,7 +104,7 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 	if err != nil {
 		return nil, err
 	}
-	// es.orgCache.cacheOrg(repoOrg)
+
 	for _, m := range repoOrg.Members {
 		if m.UserID == member.UserID {
 			return OrgMemberToModel(m), nil
@@ -110,19 +117,25 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 	if !member.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+
+	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
 	if err != nil {
 		return nil, err
 	}
-	if !existing.ContainsMember(member.UserID) {
+
+	if !org.ContainsMember(member.UserID) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oe39f", "User is not member of this org")
 	}
-	repoOrg := OrgFromModel(existing)
+
+	repoOrg := OrgFromModel(org)
 	repoMember := OrgMemberFromModel(member)
 
 	orgAggregate := OrgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
-	// es.orgCache.cacheOrg(repoOrg)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, m := range repoOrg.Members {
 		if m.UserID == member.UserID {
 			return OrgMemberToModel(m), nil
@@ -135,18 +148,19 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	if member.UserID == "" {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-d43fs", "UserID and Roles are required")
 	}
-	existing, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+
+	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
 	if err != nil {
 		return err
 	}
-	if !existing.ContainsMember(member.UserID) {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-swf34", "User is not member of this org")
+
+	if !org.ContainsMember(member.UserID) {
+		return nil
 	}
-	repoOrg := OrgFromModel(existing)
+
+	repoOrg := OrgFromModel(org)
 	repoMember := OrgMemberFromModel(member)
 
 	orgAggregate := OrgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
-	// es.orgCache.cacheOrg(repoOrg)
-	return err
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
 }

@@ -46,7 +46,7 @@ func OrgAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, i
 	return aggCreator.NewAggregate(ctx, id, org_model.OrgAggregate, orgVersion, sequence)
 }
 
-func OrgCreateAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *Org) (_ []*es_models.Aggregate, err error) {
+func OrgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *Org) (_ []*es_models.Aggregate, err error) {
 	if org == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
 	}
@@ -129,7 +129,7 @@ func OrgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
 		}
-		if org.State == int32(org_model.Inactive) {
+		if org.State == int32(org_model.ORGSTATE_INACTIVE) {
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already inactive")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
@@ -145,7 +145,7 @@ func OrgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
 		}
-		if org.State == int32(org_model.Active) {
+		if org.State == int32(org_model.ORGSTATE_ACTIVE) {
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already active")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
@@ -166,9 +166,7 @@ func uniqueDomainAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		return nil, err
 	}
 
-	aggregate.SetPrecondition(OrgDomainUniqueQuery(domain), validation(aggregate, org_model.OrgDomainReserved))
-
-	return aggregate, nil
+	return aggregate.SetPrecondition(OrgDomainUniqueQuery(domain), validation(aggregate, org_model.OrgDomainReserved)), nil
 }
 
 func uniqueNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, name string) (*es_models.Aggregate, error) {
@@ -193,7 +191,7 @@ func validation(aggregate *es_models.Aggregate, eventType es_models.EventType) f
 			return nil
 		}
 		if events[0].Type == eventType {
-			return errors.ThrowPreconditionFailed(nil, "EVENT-WMKO4", "domain already reseved")
+			return errors.ThrowPreconditionFailed(nil, "EVENT-WMKO4", "org already reseved")
 		}
 		aggregate.PreviousSequence = events[0].Sequence
 		return nil

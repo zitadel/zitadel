@@ -2,7 +2,6 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	in_model "github.com/caos/zitadel/internal/model"
 )
 
 type Org struct {
@@ -15,16 +14,19 @@ type Org struct {
 	Members []*OrgMember
 }
 
-type OrgState in_model.Enum
+type OrgState int32
 
-var states = []string{"Active", "Inactive"}
+const (
+	ORGSTATE_ACTIVE OrgState = iota
+	ORGSTATE_INACTIVE
+)
 
 func NewOrg(id string) *Org {
-	return &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: Active}
+	return &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: ORGSTATE_ACTIVE}
 }
 
 func (o *Org) IsActive() bool {
-	return o.State == Active
+	return o.State == ORGSTATE_ACTIVE
 }
 
 func (o *Org) IsValid() bool {

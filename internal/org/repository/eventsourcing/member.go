@@ -26,8 +26,8 @@ func ChangeOrgMemberAggregate(ctx context.Context, aggCreator *es_models.Aggrega
 	if existingMember == nil || updatedMember == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-nnxKg", "members must not be nil")
 	}
-	changes := existingMember.Changes(updatedMember)
 
+	changes := existingMember.Changes(updatedMember)
 	aggregate, err := aggCreator.NewAggregate(ctx, existingMember.AggregateID, model.OrgAggregate, orgVersion, existingMember.Sequence)
 	if err != nil {
 		return nil, err

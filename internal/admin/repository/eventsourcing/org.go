@@ -19,7 +19,7 @@ type OrgRepo struct {
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
 	eventstoreOrg := eventsourcing.OrgFromModel(setUp.Org)
-	aggregates, err := eventsourcing.OrgCreateAggregates(ctx, repo.AggregateCreator(), eventstoreOrg)
+	aggregates, err := eventsourcing.OrgCreatedAggregates(ctx, repo.AggregateCreator(), eventstoreOrg)
 	if err != nil {
 		return nil, err
 	}

@@ -29,7 +29,7 @@ func OrgFromModel(org *org_model.Org) *Org {
 		ObjectRoot: org.ObjectRoot,
 		Domain:     org.Domain,
 		Name:       org.Name,
-		State:      org_model.OrgStateToInt(org.State),
+		State:      int32(org.State),
 		Members:    members,
 	}
 }
@@ -39,7 +39,7 @@ func OrgToModel(org *Org) *org_model.Org {
 		ObjectRoot: org.ObjectRoot,
 		Domain:     org.Domain,
 		Name:       org.Name,
-		State:      org_model.ProjectStateFromInt(org.State),
+		State:      org_model.OrgState(org.State),
 		Members:    OrgMembersToModel(org.Members),
 	}
 }
@@ -72,10 +72,10 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 			return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
 		}
 	case org_model.OrgDeactivated:
-		o.State = org_model.OrgStateToInt(org_model.Inactive)
+		o.State = int32(org_model.ORGSTATE_INACTIVE)
 	case org_model.OrgReactivated:
-		o.State = org_model.OrgStateToInt(org_model.Active)
-	case org_model.OrgMemberAdded, org_model.GrantMemberChanged:
+		o.State = int32(org_model.ORGSTATE_ACTIVE)
+	case org_model.OrgMemberAdded, org_model.OrgMemberChanged:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
 			return err

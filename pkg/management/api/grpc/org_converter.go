@@ -33,9 +33,9 @@ func orgFromModel(org *org_model.Org) *Org {
 
 func orgStateFromModel(state org_model.OrgState) OrgState {
 	switch state {
-	case org_model.Active:
+	case org_model.ORGSTATE_ACTIVE:
 		return OrgState_ORGSTATE_ACTIVE
-	case org_model.Inactive:
+	case org_model.ORGSTATE_INACTIVE:
 		return OrgState_ORGSTATE_INACTIVE
 	default:
 		return OrgState_ORGSTATE_UNSPECIFIED

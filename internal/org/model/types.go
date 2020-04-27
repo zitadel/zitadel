@@ -21,8 +21,4 @@ const (
 	OrgMemberAdded   models.EventType = "org.member.added"
 	OrgMemberChanged models.EventType = "org.member.changed"
 	OrgMemberRemoved models.EventType = "org.member.removed"
-
-	GrantMemberAdded   models.EventType = "org.grant.member.added"
-	GrantMemberChanged models.EventType = "org.grant.member.changed"
-	GrantMemberRemoved models.EventType = "org.grant.member.removed"
 )
