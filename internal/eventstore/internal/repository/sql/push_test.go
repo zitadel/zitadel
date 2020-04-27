@@ -344,10 +344,10 @@ func Test_precondtion(t *testing.T) {
 		aggregate *models.Aggregate
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name   string
+		fields fields
+		args   args
+		isErr  func(error) bool
 	}{
 		{
 			name: "no precondition",
@@ -358,7 +358,6 @@ func Test_precondtion(t *testing.T) {
 			args: args{
 				aggregate: &models.Aggregate{},
 			},
-			wantErr: false,
 		},
 		{
 			name: "precondition fails",
@@ -369,7 +368,7 @@ func Test_precondtion(t *testing.T) {
 			args: args{
 				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.CreateCaosError(nil, "SQL-LBIKm", "err"))),
 			},
-			wantErr: true,
+			isErr: errors.IsPreconditionFailed,
 		},
 		{
 			name: "precondition with filter error",
@@ -380,7 +379,7 @@ func Test_precondtion(t *testing.T) {
 			args: args{
 				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.CreateCaosError(nil, "SQL-LBIKm", "err"))),
 			},
-			wantErr: true,
+			isErr: errors.IsPreconditionFailed,
 		},
 		{
 			name: "precondition no events",
@@ -391,7 +390,6 @@ func Test_precondtion(t *testing.T) {
 			args: args{
 				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(nil)),
 			},
-			wantErr: false,
 		},
 		{
 			name: "precondition with events",
@@ -402,7 +400,6 @@ func Test_precondtion(t *testing.T) {
 			args: args{
 				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(nil)),
 			},
-			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -412,8 +409,12 @@ func Test_precondtion(t *testing.T) {
 				t.Errorf("unable to start tx %v", err)
 				t.FailNow()
 			}
-			if err := precondtion(tx, tt.args.aggregate); (err != nil) != tt.wantErr {
-				t.Errorf("precondtion() error = %v, wantErr %v", err, tt.wantErr)
+			err = precondtion(tx, tt.args.aggregate)
+			// if (err != nil) != tt.wantErr {
+			// 	t.Errorf("precondtion() error = %v, wantErr %v", err, tt.wantErr)
+			// }
+			if (tt.isErr != nil && err == nil) || (tt.isErr != nil && !tt.isErr(err)) {
+				t.Error("precondtion() wrong error", err)
 			}
 		})
 	}
