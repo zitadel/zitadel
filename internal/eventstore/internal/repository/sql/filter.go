@@ -31,13 +31,15 @@ const (
 		" FROM eventstore.events"
 )
 
+type Querier interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+}
+
 func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*models.Event, err error) {
 	return filter(db.client, searchQuery)
 }
 
-func filter(querier interface {
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-}, searchQuery *es_models.SearchQuery) (events []*es_models.Event, err error) {
+func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_models.Event, err error) {
 	query, values := prepareQuery(searchQuery)
 
 	rows, err := querier.Query(query, values...)
