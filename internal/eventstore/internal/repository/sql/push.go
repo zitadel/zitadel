@@ -11,19 +11,14 @@ import (
 	"github.com/cockroachdb/cockroach-go/crdb"
 )
 
-const insertStmt = "insert into eventstore.events " +
+const insertStmt = "INSERT INTO eventstore.events " +
 	"(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_sequence) " +
-	"select $1, $2, $3, $4, coalesce($5, now()), $6, $7, $8, $9, " +
-	// case is to set the highest sequence or NULL in previous_sequence
-	"case (select exists(select event_sequence from eventstore.events where aggregate_type = $10 AND aggregate_id = $11)) " +
-	"WHEN true then (select event_sequence from eventstore.events where aggregate_type = $12 AND aggregate_id = $13 order by event_sequence desc limit 1) " +
-	"ELSE NULL " +
-	"end " +
-	"where (" +
-	// exactly one event of requested aggregate must have a >= sequence (last inserted event)
-	"(select count(id) from eventstore.events where event_sequence >= COALESCE($14, 0) AND aggregate_type = $15 AND aggregate_id = $16) = 1 OR " +
-	// previous sequence = 0, no events must exist for the requested aggregate
-	"((select count(id) from eventstore.events where aggregate_type = $17 and aggregate_id = $18) = 0 AND COALESCE($19, 0) = 0)) " +
+	"SELECT $1, $2, $3, $4, COALESCE($5, now()), $6, $7, $8, $9, $10 " +
+	"WHERE EXISTS (SELECT 1 WHERE " +
+	// exactly one event of requested aggregate must have the given previous sequence as sequence (last inserted event)
+	"EXISTS (SELECT 1 FROM eventstore.events WHERE event_sequence = COALESCE($11, 0) AND aggregate_type = $12 AND aggregate_id = $13) OR " +
+	// if previous sequence = 0, no events must exist for the requested aggregate
+	"NOT EXISTS (SELECT 1 FROM eventstore.events WHERE aggregate_type = $14 AND aggregate_id = $15) AND COALESCE($16, 0) = 0) " +
 	"RETURNING id, event_sequence, creation_date"
 
 func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
@@ -74,9 +69,7 @@ func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
 
 func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Event) error {
 	for _, event := range events {
-		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner,
-			event.AggregateType, event.AggregateID,
-			event.AggregateType, event.AggregateID,
+		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner, previousSequence,
 			previousSequence, event.AggregateType, event.AggregateID,
 			event.AggregateType, event.AggregateID, previousSequence)
 
@@ -94,6 +87,7 @@ func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Ev
 		}
 
 		if !rowInserted {
+			logging.LogWithFields("SQL-5aATu", "aggregate", event.AggregateType, "id", event.AggregateID).Info("wrong sequence")
 			return caos_errs.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 		}
 

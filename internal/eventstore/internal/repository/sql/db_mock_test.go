@@ -24,16 +24,13 @@ var (
 	expectedFilterEventsAggregateIDTypeLimit = regexp.MustCompile(selectEscaped + ` WHERE aggregate_id = \$1 AND aggregate_type = ANY\(\$2\) ORDER BY event_sequence LIMIT \$3`).String()
 	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence`).String()
 
-	expectedInsertStatement = regexp.MustCompile(`insert into eventstore\.events ` +
+	expectedInsertStatement = regexp.MustCompile(`INSERT INTO eventstore\.events ` +
 		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_sequence\) ` +
-		`select \$1, \$2, \$3, \$4, coalesce\(\$5, now\(\)\), \$6, \$7, \$8, \$9, ` +
-		`case \(select exists\(select event_sequence from eventstore\.events where aggregate_type = \$10 AND aggregate_id = \$11\)\) ` +
-		`WHEN true then \(select event_sequence from eventstore\.events where aggregate_type = \$12 AND aggregate_id = \$13 order by event_sequence desc limit 1\) ` +
-		`ELSE NULL ` +
-		`end ` +
-		`where \(` +
-		`\(select count\(id\) from eventstore\.events where event_sequence >= COALESCE\(\$14, 0\) AND aggregate_type = \$15 AND aggregate_id = \$16\) = 1 OR ` +
-		`\(\(select count\(id\) from eventstore\.events where aggregate_type = \$17 and aggregate_id = \$18\) = 0 AND COALESCE\(\$19, 0\) = 0\)\) RETURNING id, event_sequence, creation_date`).String()
+		`SELECT \$1, \$2, \$3, \$4, COALESCE\(\$5, now\(\)\), \$6, \$7, \$8, \$9, \$10 ` +
+		`WHERE EXISTS \(SELECT 1 WHERE ` +
+		`EXISTS \(SELECT 1 FROM eventstore\.events WHERE event_sequence = COALESCE\(\$11, 0\) AND aggregate_type = \$12 AND aggregate_id = \$13\) OR ` +
+		`NOT EXISTS \(SELECT 1 FROM eventstore\.events WHERE aggregate_type = \$14 AND aggregate_id = \$15\) AND COALESCE\(\$16, 0\) = 0\) ` +
+		`RETURNING id, event_sequence, creation_date`).String()
 )
 
 type dbMock struct {
@@ -105,9 +102,7 @@ func (db *dbMock) expectRollback(err error) *dbMock {
 func (db *dbMock) expectInsertEvent(e *models.Event, returnedID string, returnedSequence uint64) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner,
-			e.AggregateType, e.AggregateID,
-			e.AggregateType, e.AggregateID,
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, Sequence(e.PreviousSequence),
 			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,
 			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence),
 		).
@@ -122,9 +117,7 @@ func (db *dbMock) expectInsertEvent(e *models.Event, returnedID string, returned
 func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner,
-			e.AggregateType, e.AggregateID,
-			e.AggregateType, e.AggregateID,
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, Sequence(e.PreviousSequence),
 			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,
 			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence),
 		).
