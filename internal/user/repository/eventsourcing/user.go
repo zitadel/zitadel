@@ -335,23 +335,125 @@ func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 	}
 }
 
-func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, address *model.Address) func(ctx context.Context) (*es_models.Aggregate, error) {
+func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, otp *model.OTP) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if address == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkx9s", "address should not be nil")
+		if otp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dkx9s", "otp should not be nil")
 		}
 		agg, err := UserAggregate(ctx, aggCreator, existing)
 		if err != nil {
 			return nil, err
 		}
-		if existing.Address == nil {
-			existing.Address = new(model.Address)
-		}
-		changes := existing.Address.Changes(address)
-		agg, err = agg.AppendEvent(usr_model.UserAddressChanged, changes)
+		agg, err = agg.AppendEvent(usr_model.MfaOtpAdded, otp)
 		if err != nil {
 			return nil, err
 		}
+		return agg, nil
+	}
+}
+
+func MfaOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(usr_model.MfaOtpVerified, nil)
+		if err != nil {
+			return nil, err
+		}
+		return agg, nil
+	}
+}
+
+func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg, err = agg.AppendEvent(usr_model.MfaOtpRemoved, nil)
+		if err != nil {
+			return nil, err
+		}
+		return agg, nil
+	}
+}
+
+func UserGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kd89w", "grant should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(usr_model.UserGrantAdded, grant)
+		return agg, nil
+	}
+}
+
+func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-osl8x", "grant should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		var changes map[string]interface{}
+		if _, g := model.GetUserGrant(existing.Grants, grant.GrantID); g != nil {
+			changes = g.Changes(grant)
+		}
+		agg.AppendEvent(usr_model.UserGrantChanged, changes)
+
+		return agg, nil
+	}
+}
+
+func UserGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slsp3", "grant should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(usr_model.UserGrantRemoved, &model.UserGrantID{GrantID: grant.GrantID})
+
+		return agg, nil
+	}
+}
+
+func UserGrantDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo21s", "grant should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(usr_model.UserGrantDeactivated, &model.UserGrantID{GrantID: grant.GrantID})
+
+		return agg, nil
+	}
+}
+
+func UserGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if grant == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-mks34", "grant should not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(usr_model.UserGrantReactivated, &model.UserGrantID{GrantID: grant.GrantID})
+
 		return agg, nil
 	}
 }

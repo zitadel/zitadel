@@ -85,3 +85,28 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
 	return repo.UserEvents.ChangeAddress(ctx, address)
 }
+
+func (repo *UserRepo) UserGrantByID(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	return repo.UserEvents.UserGrantByIDs(ctx, userID, grantID)
+}
+
+func (repo *UserRepo) AddUserGrant(ctx context.Context, grant *usr_model.UserGrant) (*usr_model.UserGrant, error) {
+	return repo.UserEvents.AddUserGrant(ctx, grant)
+}
+
+func (repo *UserRepo) ChangeUserGrant(ctx context.Context, grant *usr_model.UserGrant) (*usr_model.UserGrant, error) {
+	return repo.UserEvents.ChangeUserGrant(ctx, grant)
+}
+
+func (repo *UserRepo) DeactivateUserGrant(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	return repo.UserEvents.DeactivateUserGrant(ctx, userID, grantID)
+}
+
+func (repo *UserRepo) ReactivateUserGrant(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	return repo.UserEvents.ReactivateUserGrant(ctx, userID, grantID)
+}
+
+func (repo *UserRepo) RemoveUserGrant(ctx context.Context, userID, grantID string) error {
+	user := usr_model.NewUserGrant(userID, grantID)
+	return repo.UserEvents.RemoveUserGrant(ctx, user)
+}

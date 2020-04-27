@@ -7,6 +7,7 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/mock/gomock"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -2064,6 +2065,812 @@ func TestChangeAddress(t *testing.T) {
 				t.Errorf("got wrong result change required: expected: %v, actual: %v ", tt.res.address.Country, result.Country)
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestOTPByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "get by id, ok",
+			args: args{
+				es:       GetMockManipulateUserWithOTP(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.OTPByID(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if tt.res.errFunc == nil && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if tt.res.errFunc == nil && result == nil {
+				t.Errorf("got wrong result change required: actual: %v ", result)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddOTP(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add ok",
+			args: args{
+				es:     GetMockManipulateUserWithOTPGen(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddOTP(tt.args.ctx, tt.args.userID)
+
+			if tt.res.errFunc == nil && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if tt.res.errFunc == nil && result.Url == "" {
+				t.Errorf("result has no url")
+			}
+			if tt.res.errFunc == nil && result.SecretString == "" {
+				t.Errorf("result has no url")
+			}
+			if tt.res.errFunc == nil && result == nil {
+				t.Errorf("got wrong result change required: actual: %v ", result)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveOTP(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove ok",
+			args: args{
+				es:       GetMockManipulateUserWithOTP(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "user has no otp",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveOTP(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("result should not get err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCheckOTP(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+		code   string
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no userid",
+			args: args{
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				code: "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "no code",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				code:   "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "user has no otp",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				code:   "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.CheckMfaOTP(tt.args.ctx, tt.args.userID, tt.args.code)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("result should not get err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestUserGrantByID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es    *UserEventstore
+		grant *model.UserGrant
+	}
+	type res struct {
+		grant   *model.UserGrant
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "get grant",
+			args: args{
+				es:    GetMockUserGrantByIDsOK(ctrl),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID"},
+			},
+			res: res{
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID:  "GrantID",
+					RoleKeys: []string{"Key"},
+				},
+			},
+		},
+		{
+			name: "no events for project",
+			args: args{
+				es:    GetMockUserByIDNoEvents(ctrl),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}, GrantID: "GrantID"},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "grant has no id",
+			args: args{
+				es:    GetMockUserByIDNoEvents(ctrl),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: func(err error) bool {
+					return caos_errs.IsPreconditionFailed(err)
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.UserGrantByIDs(nil, tt.args.grant.AggregateID, tt.args.grant.GrantID)
+			if !tt.res.wantErr && result.AggregateID != tt.res.grant.AggregateID {
+				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.res.grant.AggregateID, result.AggregateID)
+			}
+			if !tt.res.wantErr && result.GrantID != tt.res.grant.GrantID {
+				t.Errorf("got wrong result grantid: expected: %v, actual: %v ", tt.res.grant.GrantID, result.GrantID)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddUserGrant(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es    *UserEventstore
+		ctx   context.Context
+		grant *model.UserGrant
+	}
+	type res struct {
+		result  *model.UserGrant
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add grant, ok",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					ProjectID: "ProjectID",
+					RoleKeys:  []string{"Key"},
+				},
+			},
+			res: res{
+				result: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					ProjectID: "ProjectID",
+					RoleKeys:  []string{"Key"},
+				},
+			},
+		},
+		{
+			name: "invalid grant",
+			args: args{
+				es:    GetMockManipulateUser(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "grant for project already exists",
+			args: args{
+				es:  GetMockManipulateUserWithGrant(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					ProjectID: "ProjectID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateUserNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					ProjectID: "ProjectID",
+					RoleKeys:  []string{"Key"},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddUserGrant(tt.args.ctx, tt.args.grant)
+
+			if !tt.res.wantErr && result.GrantID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.ProjectID == "" {
+				t.Errorf("result has no id")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeUserGrant(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es    *UserEventstore
+		ctx   context.Context
+		grant *model.UserGrant
+	}
+	type res struct {
+		result  *model.UserGrant
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change grant, ok",
+			args: args{
+				es:  GetMockManipulateUserWithGrant(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID:  "GrantID",
+					RoleKeys: []string{"KeyChanged"},
+				},
+			},
+			res: res{
+				result: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID:   "GrantID",
+					ProjectID: "ProjectID",
+					RoleKeys:  []string{"KeyChanged"},
+				},
+			},
+		},
+		{
+			name: "invalid grant",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					RoleKeys: []string{"KeyChanged"},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "grant not existing",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID:  "GrantID",
+					RoleKeys: []string{"KeyChanged"},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:  GetMockManipulateUserNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID:  "GrantID",
+					RoleKeys: []string{"KeyChanged"},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeUserGrant(tt.args.ctx, tt.args.grant)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && !reflect.DeepEqual(result.RoleKeys, tt.res.result.RoleKeys) {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.RoleKeys, result.RoleKeys)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveUserGrant(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es    *UserEventstore
+		ctx   context.Context
+		grant *model.UserGrant
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove grant, ok",
+			args: args{
+				es:  GetMockManipulateUserWithGrant(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+		},
+		{
+			name: "no grantID",
+			args: args{
+				es:    GetMockManipulateUser(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "grant not existing",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:  GetMockManipulateUserNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveUserGrant(tt.args.ctx, tt.args.grant)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestDeactivateUserGrant(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es    *UserEventstore
+		ctx   context.Context
+		grant *model.UserGrant
+	}
+	type res struct {
+		result  *model.UserGrant
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "deactivate, ok",
+			args: args{
+				es:  GetMockManipulateUserWithGrant(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				result: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					ProjectID: "ProjectID",
+					State:     model.USERGRANTSTATE_INACTIVE,
+				},
+			},
+		},
+		{
+			name: "no grant id",
+			args: args{
+				es:    GetMockManipulateUser(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "grant not existing",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:  GetMockManipulateUserNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.DeactivateUserGrant(tt.args.ctx, tt.args.grant.AggregateID, tt.args.grant.GrantID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.ProjectID != tt.res.result.ProjectID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.ProjectID, result.ProjectID)
+			}
+			if !tt.res.wantErr && result.State != tt.res.result.State {
+				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestReactivateUserGrant(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es    *UserEventstore
+		ctx   context.Context
+		grant *model.UserGrant
+	}
+	type res struct {
+		result  *model.UserGrant
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "reactivate, ok",
+			args: args{
+				es:  GetMockManipulateUserWithGrant(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				result: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+					State:   model.USERGRANTSTATE_ACTIVE,
+				},
+			},
+		},
+		{
+			name: "no grant id",
+			args: args{
+				es:    GetMockManipulateUser(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "grant not existing",
+			args: args{
+				es:  GetMockManipulateUser(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:  GetMockManipulateUserNoEvents(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
+					GrantID: "GrantID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ReactivateUserGrant(tt.args.ctx, tt.args.grant.AggregateID, tt.args.grant.GrantID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.State != tt.res.result.State {
+				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})

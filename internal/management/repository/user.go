@@ -30,4 +30,11 @@ type UserRepository interface {
 
 	AddressByID(ctx context.Context, userID string) (*model.Address, error)
 	ChangeAddress(ctx context.Context, address *model.Address) (*model.Address, error)
+
+	UserGrantByID(ctx context.Context, userID, grantID string) (*model.UserGrant, error)
+	AddUserGrant(ctx context.Context, grant *model.UserGrant) (*model.UserGrant, error)
+	ChangeUserGrant(ctx context.Context, grant *model.UserGrant) (*model.UserGrant, error)
+	DeactivateUserGrant(ctx context.Context, userID, grantID string) (*model.UserGrant, error)
+	ReactivateUserGrant(ctx context.Context, userID, grantID string) (*model.UserGrant, error)
+	RemoveUserGrant(ctx context.Context, userID, grantID string) error
 }

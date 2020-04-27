@@ -38,3 +38,9 @@ SystemDefaults:
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
+  Multifactors:
+    OTP:
+      Issuer: 'Zitadel'
+      VerificationKey:
+        EncryptionKeyID: 'OTPVerificationKey_1'
+        Path: 'keys.yaml'

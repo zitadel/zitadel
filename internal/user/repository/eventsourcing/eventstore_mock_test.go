@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"encoding/json"
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -90,6 +91,19 @@ func GetMockUserByIDNoEvents(ctrl *gomock.Controller) *UserEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockUserGrantByIDsOK(ctrl *gomock.Controller) *UserEventstore {
+	projectData, _ := json.Marshal(model.User{Profile: &model.Profile{UserName: "UserName"}})
+	grantData, _ := json.Marshal(model.UserGrant{GrantID: "GrantID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}})
+
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: usr_model.UserAdded, Data: projectData},
+		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: usr_model.UserGrantAdded, Data: grantData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
 func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
 	user := model.User{
 		Profile: &model.Profile{
@@ -128,6 +142,32 @@ func GetMockManipulateUserWithPWGenerator(ctrl *gomock.Controller, init, email, 
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstoreWithPw(ctrl, mockEs, init, email, phone, password)
+}
+
+func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+	}
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	es := GetMockedEventstore(ctrl, mockEs)
+	hash := crypto.NewMockEncryptionAlgorithm(ctrl)
+	hash.EXPECT().Algorithm().Return("aes")
+	hash.EXPECT().Encrypt(gomock.Any()).Return(nil, nil)
+	hash.EXPECT().EncryptionKeyID().Return("id")
+	es.Multifactors = systemdefaults.Multifactors{OTP: systemdefaults.OTP{
+		Issuer:    "Issuer",
+		CryptoMFA: hash,
+	}}
+	return es
 }
 
 func GetMockManipulateInactiveUser(ctrl *gomock.Controller) *UserEventstore {
@@ -306,6 +346,51 @@ func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 	dataUser, _ := json.Marshal(user)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateUserWithOTP(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+	}
+	otp := model.OTP{Secret: &crypto.CryptoValue{
+		CryptoType: crypto.TypeEncryption,
+		Algorithm:  "enc",
+		KeyID:      "id",
+		Crypted:    []byte("code"),
+	}}
+	dataUser, _ := json.Marshal(user)
+	dataOtp, _ := json.Marshal(otp)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.MfaOtpAdded, Data: dataOtp},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateUserWithGrant(ctrl *gomock.Controller) *UserEventstore {
+	user := model.User{
+		Profile: &model.Profile{
+			UserName: "UserName",
+		},
+	}
+	grant := model.UserGrant{GrantID: "GrantID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}}
+	data, _ := json.Marshal(user)
+	dataGrant, _ := json.Marshal(grant)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserGrantAdded, Data: dataGrant},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

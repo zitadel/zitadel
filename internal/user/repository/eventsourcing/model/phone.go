@@ -57,6 +57,19 @@ func PhoneToModel(phone *Phone) *model.Phone {
 	}
 }
 
+func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
+	return &model.PhoneCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
+}
+
 func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {
 	u.Phone = new(Phone)
 	u.Phone.setData(event)

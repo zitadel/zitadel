@@ -10,6 +10,7 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/pquerna/otp/totp"
 	"github.com/sony/sonyflake"
 	"strconv"
 )
@@ -23,6 +24,7 @@ type UserEventstore struct {
 	EmailVerificationCode    crypto.Generator
 	PhoneVerificationCode    crypto.Generator
 	PasswordVerificationCode crypto.Generator
+	Multifactors             sd.Multifactors
 }
 
 type UserConfig struct {
@@ -45,7 +47,11 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	emailVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.EmailVerificationCode, aesCrypto)
 	phoneVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PhoneVerificationCode, aesCrypto)
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
-
+	aesOtpCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	systemDefaults.Multifactors.OTP.CryptoMFA = aesOtpCrypto
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
@@ -54,6 +60,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
 		PasswordVerificationCode: passwordVerificationCode,
+		Multifactors:             systemDefaults.Multifactors,
 	}, nil
 }
 
@@ -657,4 +664,227 @@ func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.
 
 	es.userCache.cacheUser(repoExisting)
 	return model.AddressToModel(repoExisting.Address), nil
+}
+
+func (es *UserEventstore) OTPByID(ctx context.Context, userID string) (*usr_model.OTP, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.OTP != nil {
+		return user.OTP, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dps09", "otp not found")
+}
+
+func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model.OTP, error) {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if existing.OTP != nil && existing.OTP.State == usr_model.MFASTATE_READY {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "user has already configured otp")
+	}
+	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: userID})
+	if err != nil {
+		return nil, err
+	}
+	encrypted, err := crypto.Encrypt([]byte(key.Secret()), es.Multifactors.OTP.CryptoMFA)
+	if err != nil {
+		return nil, err
+	}
+	repoOtp := &model.OTP{Secret: encrypted}
+	repoExisting := model.UserFromModel(existing)
+	updateAggregate := MfaOTPAddAggregate(es.AggregateCreator(), repoExisting, repoOtp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	otp := model.OTPToModel(repoExisting.OTP)
+	otp.Url = key.URL()
+	otp.SecretString = key.Secret()
+	return otp, nil
+}
+
+func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.OTP == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "no otp existing")
+	}
+	repoExisting := model.UserFromModel(existing)
+	updateAggregate := MfaOTPRemoveAggregate(es.AggregateCreator(), repoExisting)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string) error {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.OTP == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "no otp existing")
+	}
+	decrypt, err := crypto.DecryptString(existing.OTP.Secret, es.Multifactors.OTP.CryptoMFA)
+	if err != nil {
+		return err
+	}
+
+	valid := totp.Validate(code, decrypt)
+	if !valid {
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Invalid code")
+	}
+	return nil
+}
+
+func (es *UserEventstore) UserGrantByIDs(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	if grantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lop34", "projectID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := user.GetGrant(grantID); g != nil {
+		return g, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-slo9d", "grant not found")
+}
+
+func (es *UserEventstore) AddUserGrant(ctx context.Context, grant *usr_model.UserGrant) (*usr_model.UserGrant, error) {
+	if grant == nil || !grant.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
+	}
+	existing, err := es.UserByID(ctx, grant.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := existing.ContainsGrantForProject(grant.ProjectID); g != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-skw35", "Grant for project already exists")
+	}
+	id, err := es.idGenerator.NextID()
+	if err != nil {
+		return nil, err
+	}
+	grant.GrantID = strconv.FormatUint(id, 10)
+
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	addAggregate := UserGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, addAggregate)
+
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-lo93e", "Could not find grant in list")
+}
+
+func (es *UserEventstore) ChangeUserGrant(ctx context.Context, grant *usr_model.UserGrant) (*usr_model.UserGrant, error) {
+	if grant == nil && grant.GrantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo0s9", "invalid grant")
+	}
+	existing, err := es.UserByID(ctx, grant.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-olp45", "Grant not existing on user")
+	}
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	projectAggregate := UserGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	es.userCache.cacheUser(repoUser)
+
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-ms834", "Could not find app in list")
+}
+
+func (es *UserEventstore) RemoveUserGrant(ctx context.Context, grant *usr_model.UserGrant) error {
+	if grant.GrantID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-l9fsw", "grantID is required")
+	}
+	existing, err := es.UserByID(ctx, grant.AggregateID)
+	if err != nil {
+		return err
+	}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-8ixm4", "Grant doesn't exist on user")
+	}
+	repoUser := model.UserFromModel(existing)
+	grantRepo := model.GrantFromModel(grant)
+	projectAggregate := UserGrantRemovedAggregate(es.Eventstore.AggregateCreator(), repoUser, grantRepo)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) DeactivateUserGrant(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	if grantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8si34", "grantID missing")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	grant := &usr_model.UserGrant{GrantID: grantID}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-si934", "Grant is not on this user")
+	}
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	projectAggregate := UserGrantDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	es.userCache.cacheUser(repoUser)
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-skd3s", "Could not find grant in list")
+}
+
+func (es *UserEventstore) ReactivateUserGrant(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	if grantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sksiw", "grantID missing")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	grant := &usr_model.UserGrant{GrantID: grantID}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-skie3", "Grant is not on this user")
+	}
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	projectAggregate := UserGrantReactivatedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	es.userCache.cacheUser(repoUser)
+
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sko4", "Could not find grant in list")
 }

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -37,4 +39,30 @@ func OTPToModel(otp *OTP) *model.OTP {
 		Secret: otp.Secret,
 		State:  model.MfaState(otp.State),
 	}
+}
+
+func (u *User) appendOtpAddedEvent(event *es_models.Event) error {
+	u.OTP = new(OTP)
+	u.OTP.setData(event)
+	u.OTP.State = int32(model.MFASTATE_NOTREADY)
+	return nil
+}
+
+func (u *User) appendOtpVerifiedEvent() error {
+	u.OTP.State = int32(model.MFASTATE_READY)
+	return nil
+}
+
+func (u *User) appendOtpRemovedEvent() error {
+	u.OTP = nil
+	return nil
+}
+
+func (o *OTP) setData(event *es_models.Event) error {
+	o.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, o); err != nil {
+		logging.Log("EVEN-d9soe").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }

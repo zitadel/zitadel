@@ -25,6 +25,8 @@ type User struct {
 	EmailCode    *EmailCode
 	PhoneCode    *PhoneCode
 	PasswordCode *RequestPasswordSet
+	OTP          *OTP
+	Grants       []*UserGrant
 }
 
 type InitUserCode struct {
@@ -66,6 +68,12 @@ func UserFromModel(user *model.User) *User {
 	if user.Address != nil {
 		converted.Address = AddressFromModel(user.Address)
 	}
+	if user.OTP != nil {
+		converted.OTP = OTPFromModel(user.OTP)
+	}
+	if user.Grants != nil {
+		converted.Grants = GrantsFromModel(user.Grants)
+	}
 	return converted
 }
 
@@ -106,6 +114,12 @@ func UserToModel(user *User) *model.User {
 	if user.PasswordCode != nil {
 		converted.PasswordCode = PasswordCodeToModel(user.PasswordCode)
 	}
+	if user.OTP != nil {
+		converted.OTP = OTPToModel(user.OTP)
+	}
+	if user.Grants != nil {
+		converted.Grants = GrantsToModel(user.Grants)
+	}
 	return converted
 }
 
@@ -122,44 +136,6 @@ func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
 	}
 }
 
-func EmailCodeToModel(code *EmailCode) *model.EmailCode {
-	return &model.EmailCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
-		Expiry: code.Expiry,
-		Code:   code.Code,
-	}
-}
-
-func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
-	return &model.PhoneCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
-		Expiry: code.Expiry,
-		Code:   code.Code,
-	}
-}
-func PasswordCodeToModel(code *RequestPasswordSet) *model.RequestPasswordSet {
-	return &model.RequestPasswordSet{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
-		Expiry:           code.Expiry,
-		Code:             code.Code,
-		NotificationType: model.NotificationType(code.NotificationType),
-	}
-}
 func (p *User) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
 		if err := p.AppendEvent(event); err != nil {
@@ -208,6 +184,22 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		err = u.appendUserPhoneVerifiedEvent()
 	case model.UserAddressChanged:
 		err = u.appendUserAddressChangedEvent(event)
+	case model.MfaOtpAdded:
+		err = u.appendOtpAddedEvent(event)
+	case model.MfaOtpVerified:
+		err = u.appendOtpVerifiedEvent()
+	case model.MfaOtpRemoved:
+		err = u.appendOtpRemovedEvent()
+	case model.UserGrantAdded:
+		err = u.appendAddGrantEvent(event)
+	case model.UserGrantChanged:
+		err = u.appendChangeGrantEvent(event)
+	case model.UserGrantRemoved:
+		err = u.appendRemoveGrantEvent(event)
+	case model.UserGrantDeactivated:
+		err = u.appendGrantStateEvent(event, model.USERGRANTSTATE_INACTIVE)
+	case model.UserGrantReactivated:
+		err = u.appendGrantStateEvent(event, model.USERGRANTSTATE_ACTIVE)
 	}
 	if err != nil {
 		return err

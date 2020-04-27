@@ -19,6 +19,8 @@ type User struct {
 	EmailCode    *EmailCode
 	PhoneCode    *PhoneCode
 	PasswordCode *RequestPasswordSet
+	OTP          *OTP
+	Grants       []*UserGrant
 }
 
 type InitUserCode struct {
@@ -48,6 +50,10 @@ const (
 	GENDER_MALE      Gender = 2
 	GENDER_DIVERSE   Gender = 3
 )
+
+func NewUserGrant(userID, projectID string) *UserGrant {
+	return &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: userID}, ProjectID: projectID, State: USERGRANTSTATE_ACTIVE}
+}
 
 func (u *User) IsValid() bool {
 	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.UserName != "" && u.Email != nil && u.EmailAddress != ""

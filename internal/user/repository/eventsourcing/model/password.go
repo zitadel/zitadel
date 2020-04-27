@@ -50,6 +50,20 @@ func PasswordToModel(password *Password) *model.Password {
 	}
 }
 
+func PasswordCodeToModel(code *RequestPasswordSet) *model.RequestPasswordSet {
+	return &model.RequestPasswordSet{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry:           code.Expiry,
+		Code:             code.Code,
+		NotificationType: model.NotificationType(code.NotificationType),
+	}
+}
+
 func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
 	pw := new(Password)
 	err := pw.setData(event)

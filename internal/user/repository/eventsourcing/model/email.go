@@ -59,6 +59,19 @@ func EmailToModel(email *Email) *model.Email {
 	}
 }
 
+func EmailCodeToModel(code *EmailCode) *model.EmailCode {
+	return &model.EmailCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
+}
+
 func (u *User) appendUserEmailChangedEvent(event *es_models.Event) error {
 	u.Email = new(Email)
 	u.Email.setData(event)
