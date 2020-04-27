@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) SearchUserGrants(ctx context.Context, request *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
@@ -44,6 +45,11 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, in *UserGrantID) (*Use
 		return nil, err
 	}
 	return usergrantFromModel(user), nil
+}
+
+func (s *Server) RemoveUserGrant(ctx context.Context, in *UserGrantID) (*empty.Empty, error) {
+	err := s.user.RemoveUserGrant(ctx, in.UserId, in.Id)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) SearchProjectUserGrants(ctx context.Context, request *ProjectUserGrantSearchRequest) (*UserGrantSearchResponse, error) {

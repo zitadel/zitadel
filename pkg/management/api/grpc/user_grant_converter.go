@@ -29,8 +29,9 @@ func usergrantFromModel(grant *usr_model.UserGrant) *UserGrant {
 
 func userGrantCreateToModel(u *UserGrantCreate) *usr_model.UserGrant {
 	grant := &usr_model.UserGrant{
-		ProjectID: u.ProjectId,
-		RoleKeys:  u.RoleKeys,
+		ObjectRoot: models.ObjectRoot{AggregateID: u.UserId},
+		ProjectID:  u.ProjectId,
+		RoleKeys:   u.RoleKeys,
 	}
 	return grant
 }

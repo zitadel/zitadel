@@ -51,8 +51,8 @@ const (
 	GENDER_DIVERSE   Gender = 3
 )
 
-func NewUserGrant(userID, projectID string) *UserGrant {
-	return &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: userID}, ProjectID: projectID, State: USERGRANTSTATE_ACTIVE}
+func NewUserGrant(userID, grantID string) *UserGrant {
+	return &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: userID}, GrantID: grantID, State: USERGRANTSTATE_ACTIVE}
 }
 
 func (u *User) IsValid() bool {
