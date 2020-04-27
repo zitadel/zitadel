@@ -21,17 +21,23 @@ func TestSearchQuery_setFilter(t *testing.T) {
 		{
 			name:   "set idFilter",
 			fields: fields{query: NewSearchQuery()},
-			args:   args{filters: []*Filter{&Filter{field: Field_AggregateID, operation: Operation_Equals, value: "hodor"}}},
-			want:   &SearchQuery{Filters: []*Filter{&Filter{field: Field_AggregateID, operation: Operation_Equals, value: "hodor"}}},
+			args: args{filters: []*Filter{
+				{field: Field_AggregateID, operation: Operation_Equals, value: "hodor"},
+			}},
+			want: &SearchQuery{Filters: []*Filter{
+				{field: Field_AggregateID, operation: Operation_Equals, value: "hodor"},
+			}},
 		},
 		{
 			name:   "overwrite idFilter",
 			fields: fields{query: NewSearchQuery()},
 			args: args{filters: []*Filter{
-				&Filter{field: Field_AggregateID, operation: Operation_Equals, value: "hodor"},
-				&Filter{field: Field_AggregateID, operation: Operation_Equals, value: "ursli"},
+				{field: Field_AggregateID, operation: Operation_Equals, value: "hodor"},
+				{field: Field_AggregateID, operation: Operation_Equals, value: "ursli"},
 			}},
-			want: &SearchQuery{Filters: []*Filter{&Filter{field: Field_AggregateID, operation: Operation_Equals, value: "ursli"}}},
+			want: &SearchQuery{Filters: []*Filter{
+				{field: Field_AggregateID, operation: Operation_Equals, value: "ursli"},
+			}},
 		},
 	}
 	for _, tt := range tests {
