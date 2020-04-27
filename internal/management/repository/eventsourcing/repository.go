@@ -17,6 +17,7 @@ type Config struct {
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
 	ProjectRepo
+	UserRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -42,9 +43,18 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+	user, err := es_usr.StartUser(es_usr.UserConfig{
+		Eventstore:       es,
+		Cache:            conf.Eventstore.Cache,
+		PasswordSaltCost: conf.PasswordSaltCost,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	return &EsRepository{
 		ProjectRepo{project},
+		UserRepo{user},
 	}, nil
 }
 

@@ -32,7 +32,6 @@ Mgmt:
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
 
-
 Auth:
   API:
     GRPC:

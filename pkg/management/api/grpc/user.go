@@ -6,8 +6,12 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) GetUserByID(ctx context.Context, userID *UserID) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-0oVbs", "Not implemented")
+func (s *Server) GetUserByID(ctx context.Context, id *UserID) (*User, error) {
+	user, err := s.user.UserByID(ctx, id.Id)
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
 }
 
 func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *UserEmailID) (*User, error) {
@@ -26,24 +30,44 @@ func (s *Server) IsUserUnique(ctx context.Context, request *UniqueUserRequest) (
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-olF56", "Not implemented")
 }
 
-func (s *Server) CreateUser(ctx context.Context, request *CreateUserRequest) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-sd4fs", "Not implemented")
+func (s *Server) CreateUser(ctx context.Context, in *CreateUserRequest) (*User, error) {
+	user, err := s.user.CreateUser(ctx, userCreateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
 }
 
-func (s *Server) DeactivateUser(ctx context.Context, ID *UserID) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-Vgh64", "Not implemented")
+func (s *Server) DeactivateUser(ctx context.Context, in *UserID) (*User, error) {
+	user, err := s.user.DeactivateUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
 }
 
-func (s *Server) ReactivateUser(ctx context.Context, ID *UserID) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mCx4f", "Not implemented")
+func (s *Server) ReactivateUser(ctx context.Context, in *UserID) (*User, error) {
+	user, err := s.user.DeactivateUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
 }
 
-func (s *Server) LockUser(ctx context.Context, ID *UserID) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-ds4fd", "Not implemented")
+func (s *Server) LockUser(ctx context.Context, in *UserID) (*User, error) {
+	user, err := s.user.LockUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
 }
 
-func (s *Server) UnlockUser(ctx context.Context, ID *UserID) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-MV7dd", "Not implemented")
+func (s *Server) UnlockUser(ctx context.Context, in *UserID) (*User, error) {
+	user, err := s.user.UnlockUser(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return userFromModel(user), nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, ID *UserID) (*empty.Empty, error) {

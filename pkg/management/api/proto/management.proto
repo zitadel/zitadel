@@ -994,7 +994,6 @@ service ManagementService {
         };
     }
 
-
     //USER_GRANT
     rpc SearchUserGrants(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
         option (google.api.http) = {
