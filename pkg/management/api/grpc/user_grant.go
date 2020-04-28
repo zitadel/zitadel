@@ -11,7 +11,7 @@ func (s *Server) SearchUserGrants(ctx context.Context, request *UserGrantSearchR
 }
 
 func (s *Server) UserGrantByID(ctx context.Context, request *UserGrantID) (*UserGrant, error) {
-	user, err := s.user.UserGrantByID(ctx, request.UserId, request.Id)
+	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -19,28 +19,28 @@ func (s *Server) UserGrantByID(ctx context.Context, request *UserGrantID) (*User
 }
 
 func (s *Server) CreateUserGrant(ctx context.Context, in *UserGrantCreate) (*UserGrant, error) {
-	user, err := s.user.AddUserGrant(ctx, userGrantCreateToModel(in))
+	user, err := s.usergrant.AddUserGrant(ctx, userGrantCreateToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return usergrantFromModel(user), nil
 }
 func (s *Server) UpdateUserGrant(ctx context.Context, in *UserGrantUpdate) (*UserGrant, error) {
-	user, err := s.user.ChangeUserGrant(ctx, userGrantUpdateToModel(in))
+	user, err := s.usergrant.ChangeUserGrant(ctx, userGrantUpdateToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return usergrantFromModel(user), nil
 }
 func (s *Server) DeactivateUserGrant(ctx context.Context, in *UserGrantID) (*UserGrant, error) {
-	user, err := s.user.DeactivateUserGrant(ctx, in.UserId, in.Id)
+	user, err := s.usergrant.DeactivateUserGrant(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
 	return usergrantFromModel(user), nil
 }
 func (s *Server) ReactivateUserGrant(ctx context.Context, in *UserGrantID) (*UserGrant, error) {
-	user, err := s.user.ReactivateUserGrant(ctx, in.UserId, in.Id)
+	user, err := s.usergrant.ReactivateUserGrant(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, in *UserGrantID) (*Use
 }
 
 func (s *Server) RemoveUserGrant(ctx context.Context, in *UserGrantID) (*empty.Empty, error) {
-	err := s.user.RemoveUserGrant(ctx, in.UserId, in.Id)
+	err := s.usergrant.RemoveUserGrant(ctx, in.Id)
 	return &empty.Empty{}, err
 }
 
@@ -57,7 +57,7 @@ func (s *Server) SearchProjectUserGrants(ctx context.Context, request *ProjectUs
 }
 
 func (s *Server) ProjectUserGrantByID(ctx context.Context, request *ProjectUserGrantID) (*UserGrant, error) {
-	user, err := s.user.UserGrantByID(ctx, request.UserId, request.Id)
+	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +65,14 @@ func (s *Server) ProjectUserGrantByID(ctx context.Context, request *ProjectUserG
 }
 
 func (s *Server) CreateProjectUserGrant(ctx context.Context, in *UserGrantCreate) (*UserGrant, error) {
-	user, err := s.user.AddUserGrant(ctx, userGrantCreateToModel(in))
+	user, err := s.usergrant.AddUserGrant(ctx, userGrantCreateToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return usergrantFromModel(user), nil
 }
 func (s *Server) UpdateProjectUserGrant(ctx context.Context, in *ProjectUserGrantUpdate) (*UserGrant, error) {
-	user, err := s.user.ChangeUserGrant(ctx, projectUserGrantUpdateToModel(in))
+	user, err := s.usergrant.ChangeUserGrant(ctx, projectUserGrantUpdateToModel(in))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (s *Server) UpdateProjectUserGrant(ctx context.Context, in *ProjectUserGran
 }
 
 func (s *Server) DeactivateProjectUserGrant(ctx context.Context, in *ProjectUserGrantID) (*UserGrant, error) {
-	user, err := s.user.DeactivateUserGrant(ctx, in.UserId, in.Id)
+	user, err := s.usergrant.DeactivateUserGrant(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (s *Server) DeactivateProjectUserGrant(ctx context.Context, in *ProjectUser
 }
 
 func (s *Server) ReactivateProjectUserGrant(ctx context.Context, in *ProjectUserGrantID) (*UserGrant, error) {
-	user, err := s.user.ReactivateUserGrant(ctx, in.UserId, in.Id)
+	user, err := s.usergrant.ReactivateUserGrant(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, request *Proj
 }
 
 func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *ProjectGrantUserGrantID) (*UserGrant, error) {
-	user, err := s.user.UserGrantByID(ctx, request.UserId, request.Id)
+	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -108,14 +108,14 @@ func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *Project
 }
 
 func (s *Server) CreateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantCreate) (*UserGrant, error) {
-	user, err := s.user.ChangeUserGrant(ctx, projectGrantUserGrantCreateToModel(in))
+	user, err := s.usergrant.ChangeUserGrant(ctx, projectGrantUserGrantCreateToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return usergrantFromModel(user), nil
 }
 func (s *Server) UpdateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantUpdate) (*UserGrant, error) {
-	user, err := s.user.ChangeUserGrant(ctx, projectGrantUserGrantUpdateToModel(in))
+	user, err := s.usergrant.ChangeUserGrant(ctx, projectGrantUserGrantUpdateToModel(in))
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (s *Server) UpdateProjectGrantUserGrant(ctx context.Context, in *ProjectGra
 }
 
 func (s *Server) DeactivateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantID) (*UserGrant, error) {
-	user, err := s.user.DeactivateUserGrant(ctx, in.UserId, in.Id)
+	user, err := s.usergrant.DeactivateUserGrant(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (s *Server) DeactivateProjectGrantUserGrant(ctx context.Context, in *Projec
 }
 
 func (s *Server) ReactivateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantID) (*UserGrant, error) {
-	user, err := s.user.ReactivateUserGrant(ctx, in.UserId, in.Id)
+	user, err := s.usergrant.ReactivateUserGrant(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
