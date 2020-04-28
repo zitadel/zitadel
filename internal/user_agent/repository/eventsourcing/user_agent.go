@@ -150,3 +150,13 @@ func AuthSessionSetUserSessionAggregate(aggCreator *es_models.AggregateCreator, 
 		return agg.AppendEvent(model.UserSessionSet, &model.SetUserSession{UserSessionID: userSessionID, AuthSessionID: authSessionID})
 	}
 }
+
+func TokenAddedAggregate(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent, token *model.Token) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAgentAggregate(ctx, aggCreator, userAgent)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.TokenAdded, token)
+	}
+}

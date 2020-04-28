@@ -80,10 +80,10 @@ func (p *UserAgent) AppendEvent(event *es_models.Event) error {
 		return p.appendUserSessionAddedEvent(event)
 	case UserSessionTerminated:
 		return p.appendUserSessionTerminatedEvent(event)
-	case UserNameCheckSucceeded:
-		return p.appendUserNameCheckSucceededEvent(event)
-	case UserNameCheckFailed:
-		return p.appendUserNameCheckFailedEvent(event)
+	//case UserNameCheckSucceeded:
+	//	return p.appendUserNameCheckSucceededEvent(event)
+	//case UserNameCheckFailed:
+	//	return p.appendUserNameCheckFailedEvent(event)
 	case PasswordCheckSucceeded:
 		return p.appendPasswordCheckSucceededEvent(event)
 	case PasswordCheckFailed:
@@ -96,25 +96,10 @@ func (p *UserAgent) AppendEvent(event *es_models.Event) error {
 		return p.appendReAuthRequestedEvent(event)
 	case AuthSessionAdded:
 		return p.appendAuthSessionAddedEvent(event)
-	case AuthSessionSet:
+	case UserSessionSet:
 		return p.appendAuthSessionSetEvent(event)
 	case TokenAdded:
 		return p.appendTokenAddedEvent(event)
 	}
-	return nil
-}
-
-func (p *UserAgent) appendAuthSessionAddedEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendAuthSessionSetEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
-	return nil
-}
-
-func (p *UserAgent) appendTokenAddedEvent(event *es_models.Event) error {
-	p.State = model.UserAgentStateToInt(model.Inactive)
 	return nil
 }

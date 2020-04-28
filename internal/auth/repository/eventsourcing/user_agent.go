@@ -7,7 +7,6 @@ import (
 	user_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_agent_model "github.com/caos/zitadel/internal/user_agent/model"
 	user_agent_event "github.com/caos/zitadel/internal/user_agent/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/user_agent/repository/eventsourcing/model"
 )
 
 type UserAgentRepo struct {
@@ -33,10 +32,8 @@ func (repo *UserAgentRepo) CreateAuthSession(ctx context.Context, session *user_
 	return repo.UserAgentEvents.AuthSessionAdded(ctx, session)
 }
 
-func (repo *UserAgentRepo) GetAuthSession(ctx context.Context, id, agentID string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+func (repo *UserAgentRepo) GetAuthSession(ctx context.Context, agentID, userSessionID, authSessionID string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
 	//return repo.UserAgentEvents.Auth(ctx, session)
-}
-func (repo *UserAgentRepo) GetAuthSessionByTokenID(ctx context.Context, tokenID string) (*user_agent_model.AuthSession, error) { //view?
 }
 
 func (repo *UserAgentRepo) SelectUser(ctx context.Context, agentID, authSessionID, userSessionID string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
@@ -44,15 +41,40 @@ func (repo *UserAgentRepo) SelectUser(ctx context.Context, agentID, authSessionI
 }
 
 func (repo *UserAgentRepo) VerifyUser(ctx context.Context, agentID, authSessionID, userName string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
-	//return repo.UserAgentEvents.Usern(ctx, agentID)
+	user, err := repo.UserByUsername(ctx, userName)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserAgentEvents.AddUserSession(ctx, agentID, authSessionID, user_agent_model.NewUserSession(agentID, "", user.AggregateID))
 }
-func (repo *UserAgentRepo) VerifyPassword(ctx context.Context, agentID, authSessionID, password string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+func (repo *UserAgentRepo) VerifyPassword(ctx context.Context, agentID, userSessionID, authSessionID, password string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+	authSession, err := repo.UserAgentEvents.AuthSessionByIDs(ctx, agentID, userSessionID, authSessionID)
+	if err != nil {
+		return nil, err
+	}
+	if err := repo.UserEvents.VerifyPassword(ctx, authSession.UserSession.UserID, password); err == nil {
+		return repo.UserAgentEvents.PasswordCheckSucceeded(ctx, agentID, authSession.UserSession.SessionID, authSessionID)
+	}
+	return repo.UserAgentEvents.PasswordCheckFailed(ctx, agentID, authSession.UserSession.SessionID, authSessionID)
+}
+func (repo *UserAgentRepo) VerifyMfa(ctx context.Context, agentID, userSessionID, authSessionID string, mfa int32, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+	authSession, err := repo.UserAgentEvents.AuthSessionByIDs(ctx, agentID, userSessionID, authSessionID)
+	if err != nil {
+		return nil, err
+	}
+	if err := repo.UserEvents.CheckMfaOTP(ctx, authSession.UserSession.UserID, mfa); err == nil {
+		return repo.UserAgentEvents.MfaCheckSucceeded(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
+	}
+	return repo.UserAgentEvents.MfaCheckFailed(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
+}
 
-	return repo.UserAgentEvents.PasswordCheckSucceeded(ctx, agentID, user)
+func (repo *UserAgentRepo) TerminateUserSession(ctx context.Context, agentID, sessionID string) error {
+	return repo.UserAgentEvents.TerminateUserSession(ctx, agentID, sessionID)
 }
-func (repo *UserAgentRepo) VerifyMfa(ctx context.Context, agentID, authSessionID string, mfa interface{}, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error)
-func (repo *UserAgentRepo) GetUserSessions(ctx context.Context, agentID string) ([]*user_agent_model.UserSession, error)
-func (repo *UserAgentRepo) GetUserSessionByID(ctx context.Context, agentID, sessionID string) (*user_agent_model.UserSession, error)
-func (repo *UserAgentRepo) GetUserSessionByUserID(ctx context.Context) (*user_agent_model.UserAgent, error) //my? view?
-func (repo *UserAgentRepo) TerminateUserSession(ctx context.Context, agentID, sessionID string) error
-func (repo *UserAgentRepo) CreateToken(ctx context.Context, agentID, authSessionID string) (*user_agent_model.Token, error)
+func (repo *UserAgentRepo) CreateToken(ctx context.Context, agentID, authSessionID string) (*user_agent_model.Token, error) {
+	return repo.UserAgentEvents.CreateToken(ctx, agentID, "", authSessionID)
+}
+
+func (repo *UserAgentRepo) UserByUsername(ctx context.Context, username string) (*user_model.User, error) {
+	return nil, nil
+}

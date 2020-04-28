@@ -37,9 +37,10 @@ const (
 	MFaTypeSMS
 )
 
-func NewUserSession(agentID, sessionID string) *UserSession {
+func NewUserSession(agentID, sessionID string, userID string) *UserSession {
 	return &UserSession{
 		ObjectRoot: es_models.ObjectRoot{AggregateID: agentID},
+		UserID:     userID,
 		SessionID:  sessionID,
 		State:      UserSessionStateActive,
 	}

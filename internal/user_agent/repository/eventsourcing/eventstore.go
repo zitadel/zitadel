@@ -96,8 +96,8 @@ func (es *UserAgentEventstore) RevokeUserAgent(ctx context.Context, id string) (
 	return model.UserAgentToModel(repoUserAgent), nil
 }
 
-func (es *UserAgentEventstore) AddUserSession(ctx context.Context, userSession *agent_model.UserSession) (*agent_model.UserSession, error) {
-	repoUserAgent, err := es.userAgentByID(ctx, userSession.AggregateID)
+func (es *UserAgentEventstore) AddUserSession(ctx context.Context, agentID, authSessionID string, userSession *agent_model.UserSession) (*agent_model.AuthSession, error) {
+	repoUserAgent, err := es.userAgentByID(ctx, agentID)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (es *UserAgentEventstore) AddUserSession(ctx context.Context, userSession *
 	}
 
 	es.agentCache.cacheUserAgent(repoUserAgent)
-	return model.UserSessionToModel(repoUserSession), nil
+	return authSessionFromUserAgent(repoUserAgent, userSession.SessionID, authSessionID)
 }
 
 func (es *UserAgentEventstore) TerminateUserSession(ctx context.Context, userAgentID, userSessionID string) error {
@@ -128,15 +128,6 @@ func (es *UserAgentEventstore) TerminateUserSession(ctx context.Context, userAge
 }
 
 func (es *UserAgentEventstore) PasswordCheckSucceeded(ctx context.Context, agentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
-	agent, err := es.UserAgentByID(ctx, agentID)
-	if err != nil {
-		return err
-	}
-	_, session := model.GetUserSession(agent.UserSessions, userSessionID)
-	if session == nil {
-
-	}
-
 	return es.passwordCheck(ctx, agentID, userSessionID, authSessionID, PasswordCheckSucceededAggregate)
 }
 
@@ -173,6 +164,14 @@ func (es *UserAgentEventstore) ReAuthenticationRequested(ctx context.Context, us
 	return es.authSessionEventIDs(ctx, userAgentID, userSessionID, authSessionID, reauthAggregate)
 }
 
+func (es *UserAgentEventstore) AuthSessionByIDs(ctx context.Context, agentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
+	agent, err := es.userAgentByID(ctx, agentID)
+	if err != nil {
+		return nil, err
+	}
+	return authSessionFromUserAgent(agent, userSessionID, authSessionID)
+}
+
 func (es *UserAgentEventstore) AuthSessionAdded(ctx context.Context, authSession *agent_model.AuthSession) (*agent_model.AuthSession, error) {
 	repoUserAgent, err := es.userAgentByID(ctx, authSession.AggregateID)
 	if err != nil {
@@ -195,6 +194,34 @@ func (es *UserAgentEventstore) AuthSessionSetUserSession(ctx context.Context, us
 		return AuthSessionSetUserSessionAggregate(aggCreator, userAgent, userSessionID, authSessionID)
 	}
 	return es.authSessionEventIDs(ctx, userAgentID, userSessionID, authSessionID, setAggregate)
+}
+
+func (es *UserAgentEventstore) AuthSessionSetNewUserSession(ctx context.Context, userAgentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
+	setAggregate := func(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent) es_sdk.AggregateFunc {
+		return AuthSessionSetUserSessionAggregate(aggCreator, userAgent, userSessionID, authSessionID)
+	}
+	return es.authSessionEventIDs(ctx, userAgentID, userSessionID, authSessionID, setAggregate)
+}
+
+func (es *UserAgentEventstore) CreateToken(ctx context.Context, userAgentID, userSessionID, authSessionID string) (*agent_model.Token, error) {
+
+	repoUserAgent, err := es.userAgentByID(ctx, userAgentID)
+	if err != nil {
+		return nil, err
+	}
+	_, userSession := model.GetUserSession(repoUserAgent.UserSessions, userSessionID)
+	if userSession == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9sdml", "user session not found")
+	}
+	if _, authSession := model.GetAuthSession(userSession.AuthSessions, authSessionID); authSession == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s3dGk", "auth session not found")
+	}
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUserAgent.AppendEvents, TokenAddedAggregate(es.AggregateCreator(), repoUserAgent, token))
+	if err != nil {
+		return nil, err
+	}
+	es.agentCache.cacheUserAgent(repoUserAgent)
+
 }
 
 //
@@ -242,13 +269,7 @@ func (es *UserAgentEventstore) authSessionEventIDs(ctx context.Context, agentID,
 		return nil, err
 	}
 	es.agentCache.cacheUserAgent(repoUserAgent)
-
-	if _, s := model.GetUserSession(repoUserAgent.UserSessions, userSessionID); s != nil {
-		if _, authSession := model.GetAuthSession(userSession.AuthSessions, authSessionID); authSession != nil {
-			return model.AuthSessionToModel(authSession), nil
-		}
-	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-sk3t5", "Could not find user session in list")
+	return authSessionFromUserAgent(repoUserAgent, userSessionID, authSessionID)
 }
 
 func (es *UserAgentEventstore) userAgentByID(ctx context.Context, id string) (*model.UserAgent, error) {
@@ -260,5 +281,13 @@ func (es *UserAgentEventstore) userAgentByID(ctx context.Context, id string) (*m
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s3hbD", "user agent must be active")
 	}
 	return model.UserAgentFromModel(userAgent), nil
+}
 
+func authSessionFromUserAgent(repoUserAgent *model.UserAgent, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
+	if _, userSession := model.GetUserSession(repoUserAgent.UserSessions, userSessionID); userSession != nil {
+		if _, authSession := model.GetAuthSession(userSession.AuthSessions, authSessionID); authSession != nil {
+			return model.AuthSessionToModel(authSession), nil
+		}
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sk3t5", "Could not find user session in list")
 }

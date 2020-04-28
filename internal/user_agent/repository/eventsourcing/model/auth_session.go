@@ -25,6 +25,7 @@ type AuthSession struct {
 	//OIDC                  *AuthSessionOIDC
 	Request     Request
 	UserSession *UserSession
+	Token       *Token
 }
 
 func AuthSessionFromModel(authSession *model.AuthSession) *AuthSession {
@@ -75,4 +76,14 @@ func GetAuthSession(sessions []*AuthSession, id string) (int, *AuthSession) {
 		}
 	}
 	return -1, nil
+}
+
+func (p *UserAgent) appendAuthSessionAddedEvent(event *es_models.Event) error {
+	p.State = model.UserAgentStateToInt(model.Inactive)
+	return nil
+}
+
+func (p *UserAgent) appendAuthSessionSetEvent(event *es_models.Event) error {
+	p.State = model.UserAgentStateToInt(model.Inactive)
+	return nil
 }
