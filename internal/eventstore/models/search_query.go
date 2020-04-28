@@ -1,6 +1,8 @@
 package models
 
-import "github.com/caos/zitadel/internal/errors"
+import (
+	"github.com/caos/zitadel/internal/errors"
+)
 
 type SearchQuery struct {
 	Limit   uint64
@@ -31,6 +33,10 @@ func (q *SearchQuery) OrderAsc() *SearchQuery {
 
 func (q *SearchQuery) AggregateIDFilter(id string) *SearchQuery {
 	return q.setFilter(NewFilter(Field_AggregateID, id, Operation_Equals))
+}
+
+func (q *SearchQuery) AggregateIDsFilter(ids ...string) *SearchQuery {
+	return q.setFilter(NewFilter(Field_AggregateID, ids, Operation_In))
 }
 
 func (q *SearchQuery) AggregateTypeFilter(types ...AggregateType) *SearchQuery {
