@@ -1537,6 +1537,26 @@ func (mr *MockManagementServiceClientMockRecorder) RemoveProjectRole(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProjectRole", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveProjectRole), varargs...)
 }
 
+// RemoveUserGrant mocks base method
+func (m *MockManagementServiceClient) RemoveUserGrant(arg0 context.Context, arg1 *grpc.UserGrantID, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveUserGrant", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveUserGrant indicates an expected call of RemoveUserGrant
+func (mr *MockManagementServiceClientMockRecorder) RemoveUserGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveUserGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveUserGrant), varargs...)
+}
+
 // ResendEmailVerificationMail mocks base method
 func (m *MockManagementServiceClient) ResendEmailVerificationMail(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()

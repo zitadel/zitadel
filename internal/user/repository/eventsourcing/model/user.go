@@ -26,7 +26,6 @@ type User struct {
 	PhoneCode    *PhoneCode
 	PasswordCode *RequestPasswordSet
 	OTP          *OTP
-	Grants       []*UserGrant
 }
 
 type InitUserCode struct {
@@ -71,9 +70,6 @@ func UserFromModel(user *model.User) *User {
 	if user.OTP != nil {
 		converted.OTP = OTPFromModel(user.OTP)
 	}
-	if user.Grants != nil {
-		converted.Grants = GrantsFromModel(user.Grants)
-	}
 	return converted
 }
 
@@ -116,9 +112,6 @@ func UserToModel(user *User) *model.User {
 	}
 	if user.OTP != nil {
 		converted.OTP = OTPToModel(user.OTP)
-	}
-	if user.Grants != nil {
-		converted.Grants = GrantsToModel(user.Grants)
 	}
 	return converted
 }
@@ -190,16 +183,6 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		err = u.appendOtpVerifiedEvent()
 	case model.MfaOtpRemoved:
 		err = u.appendOtpRemovedEvent()
-	case model.UserGrantAdded:
-		err = u.appendAddGrantEvent(event)
-	case model.UserGrantChanged:
-		err = u.appendChangeGrantEvent(event)
-	case model.UserGrantRemoved:
-		err = u.appendRemoveGrantEvent(event)
-	case model.UserGrantDeactivated:
-		err = u.appendGrantStateEvent(event, model.USERGRANTSTATE_INACTIVE)
-	case model.UserGrantReactivated:
-		err = u.appendGrantStateEvent(event, model.USERGRANTSTATE_ACTIVE)
 	}
 	if err != nil {
 		return err
