@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
@@ -81,12 +82,154 @@ func userCreateToModel(u *CreateUserRequest) *usr_model.User {
 	return user
 }
 
+func passwordRequestToModel(r *PasswordRequest) *usr_model.Password {
+	return &usr_model.Password{
+		ObjectRoot:   models.ObjectRoot{AggregateID: r.Id},
+		SecretString: r.Password,
+	}
+}
+
+func profileFromModel(profile *usr_model.Profile) *UserProfile {
+	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
+	logging.Log("GRPC-dkso3").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
+	logging.Log("GRPC-ski8d").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserProfile{
+		Id:                profile.AggregateID,
+		CreationDate:      creationDate,
+		ChangeDate:        changeDate,
+		Sequence:          profile.Sequence,
+		UserName:          profile.UserName,
+		FirstName:         profile.FirstName,
+		LastName:          profile.LastName,
+		DisplayName:       profile.DisplayName,
+		NickName:          profile.NickName,
+		PreferredLanguage: profile.PreferredLanguage.String(),
+		Gender:            genderFromModel(profile.Gender),
+	}
+	return converted
+}
+
+func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
+	preferredLanguage, err := language.Parse(u.PreferredLanguage)
+	logging.Log("GRPC-d8k2s").OnError(err).Debug("language malformed")
+
+	return &usr_model.Profile{
+		ObjectRoot:        models.ObjectRoot{AggregateID: u.Id},
+		FirstName:         u.FirstName,
+		LastName:          u.LastName,
+		NickName:          u.NickName,
+		DisplayName:       u.DisplayName,
+		PreferredLanguage: preferredLanguage,
+		Gender:            genderToModel(u.Gender),
+	}
+}
+
+func emailFromModel(email *usr_model.Email) *UserEmail {
+	creationDate, err := ptypes.TimestampProto(email.CreationDate)
+	logging.Log("GRPC-d9ow2").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
+	logging.Log("GRPC-s0dkw").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserEmail{
+		Id:              email.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        email.Sequence,
+		Email:           email.EmailAddress,
+		IsEmailVerified: email.IsEmailVerified,
+	}
+	return converted
+}
+
+func updateEmailToModel(e *UpdateUserEmailRequest) *usr_model.Email {
+	return &usr_model.Email{
+		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
+		EmailAddress:    e.Email,
+		IsEmailVerified: e.IsEmailVerified,
+	}
+}
+
+func phoneFromModel(phone *usr_model.Phone) *UserPhone {
+	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
+	logging.Log("GRPC-ps9ws").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
+	logging.Log("GRPC-09ewq").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserPhone{
+		Id:              phone.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        phone.Sequence,
+		Phone:           phone.PhoneNumber,
+		IsPhoneVerified: phone.IsPhoneVerified,
+	}
+	return converted
+}
+
+func updatePhoneToModel(e *UpdateUserPhoneRequest) *usr_model.Phone {
+	return &usr_model.Phone{
+		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
+		PhoneNumber:     e.Phone,
+		IsPhoneVerified: e.IsPhoneVerified,
+	}
+}
+
+func addressFromModel(address *usr_model.Address) *UserAddress {
+	creationDate, err := ptypes.TimestampProto(address.CreationDate)
+	logging.Log("GRPC-ud8w7").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
+	logging.Log("GRPC-si9ws").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &UserAddress{
+		Id:            address.AggregateID,
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Sequence:      address.Sequence,
+		Country:       address.Country,
+		StreetAddress: address.StreetAddress,
+		Region:        address.Region,
+		PostalCode:    address.PostalCode,
+		Locality:      address.Locality,
+	}
+	return converted
+}
+
+func updateAddressToModel(address *UpdateUserAddressRequest) *usr_model.Address {
+	return &usr_model.Address{
+		ObjectRoot:    models.ObjectRoot{AggregateID: address.Id},
+		Country:       address.Country,
+		StreetAddress: address.StreetAddress,
+		Region:        address.Region,
+		PostalCode:    address.PostalCode,
+		Locality:      address.Locality,
+	}
+}
+
+func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
+	switch state {
+	case NotificationType_NOTIFICATIONTYPE_EMAIL:
+		return usr_model.NOTIFICATIONTYPE_EMAIL
+	case NotificationType_NOTIFICATIONTYPE_SMS:
+		return usr_model.NOTIFICATIONTYPE_SMS
+	default:
+		return usr_model.NOTIFICATIONTYPE_EMAIL
+	}
+}
+
 func userStateFromModel(state usr_model.UserState) UserState {
 	switch state {
 	case usr_model.USERSTATE_ACTIVE:
 		return UserState_USERSTATE_ACTIVE
 	case usr_model.USERSTATE_INACTIVE:
 		return UserState_USERSTATE_INACTIVE
+	case usr_model.USERSTATE_LOCKED:
+		return UserState_USERSTATE_LOCKED
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
 	}

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -55,4 +57,53 @@ func EmailToModel(email *Email) *model.Email {
 		EmailAddress:    email.EmailAddress,
 		IsEmailVerified: email.IsEmailVerified,
 	}
+}
+
+func EmailCodeToModel(code *EmailCode) *model.EmailCode {
+	return &model.EmailCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
+}
+
+func (u *User) appendUserEmailChangedEvent(event *es_models.Event) error {
+	u.Email = new(Email)
+	u.Email.setData(event)
+	u.IsEmailVerified = false
+	return nil
+}
+
+func (u *User) appendUserEmailCodeAddedEvent(event *es_models.Event) error {
+	u.EmailCode = new(EmailCode)
+	u.EmailCode.setData(event)
+	return nil
+}
+
+func (u *User) appendUserEmailVerifiedEvent() error {
+	u.IsEmailVerified = true
+	return nil
+}
+
+func (a *Email) setData(event *es_models.Event) error {
+	a.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, a); err != nil {
+		logging.Log("EVEN-dlo9s").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
+}
+
+func (a *EmailCode) setData(event *es_models.Event) error {
+	a.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, a); err != nil {
+		logging.Log("EVEN-lo9s").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }

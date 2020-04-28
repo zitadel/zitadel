@@ -5477,6 +5477,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5496,6 +5504,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5705,6 +5721,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5713,9 +5737,6 @@
       "properties": {
         "id": {
           "type": "string"
-        },
-        "state": {
-          "$ref": "#/definitions/v1UserState"
         },
         "first_name": {
           "type": "string"
@@ -5741,6 +5762,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

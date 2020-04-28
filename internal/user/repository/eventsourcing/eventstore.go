@@ -3,12 +3,14 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/cache/config"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/pquerna/otp/totp"
 	"github.com/sony/sonyflake"
 	"strconv"
 )
@@ -22,6 +24,7 @@ type UserEventstore struct {
 	EmailVerificationCode    crypto.Generator
 	PhoneVerificationCode    crypto.Generator
 	PasswordVerificationCode crypto.Generator
+	Multifactors             sd.Multifactors
 }
 
 type UserConfig struct {
@@ -30,19 +33,34 @@ type UserConfig struct {
 	PasswordSaltCost int
 }
 
-func StartUser(conf UserConfig) (*UserEventstore, error) {
+func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventstore, error) {
 	userCache, err := StartCache(conf.Cache)
 	if err != nil {
 		return nil, err
 	}
 	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
-	passwordAlg := crypto.NewBCrypt(conf.PasswordSaltCost)
-	//TODO: init code generators
+	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	initCodeGen := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.InitializeUserCode, aesCrypto)
+	emailVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.EmailVerificationCode, aesCrypto)
+	phoneVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PhoneVerificationCode, aesCrypto)
+	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
+	aesOtpCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	systemDefaults.Multifactors.OTP.CryptoMFA = aesOtpCrypto
 	return &UserEventstore{
-		Eventstore:  conf.Eventstore,
-		userCache:   userCache,
-		idGenerator: idGenerator,
-		PasswordAlg: passwordAlg,
+		Eventstore:               conf.Eventstore,
+		userCache:                userCache,
+		idGenerator:              idGenerator,
+		InitializeUserCode:       initCodeGen,
+		EmailVerificationCode:    emailVerificationCode,
+		PhoneVerificationCode:    phoneVerificationCode,
+		PasswordVerificationCode: passwordVerificationCode,
+		Multifactors:             systemDefaults.Multifactors,
 	}, nil
 }
 
@@ -62,7 +80,7 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 }
 
 func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	if user.UserName == "" && user.Email != nil {
+	if user.Profile != nil && user.UserName == "" && user.Email != nil {
 		user.UserName = user.EmailAddress
 	}
 	if !user.IsValid() {
@@ -79,11 +97,12 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 		if err != nil {
 			return nil, err
 		}
-		user.Password = &usr_model.Password{SecretCrypto: secret, ChangeRequired: true}
+		user.Password.SecretCrypto = secret
+		user.Password.ChangeRequired = true
 	}
 
 	repoUser := model.UserFromModel(user)
-	var initCode *model.InitUserCode
+	initCode := new(model.InitUserCode)
 	if user.Email == nil || !user.IsEmailVerified || user.Password == nil || user.SecretString == "" {
 		initCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
 		if err != nil {
@@ -93,7 +112,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 		initCode.Expiry = es.InitializeUserCode.Expiry()
 	}
 
-	var phoneCode *model.PhoneCode
+	phoneCode := new(model.PhoneCode)
 	if user.Phone != nil && !user.IsPhoneVerified {
 		phoneCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
 		if err != nil {
@@ -114,7 +133,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 }
 
 func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	if user.UserName == "" && user.Email != nil {
+	if user.Profile != nil && user.UserName == "" && user.Email != nil {
 		user.UserName = user.EmailAddress
 	}
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
@@ -131,13 +150,13 @@ func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User
 	if err != nil {
 		return nil, err
 	}
-	user.Password = &usr_model.Password{SecretCrypto: secret, ChangeRequired: true}
+	user.Password = &usr_model.Password{SecretCrypto: secret, ChangeRequired: false}
 
 	repoUser := model.UserFromModel(user)
 
-	var emailCode *model.EmailCode
+	emailCode := new(model.EmailCode)
 	if user.Email != nil && !user.IsEmailVerified {
-		emailCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+		emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
 		if err != nil {
 			return nil, err
 		}
@@ -160,8 +179,8 @@ func (es *UserEventstore) DeactivateUser(ctx context.Context, id string) (*usr_m
 	if err != nil {
 		return nil, err
 	}
-	if !existing.IsActive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "project must be active")
+	if existing.IsInactive() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "cant deactivate inactive user")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -179,8 +198,8 @@ func (es *UserEventstore) ReactivateUser(ctx context.Context, id string) (*usr_m
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsInctive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do94s", "project must be active")
+	if !existing.IsInactive() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do94s", "user must be inactive")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -198,8 +217,8 @@ func (es *UserEventstore) LockUser(ctx context.Context, id string) (*usr_model.U
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsActive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "project must be active")
+	if !existing.IsActive() && !existing.IsInitial() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "user must be active or initial")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -217,8 +236,8 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsLocked() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dks83", "project must be active")
+	if !existing.IsLocked() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dks83", "user must be locked")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -229,4 +248,643 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	}
 	es.userCache.cacheUser(repoExisting)
 	return model.UserToModel(repoExisting), nil
+}
+
+func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d8diw", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.InitCode != nil {
+		return user.InitCode, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "init code not found")
+}
+
+func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	initCode := new(model.InitUserCode)
+	initCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+	if err != nil {
+		return nil, err
+	}
+	initCode.Code = initCodeCrypto
+	initCode.Expiry = es.InitializeUserCode.Expiry()
+
+	repoUser := model.UserFromModel(user)
+	agg := UserInitCodeAggregate(es.AggregateCreator(), repoUser, initCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return nil, err
+	}
+	es.userCache.cacheUser(repoUser)
+	return model.InitCodeToModel(repoUser.InitCode), nil
+}
+
+func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := SkipMfaAggregate(es.AggregateCreator(), repoUser)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (*usr_model.Password, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Password != nil {
+		return user.Password, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "password not found")
+}
+
+func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+	return es.changedPassword(ctx, password, true)
+}
+
+func (es *UserEventstore) SetPassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+	return es.changedPassword(ctx, password, false)
+}
+
+func (es *UserEventstore) changedPassword(ctx context.Context, password *usr_model.Password, onetime bool) (*usr_model.Password, error) {
+	if !password.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dosi3", "password invalid")
+	}
+	user, err := es.UserByID(ctx, password.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	secret, err := crypto.Hash([]byte(password.SecretString), es.PasswordAlg)
+	if err != nil {
+		return nil, err
+	}
+	repoPassword := &model.Password{Secret: secret, ChangeRequired: onetime}
+	repoUser := model.UserFromModel(user)
+	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return nil, err
+	}
+	es.userCache.cacheUser(repoUser)
+
+	return model.PasswordToModel(repoUser.Password), nil
+}
+
+func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string, notifyType usr_model.NotificationType) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	request := &model.RequestPasswordSet{NotificationType: int32(notifyType), Expiry: es.PasswordVerificationCode.Expiry()}
+	pwCode, _, err := crypto.NewCode(es.PasswordVerificationCode)
+	if err != nil {
+		return err
+	}
+	request.Code = pwCode
+
+	repoUser := model.UserFromModel(user)
+	agg := RequestSetPassword(es.AggregateCreator(), repoUser, request)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Profile != nil {
+		return user.Profile, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dk23f", "profile not found")
+}
+
+func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
+	if !profile.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "profile is invalid")
+	}
+	existing, err := es.UserByID(ctx, profile.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.ProfileFromModel(profile)
+
+	updateAggregate := ProfileChangeAggregate(es.AggregateCreator(), repoExisting, repoNew)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return model.ProfileToModel(repoExisting.Profile), nil
+}
+
+func (es *UserEventstore) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Email != nil {
+		return user.Email, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dki89", "email not found")
+}
+
+func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
+	if !email.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "email is invalid")
+	}
+	existing, err := es.UserByID(ctx, email.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.EmailFromModel(email)
+
+	emailCode := new(model.EmailCode)
+	if !email.IsEmailVerified {
+		emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
+		if err != nil {
+			return nil, err
+		}
+		emailCode.Code = emailCodeCrypto
+		emailCode.Expiry = es.EmailVerificationCode.Expiry()
+	}
+
+	updateAggregate := EmailChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, emailCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return model.EmailToModel(repoExisting.Email), nil
+}
+
+func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationCode string) error {
+	if userID == "" || verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "userId or Code empty")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.EmailCode == nil {
+		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "code not found")
+	}
+	if err := crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, verificationCode, es.EmailVerificationCode); err != nil {
+		return err
+	}
+
+	repoExisting := model.UserFromModel(existing)
+	updateAggregate := EmailVerifiedAggregate(es.AggregateCreator(), repoExisting)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "userID missing")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	repoExisting := model.UserFromModel(existing)
+	if repoExisting.Email == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "no email existing")
+	}
+	if repoExisting.IsEmailVerified {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "email already verified")
+	}
+
+	emailCode := new(model.EmailCode)
+	emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
+	if err != nil {
+		return err
+	}
+	emailCode.Code = emailCodeCrypto
+	emailCode.Expiry = es.EmailVerificationCode.Expiry()
+
+	updateAggregate := EmailVerificationCodeAggregate(es.AggregateCreator(), repoExisting, emailCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) PhoneByID(ctx context.Context, userID string) (*usr_model.Phone, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Phone != nil {
+		return user.Phone, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-pos9e", "phone not found")
+}
+
+func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phone) (*usr_model.Phone, error) {
+	if !phone.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "phone is invalid")
+	}
+	existing, err := es.UserByID(ctx, phone.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.PhoneFromModel(phone)
+
+	phoneCode := new(model.PhoneCode)
+	if !phone.IsPhoneVerified {
+		phoneCodeCrypto, _, err := crypto.NewCode(es.PhoneVerificationCode)
+		if err != nil {
+			return nil, err
+		}
+		phoneCode.Code = phoneCodeCrypto
+		phoneCode.Expiry = es.PhoneVerificationCode.Expiry()
+	}
+
+	updateAggregate := PhoneChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, phoneCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return model.PhoneToModel(repoExisting.Phone), nil
+}
+
+func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationCode string) error {
+	if userID == "" || verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dsi8s", "userId or Code empty")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.PhoneCode == nil {
+		return caos_errs.ThrowNotFound(nil, "EVENT-slp0s", "code not found")
+	}
+	if err := crypto.VerifyCode(existing.PhoneCode.CreationDate, existing.PhoneCode.Expiry, existing.PhoneCode.Code, verificationCode, es.PhoneVerificationCode); err != nil {
+		return err
+	}
+
+	repoExisting := model.UserFromModel(existing)
+	updateAggregate := PhoneVerifiedAggregate(es.AggregateCreator(), repoExisting)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9sw", "userID missing")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	repoExisting := model.UserFromModel(existing)
+	if repoExisting.Phone == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "no phone existing")
+	}
+	if repoExisting.IsPhoneVerified {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "phone already verified")
+	}
+
+	phoneCode := new(model.PhoneCode)
+	phoneCodeCrypto, _, err := crypto.NewCode(es.PhoneVerificationCode)
+	if err != nil {
+		return err
+	}
+	phoneCode.Code = phoneCodeCrypto
+	phoneCode.Expiry = es.PhoneVerificationCode.Expiry()
+
+	updateAggregate := PhoneVerificationCodeAggregate(es.AggregateCreator(), repoExisting, phoneCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di8ws", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Address != nil {
+		return user.Address, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-so9wa", "address not found")
+}
+
+func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
+	existing, err := es.UserByID(ctx, address.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.AddressFromModel(address)
+
+	updateAggregate := AddressChangeAggregate(es.AggregateCreator(), repoExisting, repoNew)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return model.AddressToModel(repoExisting.Address), nil
+}
+
+func (es *UserEventstore) OTPByID(ctx context.Context, userID string) (*usr_model.OTP, error) {
+	if userID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.OTP != nil {
+		return user.OTP, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dps09", "otp not found")
+}
+
+func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model.OTP, error) {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if existing.OTP != nil && existing.OTP.State == usr_model.MFASTATE_READY {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "user has already configured otp")
+	}
+	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: userID})
+	if err != nil {
+		return nil, err
+	}
+	encrypted, err := crypto.Encrypt([]byte(key.Secret()), es.Multifactors.OTP.CryptoMFA)
+	if err != nil {
+		return nil, err
+	}
+	repoOtp := &model.OTP{Secret: encrypted}
+	repoExisting := model.UserFromModel(existing)
+	updateAggregate := MfaOTPAddAggregate(es.AggregateCreator(), repoExisting, repoOtp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	otp := model.OTPToModel(repoExisting.OTP)
+	otp.Url = key.URL()
+	otp.SecretString = key.Secret()
+	return otp, nil
+}
+
+func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.OTP == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "no otp existing")
+	}
+	repoExisting := model.UserFromModel(existing)
+	updateAggregate := MfaOTPRemoveAggregate(es.AggregateCreator(), repoExisting)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string) error {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.OTP == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "no otp existing")
+	}
+	decrypt, err := crypto.DecryptString(existing.OTP.Secret, es.Multifactors.OTP.CryptoMFA)
+	if err != nil {
+		return err
+	}
+
+	valid := totp.Validate(code, decrypt)
+	if !valid {
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Invalid code")
+	}
+	return nil
+}
+
+func (es *UserEventstore) UserGrantByIDs(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	if grantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lop34", "projectID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := user.GetGrant(grantID); g != nil {
+		return g, nil
+	}
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-slo9d", "grant not found")
+}
+
+func (es *UserEventstore) AddUserGrant(ctx context.Context, grant *usr_model.UserGrant) (*usr_model.UserGrant, error) {
+	if grant == nil || !grant.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
+	}
+	existing, err := es.UserByID(ctx, grant.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := existing.ContainsGrantForProject(grant.ProjectID); g != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-skw35", "Grant for project already exists")
+	}
+	id, err := es.idGenerator.NextID()
+	if err != nil {
+		return nil, err
+	}
+	grant.GrantID = strconv.FormatUint(id, 10)
+
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	addAggregate := UserGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, addAggregate)
+
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-lo93e", "Could not find grant in list")
+}
+
+func (es *UserEventstore) ChangeUserGrant(ctx context.Context, grant *usr_model.UserGrant) (*usr_model.UserGrant, error) {
+	if grant == nil && grant.GrantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo0s9", "invalid grant")
+	}
+	existing, err := es.UserByID(ctx, grant.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-olp45", "Grant not existing on user")
+	}
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	projectAggregate := UserGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	es.userCache.cacheUser(repoUser)
+
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-ms834", "Could not find app in list")
+}
+
+func (es *UserEventstore) RemoveUserGrant(ctx context.Context, grant *usr_model.UserGrant) error {
+	if grant.GrantID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-l9fsw", "grantID is required")
+	}
+	existing, err := es.UserByID(ctx, grant.AggregateID)
+	if err != nil {
+		return err
+	}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-8ixm4", "Grant doesn't exist on user")
+	}
+	repoUser := model.UserFromModel(existing)
+	grantRepo := model.GrantFromModel(grant)
+	projectAggregate := UserGrantRemovedAggregate(es.Eventstore.AggregateCreator(), repoUser, grantRepo)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) DeactivateUserGrant(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	if grantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8si34", "grantID missing")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	grant := &usr_model.UserGrant{GrantID: grantID}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-si934", "Grant is not on this user")
+	}
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	projectAggregate := UserGrantDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	es.userCache.cacheUser(repoUser)
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-skd3s", "Could not find grant in list")
+}
+
+func (es *UserEventstore) ReactivateUserGrant(ctx context.Context, userID, grantID string) (*usr_model.UserGrant, error) {
+	if grantID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sksiw", "grantID missing")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	grant := &usr_model.UserGrant{GrantID: grantID}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-skie3", "Grant is not on this user")
+	}
+	repoUser := model.UserFromModel(existing)
+	repoGrant := model.GrantFromModel(grant)
+
+	projectAggregate := UserGrantReactivatedAggregate(es.Eventstore.AggregateCreator(), repoUser, repoGrant)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, projectAggregate)
+	es.userCache.cacheUser(repoUser)
+
+	if _, g := model.GetUserGrant(repoUser.Grants, grant.GrantID); g != nil {
+		return model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-sko4", "Could not find grant in list")
 }

@@ -33,6 +33,7 @@ require (
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.0.3
+	github.com/pquerna/otp v1.2.0
 	github.com/rs/cors v1.7.0
 	github.com/sethvargo/go-password v0.1.3
 	github.com/sirupsen/logrus v1.5.0 // indirect

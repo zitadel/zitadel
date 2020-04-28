@@ -3,7 +3,7 @@ package model
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"golang.org/x/text/language"
+	"time"
 )
 
 type User struct {
@@ -15,50 +15,19 @@ type User struct {
 	*Email
 	*Phone
 	*Address
+	InitCode     *InitUserCode
+	EmailCode    *EmailCode
+	PhoneCode    *PhoneCode
+	PasswordCode *RequestPasswordSet
+	OTP          *OTP
+	Grants       []*UserGrant
 }
 
-type Password struct {
+type InitUserCode struct {
 	es_models.ObjectRoot
 
-	SecretString   string
-	SecretCrypto   *crypto.CryptoValue
-	ChangeRequired bool
-}
-
-type Profile struct {
-	es_models.ObjectRoot
-
-	UserName          string
-	FirstName         string
-	LastName          string
-	NickName          string
-	DisplayName       string
-	PreferredLanguage language.Tag
-	Gender            Gender
-}
-
-type Email struct {
-	es_models.ObjectRoot
-
-	EmailAddress    string
-	IsEmailVerified bool
-}
-
-type Phone struct {
-	es_models.ObjectRoot
-
-	PhoneNumber     string
-	IsPhoneVerified bool
-}
-
-type Address struct {
-	es_models.ObjectRoot
-
-	Country       string
-	Locality      string
-	PostalCode    string
-	Region        string
-	StreetAddress string
+	Code   *crypto.CryptoValue
+	Expiry time.Duration
 }
 
 type UserState int32
@@ -82,18 +51,23 @@ const (
 	GENDER_DIVERSE   Gender = 3
 )
 
+func NewUserGrant(userID, projectID string) *UserGrant {
+	return &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: userID}, ProjectID: projectID, State: USERGRANTSTATE_ACTIVE}
+}
+
 func (u *User) IsValid() bool {
-	if u.FirstName == "" || u.LastName == "" || u.UserName == "" || u.Email == nil || u.EmailAddress == "" {
-		return false
-	}
-	return true
+	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.UserName != "" && u.Email != nil && u.EmailAddress != ""
 }
 
 func (u *User) IsActive() bool {
 	return u.State == USERSTATE_ACTIVE
 }
 
-func (u *User) IsInctive() bool {
+func (u *User) IsInitial() bool {
+	return u.State == USERSTATE_INITIAL
+}
+
+func (u *User) IsInactive() bool {
 	return u.State == USERSTATE_INACTIVE
 }
 

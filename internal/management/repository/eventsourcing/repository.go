@@ -6,6 +6,7 @@ import (
 
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
@@ -44,10 +45,9 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 	user, err := es_usr.StartUser(es_usr.UserConfig{
-		Eventstore:       es,
-		Cache:            conf.Eventstore.Cache,
-		PasswordSaltCost: conf.PasswordSaltCost,
-	})
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
 	if err != nil {
 		return nil, err
 	}

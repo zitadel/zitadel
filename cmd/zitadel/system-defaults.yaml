@@ -1,8 +1,46 @@
-SecretGenerators:
-  PasswordSaltCost: 14
-  ClientSecretGenerator:
-    Length: 64
-    IncludeLowerLetters: true
-    IncludeUpperLetters: true
-    IncludeDigits: true
-    IncludeSymbols: true
+SystemDefaults:
+  UserVerificationKey:
+    EncryptionKeyID: 'UserVerificationKey_1'
+    Path: 'keys.yaml'
+  SecretGenerators:
+    PasswordSaltCost: 14
+    ClientSecretGenerator:
+      Length: 64
+      IncludeLowerLetters: true
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: true
+    InitializeUserCode:
+      Length: 6
+      Expiry: '72h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    EmailVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    PhoneVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    PasswordVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+  Multifactors:
+    OTP:
+      Issuer: 'Zitadel'
+      VerificationKey:
+        EncryptionKeyID: 'OTPVerificationKey_1'
+        Path: 'keys.yaml'

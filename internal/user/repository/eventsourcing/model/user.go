@@ -21,6 +21,12 @@ type User struct {
 	*Email
 	*Phone
 	*Address
+	InitCode     *InitUserCode
+	EmailCode    *EmailCode
+	PhoneCode    *PhoneCode
+	PasswordCode *RequestPasswordSet
+	OTP          *OTP
+	Grants       []*UserGrant
 }
 
 type InitUserCode struct {
@@ -45,6 +51,7 @@ func UserFromModel(user *model.User) *User {
 			ChangeDate:   user.ChangeDate,
 			CreationDate: user.CreationDate,
 		},
+		State: int32(user.State),
 	}
 	if user.Password != nil {
 		converted.Password = PasswordFromModel(user.Password)
@@ -61,6 +68,12 @@ func UserFromModel(user *model.User) *User {
 	if user.Address != nil {
 		converted.Address = AddressFromModel(user.Address)
 	}
+	if user.OTP != nil {
+		converted.OTP = OTPFromModel(user.OTP)
+	}
+	if user.Grants != nil {
+		converted.Grants = GrantsFromModel(user.Grants)
+	}
 	return converted
 }
 
@@ -72,6 +85,7 @@ func UserToModel(user *User) *model.User {
 			ChangeDate:   user.ChangeDate,
 			CreationDate: user.CreationDate,
 		},
+		State: model.UserState(user.State),
 	}
 	if user.Password != nil {
 		converted.Password = PasswordToModel(user.Password)
@@ -88,7 +102,38 @@ func UserToModel(user *User) *model.User {
 	if user.Address != nil {
 		converted.Address = AddressToModel(user.Address)
 	}
+	if user.InitCode != nil {
+		converted.InitCode = InitCodeToModel(user.InitCode)
+	}
+	if user.EmailCode != nil {
+		converted.EmailCode = EmailCodeToModel(user.EmailCode)
+	}
+	if user.PhoneCode != nil {
+		converted.PhoneCode = PhoneCodeToModel(user.PhoneCode)
+	}
+	if user.PasswordCode != nil {
+		converted.PasswordCode = PasswordCodeToModel(user.PasswordCode)
+	}
+	if user.OTP != nil {
+		converted.OTP = OTPToModel(user.OTP)
+	}
+	if user.Grants != nil {
+		converted.Grants = GrantsToModel(user.Grants)
+	}
 	return converted
+}
+
+func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
+	return &model.InitUserCode{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:  code.ObjectRoot.AggregateID,
+			Sequence:     code.Sequence,
+			ChangeDate:   code.ChangeDate,
+			CreationDate: code.CreationDate,
+		},
+		Expiry: code.Expiry,
+		Code:   code.Code,
+	}
 }
 
 func (p *User) AppendEvents(events ...*es_models.Event) error {
@@ -102,34 +147,89 @@ func (p *User) AppendEvents(events ...*es_models.Event) error {
 
 func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
-
+	var err error
 	switch event.Type {
-	case model.UserAdded, model.UserRegistered:
+	case model.UserAdded,
+		model.UserRegistered,
+		model.UserProfileChanged:
 		if err := json.Unmarshal(event.Data, u); err != nil {
 			logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
-		return nil
 	case model.UserDeactivated:
-		u.appendDeactivatedEvent()
+		err = u.appendDeactivatedEvent()
 	case model.UserReactivated:
-		u.appendReactivatedEvent()
+		err = u.appendReactivatedEvent()
 	case model.UserLocked:
-		u.appendLockedEvent()
+		err = u.appendLockedEvent()
 	case model.UserUnlocked:
-		u.appendUnlockedEvent()
+		err = u.appendUnlockedEvent()
+	case model.InitializedUserCodeCreated:
+		err = u.appendInitUsercodeCreatedEvent(event)
+	case model.UserPasswordChanged:
+		err = u.appendUserPasswordChangedEvent(event)
+	case model.UserPasswordSetRequested:
+		err = u.appendPasswordSetRequestedEvent(event)
+	case model.UserEmailChanged:
+		err = u.appendUserEmailChangedEvent(event)
+	case model.UserEmailCodeAdded:
+		err = u.appendUserEmailCodeAddedEvent(event)
+	case model.UserEmailVerified:
+		err = u.appendUserEmailVerifiedEvent()
+	case model.UserPhoneChanged:
+		err = u.appendUserPhoneChangedEvent(event)
+	case model.UserPhoneCodeAdded:
+		err = u.appendUserPhoneCodeAddedEvent(event)
+	case model.UserPhoneVerified:
+		err = u.appendUserPhoneVerifiedEvent()
+	case model.UserAddressChanged:
+		err = u.appendUserAddressChangedEvent(event)
+	case model.MfaOtpAdded:
+		err = u.appendOtpAddedEvent(event)
+	case model.MfaOtpVerified:
+		err = u.appendOtpVerifiedEvent()
+	case model.MfaOtpRemoved:
+		err = u.appendOtpRemovedEvent()
+	case model.UserGrantAdded:
+		err = u.appendAddGrantEvent(event)
+	case model.UserGrantChanged:
+		err = u.appendChangeGrantEvent(event)
+	case model.UserGrantRemoved:
+		err = u.appendRemoveGrantEvent(event)
+	case model.UserGrantDeactivated:
+		err = u.appendGrantStateEvent(event, model.USERGRANTSTATE_INACTIVE)
+	case model.UserGrantReactivated:
+		err = u.appendGrantStateEvent(event, model.USERGRANTSTATE_ACTIVE)
 	}
-	u.ComputeState()
+	if err != nil {
+		return err
+	}
+	u.ComputeObject()
 	return nil
 }
 
-func (u *User) ComputeState() {
+func (u *User) ComputeObject() {
 	if u.State == 0 {
-		if u.IsEmailVerified {
+		if u.Email != nil && u.IsEmailVerified {
 			u.State = int32(model.USERSTATE_ACTIVE)
 		} else {
 			u.State = int32(model.USERSTATE_INITIAL)
 		}
+	}
+	if u.Password != nil && u.Password.ObjectRoot.AggregateID == "" {
+		u.Password.ObjectRoot = u.ObjectRoot
+	}
+	if u.Profile != nil && u.Profile.ObjectRoot.AggregateID == "" {
+		u.Profile.ObjectRoot = u.ObjectRoot
+	}
+	if u.Email != nil && u.Email.ObjectRoot.AggregateID == "" {
+		u.Email.ObjectRoot = u.ObjectRoot
+	}
+	if u.Phone != nil && u.Phone.ObjectRoot.AggregateID == "" {
+		u.Phone.ObjectRoot = u.ObjectRoot
+	}
+	if u.Address != nil && u.Address.ObjectRoot.AggregateID == "" {
+		u.Address.ObjectRoot = u.ObjectRoot
 	}
 }
 
@@ -150,5 +250,25 @@ func (u *User) appendLockedEvent() error {
 
 func (u *User) appendUnlockedEvent() error {
 	u.State = int32(model.USERSTATE_ACTIVE)
+	return nil
+}
+
+func (u *User) appendInitUsercodeCreatedEvent(event *es_models.Event) error {
+	initCode := new(InitUserCode)
+	err := initCode.setData(event)
+	if err != nil {
+		return err
+	}
+	initCode.ObjectRoot.CreationDate = event.CreationDate
+	u.InitCode = initCode
+	return nil
+}
+
+func (c *InitUserCode) setData(event *es_models.Event) error {
+	c.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, c); err != nil {
+		logging.Log("EVEN-7duwe").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
 	return nil
 }
