@@ -96,21 +96,16 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 		return nil, errors.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Org")
 	}
 
-	repoOrg := OrgFromModel(org)
+	member.ObjectRoot = org.ObjectRoot
 	repoMember := OrgMemberFromModel(member)
 
-	addAggregate := OrgMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, addAggregate)
+	addAggregate := OrgMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, addAggregate)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, m := range repoOrg.Members {
-		if m.UserID == member.UserID {
-			return OrgMemberToModel(m), nil
-		}
-	}
-	return nil, errors.ThrowInternal(nil, "EVENT-mIyhl", "Could not find member in list")
+	return OrgMemberToModel(repoMember), nil
 }
 
 func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
@@ -123,25 +118,22 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 		return nil, err
 	}
 
-	if !org.ContainsMember(member.UserID) {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oe39f", "User is not member of this org")
+	existingMember := org.MemberByUserID(member.UserID)
+	if existingMember == nil {
+		return nil, errors.ThrowNotFound(nil, "EVENT-P2pde", "member doesn't exist")
 	}
 
-	repoOrg := OrgFromModel(org)
+	member.ObjectRoot = org.ObjectRoot
 	repoMember := OrgMemberFromModel(member)
+	repoExistingMember := OrgMemberFromModel(existingMember)
 
-	orgAggregate := OrgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
+	orgAggregate := OrgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoExistingMember, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, m := range repoOrg.Members {
-		if m.UserID == member.UserID {
-			return OrgMemberToModel(m), nil
-		}
-	}
-	return nil, errors.ThrowInternal(nil, "EVENT-3udjs", "Could not find member in list")
+	return OrgMemberToModel(repoMember), nil
 }
 
 func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.OrgMember) error {
@@ -158,9 +150,9 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 		return nil
 	}
 
-	repoOrg := OrgFromModel(org)
+	member.ObjectRoot = org.ObjectRoot
 	repoMember := OrgMemberFromModel(member)
 
-	orgAggregate := OrgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoMember)
-	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
+	orgAggregate := OrgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
+	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }

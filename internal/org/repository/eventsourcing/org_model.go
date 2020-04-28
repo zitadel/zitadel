@@ -93,8 +93,8 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 }
 
 func (o *Org) removeMember(userID string) {
-	for i, member := range o.Members {
-		if member.UserID == userID {
+	for i := len(o.Members) - 1; i > 0; i-- {
+		if o.Members[i].UserID == userID {
 			copy(o.Members[i:], o.Members[i+1:])
 			o.Members[len(o.Members)-1] = nil
 			o.Members = o.Members[:len(o.Members)-1]

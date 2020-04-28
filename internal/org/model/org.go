@@ -41,3 +41,12 @@ func (o *Org) ContainsMember(userID string) bool {
 	}
 	return false
 }
+
+func (o *Org) MemberByUserID(userID string) *OrgMember {
+	for _, member := range o.Members {
+		if member.UserID == userID {
+			return member
+		}
+	}
+	return nil
+}

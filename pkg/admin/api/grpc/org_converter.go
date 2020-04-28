@@ -9,7 +9,8 @@ import (
 
 func setUpRequestToModel(setUp *OrgSetUpRequest) *admin_model.SetupOrg {
 	return &admin_model.SetupOrg{
-		Org: orgCreateRequestToModel(setUp.Org),
+		Org:  orgCreateRequestToModel(setUp.Org),
+		User: setUp.User,
 	}
 }
 

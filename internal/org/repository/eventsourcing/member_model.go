@@ -41,6 +41,7 @@ func (m *OrgMember) Changes(updatedMember *OrgMember) map[string]interface{} {
 
 	if !reflect.DeepEqual(m.Roles, updatedMember.Roles) {
 		changes["roles"] = updatedMember.Roles
+		changes["userId"] = m.UserID
 	}
 
 	return changes

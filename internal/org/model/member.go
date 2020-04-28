@@ -12,6 +12,10 @@ func NewOrgMember(orgID, userID string) *OrgMember {
 	return &OrgMember{ObjectRoot: es_models.ObjectRoot{AggregateID: orgID}, UserID: userID}
 }
 
+func NewOrgMemberWithRoles(orgID, userID string, roles ...string) *OrgMember {
+	return &OrgMember{ObjectRoot: es_models.ObjectRoot{AggregateID: orgID}, UserID: userID, Roles: roles}
+}
+
 func (member *OrgMember) IsValid() bool {
 	return member.AggregateID != "" && member.UserID != "" && len(member.Roles) != 0
 }

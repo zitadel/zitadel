@@ -23,8 +23,25 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-	//TODO: create user with org as resource owner
-	//TODO: add member(user) to org
+	orgID := aggregates[0].ID
+
+	userAggregate, err := repo.AggregateCreator().NewAggregate(ctx, "user3", "user", "v0", 0, models.OverwriteResourceOwner(orgID)) //TODO: create user with org as resource owner
+	if err != nil {
+		return nil, err
+	}
+	userAggregate, err = userAggregate.AppendEvent("user.created", setUp.User)
+	if err != nil {
+		return nil, err
+	}
+	userID := userAggregate.ID
+	aggregates = append(aggregates, userAggregate)
+
+	eventstoreMember := eventsourcing.OrgMemberFromModel(org_model.NewOrgMemberWithRoles(orgID, userID, "ORG_ADMIN")) //TODO: role as const
+	memberAggregate, err := eventsourcing.OrgMemberAddedAggregate(repo.AggregateCreator(), eventstoreMember)(ctx)
+	if err != nil {
+		return nil, err
+	}
+	aggregates = append(aggregates, memberAggregate)
 
 	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, eventstoreOrg.AppendEvents, aggregates...)
 	if err != nil {

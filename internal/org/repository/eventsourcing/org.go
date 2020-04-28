@@ -77,9 +77,9 @@ func OrgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 	}
 
 	return []*es_models.Aggregate{
+		agg,
 		domainAgrregate,
 		nameAggregate,
-		agg,
 	}, nil
 }
 
@@ -108,6 +108,10 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 			return nil, err
 		}
 		aggregates = append(aggregates, domainAggregate)
+	}
+
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-E0hc5", "no changes")
 	}
 
 	orgAggregate, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
@@ -166,7 +170,7 @@ func uniqueDomainAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		return nil, err
 	}
 
-	return aggregate.SetPrecondition(OrgDomainUniqueQuery(domain), validation(aggregate, org_model.OrgDomainReserved)), nil
+	return aggregate.SetPrecondition(OrgDomainUniqueQuery(domain), isReservedValidation(aggregate, org_model.OrgDomainReserved)), nil
 }
 
 func uniqueNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, name string) (*es_models.Aggregate, error) {
@@ -179,18 +183,16 @@ func uniqueNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 		return nil, err
 	}
 
-	aggregate.SetPrecondition(OrgNameUniqueQuery(name), validation(aggregate, org_model.OrgNameReserved))
-
-	return aggregate, nil
+	return aggregate.SetPrecondition(OrgNameUniqueQuery(name), isReservedValidation(aggregate, org_model.OrgNameReserved)), nil
 }
 
-func validation(aggregate *es_models.Aggregate, eventType es_models.EventType) func(...*es_models.Event) error {
+func isReservedValidation(aggregate *es_models.Aggregate, resevedEventType es_models.EventType) func(...*es_models.Event) error {
 	return func(events ...*es_models.Event) error {
 		if len(events) == 0 {
 			aggregate.PreviousSequence = 0
 			return nil
 		}
-		if events[0].Type == eventType {
+		if events[0].Type == resevedEventType {
 			return errors.ThrowPreconditionFailed(nil, "EVENT-WMKO4", "org already reseved")
 		}
 		aggregate.PreviousSequence = events[0].Sequence
