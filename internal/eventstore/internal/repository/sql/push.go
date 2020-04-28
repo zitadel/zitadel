@@ -3,9 +3,10 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/cockroachdb/cockroach-go/crdb"
 )
@@ -31,11 +32,16 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		if err != nil {
 			tx.Rollback()
 			logging.Log("SQL-9ctx5").WithError(err).Warn("prepare failed")
-			return errors.ThrowInternal(err, "SQL-juCgA", "prepare failed")
+			return caos_errs.ThrowInternal(err, "SQL-juCgA", "prepare failed")
 		}
 
 		for _, aggregate := range aggregates {
-			err = insertEvents(stmt, aggregate.Events)
+			err = precondtion(tx, aggregate)
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+			err = insertEvents(stmt, Sequence(aggregate.PreviousSequence), aggregate.Events)
 			if err != nil {
 				tx.Rollback()
 				return err
@@ -44,15 +50,29 @@ func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggrega
 		return nil
 	})
 
-	if _, ok := err.(*errors.CaosError); !ok && err != nil {
-		err = errors.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
+	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
+		err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
 	}
 
 	return err
 }
 
-func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
-	currentSequence := Sequence(events[0].PreviousSequence)
+func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
+	if aggregate.Precondition == nil {
+		return nil
+	}
+	events, err := filter(tx, aggregate.Precondition.Query)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(err, "SQL-oBPxB", "filter failed")
+	}
+	err = aggregate.Precondition.Validation(events...)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(err, "SQL-s6hqU", "validation failed")
+	}
+	return nil
+}
+
+func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Event) error {
 	for _, event := range events {
 		if event.Data == nil || len(event.Data) == 0 {
 			//json decoder failes with EOF if json text is empty
@@ -62,27 +82,27 @@ func insertEvents(stmt *sql.Stmt, events []*models.Event) error {
 		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, event.Data, event.EditorUser, event.EditorService, event.ResourceOwner,
 			event.AggregateType, event.AggregateID,
 			event.AggregateType, event.AggregateID,
-			currentSequence, event.AggregateType, event.AggregateID,
-			event.AggregateType, event.AggregateID, currentSequence)
+			previousSequence, event.AggregateType, event.AggregateID,
+			event.AggregateType, event.AggregateID, previousSequence)
 
 		if err != nil {
 			logging.Log("SQL-EXA0q").WithError(err).Info("query failed")
-			return errors.ThrowInternal(err, "SQL-SBP37", "unable to create event")
+			return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 		}
 		defer rows.Close()
 
 		rowInserted := false
 		for rows.Next() {
 			rowInserted = true
-			err = rows.Scan(&event.ID, &currentSequence, &event.CreationDate)
+			err = rows.Scan(&event.ID, &previousSequence, &event.CreationDate)
 			logging.Log("SQL-rAvLD").OnError(err).Info("unable to scan result into event")
 		}
 
 		if !rowInserted {
-			return errors.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
+			return caos_errs.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 		}
 
-		event.Sequence = uint64(currentSequence)
+		event.Sequence = uint64(previousSequence)
 	}
 
 	return nil

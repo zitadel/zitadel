@@ -22,12 +22,13 @@ func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *
 		return errors.ThrowNotFound(nil, "EVENT-8due3", "no events found")
 	}
 	err = appender(events...)
-	if err != nil{
+	if err != nil {
 		return ThrowAppendEventError(err, "SDK-awiWK", "appender failed")
 	}
 	return nil
 }
 
+// Push is Deprecated use PushAggregates
 // Push creates the aggregates from aggregater
 // and pushes the aggregates to the given pushFunc
 // the given events are appended by the appender
@@ -45,7 +46,19 @@ func Push(ctx context.Context, push pushFunc, appender appendFunc, aggregaters .
 	if err != nil {
 		return err
 	}
-	
+
+	return appendAggregates(appender, aggregates)
+}
+
+func PushAggregates(ctx context.Context, push pushFunc, appender appendFunc, aggregates ...*models.Aggregate) (err error) {
+	if len(aggregates) < 1 {
+		return errors.ThrowPreconditionFailed(nil, "SDK-q9wjp", "no aggregaters passed")
+	}
+
+	err = push(ctx, aggregates...)
+	if err != nil {
+		return err
+	}
 
 	return appendAggregates(appender, aggregates)
 }

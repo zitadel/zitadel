@@ -46,3 +46,8 @@ func (err *CaosError) GetMessage() string {
 func (err *CaosError) GetID() string {
 	return err.ID
 }
+
+func (err *CaosError) Is(target error) bool {
+	_, ok := target.(*CaosError)
+	return ok
+}
