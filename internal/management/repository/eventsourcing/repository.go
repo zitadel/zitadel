@@ -3,6 +3,9 @@ package eventsourcing
 import (
 	"context"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
+	"github.com/caos/zitadel/internal/view"
 
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -10,13 +13,13 @@ import (
 
 type Config struct {
 	Eventstore es_int.Config
-	//View       view.ViewConfig
-	//Spooler    spooler.SpoolerConfig
+	View       view.ViewConfig
+	Spooler    spooler.SpoolerConfig
 }
 
 type EsRepository struct {
-	//spooler *es_spooler.Spooler
-	ProjectRepo
+	//spooler *Spooler
+	eventstore.ProjectRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -44,7 +47,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	}
 
 	return &EsRepository{
-		ProjectRepo{project},
+		eventstore.ProjectRepo{project},
 	}, nil
 }
 
