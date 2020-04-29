@@ -49,6 +49,10 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+	policy, err := es_pol.StartPolicy(es_pol.PolicyConfig{Eventstore: es, Cache: conf.Eventstore.Cache})
+	if err != nil {
+		return nil, err
+	}
 
 	return &EsRepository{
 		ProjectRepo{project},
