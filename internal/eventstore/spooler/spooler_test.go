@@ -37,7 +37,7 @@ type eventstoreStub struct {
 	err    error
 }
 
-// Healthz returns status OK as soon as the service started
+// Health returns status OK as soon as the service started
 func (es *eventstoreStub) Health(ctx context.Context) error {
 	return nil
 }
