@@ -37,12 +37,10 @@ type eventstoreStub struct {
 	err    error
 }
 
-// Health returns status OK as soon as the service started
 func (es *eventstoreStub) Health(ctx context.Context) error {
 	return nil
 }
 
-// Ready returns status OK as soon as all dependent services are available
 func (es *eventstoreStub) AggregateCreator() *models.AggregateCreator {
 	return nil
 }
