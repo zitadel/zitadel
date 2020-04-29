@@ -106,11 +106,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	events, err := s.eventstore.FilterEvents(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	return events, nil
+	return s.eventstore.FilterEvents(ctx, query)
 }
 
 func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool {
