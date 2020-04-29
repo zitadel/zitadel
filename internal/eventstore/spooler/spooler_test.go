@@ -131,6 +131,7 @@ func TestSpooler_awaitError(t *testing.T) {
 	type fields struct {
 		currentHandler Handler
 		err            error
+		canceled       bool
 	}
 	tests := []struct {
 		name   string
@@ -141,6 +142,7 @@ func TestSpooler_awaitError(t *testing.T) {
 			fields{
 				err:            nil,
 				currentHandler: &testHandler{processSleep: 500 * time.Millisecond},
+				canceled:       false,
 			},
 		},
 		{
@@ -148,6 +150,7 @@ func TestSpooler_awaitError(t *testing.T) {
 			fields{
 				err:            fmt.Errorf("hodor"),
 				currentHandler: &testHandler{processSleep: 500 * time.Millisecond},
+				canceled:       false,
 			},
 		},
 	}
@@ -156,17 +159,13 @@ func TestSpooler_awaitError(t *testing.T) {
 			s := &spooledHandler{
 				Handler: tt.fields.currentHandler,
 			}
-
-			canceled := false
 			errs := make(chan error)
-			cancel := func() {
-				canceled = true
-			}
+			ctx, cancel := context.WithCancel(context.Background())
 
 			go s.awaitError(cancel, errs)
 			errs <- tt.fields.err
 
-			if !canceled {
+			if ctx.Err() == nil {
 				t.Error("cancel function was not called")
 			}
 		})
