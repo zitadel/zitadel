@@ -74,7 +74,6 @@ func addMemberValidation(aggregate *es_models.Aggregate) func(...*es_models.Even
 				aggregate.PreviousSequence = event.Sequence
 				existsOrg = true
 			}
-
 		}
 		if existsOrg && existsUser {
 			return nil
