@@ -1,7 +1,8 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	"time"
 )
@@ -18,9 +19,9 @@ type handler struct {
 	cycleDuration time.Duration
 }
 
-func Register(configs Configs, bulkLimit uint64, view *view.View, esClient es_api.EventstoreServiceClient) []spooler.Handler {
+func Register(configs Configs, bulkLimit uint64, view *view.View, eventstore eventstore.Eventstore) []spooler.Handler {
 	return []spooler.Handler{
-		&Org{handler{view, bulkLimit, configs.cycleDuration("Org")}, esClient},
+		//&Org{handler{view, bulkLimit, configs.cycleDuration("Org")}, eventstore},
 	}
 }
 
