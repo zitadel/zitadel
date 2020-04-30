@@ -32,7 +32,6 @@ func GetMockedEventstoreWithPw(ctrl *gomock.Controller, mockEs *mock.MockEventst
 		es.InitializeUserCode = GetMockPwGenerator(ctrl)
 	}
 	if email {
-
 		es.EmailVerificationCode = GetMockPwGenerator(ctrl)
 	}
 	if phone {
