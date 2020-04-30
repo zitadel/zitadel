@@ -108,12 +108,7 @@ func UserToModel(user *User) *model.User {
 
 func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
 	return &model.InitUserCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
+		ObjectRoot: code.ObjectRoot,
 		Expiry: code.Expiry,
 		Code:   code.Code,
 	}
