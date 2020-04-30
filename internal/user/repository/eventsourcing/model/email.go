@@ -35,12 +35,7 @@ func (e *Email) Changes(changed *Email) map[string]interface{} {
 
 func EmailFromModel(email *model.Email) *Email {
 	return &Email{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  email.ObjectRoot.AggregateID,
-			Sequence:     email.Sequence,
-			ChangeDate:   email.ChangeDate,
-			CreationDate: email.CreationDate,
-		},
+		ObjectRoot: email.ObjectRoot,
 		EmailAddress:    email.EmailAddress,
 		IsEmailVerified: email.IsEmailVerified,
 	}
@@ -48,12 +43,7 @@ func EmailFromModel(email *model.Email) *Email {
 
 func EmailToModel(email *Email) *model.Email {
 	return &model.Email{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  email.ObjectRoot.AggregateID,
-			Sequence:     email.Sequence,
-			ChangeDate:   email.ChangeDate,
-			CreationDate: email.CreationDate,
-		},
+		ObjectRoot: email.ObjectRoot,
 		EmailAddress:    email.EmailAddress,
 		IsEmailVerified: email.IsEmailVerified,
 	}
@@ -61,12 +51,7 @@ func EmailToModel(email *Email) *model.Email {
 
 func EmailCodeToModel(code *EmailCode) *model.EmailCode {
 	return &model.EmailCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
+		ObjectRoot: code.ObjectRoot,
 		Expiry: code.Expiry,
 		Code:   code.Code,
 	}

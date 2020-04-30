@@ -651,7 +651,7 @@ func TestSkipMfaAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "user unlocked aggregate ok",
+			name: "mfa skipped init ok",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},

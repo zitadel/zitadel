@@ -26,12 +26,7 @@ type RequestPasswordSet struct {
 
 func PasswordFromModel(password *model.Password) *Password {
 	return &Password{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  password.ObjectRoot.AggregateID,
-			Sequence:     password.Sequence,
-			ChangeDate:   password.ChangeDate,
-			CreationDate: password.CreationDate,
-		},
+		ObjectRoot: password.ObjectRoot,
 		Secret:         password.SecretCrypto,
 		ChangeRequired: password.ChangeRequired,
 	}
@@ -39,12 +34,7 @@ func PasswordFromModel(password *model.Password) *Password {
 
 func PasswordToModel(password *Password) *model.Password {
 	return &model.Password{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  password.ObjectRoot.AggregateID,
-			Sequence:     password.Sequence,
-			ChangeDate:   password.ChangeDate,
-			CreationDate: password.CreationDate,
-		},
+		ObjectRoot: password.ObjectRoot,
 		SecretCrypto:   password.Secret,
 		ChangeRequired: password.ChangeRequired,
 	}
@@ -52,12 +42,7 @@ func PasswordToModel(password *Password) *model.Password {
 
 func PasswordCodeToModel(code *RequestPasswordSet) *model.RequestPasswordSet {
 	return &model.RequestPasswordSet{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
+		ObjectRoot: code.ObjectRoot,
 		Expiry:           code.Expiry,
 		Code:             code.Code,
 		NotificationType: model.NotificationType(code.NotificationType),

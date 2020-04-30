@@ -44,12 +44,7 @@ func UserFromEvents(user *User, events ...*es_models.Event) (*User, error) {
 
 func UserFromModel(user *model.User) *User {
 	converted := &User{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  user.ObjectRoot.AggregateID,
-			Sequence:     user.Sequence,
-			ChangeDate:   user.ChangeDate,
-			CreationDate: user.CreationDate,
-		},
+		ObjectRoot: user.ObjectRoot,
 		State: int32(user.State),
 	}
 	if user.Password != nil {
@@ -75,12 +70,7 @@ func UserFromModel(user *model.User) *User {
 
 func UserToModel(user *User) *model.User {
 	converted := &model.User{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  user.ObjectRoot.AggregateID,
-			Sequence:     user.Sequence,
-			ChangeDate:   user.ChangeDate,
-			CreationDate: user.CreationDate,
-		},
+		ObjectRoot: user.ObjectRoot,
 		State: model.UserState(user.State),
 	}
 	if user.Password != nil {
@@ -118,12 +108,7 @@ func UserToModel(user *User) *model.User {
 
 func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
 	return &model.InitUserCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
+		ObjectRoot: code.ObjectRoot,
 		Expiry: code.Expiry,
 		Code:   code.Code,
 	}

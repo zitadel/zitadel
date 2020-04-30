@@ -24,7 +24,7 @@ func UserGrantQuery(latestSequence uint64) *es_models.SearchQuery {
 
 func UserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) (*es_models.Aggregate, error) {
 	if grant == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing user should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing grant should not be nil")
 	}
 	return aggCreator.NewAggregate(ctx, grant.AggregateID, grant_model.UserGrantAggregate, model.UserGrantVersion, grant.Sequence)
 }
