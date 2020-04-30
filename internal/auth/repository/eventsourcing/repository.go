@@ -2,22 +2,26 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/auth_request/repository/cache"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_user_agent "github.com/caos/zitadel/internal/user_agent/repository/eventsourcing"
+	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
-	Eventstore es_int.Config
+	Eventstore  es_int.Config
+	AuthRequest cache.Config
 	//View       view.ViewConfig
 	//Spooler    spooler.SpoolerConfig
 }
 
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
-	UserAgentRepo
+	UserRepo
+	AuthRequestDB *cache.AuthRequestCache
 }
 
-func Start(conf Config) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -33,16 +37,31 @@ func Start(conf Config) (*EsRepository, error) {
 	//conf.Spooler.SQL = sql
 	//spool := spooler.StartSpooler(conf.Spooler)
 
-	useragent, err := es_user_agent.StartUserAgent(es_user_agent.UserAgentConfig{Eventstore: es})
+	authReq, err := cache.Start(conf.AuthRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := es_user.StartUser(
+		es_user.UserConfig{
+			Eventstore: es,
+			Cache:      conf.Eventstore.Cache,
+		},
+		systemDefaults,
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	return &EsRepository{
-		UserAgentRepo{useragent},
+		UserRepo{user},
+		authReq,
 	}, nil
 }
 
 func (repo *EsRepository) Health(ctx context.Context) error {
-	return repo.UserAgentEvents.Health(ctx)
+	if err := repo.UserEvents.Health(ctx); err != nil {
+		return err
+	}
+	return repo.AuthRequestDB.Health(ctx)
 }

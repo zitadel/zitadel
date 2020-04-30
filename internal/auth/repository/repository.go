@@ -1,9 +1,13 @@
 package repository
 
-import "context"
+import (
+	"context"
+
+	auth_request "github.com/caos/zitadel/internal/auth_request/repository"
+)
 
 type Repository interface {
 	Health(context.Context) error
-	UserAgentRepository
 	UserRepository
+	auth_request.Repository
 }

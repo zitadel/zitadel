@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -183,6 +184,25 @@ func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, existing *m
 			return nil, err
 		}
 		return agg, err
+	}
+}
+
+func PasswordCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(usr_model.UserPasswordCheckSucceeded, nil)
+	}
+}
+func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(usr_model.UserPasswordCheckFailed, nil)
 	}
 }
 

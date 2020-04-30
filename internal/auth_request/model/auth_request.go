@@ -20,8 +20,9 @@ type AuthRequest struct {
 
 	levelOfAssurance      string   //acr
 	projectApplicationIDs []string //aud?
+	possibleSteps         []NextStep
 	//UserSession   *UserSession
-	//PossibleSteps []*NextStep
+
 }
 
 func NewAuthRequest(agentID string, info *BrowserInfo, applicationID, callbackURI, transferState string,
@@ -48,6 +49,10 @@ func (a *AuthRequest) IsValid() bool {
 		a.ApplicationID != "" &&
 		a.CallbackURI != "" &&
 		a.Request != nil && a.Request.IsValid()
+}
+
+func (a *AuthRequest) AddPossibleStep(step NextStep) {
+	a.possibleSteps = append(a.possibleSteps, step)
 }
 
 type Prompt int32

@@ -36,45 +36,41 @@ func (repo *UserAgentRepo) GetAuthSession(ctx context.Context, agentID, userSess
 	//return repo.UserAgentEvents.Auth(ctx, session)
 }
 
-func (repo *UserAgentRepo) SelectUser(ctx context.Context, agentID, authSessionID, userSessionID string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
-	return repo.UserAgentEvents.AuthSessionSetUserSession(ctx, agentID, userSessionID, authSessionID)
-}
+//func (repo *UserAgentRepo) SelectUser(ctx context.Context, agentID, authSessionID, userSessionID string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+//	return repo.UserAgentEvents.AuthSessionSetUserSession(ctx, agentID, userSessionID, authSessionID)
+//}
 
-func (repo *UserAgentRepo) VerifyUser(ctx context.Context, agentID, authSessionID, userName string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
-	user, err := repo.UserByUsername(ctx, userName)
-	if err != nil {
-		return nil, err
-	}
-	return repo.UserAgentEvents.AddUserSession(ctx, agentID, authSessionID, user_agent_model.NewUserSession(agentID, "", user.AggregateID))
-}
-func (repo *UserAgentRepo) VerifyPassword(ctx context.Context, agentID, userSessionID, authSessionID, password string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
-	authSession, err := repo.UserAgentEvents.AuthSessionByIDs(ctx, agentID, userSessionID, authSessionID)
-	if err != nil {
-		return nil, err
-	}
-	if err := repo.UserEvents.VerifyPassword(ctx, authSession.UserSession.UserID, password); err == nil {
-		return repo.UserAgentEvents.PasswordCheckSucceeded(ctx, agentID, authSession.UserSession.SessionID, authSessionID)
-	}
-	return repo.UserAgentEvents.PasswordCheckFailed(ctx, agentID, authSession.UserSession.SessionID, authSessionID)
-}
-func (repo *UserAgentRepo) VerifyMfa(ctx context.Context, agentID, userSessionID, authSessionID string, mfa int32, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
-	authSession, err := repo.UserAgentEvents.AuthSessionByIDs(ctx, agentID, userSessionID, authSessionID)
-	if err != nil {
-		return nil, err
-	}
-	if err := repo.UserEvents.CheckMfaOTP(ctx, authSession.UserSession.UserID, mfa); err == nil {
-		return repo.UserAgentEvents.MfaCheckSucceeded(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
-	}
-	return repo.UserAgentEvents.MfaCheckFailed(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
-}
+//func (repo *UserAgentRepo) VerifyUser(ctx context.Context, agentID, authSessionID, userName string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+//	user, err := repo.UserByUsername(ctx, userName)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return repo.UserAgentEvents.AddUserSession(ctx, agentID, authSessionID, user_agent_model.NewUserSession(agentID, "", user.AggregateID))
+//}
+//func (repo *UserAgentRepo) VerifyPassword(ctx context.Context, agentID, userSessionID, authSessionID, password string, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+//	authSession, err := repo.UserAgentEvents.AuthSessionByIDs(ctx, agentID, userSessionID, authSessionID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if err := repo.UserEvents.VerifyPassword(ctx, authSession.UserSession.UserID, password); err == nil {
+//		return repo.UserAgentEvents.PasswordCheckSucceeded(ctx, agentID, authSession.UserSession.SessionID, authSessionID)
+//	}
+//	return repo.UserAgentEvents.PasswordCheckFailed(ctx, agentID, authSession.UserSession.SessionID, authSessionID)
+//}
+//func (repo *UserAgentRepo) VerifyMfa(ctx context.Context, agentID, userSessionID, authSessionID string, mfa int32, info *user_agent_model.BrowserInfo) (*user_agent_model.AuthSession, error) {
+//	authSession, err := repo.UserAgentEvents.AuthSessionByIDs(ctx, agentID, userSessionID, authSessionID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if err := repo.UserEvents.CheckMfaOTP(ctx, authSession.UserSession.UserID, mfa); err == nil {
+//		return repo.UserAgentEvents.MfaCheckSucceeded(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
+//	}
+//	return repo.UserAgentEvents.MfaCheckFailed(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
+//}
 
 func (repo *UserAgentRepo) TerminateUserSession(ctx context.Context, agentID, sessionID string) error {
 	return repo.UserAgentEvents.TerminateUserSession(ctx, agentID, sessionID)
 }
 func (repo *UserAgentRepo) CreateToken(ctx context.Context, agentID, authSessionID string) (*user_agent_model.Token, error) {
 	return repo.UserAgentEvents.CreateToken(ctx, agentID, "", authSessionID)
-}
-
-func (repo *UserAgentRepo) UserByUsername(ctx context.Context, username string) (*user_model.User, error) {
-	return nil, nil
 }

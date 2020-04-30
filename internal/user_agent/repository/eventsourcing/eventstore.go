@@ -127,35 +127,36 @@ func (es *UserAgentEventstore) TerminateUserSession(ctx context.Context, userAge
 	return nil
 }
 
-func (es *UserAgentEventstore) PasswordCheckSucceeded(ctx context.Context, agentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
-	return es.passwordCheck(ctx, agentID, userSessionID, authSessionID, PasswordCheckSucceededAggregate)
-}
-
-func (es *UserAgentEventstore) PasswordCheckFailed(ctx context.Context, agentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
-	return es.passwordCheck(ctx, agentID, userSessionID, authSessionID, PasswordCheckFailedAggregate)
-}
-
-func (es *UserAgentEventstore) passwordCheck(ctx context.Context, agentID, userSessionID, authSessionID string, checkAgg pwCheckAggregateFn) (*agent_model.AuthSession, error) {
-	checkAggregate := func(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent) es_sdk.AggregateFunc {
-		return checkAgg(aggCreator, userAgent, userSessionID)
-	}
-	return es.authSessionEventIDs(ctx, agentID, userSessionID, authSessionID, checkAggregate)
-}
-
-func (es *UserAgentEventstore) MfaCheckSucceeded(ctx context.Context, agentID, userSessionID, authSessionID string, mfaType int32) (*agent_model.AuthSession, error) {
-	return es.mfaCheck(ctx, agentID, userSessionID, authSessionID, mfaType, MfaCheckSucceededAggregate)
-}
-
-func (es *UserAgentEventstore) MfaCheckFailed(ctx context.Context, agentID, userSessionID, authSessionID string, mfaType int32) (*agent_model.AuthSession, error) {
-	return es.mfaCheck(ctx, agentID, userSessionID, authSessionID, mfaType, MfaCheckFailedAggregate)
-}
-
-func (es *UserAgentEventstore) mfaCheck(ctx context.Context, agentID, userSessionID, authSessionID string, mfaType int32, checkAgg mfaCheckAggregateFn) (*agent_model.AuthSession, error) {
-	checkAggregate := func(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent) es_sdk.AggregateFunc {
-		return checkAgg(aggCreator, userAgent, userSessionID, mfaType)
-	}
-	return es.authSessionEventIDs(ctx, agentID, userSessionID, authSessionID, checkAggregate)
-}
+//
+//func (es *UserAgentEventstore) PasswordCheckSucceeded(ctx context.Context, agentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
+//	return es.passwordCheck(ctx, agentID, userSessionID, authSessionID, PasswordCheckSucceededAggregate)
+//}
+//
+//func (es *UserAgentEventstore) PasswordCheckFailed(ctx context.Context, agentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
+//	return es.passwordCheck(ctx, agentID, userSessionID, authSessionID, PasswordCheckFailedAggregate)
+//}
+//
+//func (es *UserAgentEventstore) passwordCheck(ctx context.Context, agentID, userSessionID, authSessionID string, checkAgg pwCheckAggregateFn) (*agent_model.AuthSession, error) {
+//	checkAggregate := func(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent) es_sdk.AggregateFunc {
+//		return checkAgg(aggCreator, userAgent, userSessionID)
+//	}
+//	return es.authSessionEventIDs(ctx, agentID, userSessionID, authSessionID, checkAggregate)
+//}
+//
+//func (es *UserAgentEventstore) MfaCheckSucceeded(ctx context.Context, agentID, userSessionID, authSessionID string, mfaType int32) (*agent_model.AuthSession, error) {
+//	return es.mfaCheck(ctx, agentID, userSessionID, authSessionID, mfaType, MfaCheckSucceededAggregate)
+//}
+//
+//func (es *UserAgentEventstore) MfaCheckFailed(ctx context.Context, agentID, userSessionID, authSessionID string, mfaType int32) (*agent_model.AuthSession, error) {
+//	return es.mfaCheck(ctx, agentID, userSessionID, authSessionID, mfaType, MfaCheckFailedAggregate)
+//}
+//
+//func (es *UserAgentEventstore) mfaCheck(ctx context.Context, agentID, userSessionID, authSessionID string, mfaType int32, checkAgg mfaCheckAggregateFn) (*agent_model.AuthSession, error) {
+//	checkAggregate := func(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent) es_sdk.AggregateFunc {
+//		return checkAgg(aggCreator, userAgent, userSessionID, mfaType)
+//	}
+//	return es.authSessionEventIDs(ctx, agentID, userSessionID, authSessionID, checkAggregate)
+//}
 
 func (es *UserAgentEventstore) ReAuthenticationRequested(ctx context.Context, userAgentID, userSessionID, authSessionID string) (*agent_model.AuthSession, error) {
 	reauthAggregate := func(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent) es_sdk.AggregateFunc {

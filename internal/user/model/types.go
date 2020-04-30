@@ -26,6 +26,8 @@ const (
 	UserPasswordChanged          models.EventType = "user.password.changed"
 	UserPasswordSetRequested     models.EventType = "user.password.set.requested"
 	UserPasswordResetRequestSent models.EventType = "user.password.reset.request.sent"
+	UserPasswordCheckSucceeded   models.EventType = "user.password.check.succeeded"
+	UserPasswordCheckFailed      models.EventType = "user.password.check.failed"
 
 	UserEmailChanged      models.EventType = "user.email.changed"
 	UserEmailVerified     models.EventType = "user.email.verified"

@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -324,6 +325,35 @@ func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (
 		return user.Password, nil
 	}
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "password not found")
+}
+
+func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string) error {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.Password == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "no password set")
+	}
+	if err := crypto.CompareHash(existing.Password.SecretCrypto, []byte(password), es.PasswordAlg); err == nil {
+		return es.setPasswordCheckResult(ctx, existing, PasswordCheckSucceededAggregate)
+	}
+	if err := es.setPasswordCheckResult(ctx, existing, PasswordCheckFailedAggregate); err != nil {
+		return err
+	}
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "invalid password")
+}
+
+func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, check func(aggCreator *es_models.AggregateCreator, user *model.User) es_sdk.AggregateFunc) error {
+	repoUser := model.UserFromModel(user)
+
+	agg := check(es.AggregateCreator(), repoUser)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
 }
 
 func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
