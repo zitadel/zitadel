@@ -1,7 +1,6 @@
 SystemDefaults:
   UserVerificationKey:
-    EncryptionKeyID: 'UserVerificationKey_1'
-    Path: 'keys.yaml'
+    EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecretGenerator:
@@ -42,5 +41,4 @@ SystemDefaults:
     OTP:
       Issuer: 'Zitadel'
       VerificationKey:
-        EncryptionKeyID: 'OTPVerificationKey_1'
-        Path: 'keys.yaml'
+        EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY

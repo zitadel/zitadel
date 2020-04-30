@@ -3185,6 +3185,34 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "put": {
         "operationId": "UpdateUserGrant",
         "responses": {
@@ -5578,9 +5606,6 @@
       "type": "object",
       "properties": {
         "user_id": {
-          "type": "string"
-        },
-        "org_id": {
           "type": "string"
         },
         "project_id": {

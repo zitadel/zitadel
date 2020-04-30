@@ -91,19 +91,6 @@ func GetMockUserByIDNoEvents(ctrl *gomock.Controller) *UserEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockUserGrantByIDsOK(ctrl *gomock.Controller) *UserEventstore {
-	projectData, _ := json.Marshal(model.User{Profile: &model.Profile{UserName: "UserName"}})
-	grantData, _ := json.Marshal(model.UserGrant{GrantID: "GrantID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}})
-
-	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: usr_model.UserAdded, Data: projectData},
-		&es_models.Event{AggregateID: "ID", Sequence: 1, Type: usr_model.UserGrantAdded, Data: grantData},
-	}
-	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	return GetMockedEventstore(ctrl, mockEs)
-}
-
 func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
 	user := model.User{
 		Profile: &model.Profile{
@@ -371,26 +358,6 @@ func GetMockManipulateUserWithOTP(ctrl *gomock.Controller) *UserEventstore {
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.MfaOtpAdded, Data: dataOtp},
-	}
-	mockEs := mock.NewMockEventstore(ctrl)
-	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
-	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
-	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
-	return GetMockedEventstore(ctrl, mockEs)
-}
-
-func GetMockManipulateUserWithGrant(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
-		Profile: &model.Profile{
-			UserName: "UserName",
-		},
-	}
-	grant := model.UserGrant{GrantID: "GrantID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}}
-	data, _ := json.Marshal(user)
-	dataGrant, _ := json.Marshal(grant)
-	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserGrantAdded, Data: dataGrant},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)

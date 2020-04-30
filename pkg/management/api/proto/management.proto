@@ -1060,6 +1060,16 @@ service ManagementService {
         };
     }
 
+    rpc RemoveUserGrant(UserGrantID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/grants/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.delete"
+        };
+    }
+
     //PROJECT_USER_GRANT
     rpc SearchProjectUserGrants(ProjectUserGrantSearchRequest) returns (UserGrantSearchResponse) {
         option (google.api.http) = {
@@ -2095,9 +2105,8 @@ message UserGrant {
 
 message UserGrantCreate {
     string user_id = 1;
-    string org_id = 2;
-    string project_id = 3;
-    repeated string role_keys = 4;
+    string project_id = 2;
+    repeated string role_keys = 3;
 }
 
 message UserGrantUpdate {

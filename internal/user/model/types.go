@@ -44,10 +44,4 @@ const (
 	MfaOtpVerified models.EventType = "user.mfa.otp.verified"
 	MfaOtpRemoved  models.EventType = "user.mfa.otp.removed"
 	MfaInitSkipped models.EventType = "user.mfa.init.skipped"
-
-	UserGrantAdded       models.EventType = "user.grant.added"
-	UserGrantChanged     models.EventType = "user.grant.changed"
-	UserGrantRemoved     models.EventType = "user.grant.removed"
-	UserGrantDeactivated models.EventType = "user.grant.deactivated"
-	UserGrantReactivated models.EventType = "user.grant.reactivated"
 )
