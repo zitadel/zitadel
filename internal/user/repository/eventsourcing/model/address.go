@@ -39,12 +39,7 @@ func (a *Address) Changes(changed *Address) map[string]interface{} {
 
 func AddressFromModel(address *model.Address) *Address {
 	return &Address{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  address.ObjectRoot.AggregateID,
-			Sequence:     address.Sequence,
-			ChangeDate:   address.ChangeDate,
-			CreationDate: address.CreationDate,
-		},
+		ObjectRoot: address.ObjectRoot
 		Country:       address.Country,
 		Locality:      address.Locality,
 		PostalCode:    address.PostalCode,
