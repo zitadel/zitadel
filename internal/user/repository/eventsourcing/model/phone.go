@@ -33,12 +33,7 @@ func (p *Phone) Changes(changed *Phone) map[string]interface{} {
 
 func PhoneFromModel(phone *model.Phone) *Phone {
 	return &Phone{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  phone.ObjectRoot.AggregateID,
-			Sequence:     phone.Sequence,
-			ChangeDate:   phone.ChangeDate,
-			CreationDate: phone.CreationDate,
-		},
+		ObjectRoot: phone.ObjectRoot,
 		PhoneNumber:     phone.PhoneNumber,
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
