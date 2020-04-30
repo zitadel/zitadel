@@ -42,12 +42,7 @@ func PasswordToModel(password *Password) *model.Password {
 
 func PasswordCodeToModel(code *RequestPasswordSet) *model.RequestPasswordSet {
 	return &model.RequestPasswordSet{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
+		ObjectRoot: code.ObjectRoot,
 		Expiry:           code.Expiry,
 		Code:             code.Code,
 		NotificationType: model.NotificationType(code.NotificationType),
