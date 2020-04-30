@@ -453,8 +453,9 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	repoExisting := model.UserFromModel(existing)
 	repoNew := model.EmailFromModel(email)
 
-	emailCode := new(model.EmailCode)
+	var emailCode *model.EmailCode
 	if !email.IsEmailVerified {
+		emailCode = new(model.EmailCode)
 		emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
 		if err != nil {
 			return nil, err
@@ -559,8 +560,9 @@ func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phon
 	repoExisting := model.UserFromModel(existing)
 	repoNew := model.PhoneFromModel(phone)
 
-	phoneCode := new(model.PhoneCode)
+	var phoneCode *model.PhoneCode
 	if !phone.IsPhoneVerified {
+		phoneCode = new(model.PhoneCode)
 		phoneCodeCrypto, _, err := crypto.NewCode(es.PhoneVerificationCode)
 		if err != nil {
 			return nil, err
