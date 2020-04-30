@@ -26,12 +26,7 @@ type RequestPasswordSet struct {
 
 func PasswordFromModel(password *model.Password) *Password {
 	return &Password{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  password.ObjectRoot.AggregateID,
-			Sequence:     password.Sequence,
-			ChangeDate:   password.ChangeDate,
-			CreationDate: password.CreationDate,
-		},
+		ObjectRoot: password.ObjectRoot,
 		Secret:         password.SecretCrypto,
 		ChangeRequired: password.ChangeRequired,
 	}
