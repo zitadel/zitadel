@@ -70,12 +70,7 @@ func UserFromModel(user *model.User) *User {
 
 func UserToModel(user *User) *model.User {
 	converted := &model.User{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  user.ObjectRoot.AggregateID,
-			Sequence:     user.Sequence,
-			ChangeDate:   user.ChangeDate,
-			CreationDate: user.CreationDate,
-		},
+		ObjectRoot: user.ObjectRoot,
 		State: model.UserState(user.State),
 	}
 	if user.Password != nil {
