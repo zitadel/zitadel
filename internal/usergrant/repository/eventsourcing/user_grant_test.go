@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	"testing"
 )
@@ -35,7 +34,7 @@ func TestUserGrantAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: grant_model.UserGrantAdded,
+				eventType: model.UserGrantAdded,
 			},
 		},
 		{
@@ -106,7 +105,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{grant_model.UserGrantChanged},
+				eventTypes: []models.EventType{model.UserGrantChanged},
 			},
 		},
 		{
@@ -198,7 +197,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{grant_model.UserGrantRemoved},
+				eventTypes: []models.EventType{model.UserGrantRemoved},
 			},
 		},
 		{
@@ -280,7 +279,7 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{grant_model.UserGrantDeactivated},
+				eventTypes: []models.EventType{model.UserGrantDeactivated},
 			},
 		},
 		{
@@ -358,7 +357,7 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{grant_model.UserGrantReactivated},
+				eventTypes: []models.EventType{model.UserGrantReactivated},
 			},
 		},
 		{

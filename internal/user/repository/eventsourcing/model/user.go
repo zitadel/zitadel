@@ -45,7 +45,7 @@ func UserFromEvents(user *User, events ...*es_models.Event) (*User, error) {
 func UserFromModel(user *model.User) *User {
 	converted := &User{
 		ObjectRoot: user.ObjectRoot,
-		State: int32(user.State),
+		State:      int32(user.State),
 	}
 	if user.Password != nil {
 		converted.Password = PasswordFromModel(user.Password)
@@ -71,7 +71,7 @@ func UserFromModel(user *model.User) *User {
 func UserToModel(user *User) *model.User {
 	converted := &model.User{
 		ObjectRoot: user.ObjectRoot,
-		State: model.UserState(user.State),
+		State:      model.UserState(user.State),
 	}
 	if user.Password != nil {
 		converted.Password = PasswordToModel(user.Password)
@@ -109,8 +109,8 @@ func UserToModel(user *User) *model.User {
 func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
 	return &model.InitUserCode{
 		ObjectRoot: code.ObjectRoot,
-		Expiry: code.Expiry,
-		Code:   code.Code,
+		Expiry:     code.Expiry,
+		Code:       code.Code,
 	}
 }
 
@@ -127,46 +127,46 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 	var err error
 	switch event.Type {
-	case model.UserAdded,
-		model.UserRegistered,
-		model.UserProfileChanged:
+	case UserAdded,
+		UserRegistered,
+		UserProfileChanged:
 		if err := json.Unmarshal(event.Data, u); err != nil {
 			logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
 			return err
 		}
-	case model.UserDeactivated:
+	case UserDeactivated:
 		err = u.appendDeactivatedEvent()
-	case model.UserReactivated:
+	case UserReactivated:
 		err = u.appendReactivatedEvent()
-	case model.UserLocked:
+	case UserLocked:
 		err = u.appendLockedEvent()
-	case model.UserUnlocked:
+	case UserUnlocked:
 		err = u.appendUnlockedEvent()
-	case model.InitializedUserCodeCreated:
+	case InitializedUserCodeAdded:
 		err = u.appendInitUsercodeCreatedEvent(event)
-	case model.UserPasswordChanged:
+	case UserPasswordChanged:
 		err = u.appendUserPasswordChangedEvent(event)
-	case model.UserPasswordSetRequested:
+	case UserPasswordCodeAdded:
 		err = u.appendPasswordSetRequestedEvent(event)
-	case model.UserEmailChanged:
+	case UserEmailChanged:
 		err = u.appendUserEmailChangedEvent(event)
-	case model.UserEmailCodeAdded:
+	case UserEmailCodeAdded:
 		err = u.appendUserEmailCodeAddedEvent(event)
-	case model.UserEmailVerified:
+	case UserEmailVerified:
 		err = u.appendUserEmailVerifiedEvent()
-	case model.UserPhoneChanged:
+	case UserPhoneChanged:
 		err = u.appendUserPhoneChangedEvent(event)
-	case model.UserPhoneCodeAdded:
+	case UserPhoneCodeAdded:
 		err = u.appendUserPhoneCodeAddedEvent(event)
-	case model.UserPhoneVerified:
+	case UserPhoneVerified:
 		err = u.appendUserPhoneVerifiedEvent()
-	case model.UserAddressChanged:
+	case UserAddressChanged:
 		err = u.appendUserAddressChangedEvent(event)
-	case model.MfaOtpAdded:
+	case MfaOtpAdded:
 		err = u.appendOtpAddedEvent(event)
-	case model.MfaOtpVerified:
+	case MfaOtpVerified:
 		err = u.appendOtpVerifiedEvent()
-	case model.MfaOtpRemoved:
+	case MfaOtpRemoved:
 		err = u.appendOtpRemovedEvent()
 	}
 	if err != nil {

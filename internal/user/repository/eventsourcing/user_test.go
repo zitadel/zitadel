@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"testing"
 	"time"
@@ -130,7 +129,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserAdded},
+				eventTypes: []models.EventType{model.UserAdded},
 				checkData:  []bool{true},
 			},
 		},
@@ -158,7 +157,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{usr_model.UserAdded, usr_model.InitializedUserCodeCreated},
+				eventTypes: []models.EventType{model.UserAdded, model.InitializedUserCodeAdded},
 				checkData:  []bool{true, true},
 			},
 		},
@@ -174,7 +173,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{usr_model.UserAdded, usr_model.UserPhoneCodeAdded},
+				eventTypes: []models.EventType{model.UserAdded, model.UserPhoneCodeAdded},
 				checkData:  []bool{true, true},
 			},
 		},
@@ -190,7 +189,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{usr_model.UserAdded, usr_model.UserEmailVerified},
+				eventTypes: []models.EventType{model.UserAdded, model.UserEmailVerified},
 				checkData:  []bool{true, false},
 			},
 		},
@@ -206,7 +205,7 @@ func TestUserCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{usr_model.UserAdded, usr_model.UserPhoneVerified},
+				eventTypes: []models.EventType{model.UserAdded, model.UserPhoneVerified},
 				checkData:  []bool{true, false},
 			},
 		},
@@ -261,12 +260,13 @@ func TestUserRegisterAggregate(t *testing.T) {
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
 				},
+				emailCode:     &model.EmailCode{},
 				resourceOwner: "newResourceowner",
 				aggCreator:    models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserRegistered},
+				eventLen:   2,
+				eventTypes: []models.EventType{model.UserRegistered, model.UserEmailCodeAdded},
 			},
 		},
 		{
@@ -274,8 +274,23 @@ func TestUserRegisterAggregate(t *testing.T) {
 			args: args{
 				ctx:           auth.NewMockContext("orgID", "userID"),
 				new:           nil,
+				emailCode:     &model.EmailCode{},
 				resourceOwner: "newResourceowner",
 				aggCreator:    models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "code nil",
+			args: args{
+				ctx:           auth.NewMockContext("orgID", "userID"),
+				resourceOwner: "newResourceowner",
+				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Profile: &model.Profile{UserName: "UserName"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -294,7 +309,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{usr_model.UserRegistered, usr_model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.UserRegistered, model.UserEmailCodeAdded},
 			},
 		},
 		{
@@ -361,7 +376,7 @@ func TestUserDeactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.UserDeactivated,
+				eventType: model.UserDeactivated,
 			},
 		},
 		{
@@ -420,7 +435,7 @@ func TestUserReactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.UserReactivated,
+				eventType: model.UserReactivated,
 			},
 		},
 		{
@@ -479,7 +494,7 @@ func TestUserLockedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.UserLocked,
+				eventType: model.UserLocked,
 			},
 		},
 		{
@@ -538,7 +553,7 @@ func TestUserUnlockedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.UserUnlocked,
+				eventType: model.UserUnlocked,
 			},
 		},
 		{
@@ -600,7 +615,7 @@ func TestUserInitCodeAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.InitializedUserCodeCreated,
+				eventType: model.InitializedUserCodeAdded,
 			},
 		},
 		{
@@ -661,7 +676,7 @@ func TestSkipMfaAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.MfaInitSkipped,
+				eventType: model.MfaInitSkipped,
 			},
 		},
 	}
@@ -711,7 +726,7 @@ func TestChangePasswordAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.UserPasswordChanged,
+				eventType: model.UserPasswordChanged,
 			},
 		},
 		{
@@ -774,7 +789,7 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.UserPasswordSetRequested,
+				eventType: model.UserPasswordCodeAdded,
 			},
 		},
 		{
@@ -837,7 +852,7 @@ func TestChangeProfileAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: usr_model.UserProfileChanged,
+				eventType: model.UserProfileChanged,
 			},
 		},
 		{
@@ -890,18 +905,18 @@ func TestChangeEmailAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "user email change aggregate ok",
+			name: "change email aggregate, verified email",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Email: &model.Email{EmailAddress: "EmailAddress"},
 				},
-				email:      &model.Email{EmailAddress: "Changed"},
+				email:      &model.Email{EmailAddress: "Changed", IsEmailVerified: true},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserEmailChanged},
+				eventLen:   2,
+				eventTypes: []models.EventType{model.UserEmailChanged, model.UserEmailVerified},
 			},
 		},
 		{
@@ -917,11 +932,38 @@ func TestChangeEmailAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{usr_model.UserEmailChanged, usr_model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.UserEmailChanged, model.UserEmailCodeAdded},
 			},
 		},
 		{
 			name: "email nil",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Email: &model.Email{EmailAddress: "Changed"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "email verified and code not nil",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Email: &model.Email{EmailAddress: "Changed", IsEmailVerified: true},
+				},
+				code:       &model.EmailCode{Expiry: time.Hour * 1},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "email not verified and code nil",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
@@ -981,7 +1023,7 @@ func TestVerifiyEmailAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserEmailVerified},
+				eventTypes: []models.EventType{model.UserEmailVerified},
 			},
 		},
 	}
@@ -1033,7 +1075,7 @@ func TestCreateEmailCodeAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.UserEmailCodeAdded},
 			},
 		},
 		{
@@ -1090,18 +1132,18 @@ func TestChangePhoneAggregate(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "user phone change aggregate ok",
+			name: "phone change aggregate verified phone",
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
 				},
-				phone:      &model.Phone{PhoneNumber: "Changed"},
+				phone:      &model.Phone{PhoneNumber: "Changed", IsPhoneVerified: true},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserPhoneChanged},
+				eventLen:   2,
+				eventTypes: []models.EventType{model.UserPhoneChanged, model.UserPhoneVerified},
 			},
 		},
 		{
@@ -1117,7 +1159,7 @@ func TestChangePhoneAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{usr_model.UserPhoneChanged, usr_model.UserPhoneCodeAdded},
+				eventTypes: []models.EventType{model.UserPhoneChanged, model.UserPhoneCodeAdded},
 			},
 		},
 		{
@@ -1127,6 +1169,35 @@ func TestChangePhoneAggregate(t *testing.T) {
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Phone: &model.Phone{PhoneNumber: "Changed"},
 				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "phone verified and code not nil",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Phone: &model.Phone{PhoneNumber: "Changed"},
+				},
+				phone:      &model.Phone{PhoneNumber: "Changed", IsPhoneVerified: true},
+				code:       &model.PhoneCode{Expiry: time.Hour * 1},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "phone not verified and code nil",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Phone: &model.Phone{PhoneNumber: "Changed"},
+				},
+				phone:      &model.Phone{PhoneNumber: "Changed"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1183,7 +1254,7 @@ func TestVerifiyPhoneAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserPhoneVerified},
+				eventTypes: []models.EventType{model.UserPhoneVerified},
 			},
 		},
 	}
@@ -1235,7 +1306,7 @@ func TestCreatePhoneCodeAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserPhoneCodeAdded},
+				eventTypes: []models.EventType{model.UserPhoneCodeAdded},
 			},
 		},
 		{
@@ -1303,7 +1374,7 @@ func TestChangeAddressAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.UserAddressChanged},
+				eventTypes: []models.EventType{model.UserAddressChanged},
 			},
 		},
 		{
@@ -1369,7 +1440,7 @@ func TestOtpAddAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.MfaOtpAdded},
+				eventTypes: []models.EventType{model.MfaOtpAdded},
 			},
 		},
 		{
@@ -1431,7 +1502,7 @@ func TestOtpVerifyAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.MfaOtpVerified},
+				eventTypes: []models.EventType{model.MfaOtpVerified},
 			},
 		},
 	}
@@ -1479,7 +1550,7 @@ func TestOtpRemoveAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{usr_model.MfaOtpRemoved},
+				eventTypes: []models.EventType{model.MfaOtpRemoved},
 			},
 		},
 	}

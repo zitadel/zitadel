@@ -386,7 +386,7 @@ func TestReactivateUserGrant(t *testing.T) {
 		{
 			name: "reactivate, ok",
 			args: args{
-				es:    GetMockManipulateUserGrant(ctrl),
+				es:    GetMockManipulateUserGrantInactive(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},

@@ -37,20 +37,20 @@ func (g *UserGrant) Changes(changed *UserGrant) map[string]interface{} {
 func UserGrantFromModel(grant *model.UserGrant) *UserGrant {
 	return &UserGrant{
 		ObjectRoot: grant.ObjectRoot,
-		UserID:    grant.UserID,
-		ProjectID: grant.ProjectID,
-		State:     int32(grant.State),
-		RoleKeys:  grant.RoleKeys,
+		UserID:     grant.UserID,
+		ProjectID:  grant.ProjectID,
+		State:      int32(grant.State),
+		RoleKeys:   grant.RoleKeys,
 	}
 }
 
 func UserGrantToModel(grant *UserGrant) *model.UserGrant {
 	return &model.UserGrant{
 		ObjectRoot: grant.ObjectRoot,
-		UserID:    grant.UserID,
-		ProjectID: grant.ProjectID,
-		State:     model.UserGrantState(grant.State),
-		RoleKeys:  grant.RoleKeys,
+		UserID:     grant.UserID,
+		ProjectID:  grant.ProjectID,
+		State:      model.UserGrantState(grant.State),
+		RoleKeys:   grant.RoleKeys,
 	}
 }
 
@@ -66,14 +66,14 @@ func (g *UserGrant) AppendEvents(events ...*es_models.Event) error {
 func (g *UserGrant) AppendEvent(event *es_models.Event) error {
 	g.ObjectRoot.AppendEvent(event)
 	switch event.Type {
-	case model.UserGrantAdded,
-		model.UserGrantChanged:
+	case UserGrantAdded,
+		UserGrantChanged:
 		return g.setData(event)
-	case model.UserGrantDeactivated:
+	case UserGrantDeactivated:
 		return g.appendGrantStateEvent(model.USERGRANTSTATE_INACTIVE)
-	case model.UserGrantReactivated:
+	case UserGrantReactivated:
 		return g.appendGrantStateEvent(model.USERGRANTSTATE_ACTIVE)
-	case model.UserGrantRemoved:
+	case UserGrantRemoved:
 		return g.appendGrantStateEvent(model.USERGRANTSTATE_REMOVED)
 	}
 	return nil

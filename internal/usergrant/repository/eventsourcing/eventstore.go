@@ -143,7 +143,7 @@ func (es *UserGrantEventStore) ReactivateUserGrant(ctx context.Context, grantID 
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsInactive() {
+	if !existing.IsInactive() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "reactivate only possible for inactive grant")
 	}
 	repoExisting := model.UserGrantFromModel(existing)

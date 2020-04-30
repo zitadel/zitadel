@@ -39,7 +39,7 @@ func (a *Address) Changes(changed *Address) map[string]interface{} {
 
 func AddressFromModel(address *model.Address) *Address {
 	return &Address{
-		ObjectRoot: address.ObjectRoot
+		ObjectRoot:    address.ObjectRoot,
 		Country:       address.Country,
 		Locality:      address.Locality,
 		PostalCode:    address.PostalCode,
@@ -50,7 +50,7 @@ func AddressFromModel(address *model.Address) *Address {
 
 func AddressToModel(address *Address) *model.Address {
 	return &model.Address{
-		ObjectRoot:  address.ObjectRoot,
+		ObjectRoot:    address.ObjectRoot,
 		Country:       address.Country,
 		Locality:      address.Locality,
 		PostalCode:    address.PostalCode,

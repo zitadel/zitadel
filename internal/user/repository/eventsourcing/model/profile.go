@@ -43,38 +43,28 @@ func (p *Profile) Changes(changed *Profile) map[string]interface{} {
 	return changes
 }
 
-func ProfileFromModel(project *model.Profile) *Profile {
+func ProfileFromModel(profile *model.Profile) *Profile {
 	return &Profile{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  project.ObjectRoot.AggregateID,
-			Sequence:     project.Sequence,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-		},
-		UserName:          project.UserName,
-		FirstName:         project.FirstName,
-		LastName:          project.LastName,
-		NickName:          project.NickName,
-		DisplayName:       project.DisplayName,
-		PreferredLanguage: project.PreferredLanguage,
-		Gender:            int32(project.Gender),
+		ObjectRoot:        profile.ObjectRoot,
+		UserName:          profile.UserName,
+		FirstName:         profile.FirstName,
+		LastName:          profile.LastName,
+		NickName:          profile.NickName,
+		DisplayName:       profile.DisplayName,
+		PreferredLanguage: profile.PreferredLanguage,
+		Gender:            int32(profile.Gender),
 	}
 }
 
-func ProfileToModel(project *Profile) *model.Profile {
+func ProfileToModel(profile *Profile) *model.Profile {
 	return &model.Profile{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  project.ObjectRoot.AggregateID,
-			Sequence:     project.Sequence,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-		},
-		UserName:          project.UserName,
-		FirstName:         project.FirstName,
-		LastName:          project.LastName,
-		NickName:          project.NickName,
-		DisplayName:       project.DisplayName,
-		PreferredLanguage: project.PreferredLanguage,
-		Gender:            model.Gender(project.Gender),
+		ObjectRoot:        profile.ObjectRoot,
+		UserName:          profile.UserName,
+		FirstName:         profile.FirstName,
+		LastName:          profile.LastName,
+		NickName:          profile.NickName,
+		DisplayName:       profile.DisplayName,
+		PreferredLanguage: profile.PreferredLanguage,
+		Gender:            model.Gender(profile.Gender),
 	}
 }
