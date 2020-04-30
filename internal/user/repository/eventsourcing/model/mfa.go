@@ -17,12 +17,7 @@ type OTP struct {
 
 func OTPFromModel(otp *model.OTP) *OTP {
 	return &OTP{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  otp.ObjectRoot.AggregateID,
-			Sequence:     otp.Sequence,
-			ChangeDate:   otp.ChangeDate,
-			CreationDate: otp.CreationDate,
-		},
+		ObjectRoot: otp.ObjectRoot,
 		Secret: otp.Secret,
 		State:  int32(otp.State),
 	}
