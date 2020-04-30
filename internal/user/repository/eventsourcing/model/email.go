@@ -51,12 +51,7 @@ func EmailToModel(email *Email) *model.Email {
 
 func EmailCodeToModel(code *EmailCode) *model.EmailCode {
 	return &model.EmailCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
+		ObjectRoot: code.ObjectRoot,
 		Expiry: code.Expiry,
 		Code:   code.Code,
 	}
