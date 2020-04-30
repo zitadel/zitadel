@@ -5,7 +5,7 @@ import "github.com/caos/zitadel/internal/crypto"
 type SystemDefaults struct {
 	SecretGenerators    SecretGenerators
 	UserVerificationKey *crypto.KeyConfig
-	Multifactors        Multifactors
+	Multifactors        MultifactorConfig
 }
 
 type SecretGenerators struct {
@@ -17,12 +17,11 @@ type SecretGenerators struct {
 	PasswordVerificationCode crypto.GeneratorConfig
 }
 
-type Multifactors struct {
-	OTP OTP
+type MultifactorConfig struct {
+	OTP OTPConfig
 }
 
-type OTP struct {
+type OTPConfig struct {
 	Issuer          string
 	VerificationKey *crypto.KeyConfig
-	CryptoMFA       crypto.EncryptionAlgorithm
 }

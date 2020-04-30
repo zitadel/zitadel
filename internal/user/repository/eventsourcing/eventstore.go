@@ -8,6 +8,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/pquerna/otp/totp"
@@ -24,7 +25,7 @@ type UserEventstore struct {
 	EmailVerificationCode    crypto.Generator
 	PhoneVerificationCode    crypto.Generator
 	PasswordVerificationCode crypto.Generator
-	Multifactors             sd.Multifactors
+	Multifactors             global_model.Multifactors
 }
 
 type UserConfig struct {
@@ -51,7 +52,12 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	if err != nil {
 		return nil, err
 	}
-	systemDefaults.Multifactors.OTP.CryptoMFA = aesOtpCrypto
+	mfa := global_model.Multifactors{
+		OTP: global_model.OTP{
+			CryptoMFA: aesOtpCrypto,
+			Issuer:    systemDefaults.Multifactors.OTP.Issuer,
+		},
+	}
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
@@ -60,7 +66,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
 		PasswordVerificationCode: passwordVerificationCode,
-		Multifactors:             systemDefaults.Multifactors,
+		Multifactors:             mfa,
 	}, nil
 }
 
