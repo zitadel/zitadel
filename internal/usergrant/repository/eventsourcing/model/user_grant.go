@@ -46,12 +46,7 @@ func UserGrantFromModel(grant *model.UserGrant) *UserGrant {
 
 func UserGrantToModel(grant *UserGrant) *model.UserGrant {
 	return &model.UserGrant{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  grant.AggregateID,
-			ChangeDate:   grant.ChangeDate,
-			CreationDate: grant.CreationDate,
-			Sequence:     grant.Sequence,
-		},
+		ObjectRoot: grant.ObjectRoot,
 		UserID:    grant.UserID,
 		ProjectID: grant.ProjectID,
 		State:     model.UserGrantState(grant.State),
