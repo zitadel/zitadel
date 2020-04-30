@@ -49,12 +49,7 @@ func PhoneToModel(phone *Phone) *model.Phone {
 
 func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
 	return &model.PhoneCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
+		ObjectRoot: code.ObjectRoot,
 		Expiry: code.Expiry,
 		Code:   code.Code,
 	}
