@@ -36,12 +36,7 @@ func (g *UserGrant) Changes(changed *UserGrant) map[string]interface{} {
 
 func UserGrantFromModel(grant *model.UserGrant) *UserGrant {
 	return &UserGrant{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  grant.ObjectRoot.AggregateID,
-			Sequence:     grant.Sequence,
-			ChangeDate:   grant.ChangeDate,
-			CreationDate: grant.CreationDate,
-		},
+		ObjectRoot: grant.ObjectRoot,
 		UserID:    grant.UserID,
 		ProjectID: grant.ProjectID,
 		State:     int32(grant.State),
