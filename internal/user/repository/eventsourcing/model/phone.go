@@ -41,12 +41,7 @@ func PhoneFromModel(phone *model.Phone) *Phone {
 
 func PhoneToModel(phone *Phone) *model.Phone {
 	return &model.Phone{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  phone.ObjectRoot.AggregateID,
-			Sequence:     phone.Sequence,
-			ChangeDate:   phone.ChangeDate,
-			CreationDate: phone.CreationDate,
-		},
+		ObjectRoot: phone.ObjectRoot,
 		PhoneNumber:     phone.PhoneNumber,
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
