@@ -43,12 +43,7 @@ func EmailFromModel(email *model.Email) *Email {
 
 func EmailToModel(email *Email) *model.Email {
 	return &model.Email{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  email.ObjectRoot.AggregateID,
-			Sequence:     email.Sequence,
-			ChangeDate:   email.ChangeDate,
-			CreationDate: email.CreationDate,
-		},
+		ObjectRoot: email.ObjectRoot,
 		EmailAddress:    email.EmailAddress,
 		IsEmailVerified: email.IsEmailVerified,
 	}
