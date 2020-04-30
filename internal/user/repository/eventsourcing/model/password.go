@@ -34,12 +34,7 @@ func PasswordFromModel(password *model.Password) *Password {
 
 func PasswordToModel(password *Password) *model.Password {
 	return &model.Password{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  password.ObjectRoot.AggregateID,
-			Sequence:     password.Sequence,
-			ChangeDate:   password.ChangeDate,
-			CreationDate: password.CreationDate,
-		},
+		ObjectRoot: password.ObjectRoot,
 		SecretCrypto:   password.Secret,
 		ChangeRequired: password.ChangeRequired,
 	}
