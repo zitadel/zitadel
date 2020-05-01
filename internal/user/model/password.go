@@ -14,7 +14,7 @@ type Password struct {
 	ChangeRequired bool
 }
 
-type RequestPasswordSet struct {
+type PasswordCode struct {
 	es_models.ObjectRoot
 
 	Code             *crypto.CryptoValue

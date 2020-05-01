@@ -17,7 +17,7 @@ type Password struct {
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
-type RequestPasswordSet struct {
+type PasswordCode struct {
 	es_models.ObjectRoot
 
 	Code             *crypto.CryptoValue `json:"code,omitempty"`
@@ -41,8 +41,8 @@ func PasswordToModel(password *Password) *model.Password {
 	}
 }
 
-func PasswordCodeToModel(code *RequestPasswordSet) *model.RequestPasswordSet {
-	return &model.RequestPasswordSet{
+func PasswordCodeToModel(code *PasswordCode) *model.PasswordCode {
+	return &model.PasswordCode{
 		ObjectRoot:       code.ObjectRoot,
 		Expiry:           code.Expiry,
 		Code:             code.Code,
@@ -62,7 +62,7 @@ func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
 }
 
 func (u *User) appendPasswordSetRequestedEvent(event *es_models.Event) error {
-	u.PasswordCode = new(RequestPasswordSet)
+	u.PasswordCode = new(PasswordCode)
 	return u.PasswordCode.setData(event)
 }
 
@@ -75,7 +75,7 @@ func (pw *Password) setData(event *es_models.Event) error {
 	return nil
 }
 
-func (a *RequestPasswordSet) setData(event *es_models.Event) error {
+func (a *PasswordCode) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")

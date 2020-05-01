@@ -764,7 +764,7 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.User
-		request    *model.RequestPasswordSet
+		request    *model.PasswordCode
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -784,7 +784,7 @@ func TestRequestSetPasswordAggregate(t *testing.T) {
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
 				},
-				request:    &model.RequestPasswordSet{Expiry: time.Hour * 1},
+				request:    &model.PasswordCode{Expiry: time.Hour * 1},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{

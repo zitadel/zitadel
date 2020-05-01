@@ -25,7 +25,7 @@ type User struct {
 	InitCode     *InitUserCode
 	EmailCode    *EmailCode
 	PhoneCode    *PhoneCode
-	PasswordCode *RequestPasswordSet
+	PasswordCode *PasswordCode
 	OTP          *OTP
 }
 

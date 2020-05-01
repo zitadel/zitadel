@@ -365,15 +365,14 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 		return err
 	}
 
-	request := &model.RequestPasswordSet{NotificationType: int32(notifyType), Expiry: es.PasswordVerificationCode.Expiry()}
-	pwCode, _, err := crypto.NewCode(es.PasswordVerificationCode)
+	passwordCode := new(model.PasswordCode)
+	err = es.generatePasswordCode(passwordCode, notifyType)
 	if err != nil {
 		return err
 	}
-	request.Code = pwCode
 
 	repoUser := model.UserFromModel(user)
-	agg := RequestSetPassword(es.AggregateCreator(), repoUser, request)
+	agg := RequestSetPassword(es.AggregateCreator(), repoUser, passwordCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err

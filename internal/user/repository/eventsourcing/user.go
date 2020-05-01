@@ -166,7 +166,7 @@ func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, existing *m
 	}
 }
 
-func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.User, request *model.RequestPasswordSet) func(ctx context.Context) (*es_models.Aggregate, error) {
+func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.User, request *model.PasswordCode) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if request == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8ei2", "password set request should not be nil")
