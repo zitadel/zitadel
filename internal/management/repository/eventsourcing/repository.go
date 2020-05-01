@@ -49,7 +49,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 
 	return &EsRepository{
 		spool,
-		eventstore.ProjectRepo{project},
+		eventstore.ProjectRepo{project, view},
 	}, nil
 }
 

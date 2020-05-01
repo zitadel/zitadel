@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/project/repository/view/model"
 
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -9,7 +11,7 @@ import (
 
 type ProjectRepo struct {
 	ProjectEvents *proj_event.ProjectEventstore
-	//view      *view.View
+	View          *view.View
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
@@ -31,6 +33,19 @@ func (repo *ProjectRepo) DeactivateProject(ctx context.Context, id string) (*pro
 
 func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*proj_model.Project, error) {
 	return repo.ProjectEvents.ReactivateProject(ctx, id)
+}
+
+func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
+	projects, count, err := repo.View.SearchGrantedProjects(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.GrantedProjectSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.GrantedProjectsToModel(projects),
+	}, nil
 }
 
 func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {

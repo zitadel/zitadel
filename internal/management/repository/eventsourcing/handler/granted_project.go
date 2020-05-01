@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"time"
 )
 
@@ -22,13 +26,65 @@ func (p *GrantedProject) ViewModel() string {
 }
 
 func (p *GrantedProject) EventQuery() (*models.SearchQuery, error) {
-	return nil, nil
+	sequence, err := p.view.GetLatestGrantedProjectSequence()
+	if err != nil {
+		return nil, err
+	}
+	return eventsourcing.ProjectQuery(sequence), nil
 }
 
 func (p *GrantedProject) Process(event *models.Event) (err error) {
-	return nil
+	grantedProject := new(view_model.GrantedProject)
+	switch event.Type {
+	case es_model.ProjectAdded:
+		grantedProject.AppendEvent(event)
+	case es_model.ProjectChanged, es_model.ProjectDeactivated, es_model.ProjectReactivated:
+		grantedProject, err = p.view.GrantedProjectByIDs(event.AggregateID, event.ResourceOwner)
+		if err != nil {
+			return err
+		}
+		err = grantedProject.AppendEvent(event)
+	case es_model.ProjectGrantAdded:
+		err = grantedProject.AppendEvent(event)
+		//TODO: read org
+	case es_model.ProjectGrantChanged:
+		grant := new(view_model.ProjectGrant)
+		err := grant.SetData(event)
+		if err != nil {
+			return err
+		}
+		grantedProject, err = p.view.GrantedProjectByIDs(event.AggregateID, grant.GrantedOrgID)
+		if err != nil {
+			return err
+		}
+		err = grantedProject.AppendEvent(event)
+	case es_model.ProjectGrantRemoved:
+		grant := new(view_model.ProjectGrant)
+		err := grant.SetData(event)
+		if err != nil {
+			return err
+		}
+		return p.view.DeleteGrantedProject(event.AggregateID, grant.GrantedOrgID, event.Sequence)
+	default:
+		return p.view.ProcessedGrantedProjectSequence(event.Sequence)
+	}
+	if err != nil {
+		return err
+	}
+	return p.view.PutGrantedProject(grantedProject)
+}
+
+func (p *GrantedProject) getOrg(orgID string) {
+	//TODO: Get Org
 }
 
 func (p *GrantedProject) OnError(event *models.Event, err error) error {
-	return nil
+	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
+	failedEvent, err := p.view.GetLatestGrantedProjectFailedEvent(event.Sequence)
+	if err != nil {
+		return err
+	}
+	failedEvent.FailureCount++
+	failedEvent.ErrMsg = err.Error()
+	return p.view.ProcessedGrantedProjectFailedEvent(failedEvent)
 }

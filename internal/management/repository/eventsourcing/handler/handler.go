@@ -21,7 +21,7 @@ type handler struct {
 
 func Register(configs Configs, bulkLimit uint64, view *view.View, eventstore eventstore.Eventstore) []spooler.Handler {
 	return []spooler.Handler{
-		//&Org{handler{view, bulkLimit, configs.cycleDuration("Org")}, eventstore},
+		&GrantedProject{handler{view, bulkLimit, configs.cycleDuration("GrantedProject")}, eventstore},
 	}
 }
 

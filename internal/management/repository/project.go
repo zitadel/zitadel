@@ -11,6 +11,7 @@ type ProjectRepository interface {
 	UpdateProject(ctx context.Context, project *model.Project) (*model.Project, error)
 	DeactivateProject(ctx context.Context, id string) (*model.Project, error)
 	ReactivateProject(ctx context.Context, id string) (*model.Project, error)
+	SearchProjects(ctx context.Context, request *model.GrantedProjectSearchRequest) (*model.GrantedProjectSearchResponse, error)
 
 	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMember, error)
 	AddProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)
@@ -30,12 +31,12 @@ type ProjectRepository interface {
 	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 
-	ProjectGrantByID(ctx context.Context, projectID, appID string) (*model.ProjectGrant, error)
+	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
 	ChangeProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
-	DeactivateProjectGrant(ctx context.Context, projectID, appID string) (*model.ProjectGrant, error)
-	ReactivateProjectGrant(ctx context.Context, projectID, appID string) (*model.ProjectGrant, error)
-	RemoveProjectGrant(ctx context.Context, projectID, appID string) error
+	DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
+	ReactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
+	RemoveProjectGrant(ctx context.Context, projectID, grantID string) error
 
 	ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (*model.ProjectGrantMember, error)
 	AddProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
