@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	"time"
@@ -26,7 +27,7 @@ type RequestPasswordSet struct {
 
 func PasswordFromModel(password *model.Password) *Password {
 	return &Password{
-		ObjectRoot: password.ObjectRoot,
+		ObjectRoot:     password.ObjectRoot,
 		Secret:         password.SecretCrypto,
 		ChangeRequired: password.ChangeRequired,
 	}
@@ -34,7 +35,7 @@ func PasswordFromModel(password *model.Password) *Password {
 
 func PasswordToModel(password *Password) *model.Password {
 	return &model.Password{
-		ObjectRoot: password.ObjectRoot,
+		ObjectRoot:     password.ObjectRoot,
 		SecretCrypto:   password.Secret,
 		ChangeRequired: password.ChangeRequired,
 	}
@@ -42,7 +43,7 @@ func PasswordToModel(password *Password) *model.Password {
 
 func PasswordCodeToModel(code *RequestPasswordSet) *model.RequestPasswordSet {
 	return &model.RequestPasswordSet{
-		ObjectRoot: code.ObjectRoot,
+		ObjectRoot:       code.ObjectRoot,
 		Expiry:           code.Expiry,
 		Code:             code.Code,
 		NotificationType: model.NotificationType(code.NotificationType),
@@ -62,15 +63,14 @@ func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
 
 func (u *User) appendPasswordSetRequestedEvent(event *es_models.Event) error {
 	u.PasswordCode = new(RequestPasswordSet)
-	u.PasswordCode.setData(event)
-	return nil
+	return u.PasswordCode.setData(event)
 }
 
 func (pw *Password) setData(event *es_models.Event) error {
 	pw.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, pw); err != nil {
 		logging.Log("EVEN-dks93").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-sl9xlo2rsw", "could not unmarshal event")
 	}
 	return nil
 }
@@ -79,7 +79,7 @@ func (a *RequestPasswordSet) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-q21dr", "could not unmarshal event")
 	}
 	return nil
 }

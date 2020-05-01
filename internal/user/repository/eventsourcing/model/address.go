@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 )
@@ -63,15 +64,14 @@ func (u *User) appendUserAddressChangedEvent(event *es_models.Event) error {
 	if u.Address == nil {
 		u.Address = new(Address)
 	}
-	u.Address.setData(event)
-	return nil
+	return u.Address.setData(event)
 }
 
 func (a *Address) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-clos0").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-so92s", "could not unmarshal event")
 	}
 	return nil
 }

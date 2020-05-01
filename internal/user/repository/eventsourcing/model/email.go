@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	"time"
@@ -35,7 +36,7 @@ func (e *Email) Changes(changed *Email) map[string]interface{} {
 
 func EmailFromModel(email *model.Email) *Email {
 	return &Email{
-		ObjectRoot: email.ObjectRoot,
+		ObjectRoot:      email.ObjectRoot,
 		EmailAddress:    email.EmailAddress,
 		IsEmailVerified: email.IsEmailVerified,
 	}
@@ -43,7 +44,7 @@ func EmailFromModel(email *model.Email) *Email {
 
 func EmailToModel(email *Email) *model.Email {
 	return &model.Email{
-		ObjectRoot: email.ObjectRoot,
+		ObjectRoot:      email.ObjectRoot,
 		EmailAddress:    email.EmailAddress,
 		IsEmailVerified: email.IsEmailVerified,
 	}
@@ -52,34 +53,31 @@ func EmailToModel(email *Email) *model.Email {
 func EmailCodeToModel(code *EmailCode) *model.EmailCode {
 	return &model.EmailCode{
 		ObjectRoot: code.ObjectRoot,
-		Expiry: code.Expiry,
-		Code:   code.Code,
+		Expiry:     code.Expiry,
+		Code:       code.Code,
 	}
 }
 
 func (u *User) appendUserEmailChangedEvent(event *es_models.Event) error {
 	u.Email = new(Email)
-	u.Email.setData(event)
 	u.IsEmailVerified = false
-	return nil
+	return u.Email.setData(event)
 }
 
 func (u *User) appendUserEmailCodeAddedEvent(event *es_models.Event) error {
 	u.EmailCode = new(EmailCode)
-	u.EmailCode.setData(event)
-	return nil
+	return u.EmailCode.setData(event)
 }
 
-func (u *User) appendUserEmailVerifiedEvent() error {
+func (u *User) appendUserEmailVerifiedEvent() {
 	u.IsEmailVerified = true
-	return nil
 }
 
 func (a *Email) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-dlo9s").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-sl9xw", "could not unmarshal event")
 	}
 	return nil
 }
@@ -88,7 +86,7 @@ func (a *EmailCode) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo9s").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-s8uws", "could not unmarshal event")
 	}
 	return nil
 }

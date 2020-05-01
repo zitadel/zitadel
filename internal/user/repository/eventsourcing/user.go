@@ -100,12 +100,7 @@ func UserRegisterAggregate(aggCreator *es_models.AggregateCreator, user *model.U
 		if err != nil {
 			return nil, err
 		}
-
-		agg, err = agg.AppendEvent(model.UserEmailCodeAdded, emailCode)
-		if err != nil {
-			return nil, err
-		}
-		return agg, err
+		return agg.AppendEvent(model.UserEmailCodeAdded, emailCode)
 	}
 }
 
@@ -144,11 +139,7 @@ func UserInitCodeAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.InitializedUserCodeAdded, code)
-		if err != nil {
-			return nil, err
-		}
-		return agg, err
+		return agg.AppendEvent(model.InitializedUserCodeAdded, code)
 	}
 }
 
@@ -158,11 +149,7 @@ func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.Us
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.MfaInitSkipped, nil)
-		if err != nil {
-			return nil, err
-		}
-		return agg, err
+		return agg.AppendEvent(model.MfaInitSkipped, nil)
 	}
 }
 
@@ -175,11 +162,7 @@ func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, existing *m
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.UserPasswordChanged, password)
-		if err != nil {
-			return nil, err
-		}
-		return agg, err
+		return agg.AppendEvent(model.UserPasswordChanged, password)
 	}
 }
 
@@ -192,11 +175,7 @@ func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.UserPasswordCodeAdded, request)
-		if err != nil {
-			return nil, err
-		}
-		return agg, err
+		return agg.AppendEvent(model.UserPasswordCodeAdded, request)
 	}
 }
 
@@ -259,7 +238,6 @@ func EmailVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, exis
 		if err != nil {
 			return nil, err
 		}
-
 		return agg.AppendEvent(model.UserEmailCodeAdded, code)
 	}
 }
@@ -312,7 +290,6 @@ func PhoneVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, exis
 		if err != nil {
 			return nil, err
 		}
-
 		return agg.AppendEvent(model.UserPhoneCodeAdded, code)
 	}
 }
@@ -330,11 +307,7 @@ func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 			existing.Address = new(model.Address)
 		}
 		changes := existing.Address.Changes(address)
-		agg, err = agg.AppendEvent(model.UserAddressChanged, changes)
-		if err != nil {
-			return nil, err
-		}
-		return agg, nil
+		return agg.AppendEvent(model.UserAddressChanged, changes)
 	}
 }
 
@@ -347,11 +320,7 @@ func MfaOTPAddAggregate(aggCreator *es_models.AggregateCreator, existing *model.
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.MfaOtpAdded, otp)
-		if err != nil {
-			return nil, err
-		}
-		return agg, nil
+		return agg.AppendEvent(model.MfaOtpAdded, otp)
 	}
 }
 
@@ -361,11 +330,7 @@ func MfaOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.MfaOtpVerified, nil)
-		if err != nil {
-			return nil, err
-		}
-		return agg, nil
+		return agg.AppendEvent(model.MfaOtpVerified, nil)
 	}
 }
 
@@ -375,10 +340,6 @@ func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 		if err != nil {
 			return nil, err
 		}
-		agg, err = agg.AppendEvent(model.MfaOtpRemoved, nil)
-		if err != nil {
-			return nil, err
-		}
-		return agg, nil
+		return agg.AppendEvent(model.MfaOtpRemoved, nil)
 	}
 }

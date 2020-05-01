@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/usergrant/model"
 	"reflect"
@@ -70,11 +71,11 @@ func (g *UserGrant) AppendEvent(event *es_models.Event) error {
 		UserGrantChanged:
 		return g.setData(event)
 	case UserGrantDeactivated:
-		return g.appendGrantStateEvent(model.USERGRANTSTATE_INACTIVE)
+		g.appendGrantStateEvent(model.USERGRANTSTATE_INACTIVE)
 	case UserGrantReactivated:
-		return g.appendGrantStateEvent(model.USERGRANTSTATE_ACTIVE)
+		g.appendGrantStateEvent(model.USERGRANTSTATE_ACTIVE)
 	case UserGrantRemoved:
-		return g.appendGrantStateEvent(model.USERGRANTSTATE_REMOVED)
+		g.appendGrantStateEvent(model.USERGRANTSTATE_REMOVED)
 	}
 	return nil
 }
@@ -87,15 +88,14 @@ func (g *UserGrant) appendChangeGrantEvent(event *es_models.Event) error {
 	return g.setData(event)
 }
 
-func (g *UserGrant) appendGrantStateEvent(state model.UserGrantState) error {
+func (g *UserGrant) appendGrantStateEvent(state model.UserGrantState) {
 	g.State = int32(state)
-	return nil
 }
 
 func (g *UserGrant) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, g); err != nil {
 		logging.Log("EVEN-lso9x").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-o0se3", "could not unmarshal event")
 	}
 	return nil
 }

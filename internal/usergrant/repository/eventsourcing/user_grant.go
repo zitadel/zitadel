@@ -34,8 +34,7 @@ func UserGrantAddedAggregate(aggCreator *es_models.AggregateCreator, grant *mode
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.UserGrantAdded, grant)
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantAdded, grant)
 	}
 }
 
@@ -49,9 +48,7 @@ func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing 
 			return nil, err
 		}
 		changes := existing.Changes(grant)
-		agg.AppendEvent(model.UserGrantChanged, changes)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantChanged, changes)
 	}
 }
 
@@ -64,9 +61,7 @@ func UserGrantDeactivatedAggregate(aggCreator *es_models.AggregateCreator, exist
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.UserGrantDeactivated, nil)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantDeactivated, nil)
 	}
 }
 
@@ -79,9 +74,7 @@ func UserGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, exist
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.UserGrantReactivated, nil)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantReactivated, nil)
 	}
 }
 
@@ -94,8 +87,6 @@ func UserGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existing 
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.UserGrantRemoved, nil)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantRemoved, nil)
 	}
 }

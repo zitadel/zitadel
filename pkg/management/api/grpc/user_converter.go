@@ -96,7 +96,7 @@ func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
 	logging.Log("GRPC-ski8d").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &UserProfile{
+	return &UserProfile{
 		Id:                profile.AggregateID,
 		CreationDate:      creationDate,
 		ChangeDate:        changeDate,
@@ -109,7 +109,6 @@ func profileFromModel(profile *usr_model.Profile) *UserProfile {
 		PreferredLanguage: profile.PreferredLanguage.String(),
 		Gender:            genderFromModel(profile.Gender),
 	}
-	return converted
 }
 
 func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
@@ -134,7 +133,7 @@ func emailFromModel(email *usr_model.Email) *UserEmail {
 	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
 	logging.Log("GRPC-s0dkw").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &UserEmail{
+	return &UserEmail{
 		Id:              email.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -142,7 +141,6 @@ func emailFromModel(email *usr_model.Email) *UserEmail {
 		Email:           email.EmailAddress,
 		IsEmailVerified: email.IsEmailVerified,
 	}
-	return converted
 }
 
 func updateEmailToModel(e *UpdateUserEmailRequest) *usr_model.Email {
@@ -160,7 +158,7 @@ func phoneFromModel(phone *usr_model.Phone) *UserPhone {
 	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
 	logging.Log("GRPC-09ewq").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &UserPhone{
+	return &UserPhone{
 		Id:              phone.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -168,7 +166,6 @@ func phoneFromModel(phone *usr_model.Phone) *UserPhone {
 		Phone:           phone.PhoneNumber,
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
-	return converted
 }
 
 func updatePhoneToModel(e *UpdateUserPhoneRequest) *usr_model.Phone {
@@ -186,7 +183,7 @@ func addressFromModel(address *usr_model.Address) *UserAddress {
 	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
 	logging.Log("GRPC-si9ws").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &UserAddress{
+	return &UserAddress{
 		Id:            address.AggregateID,
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
@@ -197,7 +194,6 @@ func addressFromModel(address *usr_model.Address) *UserAddress {
 		PostalCode:    address.PostalCode,
 		Locality:      address.Locality,
 	}
-	return converted
 }
 
 func updateAddressToModel(address *UpdateUserAddressRequest) *usr_model.Address {

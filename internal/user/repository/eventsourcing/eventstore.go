@@ -78,7 +78,7 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 		return nil, err
 	}
 	err = es_sdk.Filter(ctx, es.FilterEvents, user.AppendEvents, query)
-	if err != nil && !(caos_errs.IsNotFound(err) && user.Sequence != 0) {
+	if err != nil && caos_errs.IsNotFound(err) && user.Sequence == 0 {
 		return nil, err
 	}
 	es.userCache.cacheUser(user)
@@ -107,27 +107,23 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 		user.Password.ChangeRequired = true
 	}
 
-	repoUser := model.UserFromModel(user)
 	initCode := new(model.InitUserCode)
 	if user.Email == nil || !user.IsEmailVerified || user.Password == nil || user.SecretString == "" {
-		initCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+		err := es.generateInitUserCode(initCode)
 		if err != nil {
 			return nil, err
 		}
-		initCode.Code = initCodeCrypto
-		initCode.Expiry = es.InitializeUserCode.Expiry()
 	}
 
 	phoneCode := new(model.PhoneCode)
 	if user.Phone != nil && !user.IsPhoneVerified {
-		phoneCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+		err := es.generatePhoneCode(phoneCode)
 		if err != nil {
 			return nil, err
 		}
-		phoneCode.Code = phoneCodeCrypto
-		phoneCode.Expiry = es.PhoneVerificationCode.Expiry()
 	}
 
+	repoUser := model.UserFromModel(user)
 	createAggregate := UserCreateAggregate(es.AggregateCreator(), repoUser, initCode, phoneCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, createAggregate)
 	if err != nil {
@@ -158,18 +154,15 @@ func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User
 	}
 	user.Password = &usr_model.Password{SecretCrypto: secret, ChangeRequired: false}
 
-	repoUser := model.UserFromModel(user)
-
 	emailCode := new(model.EmailCode)
 	if user.Email != nil && !user.IsEmailVerified {
-		emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
+		err := es.generateEmailCode(emailCode)
 		if err != nil {
 			return nil, err
 		}
-		emailCode.Code = emailCodeCrypto
-		emailCode.Expiry = es.EmailVerificationCode.Expiry()
 	}
 
+	repoUser := model.UserFromModel(user)
 	createAggregate := UserRegisterAggregate(es.AggregateCreator(), repoUser, resourceOwner, emailCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, createAggregate)
 	if err != nil {
@@ -281,12 +274,10 @@ func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, user
 	}
 
 	initCode := new(model.InitUserCode)
-	initCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+	err = es.generateInitUserCode(initCode)
 	if err != nil {
 		return nil, err
 	}
-	initCode.Code = initCodeCrypto
-	initCode.Expiry = es.InitializeUserCode.Expiry()
 
 	repoUser := model.UserFromModel(user)
 	agg := UserInitCodeAggregate(es.AggregateCreator(), repoUser, initCode)
@@ -450,20 +441,18 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	if err != nil {
 		return nil, err
 	}
-	repoExisting := model.UserFromModel(existing)
-	repoNew := model.EmailFromModel(email)
 
 	var emailCode *model.EmailCode
 	if !email.IsEmailVerified {
 		emailCode = new(model.EmailCode)
-		emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
+		err := es.generateEmailCode(emailCode)
 		if err != nil {
 			return nil, err
 		}
-		emailCode.Code = emailCodeCrypto
-		emailCode.Expiry = es.EmailVerificationCode.Expiry()
 	}
 
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.EmailFromModel(email)
 	updateAggregate := EmailChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, emailCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -508,22 +497,20 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 	if err != nil {
 		return err
 	}
-	repoExisting := model.UserFromModel(existing)
-	if repoExisting.Email == nil {
+	if existing.Email == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "no email existing")
 	}
-	if repoExisting.IsEmailVerified {
+	if existing.IsEmailVerified {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "email already verified")
 	}
 
 	emailCode := new(model.EmailCode)
-	emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
+	err = es.generateEmailCode(emailCode)
 	if err != nil {
 		return err
 	}
-	emailCode.Code = emailCodeCrypto
-	emailCode.Expiry = es.EmailVerificationCode.Expiry()
 
+	repoExisting := model.UserFromModel(existing)
 	updateAggregate := EmailVerificationCodeAggregate(es.AggregateCreator(), repoExisting, emailCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -557,20 +544,18 @@ func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phon
 	if err != nil {
 		return nil, err
 	}
-	repoExisting := model.UserFromModel(existing)
-	repoNew := model.PhoneFromModel(phone)
 
 	var phoneCode *model.PhoneCode
 	if !phone.IsPhoneVerified {
 		phoneCode = new(model.PhoneCode)
-		phoneCodeCrypto, _, err := crypto.NewCode(es.PhoneVerificationCode)
+		err := es.generatePhoneCode(phoneCode)
 		if err != nil {
 			return nil, err
 		}
-		phoneCode.Code = phoneCodeCrypto
-		phoneCode.Expiry = es.PhoneVerificationCode.Expiry()
 	}
 
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.PhoneFromModel(phone)
 	updateAggregate := PhoneChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, phoneCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -615,22 +600,20 @@ func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userI
 	if err != nil {
 		return err
 	}
-	repoExisting := model.UserFromModel(existing)
-	if repoExisting.Phone == nil {
+	if existing.Phone == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "no phone existing")
 	}
-	if repoExisting.IsPhoneVerified {
+	if existing.IsPhoneVerified {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "phone already verified")
 	}
 
 	phoneCode := new(model.PhoneCode)
-	phoneCodeCrypto, _, err := crypto.NewCode(es.PhoneVerificationCode)
+	err = es.generatePhoneCode(phoneCode)
 	if err != nil {
 		return err
 	}
-	phoneCode.Code = phoneCodeCrypto
-	phoneCode.Expiry = es.PhoneVerificationCode.Expiry()
 
+	repoExisting := model.UserFromModel(existing)
 	updateAggregate := PhoneVerificationCodeAggregate(es.AggregateCreator(), repoExisting, phoneCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {

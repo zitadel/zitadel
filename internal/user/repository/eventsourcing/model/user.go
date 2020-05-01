@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	"time"
@@ -32,14 +33,6 @@ type InitUserCode struct {
 	es_models.ObjectRoot
 	Code   *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry time.Duration       `json:"expiry,omitempty"`
-}
-
-func UserFromEvents(user *User, events ...*es_models.Event) (*User, error) {
-	if user == nil {
-		user = &User{}
-	}
-
-	return user, user.AppendEvents(events...)
 }
 
 func UserFromModel(user *model.User) *User {
@@ -130,20 +123,17 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	case UserAdded,
 		UserRegistered,
 		UserProfileChanged:
-		if err := json.Unmarshal(event.Data, u); err != nil {
-			logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
-			return err
-		}
+		u.setData(event)
 	case UserDeactivated:
-		err = u.appendDeactivatedEvent()
+		u.appendDeactivatedEvent()
 	case UserReactivated:
-		err = u.appendReactivatedEvent()
+		u.appendReactivatedEvent()
 	case UserLocked:
-		err = u.appendLockedEvent()
+		u.appendLockedEvent()
 	case UserUnlocked:
-		err = u.appendUnlockedEvent()
+		u.appendUnlockedEvent()
 	case InitializedUserCodeAdded:
-		err = u.appendInitUsercodeCreatedEvent(event)
+		u.appendInitUsercodeCreatedEvent(event)
 	case UserPasswordChanged:
 		err = u.appendUserPasswordChangedEvent(event)
 	case UserPasswordCodeAdded:
@@ -153,21 +143,21 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 	case UserEmailCodeAdded:
 		err = u.appendUserEmailCodeAddedEvent(event)
 	case UserEmailVerified:
-		err = u.appendUserEmailVerifiedEvent()
+		u.appendUserEmailVerifiedEvent()
 	case UserPhoneChanged:
 		err = u.appendUserPhoneChangedEvent(event)
 	case UserPhoneCodeAdded:
 		err = u.appendUserPhoneCodeAddedEvent(event)
 	case UserPhoneVerified:
-		err = u.appendUserPhoneVerifiedEvent()
+		u.appendUserPhoneVerifiedEvent()
 	case UserAddressChanged:
 		err = u.appendUserAddressChangedEvent(event)
 	case MfaOtpAdded:
 		err = u.appendOtpAddedEvent(event)
 	case MfaOtpVerified:
-		err = u.appendOtpVerifiedEvent()
+		u.appendOtpVerifiedEvent()
 	case MfaOtpRemoved:
-		err = u.appendOtpRemovedEvent()
+		u.appendOtpRemovedEvent()
 	}
 	if err != nil {
 		return err
@@ -201,24 +191,28 @@ func (u *User) ComputeObject() {
 	}
 }
 
-func (u *User) appendDeactivatedEvent() error {
+func (u *User) setData(event *es_models.Event) error {
+	if err := json.Unmarshal(event.Data, u); err != nil {
+		logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(err, "MODEL-sj4jd", "could not unmarshal event")
+	}
+	return nil
+}
+
+func (u *User) appendDeactivatedEvent() {
 	u.State = int32(model.USERSTATE_INACTIVE)
-	return nil
 }
 
-func (u *User) appendReactivatedEvent() error {
+func (u *User) appendReactivatedEvent() {
 	u.State = int32(model.USERSTATE_ACTIVE)
-	return nil
 }
 
-func (u *User) appendLockedEvent() error {
+func (u *User) appendLockedEvent() {
 	u.State = int32(model.USERSTATE_LOCKED)
-	return nil
 }
 
-func (u *User) appendUnlockedEvent() error {
+func (u *User) appendUnlockedEvent() {
 	u.State = int32(model.USERSTATE_ACTIVE)
-	return nil
 }
 
 func (u *User) appendInitUsercodeCreatedEvent(event *es_models.Event) error {
@@ -236,7 +230,7 @@ func (c *InitUserCode) setData(event *es_models.Event) error {
 	c.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-7duwe").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-lo34s", "could not unmarshal event")
 	}
 	return nil
 }
