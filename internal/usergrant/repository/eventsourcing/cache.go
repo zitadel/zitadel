@@ -21,9 +21,9 @@ func StartCache(conf *config.CacheConfig) (*UserGrantCache, error) {
 
 func (c *UserGrantCache) getUserGrant(ID string) *model.UserGrant {
 	user := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: ID}}
-	if err := c.userGrantCache.Get(ID, user); err != nil {
-		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
-	}
+	err := c.userGrantCache.Get(ID, user)
+	logging.Log("EVENT-4eTZh").OnError(err).Debug("error in getting cache")
+	
 	return user
 }
 
