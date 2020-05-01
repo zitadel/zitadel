@@ -45,7 +45,7 @@ func (es *UserGrantEventStore) UserGrantByID(ctx context.Context, id string) (*g
 		return nil, err
 	}
 	err = es_sdk.Filter(ctx, es.FilterEvents, grant.AppendEvents, query)
-	if err != nil && !(caos_errs.IsNotFound(err) && grant.Sequence != 0) {
+	if err != nil && caos_errs.IsNotFound(err) && grant.Sequence == 0 {
 		return nil, err
 	}
 	es.userGrantCache.cacheUserGrant(grant)
