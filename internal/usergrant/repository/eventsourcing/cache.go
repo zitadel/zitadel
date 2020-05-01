@@ -29,7 +29,6 @@ func (c *UserGrantCache) getUserGrant(ID string) *model.UserGrant {
 
 func (c *UserGrantCache) cacheUserGrant(grant *model.UserGrant) {
 	err := c.userGrantCache.Set(grant.AggregateID, grant)
-	if err != nil {
-		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting project cache")
-	}
+
+	logging.Log("EVENT-ThnBb").OnError(err).Debug("error in setting project cache")
 }
