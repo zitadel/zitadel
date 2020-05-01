@@ -16,7 +16,7 @@ func (es *UserEventstore) generateInitUserCode(initCode *model.InitUserCode) err
 }
 
 func (es *UserEventstore) generatePhoneCode(phoneCode *model.PhoneCode) error {
-	phoneCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+	phoneCodeCrypto, _, err := crypto.NewCode(es.PhoneVerificationCode)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (es *UserEventstore) generatePhoneCode(phoneCode *model.PhoneCode) error {
 }
 
 func (es *UserEventstore) generateEmailCode(emailCode *model.EmailCode) error {
-	emailCodeCrypto, _, err := crypto.NewCode(es.InitializeUserCode)
+	emailCodeCrypto, _, err := crypto.NewCode(es.EmailVerificationCode)
 	if err != nil {
 		return err
 	}
