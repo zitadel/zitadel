@@ -1,0 +1,1 @@
+This document should outline how we securly develop zitadel

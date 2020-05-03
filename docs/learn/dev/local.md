@@ -1,7 +1,7 @@
 
-## local development
+# local development
 
-### start cockroach in docker
+## start cockroach in docker
 
 ```bash
 docker rm -f zitadel-db &&
@@ -14,20 +14,20 @@ docker run -d \
 cockroachdb/cockroach:v19.2.2 start --insecure
 ```
 
-### local database migrations
+## local database migrations
 
-#### local migrate
+### local migrate
 
 `go generate $GOPATH/src/github.com/caos/zitadel/migrations/cockroach/migrate_local.go`
 
-#### local cleanup
+### local cleanup
 
 `go generate $GOPATH/src/github.com/caos/zitadel/migrations/cockroach/clean_local.go`
 
-
-### Connect to Cockroach
+## Connect to Cockroach
 
 `docker exec -it "zitadel-db" /cockroach/cockroach sql --insecure`
 
-#### Should show eventstore, management, admin, auth
+### Should show eventstore, management, admin, auth
+
 `show databases;`

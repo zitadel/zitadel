@@ -20,10 +20,10 @@
 
 ### Development Practices
 
-#### Software Quality
+### Versioning
 
-#### Cloud Native Design / Architecutre
+### Architecutre
 
-## Versioning
+### Security
 
 ## Faqs
