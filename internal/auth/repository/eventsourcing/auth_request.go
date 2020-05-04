@@ -98,11 +98,11 @@ func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.Aut
 	}
 	if user.Password.ChangeRequired {
 		request.AddPossibleStep(&req_model.ChangePasswordStep{})
+	}
+	if user.Email == nil || user.Email != nil && !user.Email.IsEmailVerified {
+		request.AddPossibleStep(&req_model.VerifyEMailStep{})
 		return request, nil
 	}
-	err := request.GenerateNextSteps(user)
-	if err != nil {
-		return nil, err
-	}
+
 	return request, nil
 }
