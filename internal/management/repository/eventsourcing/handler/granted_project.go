@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"context"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"time"
@@ -12,7 +15,8 @@ import (
 
 type GrantedProject struct {
 	handler
-	eventstore eventstore.Eventstore
+	eventstore    eventstore.Eventstore
+	projectEvents *proj_event.ProjectEventstore
 }
 
 const (
@@ -38,7 +42,17 @@ func (p *GrantedProject) Process(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.ProjectAdded:
 		grantedProject.AppendEvent(event)
-	case es_model.ProjectChanged, es_model.ProjectDeactivated, es_model.ProjectReactivated:
+	case es_model.ProjectChanged:
+		grantedProject, err = p.view.GrantedProjectByIDs(event.AggregateID, event.ResourceOwner)
+		if err != nil {
+			return err
+		}
+		err = grantedProject.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		p.updateExistingProjects(grantedProject)
+	case es_model.ProjectDeactivated, es_model.ProjectReactivated:
 		grantedProject, err = p.view.GrantedProjectByIDs(event.AggregateID, event.ResourceOwner)
 		if err != nil {
 			return err
@@ -46,6 +60,14 @@ func (p *GrantedProject) Process(event *models.Event) (err error) {
 		err = grantedProject.AppendEvent(event)
 	case es_model.ProjectGrantAdded:
 		err = grantedProject.AppendEvent(event)
+		if err != nil {
+			return err
+		}
+		project, err := p.getProject(grantedProject.ProjectID)
+		if err != nil {
+			return err
+		}
+		grantedProject.Name = project.Name
 		//TODO: read org
 	case es_model.ProjectGrantChanged:
 		grant := new(view_model.ProjectGrant)
@@ -78,6 +100,22 @@ func (p *GrantedProject) getOrg(orgID string) {
 	//TODO: Get Org
 }
 
+func (p *GrantedProject) getProject(projectID string) (*model.Project, error) {
+	return p.projectEvents.ProjectByID(context.Background(), projectID)
+}
+
+func (p *GrantedProject) updateExistingProjects(project *view_model.GrantedProject) {
+	projects, err := p.view.GrantedProjectsByID(project.ProjectID)
+	if err != nil {
+		logging.LogWithFields("SPOOL-los03", "id", project.ProjectID).WithError(err).Warn("could not update existing projects")
+	}
+	for _, existing := range projects {
+		existing.Name = project.Name
+		err := p.view.PutGrantedProject(existing)
+		logging.LogWithFields("SPOOL-sjwi3", "id", existing.ProjectID).WithError(err).Warn("could not update existing project")
+	}
+}
+
 func (p *GrantedProject) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
 	failedEvent, err := p.view.GetLatestGrantedProjectFailedEvent(event.Sequence)
@@ -86,5 +124,12 @@ func (p *GrantedProject) OnError(event *models.Event, err error) error {
 	}
 	failedEvent.FailureCount++
 	failedEvent.ErrMsg = err.Error()
-	return p.view.ProcessedGrantedProjectFailedEvent(failedEvent)
+	err = p.view.ProcessedGrantedProjectFailedEvent(failedEvent)
+	if err != nil {
+		return err
+	}
+	if p.errorCountUntilSkip == failedEvent.FailureCount {
+		return p.view.ProcessedGrantedProjectSequence(event.Sequence)
+	}
+	return nil
 }

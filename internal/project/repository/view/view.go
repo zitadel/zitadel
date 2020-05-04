@@ -18,6 +18,19 @@ func GrantedProjectByIDs(db *gorm.DB, table, projectID, orgID string) (*model.Gr
 	return project, err
 }
 
+func GrantedProjectsByID(db *gorm.DB, table, projectID string) ([]*model.GrantedProject, error) {
+	projects := make([]*model.GrantedProject, 0)
+	queries := []*proj_model.GrantedProjectSearchQuery{
+		&proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+	}
+	query := view.PrepareSearchQuery(table, model.GrantedProjectSearchRequest{Queries: queries})
+	_, err := query(db, &projects)
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
 func SearchGrantedProjects(db *gorm.DB, table string, req *proj_model.GrantedProjectSearchRequest) ([]*model.GrantedProject, int, error) {
 	projects := make([]*model.GrantedProject, 0)
 	query := view.PrepareSearchQuery(table, model.GrantedProjectSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})

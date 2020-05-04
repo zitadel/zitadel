@@ -41,6 +41,7 @@ Mgmt:
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100
+      FailureCountUntilSkip: 5
 
 Auth:
   API:

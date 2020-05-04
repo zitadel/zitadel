@@ -15,6 +15,10 @@ func (v *View) GrantedProjectByIDs(projectID, orgID string) (*model.GrantedProje
 	return view.GrantedProjectByIDs(v.Db, grantedProjectTable, projectID, orgID)
 }
 
+func (v *View) GrantedProjectsByID(projectID string) ([]*model.GrantedProject, error) {
+	return view.GrantedProjectsByID(v.Db, grantedProjectTable, projectID)
+}
+
 func (v *View) SearchGrantedProjects(request *proj_model.GrantedProjectSearchRequest) ([]*model.GrantedProject, int, error) {
 	return view.SearchGrantedProjects(v.Db, grantedProjectTable, request)
 }

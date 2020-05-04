@@ -5,6 +5,7 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/view"
@@ -35,10 +36,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
-	conf.Spooler.View = view
-	conf.Spooler.SQL = sql
-	spool := spooler.StartSpooler(conf.Spooler, es)
-
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -46,6 +43,11 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+
+	conf.Spooler.View = view
+	conf.Spooler.SQL = sql
+	conf.Spooler.EventstoreRepos = handler.EventstoreRepos{ProjectEvents: project}
+	spool := spooler.StartSpooler(conf.Spooler, es)
 
 	return &EsRepository{
 		spool,

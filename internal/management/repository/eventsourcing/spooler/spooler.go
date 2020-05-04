@@ -9,10 +9,12 @@ import (
 )
 
 type SpoolerConfig struct {
-	BulkLimit       uint64
-	ConcurrentTasks int
-	View            *view.View
-	Handlers        handler.Configs
+	BulkLimit             uint64
+	FailureCountUntilSkip uint64
+	ConcurrentTasks       int
+	View                  *view.View
+	Handlers              handler.Configs
+	EventstoreRepos       handler.EventstoreRepos
 
 	SQL *sql.DB
 }
@@ -22,7 +24,7 @@ func StartSpooler(c SpoolerConfig, es eventstore.Eventstore) *spooler.Spooler {
 		Eventstore:      es,
 		Locker:          &locker{dbClient: c.SQL},
 		ConcurrentTasks: c.ConcurrentTasks,
-		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.View, es),
+		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, c.View, es, c.EventstoreRepos),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()
