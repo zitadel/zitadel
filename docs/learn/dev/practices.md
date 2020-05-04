@@ -2,6 +2,11 @@
 
 > This is just an outline!
 
+## Technologies
+
+- Go
+- Angular
+
 ## License
 
 - Apache 2.0
