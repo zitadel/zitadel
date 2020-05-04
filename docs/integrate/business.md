@@ -9,3 +9,7 @@
 ## Directory Sync
 
 ## Customer Self-Service
+
+### B2B
+
+### B2C

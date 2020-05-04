@@ -13,11 +13,18 @@
 
 ## What Is It
 
-It will be an IAM ;-)
+Zitadel is a Cloud Native IAM with a clear focus toward federated Authentication and Authorization. We @caos firmly believe that a modern IAM should be easy to deploy and operate even at cloudscale seizes. One thing zitadel that seperates zitadel even thurder from most other solutions is that it is built around the assumption that each operation should be reproducable at infinit lengt.
 
 ## How Does It Work
 
-## Why Another IAM
+## Our Mission Statement
+
+- Opensource Solution
+- Cloud Native Desing
+- Easy to operate at scale
+- Each operation is auditable
+- Can be used as SaaS or Own Instace
+- Security features are default and not hidden behind a paid tier
 
 ## How To Use It
 

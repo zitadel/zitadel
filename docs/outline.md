@@ -2,6 +2,8 @@
 
 ## How to start
 
+## Features
+
 ## Integrate
 
 ## Deploy
