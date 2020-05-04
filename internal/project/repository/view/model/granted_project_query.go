@@ -19,6 +19,9 @@ func (req GrantedProjectSearchRequest) GetOffset() uint64 {
 }
 
 func (req GrantedProjectSearchRequest) GetSortingColumn() view.ColumnKey {
+	if req.SortingColumn == proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED {
+		return nil
+	}
 	return GrantedProjectSearchKey(req.SortingColumn)
 }
 

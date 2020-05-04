@@ -20,8 +20,8 @@ func GrantedProjectByIDs(db *gorm.DB, table, projectID, orgID string) (*model.Gr
 
 func SearchGrantedProjects(db *gorm.DB, table string, req *proj_model.GrantedProjectSearchRequest) ([]*model.GrantedProject, int, error) {
 	projects := make([]*model.GrantedProject, 0)
-	query := view.PrepareSearchQuery(table, model.GrantedProjectSearchRequest{Limit: req.Limit, Offset: req.Offset, SortingColumn: req.SortingColumn, Asc: req.Asc, Queries: req.Queries})
-	count, err := query(db, projects)
+	query := view.PrepareSearchQuery(table, model.GrantedProjectSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+	count, err := query(db, &projects)
 	if err != nil {
 		return nil, 0, err
 	}
