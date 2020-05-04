@@ -6,6 +6,10 @@
 
 - Go
 - Angular
+- GRPC
+- CockroachDB
+- Kubernetes
+- Docker Images
 
 ## License
 
