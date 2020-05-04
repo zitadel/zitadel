@@ -1,3 +1,4 @@
 # Development
 
-This document should outline how we securly develop zitadel
+- Dependency Updates
+- Security Advisories
