@@ -51,7 +51,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	if request.PasswordChecked() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-s6Gn3", "password already checked")
 	}
-	if err = repo.UserEvents.CheckPassword(ctx, userID, password); err != nil {
+	if err = repo.UserEvents.CheckPassword(ctx, userID, password, id); err != nil {
 
 	}
 	return nextSteps(request, nil)
@@ -71,8 +71,18 @@ func (repo *AuthRequestRepo) SkipMfaInit(ctx context.Context, id, userID string)
 	}
 
 }
-func (repo *AuthRequestRepo) AddMfa(ctx context.Context, agentID, authRequestID string, mfa interface{}, info *req_model.BrowserInfo) (*req_model.AuthRequest, error)
-func (repo *AuthRequestRepo) VerifyMfa(ctx context.Context, agentID, authRequestID string, mfa interface{}, info *req_model.BrowserInfo) (*req_model.AuthRequest, error)
+func (repo *AuthRequestRepo) AddMfa(ctx context.Context, agentID, authRequestID string, mfa interface{}, info *req_model.BrowserInfo) (*req_model.AuthRequest, error) {
+
+	opt, err := repo.UserEvents.AddOTP(ctx, userID)
+	if err != nil {
+
+	}
+	return nextSteps(request, user)
+}
+func (repo *AuthRequestRepo) VerifyMfa(ctx context.Context, agentID, authRequestID string, mfa interface{}, info *req_model.BrowserInfo) (*req_model.AuthRequest, error) {
+
+	repo.UserEvents.CheckMfaOTP(ctx, userID, code)
+}
 
 func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.AuthRequest, error) {
 	if user == nil {
@@ -103,6 +113,14 @@ func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.Aut
 		request.AddPossibleStep(&req_model.VerifyEMailStep{})
 		return request, nil
 	}
-
+	if len(user.MfaTypesReady()) == 0 && !user.SkippedMfaInit {
+		request.AddPossibleStep(req_model.NewMfaPromptStep(user.MfaTypesPossible(), request.IsMfaNeccesary()))
+		return request, nil
+	}
+	//TODO: consent step
+	if user.Authorized() {
+		request.AddPossibleStep(&req_model.RedirectToCallbackStep{})
+		return request, nil
+	}
 	return request, nil
 }

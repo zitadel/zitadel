@@ -113,6 +113,13 @@ type MfaPromptStep struct {
 	MfaProviders []MfaType
 }
 
+func NewMfaPromptStep(mfaProviders []MfaType, required bool) *MfaPromptStep {
+	return &MfaPromptStep{
+		MfaProviders: mfaProviders,
+		Required:     required,
+	}
+}
+
 func (s *MfaPromptStep) Type() NextStepType {
 	return NextStepMfaPrompt
 }

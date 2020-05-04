@@ -187,7 +187,7 @@ func PasswordChangeAggregate(aggCreator *es_models.AggregateCreator, existing *m
 	}
 }
 
-func PasswordCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+func PasswordCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, authRequestID string) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)
 		if err != nil {
@@ -196,7 +196,7 @@ func PasswordCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, exi
 		return agg.AppendEvent(usr_model.UserPasswordCheckSucceeded, nil)
 	}
 }
-func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, authRequestID string) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)
 		if err != nil {
