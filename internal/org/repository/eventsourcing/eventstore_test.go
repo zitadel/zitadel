@@ -362,8 +362,8 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 		isErr            func(error) bool
 	}
 	type args struct {
-		ctx context.Context
-		org *org_model.Org
+		ctx    context.Context
+		member *org_model.OrgMember
 	}
 	tests := []struct {
 		name   string
@@ -375,20 +375,32 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 			name:   "no input member",
 			fields: fields{Eventstore: newTestEventstore(t)},
 			args: args{
-				ctx: auth.NewMockContext("user", "org"),
-				org: nil,
+				ctx:    auth.NewMockContext("user", "org"),
+				member: nil,
 			},
 			res: res{
 				expectedSequence: 0,
-				isErr:            errors.IsErrorInvalidArgument,
+				isErr:            errors.IsPreconditionFailed,
 			},
 		},
 		{
-			name:   "no aggregate id in input org",
+			name:   "no aggregate id in input member",
 			fields: fields{Eventstore: newTestEventstore(t)},
 			args: args{
-				ctx: auth.NewMockContext("user", "org"),
-				org: &org_model.Org{ObjectRoot: es_models.ObjectRoot{Sequence: 4}},
+				ctx:    auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{ObjectRoot: es_models.ObjectRoot{Sequence: 4}, UserID: "asdf"},
+			},
+			res: res{
+				expectedSequence: 0,
+				isErr:            errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name:   "no aggregate id in input member",
+			fields: fields{Eventstore: newTestEventstore(t)},
+			args: args{
+				ctx:    auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "asdf"}},
 			},
 			res: res{
 				expectedSequence: 0,
@@ -399,8 +411,8 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 			name:   "no events found success",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{}, nil)},
 			args: args{
-				ctx: auth.NewMockContext("user", "org"),
-				org: &org_model.Org{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "hodor"}},
+				ctx:    auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "plants"}, UserID: "banana"},
 			},
 			res: res{
 				expectedSequence: 4,
@@ -411,8 +423,8 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 			name:   "filter fail",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{}, errors.ThrowInternal(nil, "EVENT-SAa1O", "message"))},
 			args: args{
-				ctx: auth.NewMockContext("user", "org"),
-				org: &org_model.Org{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "hodor"}},
+				ctx:    auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "plants"}, UserID: "banana"},
 			},
 			res: res{
 				expectedSequence: 0,
@@ -422,11 +434,11 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 		{
 			name: "new events found and added success",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
-				{Sequence: 6},
+				{Sequence: 6, Data: []byte("{\"roles\": [\"bananaa\"]}")},
 			}, nil)},
 			args: args{
-				ctx: auth.NewMockContext("user", "org"),
-				org: &org_model.Org{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "hodor", ChangeDate: time.Now(), CreationDate: time.Now()}},
+				ctx:    auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "plants", ChangeDate: time.Now(), CreationDate: time.Now()}, UserID: "banana"},
 			},
 			res: res{
 				expectedSequence: 6,
@@ -436,7 +448,7 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fields.Eventstore.OrgByID(tt.args.ctx, tt.args.org)
+			got, err := tt.fields.Eventstore.OrgMemberByIDs(tt.args.ctx, tt.args.member)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got:%T %v", err, err)
 			}
