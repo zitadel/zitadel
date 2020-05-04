@@ -17,14 +17,16 @@ Zitadel is a Cloud Native IAM with a clear focus toward federated Authentication
 
 ## How Does It Work
 
-## Our Mission Statement
+## Our Vision
 
-- Opensource Solution
-- Cloud Native Desing
-- Easy to operate at scale
-- Each operation is auditable
-- Can be used as SaaS or Own Instace
-- Security features are default and not hidden behind a paid tier
+- Create an IAM ...
+  - where each operation is auditable over a long time period
+  - which can be used as SaaS or a dedicated instace
+  - with security features available by default and not hidden behind a paid tier
+  - based and available on opensource librarys
+  - designed to be a cloud-native application
+  - that is easy to operate and scale scale
+  - pricing....(some words to that)
 
 ## Quickstart
 
