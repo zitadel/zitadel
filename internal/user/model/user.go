@@ -18,7 +18,7 @@ type User struct {
 	InitCode     *InitUserCode
 	EmailCode    *EmailCode
 	PhoneCode    *PhoneCode
-	PasswordCode *RequestPasswordSet
+	PasswordCode *PasswordCode
 	OTP          *OTP
 }
 
@@ -44,10 +44,10 @@ const (
 type Gender int32
 
 const (
-	GENDER_UNDEFINED Gender = 0
-	GENDER_FEMALE    Gender = 1
-	GENDER_MALE      Gender = 2
-	GENDER_DIVERSE   Gender = 3
+	GENDER_UNDEFINED Gender = iota
+	GENDER_FEMALE
+	GENDER_MALE
+	GENDER_DIVERSE
 )
 
 func (u *User) IsValid() bool {

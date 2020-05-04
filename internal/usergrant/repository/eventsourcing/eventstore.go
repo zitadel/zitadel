@@ -45,7 +45,7 @@ func (es *UserGrantEventStore) UserGrantByID(ctx context.Context, id string) (*g
 		return nil, err
 	}
 	err = es_sdk.Filter(ctx, es.FilterEvents, grant.AppendEvents, query)
-	if err != nil && !(caos_errs.IsNotFound(err) && grant.Sequence != 0) {
+	if err != nil && caos_errs.IsNotFound(err) && grant.Sequence == 0 {
 		return nil, err
 	}
 	es.userGrantCache.cacheUserGrant(grant)
@@ -143,7 +143,7 @@ func (es *UserGrantEventStore) ReactivateUserGrant(ctx context.Context, grantID 
 	if err != nil {
 		return nil, err
 	}
-	if existing.IsInactive() {
+	if !existing.IsInactive() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "reactivate only possible for inactive grant")
 	}
 	repoExisting := model.UserGrantFromModel(existing)

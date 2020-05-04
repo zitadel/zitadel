@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 )
@@ -39,12 +40,7 @@ func (a *Address) Changes(changed *Address) map[string]interface{} {
 
 func AddressFromModel(address *model.Address) *Address {
 	return &Address{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  address.ObjectRoot.AggregateID,
-			Sequence:     address.Sequence,
-			ChangeDate:   address.ChangeDate,
-			CreationDate: address.CreationDate,
-		},
+		ObjectRoot:    address.ObjectRoot,
 		Country:       address.Country,
 		Locality:      address.Locality,
 		PostalCode:    address.PostalCode,
@@ -55,12 +51,7 @@ func AddressFromModel(address *model.Address) *Address {
 
 func AddressToModel(address *Address) *model.Address {
 	return &model.Address{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  address.ObjectRoot.AggregateID,
-			Sequence:     address.Sequence,
-			ChangeDate:   address.ChangeDate,
-			CreationDate: address.CreationDate,
-		},
+		ObjectRoot:    address.ObjectRoot,
 		Country:       address.Country,
 		Locality:      address.Locality,
 		PostalCode:    address.PostalCode,
@@ -73,15 +64,14 @@ func (u *User) appendUserAddressChangedEvent(event *es_models.Event) error {
 	if u.Address == nil {
 		u.Address = new(Address)
 	}
-	u.Address.setData(event)
-	return nil
+	return u.Address.setData(event)
 }
 
 func (a *Address) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-clos0").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-so92s", "could not unmarshal event")
 	}
 	return nil
 }

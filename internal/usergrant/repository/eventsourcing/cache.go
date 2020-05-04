@@ -21,15 +21,14 @@ func StartCache(conf *config.CacheConfig) (*UserGrantCache, error) {
 
 func (c *UserGrantCache) getUserGrant(ID string) *model.UserGrant {
 	user := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: ID}}
-	if err := c.userGrantCache.Get(ID, user); err != nil {
-		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
-	}
+	err := c.userGrantCache.Get(ID, user)
+	logging.Log("EVENT-4eTZh").OnError(err).Debug("error in getting cache")
+	
 	return user
 }
 
 func (c *UserGrantCache) cacheUserGrant(grant *model.UserGrant) {
 	err := c.userGrantCache.Set(grant.AggregateID, grant)
-	if err != nil {
-		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting project cache")
-	}
+
+	logging.Log("EVENT-ThnBb").OnError(err).Debug("error in setting project cache")
 }

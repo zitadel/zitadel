@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 )
 
@@ -18,28 +17,24 @@ func UserGrantByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuer
 
 func UserGrantQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(grant_model.UserGrantAggregate).
+		AggregateTypeFilter(model.UserGrantAggregate).
 		LatestSequenceFilter(latestSequence)
 }
 
 func UserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) (*es_models.Aggregate, error) {
 	if grant == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing user should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing grant should not be nil")
 	}
-	return aggCreator.NewAggregate(ctx, grant.AggregateID, grant_model.UserGrantAggregate, model.UserGrantVersion, grant.Sequence)
+	return aggCreator.NewAggregate(ctx, grant.AggregateID, model.UserGrantAggregate, model.UserGrantVersion, grant.Sequence)
 }
 
 func UserGrantAddedAggregate(aggCreator *es_models.AggregateCreator, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if grant == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dlox9", "grant should not be nil")
-		}
 		agg, err := UserGrantAggregate(ctx, aggCreator, grant)
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(grant_model.UserGrantAdded, grant)
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantAdded, grant)
 	}
 }
 
@@ -53,9 +48,7 @@ func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing 
 			return nil, err
 		}
 		changes := existing.Changes(grant)
-		agg.AppendEvent(grant_model.UserGrantChanged, changes)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantChanged, changes)
 	}
 }
 
@@ -68,9 +61,7 @@ func UserGrantDeactivatedAggregate(aggCreator *es_models.AggregateCreator, exist
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(grant_model.UserGrantDeactivated, nil)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantDeactivated, nil)
 	}
 }
 
@@ -83,9 +74,7 @@ func UserGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, exist
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(grant_model.UserGrantReactivated, nil)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantReactivated, nil)
 	}
 }
 
@@ -98,8 +87,6 @@ func UserGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existing 
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(grant_model.UserGrantRemoved, nil)
-
-		return agg, nil
+		return agg.AppendEvent(model.UserGrantRemoved, nil)
 	}
 }

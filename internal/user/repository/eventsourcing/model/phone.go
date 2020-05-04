@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	"time"
@@ -33,12 +34,7 @@ func (p *Phone) Changes(changed *Phone) map[string]interface{} {
 
 func PhoneFromModel(phone *model.Phone) *Phone {
 	return &Phone{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  phone.ObjectRoot.AggregateID,
-			Sequence:     phone.Sequence,
-			ChangeDate:   phone.ChangeDate,
-			CreationDate: phone.CreationDate,
-		},
+		ObjectRoot:      phone.ObjectRoot,
 		PhoneNumber:     phone.PhoneNumber,
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
@@ -46,12 +42,7 @@ func PhoneFromModel(phone *model.Phone) *Phone {
 
 func PhoneToModel(phone *Phone) *model.Phone {
 	return &model.Phone{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  phone.ObjectRoot.AggregateID,
-			Sequence:     phone.Sequence,
-			ChangeDate:   phone.ChangeDate,
-			CreationDate: phone.CreationDate,
-		},
+		ObjectRoot:      phone.ObjectRoot,
 		PhoneNumber:     phone.PhoneNumber,
 		IsPhoneVerified: phone.IsPhoneVerified,
 	}
@@ -59,40 +50,32 @@ func PhoneToModel(phone *Phone) *model.Phone {
 
 func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
 	return &model.PhoneCode{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  code.ObjectRoot.AggregateID,
-			Sequence:     code.Sequence,
-			ChangeDate:   code.ChangeDate,
-			CreationDate: code.CreationDate,
-		},
-		Expiry: code.Expiry,
-		Code:   code.Code,
+		ObjectRoot: code.ObjectRoot,
+		Expiry:     code.Expiry,
+		Code:       code.Code,
 	}
 }
 
 func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {
 	u.Phone = new(Phone)
-	u.Phone.setData(event)
 	u.IsPhoneVerified = false
-	return nil
+	return u.Phone.setData(event)
 }
 
 func (u *User) appendUserPhoneCodeAddedEvent(event *es_models.Event) error {
 	u.PhoneCode = new(PhoneCode)
-	u.PhoneCode.setData(event)
-	return nil
+	return u.PhoneCode.setData(event)
 }
 
-func (u *User) appendUserPhoneVerifiedEvent() error {
+func (u *User) appendUserPhoneVerifiedEvent() {
 	u.IsPhoneVerified = true
-	return nil
 }
 
-func (a *Phone) setData(event *es_models.Event) error {
-	a.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, a); err != nil {
+func (p *Phone) setData(event *es_models.Event) error {
+	p.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-lco9s").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-lre56", "could not unmarshal event")
 	}
 	return nil
 }
@@ -101,7 +84,7 @@ func (a *PhoneCode) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-sk8ws").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-7hdj3", "could not unmarshal event")
 	}
 	return nil
 }

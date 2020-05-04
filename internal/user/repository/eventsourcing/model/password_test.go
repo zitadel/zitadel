@@ -45,7 +45,7 @@ func TestAppendUserPasswordChangedEvent(t *testing.T) {
 func TestAppendPasswordSetRequestedEvent(t *testing.T) {
 	type args struct {
 		user  *User
-		code  *RequestPasswordSet
+		code  *PasswordCode
 		event *es_models.Event
 	}
 	tests := []struct {
@@ -57,10 +57,10 @@ func TestAppendPasswordSetRequestedEvent(t *testing.T) {
 			name: "append user phone code added event",
 			args: args{
 				user:  &User{Phone: &Phone{PhoneNumber: "PhoneNumber"}},
-				code:  &RequestPasswordSet{Expiry: time.Hour * 1},
+				code:  &PasswordCode{Expiry: time.Hour * 1},
 				event: &es_models.Event{},
 			},
-			result: &User{PasswordCode: &RequestPasswordSet{Expiry: time.Hour * 1}},
+			result: &User{PasswordCode: &PasswordCode{Expiry: time.Hour * 1}},
 		},
 	}
 	for _, tt := range tests {

@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/usergrant/model"
 	"reflect"
@@ -36,31 +37,21 @@ func (g *UserGrant) Changes(changed *UserGrant) map[string]interface{} {
 
 func UserGrantFromModel(grant *model.UserGrant) *UserGrant {
 	return &UserGrant{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  grant.ObjectRoot.AggregateID,
-			Sequence:     grant.Sequence,
-			ChangeDate:   grant.ChangeDate,
-			CreationDate: grant.CreationDate,
-		},
-		UserID:    grant.UserID,
-		ProjectID: grant.ProjectID,
-		State:     int32(grant.State),
-		RoleKeys:  grant.RoleKeys,
+		ObjectRoot: grant.ObjectRoot,
+		UserID:     grant.UserID,
+		ProjectID:  grant.ProjectID,
+		State:      int32(grant.State),
+		RoleKeys:   grant.RoleKeys,
 	}
 }
 
 func UserGrantToModel(grant *UserGrant) *model.UserGrant {
 	return &model.UserGrant{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  grant.AggregateID,
-			ChangeDate:   grant.ChangeDate,
-			CreationDate: grant.CreationDate,
-			Sequence:     grant.Sequence,
-		},
-		UserID:    grant.UserID,
-		ProjectID: grant.ProjectID,
-		State:     model.UserGrantState(grant.State),
-		RoleKeys:  grant.RoleKeys,
+		ObjectRoot: grant.ObjectRoot,
+		UserID:     grant.UserID,
+		ProjectID:  grant.ProjectID,
+		State:      model.UserGrantState(grant.State),
+		RoleKeys:   grant.RoleKeys,
 	}
 }
 
@@ -76,15 +67,15 @@ func (g *UserGrant) AppendEvents(events ...*es_models.Event) error {
 func (g *UserGrant) AppendEvent(event *es_models.Event) error {
 	g.ObjectRoot.AppendEvent(event)
 	switch event.Type {
-	case model.UserGrantAdded,
-		model.UserGrantChanged:
+	case UserGrantAdded,
+		UserGrantChanged:
 		return g.setData(event)
-	case model.UserGrantDeactivated:
-		return g.appendGrantStateEvent(model.USERGRANTSTATE_INACTIVE)
-	case model.UserGrantReactivated:
-		return g.appendGrantStateEvent(model.USERGRANTSTATE_ACTIVE)
-	case model.UserGrantRemoved:
-		return g.appendGrantStateEvent(model.USERGRANTSTATE_REMOVED)
+	case UserGrantDeactivated:
+		g.appendGrantStateEvent(model.USERGRANTSTATE_INACTIVE)
+	case UserGrantReactivated:
+		g.appendGrantStateEvent(model.USERGRANTSTATE_ACTIVE)
+	case UserGrantRemoved:
+		g.appendGrantStateEvent(model.USERGRANTSTATE_REMOVED)
 	}
 	return nil
 }
@@ -97,15 +88,14 @@ func (g *UserGrant) appendChangeGrantEvent(event *es_models.Event) error {
 	return g.setData(event)
 }
 
-func (g *UserGrant) appendGrantStateEvent(state model.UserGrantState) error {
+func (g *UserGrant) appendGrantStateEvent(state model.UserGrantState) {
 	g.State = int32(state)
-	return nil
 }
 
 func (g *UserGrant) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, g); err != nil {
 		logging.Log("EVEN-lso9x").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-o0se3", "could not unmarshal event")
 	}
 	return nil
 }

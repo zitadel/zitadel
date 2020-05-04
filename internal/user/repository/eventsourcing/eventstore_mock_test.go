@@ -3,11 +3,10 @@ package eventsourcing
 import (
 	"encoding/json"
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	usr_model "github.com/caos/zitadel/internal/user/model"
+	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
 	"github.com/sony/sonyflake"
@@ -32,7 +31,6 @@ func GetMockedEventstoreWithPw(ctrl *gomock.Controller, mockEs *mock.MockEventst
 		es.InitializeUserCode = GetMockPwGenerator(ctrl)
 	}
 	if email {
-
 		es.EmailVerificationCode = GetMockPwGenerator(ctrl)
 	}
 	if phone {
@@ -69,15 +67,10 @@ func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {
 	return generator
 }
 
-func GetMockUserByIDOK(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
-		Profile: &model.Profile{
-			UserName: "UserName",
-		},
-	}
+func GetMockUserByIDOK(ctrl *gomock.Controller, user model.User) *UserEventstore {
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -99,7 +92,7 @@ func GetMockManipulateUser(ctrl *gomock.Controller) *UserEventstore {
 	}
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -122,13 +115,73 @@ func GetMockManipulateUserWithPWGenerator(ctrl *gomock.Controller, init, email, 
 	}
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstoreWithPw(ctrl, mockEs, init, email, phone, password)
+}
+
+func GetMockManipulateUserWithInitCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, true, false, false, false)
+}
+
+func GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, false, true, false, true)
+}
+
+func GetMockManipulateUserWithEmailCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, false, true, false, false)
+}
+
+func GetMockManipulateUserWithPhoneCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, false, false, true, false)
+}
+
+func GetMockManipulateUserWithPasswordCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
+	data, _ := json.Marshal(user)
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, false, false, false, true)
 }
 
 func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
@@ -139,7 +192,7 @@ func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
 	}
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -150,7 +203,7 @@ func GetMockManipulateUserWithOTPGen(ctrl *gomock.Controller) *UserEventstore {
 	hash.EXPECT().Algorithm().Return("aes")
 	hash.EXPECT().Encrypt(gomock.Any()).Return(nil, nil)
 	hash.EXPECT().EncryptionKeyID().Return("id")
-	es.Multifactors = systemdefaults.Multifactors{OTP: systemdefaults.OTP{
+	es.Multifactors = global_model.Multifactors{OTP: global_model.OTP{
 		Issuer:    "Issuer",
 		CryptoMFA: hash,
 	}}
@@ -165,8 +218,8 @@ func GetMockManipulateInactiveUser(ctrl *gomock.Controller) *UserEventstore {
 	}
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 2, Type: usr_model.UserDeactivated},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 2, Type: model.UserDeactivated},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -183,8 +236,8 @@ func GetMockManipulateLockedUser(ctrl *gomock.Controller) *UserEventstore {
 	}
 	data, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: data},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserLocked},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserLocked},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -203,8 +256,8 @@ func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller) *UserEventstore 
 	dataUser, _ := json.Marshal(user)
 	dataCode, _ := json.Marshal(code)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.InitializedUserCodeCreated, Data: dataCode},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.InitializedUserCodeAdded, Data: dataCode},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -231,8 +284,8 @@ func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore
 	dataUser, _ := json.Marshal(user)
 	dataCode, _ := json.Marshal(code)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserEmailCodeAdded, Data: dataCode},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserEmailCodeAdded, Data: dataCode},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -251,8 +304,8 @@ func GetMockManipulateUserVerifiedEmail(ctrl *gomock.Controller) *UserEventstore
 	}
 	dataUser, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserEmailVerified},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserEmailVerified},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -279,8 +332,8 @@ func GetMockManipulateUserWithPhoneCode(ctrl *gomock.Controller) *UserEventstore
 	dataUser, _ := json.Marshal(user)
 	dataCode, _ := json.Marshal(code)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserPhoneCodeAdded, Data: dataCode},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserPhoneCodeAdded, Data: dataCode},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -300,8 +353,8 @@ func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore
 	}
 	dataUser, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserPhoneVerified},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserPhoneVerified},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -332,7 +385,7 @@ func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 	}
 	dataUser, _ := json.Marshal(user)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
@@ -356,8 +409,8 @@ func GetMockManipulateUserWithOTP(ctrl *gomock.Controller) *UserEventstore {
 	dataUser, _ := json.Marshal(user)
 	dataOtp, _ := json.Marshal(otp)
 	events := []*es_models.Event{
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.UserAdded, Data: dataUser},
-		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: usr_model.MfaOtpAdded, Data: dataOtp},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MfaOtpAdded, Data: dataOtp},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
