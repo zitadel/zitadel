@@ -173,7 +173,7 @@ func PasswordCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, exi
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(usr_model.UserPasswordCheckSucceeded, nil)
+		return agg.AppendEvent(model.UserPasswordCheckSucceeded, &model.PasswordCheck{AuthRequestID: authRequestID})
 	}
 }
 func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, authRequestID string) es_sdk.AggregateFunc {
@@ -182,7 +182,7 @@ func PasswordCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existi
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(usr_model.UserPasswordCheckFailed, nil)
+		return agg.AppendEvent(model.UserPasswordCheckFailed, &model.PasswordCheck{AuthRequestID: authRequestID})
 	}
 }
 

@@ -1,9 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"time"
 )
 
 type User struct {
@@ -15,11 +16,12 @@ type User struct {
 	*Email
 	*Phone
 	*Address
-	InitCode     *InitUserCode
-	EmailCode    *EmailCode
-	PhoneCode    *PhoneCode
-	PasswordCode *PasswordCode
-	OTP          *OTP
+	InitCode       *InitUserCode
+	EmailCode      *EmailCode
+	PhoneCode      *PhoneCode
+	PasswordCode   *PasswordCode
+	OTP            *OTP
+	SkippedMfaInit time.Time
 }
 
 type InitUserCode struct {
@@ -68,4 +70,28 @@ func (u *User) IsInactive() bool {
 
 func (u *User) IsLocked() bool {
 	return u.State == USERSTATE_LOCKED
+}
+
+func (u *User) PasswordVerified(userAgentID string) (bool, uint16) {
+	return true, 0 //TODO: ???
+}
+
+func (u *User) MfaVerified(userAgentID string) (bool, uint16) {
+	return true, 0 //TODO: ???
+}
+
+func (u *User) MfaTypesReady(level MfaLevel) []MfaType {
+	types := make([]MfaType, 0, 1)
+	if MfaIsReady(u.OTP) && MfaLevelSufficient(u.OTP, level) {
+		types = append(types, u.OTP)
+	}
+	return types
+}
+
+func (u *User) MfaTypesPossible() []MfaType {
+	types := make([]MfaType, 0, 1)
+	if !MfaIsReady(u.OTP) {
+		types = append(types, u.OTP)
+	}
+	return types
 }

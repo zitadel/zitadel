@@ -23,9 +23,9 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
 }
 
-func (repo *UserRepo) CheckUserPassword(ctx context.Context, id, password string) error {
-	return repo.UserEvents.CheckPassword(ctx, id, password)
-}
+//func (repo *UserRepo) CheckUserPassword(ctx context.Context, id, password string) error {
+//	return repo.UserEvents.CheckPassword(ctx, id, password)
+//}
 
 func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {
 	return repo.UserEvents.RequestSetPassword(ctx, id, notifyType)

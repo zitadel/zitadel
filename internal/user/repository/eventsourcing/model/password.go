@@ -25,6 +25,10 @@ type PasswordCode struct {
 	NotificationType int32               `json:"notificationType,omitempty"`
 }
 
+type PasswordCheck struct {
+	AuthRequestID string `json:"authReqID"`
+}
+
 func PasswordFromModel(password *model.Password) *Password {
 	return &Password{
 		ObjectRoot:     password.ObjectRoot,

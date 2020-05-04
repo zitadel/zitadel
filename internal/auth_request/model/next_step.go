@@ -1,5 +1,7 @@
 package model
 
+import user_model "github.com/caos/zitadel/internal/user/model"
+
 type possibleSteps []NextStep
 
 func (p possibleSteps) add(step NextStep) {
@@ -41,15 +43,7 @@ const (
 )
 
 type LoginStep struct {
-	ErrMsg string
-}
-
-func NewLoginStep(err error) *LoginStep {
-	var msg string
-	if err != nil {
-		msg = err.Error()
-	}
-	return &LoginStep{ErrMsg: msg}
+	NotFound bool
 }
 
 func (s *LoginStep) Type() NextStepType {
@@ -71,16 +65,7 @@ type UserSelection struct {
 }
 
 type PasswordStep struct {
-	ErrMsg       string
 	FailureCount uint16
-}
-
-func NewPasswordStep(failureCount uint16) *PasswordStep {
-	step := &PasswordStep{FailureCount: failureCount}
-	if failureCount > 0 {
-		step.ErrMsg = "Password invalid"
-	}
-	return step
 }
 
 func (s *PasswordStep) Type() NextStepType {
@@ -110,14 +95,7 @@ func (s *VerifyEMailStep) Type() NextStepType {
 
 type MfaPromptStep struct {
 	Required     bool
-	MfaProviders []MfaType
-}
-
-func NewMfaPromptStep(mfaProviders []MfaType, required bool) *MfaPromptStep {
-	return &MfaPromptStep{
-		MfaProviders: mfaProviders,
-		Required:     required,
-	}
+	MfaProviders []user_model.MfaType
 }
 
 func (s *MfaPromptStep) Type() NextStepType {
@@ -125,20 +103,8 @@ func (s *MfaPromptStep) Type() NextStepType {
 }
 
 type MfaVerificationStep struct {
-	ErrMsg       string
 	FailureCount uint16
-	MfaProviders []MfaType
-}
-
-func NewMfaVerificationStep(failureCount uint16, mfaProviders []MfaType) *MfaVerificationStep {
-	step := &MfaVerificationStep{
-		FailureCount: failureCount,
-		MfaProviders: mfaProviders,
-	}
-	if failureCount > 0 {
-		step.ErrMsg = "Code invalid"
-	}
-	return step
+	MfaProviders []user_model.MfaType
 }
 
 func (s *MfaVerificationStep) Type() NextStepType {

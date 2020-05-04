@@ -7,26 +7,32 @@ import (
 type AuthRequest struct {
 	es_models.ObjectRoot
 	BrowserInfo       *BrowserInfo
-	ApplicationID     string   //clientID
-	CallbackURI       string   //redirectURi
-	TransferState     string   //state //oidc only?
-	Prompt            Prompt   //name?
-	PossibleLOAs      []string //acr_values
-	UiLocales         []string //language.Tag?
+	ApplicationID     string             //clientID
+	CallbackURI       string             //redirectURi
+	TransferState     string             //state //oidc only?
+	Prompt            Prompt             //name?
+	PossibleLOAs      []LevelOfAssurance //acr_values
+	UiLocales         []string           //language.Tag?
 	LoginHint         string
 	PreselectedUserID string
 	MaxAuthAge        uint32
 	Request           Request
 
-	levelOfAssurance      string   //acr
-	projectApplicationIDs []string //aud?
+	levelOfAssurance      LevelOfAssurance //acr
+	projectApplicationIDs []string         //aud?
 	possibleSteps         []NextStep
 	//UserSession   *UserSession
 
 }
 
+type LevelOfAssurance int
+
+const (
+	LevelOfAssuranceNone LevelOfAssurance = iota
+)
+
 func NewAuthRequest(agentID string, info *BrowserInfo, applicationID, callbackURI, transferState string,
-	prompt Prompt, possibleLOAs, uiLocales []string, loginHint, preselectedUserID string, maxAuthAge uint32, request Request) *AuthRequest {
+	prompt Prompt, possibleLOAs []LevelOfAssurance, uiLocales []string, loginHint, preselectedUserID string, maxAuthAge uint32, request Request) *AuthRequest {
 	return &AuthRequest{
 		ObjectRoot:        es_models.ObjectRoot{AggregateID: agentID},
 		BrowserInfo:       info,
@@ -53,6 +59,11 @@ func (a *AuthRequest) IsValid() bool {
 
 func (a *AuthRequest) AddPossibleStep(step NextStep) {
 	a.possibleSteps = append(a.possibleSteps, step)
+}
+
+func (a *AuthRequest) IsMfaRequired() bool {
+	return false
+	//TODO: check a.PossibleLOAs
 }
 
 type Prompt int32
