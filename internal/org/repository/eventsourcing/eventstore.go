@@ -32,7 +32,7 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 
 	esOrg := OrgFromModel(org)
 	err = es_sdk.Filter(ctx, es.FilterEvents, esOrg.AppendEvents, query)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
 
@@ -40,6 +40,9 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 }
 
 func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
+	if orgModel == nil {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not set")
+	}
 	org := OrgFromModel(orgModel)
 
 	aggregate := OrgDeactivateAggregate(es.AggregateCreator(), org)
@@ -52,6 +55,9 @@ func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgModel *org_model.
 }
 
 func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
+	if orgModel == nil {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-9t73w", "org not set")
+	}
 	org := OrgFromModel(orgModel)
 
 	aggregate := OrgReactivateAggregate(es.AggregateCreator(), org)
@@ -63,23 +69,24 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgModel *org_model.
 	return OrgToModel(org), nil
 }
 
-func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
-	if member.UserID == "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ld93d", "userID missing")
+func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, memberModel *org_model.OrgMember) (*org_model.OrgMember, error) {
+	if memberModel == nil || memberModel.UserID == "" || memberModel.AggregateID == "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ld93d", "member not set")
 	}
 
-	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+	member := OrgMemberFromModel(memberModel)
+
+	query, err := OrgByIDQuery(member.AggregateID, member.Sequence)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, m := range org.Members {
-		if m.UserID == member.UserID {
-			return m, nil
-		}
+	err = es_sdk.Filter(ctx, es.FilterEvents, member.AppendEvents, query)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
 	}
 
-	return nil, errors.ThrowInternal(nil, "EVENT-a0Poo", "Could not find member in list")
+	return OrgMemberToModel(member), nil
 }
 
 func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
