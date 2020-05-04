@@ -132,6 +132,33 @@
         ]
       }
     },
+    "/grantedprojects/_search": {
+      "post": {
+        "summary": "PROJECTS",
+        "operationId": "SearchGrantedProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GrantedProjectSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GrantedProjectSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/grants/{id}": {
       "get": {
         "summary": "GRANTED_PROJECT_GRANTS",
@@ -988,33 +1015,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1ProjectCreateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/projects/_search": {
-      "post": {
-        "summary": "PROJECTS",
-        "operationId": "SearchProjects",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ProjectSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ProjectSearchRequest"
             }
           }
         ],
@@ -3756,6 +3756,114 @@
       ],
       "default": "GENDER_UNSPECIFIED"
     },
+    "v1GrantedProject": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1ProjectState"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "type": {
+          "$ref": "#/definitions/v1ProjectType"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "org_name": {
+          "type": "string"
+        },
+        "org_domain": {
+          "type": "string"
+        },
+        "grant_id": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1GrantedProjectSearchKey": {
+      "type": "string",
+      "enum": [
+        "PROJECTSEARCHKEY_UNSPECIFIED",
+        "PROJECTSEARCHKEY_PROJECT_NAME"
+      ],
+      "default": "PROJECTSEARCHKEY_UNSPECIFIED"
+    },
+    "v1GrantedProjectSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1GrantedProjectSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GrantedProjectSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1GrantedProjectSearchQuery"
+          }
+        }
+      }
+    },
+    "v1GrantedProjectSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1GrantedProject"
+          }
+        }
+      }
+    },
     "v1MFAState": {
       "type": "string",
       "enum": [
@@ -4412,24 +4520,6 @@
         "creation_date": {
           "type": "string",
           "format": "date-time"
-        },
-        "type": {
-          "$ref": "#/definitions/v1ProjectType"
-        },
-        "resource_owner": {
-          "type": "string"
-        },
-        "org_id": {
-          "type": "string"
-        },
-        "org_name": {
-          "type": "string"
-        },
-        "org_domain": {
-          "type": "string"
-        },
-        "grant_id": {
-          "type": "string"
         },
         "sequence": {
           "type": "string",
@@ -5115,70 +5205,6 @@
         }
       }
     },
-    "v1ProjectSearchKey": {
-      "type": "string",
-      "enum": [
-        "PROJECTSEARCHKEY_UNSPECIFIED",
-        "PROJECTSEARCHKEY_PROJECT_NAME"
-      ],
-      "default": "PROJECTSEARCHKEY_UNSPECIFIED"
-    },
-    "v1ProjectSearchQuery": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "$ref": "#/definitions/v1ProjectSearchKey"
-        },
-        "method": {
-          "$ref": "#/definitions/v1SearchMethod"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
-    "v1ProjectSearchRequest": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1ProjectSearchQuery"
-          }
-        }
-      }
-    },
-    "v1ProjectSearchResponse": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "total_result": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1Project"
-          }
-        }
-      }
-    },
     "v1ProjectState": {
       "type": "string",
       "enum": [
@@ -5191,11 +5217,11 @@
     "v1ProjectType": {
       "type": "string",
       "enum": [
-        "PROJECTTYPE_UNKNOWN",
-        "PROJECTTYPE_SELF",
+        "PROJECTTYPE_UNSPECIFIED",
+        "PROJECTTYPE_OWNED",
         "PROJECTTYPE_GRANTED"
       ],
-      "default": "PROJECTTYPE_UNKNOWN"
+      "default": "PROJECTTYPE_UNSPECIFIED"
     },
     "v1ProjectUpdateRequest": {
       "type": "object",
@@ -5269,7 +5295,10 @@
       "enum": [
         "SEARCHMETHOD_EQUALS",
         "SEARCHMETHOD_STARTS_WITH",
-        "SEARCHMETHOD_CONTAINS"
+        "SEARCHMETHOD_CONTAINS",
+        "SEARCHMETHOD_EQUALS_IGNORE_CASE",
+        "SEARCHMETHOD_STARTS_WITH_IGNORE_CASE",
+        "SEARCHMETHOD_CONTAINS_IGNORE_CASE"
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },

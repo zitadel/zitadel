@@ -35,7 +35,7 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 	return repo.ProjectEvents.ReactivateProject(ctx, id)
 }
 
-func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
+func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
 	projects, count, err := repo.View.SearchGrantedProjects(request)
 	if err != nil {
 		return nil, err

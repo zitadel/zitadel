@@ -38,6 +38,9 @@ Mgmt:
         User: 'management'
         Database: 'management'
         SSLmode: disable
+    Spooler:
+      ConcurrentTasks: 4
+      BulkLimit: 100
 
 Auth:
   API:

@@ -571,9 +571,9 @@ service ManagementService {
     }
 
     //PROJECTS
-    rpc SearchProjects(ProjectSearchRequest) returns (ProjectSearchResponse) {
+    rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (GrantedProjectSearchResponse) {
         option (google.api.http) = {
-            post: "/projects/_search"
+            post: "/grantedprojects/_search"
             body: "*"
         };
 
@@ -1357,8 +1357,10 @@ enum SearchMethod {
     SEARCHMETHOD_EQUALS = 0;
     SEARCHMETHOD_STARTS_WITH = 1;
     SEARCHMETHOD_CONTAINS = 2;
+    SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
+    SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
+    SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
 }
-
 
 message UserProfile {
     string id = 1;
@@ -1677,13 +1679,7 @@ message Project {
     ProjectState state = 3;
     google.protobuf.Timestamp change_date = 4;
     google.protobuf.Timestamp creation_date = 5;
-    ProjectType type = 6;
-    string resource_owner = 7;
-    string org_id = 8;
-    string org_name = 9;
-    string org_domain = 10;
-    string grant_id = 11;
-    uint64 sequence = 12;
+    uint64 sequence = 6;
 }
 
 enum ProjectState {
@@ -1693,31 +1689,46 @@ enum ProjectState {
 }
 
 enum ProjectType {
-    PROJECTTYPE_UNKNOWN = 0;
-    PROJECTTYPE_SELF = 1;
+    PROJECTTYPE_UNSPECIFIED = 0;
+    PROJECTTYPE_OWNED = 1;
     PROJECTTYPE_GRANTED = 2;
 }
 
-message ProjectSearchResponse {
+message GrantedProjectSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated Project result = 4;
+    repeated GrantedProject result = 4;
 }
 
-message ProjectSearchRequest {
+message GrantedProject {
+    string id = 1;
+    string name = 2;
+    ProjectState state = 3;
+    google.protobuf.Timestamp change_date = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    ProjectType type = 6;
+    string resource_owner = 7;
+    string org_id = 8;
+    string org_name = 9;
+    string org_domain = 10;
+    string grant_id = 11;
+    uint64 sequence = 12;
+}
+
+message GrantedProjectSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
-    repeated ProjectSearchQuery queries = 3;
+    repeated GrantedProjectSearchQuery queries = 3;
 }
 
-message ProjectSearchQuery {
-    ProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+message GrantedProjectSearchQuery {
+    GrantedProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
     SearchMethod method = 2;
     string value = 3;
 }
 
-enum ProjectSearchKey {
+enum GrantedProjectSearchKey {
     PROJECTSEARCHKEY_UNSPECIFIED = 0;
     PROJECTSEARCHKEY_PROJECT_NAME = 1;
 }

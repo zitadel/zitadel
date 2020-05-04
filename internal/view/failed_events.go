@@ -80,7 +80,7 @@ func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*F
 		return failedEvent, nil
 	}
 
-	if gorm.IsRecordNotFoundError(err) {
+	if errors.IsNotFound(err) {
 		failedEvent.ViewName = viewName
 		failedEvent.FailedSequnce = sequence
 		failedEvent.FailureCount = 0

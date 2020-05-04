@@ -35,8 +35,12 @@ func (s *Server) ReactivateProject(ctx context.Context, in *ProjectID) (*Project
 	return projectFromModel(project), nil
 }
 
-func (s *Server) SearchProjects(ctx context.Context, in *ProjectSearchRequest) (*ProjectSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-2sFvd", "Not implemented")
+func (s *Server) SearchGrantedProjects(ctx context.Context, in *GrantedProjectSearchRequest) (*GrantedProjectSearchResponse, error) {
+	response, err := s.project.SearchGrantedProjects(ctx, grantedProjectSearchRequestsToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return grantedProjectSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, error) {
