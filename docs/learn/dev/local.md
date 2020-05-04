@@ -1,4 +1,3 @@
-
 # local development
 
 ## start cockroach in docker

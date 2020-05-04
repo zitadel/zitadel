@@ -1,7 +1,21 @@
-# dev practices
+# Development Practices
 
-## Quality
+> This is just an outline!
 
-## Dependencies
+## License
 
-## Versioning
+- Apache 2.0
+
+## Software Quality
+
+- Unit Testing
+- Code Coverage
+- Source Best Practices Scan
+
+## Dependency Management
+
+- Scheduled integration of Dependencies (dependabot)
+
+## Version Strategy
+
+- Semantic Release
