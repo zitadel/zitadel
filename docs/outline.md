@@ -2,10 +2,6 @@
 
 ## How to start
 
-### Zitadel Cloud
-
-### Zitadel
-
 ## Integrate
 
 ## Deploy
@@ -17,13 +13,5 @@
 ## Migrate
 
 ## Learn More
-
-### Development Practices
-
-### Versioning
-
-### Architecutre
-
-### Security
 
 ## Faqs
