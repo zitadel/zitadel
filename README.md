@@ -26,7 +26,9 @@ Zitadel is a Cloud Native IAM with a clear focus toward federated Authentication
 - Can be used as SaaS or Own Instace
 - Security features are default and not hidden behind a paid tier
 
-## How To Use It
+## Quickstart
+
+-> LINK docs
 
 ## How To Contribute
 
@@ -34,7 +36,8 @@ TBD
 
 ## Security
 
-See the policy [here](./SECURITY.md)
+See the security policy [here](./SECURITY.md)
+And our security practices -> LINK docs
 
 ## License
 
