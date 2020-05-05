@@ -77,4 +77,21 @@ CREATE TABLE management.project_members (
     PRIMARY KEY (project_id, user_id)
 );
 
+CREATE TABLE management.project_grant_members (
+    user_id TEXT,
+    grant_id TEXT,
+
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+
+    user_name TEXT,
+    email_address TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    roles TEXT ARRAY,
+    sequence BIGINT,
+
+    PRIMARY KEY (grant_id, user_id)
+);
+
 COMMIT;

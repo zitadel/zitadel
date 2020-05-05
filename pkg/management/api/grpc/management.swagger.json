@@ -4619,18 +4619,6 @@
         "user_id": {
           "type": "string"
         },
-        "user_name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
         "roles": {
           "type": "array",
           "items": {
@@ -4709,7 +4697,8 @@
         "PROJECTGRANTMEMBERSEARCHKEY_FIRST_NAME",
         "PROJECTGRANTMEMBERSEARCHKEY_LAST_NAME",
         "PROJECTGRANTMEMBERSEARCHKEY_EMAIL",
-        "PROJECTGRANTMEMBERSEARCHKEY_USER_ID"
+        "PROJECTGRANTMEMBERSEARCHKEY_USER_ID",
+        "PROJECTGRANTMEMBERSEARCHKEY_USER_NAME"
       ],
       "default": "PROJECTGRANTMEMBERSEARCHKEY_UNSPECIFIED"
     },
@@ -4770,8 +4759,46 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ProjectGrantMember"
+            "$ref": "#/definitions/v1ProjectGrantMemberView"
           }
+        }
+      }
+    },
+    "v1ProjectGrantMemberView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

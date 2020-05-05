@@ -190,3 +190,19 @@ func (repo *ProjectRepo) RemoveProjectGrantMember(ctx context.Context, projectID
 	member := proj_model.NewProjectGrantMember(projectID, grantID, userID)
 	return repo.ProjectEvents.RemoveProjectGrantMember(ctx, member)
 }
+
+func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request *proj_model.ProjectGrantMemberSearchRequest) (*proj_model.ProjectGrantMemberSearchResponse, error) {
+	if request.Limit == 0 {
+		request.Limit = repo.SearchLimit
+	}
+	members, count, err := repo.View.SearchProjectGrantMembers(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectGrantMemberSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectGrantMembersToModel(members),
+	}, nil
+}

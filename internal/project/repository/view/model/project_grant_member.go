@@ -11,17 +11,18 @@ import (
 )
 
 const (
-	ProjectMemberKeyUserID    = "user_id"
-	ProjectMemberKeyProjectID = "project_id"
-	ProjectMemberKeyUserName  = "user_name"
-	ProjectMemberKeyEmail     = "email"
-	ProjectMemberKeyFirstName = "first_name"
-	ProjectMemberKeyLastName  = "last_name"
+	ProjectGrantMemberKeyUserID    = "user_id"
+	ProjectGrantMemberKeyGrantID   = "grant_id"
+	ProjectGrantMemberKeyUserName  = "user_name"
+	ProjectGrantMemberKeyEmail     = "email"
+	ProjectGrantMemberKeyFirstName = "first_name"
+	ProjectGrantMemberKeyLastName  = "last_name"
 )
 
-type ProjectMemberView struct {
+type ProjectGrantMemberView struct {
 	UserID    string         `json:"userId" gorm:"column:user_id;primary_key"`
-	ProjectID string         `json:"-" gorm:"column:project_id;primary_key"`
+	GrantID   string         `json:"grantId" gorm:"column:grant_id;primary_key"`
+	ProjectID string         `json:"-" gorm:"column:project_id"`
 	UserName  string         `json:"-" gorm:"column:user_name"`
 	Email     string         `json:"-" gorm:"column:email_address"`
 	FirstName string         `json:"-" gorm:"column:first_name"`
@@ -33,9 +34,10 @@ type ProjectMemberView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func ProjectMemberViewFromModel(member *model.ProjectMemberView) *ProjectMemberView {
-	return &ProjectMemberView{
+func ProjectGrantMemberViewFromModel(member *model.ProjectGrantMemberView) *ProjectGrantMemberView {
+	return &ProjectGrantMemberView{
 		UserID:       member.UserID,
+		GrantID:      member.GrantID,
 		ProjectID:    member.ProjectID,
 		UserName:     member.UserName,
 		Email:        member.Email,
@@ -48,9 +50,10 @@ func ProjectMemberViewFromModel(member *model.ProjectMemberView) *ProjectMemberV
 	}
 }
 
-func ProjectMemberToModel(member *ProjectMemberView) *model.ProjectMemberView {
-	return &model.ProjectMemberView{
+func ProjectGrantMemberToModel(member *ProjectGrantMemberView) *model.ProjectGrantMemberView {
+	return &model.ProjectGrantMemberView{
 		UserID:       member.UserID,
+		GrantID:      member.GrantID,
 		ProjectID:    member.ProjectID,
 		UserName:     member.UserName,
 		Email:        member.Email,
@@ -63,33 +66,33 @@ func ProjectMemberToModel(member *ProjectMemberView) *model.ProjectMemberView {
 	}
 }
 
-func ProjectMembersToModel(roles []*ProjectMemberView) []*model.ProjectMemberView {
-	result := make([]*model.ProjectMemberView, 0)
+func ProjectGrantMembersToModel(roles []*ProjectGrantMemberView) []*model.ProjectGrantMemberView {
+	result := make([]*model.ProjectGrantMemberView, 0)
 	for _, r := range roles {
-		result = append(result, ProjectMemberToModel(r))
+		result = append(result, ProjectGrantMemberToModel(r))
 	}
 	return result
 }
 
-func (r *ProjectMemberView) AppendEvent(event *models.Event) error {
+func (r *ProjectGrantMemberView) AppendEvent(event *models.Event) error {
 	r.Sequence = event.Sequence
 	switch event.Type {
-	case es_model.ProjectMemberAdded:
+	case es_model.ProjectGrantMemberAdded:
 		r.setRootData(event)
 		r.SetData(event)
 		r.CreationDate = event.CreationDate
-	case es_model.ProjectMemberChanged:
+	case es_model.ProjectGrantMemberChanged:
 		r.SetData(event)
 	}
 	return nil
 }
 
-func (r *ProjectMemberView) setRootData(event *models.Event) {
+func (r *ProjectGrantMemberView) setRootData(event *models.Event) {
 	r.ProjectID = event.AggregateID
 	r.ChangeDate = event.CreationDate
 }
 
-func (r *ProjectMemberView) SetData(event *models.Event) error {
+func (r *ProjectGrantMemberView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-slo9s").WithError(err).Error("could not unmarshal event data")
 		return err

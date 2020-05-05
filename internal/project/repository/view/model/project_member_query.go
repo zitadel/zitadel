@@ -59,6 +59,10 @@ func (key ProjectMemberSearchKey) ToColumnName() string {
 		return ProjectMemberKeyLastName
 	case proj_model.PROJECTMEMBERSEARCHKEY_USER_NAME:
 		return ProjectMemberKeyUserName
+	case proj_model.PROJECTMEMBERSEARCHKEY_USER_ID:
+		return ProjectMemberKeyUserID
+	case proj_model.PROJECTMEMBERSEARCHKEY_PROJECT_ID:
+		return ProjectMemberKeyProjectID
 	default:
 		return ""
 	}
