@@ -209,7 +209,7 @@ func (db *dbMock) expectGetByQueryErr(table, key, method, value string, err erro
 }
 
 func (db *dbMock) expectSave(table string, object Test) *dbMock {
-	query := fmt.Sprintf(expectedSave, table, table, "id")
+	query := fmt.Sprintf(expectedSave, table, table, "primary_id")
 	db.mock.ExpectExec(query).
 		WithArgs(object.Test, object.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
