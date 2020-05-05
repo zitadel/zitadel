@@ -200,18 +200,6 @@ service AuthService {
             };
     }
     //Password
-
-    rpc SetMyPassword(PasswordRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-                put: "/users/me/passwords"
-                body: "*"
-            };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-                permission: "authenticated"
-            };
-    }
-
     rpc ChangeMyPassword(PasswordChange) returns (google.protobuf.Empty) {
         option (google.api.http) = {
                 put: "/users/me/passwords/_change"

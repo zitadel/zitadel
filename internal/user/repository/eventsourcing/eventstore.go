@@ -355,23 +355,45 @@ func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_
 }
 
 func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
-	return es.changedPassword(ctx, password, true)
+	return es.changedPassword(ctx, password.AggregateID, password.SecretString, true)
 }
 
-func (es *UserEventstore) SetPassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
-	return es.changedPassword(ctx, password, false)
-}
-
-func (es *UserEventstore) changedPassword(ctx context.Context, password *usr_model.Password, onetime bool) (*usr_model.Password, error) {
-	if !password.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dosi3", "password invalid")
+func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, password string) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
 	}
-	user, err := es.UserByID(ctx, password.AggregateID)
+	if user.PasswordCode == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-65sdr", "reset code not found")
+	}
+	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
+
+	}
+	_, err = es.changedPassword(ctx, userID, password, false)
+	return err
+}
+
+func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new string) (*usr_model.Password, error) {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.Password == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fds3s", "user has no password")
+	}
+	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "invalid password")
+	}
+	return es.changedPassword(ctx, userID, new, false)
+}
+
+func (es *UserEventstore) changedPassword(ctx context.Context, userID, password string, onetime bool) (*usr_model.Password, error) {
+	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	secret, err := crypto.Hash([]byte(password.SecretString), es.PasswordAlg)
+	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
 	if err != nil {
 		return nil, err
 	}

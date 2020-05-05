@@ -96,17 +96,13 @@ func (s *Server) UpdateMyUserAddress(ctx context.Context, request *UpdateUserAdd
 	return addressFromModel(address), nil
 }
 
-func (s *Server) SetMyPassword(ctx context.Context, request *PasswordRequest) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-pl9c2", "Not implemented")
-}
-
 func (s *Server) ChangeMyPassword(ctx context.Context, request *PasswordChange) (*empty.Empty, error) {
 	err := s.repo.ChangeMyPassword(ctx, request.OldPassword, request.NewPassword)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpResponse, err error) {
-	otp, err := s.repo.AddMfaOTP(ctx)
+	otp, err := s.repo.AddMyMfaOTP(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +110,7 @@ func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpRespon
 }
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *VerifyMfaOtp) (_ *MfaOtpResponse, err error) {
-	otp, err := s.repo.VerifyMfaOTP(ctx, request.Code)
+	otp, err := s.repo.VerifyMyMfaOTP(ctx, request.Code)
 	if err != nil {
 		return nil, err
 	}

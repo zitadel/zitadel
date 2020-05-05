@@ -16,6 +16,10 @@ type UserRepo struct {
 	PasswordAlg crypto.HashAlgorithm
 }
 
+func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error) {
+	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
+}
+
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 	return repo.UserEvents.ProfileByID(ctx, auth.GetCtxData(ctx).UserID)
 }
@@ -77,31 +81,30 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 }
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
-	//TODO: move to user command and add check of old
-	passwordHash, err := crypto.Hash([]byte(new), repo.PasswordAlg)
-	if err != nil {
-		return err
-	}
-	password := &model.Password{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID: auth.GetCtxData(ctx).UserID,
-		},
-		SecretCrypto: passwordHash,
-	}
-	_, err = repo.UserEvents.SetPassword(ctx, password)
+	_, err := repo.UserEvents.ChangePassword(ctx, auth.GetCtxData(ctx).UserID, old, new)
 	return err
 }
 
-func (repo *UserRepo) AddMfaOTP(ctx context.Context) (*model.OTP, error) {
+func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	return repo.UserEvents.AddOTP(ctx, auth.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMfaOTP(ctx context.Context, code string) (*model.OTP, error) {
-	return nil, repo.UserEvents.CheckMfaOTP(ctx, auth.GetCtxData(ctx).UserID, code) //TODO:
+func (repo *UserRepo) VerifyMyMfaOTP(ctx context.Context, code string) (*model.OTP, error) {
+	return nil, repo.UserEvents.CheckMfaOTP(ctx, auth.GetCtxData(ctx).UserID, code) //TODO: return?
 }
 
 func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, auth.GetCtxData(ctx).UserID)
+}
+
+func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string) error {
+	//TODO: get id from view
+	var userID string
+	return repo.UserEvents.RequestSetPassword(ctx, userID, model.NOTIFICATIONTYPE_EMAIL) //TODO: ?
+}
+
+func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
+	return repo.UserEvents.SetPassword(ctx, userID, code, password)
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {

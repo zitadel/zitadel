@@ -343,34 +343,9 @@
         ]
       }
     },
-    "/users/me/passwords": {
-      "put": {
-        "operationId": "SetMyPassword",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
     "/users/me/passwords/_change": {
       "put": {
+        "summary": "Password",
         "operationId": "ChangeMyPassword",
         "responses": {
           "200": {
@@ -728,14 +703,6 @@
           "type": "string"
         },
         "new_password": {
-          "type": "string"
-        }
-      }
-    },
-    "v1PasswordRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
           "type": "string"
         }
       }

@@ -7,6 +7,14 @@ import (
 )
 
 type UserRepository interface {
+	Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error)
+
+	myUserRepo
+	RequestPasswordReset(ctx context.Context, username string) error
+	SetPassword(ctx context.Context, userID, code, password string) error
+}
+
+type myUserRepo interface {
 	MyProfile(ctx context.Context) (*model.Profile, error)
 	ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
@@ -25,7 +33,7 @@ type UserRepository interface {
 
 	ChangeMyPassword(ctx context.Context, old, new string) error
 
-	AddMfaOTP(ctx context.Context) (*model.OTP, error)
-	VerifyMfaOTP(ctx context.Context, code string) (*model.OTP, error)
+	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
+	VerifyMyMfaOTP(ctx context.Context, code string) (*model.OTP, error)
 	RemoveMyMfaOTP(ctx context.Context) error
 }
