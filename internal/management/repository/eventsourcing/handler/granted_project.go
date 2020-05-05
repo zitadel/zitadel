@@ -38,7 +38,7 @@ func (p *GrantedProject) EventQuery() (*models.SearchQuery, error) {
 }
 
 func (p *GrantedProject) Process(event *models.Event) (err error) {
-	grantedProject := new(view_model.GrantedProject)
+	grantedProject := new(view_model.GrantedProjectView)
 	switch event.Type {
 	case es_model.ProjectAdded:
 		grantedProject.AppendEvent(event)
@@ -104,7 +104,7 @@ func (p *GrantedProject) getProject(projectID string) (*model.Project, error) {
 	return p.projectEvents.ProjectByID(context.Background(), projectID)
 }
 
-func (p *GrantedProject) updateExistingProjects(project *view_model.GrantedProject) {
+func (p *GrantedProject) updateExistingProjects(project *view_model.GrantedProjectView) {
 	projects, err := p.view.GrantedProjectsByID(project.ProjectID)
 	if err != nil {
 		logging.LogWithFields("SPOOL-los03", "id", project.ProjectID).WithError(err).Warn("could not update existing projects")

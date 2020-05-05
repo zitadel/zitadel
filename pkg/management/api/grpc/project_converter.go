@@ -34,7 +34,7 @@ func grantedProjectSearchResponseFromModel(response *proj_model.GrantedProjectSe
 	}
 }
 
-func grantedProjectsFromModel(projects []*proj_model.GrantedProject) []*GrantedProject {
+func grantedProjectsFromModel(projects []*proj_model.GrantedProjectView) []*GrantedProject {
 	converted := make([]*GrantedProject, 0)
 	for _, q := range projects {
 		converted = append(converted, grantedProjectFromModel(q))
@@ -42,7 +42,7 @@ func grantedProjectsFromModel(projects []*proj_model.GrantedProject) []*GrantedP
 	return converted
 }
 
-func grantedProjectFromModel(project *proj_model.GrantedProject) *GrantedProject {
+func grantedProjectFromModel(project *proj_model.GrantedProjectView) *GrantedProject {
 	creationDate, err := ptypes.TimestampProto(project.CreationDate)
 	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
 

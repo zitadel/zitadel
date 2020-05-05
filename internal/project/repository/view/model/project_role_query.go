@@ -52,13 +52,13 @@ func (req ProjectRoleSearchQuery) GetValue() interface{} {
 func (key ProjectRoleSearchKey) ToColumnName() string {
 	switch proj_model.ProjectRoleSearchKey(key) {
 	case proj_model.PROJECTROLESEARCHKEY_KEY:
-		return ProjectRoleKeyNameKey
+		return ProjectRoleKeyKey
 	case proj_model.PROJECTROLESEARCHKEY_ORGID:
-		return ProjectRoleKeyNameOrgID
+		return ProjectRoleKeyOrgID
 	case proj_model.PROJECTROLESEARCHKEY_PROJECTID:
-		return ProjectRoleKeyNameProjectID
+		return ProjectRoleKeyProjectID
 	case proj_model.PROJECTROLESEARCHKEY_RESOURCEOWNER:
-		return ProjectRoleKeyNameResourceOwner
+		return ProjectRoleKeyResourceOwner
 	default:
 		return ""
 	}

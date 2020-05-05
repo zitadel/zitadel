@@ -10,6 +10,7 @@ import (
 )
 
 type ProjectRepo struct {
+	SearchLimit   uint64
 	ProjectEvents *proj_event.ProjectEventstore
 	View          *view.View
 }
@@ -36,6 +37,9 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 }
 
 func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
+	if request.Limit == 0 {
+		request.Limit = repo.SearchLimit
+	}
 	projects, count, err := repo.View.SearchGrantedProjects(request)
 	if err != nil {
 		return nil, err
@@ -66,6 +70,22 @@ func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, use
 	return repo.ProjectEvents.RemoveProjectMember(ctx, member)
 }
 
+func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
+	if request.Limit == 0 {
+		request.Limit = repo.SearchLimit
+	}
+	members, count, err := repo.View.SearchProjectMembers(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectMemberSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectMembersToModel(members),
+	}, nil
+}
+
 func (repo *ProjectRepo) AddProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
 	return repo.ProjectEvents.AddProjectRole(ctx, member)
 }
@@ -80,6 +100,9 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 }
 
 func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
+	if request.Limit == 0 {
+		request.Limit = repo.SearchLimit
+	}
 	roles, count, err := repo.View.SearchProjectRoles(request)
 	if err != nil {
 		return nil, err

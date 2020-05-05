@@ -1739,14 +1739,10 @@ message ProjectMemberRoles {
 
 message ProjectMember {
     string user_id = 1;
-    string user_name = 2;
-    string email = 3;
-    string first_name = 4;
-    string last_name = 5;
-    repeated string roles = 6;
-    google.protobuf.Timestamp change_date = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    uint64 sequence = 10;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
 }
 
 message ProjectMemberAdd {
@@ -1830,11 +1826,23 @@ enum ProjectRoleSearchKey {
     PROJECTROLESEARCHKEY_DISPLAY_NAME = 2;
 }
 
+message ProjectMemberView {
+    string user_id = 1;
+    string user_name = 2;
+    string email = 3;
+    string first_name = 4;
+    string last_name = 5;
+    repeated string roles = 6;
+    google.protobuf.Timestamp change_date = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    uint64 sequence = 10;
+}
+
 message ProjectMemberSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated ProjectMember result = 4;
+    repeated ProjectMemberView result = 4;
 }
 
 message ProjectMemberSearchRequest {
@@ -1856,6 +1864,7 @@ enum ProjectMemberSearchKey {
     PROJECTMEMBERSEARCHKEY_LAST_NAME = 2;
     PROJECTMEMBERSEARCHKEY_EMAIL = 3;
     PROJECTMEMBERSEARCHKEY_USER_ID = 4;
+    PROJECTMEMBERSEARCHKEY_USER_NAME = 5;
 }
 
 enum AppState {

@@ -131,7 +131,7 @@ func (p *ProjectRole) addGrantRoles(event *models.Event) error {
 			Sequence:      event.Sequence,
 		}
 		err := p.view.PutProjectRole(projectRole)
-		logging.LogWithFields("HANDL-sj3TG", "eventID", event.ID).OnError(err).Warn("could not save granted role")
+		logging.LogWithFields("HANDL-sj3TG", "eventID", event.ID).OnError(err).Warn("could not save project role")
 	}
 	return nil
 }
@@ -146,7 +146,7 @@ func getRoleFromProject(roleKey string, project *proj_model.Project) *proj_model
 }
 
 func (p *ProjectRole) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-lso9w", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
+	logging.LogWithFields("SPOOL-lso9w", "id", event.AggregateID).WithError(err).Warn("something went wrong in project role handler")
 	failedEvent, err := p.view.GetLatestProjectRoleFailedEvent(event.Sequence)
 	if err != nil {
 		return err

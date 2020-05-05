@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	ProjectRoleKeyNameKey           = "role_key"
-	ProjectRoleKeyNameOrgID         = "org_id"
-	ProjectRoleKeyNameProjectID     = "project_id"
-	ProjectRoleKeyNameResourceOwner = "resource_owner"
+	ProjectRoleKeyKey           = "role_key"
+	ProjectRoleKeyOrgID         = "org_id"
+	ProjectRoleKeyProjectID     = "project_id"
+	ProjectRoleKeyResourceOwner = "resource_owner"
 )
 
 type ProjectRoleView struct {

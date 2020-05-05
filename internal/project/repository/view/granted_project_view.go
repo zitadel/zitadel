@@ -8,8 +8,8 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func GrantedProjectByIDs(db *gorm.DB, table, projectID, orgID string) (*model.GrantedProject, error) {
-	project := new(model.GrantedProject)
+func GrantedProjectByIDs(db *gorm.DB, table, projectID, orgID string) (*model.GrantedProjectView, error) {
+	project := new(model.GrantedProjectView)
 
 	projectIDQuery := model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
 	grantIDQuery := model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_ORGID, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
@@ -18,8 +18,8 @@ func GrantedProjectByIDs(db *gorm.DB, table, projectID, orgID string) (*model.Gr
 	return project, err
 }
 
-func GrantedProjectsByID(db *gorm.DB, table, projectID string) ([]*model.GrantedProject, error) {
-	projects := make([]*model.GrantedProject, 0)
+func GrantedProjectsByID(db *gorm.DB, table, projectID string) ([]*model.GrantedProjectView, error) {
+	projects := make([]*model.GrantedProjectView, 0)
 	queries := []*proj_model.GrantedProjectSearchQuery{
 		&proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
 	}
@@ -31,8 +31,8 @@ func GrantedProjectsByID(db *gorm.DB, table, projectID string) ([]*model.Granted
 	return projects, nil
 }
 
-func SearchGrantedProjects(db *gorm.DB, table string, req *proj_model.GrantedProjectSearchRequest) ([]*model.GrantedProject, int, error) {
-	projects := make([]*model.GrantedProject, 0)
+func SearchGrantedProjects(db *gorm.DB, table string, req *proj_model.GrantedProjectSearchRequest) ([]*model.GrantedProjectView, int, error) {
+	projects := make([]*model.GrantedProjectView, 0)
 	query := view.PrepareSearchQuery(table, model.GrantedProjectSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &projects)
 	if err != nil {
@@ -41,7 +41,7 @@ func SearchGrantedProjects(db *gorm.DB, table string, req *proj_model.GrantedPro
 	return projects, count, nil
 }
 
-func PutGrantedProject(db *gorm.DB, table string, project *model.GrantedProject) error {
+func PutGrantedProject(db *gorm.DB, table string, project *model.GrantedProjectView) error {
 	save := view.PrepareSave(table)
 	return save(db, project)
 }

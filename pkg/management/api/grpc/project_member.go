@@ -10,8 +10,12 @@ func (s *Server) GetProjectMemberRoles(ctx context.Context, _ *empty.Empty) (*Pr
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-qw34d", "Not implemented")
 }
 
-func (s *Server) SearchProjectMembers(ctx context.Context, request *ProjectMemberSearchRequest) (*ProjectMemberSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-PLr84", "Not implemented")
+func (s *Server) SearchProjectMembers(ctx context.Context, in *ProjectMemberSearchRequest) (*ProjectMemberSearchResponse, error) {
+	response, err := s.project.SearchProjectMembers(ctx, projectMemberSearchRequestsToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return projectMemberSearchResponseFromModel(response), nil
 }
 
 func (s *Server) AddProjectMember(ctx context.Context, in *ProjectMemberAdd) (*ProjectMember, error) {

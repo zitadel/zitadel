@@ -18,6 +18,7 @@ Mgmt:
       CustomHeaders:
         - x-zitadel-
   Repository:
+    SearchLimit: 100
     Eventstore:
       ServiceName: 'ManagementAPI'
       Repository:

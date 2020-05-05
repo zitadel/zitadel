@@ -15,9 +15,10 @@ import (
 )
 
 type Config struct {
-	Eventstore es_int.Config
-	View       view.ViewConfig
-	Spooler    spooler.SpoolerConfig
+	SearchLimit uint64
+	Eventstore  es_int.Config
+	View        view.ViewConfig
+	Spooler     spooler.SpoolerConfig
 }
 
 type EsRepository struct {
@@ -51,7 +52,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 
 	return &EsRepository{
 		spool,
-		eventstore.ProjectRepo{project, view},
+		eventstore.ProjectRepo{conf.SearchLimit, project, view},
 	}, nil
 }
 

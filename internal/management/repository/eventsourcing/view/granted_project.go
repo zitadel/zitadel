@@ -11,19 +11,19 @@ const (
 	grantedProjectTable = "management.granted_projects"
 )
 
-func (v *View) GrantedProjectByIDs(projectID, orgID string) (*model.GrantedProject, error) {
+func (v *View) GrantedProjectByIDs(projectID, orgID string) (*model.GrantedProjectView, error) {
 	return view.GrantedProjectByIDs(v.Db, grantedProjectTable, projectID, orgID)
 }
 
-func (v *View) GrantedProjectsByID(projectID string) ([]*model.GrantedProject, error) {
+func (v *View) GrantedProjectsByID(projectID string) ([]*model.GrantedProjectView, error) {
 	return view.GrantedProjectsByID(v.Db, grantedProjectTable, projectID)
 }
 
-func (v *View) SearchGrantedProjects(request *proj_model.GrantedProjectSearchRequest) ([]*model.GrantedProject, int, error) {
+func (v *View) SearchGrantedProjects(request *proj_model.GrantedProjectSearchRequest) ([]*model.GrantedProjectView, int, error) {
 	return view.SearchGrantedProjects(v.Db, grantedProjectTable, request)
 }
 
-func (v *View) PutGrantedProject(project *model.GrantedProject) error {
+func (v *View) PutGrantedProject(project *model.GrantedProjectView) error {
 	err := view.PutGrantedProject(v.Db, grantedProjectTable, project)
 	if err != nil {
 		return err

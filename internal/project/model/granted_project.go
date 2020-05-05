@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type GrantedProject struct {
+type GrantedProjectView struct {
 	ProjectID     string
 	Name          string
 	CreationDate  time.Time
@@ -55,5 +55,5 @@ type GrantedProjectSearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Result      []*GrantedProject
+	Result      []*GrantedProjectView
 }

@@ -42,3 +42,79 @@ func projectMemberChangeToModel(member *ProjectMemberChange) *proj_model.Project
 		Roles:  member.Roles,
 	}
 }
+
+func projectMemberSearchRequestsToModel(role *ProjectMemberSearchRequest) *proj_model.ProjectMemberSearchRequest {
+	return &proj_model.ProjectMemberSearchRequest{
+		Offset:  role.Offset,
+		Limit:   role.Limit,
+		Queries: projectMemberSearchQueriesToModel(role.Queries),
+	}
+}
+
+func projectMemberSearchQueriesToModel(queries []*ProjectMemberSearchQuery) []*proj_model.ProjectMemberSearchQuery {
+	converted := make([]*proj_model.ProjectMemberSearchQuery, 0)
+	for _, q := range queries {
+		converted = append(converted, projectMemberSearchQueryToModel(q))
+	}
+	return converted
+}
+
+func projectMemberSearchQueryToModel(query *ProjectMemberSearchQuery) *proj_model.ProjectMemberSearchQuery {
+	return &proj_model.ProjectMemberSearchQuery{
+		Key:    projectMemberSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func projectMemberSearchKeyToModel(key ProjectMemberSearchKey) proj_model.ProjectMemberSearchKey {
+	switch key {
+	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_EMAIL:
+		return proj_model.PROJECTMEMBERSEARCHKEY_EMAIL
+	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_FIRST_NAME:
+		return proj_model.PROJECTMEMBERSEARCHKEY_FIRST_NAME
+	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_LAST_NAME:
+		return proj_model.PROJECTMEMBERSEARCHKEY_LAST_NAME
+	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_USER_NAME:
+		return proj_model.PROJECTMEMBERSEARCHKEY_USER_NAME
+	default:
+		return proj_model.PROJECTMEMBERSEARCHKEY_UNSPECIFIED
+	}
+}
+
+func projectMemberSearchResponseFromModel(response *proj_model.ProjectMemberSearchResponse) *ProjectMemberSearchResponse {
+	return &ProjectMemberSearchResponse{
+		Offset:      response.Offset,
+		Limit:       response.Limit,
+		TotalResult: response.TotalResult,
+		Result:      projectMemberViewsFromModel(response.Result),
+	}
+}
+
+func projectMemberViewsFromModel(roles []*proj_model.ProjectMemberView) []*ProjectMemberView {
+	converted := make([]*ProjectMemberView, 0)
+	for _, q := range roles {
+		converted = append(converted, projectMemberViewFromModel(q))
+	}
+	return converted
+}
+
+func projectMemberViewFromModel(member *proj_model.ProjectMemberView) *ProjectMemberView {
+	creationDate, err := ptypes.TimestampProto(member.CreationDate)
+	logging.Log("GRPC-sl9cs").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
+	logging.Log("GRPC-8iw2d").OnError(err).Debug("unable to parse timestamp")
+
+	return &ProjectMemberView{
+		UserId:       member.UserID,
+		UserName:     member.UserName,
+		Email:        member.Email,
+		FirstName:    member.FirstName,
+		LastName:     member.LastName,
+		Roles:        member.Roles,
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
+		Sequence:     member.Sequence,
+	}
+}

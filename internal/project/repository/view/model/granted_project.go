@@ -10,13 +10,13 @@ import (
 )
 
 const (
-	GrantedProjectIDKey      = "project_id"
-	GrantedProjectGrantIDKey = "grant_id"
-	GrantedProjectOrgIDKey   = "org_id"
-	GrantedProjectNameKey    = "name"
+	GrantedProjectKeyProjectID = "project_id"
+	GrantedProjectKeyGrantID   = "grant_id"
+	GrantedProjectKeyOrgID     = "org_id"
+	GrantedProjectKeyName      = "name"
 )
 
-type GrantedProject struct {
+type GrantedProjectView struct {
 	ProjectID     string    `json:"-" gorm:"column:project_id;primary_key"`
 	OrgID         string    `json:"-" gorm:"column:org_id;primary_key"`
 	Name          string    `json:"name" gorm:"column:project_name"`
@@ -37,8 +37,8 @@ type ProjectGrant struct {
 	RoleKeys     []string `json:"roleKeys"`
 }
 
-func GrantedProjectFromModel(project *model.GrantedProject) *GrantedProject {
-	return &GrantedProject{
+func GrantedProjectFromModel(project *model.GrantedProjectView) *GrantedProjectView {
+	return &GrantedProjectView{
 		ProjectID:     project.ProjectID,
 		OrgID:         project.OrgID,
 		Name:          project.Name,
@@ -53,8 +53,8 @@ func GrantedProjectFromModel(project *model.GrantedProject) *GrantedProject {
 	}
 }
 
-func GrantedProjectToModel(project *GrantedProject) *model.GrantedProject {
-	return &model.GrantedProject{
+func GrantedProjectToModel(project *GrantedProjectView) *model.GrantedProjectView {
+	return &model.GrantedProjectView{
 		ProjectID:     project.ProjectID,
 		OrgID:         project.OrgID,
 		Name:          project.Name,
@@ -69,15 +69,15 @@ func GrantedProjectToModel(project *GrantedProject) *model.GrantedProject {
 	}
 }
 
-func GrantedProjectsToModel(projects []*GrantedProject) []*model.GrantedProject {
-	result := make([]*model.GrantedProject, 0)
+func GrantedProjectsToModel(projects []*GrantedProjectView) []*model.GrantedProjectView {
+	result := make([]*model.GrantedProjectView, 0)
 	for _, p := range projects {
 		result = append(result, GrantedProjectToModel(p))
 	}
 	return result
 }
 
-func (p *GrantedProject) AppendEvent(event *models.Event) error {
+func (p *GrantedProjectView) AppendEvent(event *models.Event) error {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Sequence
 	switch event.Type {
@@ -105,13 +105,13 @@ func (p *GrantedProject) AppendEvent(event *models.Event) error {
 	return nil
 }
 
-func (p *GrantedProject) setRootData(event *models.Event) {
+func (p *GrantedProjectView) setRootData(event *models.Event) {
 	p.ProjectID = event.AggregateID
 	p.OrgID = event.ResourceOwner
 	p.ResourceOwner = event.ResourceOwner
 }
 
-func (p *GrantedProject) setData(event *models.Event) error {
+func (p *GrantedProjectView) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-dlo92").WithError(err).Error("could not unmarshal event data")
 		return err
@@ -119,7 +119,7 @@ func (p *GrantedProject) setData(event *models.Event) error {
 	return nil
 }
 
-func (p *GrantedProject) setProjectGrantData(event *models.Event) error {
+func (p *GrantedProjectView) setProjectGrantData(event *models.Event) error {
 	grant := new(ProjectGrant)
 	err := grant.SetData(event)
 	if err != nil {

@@ -52,13 +52,13 @@ func (req GrantedProjectSearchQuery) GetValue() interface{} {
 func (key GrantedProjectSearchKey) ToColumnName() string {
 	switch proj_model.GrantedProjectSearchKey(key) {
 	case proj_model.GRANTEDPROJECTSEARCHKEY_NAME:
-		return GrantedProjectNameKey
+		return GrantedProjectKeyName
 	case proj_model.GRANTEDPROJECTSEARCHKEY_GRANTID:
-		return GrantedProjectGrantIDKey
+		return GrantedProjectKeyGrantID
 	case proj_model.GRANTEDPROJECTSEARCHKEY_ORGID:
-		return GrantedProjectOrgIDKey
+		return GrantedProjectKeyOrgID
 	case proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID:
-		return GrantedProjectIDKey
+		return GrantedProjectKeyProjectID
 	default:
 		return ""
 	}
