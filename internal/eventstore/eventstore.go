@@ -51,3 +51,7 @@ func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.Sear
 	}
 	return es.repo.Filter(ctx, searchQuery)
 }
+
+func (es *eventstore) Health(ctx context.Context) error {
+	return es.repo.Health(ctx)
+}

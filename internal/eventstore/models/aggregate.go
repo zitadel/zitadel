@@ -78,13 +78,3 @@ func (a *Aggregate) Validate() error {
 
 	return nil
 }
-
-func (a *Aggregate) OverwriteEditorUser(userID string) *Aggregate {
-	a.editorUser = userID
-	return a
-}
-
-func (a *Aggregate) OverwriteResourceOwner(resourceOwner string) *Aggregate {
-	a.resourceOwner = resourceOwner
-	return a
-}
