@@ -2,7 +2,11 @@ package grpc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api"
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/model"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -36,7 +40,10 @@ func (s *Server) ReactivateProject(ctx context.Context, in *ProjectID) (*Project
 }
 
 func (s *Server) SearchGrantedProjects(ctx context.Context, in *GrantedProjectSearchRequest) (*GrantedProjectSearchResponse, error) {
-	response, err := s.project.SearchGrantedProjects(ctx, grantedProjectSearchRequestsToModel(in))
+	request := grantedProjectSearchRequestsToModel(in)
+	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	response, err := s.project.SearchGrantedProjects(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +87,10 @@ func (s *Server) RemoveProjectRole(ctx context.Context, in *ProjectRoleRemove) (
 }
 
 func (s *Server) SearchProjectRoles(ctx context.Context, in *ProjectRoleSearchRequest) (*ProjectRoleSearchResponse, error) {
-	response, err := s.project.SearchProjectRoles(ctx, projectRoleSearchRequestsToModel(in))
+	request := projectRoleSearchRequestsToModel(in)
+	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	request.Queries = append(request.Queries, &proj_model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	response, err := s.project.SearchProjectRoles(ctx, request)
 	if err != nil {
 		return nil, err
 	}
