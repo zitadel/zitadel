@@ -102,10 +102,6 @@ func nextStepsNoUserSelected(request *req_model.AuthRequest, notFound bool) (*re
 	return request, nil
 }
 
-func mfa() {
-
-}
-
 func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.AuthRequest, error) {
 	if user == nil {
 		return nextStepsNoUserSelected(request, true)
@@ -120,18 +116,10 @@ func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.Aut
 	}
 	//request.PasswordVerified = true
 
-	minimalMfaLevel := MfaLevel(request)
-	mfaTypes := user.MfaTypesReadyAndSufficient(minimalMfaLevel)
-	if len(mfaTypes) > 0 {
-		mfaType, mfaTime, count := user.MfaVerificationTime(request.AggregateID, minimalMfaLevel)
-		if verification == nil || reAuthRequired(mfaType, mfaTime) {
-			request.AddPossibleStep(&req_model.MfaVerificationStep{
-				FailureCount: count,
-				MfaProviders: mfaTypes,
-			})
-			return request, nil
-		}
+	if !mfaChecked(request, user) {
+		return request, nil
 	}
+
 	if user.Password.ChangeRequired {
 		request.AddPossibleStep(&req_model.ChangePasswordStep{})
 		return request, nil
@@ -140,16 +128,7 @@ func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.Aut
 		request.AddPossibleStep(&req_model.VerifyEMailStep{})
 		return request, nil
 	}
-	mfaRequired := MfaRequired(request)
-	if mfaRequired || MfaNotSkippedAndNotReady(user, minimalMfaLevel) {
-		request.AddPossibleStep(&req_model.MfaPromptStep{
-			Required:     mfaRequired,
-			MfaProviders: user.MfaTypesPossible(minimalMfaLevel),
-		})
-		if mfaRequired {
-			return request, nil
-		}
-	}
+
 	//TODO: consent step
 	if authenticated() {
 		request.AddPossibleStep(&req_model.RedirectToCallbackStep{})
@@ -158,25 +137,28 @@ func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.Aut
 	return request, nil
 }
 
-func mfa(request *req_model.AuthRequest, user *model.User) {
-	mfaRequired := MfaRequired(request)
-	minimalMfaLevel := MfaLevel(request)
-	mfaTypes := user.MfaTypesReadyAndSufficient(minimalMfaLevel)
-	if len(mfaTypes) == 0 {
+func mfaChecked(request *req_model.AuthRequest, user *model.User) bool {
+	mfaLevel := request.MfaLevel()
+	mfaTypes := user.MfaTypesReadyAndSufficient(mfaLevel)
+	if len(mfaTypes) > 0 {
+		mfaTime, mfaType, count := user.MfaVerificationTime(request.AggregateID, mfaLevel)
+		if mfaTime.IsZero() || reAuthRequired(mfaType, mfaTime) {
+			request.AddPossibleStep(&req_model.MfaVerificationStep{
+				FailureCount: count,
+				MfaProviders: mfaTypes,
+			})
+		}
+		return false
+	}
+	required := mfaLevel >= 0
+	if required || MfaNotSkipped(user) {
 		request.AddPossibleStep(&req_model.MfaPromptStep{
-			Required:     mfaRequired,
-			MfaProviders: user.MfaTypesPossible(minimalMfaLevel),
+			Required:     required,
+			MfaProviders: user.MfaTypesPossible(mfaLevel),
 		})
-		return
+		return false
 	}
-	mfaTime, mfaType, count := user.MfaVerificationTime(request.AggregateID, minimalMfaLevel)
-	if mfaTime.IsZero() || reAuthRequired(mfaType, mfaTime) {
-		request.AddPossibleStep(&req_model.MfaVerificationStep{
-			FailureCount: count,
-			MfaProviders: mfaTypes,
-		})
-		return
-	}
+	return true
 }
 
 func reAuthRequired(mfaType model.MfaType, t time.Time) bool {
@@ -188,18 +170,14 @@ func reAuthRequired(mfaType model.MfaType, t time.Time) bool {
 	return t.Add(authDuration).After(time.Now().UTC())
 }
 
-func MfaLevel(request *req_model.AuthRequest) model.MfaLevel {
-	return model.MfaLevelSoftware //TODO: map acr_values
-}
+//
+//func MfaLevel(request *req_model.AuthRequest) model.MfaLevel {
+//	return model.MfaLevelNone //TODO: map acr_values
+//}
 
-func MfaRequired(request *req_model.AuthRequest) bool {
-	return request.IsMfaRequired() //TODO: add policies (org requires mfa, org whitelist?)
-}
-
-func MfaNotSkippedAndNotReady(user *model.User, level model.MfaLevel) bool {
+func MfaNotSkipped(user *model.User) bool {
 	skipDuration := 30 * 24 * time.Hour
-	return user.SkippedMfaInit.Add(skipDuration).Before(time.Now().UTC()) &&
-		len(user.MfaTypesReadyAndSufficient(level)) == 0
+	return user.SkippedMfaInit.Add(skipDuration).Before(time.Now().UTC())
 }
 
 func authenticated() bool {

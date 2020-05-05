@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/user/model"
 )
 
 type AuthRequest struct {
@@ -61,8 +62,8 @@ func (a *AuthRequest) AddPossibleStep(step NextStep) {
 	a.PossibleSteps = append(a.PossibleSteps, step)
 }
 
-func (a *AuthRequest) IsMfaRequired() bool {
-	return false
+func (a *AuthRequest) MfaLevel() model.MfaLevel {
+	return -1
 	//TODO: check a.PossibleLOAs
 }
 
