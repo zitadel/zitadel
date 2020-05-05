@@ -61,7 +61,7 @@ func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {
 	return repo.UserEvents.VerifyPhone(ctx, auth.GetCtxData(ctx).UserID, code)
 }
 
-func (repo *UserRepo) ResendMyPhoneVerificationMail(ctx context.Context) error {
+func (repo *UserRepo) ResendMyPhoneVerificationCode(ctx context.Context) error {
 	return repo.UserEvents.CreatePhoneVerificationCode(ctx, auth.GetCtxData(ctx).UserID)
 }
 
