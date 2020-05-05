@@ -64,6 +64,37 @@ func grantedProjectFromModel(project *proj_model.GrantedProject) *GrantedProject
 	}
 }
 
+func projectRoleSearchResponseFromModel(response *proj_model.ProjectRoleSearchResponse) *ProjectRoleSearchResponse {
+	return &ProjectRoleSearchResponse{
+		Offset:      response.Offset,
+		Limit:       response.Limit,
+		TotalResult: response.TotalResult,
+		Result:      projectRoleViewsFromModel(response.Result),
+	}
+}
+
+func projectRoleViewsFromModel(roles []*proj_model.ProjectRoleView) []*ProjectRoleView {
+	converted := make([]*ProjectRoleView, 0)
+	for _, q := range roles {
+		converted = append(converted, projectRoleViewFromModel(q))
+	}
+	return converted
+}
+
+func projectRoleViewFromModel(role *proj_model.ProjectRoleView) *ProjectRoleView {
+	creationDate, err := ptypes.TimestampProto(role.CreationDate)
+	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
+
+	return &ProjectRoleView{
+		ProjectId:    role.ProjectID,
+		CreationDate: creationDate,
+		Key:          role.Key,
+		Group:        role.Group,
+		DisplayName:  role.DisplayName,
+		Sequence:     role.Sequence,
+	}
+}
+
 func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 	switch state {
 	case proj_model.PROJECTSTATE_ACTIVE:
@@ -167,6 +198,40 @@ func projectSearchKeyToModel(key GrantedProjectSearchKey) proj_model.GrantedProj
 	}
 }
 
+func projectRoleSearchRequestsToModel(role *ProjectRoleSearchRequest) *proj_model.ProjectRoleSearchRequest {
+	return &proj_model.ProjectRoleSearchRequest{
+		Offset:  role.Offset,
+		Limit:   role.Limit,
+		Queries: projectRoleSearchQueriesToModel(role.Queries),
+	}
+}
+
+func projectRoleSearchQueriesToModel(queries []*ProjectRoleSearchQuery) []*proj_model.ProjectRoleSearchQuery {
+	converted := make([]*proj_model.ProjectRoleSearchQuery, 0)
+	for _, q := range queries {
+		converted = append(converted, projectRoleSearchQueryToModel(q))
+	}
+	return converted
+}
+
+func projectRoleSearchQueryToModel(query *ProjectRoleSearchQuery) *proj_model.ProjectRoleSearchQuery {
+	return &proj_model.ProjectRoleSearchQuery{
+		Key:    projectRoleSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func projectRoleSearchKeyToModel(key ProjectRoleSearchKey) proj_model.ProjectRoleSearchKey {
+	switch key {
+	case ProjectRoleSearchKey_PROJECTROLESEARCHKEY_KEY:
+		return proj_model.PROJECTROLESEARCHKEY_KEY
+	case ProjectRoleSearchKey_PROJECTROLESEARCHKEY_DISPLAY_NAME:
+		return proj_model.PROJECTROLESEARCHKEY_DISPLAY_NAME
+	default:
+		return proj_model.PROJECTROLESEARCHKEY_UNSPECIFIED
+	}
+}
 func searchMethodToModel(method SearchMethod) model.SearchMethod {
 	switch method {
 	case SearchMethod_SEARCHMETHOD_EQUALS:

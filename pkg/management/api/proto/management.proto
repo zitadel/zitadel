@@ -641,9 +641,9 @@ service ManagementService {
     }
 
     //GRANTED_PROJECT_GRANTS
-    rpc GetGrantedProjectGrantByID(GrantedGrantID) returns (ProjectGrant) {
+    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (ProjectGrant) {
         option (google.api.http) = {
-            get: "/grants/{id}"
+            get: "/grantedprojects/{project_id}/grants/{id}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1790,6 +1790,15 @@ message ProjectRole {
     uint64 sequence = 7;
 }
 
+message ProjectRoleView {
+    string project_id = 1;
+    string key = 2;
+    string display_name = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    string group = 6;
+    uint64 sequence = 7;
+}
+
 message ProjectRoleRemove {
     string id = 1;
     string key = 2;
@@ -1799,7 +1808,7 @@ message ProjectRoleSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated ProjectRole result = 4;
+    repeated ProjectRoleView result = 4;
 }
 
 message ProjectRoleSearchRequest {
@@ -1989,10 +1998,6 @@ message ProjectGrantUpdate {
 message ProjectGrantID {
     string project_id = 1;
     string id = 2;
-}
-
-message GrantedGrantID {
-    string id = 1;
 }
 
 enum ProjectGrantState {

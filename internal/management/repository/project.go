@@ -21,6 +21,7 @@ type ProjectRepository interface {
 	AddProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
+	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.Application, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)

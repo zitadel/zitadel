@@ -32,8 +32,9 @@ type GrantedProject struct {
 }
 
 type ProjectGrant struct {
-	GrantID      string `json:"grantId,omitempty"`
-	GrantedOrgID string `json:"grantedOrgId,omitempty"`
+	GrantID      string   `json:"grantId"`
+	GrantedOrgID string   `json:"grantedOrgId"`
+	RoleKeys     []string `json:"roleKeys"`
 }
 
 func GrantedProjectFromModel(project *model.GrantedProject) *GrantedProject {

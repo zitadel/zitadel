@@ -51,8 +51,12 @@ func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, erro
 	return projectFromModel(project), nil
 }
 
-func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, request *GrantedGrantID) (*ProjectGrant, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-974vd", "Not implemented")
+func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrant, error) {
+	project, err := s.project.ProjectGrantByID(ctx, in.ProjectId, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return projectGrantFromModel(project), nil
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*ProjectRole, error) {
@@ -76,7 +80,11 @@ func (s *Server) RemoveProjectRole(ctx context.Context, in *ProjectRoleRemove) (
 }
 
 func (s *Server) SearchProjectRoles(ctx context.Context, in *ProjectRoleSearchRequest) (*ProjectRoleSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-plV56", "Not implemented")
+	response, err := s.project.SearchProjectRoles(ctx, projectRoleSearchRequestsToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return projectRoleSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {

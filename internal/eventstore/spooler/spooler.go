@@ -94,6 +94,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 			return nil
 		default:
 			if err := s.Process(event); err != nil {
+				s.OnError(event, err)
 				return err
 			}
 		}

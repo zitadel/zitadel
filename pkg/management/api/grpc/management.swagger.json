@@ -159,7 +159,7 @@
         ]
       }
     },
-    "/grants/{id}": {
+    "/grantedprojects/{project_id}/grants/{id}": {
       "get": {
         "summary": "GRANTED_PROJECT_GRANTS",
         "operationId": "GetGrantedProjectGrantByID",
@@ -172,6 +172,12 @@
           }
         },
         "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "id",
             "in": "path",
@@ -5200,8 +5206,33 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ProjectRole"
+            "$ref": "#/definitions/v1ProjectRoleView"
           }
+        }
+      }
+    },
+    "v1ProjectRoleView": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "group": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

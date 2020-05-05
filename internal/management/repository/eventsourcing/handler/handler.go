@@ -28,6 +28,7 @@ type EventstoreRepos struct {
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []spooler.Handler {
 	return []spooler.Handler{
 		&GrantedProject{handler: handler{view, bulkLimit, configs.cycleDuration("GrantedProject"), errorCount}, eventstore: eventstore, projectEvents: repos.ProjectEvents},
+		&ProjectRole{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount}, projectEvents: repos.ProjectEvents},
 	}
 }
 

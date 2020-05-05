@@ -79,6 +79,19 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 	return repo.ProjectEvents.RemoveProjectRole(ctx, member)
 }
 
+func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
+	roles, count, err := repo.View.SearchProjectRoles(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectRoleSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectRolesToModel(roles),
+	}, nil
+}
+
 func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (app *proj_model.Application, err error) {
 	return repo.ProjectEvents.ApplicationByIDs(ctx, projectID, appID)
 }

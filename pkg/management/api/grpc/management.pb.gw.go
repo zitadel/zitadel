@@ -1601,7 +1601,7 @@ func request_ManagementService_ReactivateProject_0(ctx context.Context, marshale
 }
 
 func request_ManagementService_GetGrantedProjectGrantByID_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GrantedGrantID
+	var protoReq ProjectGrantID
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -1610,6 +1610,17 @@ func request_ManagementService_GetGrantedProjectGrantByID_0(ctx context.Context,
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["project_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "project_id")
+	}
+
+	protoReq.ProjectId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "project_id", err)
+	}
 
 	val, ok = pathParams["id"]
 	if !ok {
@@ -5954,7 +5965,7 @@ var (
 
 	pattern_ManagementService_ReactivateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_GetGrantedProjectGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"grants", "id"}, ""))
+	pattern_ManagementService_GetGrantedProjectGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"grantedprojects", "project_id", "grants", "id"}, ""))
 
 	pattern_ManagementService_GetProjectMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"projects", "members", "roles"}, ""))
 
