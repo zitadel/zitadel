@@ -366,7 +366,9 @@ message UserProfile {
     string display_name = 6;
     string preferred_language = 7;
     Gender gender = 8;
-    uint64 sequence = 26;
+    uint64 sequence = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp change_date = 11;
 }
 
 message UpdateUserProfileRequest {
@@ -383,6 +385,8 @@ message UserEmail {
     string email = 2;
     bool isEmailVerified = 3;
     uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
 }
 
 message VerifyMyUserEmailRequest {
@@ -403,6 +407,8 @@ message UserPhone {
     string phone = 2;
     bool is_phone_verified = 3;
     uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
 }
 
 message UpdateUserPhoneRequest {
@@ -421,6 +427,8 @@ message UserAddress {
     string region = 5;
     string street_address = 6;
     uint64 sequence = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    google.protobuf.Timestamp change_date = 9;
 }
 
 message UpdateUserAddressRequest {
