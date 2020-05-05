@@ -33,6 +33,10 @@
       - Region
       - User-Agent
 
+## Threat Management
+
+- Machine Learning validation of metadata
+
 ## Whitelabe
 
 More flexible whitelabeling options
