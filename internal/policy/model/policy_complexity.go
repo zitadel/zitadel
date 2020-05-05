@@ -6,7 +6,7 @@ type PasswordComplexityPolicy struct {
 	models.ObjectRoot
 
 	Description  string
-	State        int32
+	State        PolicyState
 	MinLength    uint64
 	HasLowercase bool
 	HasUppercase bool
@@ -15,8 +15,5 @@ type PasswordComplexityPolicy struct {
 }
 
 func (p *PasswordComplexityPolicy) IsValid() bool {
-	if p.Description == "" {
-		return false
-	}
-	return true
+	return p.Description != ""
 }

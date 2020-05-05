@@ -6,14 +6,11 @@ type PasswordLockoutPolicy struct {
 	models.ObjectRoot
 
 	Description         string
-	State               int32
+	State               PolicyState
 	MaxAttempts         uint64
 	ShowLockOutFailures bool
 }
 
 func (p *PasswordLockoutPolicy) IsValid() bool {
-	if p.Description == "" {
-		return false
-	}
-	return true
+	return p.Description != ""
 }

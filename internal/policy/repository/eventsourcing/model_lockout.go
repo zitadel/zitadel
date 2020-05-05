@@ -9,25 +9,29 @@ import (
 	"github.com/caos/zitadel/internal/policy/model"
 )
 
+const (
+	policyLockoutVersion = "v1"
+)
+
 type PasswordLockoutPolicy struct {
 	models.ObjectRoot
 
-	Description         string
-	State               int32
-	MaxAttempts         uint64
-	ShowLockOutFailures bool
+	Description         string `json:"description,omitempty"`
+	State               int32  `json:"-"`
+	MaxAttempts         uint64 `json:"maxAttempts"`
+	ShowLockOutFailures bool   `json:"showLockOutFailures"`
 }
 
 func (p *PasswordLockoutPolicy) LockoutChanges(changed *PasswordLockoutPolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if changed.Description != "" && p.Description != changed.Description {
-		changes["Description"] = changed.Description
+		changes["description"] = changed.Description
 	}
 	if p.MaxAttempts != changed.MaxAttempts {
-		changes["MaxAttempts"] = changed.MaxAttempts
+		changes["maxAttempts"] = changed.MaxAttempts
 	}
 	if p.ShowLockOutFailures != changed.ShowLockOutFailures {
-		changes["ShowLockOutFailures"] = changed.ShowLockOutFailures
+		changes["showLockOutFailures"] = changed.ShowLockOutFailures
 	}
 	return changes
 }
@@ -36,7 +40,7 @@ func PasswordLockoutPolicyFromModel(policy *model.PasswordLockoutPolicy) *Passwo
 	return &PasswordLockoutPolicy{
 		ObjectRoot:          policy.ObjectRoot,
 		Description:         policy.Description,
-		State:               policy.State,
+		State:               int32(policy.State),
 		MaxAttempts:         policy.MaxAttempts,
 		ShowLockOutFailures: policy.ShowLockOutFailures,
 	}
@@ -46,7 +50,7 @@ func PasswordLockoutPolicyToModel(policy *PasswordLockoutPolicy) *model.Password
 	return &model.PasswordLockoutPolicy{
 		ObjectRoot:          policy.ObjectRoot,
 		Description:         policy.Description,
-		State:               policy.State,
+		State:               model.PolicyState(policy.State),
 		MaxAttempts:         policy.MaxAttempts,
 		ShowLockOutFailures: policy.ShowLockOutFailures,
 	}

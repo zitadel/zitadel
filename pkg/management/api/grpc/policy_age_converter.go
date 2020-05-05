@@ -9,10 +9,10 @@ import (
 
 func passwordAgePolicyFromModel(policy *model.PasswordAgePolicy) *PasswordAgePolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-6ILdB").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-ngUzJ").OnError(err).Debug("unable to parse timestamp")
 
 	return &PasswordAgePolicy{
 		Id:             policy.AggregateID,
@@ -27,10 +27,10 @@ func passwordAgePolicyFromModel(policy *model.PasswordAgePolicy) *PasswordAgePol
 
 func passwordAgePolicyToModel(policy *PasswordAgePolicy) *model.PasswordAgePolicy {
 	creationDate, err := ptypes.Timestamp(policy.CreationDate)
-	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-2QSfU").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.Timestamp(policy.ChangeDate)
-	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-LdU91").OnError(err).Debug("unable to parse timestamp")
 
 	return &model.PasswordAgePolicy{
 		ObjectRoot: models.ObjectRoot{
@@ -39,8 +39,7 @@ func passwordAgePolicyToModel(policy *PasswordAgePolicy) *model.PasswordAgePolic
 			ChangeDate:   changeDate,
 			Sequence:     policy.Sequence,
 		},
-		Description: policy.Description,
-		//	State:          policy.State,
+		Description:    policy.Description,
 		ExpireWarnDays: policy.ExpireWarnDays,
 		MaxAgeDays:     policy.MaxAgeDays,
 	}
@@ -48,8 +47,7 @@ func passwordAgePolicyToModel(policy *PasswordAgePolicy) *model.PasswordAgePolic
 
 func passwordAgePolicyCreateToModel(policy *PasswordAgePolicyCreate) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
-		Description: policy.Description,
-		//	State:          policy.State,
+		Description:    policy.Description,
 		ExpireWarnDays: policy.ExpireWarnDays,
 		MaxAgeDays:     policy.MaxAgeDays,
 	}
@@ -60,8 +58,7 @@ func passwordAgePolicyUpdateToModel(policy *PasswordAgePolicyUpdate) *model.Pass
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: policy.Id,
 		},
-		Description: policy.Description,
-		//		State:          policy.State,
+		Description:    policy.Description,
 		ExpireWarnDays: policy.ExpireWarnDays,
 		MaxAgeDays:     policy.MaxAgeDays,
 	}

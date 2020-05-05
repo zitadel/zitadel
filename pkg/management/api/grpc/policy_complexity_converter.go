@@ -9,10 +9,10 @@ import (
 
 func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *PasswordComplexityPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
-	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-cQRHE").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
-	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-PVA1c").OnError(err).Debug("unable to parse timestamp")
 
 	return &PasswordComplexityPolicy{
 		Id:           policy.AggregateID,
@@ -30,10 +30,10 @@ func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *
 
 func passwordComplexityPolicyToModel(policy *PasswordComplexityPolicy) *model.PasswordComplexityPolicy {
 	creationDate, err := ptypes.Timestamp(policy.CreationDate)
-	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-asmEZ").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.Timestamp(policy.ChangeDate)
-	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
+	logging.Log("GRPC-MCE4o").OnError(err).Debug("unable to parse timestamp")
 
 	return &model.PasswordComplexityPolicy{
 		ObjectRoot: models.ObjectRoot{

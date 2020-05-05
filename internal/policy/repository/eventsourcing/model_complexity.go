@@ -9,37 +9,41 @@ import (
 	"github.com/caos/zitadel/internal/policy/model"
 )
 
+const (
+	policyComplexityVersion = "v1"
+)
+
 type PasswordComplexityPolicy struct {
 	models.ObjectRoot
 
-	Description  string
-	State        int32
-	MinLength    uint64
-	HasLowercase bool
-	HasUppercase bool
-	HasNumber    bool
-	HasSymbol    bool
+	Description  string `json:"description,omitempty"`
+	State        int32  `json:"-"`
+	MinLength    uint64 `json:"minLength"`
+	HasLowercase bool   `json:"hasLowercase"`
+	HasUppercase bool   `json:"hasUppercase"`
+	HasNumber    bool   `json:"hasNumber"`
+	HasSymbol    bool   `json:"hasSymbol"`
 }
 
 func (p *PasswordComplexityPolicy) ComplexityChanges(changed *PasswordComplexityPolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if changed.Description != "" && p.Description != changed.Description {
-		changes["Description"] = changed.Description
+		changes["description"] = changed.Description
 	}
 	if p.MinLength != changed.MinLength {
-		changes["MinLength"] = changed.MinLength
+		changes["minLength"] = changed.MinLength
 	}
 	if p.HasLowercase != changed.HasLowercase {
-		changes["HasLowercase"] = changed.HasLowercase
+		changes["hasLowercase"] = changed.HasLowercase
 	}
 	if p.HasUppercase != changed.HasUppercase {
-		changes["HasUppercase"] = changed.HasUppercase
+		changes["hasUppercase"] = changed.HasUppercase
 	}
 	if p.HasNumber != changed.HasNumber {
-		changes["HasNumber"] = changed.HasNumber
+		changes["hasNumber"] = changed.HasNumber
 	}
 	if p.HasSymbol != changed.HasSymbol {
-		changes["HasSymbol"] = changed.HasSymbol
+		changes["hasSymbol"] = changed.HasSymbol
 	}
 	return changes
 }
@@ -48,7 +52,7 @@ func PasswordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *
 	return &PasswordComplexityPolicy{
 		ObjectRoot:   policy.ObjectRoot,
 		Description:  policy.Description,
-		State:        policy.State,
+		State:        int32(policy.State),
 		MinLength:    policy.MinLength,
 		HasLowercase: policy.HasLowercase,
 		HasUppercase: policy.HasUppercase,
@@ -61,7 +65,7 @@ func PasswordComplexityPolicyToModel(policy *PasswordComplexityPolicy) *model.Pa
 	return &model.PasswordComplexityPolicy{
 		ObjectRoot:   policy.ObjectRoot,
 		Description:  policy.Description,
-		State:        policy.State,
+		State:        model.PolicyState(policy.State),
 		MinLength:    policy.MinLength,
 		HasLowercase: policy.HasLowercase,
 		HasUppercase: policy.HasUppercase,

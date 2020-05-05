@@ -9,25 +9,29 @@ import (
 	"github.com/caos/zitadel/internal/policy/model"
 )
 
+const (
+	policyAgeVersion = "v1"
+)
+
 type PasswordAgePolicy struct {
 	models.ObjectRoot
 
-	Description    string
-	State          int32
-	MaxAgeDays     uint64
-	ExpireWarnDays uint64
+	Description    string `json:"description,omitempty"`
+	State          int32  `json:"-"`
+	MaxAgeDays     uint64 `json:"maxAgeDays"`
+	ExpireWarnDays uint64 `json:"expireWarnDays"`
 }
 
 func (p *PasswordAgePolicy) AgeChanges(changed *PasswordAgePolicy) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if changed.Description != "" && p.Description != changed.Description {
-		changes["Description"] = changed.Description
+		changes["description"] = changed.Description
 	}
 	if p.MaxAgeDays != changed.MaxAgeDays {
-		changes["MaxAgeDays"] = changed.MaxAgeDays
+		changes["maxAgeDays"] = changed.MaxAgeDays
 	}
 	if p.ExpireWarnDays != changed.ExpireWarnDays {
-		changes["ExpireWarnDays"] = changed.ExpireWarnDays
+		changes["expireWarnDays"] = changed.ExpireWarnDays
 	}
 	return changes
 }
@@ -36,7 +40,7 @@ func PasswordAgePolicyFromModel(policy *model.PasswordAgePolicy) *PasswordAgePol
 	return &PasswordAgePolicy{
 		ObjectRoot:     policy.ObjectRoot,
 		Description:    policy.Description,
-		State:          policy.State,
+		State:          int32(policy.State),
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
 	}
@@ -46,7 +50,7 @@ func PasswordAgePolicyToModel(policy *PasswordAgePolicy) *model.PasswordAgePolic
 	return &model.PasswordAgePolicy{
 		ObjectRoot:     policy.ObjectRoot,
 		Description:    policy.Description,
-		State:          policy.State,
+		State:          model.PolicyState(policy.State),
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
 	}

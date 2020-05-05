@@ -21,3 +21,10 @@ const (
 	PasswordLockoutPolicyAdded   models.EventType = "policy.password.lockout.added"
 	PasswordLockoutPolicyChanged models.EventType = "policy.password.lockout.changed"
 )
+
+type PolicyState int32
+
+const (
+	POLICYSTATE_ACTIVE PolicyState = iota
+	POLICYSTATE_INACTIVE
+)

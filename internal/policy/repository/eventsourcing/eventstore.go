@@ -3,7 +3,10 @@ package eventsourcing
 import (
 	"github.com/caos/zitadel/internal/cache/config"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	"github.com/sony/sonyflake"
 )
+
+var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
 type PolicyEventstore struct {
 	es_int.Eventstore

@@ -7,7 +7,7 @@ import (
 func (c *PolicyCache) getLockoutPolicy(id string) (policy *PasswordLockoutPolicy) {
 	policy = new(PasswordLockoutPolicy)
 	if err := c.policyCache.Get(id, policy); err != nil {
-		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
+		logging.Log("EVENT-Zoljf").WithError(err).Debug("error in getting cache")
 	}
 	return policy
 }
@@ -15,6 +15,6 @@ func (c *PolicyCache) getLockoutPolicy(id string) (policy *PasswordLockoutPolicy
 func (c *PolicyCache) cacheLockoutPolicy(policy *PasswordLockoutPolicy) {
 	err := c.policyCache.Set(policy.AggregateID, policy)
 	if err != nil {
-		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting policy cache")
+		logging.Log("EVENT-6klAf").WithError(err).Debug("error in setting policy cache")
 	}
 }

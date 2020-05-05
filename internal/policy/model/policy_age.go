@@ -6,7 +6,7 @@ type PasswordAgePolicy struct {
 	models.ObjectRoot
 
 	Description    string
-	State          int32
+	State          PolicyState
 	MaxAgeDays     uint64
 	ExpireWarnDays uint64
 }
