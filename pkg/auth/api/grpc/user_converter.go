@@ -1,58 +1,15 @@
 package grpc
 
 import (
+	"context"
+
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 )
-
-func userFromModel(user *usr_model.User) *User {
-	creationDate, err := ptypes.TimestampProto(user.CreationDate)
-	logging.Log("GRPC-ao4OI").OnError(err).Debug("unable to parse timestamp")
-
-	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
-	logging.Log("GRPC-LLsq4").OnError(err).Debug("unable to parse timestamp")
-
-	converted := &User{
-		Id:                user.AggregateID,
-		State:             userStateFromModel(user.State),
-		CreationDate:      creationDate,
-		ChangeDate:        changeDate,
-		Sequence:          user.Sequence,
-		UserName:          user.UserName,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		DisplayName:       user.DisplayName,
-		NickName:          user.NickName,
-		PreferredLanguage: user.PreferredLanguage.String(),
-		Gender:            genderFromModel(user.Gender),
-	}
-	if user.Email != nil {
-		converted.Email = user.EmailAddress
-		converted.IsEmailVerified = user.IsEmailVerified
-	}
-	if user.Phone != nil {
-		converted.Phone = user.PhoneNumber
-		converted.IsPhoneVerified = user.IsPhoneVerified
-	}
-	if user.Address != nil {
-		converted.Country = user.Country
-		converted.Locality = user.Locality
-		converted.PostalCode = user.PostalCode
-		converted.Region = user.Region
-		converted.StreetAddress = user.StreetAddress
-	}
-	return converted
-}
-
-func passwordRequestToModel(r *PasswordRequest) *usr_model.Password {
-	return &usr_model.Password{
-		ObjectRoot:   models.ObjectRoot{AggregateID: r.Id},
-		SecretString: r.Password,
-	}
-}
 
 func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
@@ -76,12 +33,12 @@ func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	}
 }
 
-func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
+func updateProfileToModel(ctx context.Context, u *UpdateUserProfileRequest) *usr_model.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-lk73L").OnError(err).Debug("language malformed")
 
 	return &usr_model.Profile{
-		ObjectRoot:        models.ObjectRoot{AggregateID: u.Id},
+		ObjectRoot:        models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
@@ -108,11 +65,10 @@ func emailFromModel(email *usr_model.Email) *UserEmail {
 	}
 }
 
-func updateEmailToModel(e *UpdateUserEmailRequest) *usr_model.Email {
+func updateEmailToModel(ctx context.Context, e *UpdateUserEmailRequest) *usr_model.Email {
 	return &usr_model.Email{
-		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
-		EmailAddress:    e.Email,
-		IsEmailVerified: e.IsEmailVerified,
+		ObjectRoot:   models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
+		EmailAddress: e.Email,
 	}
 }
 
@@ -133,11 +89,10 @@ func phoneFromModel(phone *usr_model.Phone) *UserPhone {
 	}
 }
 
-func updatePhoneToModel(e *UpdateUserPhoneRequest) *usr_model.Phone {
+func updatePhoneToModel(ctx context.Context, e *UpdateUserPhoneRequest) *usr_model.Phone {
 	return &usr_model.Phone{
-		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
-		PhoneNumber:     e.Phone,
-		IsPhoneVerified: e.IsPhoneVerified,
+		ObjectRoot:  models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
+		PhoneNumber: e.Phone,
 	}
 }
 
@@ -161,9 +116,9 @@ func addressFromModel(address *usr_model.Address) *UserAddress {
 	}
 }
 
-func updateAddressToModel(address *UpdateUserAddressRequest) *usr_model.Address {
+func updateAddressToModel(ctx context.Context, address *UpdateUserAddressRequest) *usr_model.Address {
 	return &usr_model.Address{
-		ObjectRoot:    models.ObjectRoot{AggregateID: address.Id},
+		ObjectRoot:    models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
 		Country:       address.Country,
 		StreetAddress: address.StreetAddress,
 		Region:        address.Region,
@@ -178,30 +133,6 @@ func otpFromModel(otp *usr_model.OTP) *MfaOtpResponse {
 		Url:    otp.Url,
 		Secret: otp.SecretString,
 		State:  mfaStateFromModel(otp.State),
-	}
-}
-
-func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
-	switch state {
-	case NotificationType_NOTIFICATIONTYPE_EMAIL:
-		return usr_model.NOTIFICATIONTYPE_EMAIL
-	case NotificationType_NOTIFICATIONTYPE_SMS:
-		return usr_model.NOTIFICATIONTYPE_SMS
-	default:
-		return usr_model.NOTIFICATIONTYPE_EMAIL
-	}
-}
-
-func userStateFromModel(state usr_model.UserState) UserState {
-	switch state {
-	case usr_model.USERSTATE_ACTIVE:
-		return UserState_USERSTATE_ACTIVE
-	case usr_model.USERSTATE_INACTIVE:
-		return UserState_USERSTATE_INACTIVE
-	case usr_model.USERSTATE_LOCKED:
-		return UserState_USERSTATE_LOCKED
-	default:
-		return UserState_USERSTATE_UNSPECIFIED
 	}
 }
 

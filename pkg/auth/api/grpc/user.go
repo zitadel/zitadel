@@ -45,7 +45,7 @@ func (s *Server) GetMyMfas(ctx context.Context, _ *empty.Empty) (*MultiFactors, 
 }
 
 func (s *Server) UpdateMyUserProfile(ctx context.Context, request *UpdateUserProfileRequest) (*UserProfile, error) {
-	profile, err := s.repo.ChangeMyProfile(ctx, updateProfileToModel(request))
+	profile, err := s.repo.ChangeMyProfile(ctx, updateProfileToModel(ctx, request))
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *Server) UpdateMyUserProfile(ctx context.Context, request *UpdateUserPro
 }
 
 func (s *Server) ChangeMyUserEmail(ctx context.Context, request *UpdateUserEmailRequest) (*UserEmail, error) {
-	email, err := s.repo.ChangeMyEmail(ctx, updateEmailToModel(request))
+	email, err := s.repo.ChangeMyEmail(ctx, updateEmailToModel(ctx, request))
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) ChangeMyUserPhone(ctx context.Context, request *UpdateUserPhoneRequest) (*UserPhone, error) {
-	phone, err := s.repo.ChangeMyPhone(ctx, updatePhoneToModel(request))
+	phone, err := s.repo.ChangeMyPhone(ctx, updatePhoneToModel(ctx, request))
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (s *Server) ResendMyPhoneVerificationCode(ctx context.Context, _ *empty.Emp
 }
 
 func (s *Server) UpdateMyUserAddress(ctx context.Context, request *UpdateUserAddressRequest) (*UserAddress, error) {
-	address, err := s.repo.ChangeMyAddress(ctx, updateAddressToModel(request))
+	address, err := s.repo.ChangeMyAddress(ctx, updateAddressToModel(ctx, request))
 	if err != nil {
 		return nil, err
 	}
