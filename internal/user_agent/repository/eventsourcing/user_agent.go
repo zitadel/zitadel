@@ -131,15 +131,16 @@ func ReAuthRequestAggregate(aggCreator *es_models.AggregateCreator, userAgent *m
 	}
 }
 
-func AuthSessionAddedAggregate(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent, authSession *model.AuthSession) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAgentAggregate(ctx, aggCreator, userAgent)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.AuthSessionAdded, authSession)
-	}
-}
+//
+//func AuthSessionAddedAggregate(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent, authSession *model.AuthSession) func(ctx context.Context) (*es_models.Aggregate, error) {
+//	return func(ctx context.Context) (*es_models.Aggregate, error) {
+//		agg, err := UserAgentAggregate(ctx, aggCreator, userAgent)
+//		if err != nil {
+//			return nil, err
+//		}
+//		return agg.AppendEvent(model.AuthSessionAdded, authSession)
+//	}
+//}
 
 func AuthSessionSetUserSessionAggregate(aggCreator *es_models.AggregateCreator, userAgent *model.UserAgent, authSessionID, userSessionID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {

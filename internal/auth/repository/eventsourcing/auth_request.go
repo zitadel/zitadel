@@ -38,14 +38,15 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	if err != nil {
 		return nil, err
 	}
+	_ = request
 	//if request.PasswordChecked() {
 	//	return nil, errors.ThrowPreconditionFailed(nil, "EVENT-52NGs", "user already chosen")
 	//}
 	return nil, errors.ThrowUnimplemented(nil, "EVENT-asjod", "user by username not yet implemented")
-	if err != nil {
-		return nextStepsNoUserSelected(request, true)
-	}
-	return nextSteps(request, user)
+	//if err != nil {
+	//	return nextStepsNoUserSelected(request, true)
+	//}
+	//return nextSteps(request, user)
 }
 
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password string, info *req_model.BrowserInfo) (*req_model.AuthRequest, error) {
@@ -101,6 +102,10 @@ func nextStepsNoUserSelected(request *req_model.AuthRequest, notFound bool) (*re
 	return request, nil
 }
 
+func mfa() {
+
+}
+
 func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.AuthRequest, error) {
 	if user == nil {
 		return nextStepsNoUserSelected(request, true)
@@ -113,28 +118,33 @@ func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.Aut
 		request.AddPossibleStep(&req_model.PasswordStep{FailureCount: count})
 		return request, nil
 	}
-	minimalLevel := MfaLevel(request)
-	if len(user.MfaTypesReady(minimalLevel)) > 0 {
-		if ok, count := user.MfaVerified(request.AggregateID); !ok {
+	//request.PasswordVerified = true
+
+	minimalMfaLevel := MfaLevel(request)
+	mfaTypes := user.MfaTypesReadyAndSufficient(minimalMfaLevel)
+	if len(mfaTypes) > 0 {
+		mfaType, mfaTime, count := user.MfaVerificationTime(request.AggregateID, minimalMfaLevel)
+		if verification == nil || reAuthRequired(mfaType, mfaTime) {
 			request.AddPossibleStep(&req_model.MfaVerificationStep{
 				FailureCount: count,
-				MfaProviders: user.MfaTypesReady(minimalLevel),
+				MfaProviders: mfaTypes,
 			})
 			return request, nil
 		}
 	}
 	if user.Password.ChangeRequired {
 		request.AddPossibleStep(&req_model.ChangePasswordStep{})
+		return request, nil
 	}
 	if user.Email == nil || user.Email != nil && !user.Email.IsEmailVerified {
 		request.AddPossibleStep(&req_model.VerifyEMailStep{})
 		return request, nil
 	}
 	mfaRequired := MfaRequired(request)
-	if MfaNotSkippedAndNotReady(user) {
+	if mfaRequired || MfaNotSkippedAndNotReady(user, minimalMfaLevel) {
 		request.AddPossibleStep(&req_model.MfaPromptStep{
 			Required:     mfaRequired,
-			MfaProviders: user.MfaTypesPossible(),
+			MfaProviders: user.MfaTypesPossible(minimalMfaLevel),
 		})
 		if mfaRequired {
 			return request, nil
@@ -148,6 +158,36 @@ func nextSteps(request *req_model.AuthRequest, user *model.User) (*req_model.Aut
 	return request, nil
 }
 
+func mfa(request *req_model.AuthRequest, user *model.User) {
+	mfaRequired := MfaRequired(request)
+	minimalMfaLevel := MfaLevel(request)
+	mfaTypes := user.MfaTypesReadyAndSufficient(minimalMfaLevel)
+	if len(mfaTypes) == 0 {
+		request.AddPossibleStep(&req_model.MfaPromptStep{
+			Required:     mfaRequired,
+			MfaProviders: user.MfaTypesPossible(minimalMfaLevel),
+		})
+		return
+	}
+	mfaTime, mfaType, count := user.MfaVerificationTime(request.AggregateID, minimalMfaLevel)
+	if mfaTime.IsZero() || reAuthRequired(mfaType, mfaTime) {
+		request.AddPossibleStep(&req_model.MfaVerificationStep{
+			FailureCount: count,
+			MfaProviders: mfaTypes,
+		})
+		return
+	}
+}
+
+func reAuthRequired(mfaType model.MfaType, t time.Time) bool {
+	var authDuration time.Duration
+	switch mfaType.(type) {
+	case *model.OTP:
+		authDuration = 18 * time.Hour
+	}
+	return t.Add(authDuration).After(time.Now().UTC())
+}
+
 func MfaLevel(request *req_model.AuthRequest) model.MfaLevel {
 	return model.MfaLevelSoftware //TODO: map acr_values
 }
@@ -156,12 +196,12 @@ func MfaRequired(request *req_model.AuthRequest) bool {
 	return request.IsMfaRequired() //TODO: add policies (org requires mfa, org whitelist?)
 }
 
-func MfaNotSkippedAndNotReady(user *model.User) bool {
+func MfaNotSkippedAndNotReady(user *model.User, level model.MfaLevel) bool {
 	skipDuration := 30 * 24 * time.Hour
 	return user.SkippedMfaInit.Add(skipDuration).Before(time.Now().UTC()) &&
-		len(user.MfaTypesReady()) == 0
+		len(user.MfaTypesReadyAndSufficient(level)) == 0
 }
 
 func authenticated() bool {
-
+	return false
 }

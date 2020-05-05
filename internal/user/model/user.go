@@ -80,17 +80,17 @@ func (u *User) MfaVerified(userAgentID string) (bool, uint16) {
 	return true, 0 //TODO: ???
 }
 
-func (u *User) MfaTypesReady(level MfaLevel) []MfaType {
+func (u *User) MfaTypesReadyAndSufficient(level MfaLevel) []MfaType {
 	types := make([]MfaType, 0, 1)
-	if MfaIsReady(u.OTP) && MfaLevelSufficient(u.OTP, level) {
+	if u.OTP != nil && MfaIsReady(u.OTP) && MfaLevelSufficient(u.OTP, level) {
 		types = append(types, u.OTP)
 	}
 	return types
 }
 
-func (u *User) MfaTypesPossible() []MfaType {
+func (u *User) MfaTypesPossible(level MfaLevel) []MfaType {
 	types := make([]MfaType, 0, 1)
-	if !MfaIsReady(u.OTP) {
+	if u.OTP == nil || !MfaIsReady(u.OTP) && MfaLevelSufficient(u.OTP, level) {
 		types = append(types, u.OTP)
 	}
 	return types

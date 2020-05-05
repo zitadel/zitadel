@@ -6,12 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/aws/aws-sdk-go/aws/request"
-
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/config/types"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 )
 
 type Config struct {

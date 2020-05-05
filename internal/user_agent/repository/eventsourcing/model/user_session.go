@@ -23,7 +23,7 @@ type UserSession struct {
 	MfaVerified          bool
 	MfaFailureCount      uint16
 	AuthTime             time.Time
-	AuthSessions         []*AuthSession
+	//AuthSessions         []*AuthSession
 }
 
 type UserSessionID struct {

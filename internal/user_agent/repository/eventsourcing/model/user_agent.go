@@ -45,13 +45,14 @@ func UserAgentToModel(userAgent *UserAgent) *model.UserAgent {
 	}
 }
 
-func (p *UserAgent) Changes(changed *UserAgent) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
-	if changed.Name != "" && p.Name != changed.Name {
-		changes["name"] = changed.Name
-	}
-	return changes
-}
+//
+//func (p *UserAgent) Changes(changed *UserAgent) map[string]interface{} {
+//	changes := make(map[string]interface{}, 1)
+//	if changed.Name != "" && p.Name != changed.Name {
+//		changes["name"] = changed.Name
+//	}
+//	return changes
+//}
 
 func (p *UserAgent) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
@@ -94,10 +95,10 @@ func (p *UserAgent) AppendEvent(event *es_models.Event) error {
 		return p.appendMfaCheckFailedEvent(event)
 	case ReAuthRequested:
 		return p.appendReAuthRequestedEvent(event)
-	case AuthSessionAdded:
-		return p.appendAuthSessionAddedEvent(event)
-	case UserSessionSet:
-		return p.appendAuthSessionSetEvent(event)
+	//case AuthSessionAdded:
+	//	return p.appendAuthSessionAddedEvent(event)
+	//case UserSessionSet:
+	//	return p.appendAuthSessionSetEvent(event)
 	case TokenAdded:
 		return p.appendTokenAddedEvent(event)
 	}

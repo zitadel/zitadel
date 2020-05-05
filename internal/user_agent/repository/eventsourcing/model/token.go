@@ -44,10 +44,10 @@ func (a *UserAgent) appendTokenAddedEvent(event *es_models.Event) error {
 		logging.Log("MODEL-452wa").WithError(err).Debug("could not unmarshal event data")
 		return err
 	}
-	if _, userSession := GetUserSession(a.UserSessions, token.UserSessionID); userSession != nil {
-		if _, authSession := GetAuthSession(userSession.AuthSessions, token.AuthSessionID); authSession != nil {
-			authSession.Token = token
-		}
-	}
+	//if _, userSession := GetUserSession(a.UserSessions, token.UserSessionID); userSession != nil {
+	//	if _, authSession := GetAuthSession(userSession.AuthSessions, token.AuthSessionID); authSession != nil {
+	//		authSession.Token = token
+	//	}
+	//}
 	return nil
 }

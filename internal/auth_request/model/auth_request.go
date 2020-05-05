@@ -20,7 +20,7 @@ type AuthRequest struct {
 
 	levelOfAssurance      LevelOfAssurance //acr
 	projectApplicationIDs []string         //aud?
-	possibleSteps         []NextStep
+	PossibleSteps         []NextStep
 	//UserSession   *UserSession
 
 }
@@ -58,7 +58,7 @@ func (a *AuthRequest) IsValid() bool {
 }
 
 func (a *AuthRequest) AddPossibleStep(step NextStep) {
-	a.possibleSteps = append(a.possibleSteps, step)
+	a.PossibleSteps = append(a.PossibleSteps, step)
 }
 
 func (a *AuthRequest) IsMfaRequired() bool {

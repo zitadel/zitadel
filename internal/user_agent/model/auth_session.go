@@ -30,7 +30,7 @@ func NewAuthSession(agentID, sessionID string, info *BrowserInfo,
 	applicationID, callbackURI, transferState string, prompt Prompt, requestedPossibleLOAs, requestedUiLocales []string,
 	loginHint, preselectedUserID string, maxAuthAge uint32, request Request) *AuthSession {
 	return &AuthSession{
-		ObjectRoot: es_models.ObjectRoot{ID: agentID},
+		ObjectRoot: es_models.ObjectRoot{AggregateID: agentID},
 		SessionID:  sessionID,
 		//Type:                  sessionType,
 		BrowserInfo:           info,
