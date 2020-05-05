@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -11,7 +12,8 @@ import (
 )
 
 type UserRepo struct {
-	UserEvents *user_event.UserEventstore
+	UserEvents  *user_event.UserEventstore
+	PasswordAlg crypto.HashAlgorithm
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
@@ -36,7 +38,13 @@ func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*m
 	return repo.UserEvents.ChangeEmail(ctx, email)
 }
 
-//func (repo *UserRepo) CreateEmailVerificationCode(ctx context.Context) error
+func (repo *UserRepo) VerifyMyEmail(ctx context.Context, code string) error {
+	return repo.UserEvents.VerifyEmail(ctx, auth.GetCtxData(ctx).UserID, code)
+}
+
+func (repo *UserRepo) ResendMyEmailVerificationMail(ctx context.Context) error {
+	return repo.UserEvents.CreateEmailVerificationCode(ctx, auth.GetCtxData(ctx).UserID)
+}
 
 func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
 	return repo.UserEvents.PhoneByID(ctx, auth.GetCtxData(ctx).UserID)
@@ -49,7 +57,13 @@ func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*m
 	return repo.UserEvents.ChangePhone(ctx, phone)
 }
 
-//func (repo *UserRepo) CreatePhoneVerificationCode(ctx context.Context) error
+func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {
+	return repo.UserEvents.VerifyPhone(ctx, auth.GetCtxData(ctx).UserID, code)
+}
+
+func (repo *UserRepo) ResendMyPhoneVerificationMail(ctx context.Context) error {
+	return repo.UserEvents.CreatePhoneVerificationCode(ctx, auth.GetCtxData(ctx).UserID)
+}
 
 func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
 	return repo.UserEvents.AddressByID(ctx, auth.GetCtxData(ctx).UserID)
@@ -60,6 +74,22 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 		return nil, err
 	}
 	return repo.UserEvents.ChangeAddress(ctx, address)
+}
+
+func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
+	//TODO: move to user command and add check of old
+	passwordHash, err := crypto.Hash([]byte(new), repo.PasswordAlg)
+	if err != nil {
+		return err
+	}
+	password := &model.Password{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: auth.GetCtxData(ctx).UserID,
+		},
+		SecretCrypto: passwordHash,
+	}
+	_, err = repo.UserEvents.SetPassword(ctx, password)
+	return err
 }
 
 func (repo *UserRepo) AddMfaOTP(ctx context.Context) (*model.OTP, error) {

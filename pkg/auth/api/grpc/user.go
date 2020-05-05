@@ -61,15 +61,13 @@ func (s *Server) ChangeMyUserEmail(ctx context.Context, request *UpdateUserEmail
 }
 
 func (s *Server) VerifyMyUserEmail(ctx context.Context, request *VerifyMyUserEmailRequest) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-poru7", "Not implemented")
-}
-
-func (s *Server) VerifyUserEmail(ctx context.Context, request *VerifyUserEmailRequest) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dlep3", "Not implemented")
+	err := s.repo.VerifyMyEmail(ctx, request.Code)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyEmailVerificationMail(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dh69i", "Not implemented")
+	err := s.repo.ResendMyEmailVerificationMail(ctx)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) ChangeMyUserPhone(ctx context.Context, request *UpdateUserPhoneRequest) (*UserPhone, error) {
@@ -81,11 +79,13 @@ func (s *Server) ChangeMyUserPhone(ctx context.Context, request *UpdateUserPhone
 }
 
 func (s *Server) VerifyMyUserPhone(ctx context.Context, request *VerifyUserPhoneRequest) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-ol6gE", "Not implemented")
+	err := s.repo.VerifyMyPhone(ctx, request.Code)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) ResendMyPhoneVerificationCode(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-Wk8rf", "Not implemented")
+	err := s.repo.ResendMyPhoneVerificationCode(ctx)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) UpdateMyUserAddress(ctx context.Context, request *UpdateUserAddressRequest) (*UserAddress, error) {
@@ -101,7 +101,8 @@ func (s *Server) SetMyPassword(ctx context.Context, request *PasswordRequest) (*
 }
 
 func (s *Server) ChangeMyPassword(ctx context.Context, request *PasswordChange) (*empty.Empty, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dlo6G", "Not implemented")
+	err := s.repo.ChangeMyPassword(ctx, request.OldPassword, request.NewPassword)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpResponse, err error) {
