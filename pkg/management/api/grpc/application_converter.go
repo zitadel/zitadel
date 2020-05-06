@@ -47,6 +47,18 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *OIDCConfig {
 	}
 }
 
+func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *OIDCConfig {
+	return &OIDCConfig{
+		RedirectUris:           app.OIDCRedirectUris,
+		ResponseTypes:          oidcResponseTypesFromModel(app.OIDCResponseTypes),
+		GrantTypes:             oidcGrantTypesFromModel(app.OIDCGrantTypes),
+		ApplicationType:        oidcApplicationTypeFromModel(app.OIDCApplicationType),
+		ClientId:               app.OIDCClientID,
+		AuthMethodType:         oidcAuthMethodTypeFromModel(app.OIDCAuthMethodType),
+		PostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
+	}
+}
+
 func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
@@ -88,6 +100,79 @@ func oidcConfigUpdateToModel(app *OIDCConfigUpdate) *proj_model.OIDCConfig {
 		AuthMethodType:         oidcAuthMethodTypeToModel(app.AuthMethodType),
 		PostLogoutRedirectUris: app.PostLogoutRedirectUris,
 	}
+}
+
+func applicationSearchRequestsToModel(request *ApplicationSearchRequest) *proj_model.ApplicationSearchRequest {
+	return &proj_model.ApplicationSearchRequest{
+		Offset:  request.Offset,
+		Limit:   request.Limit,
+		Queries: applicationSearchQueriesToModel(request.Queries),
+	}
+}
+
+func applicationSearchQueriesToModel(queries []*ApplicationSearchQuery) []*proj_model.ApplicationSearchQuery {
+	converted := make([]*proj_model.ApplicationSearchQuery, 0)
+	for _, q := range queries {
+		converted = append(converted, applicationSearchQueryToModel(q))
+	}
+	return converted
+}
+
+func applicationSearchQueryToModel(query *ApplicationSearchQuery) *proj_model.ApplicationSearchQuery {
+	return &proj_model.ApplicationSearchQuery{
+		Key:    applicationSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func applicationSearchKeyToModel(key ApplicationSearchKey) proj_model.ApplicationSearchKey {
+	switch key {
+	case ApplicationSearchKey_APPLICATIONSEARCHKEY_APP_NAME:
+		return proj_model.APPLICATIONSEARCHKEY_NAME
+	default:
+		return proj_model.APPLICATIONSEARCHKEY_UNSPECIFIED
+	}
+}
+
+func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchResponse) *ApplicationSearchResponse {
+	return &ApplicationSearchResponse{
+		Offset:      response.Offset,
+		Limit:       response.Limit,
+		TotalResult: response.TotalResult,
+		Result:      applicationViewsFromModel(response.Result),
+	}
+}
+
+func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*Application {
+	converted := make([]*Application, 0)
+	for _, q := range apps {
+		converted = append(converted, applicationViewFromModel(q))
+	}
+	return converted
+}
+
+func applicationViewFromModel(application *proj_model.ApplicationView) *Application {
+	creationDate, err := ptypes.TimestampProto(application.CreationDate)
+	logging.Log("GRPC-lo9sw").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(application.ChangeDate)
+	logging.Log("GRPC-8uwsd").OnError(err).Debug("unable to parse timestamp")
+
+	converted := &Application{
+		Id:           application.ID,
+		State:        appStateFromModel(application.State),
+		CreationDate: creationDate,
+		ChangeDate:   changeDate,
+		Name:         application.Name,
+		Sequence:     application.Sequence,
+	}
+	if application.IsOIDC {
+		converted.AppConfig = &Application_OidcConfig{
+			OidcConfig: oidcConfigFromApplicationViewModel(application),
+		}
+	}
+	return converted
 }
 
 func appStateFromModel(state proj_model.AppState) AppState {

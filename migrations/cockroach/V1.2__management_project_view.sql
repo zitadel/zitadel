@@ -40,6 +40,7 @@ CREATE TABLE management.granted_projects (
     project_state SMALLINT,
     resource_owner TEXT,
     grant_id TEXT,
+    granted_role_keys TEXT Array,
     sequence BIGINT,
 
 
@@ -80,6 +81,7 @@ CREATE TABLE management.project_members (
 CREATE TABLE management.project_grant_members (
     user_id TEXT,
     grant_id TEXT,
+    project_id TEXT,
 
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
@@ -92,6 +94,30 @@ CREATE TABLE management.project_grant_members (
     sequence BIGINT,
 
     PRIMARY KEY (grant_id, user_id)
+);
+
+CREATE TABLE management.applications (
+    id TEXT,
+
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    sequence BIGINT,
+
+    app_state SMALLINT,
+    resource_owner TEXT,
+    app_name TEXT,
+    project_id TEXT,
+    app_type SMALLINT,
+    is_oidc BOOLEAN,
+    oidc_client_id TEXT,
+    oidc_redirect_uris TEXT ARRAY,
+    oidc_response_types SMALLINT ARRAY,
+    oidc_grant_types SMALLINT ARRAY,
+    oidc_application_type SMALLINT,
+    oidc_auth_method_type SMALLINT,
+    oidc_post_logout_redirect_uris TEXT ARRAY,
+
+    PRIMARY KEY (id)
 );
 
 COMMIT;

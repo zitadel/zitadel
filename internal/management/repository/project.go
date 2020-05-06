@@ -32,6 +32,7 @@ type ProjectRepository interface {
 	RemoveApplication(ctx context.Context, projectID, appID string) error
 	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
+	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
 
 	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)

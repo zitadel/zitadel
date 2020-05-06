@@ -1891,7 +1891,6 @@ message ApplicationUpdate {
     string name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-
 message OIDCConfig {
     repeated string redirect_uris = 1;
     repeated OIDCResponseType response_types = 2;
@@ -1953,11 +1952,23 @@ message ClientSecret {
     string client_secret = 1;
 }
 
+message ApplicationView {
+    string id = 1;
+    AppState state = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+    string name = 5;
+    oneof app_config {
+        OIDCConfig oidc_config = 8;
+    }
+    uint64 sequence = 9;
+}
+
 message ApplicationSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated Application result = 4;
+    repeated ApplicationView result = 4;
 }
 
 message ApplicationSearchRequest {
@@ -2084,7 +2095,7 @@ message ProjectGrantMemberSearchRequest {
     string grant_id = 2;
     uint64 offset = 3;
     uint64 limit = 4;
-    repeated ProjectGrantMemberSearchQuery queries = 5;
+    repeated ProjectGrantMemberSearchQuery queries = 5;a
 }
 
 message ProjectGrantMemberSearchQuery {

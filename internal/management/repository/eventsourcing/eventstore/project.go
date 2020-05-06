@@ -140,6 +140,22 @@ func (repo *ProjectRepo) RemoveApplication(ctx context.Context, projectID, appID
 	return repo.ProjectEvents.RemoveApplication(ctx, app)
 }
 
+func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
+	if request.Limit == 0 {
+		request.Limit = repo.SearchLimit
+	}
+	apps, count, err := repo.View.SearchApplications(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ApplicationSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ApplicationViewsToModel(apps),
+	}, nil
+}
+
 func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
 }
