@@ -355,7 +355,11 @@ func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_
 }
 
 func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
-	return es.changedPassword(ctx, password.AggregateID, password.SecretString, true)
+	user, err := es.UserByID(ctx, password.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	return es.changedPassword(ctx, user, password.SecretString, true)
 }
 
 func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, password string) error {
@@ -367,9 +371,9 @@ func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, passwor
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-65sdr", "reset code not found")
 	}
 	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
-
+		return caos_errs.ThrowPreconditionFailed(err, "EVENT-sd6DF", "code invalid")
 	}
-	_, err = es.changedPassword(ctx, userID, password, false)
+	_, err = es.changedPassword(ctx, user, password, false)
 	return err
 }
 
@@ -384,15 +388,10 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new s
 	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "invalid password")
 	}
-	return es.changedPassword(ctx, userID, new, false)
+	return es.changedPassword(ctx, user, new, false)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, userID, password string, onetime bool) (*usr_model.Password, error) {
-	user, err := es.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, password string, onetime bool) (*usr_model.Password, error) {
 	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
 	if err != nil {
 		return nil, err

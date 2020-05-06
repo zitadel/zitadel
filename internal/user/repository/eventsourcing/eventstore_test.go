@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -1030,11 +1031,12 @@ func TestSetPassword(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
-		password *model.Password
+		userID   string
+		code     string
+		password string
 	}
 	type res struct {
-		password *model.Password
-		errFunc  func(err error) bool
+		errFunc func(err error) bool
 	}
 	tests := []struct {
 		name string
@@ -1044,20 +1046,32 @@ func TestSetPassword(t *testing.T) {
 		{
 			name: "create pw",
 			args: args{
-				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						PasswordCode: &repo_model.PasswordCode{Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "enc",
+							KeyID:      "id",
+							Crypted:    []byte("code"),
+						}},
+					},
+				),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
+				userID:   "userID",
+				code:     "code",
+				password: "password",
 			},
-			res: res{
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, ChangeRequired: false},
-			},
+			res: res{},
 		},
 		{
 			name: "empty userid",
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: ""}, SecretString: "Password"},
+				userID:   "",
+				code:     "code",
+				password: "password",
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1068,25 +1082,187 @@ func TestSetPassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
+				userID:   "userID",
+				code:     "code",
+				password: "password",
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
 			},
 		},
+		{
+			name: "no passcode",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+					},
+				),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				code:     "code",
+				password: "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid passcode",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						PasswordCode: &repo_model.PasswordCode{Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "enc2",
+							KeyID:      "id",
+							Crypted:    []byte("code2"),
+						}},
+					},
+				),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				code:     "code",
+				password: "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.SetPassword(tt.args.ctx, tt.args.password)
+			err := tt.args.es.SetPassword(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.password)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("result has error: %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v", err)
+			}
+		})
+	}
+}
+
+func TestChangePassword(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+		old    string
+		new    string
+	}
+	type res struct {
+		password string
+		errFunc  func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change pw",
+			args: args{
+				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							Crypted:    []byte("old"),
+						}},
+					},
+				),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				password: "new",
+			},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "no password",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+					},
+				),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid password",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							Crypted:    []byte("older"),
+						}},
+					},
+				),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePassword(tt.args.ctx, tt.args.userID, tt.args.old, tt.args.new)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.ChangeRequired != false {
-				t.Errorf("should not be one time")
+			if tt.res.errFunc == nil && string(result.SecretCrypto.Crypted) != tt.res.password {
+				t.Errorf("got wrong result crypted: expected: %v, actual: %v ", tt.res.password, result.SecretString)
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
+				t.Errorf("got wrong err: %v", err)
 			}
 		})
 	}

@@ -100,7 +100,7 @@ func Hash(value []byte, alg HashAlgorithm) (*CryptoValue, error) {
 
 func CompareHash(value *CryptoValue, comparer []byte, alg HashAlgorithm) error {
 	if value.Algorithm != alg.Algorithm() {
-		return errors.ThrowInvalidArgument(nil, "CRYPT-HF32f", "value was hash with a different algorithm")
+		return errors.ThrowInvalidArgument(nil, "CRYPT-HF32f", "value was hashed with a different algorithm")
 	}
 	return alg.CompareHash(value.Crypted, comparer)
 }

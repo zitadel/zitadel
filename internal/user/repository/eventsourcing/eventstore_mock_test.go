@@ -38,10 +38,12 @@ func GetMockedEventstoreWithPw(ctrl *gomock.Controller, mockEs *mock.MockEventst
 	}
 	if password {
 		es.PasswordVerificationCode = GetMockPwGenerator(ctrl)
-		hash := crypto.NewMockHashAlgorithm(ctrl)
-		hash.EXPECT().Hash(gomock.Any()).Return(nil, nil)
-		hash.EXPECT().Algorithm().Return("bcrypt")
-		es.PasswordAlg = hash
+		es.PasswordAlg = crypto.CreateMockHashAlg(ctrl)
+		//hash.EXPECT().Hash(gomock.Any()).Return(nil, nil)
+		//hash.EXPECT().Algorithm().Return("bcrypt")
+		//hash.EXPECT().CompareHash(gomock.Any(), gomock.Any()).Return(nil)
+		//hash.EXPECT().Algorithm().Return("bcrypt")
+		//
 	}
 	return es
 }
