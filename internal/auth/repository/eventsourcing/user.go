@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -12,8 +11,7 @@ import (
 )
 
 type UserRepo struct {
-	UserEvents  *user_event.UserEventstore
-	PasswordAlg crypto.HashAlgorithm
+	UserEvents *user_event.UserEventstore
 }
 
 func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error) {

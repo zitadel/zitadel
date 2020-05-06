@@ -80,7 +80,7 @@ func TestPush(t *testing.T) {
 	type args struct {
 		push        pushFunc
 		appender    appendFunc
-		aggregaters []aggregateFunc
+		aggregaters []AggregateFunc
 	}
 	tests := []struct {
 		name    string
@@ -101,7 +101,7 @@ func TestPush(t *testing.T) {
 			args: args{
 				push:     nil,
 				appender: nil,
-				aggregaters: []aggregateFunc{
+				aggregaters: []AggregateFunc{
 					func(context.Context) (*es_models.Aggregate, error) {
 						return nil, errors.ThrowInternal(nil, "SDK-Ec5x2", "test err")
 					},
@@ -116,7 +116,7 @@ func TestPush(t *testing.T) {
 					return errors.ThrowInternal(nil, "SDK-0g4gW", "test error")
 				},
 				appender: nil,
-				aggregaters: []aggregateFunc{
+				aggregaters: []AggregateFunc{
 					func(context.Context) (*es_models.Aggregate, error) {
 						return &es_models.Aggregate{}, nil
 					},
@@ -133,7 +133,7 @@ func TestPush(t *testing.T) {
 				appender: func(...*es_models.Event) error {
 					return errors.ThrowInvalidArgument(nil, "SDK-BDhcT", "test err")
 				},
-				aggregaters: []aggregateFunc{
+				aggregaters: []AggregateFunc{
 					func(context.Context) (*es_models.Aggregate, error) {
 						return &es_models.Aggregate{Events: []*es_models.Event{&es_models.Event{}}}, nil
 					},
@@ -150,7 +150,7 @@ func TestPush(t *testing.T) {
 				appender: func(...*es_models.Event) error {
 					return nil
 				},
-				aggregaters: []aggregateFunc{
+				aggregaters: []AggregateFunc{
 					func(context.Context) (*es_models.Aggregate, error) {
 						return &es_models.Aggregate{Events: []*es_models.Event{&es_models.Event{}}}, nil
 					},
@@ -167,7 +167,7 @@ func TestPush(t *testing.T) {
 				appender: func(...*es_models.Event) error {
 					return nil
 				},
-				aggregaters: []aggregateFunc{
+				aggregaters: []AggregateFunc{
 					func(context.Context) (*es_models.Aggregate, error) {
 						return &es_models.Aggregate{Events: []*es_models.Event{&es_models.Event{}}}, nil
 					},

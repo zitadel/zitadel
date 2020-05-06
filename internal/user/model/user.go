@@ -95,3 +95,7 @@ func (u *User) MfaTypesPossible(level MfaLevel) []MfaType {
 	}
 	return types
 }
+
+func (u *User) MfaVerificationTime(string, MfaLevel) (time.Time, MfaType, uint16) {
+	return time.Time{}, &OTP{}, 0 //TODO: ??
+}
