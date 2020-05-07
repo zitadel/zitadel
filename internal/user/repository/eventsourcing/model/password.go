@@ -26,7 +26,8 @@ type PasswordCode struct {
 }
 
 type PasswordCheck struct {
-	AuthRequestID string `json:"authReqID"`
+	UserAgentID string       `json:"userAgentID"`
+	BrowserInfo *BrowserInfo `json:"browserInfo"`
 }
 
 func PasswordFromModel(password *model.Password) *Password {

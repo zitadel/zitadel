@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
@@ -14,4 +15,5 @@ type AuthRequestRepository interface {
 	//RequestPasswordReset(ctx context.Context, id, userID string, info *model.BrowserInfo) (*model.AuthRequest, error) //?
 	SkipMfaInit(ctx context.Context, id, userID string) (*model.AuthRequest, error)
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID string, code string, info *model.BrowserInfo) (*model.AuthRequest, error)
+	CreateToken(ctx context.Context, agentID, userID string, lifetime time.Duration) (*model.Token, error)
 }

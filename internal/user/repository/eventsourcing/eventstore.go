@@ -324,34 +324,34 @@ func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "password not found")
 }
 
-func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password, authRequestID string) (*usr_model.User, error) {
+func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *usr_model.AuthRequest) error {
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if existing.Password == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "no password set")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "no password set")
 	}
 	if err := crypto.CompareHash(existing.Password.SecretCrypto, []byte(password), es.PasswordAlg); err == nil {
-		return es.setPasswordCheckResult(ctx, existing, authRequestID, PasswordCheckSucceededAggregate)
+		return es.setPasswordCheckResult(ctx, existing, authRequest, PasswordCheckSucceededAggregate)
 	}
-	user, err := es.setPasswordCheckResult(ctx, existing, authRequestID, PasswordCheckFailedAggregate)
-	if err != nil {
-		return nil, err
+	if err := es.setPasswordCheckResult(ctx, existing, authRequest, PasswordCheckFailedAggregate); err != nil {
+		return err
 	}
-	return user, caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "invalid password")
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "invalid password")
 }
 
-func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequestID string, check func(aggCreator *es_models.AggregateCreator, user *model.User, authRequestID string) es_sdk.AggregateFunc) (*usr_model.User, error) {
+func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *usr_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.PasswordCheck) es_sdk.AggregateFunc) error {
 	repoUser := model.UserFromModel(user)
-
-	agg := check(es.AggregateCreator(), repoUser, authRequestID)
+	repoAuthRequest := model.AuthRequestFromModel(authRequest)
+	passwordCheck := &model.PasswordCheck{UserAgentID: repoAuthRequest.UserAgentID, BrowserInfo: repoAuthRequest.BrowserInfo}
+	agg := check(es.AggregateCreator(), repoUser, passwordCheck)
 	err := es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	es.userCache.cacheUser(repoUser)
-	return model.UserToModel(repoUser), nil
+	return nil
 }
 
 func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
