@@ -16,7 +16,11 @@ func PasswordAgePolicyQuery(recourceOwner string, latestSequence uint64) *es_mod
 		ResourceOwnerFilter(recourceOwner)
 
 }
+
 func PasswordAgePolicyAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, policy *PasswordAgePolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-1T05i", "existing policy should not be nil")
+	}
 	return aggCreator.NewAggregate(ctx, policy.AggregateID, model.PasswordAgePolicyAggregate, policyAgeVersion, policy.Sequence)
 }
 

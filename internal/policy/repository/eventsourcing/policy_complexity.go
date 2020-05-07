@@ -16,7 +16,11 @@ func PasswordComplexityPolicyQuery(recourceOwner string, latestSequence uint64) 
 		ResourceOwnerFilter(recourceOwner)
 
 }
+
 func PasswordComplexityPolicyAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, policy *PasswordComplexityPolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-fRVr9", "existing policy should not be nil")
+	}
 	return aggCreator.NewAggregate(ctx, policy.AggregateID, model.PasswordComplexityPolicyAggregate, policyComplexityVersion, policy.Sequence)
 }
 

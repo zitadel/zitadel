@@ -16,7 +16,11 @@ func PasswordLockoutPolicyQuery(recourceOwner string, latestSequence uint64) *es
 		ResourceOwnerFilter(recourceOwner)
 
 }
+
 func PasswordLockoutPolicyAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, policy *PasswordLockoutPolicy) (*es_models.Aggregate, error) {
+	if policy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-aTRlj", "existing policy should not be nil")
+	}
 	return aggCreator.NewAggregate(ctx, policy.AggregateID, model.PasswordLockoutPolicyAggregate, policyLockoutVersion, policy.Sequence)
 }
 
