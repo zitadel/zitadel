@@ -7,24 +7,19 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type ViewDB struct {
-	SQL  *sql.DB
-	GORM *gorm.DB
-}
-
 type ViewConfig struct {
 	SQL *types.SQL
 }
 
-func Start(conf ViewConfig) (*ViewDB, error) {
+func Start(conf ViewConfig) (*sql.DB, *gorm.DB, error) {
 	sqlClient, err := sql.Open("postgres", conf.SQL.ConnectionString())
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
+		return nil, nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
 	}
 
 	client, err := gorm.Open("postgres", sqlClient)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &ViewDB{SQL: sqlClient, GORM: client}, nil
+	return sqlClient, client, nil
 }
