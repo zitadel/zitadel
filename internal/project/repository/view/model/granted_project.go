@@ -101,6 +101,8 @@ func (p *GrantedProjectView) AppendEvent(event *models.Event) error {
 		p.setProjectGrantData(event)
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		p.CreationDate = event.CreationDate
+	case es_model.ProjectGrantChanged:
+		p.setProjectGrantData(event)
 	case es_model.ProjectGrantDeactivated:
 		p.State = int32(model.PROJECTSTATE_INACTIVE)
 	case es_model.ProjectGrantReactivated:
@@ -129,7 +131,9 @@ func (p *GrantedProjectView) setProjectGrantData(event *models.Event) error {
 	if err != nil {
 		return err
 	}
-	p.OrgID = grant.GrantedOrgID
+	if grant.GrantedOrgID != "" {
+		p.OrgID = grant.GrantedOrgID
+	}
 	p.GrantID = grant.GrantID
 	p.GrantedRoleKeys = grant.RoleKeys
 	return nil

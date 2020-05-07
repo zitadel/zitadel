@@ -28,7 +28,6 @@ type ApplicationView struct {
 
 	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
 	OIDCClientID               string         `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCClientSecret           string         `json:"clientId" gorm:"column:oidc_client_secret"`
 	OIDCRedirectUris           pq.StringArray `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
 	OIDCResponseTypes          pq.Int64Array  `json:"responseTypes" gorm:"column:oidc_response_types"`
 	OIDCGrantTypes             pq.Int64Array  `json:"grantTypes" gorm:"column:oidc_grant_types"`
