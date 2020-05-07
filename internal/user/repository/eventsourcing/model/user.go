@@ -127,9 +127,8 @@ func (p *User) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (u *User) AppendEvent(event *es_models.Event) error {
+func (u *User) AppendEvent(event *es_models.Event) (err error) {
 	u.ObjectRoot.AppendEvent(event)
-	var err error
 	switch event.Type {
 	case UserAdded,
 		UserRegistered,
