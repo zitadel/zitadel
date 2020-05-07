@@ -6,18 +6,19 @@ import (
 )
 
 type GrantedProjectView struct {
-	ProjectID     string
-	Name          string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	State         ProjectState
-	Type          ProjectType
-	ResourceOwner string
-	OrgID         string
-	OrgName       string
-	OrgDomain     string
-	Sequence      uint64
-	GrantID       string
+	ProjectID       string
+	Name            string
+	CreationDate    time.Time
+	ChangeDate      time.Time
+	State           ProjectState
+	Type            ProjectType
+	ResourceOwner   string
+	OrgID           string
+	OrgName         string
+	OrgDomain       string
+	Sequence        uint64
+	GrantID         string
+	GrantedRoleKeys []string
 }
 
 type ProjectType int32
@@ -43,6 +44,7 @@ const (
 	GRANTEDPROJECTSEARCHKEY_PROJECTID
 	GRANTEDPROJECTSEARCHKEY_GRANTID
 	GRANTEDPROJECTSEARCHKEY_ORGID
+	GRANTEDPROJECTSEARCHKEY_RESOURCE_OWNER
 )
 
 type GrantedProjectSearchQuery struct {

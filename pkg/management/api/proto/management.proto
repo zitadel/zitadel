@@ -1993,14 +1993,11 @@ message ProjectGrant {
     string id = 1;
     string project_id = 2;
     string granted_org_id = 3;
-    string granted_org_name = 4;
-    string granted_org_domain = 5;
-    repeated string role_keys = 6;
-    ProjectGrantState state = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    google.protobuf.Timestamp change_date = 9;
-    string project_name = 10;
-    uint64 sequence = 11;
+    repeated string role_keys = 4;
+    ProjectGrantState state = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+    uint64 sequence = 9;
 }
 
 message ProjectGrantCreate {
@@ -2026,11 +2023,25 @@ enum ProjectGrantState {
     PROJECTGRANTSTATE_INACTIVE = 2;
 }
 
+message ProjectGrantView {
+    string id = 1;
+    string project_id = 2;
+    string granted_org_id = 3;
+    string granted_org_name = 4;
+    string granted_org_domain = 5;
+    repeated string role_keys = 6;
+    ProjectGrantState state = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    google.protobuf.Timestamp change_date = 9;
+    string project_name = 10;
+    uint64 sequence = 11;
+}
+
 message ProjectGrantSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated ProjectGrant result = 4;
+    repeated ProjectGrantView result = 4;
 }
 
 message ProjectGrantSearchRequest {
@@ -2095,7 +2106,7 @@ message ProjectGrantMemberSearchRequest {
     string grant_id = 2;
     uint64 offset = 3;
     uint64 limit = 4;
-    repeated ProjectGrantMemberSearchQuery queries = 5;a
+    repeated ProjectGrantMemberSearchQuery queries = 5;
 }
 
 message ProjectGrantMemberSearchQuery {

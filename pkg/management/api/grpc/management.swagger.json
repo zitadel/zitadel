@@ -3516,7 +3516,7 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Application"
+            "$ref": "#/definitions/v1ApplicationView"
           }
         }
       }
@@ -3532,6 +3532,35 @@
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "v1ApplicationView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1AppState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "oidc_config": {
+          "$ref": "#/definitions/v1OIDCConfig"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -4553,12 +4582,6 @@
         "granted_org_id": {
           "type": "string"
         },
-        "granted_org_name": {
-          "type": "string"
-        },
-        "granted_org_domain": {
-          "type": "string"
-        },
         "role_keys": {
           "type": "array",
           "items": {
@@ -4575,9 +4598,6 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
-        },
-        "project_name": {
-          "type": "string"
         },
         "sequence": {
           "type": "string",
@@ -4836,7 +4856,7 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ProjectGrant"
+            "$ref": "#/definitions/v1ProjectGrantView"
           }
         }
       }
@@ -4943,6 +4963,50 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "v1ProjectGrantView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "granted_org_id": {
+          "type": "string"
+        },
+        "granted_org_name": {
+          "type": "string"
+        },
+        "granted_org_domain": {
+          "type": "string"
+        },
+        "role_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "state": {
+          "$ref": "#/definitions/v1ProjectGrantState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "project_name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

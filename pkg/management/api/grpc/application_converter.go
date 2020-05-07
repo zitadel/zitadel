@@ -144,22 +144,22 @@ func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchRe
 	}
 }
 
-func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*Application {
-	converted := make([]*Application, 0)
+func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*ApplicationView {
+	converted := make([]*ApplicationView, 0)
 	for _, q := range apps {
 		converted = append(converted, applicationViewFromModel(q))
 	}
 	return converted
 }
 
-func applicationViewFromModel(application *proj_model.ApplicationView) *Application {
+func applicationViewFromModel(application *proj_model.ApplicationView) *ApplicationView {
 	creationDate, err := ptypes.TimestampProto(application.CreationDate)
 	logging.Log("GRPC-lo9sw").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(application.ChangeDate)
 	logging.Log("GRPC-8uwsd").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &Application{
+	converted := &ApplicationView{
 		Id:           application.ID,
 		State:        appStateFromModel(application.State),
 		CreationDate: creationDate,
@@ -168,7 +168,7 @@ func applicationViewFromModel(application *proj_model.ApplicationView) *Applicat
 		Sequence:     application.Sequence,
 	}
 	if application.IsOIDC {
-		converted.AppConfig = &Application_OidcConfig{
+		converted.AppConfig = &ApplicationView_OidcConfig{
 			OidcConfig: oidcConfigFromApplicationViewModel(application),
 		}
 	}

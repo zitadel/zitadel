@@ -6,29 +6,32 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/lib/pq"
 	"time"
 )
 
 const (
-	GrantedProjectKeyProjectID = "project_id"
-	GrantedProjectKeyGrantID   = "grant_id"
-	GrantedProjectKeyOrgID     = "org_id"
-	GrantedProjectKeyName      = "name"
+	GrantedProjectKeyProjectID     = "project_id"
+	GrantedProjectKeyGrantID       = "grant_id"
+	GrantedProjectKeyOrgID         = "org_id"
+	GrantedProjectKeyResourceOwner = "resource_owner"
+	GrantedProjectKeyName          = "name"
 )
 
 type GrantedProjectView struct {
-	ProjectID     string    `json:"-" gorm:"column:project_id;primary_key"`
-	OrgID         string    `json:"-" gorm:"column:org_id;primary_key"`
-	Name          string    `json:"name" gorm:"column:project_name"`
-	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
-	State         int32     `json:"-" gorm:"column:project_state"`
-	Type          int32     `json:"-" gorm:"column:project_type"`
-	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
-	OrgName       string    `json:"-" gorm:"column:org_name"`
-	OrgDomain     string    `json:"-" gorm:"column:org_domain"`
-	Sequence      uint64    `json:"-" gorm:"column:sequence"`
-	GrantID       string    `json:"-" gorm:"column:grant_id"`
+	ProjectID       string         `json:"-" gorm:"column:project_id;primary_key"`
+	OrgID           string         `json:"-" gorm:"column:org_id;primary_key"`
+	Name            string         `json:"name" gorm:"column:project_name"`
+	CreationDate    time.Time      `json:"-" gorm:"column:creation_date"`
+	ChangeDate      time.Time      `json:"-" gorm:"column:change_date"`
+	State           int32          `json:"-" gorm:"column:project_state"`
+	Type            int32          `json:"-" gorm:"column:project_type"`
+	ResourceOwner   string         `json:"-" gorm:"column:resource_owner"`
+	OrgName         string         `json:"-" gorm:"column:org_name"`
+	OrgDomain       string         `json:"-" gorm:"column:org_domain"`
+	Sequence        uint64         `json:"-" gorm:"column:sequence"`
+	GrantID         string         `json:"-" gorm:"column:grant_id"`
+	GrantedRoleKeys pq.StringArray `json:"-" gorm:"column:granted_role_keys"`
 }
 
 type ProjectGrant struct {
@@ -39,17 +42,18 @@ type ProjectGrant struct {
 
 func GrantedProjectFromModel(project *model.GrantedProjectView) *GrantedProjectView {
 	return &GrantedProjectView{
-		ProjectID:     project.ProjectID,
-		OrgID:         project.OrgID,
-		Name:          project.Name,
-		ChangeDate:    project.ChangeDate,
-		CreationDate:  project.CreationDate,
-		State:         int32(project.State),
-		Type:          int32(project.Type),
-		ResourceOwner: project.ResourceOwner,
-		OrgName:       project.OrgName,
-		GrantID:       project.GrantID,
-		Sequence:      project.Sequence,
+		ProjectID:       project.ProjectID,
+		OrgID:           project.OrgID,
+		Name:            project.Name,
+		ChangeDate:      project.ChangeDate,
+		CreationDate:    project.CreationDate,
+		State:           int32(project.State),
+		Type:            int32(project.Type),
+		ResourceOwner:   project.ResourceOwner,
+		OrgName:         project.OrgName,
+		GrantID:         project.GrantID,
+		GrantedRoleKeys: project.GrantedRoleKeys,
+		Sequence:        project.Sequence,
 	}
 }
 
@@ -127,6 +131,7 @@ func (p *GrantedProjectView) setProjectGrantData(event *models.Event) error {
 	}
 	p.OrgID = grant.GrantedOrgID
 	p.GrantID = grant.GrantID
+	p.GrantedRoleKeys = grant.RoleKeys
 	return nil
 }
 

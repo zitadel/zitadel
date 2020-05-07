@@ -59,6 +59,8 @@ func (key GrantedProjectSearchKey) ToColumnName() string {
 		return GrantedProjectKeyOrgID
 	case proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID:
 		return GrantedProjectKeyProjectID
+	case proj_model.GRANTEDPROJECTSEARCHKEY_RESOURCE_OWNER:
+		return GrantedProjectKeyResourceOwner
 	default:
 		return ""
 	}

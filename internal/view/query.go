@@ -96,7 +96,8 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eid73", "Contains with only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText+"%")
-
+	case model.SEARCHMETHOD_NOT_EQUALS:
+		query = query.Where(""+column+" <> ?", value)
 	default:
 		return nil, nil
 	}

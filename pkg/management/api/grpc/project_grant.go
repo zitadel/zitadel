@@ -2,7 +2,11 @@ package grpc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api"
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/model"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -11,7 +15,15 @@ func (s *Server) GetProjectGrantMemberRoles(ctx context.Context, _ *empty.Empty)
 }
 
 func (s *Server) SearchProjectGrants(ctx context.Context, in *ProjectGrantSearchRequest) (*ProjectGrantSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-po9fs", "Not implemented")
+	request := projectGrantSearchRequestsToModel(in)
+	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_RESOURCE_OWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_ORGID, Method: model.SEARCHMETHOD_NOT_EQUALS, Value: orgID})
+	response, err := s.project.SearchGrantedProjects(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return projectGrantSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrant, error) {
