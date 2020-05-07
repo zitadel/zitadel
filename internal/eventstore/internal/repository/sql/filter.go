@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
@@ -30,23 +31,18 @@ const (
 		" FROM eventstore.events"
 )
 
+type Querier interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+}
+
 func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*models.Event, err error) {
-	where, values := prepareWhere(searchQuery)
-	query := selectStmt + where
+	return filter(db.client, searchQuery)
+}
 
-	query += " ORDER BY event_sequence"
-	if searchQuery.Desc {
-		query += " DESC"
-	}
+func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_models.Event, err error) {
+	query, values := prepareQuery(searchQuery)
 
-	if searchQuery.Limit > 0 {
-		values = append(values, searchQuery.Limit)
-		query += " LIMIT ?"
-	}
-
-	query = numberPlaceholder(query, "?", "$")
-
-	rows, err := db.client.Query(query, values...)
+	rows, err := querier.Query(query, values...)
 	if err != nil {
 		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
 		return nil, errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
@@ -84,6 +80,25 @@ func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (
 	}
 
 	return events, nil
+}
+
+func prepareQuery(searchQuery *es_models.SearchQuery) (query string, values []interface{}) {
+	where, values := prepareWhere(searchQuery)
+	query = selectStmt + where
+
+	query += " ORDER BY event_sequence"
+	if searchQuery.Desc {
+		query += " DESC"
+	}
+
+	if searchQuery.Limit > 0 {
+		values = append(values, searchQuery.Limit)
+		query += " LIMIT ?"
+	}
+
+	query = numberPlaceholder(query, "?", "$")
+
+	return query, values
 }
 
 func numberPlaceholder(query, old, new string) string {

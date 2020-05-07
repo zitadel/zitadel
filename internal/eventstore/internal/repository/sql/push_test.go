@@ -60,6 +60,21 @@ func TestSQL_PushAggregates(t *testing.T) {
 			shouldCheckEvents: false,
 		},
 		{
+			name: "aggregate precondtion fails",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil).
+					expectSavepoint().
+					expectPrepareInsert().
+					expectFilterEventsError(errors.CreateCaosError(nil, "SQL-IzJOf", "err")).
+					expectRollback(nil),
+			},
+
+			args:              args{aggregates: []*models.Aggregate{aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(1), nil)}},
+			isError:           errors.IsPreconditionFailed,
+			shouldCheckEvents: false,
+		},
+		{
 			name: "one aggregate two events success",
 			fields: fields{
 				client: mockDB(t).
@@ -94,9 +109,10 @@ func TestSQL_PushAggregates(t *testing.T) {
 			},
 			args: args{
 				aggregates: []*models.Aggregate{
-					&models.Aggregate{
+					{
+						PreviousSequence: 34,
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -104,9 +120,8 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr",
 								ResourceOwner:    "ro",
 								Type:             "eventTyp",
-								PreviousSequence: 34,
 							},
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -114,7 +129,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr2",
 								ResourceOwner:    "ro2",
 								Type:             "eventTyp",
-								PreviousSequence: 0,
 							},
 						},
 					},
@@ -157,9 +171,10 @@ func TestSQL_PushAggregates(t *testing.T) {
 			},
 			args: args{
 				aggregates: []*models.Aggregate{
-					&models.Aggregate{
+					{
+						PreviousSequence: 34,
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -167,13 +182,13 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr",
 								ResourceOwner:    "ro",
 								Type:             "eventTyp",
-								PreviousSequence: 34,
 							},
 						},
 					},
-					&models.Aggregate{
+					{
+						PreviousSequence: 40,
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID2",
 								AggregateType:    "aggType2",
 								AggregateVersion: "v0.0.1",
@@ -181,7 +196,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 								EditorUser:       "usr",
 								ResourceOwner:    "ro",
 								Type:             "eventTyp",
-								PreviousSequence: 40,
 							},
 						},
 					},
@@ -212,9 +226,9 @@ func TestSQL_PushAggregates(t *testing.T) {
 			},
 			args: args{
 				aggregates: []*models.Aggregate{
-					&models.Aggregate{
+					{
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -224,7 +238,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 								Type:             "eventTyp",
 								PreviousSequence: 34,
 							},
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -265,9 +279,9 @@ func TestSQL_PushAggregates(t *testing.T) {
 			},
 			args: args{
 				aggregates: []*models.Aggregate{
-					&models.Aggregate{
+					{
 						Events: []*models.Event{
-							&models.Event{
+							{
 								AggregateID:      "aggID",
 								AggregateType:    "aggType",
 								AggregateVersion: "v0.0.1",
@@ -320,4 +334,96 @@ func noErr(err error) bool {
 
 func functionName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+}
+
+func Test_precondtion(t *testing.T) {
+	type fields struct {
+		client *dbMock
+	}
+	type args struct {
+		aggregate *models.Aggregate
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		isErr  func(error) bool
+	}{
+		{
+			name: "no precondition",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil),
+			},
+			args: args{
+				aggregate: &models.Aggregate{},
+			},
+		},
+		{
+			name: "precondition fails",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil).expectFilterEventsLimit(5, 0),
+			},
+			args: args{
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.CreateCaosError(nil, "SQL-LBIKm", "err"))),
+			},
+			isErr: errors.IsPreconditionFailed,
+		},
+		{
+			name: "precondition with filter error",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil).expectFilterEventsError(errors.ThrowInternal(nil, "SQL-ac9EW", "err")),
+			},
+			args: args{
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.CreateCaosError(nil, "SQL-LBIKm", "err"))),
+			},
+			isErr: errors.IsPreconditionFailed,
+		},
+		{
+			name: "precondition no events",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil).expectFilterEventsLimit(5, 0),
+			},
+			args: args{
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(nil)),
+			},
+		},
+		{
+			name: "precondition with events",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil).expectFilterEventsLimit(5, 3),
+			},
+			args: args{
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(nil)),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := tt.fields.client.sqlClient.Begin()
+			if err != nil {
+				t.Errorf("unable to start tx %v", err)
+				t.FailNow()
+			}
+			err = precondtion(tx, tt.args.aggregate)
+			if (tt.isErr != nil && err == nil) || (tt.isErr != nil && !tt.isErr(err)) {
+				t.Error("precondtion() wrong error", err)
+			}
+		})
+	}
+}
+
+func aggregateWithPrecondition(aggregate *models.Aggregate, query *models.SearchQuery, precondition func(...*models.Event) error) *models.Aggregate {
+	aggregate.SetPrecondition(query, precondition)
+	return aggregate
+}
+
+func validationFunc(err error) func(events ...*models.Event) error {
+	return func(events ...*models.Event) error {
+		return err
+	}
 }
