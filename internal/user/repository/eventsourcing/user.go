@@ -210,6 +210,9 @@ func EmailChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 		if err != nil {
 			return nil, err
 		}
+		if existing.Email == nil {
+			existing.Email = new(model.Email)
+		}
 		if email.IsEmailVerified {
 			return agg.AppendEvent(model.UserEmailVerified, code)
 		}
