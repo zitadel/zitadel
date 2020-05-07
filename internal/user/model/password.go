@@ -32,3 +32,16 @@ const (
 func (p *Password) IsValid() bool {
 	return p.AggregateID != "" && p.SecretString != ""
 }
+
+func (p *Password) HashPasswordIfExisting(passwordAlg crypto.HashAlgorithm, onetime bool) error {
+	if p.SecretString == "" {
+		return nil
+	}
+	secret, err := crypto.Hash([]byte(p.SecretString), passwordAlg)
+	if err != nil {
+		return err
+	}
+	p.SecretCrypto = secret
+	p.ChangeRequired = onetime
+	return nil
+}

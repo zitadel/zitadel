@@ -38,11 +38,30 @@ func (u *User) appendUserPhoneVerifiedEvent() error {
 	return nil
 }
 
-func (a *Phone) setData(event *es_models.Event) error {
-	a.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, a); err != nil {
+func (p *Phone) setData(event *es_models.Event) error {
+	p.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-dlo9s").WithError(err).Error("could not unmarshal event data")
 		return err
 	}
+	return nil
+}
+
+func (p *Phone) GeneratePhoneCodeIfNeeded(phoneGenerator crypto.Generator) (*PhoneCode, error) {
+	var phoneCode *PhoneCode
+	if p.IsPhoneVerified {
+		return phoneCode, nil
+	}
+	phoneCode = new(PhoneCode)
+	return phoneCode, phoneCode.GeneratePhoneCode(phoneGenerator)
+}
+
+func (code *PhoneCode) GeneratePhoneCode(phoneGenerator crypto.Generator) error {
+	phoneCodeCrypto, _, err := crypto.NewCode(phoneGenerator)
+	if err != nil {
+		return err
+	}
+	code.Code = phoneCodeCrypto
+	code.Expiry = phoneGenerator.Expiry()
 	return nil
 }

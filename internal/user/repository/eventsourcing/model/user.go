@@ -99,6 +99,17 @@ func UserToModel(user *User) *model.User {
 	return converted
 }
 
+func InitCodeFromModel(code *model.InitUserCode) *InitUserCode {
+	if code == nil {
+		return nil
+	}
+	return &InitUserCode{
+		ObjectRoot: code.ObjectRoot,
+		Expiry:     code.Expiry,
+		Code:       code.Code,
+	}
+}
+
 func InitCodeToModel(code *InitUserCode) *model.InitUserCode {
 	return &model.InitUserCode{
 		ObjectRoot: code.ObjectRoot,
@@ -174,19 +185,19 @@ func (u *User) ComputeObject() {
 			u.State = int32(model.USERSTATE_INITIAL)
 		}
 	}
-	if u.Password != nil && u.Password.ObjectRoot.AggregateID == "" {
+	if u.Password != nil && u.Password.ObjectRoot.IsZero() {
 		u.Password.ObjectRoot = u.ObjectRoot
 	}
-	if u.Profile != nil && u.Profile.ObjectRoot.AggregateID == "" {
+	if u.Profile != nil && u.Profile.ObjectRoot.IsZero() {
 		u.Profile.ObjectRoot = u.ObjectRoot
 	}
-	if u.Email != nil && u.Email.ObjectRoot.AggregateID == "" {
+	if u.Email != nil && u.Email.ObjectRoot.IsZero() {
 		u.Email.ObjectRoot = u.ObjectRoot
 	}
-	if u.Phone != nil && u.Phone.ObjectRoot.AggregateID == "" {
+	if u.Phone != nil && u.Phone.ObjectRoot.IsZero() {
 		u.Phone.ObjectRoot = u.ObjectRoot
 	}
-	if u.Address != nil && u.Address.ObjectRoot.AggregateID == "" {
+	if u.Address != nil && u.Address.ObjectRoot.IsZero() {
 		u.Address.ObjectRoot = u.ObjectRoot
 	}
 }

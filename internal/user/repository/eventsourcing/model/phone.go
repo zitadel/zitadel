@@ -48,6 +48,17 @@ func PhoneToModel(phone *Phone) *model.Phone {
 	}
 }
 
+func PhoneCodeFromModel(code *model.PhoneCode) *PhoneCode {
+	if code == nil {
+		return nil
+	}
+	return &PhoneCode{
+		ObjectRoot: code.ObjectRoot,
+		Expiry:     code.Expiry,
+		Code:       code.Code,
+	}
+}
+
 func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
 	return &model.PhoneCode{
 		ObjectRoot: code.ObjectRoot,
@@ -58,7 +69,6 @@ func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
 
 func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {
 	u.Phone = new(Phone)
-	u.IsPhoneVerified = false
 	return u.Phone.setData(event)
 }
 
