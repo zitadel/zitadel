@@ -123,7 +123,6 @@ func (p *UserView) AppendEvent(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered:
-		p.State = int32(model.USERSTATE_ACTIVE)
 		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setData(event)
@@ -154,6 +153,7 @@ func (p *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.MfaOtpRemoved:
 		p.OTPState = int32(model.MFASTATE_UNSPECIFIED)
 	}
+	p.ComputeObject()
 	return err
 }
 
@@ -168,4 +168,14 @@ func (u *UserView) setData(event *models.Event) error {
 		return err
 	}
 	return nil
+}
+
+func (u *UserView) ComputeObject() {
+	if u.State == int32(model.USERSTATE_UNSPECIFIED) || u.State == int32(model.USERSTATE_INITIAL) {
+		if u.IsEmailVerified {
+			u.State = int32(model.USERSTATE_ACTIVE)
+		} else {
+			u.State = int32(model.USERSTATE_INITIAL)
+		}
+	}
 }

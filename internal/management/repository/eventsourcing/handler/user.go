@@ -73,5 +73,5 @@ func (p *User) Process(event *models.Event) (err error) {
 
 func (p *User) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
-	return spooler.HandleError(event, p.view.GetLatestUserFailedEvent, p.view.ProcessedUserFailedEvent, p.view.ProcessedUserSequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestUserFailedEvent, p.view.ProcessedUserFailedEvent, p.view.ProcessedUserSequence, p.errorCountUntilSkip)
 }
