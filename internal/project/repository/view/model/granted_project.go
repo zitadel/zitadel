@@ -81,34 +81,34 @@ func GrantedProjectsToModel(projects []*GrantedProjectView) []*model.GrantedProj
 	return result
 }
 
-func (p *GrantedProjectView) AppendEvent(event *models.Event) error {
+func (p *GrantedProjectView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.ProjectAdded:
-		p.setRootData(event)
-		p.setData(event)
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		p.CreationDate = event.CreationDate
+		p.setRootData(event)
+		err = p.setData(event)
 	case es_model.ProjectChanged:
-		p.setData(event)
+		err = p.setData(event)
 	case es_model.ProjectDeactivated:
 		p.State = int32(model.PROJECTSTATE_INACTIVE)
 	case es_model.ProjectReactivated:
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 	case es_model.ProjectGrantAdded:
-		p.setRootData(event)
-		p.setProjectGrantData(event)
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		p.CreationDate = event.CreationDate
+		p.setRootData(event)
+		err = p.setProjectGrantData(event)
 	case es_model.ProjectGrantChanged:
-		p.setProjectGrantData(event)
+		err = p.setProjectGrantData(event)
 	case es_model.ProjectGrantDeactivated:
 		p.State = int32(model.PROJECTSTATE_INACTIVE)
 	case es_model.ProjectGrantReactivated:
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 	}
-	return nil
+	return err
 }
 
 func (p *GrantedProjectView) setRootData(event *models.Event) {

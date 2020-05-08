@@ -5,7 +5,6 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"reflect"
 	"testing"
 )
 
@@ -93,7 +92,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 			if tt.args.app.IsOIDC != tt.result.IsOIDC {
 				t.Errorf("got wrong result IsOIDC: expected: %v, actual: %v ", tt.result.IsOIDC, tt.args.app.IsOIDC)
 			}
-			if !reflect.DeepEqual(tt.args.app.OIDCClientID, tt.result.OIDCClientID) {
+			if tt.args.app.OIDCClientID != tt.result.OIDCClientID {
 				t.Errorf("got wrong result OIDCClientID: expected: %v, actual: %v ", tt.result.OIDCClientID, tt.args.app.OIDCClientID)
 			}
 		})

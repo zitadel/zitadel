@@ -50,3 +50,9 @@ type ProjectMemberSearchResponse struct {
 	TotalResult uint64
 	Result      []*ProjectMemberView
 }
+
+func (r *ProjectMemberSearchRequest) EnsureLimit(limit uint64) {
+	if r.Limit == 0 || r.Limit > limit {
+		r.Limit = limit
+	}
+}

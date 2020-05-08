@@ -62,17 +62,17 @@ func ProjectRolesToModel(roles []*ProjectRoleView) []*model.ProjectRoleView {
 	return result
 }
 
-func (r *ProjectRoleView) AppendEvent(event *models.Event) error {
+func (r *ProjectRoleView) AppendEvent(event *models.Event) (err error) {
 	r.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.ProjectRoleAdded:
 		r.setRootData(event)
-		r.SetData(event)
 		r.CreationDate = event.CreationDate
+		err = r.SetData(event)
 	case es_model.ProjectRoleChanged:
-		r.SetData(event)
+		err = r.SetData(event)
 	}
-	return nil
+	return err
 }
 
 func (r *ProjectRoleView) setRootData(event *models.Event) {

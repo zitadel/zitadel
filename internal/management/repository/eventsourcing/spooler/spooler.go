@@ -13,15 +13,14 @@ type SpoolerConfig struct {
 	FailureCountUntilSkip uint64
 	ConcurrentTasks       int
 	Handlers              handler.Configs
-	EventstoreRepos       handler.EventstoreRepos
 }
 
-func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, sqlClient *sql.DB, view *view.View) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sql *sql.DB, eventstoreRepos handler.EventstoreRepos) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:      es,
-		Locker:          &locker{dbClient: sqlClient},
+		Locker:          &locker{dbClient: sql},
 		ConcurrentTasks: c.ConcurrentTasks,
-		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, c.EventstoreRepos),
+		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, eventstoreRepos),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

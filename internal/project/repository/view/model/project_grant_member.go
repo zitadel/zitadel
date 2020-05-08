@@ -74,22 +74,22 @@ func ProjectGrantMembersToModel(roles []*ProjectGrantMemberView) []*model.Projec
 	return result
 }
 
-func (r *ProjectGrantMemberView) AppendEvent(event *models.Event) error {
+func (r *ProjectGrantMemberView) AppendEvent(event *models.Event) (err error) {
 	r.Sequence = event.Sequence
+	r.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.ProjectGrantMemberAdded:
 		r.setRootData(event)
-		r.SetData(event)
 		r.CreationDate = event.CreationDate
+		err = r.SetData(event)
 	case es_model.ProjectGrantMemberChanged:
-		r.SetData(event)
+		err = r.SetData(event)
 	}
-	return nil
+	return err
 }
 
 func (r *ProjectGrantMemberView) setRootData(event *models.Event) {
 	r.ProjectID = event.AggregateID
-	r.ChangeDate = event.CreationDate
 }
 
 func (r *ProjectGrantMemberView) SetData(event *models.Event) error {

@@ -71,22 +71,22 @@ func ProjectMembersToModel(roles []*ProjectMemberView) []*model.ProjectMemberVie
 	return result
 }
 
-func (r *ProjectMemberView) AppendEvent(event *models.Event) error {
+func (r *ProjectMemberView) AppendEvent(event *models.Event) (err error) {
 	r.Sequence = event.Sequence
+	r.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.ProjectMemberAdded:
 		r.setRootData(event)
-		r.SetData(event)
 		r.CreationDate = event.CreationDate
+		err = r.SetData(event)
 	case es_model.ProjectMemberChanged:
-		r.SetData(event)
+		err = r.SetData(event)
 	}
-	return nil
+	return err
 }
 
 func (r *ProjectMemberView) setRootData(event *models.Event) {
 	r.ProjectID = event.AggregateID
-	r.ChangeDate = event.CreationDate
 }
 
 func (r *ProjectMemberView) SetData(event *models.Event) error {

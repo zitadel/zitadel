@@ -37,9 +37,7 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 }
 
 func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
-	if request.Limit == 0 {
-		request.Limit = repo.SearchLimit
-	}
+	request.EnsureLimit(repo.SearchLimit)
 	projects, count, err := repo.View.SearchGrantedProjects(request)
 	if err != nil {
 		return nil, err
@@ -71,9 +69,7 @@ func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, use
 }
 
 func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
-	if request.Limit == 0 {
-		request.Limit = repo.SearchLimit
-	}
+	request.EnsureLimit(repo.SearchLimit)
 	members, count, err := repo.View.SearchProjectMembers(request)
 	if err != nil {
 		return nil, err
@@ -100,9 +96,7 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 }
 
 func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
-	if request.Limit == 0 {
-		request.Limit = repo.SearchLimit
-	}
+	request.EnsureLimit(repo.SearchLimit)
 	roles, count, err := repo.View.SearchProjectRoles(request)
 	if err != nil {
 		return nil, err
@@ -141,9 +135,7 @@ func (repo *ProjectRepo) RemoveApplication(ctx context.Context, projectID, appID
 }
 
 func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
-	if request.Limit == 0 {
-		request.Limit = repo.SearchLimit
-	}
+	request.EnsureLimit(repo.SearchLimit)
 	apps, count, err := repo.View.SearchApplications(request)
 	if err != nil {
 		return nil, err
@@ -208,9 +200,7 @@ func (repo *ProjectRepo) RemoveProjectGrantMember(ctx context.Context, projectID
 }
 
 func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request *proj_model.ProjectGrantMemberSearchRequest) (*proj_model.ProjectGrantMemberSearchResponse, error) {
-	if request.Limit == 0 {
-		request.Limit = repo.SearchLimit
-	}
+	request.EnsureLimit(repo.SearchLimit)
 	members, count, err := repo.View.SearchProjectGrantMembers(request)
 	if err != nil {
 		return nil, err
