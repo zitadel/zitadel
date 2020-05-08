@@ -14,12 +14,22 @@ func (s *Server) GetUserByID(ctx context.Context, id *UserID) (*User, error) {
 	return userFromModel(user), nil
 }
 
-func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *UserEmailID) (*User, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-9djSw", "Not implemented")
+func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *UserEmailID) (*UserView, error) {
+	user, err := s.user.GetGlobalUserByEmail(ctx, email.Email)
+	if err != nil {
+		return nil, err
+	}
+	return userViewFromModel(user), nil
 }
 
-func (s *Server) SearchUsers(ctx context.Context, userSearch *UserSearchRequest) (*UserSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-as2Dc", "Not implemented")
+func (s *Server) SearchUsers(ctx context.Context, in *UserSearchRequest) (*UserSearchResponse, error) {
+	request := userSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(ctx)
+	response, err := s.user.SearchUsers(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userSearchResponseFromModel(response), nil
 }
 
 func (s *Server) UserChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
@@ -27,7 +37,11 @@ func (s *Server) UserChanges(ctx context.Context, changesRequest *ChangeRequest)
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, request *UniqueUserRequest) (*UniqueUserResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-olF56", "Not implemented")
+	unique, err := s.user.IsUserUnique(ctx, request.UserName, request.Email)
+	if err != nil {
+		return nil, err
+	}
+	return &UniqueUserResponse{IsUnique: unique}, nil
 }
 
 func (s *Server) CreateUser(ctx context.Context, in *CreateUserRequest) (*User, error) {
@@ -159,5 +173,9 @@ func (s *Server) SetInitialPassword(ctx context.Context, request *PasswordReques
 }
 
 func (s *Server) GetUserMfas(ctx context.Context, userID *UserID) (*MultiFactors, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-ldmw3", "Not implemented")
+	mfas, err := s.user.UserMfas(ctx, userID.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &MultiFactors{Mfas: mfasFromModel(mfas)}, nil
 }

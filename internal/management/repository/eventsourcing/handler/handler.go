@@ -32,6 +32,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&ProjectMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount}},
 		&ProjectGrantMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount}},
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
+		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
 	}
 }
 
