@@ -1,7 +1,5 @@
 package model
 
-import user_model "github.com/caos/zitadel/internal/user/model"
-
 type possibleSteps []NextStep
 
 func (p possibleSteps) add(step NextStep) {
@@ -34,30 +32,31 @@ const (
 	UserSessionStateTerminated
 )
 
-type Mfa interface {
-	Type() MfaType
-	AuthLevel() AuthLevel
-}
-
-type AuthLevel int32
-
-type OTP struct{}
-
-func (o *OTP) MfaType() MfaType {
-	return MfaTypeOTP
-}
-
-func (o *OTP) AuthLevel() AuthLevel {
-	return 1
-}
-
-type MfaType int32
-
-const (
-	MfaTypeNone MfaType = iota
-	MfaTypeOTP
-	MFaTypeSMS
-)
+//
+//type Mfa interface {
+//	Type() MfaType
+//	AuthLevel() AuthLevel
+//}
+//
+//type AuthLevel int32
+//
+//type OTP struct{}
+//
+//func (o *OTP) MfaType() MfaType {
+//	return MfaTypeOTP
+//}
+//
+//func (o *OTP) AuthLevel() AuthLevel {
+//	return 1
+//}
+//
+//type MfaType int32
+//
+//const (
+//	MfaTypeNone MfaType = iota
+//	MfaTypeOTP
+//	MFaTypeSMS
+//)
 
 type LoginStep struct {
 	NotFound bool
@@ -112,7 +111,7 @@ func (s *VerifyEMailStep) Type() NextStepType {
 
 type MfaPromptStep struct {
 	Required     bool
-	MfaProviders []user_model.MfaType
+	MfaProviders []MfaType
 }
 
 func (s *MfaPromptStep) Type() NextStepType {
@@ -121,7 +120,7 @@ func (s *MfaPromptStep) Type() NextStepType {
 
 type MfaVerificationStep struct {
 	FailureCount uint16
-	MfaProviders []user_model.MfaType
+	MfaProviders []MfaType
 }
 
 func (s *MfaVerificationStep) Type() NextStepType {
@@ -134,3 +133,17 @@ type RedirectToCallbackStep struct {
 func (s *RedirectToCallbackStep) Type() NextStepType {
 	return NextStepRedirectToCallback
 }
+
+type MfaType int
+
+const (
+	MfaTypeOTP MfaType = iota
+)
+
+type MfaLevel int
+
+const (
+	MfaLevelSoftware MfaLevel = iota
+	MfaLevelHardware
+	MfaLevelHardwareCertified
+)

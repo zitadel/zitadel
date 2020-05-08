@@ -14,6 +14,10 @@ type UserRepo struct {
 	UserEvents *user_event.UserEventstore
 }
 
+func (repo *UserRepo) Health(ctx context.Context) error {
+	return repo.UserEvents.Health(ctx)
+}
+
 func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error) {
 	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
 }
@@ -93,6 +97,10 @@ func (repo *UserRepo) VerifyMyMfaOTP(ctx context.Context, code string) (*model.O
 
 func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, auth.GetCtxData(ctx).UserID)
+}
+
+func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
+	return repo.UserEvents.SkipMfaInit(ctx, userID)
 }
 
 func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string) error {

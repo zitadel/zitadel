@@ -42,8 +42,10 @@ const (
 	UserProfileChanged models.EventType = "user.profile.changed"
 	UserAddressChanged models.EventType = "user.address.changed"
 
-	MfaOtpAdded    models.EventType = "user.mfa.otp.added"
-	MfaOtpVerified models.EventType = "user.mfa.otp.verified"
-	MfaOtpRemoved  models.EventType = "user.mfa.otp.removed"
-	MfaInitSkipped models.EventType = "user.mfa.init.skipped"
+	MfaOtpAdded          models.EventType = "user.mfa.otp.added"
+	MfaOtpVerified       models.EventType = "user.mfa.otp.verified"
+	MfaOtpRemoved        models.EventType = "user.mfa.otp.removed"
+	MfaOtpCheckSucceeded models.EventType = "user.mfa.otp.check.succeeded"
+	MfaOtpCheckFailed    models.EventType = "user.mfa.otp.check.failed"
+	MfaInitSkipped       models.EventType = "user.mfa.init.skipped"
 )

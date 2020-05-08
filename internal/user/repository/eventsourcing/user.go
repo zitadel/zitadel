@@ -357,6 +357,32 @@ func MfaOTPVerifyAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 	}
 }
 
+func MfaOTPCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if authReq == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sd5DA", "authReq must not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.MfaOtpCheckSucceeded, authReq)
+	}
+}
+
+func MfaOTPCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, authReq *model.AuthRequest) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if authReq == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-64sd6", "authReq must not be nil")
+		}
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.MfaOtpCheckFailed, authReq)
+	}
+}
+
 func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)

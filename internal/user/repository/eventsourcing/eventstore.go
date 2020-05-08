@@ -2,6 +2,12 @@ package eventsourcing
 
 import (
 	"context"
+	"strconv"
+
+	"github.com/pquerna/otp/totp"
+	"github.com/sony/sonyflake"
+
+	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -12,9 +18,6 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/pquerna/otp/totp"
-	"github.com/sony/sonyflake"
-	"strconv"
 )
 
 type UserEventstore struct {
@@ -311,7 +314,7 @@ func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (
 	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "password not found")
 }
 
-func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *usr_model.AuthRequest) error {
+func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *req_model.AuthRequest) error {
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -328,7 +331,7 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "invalid password")
 }
 
-func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *usr_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.PasswordCheck) es_sdk.AggregateFunc) error {
+func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.PasswordCheck) es_sdk.AggregateFunc) error {
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
 	passwordCheck := &model.PasswordCheck{UserAgentID: repoAuthRequest.UserAgentID, BrowserInfo: repoAuthRequest.BrowserInfo}
@@ -693,21 +696,6 @@ func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.
 	return model.AddressToModel(repoExisting.Address), nil
 }
 
-func (es *UserEventstore) OTPByID(ctx context.Context, userID string) (*usr_model.OTP, error) {
-	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "userID missing")
-	}
-	user, err := es.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	if user.OTP != nil {
-		return user.OTP, nil
-	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dps09", "otp not found")
-}
-
 func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model.OTP, error) {
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -759,26 +747,54 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 }
 
 func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code string) error {
-	return es.verifyMfaOTP(ctx, userID, code)
-}
-
-func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, authRequest *usr_model.AuthRequest) error {
-	opt, err := es.OTPByID(ctx, userID)
-	if err != nil {
-
-	}
-
-}
-
-func (es *UserEventstore) verifyMfaOTP(ctx context.Context, userID, code string) error {
-	existing, err := es.UserByID(ctx, userID)
+	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
-	if existing.OTP == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "no otp existing")
+	if user.OTP == nil || user.IsOTPReady() {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "otp not existing or already set up")
 	}
-	decrypt, err := crypto.DecryptString(existing.OTP.Secret, es.Multifactors.OTP.CryptoMFA)
+	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
+		return err
+	}
+	repoUser := model.UserFromModel(user)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MfaOTPVerifyAggregate(es.AggregateCreator(), repoUser))
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, authRequest *req_model.AuthRequest) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if !user.IsOTPReady() {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "opt not ready")
+	}
+
+	repoUser := model.UserFromModel(user)
+	repoAuthReq := model.AuthRequestFromModel(authRequest)
+	var aggregate func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc
+	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
+		aggregate = MfaOTPCheckFailedAggregate
+	} else {
+		aggregate = MfaOTPCheckSucceededAggregate
+	}
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, aggregate(es.AggregateCreator(), repoUser, repoAuthReq))
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
+	decrypt, err := crypto.DecryptString(otp.Secret, es.Multifactors.OTP.CryptoMFA)
 	if err != nil {
 		return err
 	}

@@ -1,49 +1,41 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/user/model"
+	"net"
+
+	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 type AuthRequest struct {
-	es_models.ObjectRoot
-
-	UserAgentID string
+	UserAgentID string `json:"userAgentID,omitempty"`
 	*BrowserInfo
 }
 
 func AuthRequestFromModel(request *model.AuthRequest) *AuthRequest {
 	return &AuthRequest{
-		ObjectRoot:  request.ObjectRoot,
+		UserAgentID: request.ObjectRoot.AggregateID,
 		BrowserInfo: BrowserInfoFromModel(request.BrowserInfo),
 	}
 }
 
-func AuthRequestToModel(request *AuthRequest) *model.AuthRequest {
-	return &model.AuthRequest{
-		ObjectRoot:  request.ObjectRoot,
-		BrowserInfo: BrowserInfoToModel(request.BrowserInfo),
+type BrowserInfo struct {
+	UserAgent      string `json:"userAgent,omitempty"`
+	AcceptLanguage string `json:"acceptLanguage,omitempty"`
+	RemoteIP       net.IP `json:"remoteIP,omitempty"`
+}
+
+func BrowserInfoFromModel(info *model.BrowserInfo) *BrowserInfo {
+	return &BrowserInfo{
+		UserAgent:      info.UserAgent,
+		AcceptLanguage: info.AcceptLanguage,
+		RemoteIP:       info.RemoteIP,
 	}
 }
 
 //
-//func (u *User) appendUserAuthRequestChangedEvent(event *es_models.Event) error {
-//	if u.AuthRequest == nil {
-//		u.AuthRequest = new(AuthRequest)
+//func AuthRequestToModel(request *AuthRequest) *model.AuthRequest {
+//	return &model.AuthRequest{
+//		UserAgentID: request.UserAgentID,
+//		BrowserInfo: BrowserInfoToModel(request.BrowserInfo),
 //	}
-//	return u.AuthRequest.setData(event)
-//}
-//
-//func (a *AuthRequest) setData(event *es_models.Event) error {
-//	a.ObjectRoot.AppendEvent(event)
-//	if err := json.Unmarshal(event.Data, a); err != nil {
-//		logging.Log("EVEN-clos0").WithError(err).Error("could not unmarshal event data")
-//		return caos_errs.ThrowInternal(err, "MODEL-so92s", "could not unmarshal event")
-//	}
-//	return nil
-//}
-
-//
-//func (a *AuthRequest) AddPossibleStep(step NextStep) {
-//	a.possibleSteps = append(a.possibleSteps, step)
 //}

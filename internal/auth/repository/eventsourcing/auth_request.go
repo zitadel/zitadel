@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/user/repository/auth_request_cache"
+	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -14,6 +15,18 @@ type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
 	AuthRequests *cache.AuthRequestCache
 	//view      *view.View
+
+	PasswordCheckLifeTime    time.Duration
+	MfaInitSkippedLifeTime   time.Duration
+	MfaSoftwareCheckLifeTime time.Duration
+	MfaHardwareCheckLifeTime time.Duration
+}
+
+func (repo *AuthRequestRepo) Health(ctx context.Context) error {
+	if err := repo.UserEvents.Health(ctx); err != nil {
+		return err
+	}
+	return repo.AuthRequests.Health(ctx)
 }
 
 func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *model.AuthRequest) (*model.AuthRequest, error) {
@@ -30,7 +43,7 @@ func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*m
 		return nil, err
 	}
 	//query view
-	return nextSteps(request, nil)
+	return repo.nextSteps(request)
 }
 
 func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username string) error {
@@ -42,11 +55,7 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	//if request.PasswordChecked() {
 	//	return nil, errors.ThrowPreconditionFailed(nil, "EVENT-52NGs", "user already chosen")
 	//}
-	return nil, errors.ThrowUnimplemented(nil, "EVENT-asjod", "user by username not yet implemented")
-	//if err != nil {
-	//	return nextStepsNoUserSelected(request, true)
-	//}
-	//return nextSteps(request, user)
+	return errors.ThrowUnimplemented(nil, "EVENT-asjod", "user by username not yet implemented")
 }
 
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password string, info *model.BrowserInfo) error {
@@ -60,18 +69,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	//if request.PasswordChecked() {
 	//	return nil, errors.ThrowPreconditionFailed(nil, "EVENT-s6Gn3", "password already checked")
 	//}
-	authReq := &model.AuthRequest{
-		BrowserInfo: info,
-	}
-	return repo.UserEvents.CheckPassword(ctx, userID, password, authReq)
-}
-
-func (repo *AuthRequestRepo) SkipMfaInit(ctx context.Context, authRequestID, userID string) error {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, authRequestID)
-	if err != nil {
-		return err
-	}
-	return repo.UserEvents.SkipMfaInit(ctx, userID)
+	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
 
 func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID string, code string, info *model.BrowserInfo) error {
@@ -82,22 +80,7 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	if request.UserID != userID {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "user id does not match request id")
 	}
-	return repo.UserEvents.CheckMfaOTP(ctx, userID, code)
-}
-
-type UserSession struct {
-	PasswordVerification    time.Time
-	MfaVerification         time.Time
-	MfaSoftwareVerification time.Time
-	MfaHardwareVerification time.Time
-}
-
-func nextStepsNoUserSelected(request *model.AuthRequest, notFound bool) (*model.AuthRequest, error) {
-	if request.Prompt != model.PromptNone {
-		request.AddPossibleStep(&model.LoginStep{NotFound: notFound})
-	}
-	//TODO: select account
-	return request, nil
+	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
 func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) (*model.AuthRequest, error) {
@@ -105,7 +88,7 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) (*model.AuthR
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "request must not be nil")
 	}
 	if request.UserID == "" {
-		return nextStepsNoUserSelected(request, false)
+		return repo.nextStepsNoUserSelected(request)
 	}
 	//userSession, err := repo.view.GetUserSessionByIDs(request.UserAgentID, request.UserID)
 	var userSession *UserSession
@@ -116,13 +99,12 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) (*model.AuthR
 		return request, nil
 	}
 
-	PasswordCheckLifeTime := 30 * 24 * time.Hour
-	if !checkVerificationTime(userSession.PasswordVerification, PasswordCheckLifeTime) {
+	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
 		request.AddPossibleStep(&model.PasswordStep{})
 		return request, nil
 	}
 
-	if !mfaChecked(userSession, request, user) {
+	if !repo.mfaChecked(userSession, request, user) {
 		return request, nil
 	}
 
@@ -140,8 +122,61 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) (*model.AuthR
 	return request, nil
 }
 
+func (repo *AuthRequestRepo) nextStepsNoUserSelected(request *model.AuthRequest) (*model.AuthRequest, error) {
+	if request.Prompt != model.PromptNone {
+		request.AddPossibleStep(&model.LoginStep{})
+	}
+	//TODO: select account
+	return request, nil
+}
+
+func (repo *AuthRequestRepo) mfaChecked(userSession *UserSession, request *model.AuthRequest, user *User) bool {
+	mfaLevel := request.MfaLevel()
+	required := user.MfaMaxSetup < mfaLevel
+	if required || repo.mfaNotSkipped(user) {
+		request.AddPossibleStep(&model.MfaPromptStep{
+			Required:     required,
+			MfaProviders: user.MfaTypesSetupPossible(mfaLevel),
+		})
+		return false
+	}
+	switch mfaLevel {
+	default:
+		fallthrough
+	case model.MfaLevelSoftware:
+		if checkVerificationTime(userSession.MfaSoftwareVerification, repo.MfaSoftwareCheckLifeTime) {
+			return true
+		}
+		//fallthrough?
+	case model.MfaLevelHardware:
+		if checkVerificationTime(userSession.MfaHardwareVerification, repo.MfaHardwareCheckLifeTime) {
+			return true
+		}
+	}
+	request.AddPossibleStep(&model.MfaVerificationStep{
+		MfaProviders: user.MfaTypesAllowed(mfaLevel),
+	})
+	return false
+}
+
+func (repo *AuthRequestRepo) mfaNotSkipped(user *User) bool {
+	if user.MfaMaxSetup >= 0 {
+		return false
+	}
+	return !checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
+}
+
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {
 	return verificationTime.Add(lifetime).After(time.Now().UTC())
+}
+
+//TODO: into view
+
+type UserSession struct {
+	PasswordVerification    time.Time
+	MfaVerification         time.Time
+	MfaSoftwareVerification time.Time
+	MfaHardwareVerification time.Time
 }
 
 type User struct {
@@ -153,7 +188,7 @@ type User struct {
 }
 
 type Password struct {
-	IsEmailVerified bool
+	ChangeRequired bool
 }
 
 func (u *User) MfaTypesSetupPossible(level model.MfaLevel) []model.MfaType {
@@ -180,44 +215,4 @@ func (u *User) MfaTypesAllowed(level model.MfaLevel) []model.MfaType {
 	case model.MfaLevelHardware:
 	}
 	return types
-}
-
-const MfaInitSkippedLifeTime = 30 * 24 * time.Hour
-const MfaSoftwareCheckLifeTime = 18 * time.Hour
-const MfaHardwareCheckLifeTime = 12 * time.Hour
-
-func mfaChecked(userSession *UserSession, request *model.AuthRequest, user *User) bool {
-	mfaLevel := request.MfaLevel()
-	required := user.MfaMaxSetup < mfaLevel
-	if required || MfaNotSkipped(user) {
-		request.AddPossibleStep(&model.MfaPromptStep{
-			Required:     required,
-			MfaProviders: user.MfaTypesSetupPossible(mfaLevel),
-		})
-		return false
-	}
-	switch mfaLevel {
-	default:
-		fallthrough
-	case model.MfaLevelSoftware:
-		if checkVerificationTime(userSession.MfaSoftwareVerification, MfaSoftwareCheckLifeTime) {
-			return true
-		}
-		//fallthrough?
-	case model.MfaLevelHardware:
-		if checkVerificationTime(userSession.MfaHardwareVerification, MfaHardwareCheckLifeTime) {
-			return true
-		}
-	}
-	request.AddPossibleStep(&model.MfaVerificationStep{
-		MfaProviders: user.MfaTypesAllowed(mfaLevel),
-	})
-	return false
-}
-
-func MfaNotSkipped(user *User) bool {
-	if user.MfaMaxSetup >= 0 {
-		return false
-	}
-	return !checkVerificationTime(user.MfaInitSkipped, MfaInitSkippedLifeTime)
 }

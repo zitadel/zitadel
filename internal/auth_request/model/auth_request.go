@@ -26,6 +26,16 @@ type AuthRequest struct {
 
 }
 
+type Prompt int32
+
+const (
+	PromptUnspecified Prompt = iota
+	PromptNone
+	PromptLogin
+	PromptConsent
+	PromptSelectAccount
+)
+
 type LevelOfAssurance int
 
 const (
@@ -67,12 +77,7 @@ func (a *AuthRequest) MfaLevel() model.MfaLevel {
 	//TODO: check a.PossibleLOAs
 }
 
-type Prompt int32
-
-const (
-	PromptUnspecified Prompt = iota
-	PromptNone
-	PromptLogin
-	PromptConsent
-	PromptSelectAccount
-)
+func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
+	a.BrowserInfo = info
+	return a
+}

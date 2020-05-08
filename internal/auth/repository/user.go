@@ -10,6 +10,7 @@ type UserRepository interface {
 	Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error)
 
 	myUserRepo
+	SkipMfaInit(ctx context.Context, userID string) error
 	RequestPasswordReset(ctx context.Context, username string) error
 	SetPassword(ctx context.Context, userID, code, password string) error
 }

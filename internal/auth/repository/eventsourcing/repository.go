@@ -17,8 +17,8 @@ type Config struct {
 
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
-	UserRepo
-	AuthRequestDB *cache.AuthRequestCache
+	UserRepo        UserRepo
+	AuthRequestRepo AuthRequestRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -37,11 +37,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	//conf.Spooler.SQL = sql
 	//spool := spooler.StartSpooler(conf.Spooler)
 
-	authReq, err := cache.Start(conf.AuthRequest)
-	if err != nil {
-		return nil, err
-	}
-
 	user, err := es_user.StartUser(
 		es_user.UserConfig{
 			Eventstore: es,
@@ -52,16 +47,27 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+	authReq, err := cache.Start(conf.AuthRequest)
+	if err != nil {
+		return nil, err
+	}
 
 	return &EsRepository{
 		UserRepo{user},
-		authReq,
+		AuthRequestRepo{
+			UserEvents:               user,
+			AuthRequests:             authReq,
+			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
+			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
+			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
+			MfaHardwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
+		},
 	}, nil
 }
 
 func (repo *EsRepository) Health(ctx context.Context) error {
-	if err := repo.UserEvents.Health(ctx); err != nil {
+	if err := repo.UserRepo.Health(ctx); err != nil {
 		return err
 	}
-	return repo.AuthRequestDB.Health(ctx)
+	return repo.AuthRequestRepo.Health(ctx)
 }
