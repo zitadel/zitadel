@@ -88,7 +88,7 @@ func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 }
 
 func (repo *UserRepo) VerifyMyMfaOTP(ctx context.Context, code string) (*model.OTP, error) {
-	return nil, repo.UserEvents.CheckMfaOTP(ctx, auth.GetCtxData(ctx).UserID, code) //TODO: return?
+	return nil, repo.UserEvents.CheckMfaOTPSetup(ctx, auth.GetCtxData(ctx).UserID, code) //TODO: return?
 }
 
 func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {

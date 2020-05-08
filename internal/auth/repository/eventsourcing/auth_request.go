@@ -33,10 +33,10 @@ func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*m
 	return nextSteps(request, nil)
 }
 
-func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username string) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username string) error {
 	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	_ = request
 	//if request.PasswordChecked() {
@@ -74,10 +74,13 @@ func (repo *AuthRequestRepo) SkipMfaInit(ctx context.Context, authRequestID, use
 	return repo.UserEvents.SkipMfaInit(ctx, userID)
 }
 
-func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID string, code string, info *model.BrowserInfo) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, userID string, code string, info *model.BrowserInfo) error {
 	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, authRequestID)
 	if err != nil {
-		return nil, err
+		return err
+	}
+	if request.UserID != userID {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "user id does not match request id")
 	}
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code)
 }

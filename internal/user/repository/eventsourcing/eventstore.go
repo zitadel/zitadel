@@ -773,7 +773,19 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 	return nil
 }
 
-func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string) error {
+func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code string) error {
+	return es.verifyMfaOTP(ctx, userID, code)
+}
+
+func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, authRequest *usr_model.AuthRequest) error {
+	opt, err := es.OTPByID(ctx, userID)
+	if err != nil {
+
+	}
+
+}
+
+func (es *UserEventstore) verifyMfaOTP(ctx context.Context, userID, code string) error {
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err

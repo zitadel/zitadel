@@ -71,31 +71,3 @@ func (u *User) IsInactive() bool {
 func (u *User) IsLocked() bool {
 	return u.State == USERSTATE_LOCKED
 }
-
-func (u *User) PasswordVerified(userAgentID string) (bool, uint16) {
-	return true, 0 //TODO: ???
-}
-
-func (u *User) MfaVerified(userAgentID string) (bool, uint16) {
-	return true, 0 //TODO: ???
-}
-
-func (u *User) MfaTypesReadyAndSufficient(level MfaLevel) []MfaType {
-	types := make([]MfaType, 0, 1)
-	if u.OTP != nil && MfaIsReady(u.OTP) && MfaLevelSufficient(u.OTP, level) {
-		types = append(types, u.OTP)
-	}
-	return types
-}
-
-func (u *User) MfaTypesPossible(level MfaLevel) []MfaType {
-	types := make([]MfaType, 0, 1)
-	if u.OTP == nil || !MfaIsReady(u.OTP) && MfaLevelSufficient(u.OTP, level) {
-		types = append(types, u.OTP)
-	}
-	return types
-}
-
-func (u *User) MfaVerificationTime(string, MfaLevel) (time.Time, MfaType, uint16) {
-	return time.Time{}, &OTP{}, 0 //TODO: ??
-}

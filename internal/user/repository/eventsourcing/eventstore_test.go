@@ -2480,7 +2480,7 @@ func TestCheckOTP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.CheckMfaOTP(tt.args.ctx, tt.args.userID, tt.args.code)
+			err := tt.args.es.CheckMfaOTPSetup(tt.args.ctx, tt.args.userID, tt.args.code)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("result should not get err")

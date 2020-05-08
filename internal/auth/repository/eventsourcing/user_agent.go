@@ -61,7 +61,7 @@ package eventsourcing
 //	if err != nil {
 //		return nil, err
 //	}
-//	if err := repo.UserEvents.CheckMfaOTP(ctx, authSession.UserSession.UserID, mfa); err == nil {
+//	if err := repo.UserEvents.CheckMfaOTPSetup(ctx, authSession.UserSession.UserID, mfa); err == nil {
 //		return repo.UserAgentEvents.MfaCheckSucceeded(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
 //	}
 //	return repo.UserAgentEvents.MfaCheckFailed(ctx, agentID, authSession.UserSession.SessionID, authSessionID, mfa)
