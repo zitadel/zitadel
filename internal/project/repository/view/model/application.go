@@ -33,7 +33,7 @@ type ApplicationView struct {
 	OIDCGrantTypes             pq.Int64Array  `json:"grantTypes" gorm:"column:oidc_grant_types"`
 	OIDCApplicationType        int32          `json:"applicationType" gorm:"column:oidc_application_type"`
 	OIDCAuthMethodType         int32          `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
-	OIDCPostLogoutRedirectUris pq.StringArray `json:"redirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
+	OIDCPostLogoutRedirectUris pq.StringArray `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
