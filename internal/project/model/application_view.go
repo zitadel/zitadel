@@ -55,3 +55,9 @@ type ApplicationSearchResponse struct {
 	TotalResult uint64
 	Result      []*ApplicationView
 }
+
+func (r *ApplicationSearchRequest) EnsureLimit(limit uint64) {
+	if r.Limit == 0 || r.Limit > limit {
+		r.Limit = limit
+	}
+}

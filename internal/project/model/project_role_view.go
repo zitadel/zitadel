@@ -1,6 +1,9 @@
 package model
 
 import (
+	"context"
+	"github.com/caos/zitadel/internal/api"
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/model"
 	"time"
 )
@@ -46,4 +49,15 @@ type ProjectRoleSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*ProjectRoleView
+}
+
+func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(ctx context.Context) {
+	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: PROJECTROLESEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+}
+
+func (r *ProjectRoleSearchRequest) EnsureLimit(limit uint64) {
+	if r.Limit == 0 || r.Limit > limit {
+		r.Limit = limit
+	}
 }
