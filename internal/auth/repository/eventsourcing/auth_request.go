@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
+	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -42,7 +43,12 @@ func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*m
 		return nil, err
 	}
 	//query view
-	return repo.nextSteps(request)
+	steps, err := repo.nextSteps(request)
+	if err != nil {
+		return nil, err
+	}
+	request.PossibleSteps = steps
+	return request, nil
 }
 
 func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username string) error {
@@ -82,87 +88,85 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) (*model.AuthRequest, error) {
+func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.NextStep, error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "request must not be nil")
 	}
+	steps := make([]model.NextStep, 0)
 	if request.UserID == "" {
-		return repo.nextStepsNoUserSelected(request)
+		if request.Prompt != model.PromptNone {
+			steps = append(steps, &model.LoginStep{})
+		}
+		//TODO: select account
+		return steps, nil
 	}
 	//userSession, err := repo.view.GetUserSessionByIDs(request.UserAgentID, request.UserID)
 	var userSession *UserSession
 	var user *User
 
 	if user.Password == nil {
-		request.AddPossibleStep(&model.InitPasswordStep{})
-		return request, nil
+		steps = append(steps, &model.InitPasswordStep{})
+		return steps, nil
 	}
 
 	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
-		request.AddPossibleStep(&model.PasswordStep{})
-		return request, nil
+		steps = append(steps, &model.PasswordStep{})
+		return steps, nil
 	}
 
-	if !repo.mfaChecked(userSession, request, user) {
-		return request, nil
+	if step, ok := repo.mfaChecked(userSession, request, user); !ok {
+		steps = append(steps, step)
+		return steps, nil
 	}
 
 	if user.Password.ChangeRequired {
-		request.AddPossibleStep(&model.ChangePasswordStep{})
-		return request, nil
+		steps = append(steps, &model.ChangePasswordStep{})
 	}
 	if !user.IsEmailVerified {
-		request.AddPossibleStep(&model.VerifyEMailStep{})
-		return request, nil
+		steps = append(steps, &model.VerifyEMailStep{})
+	}
+
+	if user.Password.ChangeRequired || !user.IsEmailVerified {
+		return steps, nil
 	}
 
 	//TODO: consent step
-	request.AddPossibleStep(&model.RedirectToCallbackStep{})
-	return request, nil
+	steps = append(steps, &model.RedirectToCallbackStep{})
+	return steps, nil
 }
 
-func (repo *AuthRequestRepo) nextStepsNoUserSelected(request *model.AuthRequest) (*model.AuthRequest, error) {
-	if request.Prompt != model.PromptNone {
-		request.AddPossibleStep(&model.LoginStep{})
-	}
-	//TODO: select account
-	return request, nil
-}
-
-func (repo *AuthRequestRepo) mfaChecked(userSession *UserSession, request *model.AuthRequest, user *User) bool {
+func (repo *AuthRequestRepo) mfaChecked(userSession *UserSession, request *model.AuthRequest, user *User) (model.NextStep, bool) {
 	mfaLevel := request.MfaLevel()
 	required := user.MfaMaxSetup < mfaLevel
-	if required || repo.mfaNotSkipped(user) {
-		request.AddPossibleStep(&model.MfaPromptStep{
+	if required || !repo.mfaSkippedOrSetUp(user) {
+		return &model.MfaPromptStep{
 			Required:     required,
 			MfaProviders: user.MfaTypesSetupPossible(mfaLevel),
-		})
-		return false
+		}, false
 	}
 	switch mfaLevel {
 	default:
 		fallthrough
 	case model.MfaLevelSoftware:
 		if checkVerificationTime(userSession.MfaSoftwareVerification, repo.MfaSoftwareCheckLifeTime) {
-			return true
+			return nil, true
 		}
 		//fallthrough?
 	case model.MfaLevelHardware:
 		if checkVerificationTime(userSession.MfaHardwareVerification, repo.MfaHardwareCheckLifeTime) {
-			return true
+			return nil, true
 		}
 	}
-	request.AddPossibleStep(&model.MfaVerificationStep{
+	return &model.MfaVerificationStep{
 		MfaProviders: user.MfaTypesAllowed(mfaLevel),
-	})
-	return false
+	}, false
 }
 
-func (repo *AuthRequestRepo) mfaNotSkipped(user *User) bool {
+func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *User) bool {
 	if user.MfaMaxSetup >= 0 {
-		return false
+		return true
 	}
-	return !checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
+	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
 }
 
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {
@@ -181,13 +185,9 @@ type UserSession struct {
 type User struct {
 	MfaInitSkipped  time.Time
 	MfaMaxSetup     model.MfaLevel
-	Password        *Password
-	OTP             interface{}
+	Password        *user_model.Password
+	OTP             *user_model.OTP
 	IsEmailVerified bool
-}
-
-type Password struct {
-	ChangeRequired bool
 }
 
 func (u *User) MfaTypesSetupPossible(level model.MfaLevel) []model.MfaType {
@@ -206,6 +206,8 @@ func (u *User) MfaTypesSetupPossible(level model.MfaLevel) []model.MfaType {
 func (u *User) MfaTypesAllowed(level model.MfaLevel) []model.MfaType {
 	types := make([]model.MfaType, 0)
 	switch level {
+	default:
+		fallthrough
 	case model.MfaLevelSoftware:
 		if u.OTP != nil {
 			types = append(types, model.MfaTypeOTP)
