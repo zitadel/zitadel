@@ -2,7 +2,6 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/user/model"
 )
 
 type AuthRequest struct {
@@ -21,6 +20,7 @@ type AuthRequest struct {
 
 	levelOfAssurance      LevelOfAssurance //acr
 	projectApplicationIDs []string         //aud?
+	UserID                string
 	PossibleSteps         []NextStep
 	//UserSession   *UserSession
 
@@ -72,7 +72,7 @@ func (a *AuthRequest) AddPossibleStep(step NextStep) {
 	a.PossibleSteps = append(a.PossibleSteps, step)
 }
 
-func (a *AuthRequest) MfaLevel() model.MfaLevel {
+func (a *AuthRequest) MfaLevel() MfaLevel {
 	return -1
 	//TODO: check a.PossibleLOAs
 }

@@ -5,6 +5,10 @@ type OIDCCodeChallenge struct {
 	Method    OIDCCodeChallengeMethod
 }
 
+func (c *OIDCCodeChallenge) IsValid() bool {
+	return c.Challenge != ""
+}
+
 type OIDCCodeChallengeMethod int32
 
 const (
