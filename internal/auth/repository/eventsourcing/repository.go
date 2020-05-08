@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -17,8 +18,8 @@ type Config struct {
 
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
-	UserRepo        UserRepo
-	AuthRequestRepo AuthRequestRepo
+	UserRepo
+	AuthRequestRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {

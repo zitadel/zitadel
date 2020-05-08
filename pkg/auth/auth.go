@@ -6,8 +6,8 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/pkg/auth/api"
 )
 
