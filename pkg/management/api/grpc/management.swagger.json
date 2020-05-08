@@ -5745,27 +5745,6 @@
           "type": "string",
           "format": "date-time"
         },
-        "user_name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "org_name": {
-          "type": "string"
-        },
-        "org_domain": {
-          "type": "string"
-        },
-        "project_name": {
-          "type": "string"
-        },
         "sequence": {
           "type": "string",
           "format": "uint64"
@@ -5861,7 +5840,7 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1UserGrant"
+            "$ref": "#/definitions/v1UserGrantView"
           }
         }
       }
@@ -5889,6 +5868,68 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "v1UserGrantView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "role_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "state": {
+          "$ref": "#/definitions/v1UserGrantState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "org_name": {
+          "type": "string"
+        },
+        "org_domain": {
+          "type": "string"
+        },
+        "project_name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "resource_owner": {
+          "type": "string"
         }
       }
     },

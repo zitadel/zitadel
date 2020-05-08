@@ -72,7 +72,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		spool,
 		eventstore.ProjectRepo{conf.SearchLimit, project, view},
 		eventstore.UserRepo{conf.SearchLimit, user, view},
-		eventstore.UserGrantRepo{usergrant},
+		eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 	}, nil
 }
 

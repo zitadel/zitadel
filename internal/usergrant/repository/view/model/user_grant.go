@@ -60,7 +60,7 @@ func UserGrantFromModel(grant *model.UserGrantView) *UserGrantView {
 	}
 }
 
-func UserToModel(grant *UserGrantView) *model.UserGrantView {
+func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 	return &model.UserGrantView{
 		ID:            grant.ID,
 		ResourceOwner: grant.ResourceOwner,
@@ -81,10 +81,10 @@ func UserToModel(grant *UserGrantView) *model.UserGrantView {
 	}
 }
 
-func UsersToModel(grants []*UserGrantView) []*model.UserGrantView {
+func UserGrantsToModel(grants []*UserGrantView) []*model.UserGrantView {
 	result := make([]*model.UserGrantView, 0)
 	for _, g := range grants {
-		result = append(result, UserToModel(g))
+		result = append(result, UserGrantToModel(g))
 	}
 	return result
 }

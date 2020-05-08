@@ -2174,14 +2174,7 @@ message UserGrant {
     UserGrantState state = 6;
     google.protobuf.Timestamp creation_date = 7;
     google.protobuf.Timestamp change_date = 8;
-    string user_name = 9;
-    string first_name = 10;
-    string last_name = 11;
-    string email = 12;
-    string org_name = 13;
-    string org_domain = 14;
-    string project_name = 15;
-    uint64 sequence = 16;
+    uint64 sequence = 9;
 }
 
 message UserGrantCreate {
@@ -2241,12 +2234,32 @@ enum UserGrantState {
     USERGRANTSTATE_INACTIVE = 2;
 }
 
+message UserGrantView {
+    string id = 1;
+    string user_id = 2;
+    string org_id = 3;
+    string project_id = 4;
+    repeated string role_keys = 5;
+    UserGrantState state = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    google.protobuf.Timestamp change_date = 8;
+    string user_name = 9;
+    string first_name = 10;
+    string last_name = 11;
+    string email = 12;
+    string org_name = 13;
+    string org_domain = 14;
+    string project_name = 15;
+    uint64 sequence = 16;
+    string resource_owner = 17;
+}
+
 
 message UserGrantSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated UserGrant result = 4;
+    repeated UserGrantView result = 4;
 }
 
 message UserGrantSearchRequest {
