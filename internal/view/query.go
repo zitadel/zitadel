@@ -81,7 +81,7 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	case model.SEARCHMETHOD_STARTS_WITH_IGNORE_CASE:
 		valueText, ok := value.(string)
 		if !ok {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eidus", "Starts with ignore only possible for strings")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eidus", "Starts with ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", valueText+"%")
 	case model.SEARCHMETHOD_CONTAINS:
@@ -93,7 +93,7 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	case model.SEARCHMETHOD_CONTAINS_IGNORE_CASE:
 		valueText, ok := value.(string)
 		if !ok {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eid73", "Contains with only possible for strings")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eid73", "Contains with ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText+"%")
 	case model.SEARCHMETHOD_NOT_EQUALS:
