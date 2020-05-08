@@ -120,30 +120,30 @@ func ApplicationViewsToModel(roles []*ApplicationView) []*model.ApplicationView 
 	return result
 }
 
-func (a *ApplicationView) AppendEvent(event *models.Event) error {
+func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	a.Sequence = event.Sequence
+	a.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.ApplicationAdded:
 		a.setRootData(event)
-		a.SetData(event)
 		a.CreationDate = event.CreationDate
+		err = a.SetData(event)
 	case es_model.OIDCConfigAdded:
 		a.IsOIDC = true
-		a.SetData(event)
+		err = a.SetData(event)
 	case es_model.OIDCConfigChanged,
 		es_model.ApplicationChanged:
-		a.SetData(event)
+		err = a.SetData(event)
 	case es_model.ApplicationDeactivated:
 		a.State = int32(model.APPSTATE_INACTIVE)
 	case es_model.ApplicationReactivated:
 		a.State = int32(model.APPSTATE_ACTIVE)
 	}
-	return nil
+	return err
 }
 
 func (a *ApplicationView) setRootData(event *models.Event) {
 	a.ProjectID = event.AggregateID
-	a.ChangeDate = event.CreationDate
 }
 
 func (a *ApplicationView) SetData(event *models.Event) error {
