@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -69,18 +70,5 @@ func (p *Application) Process(event *models.Event) (err error) {
 
 func (p *Application) OnError(event *models.Event, soolerError error) error {
 	logging.LogWithFields("SPOOL-ls9ew", "id", event.AggregateID).WithError(soolerError).Warn("something went wrong in project app handler")
-	failedEvent, err := p.view.GetLatestApplicationFailedEvent(event.Sequence)
-	if err != nil {
-		return err
-	}
-	failedEvent.FailureCount++
-	failedEvent.ErrMsg = soolerError.Error()
-	err = p.view.ProcessedApplicationFailedEvent(failedEvent)
-	if err != nil {
-		return err
-	}
-	if p.errorCountUntilSkip == failedEvent.FailureCount {
-		return p.view.ProcessedApplicationSequence(event.Sequence)
-	}
-	return nil
+	return spooler.HandleError(event, p.view.GetLatestApplicationFailedEvent, p.view.ProcessedApplicationFailedEvent, p.view.ProcessedApplicationSequence, p.errorCountUntilSkip)
 }

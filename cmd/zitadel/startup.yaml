@@ -33,12 +33,11 @@ Mgmt:
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
     View:
-      SQL:
-        Host: $CR_HOST
-        Port: $CR_PORT
-        User: 'management'
-        Database: 'management'
-        SSLmode: disable
+      Host: $CR_HOST
+      Port: $CR_PORT
+      User: 'management'
+      Database: 'management'
+      SSLmode: disable
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100

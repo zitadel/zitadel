@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/spooler"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -147,18 +148,5 @@ func getRoleFromProject(roleKey string, project *proj_model.Project) *proj_model
 
 func (p *ProjectRole) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-lso9w", "id", event.AggregateID).WithError(err).Warn("something went wrong in project role handler")
-	failedEvent, err := p.view.GetLatestProjectRoleFailedEvent(event.Sequence)
-	if err != nil {
-		return err
-	}
-	failedEvent.FailureCount++
-	failedEvent.ErrMsg = err.Error()
-	err = p.view.ProcessedProjectRoleFailedEvent(failedEvent)
-	if err != nil {
-		return err
-	}
-	if p.errorCountUntilSkip == failedEvent.FailureCount {
-		return p.view.ProcessedProjectRoleSequence(event.Sequence)
-	}
-	return nil
+	return spooler.HandleError(event, p.view.GetLatestProjectRoleFailedEvent, p.view.ProcessedProjectRoleFailedEvent, p.view.ProcessedProjectRoleSequence, p.errorCountUntilSkip)
 }

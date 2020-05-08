@@ -4,6 +4,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/spooler"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"time"
@@ -68,18 +69,5 @@ func (p *ProjectMember) Process(event *models.Event) (err error) {
 
 func (p *ProjectMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")
-	failedEvent, err := p.view.GetLatestProjectMemberFailedEvent(event.Sequence)
-	if err != nil {
-		return err
-	}
-	failedEvent.FailureCount++
-	failedEvent.ErrMsg = err.Error()
-	err = p.view.ProcessedProjectMemberFailedEvent(failedEvent)
-	if err != nil {
-		return err
-	}
-	if p.errorCountUntilSkip == failedEvent.FailureCount {
-		return p.view.ProcessedProjectMemberSequence(event.Sequence)
-	}
-	return nil
+	return spooler.HandleError(event, p.view.GetLatestProjectMemberFailedEvent, p.view.ProcessedProjectMemberFailedEvent, p.view.ProcessedProjectMemberSequence, p.errorCountUntilSkip)
 }
