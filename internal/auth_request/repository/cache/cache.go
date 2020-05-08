@@ -59,7 +59,7 @@ func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *model.Aut
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-dswfF", "sql prepare failed")
 	}
-	_, err = stmt.Exec(request.AggregateID, b)
+	_, err = stmt.Exec(request.ID, b)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-sw4af", "unable to save auth request")
 	}

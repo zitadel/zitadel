@@ -30,6 +30,7 @@ type UserEventstore struct {
 	PhoneVerificationCode    crypto.Generator
 	PasswordVerificationCode crypto.Generator
 	Multifactors             global_model.Multifactors
+	validateTOTP             func(string, string) bool
 }
 
 type UserConfig struct {
@@ -71,6 +72,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		PhoneVerificationCode:    phoneVerificationCode,
 		PasswordVerificationCode: passwordVerificationCode,
 		Multifactors:             mfa,
+		validateTOTP:             totp.Validate,
 	}, nil
 }
 
@@ -799,7 +801,7 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 		return err
 	}
 
-	valid := totp.Validate(code, decrypt)
+	valid := es.validateTOTP(code, decrypt)
 	if !valid {
 		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Invalid code")
 	}

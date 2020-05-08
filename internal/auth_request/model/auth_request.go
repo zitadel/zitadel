@@ -1,11 +1,14 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"time"
 )
 
 type AuthRequest struct {
-	es_models.ObjectRoot
+	ID                string
+	AgentID           string
+	CreationDate      time.Time
+	ChangeDate        time.Time
 	BrowserInfo       *BrowserInfo
 	ApplicationID     string             //clientID
 	CallbackURI       string             //redirectURi
@@ -42,10 +45,11 @@ const (
 	LevelOfAssuranceNone LevelOfAssurance = iota
 )
 
-func NewAuthRequest(agentID string, info *BrowserInfo, applicationID, callbackURI, transferState string,
+func NewAuthRequest(id, agentID string, info *BrowserInfo, applicationID, callbackURI, transferState string,
 	prompt Prompt, possibleLOAs []LevelOfAssurance, uiLocales []string, loginHint, preselectedUserID string, maxAuthAge uint32, request Request) *AuthRequest {
 	return &AuthRequest{
-		ObjectRoot:        es_models.ObjectRoot{AggregateID: agentID},
+		ID:                id,
+		AgentID:           agentID,
 		BrowserInfo:       info,
 		ApplicationID:     applicationID,
 		CallbackURI:       callbackURI,
@@ -61,20 +65,17 @@ func NewAuthRequest(agentID string, info *BrowserInfo, applicationID, callbackUR
 }
 
 func (a *AuthRequest) IsValid() bool {
-	return a.AggregateID != "" &&
+	return a.ID != "" &&
+		a.AgentID != "" &&
 		a.BrowserInfo != nil && a.BrowserInfo.IsValid() &&
 		a.ApplicationID != "" &&
 		a.CallbackURI != "" &&
 		a.Request != nil && a.Request.IsValid()
 }
 
-func (a *AuthRequest) AddPossibleStep(step NextStep) {
-	a.PossibleSteps = append(a.PossibleSteps, step)
-}
-
 func (a *AuthRequest) MfaLevel() MfaLevel {
 	return -1
-	//TODO: check a.PossibleLOAs
+	//TODO: check a.PossibleLOAs (and Prompt Login?)
 }
 
 func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {

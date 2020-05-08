@@ -11,5 +11,5 @@ type BrowserInfo struct {
 func (i *BrowserInfo) IsValid() bool {
 	return i.UserAgent != "" &&
 		i.AcceptLanguage != "" &&
-		i.RemoteIP != nil && i.RemoteIP.IsUnspecified()
+		i.RemoteIP != nil && !i.RemoteIP.IsUnspecified()
 }

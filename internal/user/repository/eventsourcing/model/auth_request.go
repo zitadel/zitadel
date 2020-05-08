@@ -7,13 +7,15 @@ import (
 )
 
 type AuthRequest struct {
+	ID          string `json:"id,omitempty"`
 	UserAgentID string `json:"userAgentID,omitempty"`
 	*BrowserInfo
 }
 
 func AuthRequestFromModel(request *model.AuthRequest) *AuthRequest {
 	return &AuthRequest{
-		UserAgentID: request.ObjectRoot.AggregateID,
+		ID:          request.ID,
+		UserAgentID: request.AgentID,
 		BrowserInfo: BrowserInfoFromModel(request.BrowserInfo),
 	}
 }

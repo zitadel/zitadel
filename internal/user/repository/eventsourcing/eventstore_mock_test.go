@@ -2,15 +2,17 @@ package eventsourcing
 
 import (
 	"encoding/json"
+	"time"
+
+	"github.com/golang/mock/gomock"
+	"github.com/sony/sonyflake"
+
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/golang/mock/gomock"
-	"github.com/sony/sonyflake"
-	"time"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *UserEventstore {
@@ -396,29 +398,48 @@ func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockManipulateUserWithOTP(ctrl *gomock.Controller) *UserEventstore {
+func GetMockManipulateUserWithOTP(ctrl *gomock.Controller, decrypt, verified bool) *UserEventstore {
 	user := model.User{
 		Profile: &model.Profile{
 			UserName: "UserName",
 		},
 	}
-	otp := model.OTP{Secret: &crypto.CryptoValue{
-		CryptoType: crypto.TypeEncryption,
-		Algorithm:  "enc",
-		KeyID:      "id",
-		Crypted:    []byte("code"),
-	}}
+	otp := model.OTP{
+		Secret: &crypto.CryptoValue{
+			CryptoType: crypto.TypeEncryption,
+			Algorithm:  "enc",
+			KeyID:      "id",
+			Crypted:    []byte("code"),
+		},
+	}
 	dataUser, _ := json.Marshal(user)
 	dataOtp, _ := json.Marshal(otp)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: dataUser},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MfaOtpAdded, Data: dataOtp},
 	}
+	if verified {
+		events = append(events, &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.MfaOtpVerified})
+	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
-	return GetMockedEventstore(ctrl, mockEs)
+	es := GetMockedEventstore(ctrl, mockEs)
+	if !decrypt {
+		return es
+	}
+	enc := crypto.NewMockEncryptionAlgorithm(ctrl)
+	enc.EXPECT().Algorithm().Return("enc")
+	enc.EXPECT().Encrypt(gomock.Any()).Return(nil, nil)
+	enc.EXPECT().EncryptionKeyID().Return("id")
+	enc.EXPECT().DecryptionKeyIDs().Return([]string{"id"})
+	enc.EXPECT().DecryptString(gomock.Any(), gomock.Any()).Return("code", nil)
+	es.Multifactors = global_model.Multifactors{OTP: global_model.OTP{
+		Issuer:    "Issuer",
+		CryptoMFA: enc,
+	}}
+	return es
 }
 
 func GetMockManipulateUserNoEvents(ctrl *gomock.Controller) *UserEventstore {
