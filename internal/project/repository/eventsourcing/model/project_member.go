@@ -40,27 +40,17 @@ func ProjectMembersFromModel(members []*model.ProjectMember) []*ProjectMember {
 
 func ProjectMemberFromModel(member *model.ProjectMember) *ProjectMember {
 	return &ProjectMember{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  member.ObjectRoot.AggregateID,
-			Sequence:     member.Sequence,
-			ChangeDate:   member.ChangeDate,
-			CreationDate: member.CreationDate,
-		},
-		UserID: member.UserID,
-		Roles:  member.Roles,
+		ObjectRoot: member.ObjectRoot,
+		UserID:     member.UserID,
+		Roles:      member.Roles,
 	}
 }
 
 func ProjectMemberToModel(member *ProjectMember) *model.ProjectMember {
 	return &model.ProjectMember{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  member.AggregateID,
-			ChangeDate:   member.ChangeDate,
-			CreationDate: member.CreationDate,
-			Sequence:     member.Sequence,
-		},
-		UserID: member.UserID,
-		Roles:  member.Roles,
+		ObjectRoot: member.ObjectRoot,
+		UserID:     member.UserID,
+		Roles:      member.Roles,
 	}
 }
 

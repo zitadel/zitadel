@@ -35,12 +35,7 @@ func ProjectFromModel(project *model.Project) *Project {
 	apps := AppsFromModel(project.Applications)
 	grants := GrantsFromModel(project.Grants)
 	return &Project{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  project.ObjectRoot.AggregateID,
-			Sequence:     project.Sequence,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-		},
+		ObjectRoot:   project.ObjectRoot,
 		Name:         project.Name,
 		State:        int32(project.State),
 		Members:      members,
@@ -56,12 +51,7 @@ func ProjectToModel(project *Project) *model.Project {
 	apps := AppsToModel(project.Applications)
 	grants := GrantsToModel(project.Grants)
 	return &model.Project{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  project.AggregateID,
-			ChangeDate:   project.ChangeDate,
-			CreationDate: project.CreationDate,
-			Sequence:     project.Sequence,
-		},
+		ObjectRoot:   project.ObjectRoot,
 		Name:         project.Name,
 		State:        model.ProjectState(project.State),
 		Members:      members,
@@ -92,60 +82,61 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
-	case model.ProjectAdded, model.ProjectChanged:
-		if err := json.Unmarshal(event.Data, p); err != nil {
-			logging.Log("EVEN-idl93").WithError(err).Error("could not unmarshal event data")
-			return err
-		}
-		p.State = int32(model.PROJECTSTATE_ACTIVE)
-		return nil
-	case model.ProjectDeactivated:
+	case ProjectAdded, ProjectChanged:
+		return p.AppendAddProjectEvent(event)
+	case ProjectDeactivated:
 		return p.appendDeactivatedEvent()
-	case model.ProjectReactivated:
+	case ProjectReactivated:
 		return p.appendReactivatedEvent()
-	case model.ProjectMemberAdded:
+	case ProjectMemberAdded:
 		return p.appendAddMemberEvent(event)
-	case model.ProjectMemberChanged:
+	case ProjectMemberChanged:
 		return p.appendChangeMemberEvent(event)
-	case model.ProjectMemberRemoved:
+	case ProjectMemberRemoved:
 		return p.appendRemoveMemberEvent(event)
-	case model.ProjectRoleAdded:
+	case ProjectRoleAdded:
 		return p.appendAddRoleEvent(event)
-	case model.ProjectRoleChanged:
+	case ProjectRoleChanged:
 		return p.appendChangeRoleEvent(event)
-	case model.ProjectRoleRemoved:
+	case ProjectRoleRemoved:
 		return p.appendRemoveRoleEvent(event)
-	case model.ApplicationAdded:
+	case ApplicationAdded:
 		return p.appendAddAppEvent(event)
-	case model.ApplicationChanged:
+	case ApplicationChanged:
 		return p.appendChangeAppEvent(event)
-	case model.ApplicationRemoved:
+	case ApplicationRemoved:
 		return p.appendRemoveAppEvent(event)
-	case model.ApplicationDeactivated:
+	case ApplicationDeactivated:
 		return p.appendAppStateEvent(event, model.APPSTATE_INACTIVE)
-	case model.ApplicationReactivated:
+	case ApplicationReactivated:
 		return p.appendAppStateEvent(event, model.APPSTATE_ACTIVE)
-	case model.OIDCConfigAdded:
+	case OIDCConfigAdded:
 		return p.appendAddOIDCConfigEvent(event)
-	case model.OIDCConfigChanged, model.OIDCConfigSecretChanged:
+	case OIDCConfigChanged, OIDCConfigSecretChanged:
 		return p.appendChangeOIDCConfigEvent(event)
-	case model.ProjectGrantAdded:
+	case ProjectGrantAdded:
 		return p.appendAddGrantEvent(event)
-	case model.ProjectGrantChanged:
+	case ProjectGrantChanged:
 		return p.appendChangeGrantEvent(event)
-	case model.ProjectGrantDeactivated:
+	case ProjectGrantDeactivated:
 		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_INACTIVE)
-	case model.ProjectGrantReactivated:
+	case ProjectGrantReactivated:
 		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_ACTIVE)
-	case model.ProjectGrantRemoved:
+	case ProjectGrantRemoved:
 		return p.appendRemoveGrantEvent(event)
-	case model.ProjectGrantMemberAdded:
+	case ProjectGrantMemberAdded:
 		return p.appendAddGrantMemberEvent(event)
-	case model.ProjectGrantMemberChanged:
+	case ProjectGrantMemberChanged:
 		return p.appendChangeGrantMemberEvent(event)
-	case model.ProjectGrantMemberRemoved:
+	case ProjectGrantMemberRemoved:
 		return p.appendRemoveGrantMemberEvent(event)
 	}
+	return nil
+}
+
+func (p *Project) AppendAddProjectEvent(event *es_models.Event) error {
+	p.setData(event)
+	p.State = int32(model.PROJECTSTATE_ACTIVE)
 	return nil
 }
 
@@ -156,5 +147,13 @@ func (p *Project) appendDeactivatedEvent() error {
 
 func (p *Project) appendReactivatedEvent() error {
 	p.State = int32(model.PROJECTSTATE_ACTIVE)
+	return nil
+}
+
+func (p *Project) setData(event *es_models.Event) error {
+	if err := json.Unmarshal(event.Data, p); err != nil {
+		logging.Log("EVEN-lo9sr").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
 	return nil
 }

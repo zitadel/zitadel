@@ -11,7 +11,14 @@ func (s *Server) GetProjectGrantMemberRoles(ctx context.Context, _ *empty.Empty)
 }
 
 func (s *Server) SearchProjectGrants(ctx context.Context, in *ProjectGrantSearchRequest) (*ProjectGrantSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-po9fs", "Not implemented")
+	request := projectGrantSearchRequestsToModel(in)
+	request.AppendMyResourceOwnerQuery(ctx)
+	request.AppendNotMyOrgQuery(ctx)
+	response, err := s.project.SearchGrantedProjects(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return projectGrantSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrant, error) {

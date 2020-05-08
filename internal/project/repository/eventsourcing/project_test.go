@@ -126,7 +126,7 @@ func TestProjectAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen: 0,
-				aggType:  proj_model.ProjectAggregate,
+				aggType:  model.ProjectAggregate,
 			},
 		},
 		{
@@ -137,7 +137,7 @@ func TestProjectAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen: 0,
-				aggType:  proj_model.ProjectAggregate,
+				aggType:  model.ProjectAggregate,
 				wantErr:  true,
 				errFunc:  caos_errs.IsPreconditionFailed,
 			},
@@ -186,7 +186,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectAdded,
+				eventType: model.ProjectAdded,
 			},
 		},
 		{
@@ -198,7 +198,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectAdded,
+				eventType: model.ProjectAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -252,7 +252,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectChanged,
+				eventType: model.ProjectChanged,
 			},
 		},
 		{
@@ -264,7 +264,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectChanged,
+				eventType: model.ProjectChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -279,7 +279,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectChanged,
+				eventType: model.ProjectChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -331,7 +331,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectDeactivated,
+				eventType: model.ProjectDeactivated,
 			},
 		},
 		{
@@ -343,7 +343,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectDeactivated,
+				eventType: model.ProjectDeactivated,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -392,7 +392,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectReactivated,
+				eventType: model.ProjectReactivated,
 			},
 		},
 		{
@@ -404,7 +404,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectReactivated,
+				eventType: model.ProjectReactivated,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -455,7 +455,7 @@ func TestProjectMemberAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberAdded,
+				eventType: model.ProjectMemberAdded,
 			},
 		},
 		{
@@ -467,7 +467,7 @@ func TestProjectMemberAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberAdded,
+				eventType: model.ProjectMemberAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -482,7 +482,7 @@ func TestProjectMemberAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberAdded,
+				eventType: model.ProjectMemberAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -536,7 +536,7 @@ func TestProjectMemberChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberChanged,
+				eventType: model.ProjectMemberChanged,
 			},
 		},
 		{
@@ -548,7 +548,7 @@ func TestProjectMemberChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberChanged,
+				eventType: model.ProjectMemberChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -563,7 +563,7 @@ func TestProjectMemberChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberChanged,
+				eventType: model.ProjectMemberChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -617,7 +617,7 @@ func TestProjectMemberRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberRemoved,
+				eventType: model.ProjectMemberRemoved,
 			},
 		},
 		{
@@ -629,7 +629,7 @@ func TestProjectMemberRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberRemoved,
+				eventType: model.ProjectMemberRemoved,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -644,7 +644,7 @@ func TestProjectMemberRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectMemberRemoved,
+				eventType: model.ProjectMemberRemoved,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -698,7 +698,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleAdded,
+				eventType: model.ProjectRoleAdded,
 			},
 		},
 		{
@@ -710,7 +710,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleAdded,
+				eventType: model.ProjectRoleAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -725,7 +725,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleAdded,
+				eventType: model.ProjectRoleAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -779,7 +779,7 @@ func TestProjectRoleChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleChanged,
+				eventType: model.ProjectRoleChanged,
 			},
 		},
 		{
@@ -791,7 +791,7 @@ func TestProjectRoleChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleChanged,
+				eventType: model.ProjectRoleChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -806,7 +806,7 @@ func TestProjectRoleChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleChanged,
+				eventType: model.ProjectRoleChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -860,7 +860,7 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleRemoved,
+				eventType: model.ProjectRoleRemoved,
 			},
 		},
 		{
@@ -872,7 +872,7 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleRemoved,
+				eventType: model.ProjectRoleRemoved,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -887,7 +887,7 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectRoleRemoved,
+				eventType: model.ProjectRoleRemoved,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -946,7 +946,7 @@ func TestProjectAppAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{proj_model.ApplicationAdded, proj_model.OIDCConfigAdded},
+				eventTypes: []models.EventType{model.ApplicationAdded, model.OIDCConfigAdded},
 			},
 		},
 		{
@@ -1038,7 +1038,7 @@ func TestProjectAppChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ApplicationChanged},
+				eventTypes: []models.EventType{model.ApplicationChanged},
 			},
 		},
 		{
@@ -1128,7 +1128,7 @@ func TestProjectAppRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ApplicationRemoved},
+				eventTypes: []models.EventType{model.ApplicationRemoved},
 			},
 		},
 		{
@@ -1218,7 +1218,7 @@ func TestProjectAppDeactivatedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ApplicationDeactivated},
+				eventTypes: []models.EventType{model.ApplicationDeactivated},
 			},
 		},
 		{
@@ -1308,7 +1308,7 @@ func TestProjectAppReactivatedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ApplicationReactivated},
+				eventTypes: []models.EventType{model.ApplicationReactivated},
 			},
 		},
 		{
@@ -1398,7 +1398,7 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.OIDCConfigChanged},
+				eventTypes: []models.EventType{model.OIDCConfigChanged},
 			},
 		},
 		{
@@ -1488,7 +1488,7 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.OIDCConfigSecretChanged},
+				eventTypes: []models.EventType{model.OIDCConfigSecretChanged},
 			},
 		},
 		{
@@ -1559,7 +1559,7 @@ func TestProjectGrantAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantAdded,
+				eventType: model.ProjectGrantAdded,
 			},
 		},
 		{
@@ -1571,7 +1571,7 @@ func TestProjectGrantAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantAdded,
+				eventType: model.ProjectGrantAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -1586,7 +1586,7 @@ func TestProjectGrantAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantAdded,
+				eventType: model.ProjectGrantAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -1651,7 +1651,7 @@ func TestProjectGrantChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ProjectGrantChanged},
+				eventTypes: []models.EventType{model.ProjectGrantChanged},
 			},
 		},
 		{
@@ -1742,7 +1742,7 @@ func TestProjectGrantRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ProjectGrantRemoved},
+				eventTypes: []models.EventType{model.ProjectGrantRemoved},
 			},
 		},
 		{
@@ -1833,7 +1833,7 @@ func TestProjectGrantDeactivatedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ProjectGrantDeactivated},
+				eventTypes: []models.EventType{model.ProjectGrantDeactivated},
 			},
 		},
 		{
@@ -1924,7 +1924,7 @@ func TestProjectGrantReactivatedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   1,
-				eventTypes: []models.EventType{proj_model.ProjectGrantReactivated},
+				eventTypes: []models.EventType{model.ProjectGrantReactivated},
 			},
 		},
 		{
@@ -2004,7 +2004,7 @@ func TestProjectGrantMemberAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberAdded,
+				eventType: model.ProjectGrantMemberAdded,
 			},
 		},
 		{
@@ -2016,7 +2016,7 @@ func TestProjectGrantMemberAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberAdded,
+				eventType: model.ProjectGrantMemberAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -2031,7 +2031,7 @@ func TestProjectGrantMemberAddedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberAdded,
+				eventType: model.ProjectGrantMemberAdded,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -2085,7 +2085,7 @@ func TestProjectGrantMemberChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberChanged,
+				eventType: model.ProjectGrantMemberChanged,
 			},
 		},
 		{
@@ -2097,7 +2097,7 @@ func TestProjectGrantMemberChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberChanged,
+				eventType: model.ProjectGrantMemberChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -2112,7 +2112,7 @@ func TestProjectGrantMemberChangedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberChanged,
+				eventType: model.ProjectGrantMemberChanged,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -2166,7 +2166,7 @@ func TestProjectGrantMemberRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberRemoved,
+				eventType: model.ProjectGrantMemberRemoved,
 			},
 		},
 		{
@@ -2178,7 +2178,7 @@ func TestProjectGrantMemberRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberRemoved,
+				eventType: model.ProjectGrantMemberRemoved,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
@@ -2193,7 +2193,7 @@ func TestProjectGrantMemberRemovedAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:  1,
-				eventType: proj_model.ProjectGrantMemberRemoved,
+				eventType: model.ProjectGrantMemberRemoved,
 				wantErr:   true,
 				errFunc:   caos_errs.IsPreconditionFailed,
 			},
