@@ -25,7 +25,7 @@ func (a *AuthRequestOIDC) Type() AuthRequestType {
 
 func (a *AuthRequestOIDC) IsValid() bool {
 	return len(a.Scopes) > 0 &&
-		a.CodeChallenge == nil || a.CodeChallenge.IsValid()
+		a.CodeChallenge == nil || a.CodeChallenge != nil && a.CodeChallenge.IsValid()
 }
 
 type AuthRequestSAML struct {
