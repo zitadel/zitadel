@@ -15,15 +15,21 @@ func (at AggregateType) String() string {
 type Aggregates []*Aggregate
 
 type Aggregate struct {
-	id             string
-	typ            AggregateType
-	latestSequence uint64
-	version        Version
+	id               string
+	typ              AggregateType
+	PreviousSequence uint64
+	version          Version
 
 	editorService string
 	editorUser    string
 	resourceOwner string
 	Events        []*Event
+	Precondition  *precondition
+}
+
+type precondition struct {
+	Query      *SearchQuery
+	Validation func(...*Event) error
 }
 
 func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate, error) {
@@ -39,7 +45,6 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 		CreationDate:     time.Now(),
 		Data:             data,
 		Type:             typ,
-		PreviousSequence: a.latestSequence,
 		AggregateID:      a.id,
 		AggregateType:    a.typ,
 		AggregateVersion: a.version,
@@ -50,6 +55,11 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 
 	a.Events = append(a.Events, e)
 	return a, nil
+}
+
+func (a *Aggregate) SetPrecondition(query *SearchQuery, validateFunc func(...*Event) error) *Aggregate {
+	a.Precondition = &precondition{Query: query, Validation: validateFunc}
+	return a
 }
 
 func (a *Aggregate) Validate() error {
@@ -74,6 +84,9 @@ func (a *Aggregate) Validate() error {
 	}
 	if a.resourceOwner == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-eBYUW", "resource owner not set")
+	}
+	if a.Precondition != nil && (a.Precondition.Query == nil || a.Precondition.Query.Validate() != nil || a.Precondition.Validation == nil) {
+		return errors.ThrowPreconditionFailed(nil, "MODEL-EEUvA", "invalid precondition")
 	}
 
 	return nil

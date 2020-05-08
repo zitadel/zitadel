@@ -50,6 +50,17 @@ func EmailToModel(email *Email) *model.Email {
 	}
 }
 
+func EmailCodeFromModel(code *model.EmailCode) *EmailCode {
+	if code == nil {
+		return nil
+	}
+	return &EmailCode{
+		ObjectRoot: code.ObjectRoot,
+		Expiry:     code.Expiry,
+		Code:       code.Code,
+	}
+}
+
 func EmailCodeToModel(code *EmailCode) *model.EmailCode {
 	return &model.EmailCode{
 		ObjectRoot: code.ObjectRoot,
@@ -60,7 +71,6 @@ func EmailCodeToModel(code *EmailCode) *model.EmailCode {
 
 func (u *User) appendUserEmailChangedEvent(event *es_models.Event) error {
 	u.Email = new(Email)
-	u.IsEmailVerified = false
 	return u.Email.setData(event)
 }
 

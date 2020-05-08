@@ -56,13 +56,12 @@ func PasswordCodeToModel(code *PasswordCode) *model.PasswordCode {
 }
 
 func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
-	pw := new(Password)
-	err := pw.setData(event)
+	u.Password = new(Password)
+	err := u.Password.setData(event)
 	if err != nil {
 		return err
 	}
-	pw.ObjectRoot.CreationDate = event.CreationDate
-	u.Password = pw
+	u.Password.ObjectRoot.CreationDate = event.CreationDate
 	return nil
 }
 

@@ -80,14 +80,6 @@ func (g *UserGrant) AppendEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (g *UserGrant) appendAddGrantEvent(event *es_models.Event) error {
-	return g.setData(event)
-}
-
-func (g *UserGrant) appendChangeGrantEvent(event *es_models.Event) error {
-	return g.setData(event)
-}
-
 func (g *UserGrant) appendGrantStateEvent(state model.UserGrantState) {
 	g.State = int32(state)
 }
