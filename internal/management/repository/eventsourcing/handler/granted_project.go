@@ -2,15 +2,18 @@ package handler
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
-	"time"
 )
 
 type GrantedProject struct {
@@ -118,18 +121,5 @@ func (p *GrantedProject) updateExistingProjects(project *view_model.GrantedProje
 
 func (p *GrantedProject) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
-	failedEvent, err := p.view.GetLatestGrantedProjectFailedEvent(event.Sequence)
-	if err != nil {
-		return err
-	}
-	failedEvent.FailureCount++
-	failedEvent.ErrMsg = err.Error()
-	err = p.view.ProcessedGrantedProjectFailedEvent(failedEvent)
-	if err != nil {
-		return err
-	}
-	if p.errorCountUntilSkip == failedEvent.FailureCount {
-		return p.view.ProcessedGrantedProjectSequence(event.Sequence)
-	}
-	return nil
+	return spooler.HandleError(event, p.view.GetLatestGrantedProjectFailedEvent, p.view.ProcessedGrantedProjectFailedEvent, p.view.ProcessedGrantedProjectSequence, p.errorCountUntilSkip)
 }

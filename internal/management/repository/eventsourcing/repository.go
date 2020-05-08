@@ -2,22 +2,22 @@ package eventsourcing
 
 import (
 	"context"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
+	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/view"
-
-	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Config struct {
 	SearchLimit uint64
 	Eventstore  es_int.Config
-	View        view.ViewConfig
+	View        types.SQL
 	Spooler     spooler.SpoolerConfig
 }
 
@@ -32,7 +32,11 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
-	view, sql, err := mgmt_view.StartView(conf.View)
+	sqlClient, err := conf.View.Start()
+	if err != nil {
+		return nil, err
+	}
+	view, err := mgmt_view.StartView(sqlClient)
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +48,9 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+
 	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sql, eventstoreRepos)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
 
 	return &EsRepository{
 		spool,
