@@ -27,7 +27,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
-	github.com/jackc/pgconn v1.5.0 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/lib/pq v1.4.0
@@ -35,6 +34,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.0.3
 	github.com/pquerna/otp v1.2.0
+	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/sony/sonyflake v1.0.0

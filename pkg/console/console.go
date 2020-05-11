@@ -4,34 +4,33 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"path/filepath"
+	"path"
+
+	"github.com/rakyll/statik/fs"
 )
 
 type Config struct {
-	Port      string
-	StaticDir string
+	Port string
 }
 
 type spaHandler struct {
-	dir       string
-	indexFile string
+	fileSystem http.FileSystem
+}
+
+func (i *spaHandler) Open(name string) (http.File, error) {
+	ret, err := i.fileSystem.Open(name)
+	if !os.IsNotExist(err) || path.Ext(name) != "" {
+		return ret, err
+	}
+
+	return i.fileSystem.Open("/index.html")
 }
 
 func Start(ctx context.Context, config Config) error {
-	http.Handle("/", &spaHandler{config.StaticDir, "index.html"})
-	return http.ListenAndServe(":"+config.Port, nil)
-}
-
-func (s *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p := filepath.Join(s.dir, filepath.Clean(r.URL.Path))
-
-	if info, err := os.Stat(p); err != nil {
-		http.ServeFile(w, r, filepath.Join(s.dir, s.indexFile))
-		return
-	} else if info.IsDir() {
-		http.ServeFile(w, r, filepath.Join(s.dir, s.indexFile))
-		return
+	statikFS, err := fs.New()
+	if err != nil {
+		return err
 	}
-
-	http.ServeFile(w, r, p)
+	http.Handle("/", http.FileServer(&spaHandler{statikFS}))
+	return http.ListenAndServe(":"+config.Port, nil)
 }
