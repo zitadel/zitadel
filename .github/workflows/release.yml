@@ -17,11 +17,10 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: echo "hodor" > hodor.txt
-    # - run: npm ci 
-    # - run: npm run lint
-    # - run: npm run prodbuild
-    # - run: npm test
+    - run: npm ci 
+    - run: npm run lint
+    - run: npm run prodbuild
+    - run: npm test
     - uses: actions/upload-artifact@v1
       with:
         name: angular
