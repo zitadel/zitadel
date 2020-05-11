@@ -91,10 +91,10 @@ func projectMemberSearchResponseFromModel(response *proj_model.ProjectMemberSear
 	}
 }
 
-func projectMemberViewsFromModel(roles []*proj_model.ProjectMemberView) []*ProjectMemberView {
-	converted := make([]*ProjectMemberView, 0)
-	for _, q := range roles {
-		converted = append(converted, projectMemberViewFromModel(q))
+func projectMemberViewsFromModel(members []*proj_model.ProjectMemberView) []*ProjectMemberView {
+	converted := make([]*ProjectMemberView, len(members))
+	for i, member := range members {
+		converted[i] = projectMemberViewFromModel(member)
 	}
 	return converted
 }
