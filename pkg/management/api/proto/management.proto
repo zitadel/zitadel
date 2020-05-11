@@ -931,6 +931,15 @@ service ManagementService {
         };
     }
 
+    rpc RemoveProjectGrant(ProjectGrantID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/grants/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.grant.delete"
+        };
+    }
 
     //PROJECT_GRANT_MEMBER
     rpc GetProjectGrantMemberRoles(google.protobuf.Empty) returns (ProjectGrantMemberRoles) {
@@ -953,7 +962,7 @@ service ManagementService {
         };
     }
 
-    rpc AddProjectGrantMember(ProjectGrantMemberAdd) returns (google.protobuf.Empty) {
+    rpc AddProjectGrantMember(ProjectGrantMemberAdd) returns (ProjectGrantMember) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members"
             body: "*"
@@ -964,7 +973,7 @@ service ManagementService {
         };
     }
 
-    rpc ChangeProjectGrantMember(ProjectGrantMemberChange) returns (google.protobuf.Empty) {
+    rpc ChangeProjectGrantMember(ProjectGrantMemberChange) returns (ProjectGrantMember) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
             body: "*"
@@ -984,7 +993,6 @@ service ManagementService {
             permission: "project.grant.member.delete"
         };
     }
-
 
     //USER_GRANT
     rpc SearchUserGrants(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
@@ -1049,6 +1057,16 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.write"
+        };
+    }
+
+    rpc RemoveUserGrant(UserGrantID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/grants/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.delete"
         };
     }
 
@@ -1353,15 +1371,16 @@ enum SearchMethod {
 
 message UserProfile {
     string id = 1;
-    UserState state = 2;
-    string first_name = 3;
-    string last_name = 4;
-    string nick_name = 5;
-    string display_name = 6;
-    string preferred_language = 7;
-    Gender gender = 8;
-    string user_name = 9;
-    uint64 sequence = 10;
+    string first_name = 2;
+    string last_name = 3;
+    string nick_name = 4;
+    string display_name = 5;
+    string preferred_language = 6;
+    Gender gender = 7;
+    string user_name = 8;
+    uint64 sequence = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp change_date = 11;
 }
 
 message UpdateUserProfileRequest {
@@ -1379,6 +1398,8 @@ message UserEmail {
     string email = 2;
     bool is_email_verified = 3;
     uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
 }
 
 message UpdateUserEmailRequest {
@@ -1392,6 +1413,8 @@ message UserPhone {
     string phone = 2;
     bool is_phone_verified = 3;
     uint64 sequence = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
 }
 
 message UpdateUserPhoneRequest {
@@ -1408,6 +1431,8 @@ message UserAddress {
     string region = 5;
     string street_address = 6;
     uint64 sequence = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    google.protobuf.Timestamp change_date = 9;
 }
 
 message UpdateUserAddressRequest {
@@ -1946,7 +1971,7 @@ message ProjectGrant {
     string granted_org_id = 3;
     string granted_org_name = 4;
     string granted_org_domain = 5;
-    repeated string role_names = 6;
+    repeated string role_keys = 6;
     ProjectGrantState state = 7;
     google.protobuf.Timestamp creation_date = 8;
     google.protobuf.Timestamp change_date = 9;
@@ -1957,13 +1982,13 @@ message ProjectGrant {
 message ProjectGrantCreate {
     string project_id = 1;
     string granted_org_id = 2;
-    repeated string role_names = 3;
+    repeated string role_keys = 3;
 }
 
 message ProjectGrantUpdate {
     string project_id = 1;
     string id = 2;
-    repeated string role_names = 3;
+    repeated string role_keys = 3;
 }
 
 message ProjectGrantID {
@@ -2064,7 +2089,7 @@ message UserGrant {
     string user_id = 2;
     string org_id = 3;
     string project_id = 4;
-    repeated string role_names = 5;
+    repeated string role_keys = 5;
     UserGrantState state = 6;
     google.protobuf.Timestamp creation_date = 7;
     google.protobuf.Timestamp change_date = 8;
@@ -2080,15 +2105,14 @@ message UserGrant {
 
 message UserGrantCreate {
     string user_id = 1;
-    string org_id = 2;
-    string project_id = 3;
-    repeated string role_names = 4;
+    string project_id = 2;
+    repeated string role_keys = 3;
 }
 
 message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
-    repeated string role_names = 3;
+    repeated string role_keys = 3;
 }
 
 message UserGrantID {
@@ -2106,7 +2130,7 @@ message ProjectUserGrantUpdate {
     string project_id = 1;
     string user_id = 2;
     string id = 3;
-    repeated string role_names = 4;
+    repeated string role_keys = 4;
 }
 
 message ProjectGrantUserGrantID {
@@ -2120,14 +2144,14 @@ message ProjectGrantUserGrantCreate {
     string org_id = 2;
     string project_grant_id = 3;
     string project_id = 4 [(validate.rules).string.min_len = 1];
-    repeated string role_names = 5;
+    repeated string role_keys = 5;
 }
 
 message ProjectGrantUserGrantUpdate {
     string project_grant_id = 1;
     string user_id = 2;
     string id = 3;
-    repeated string role_names = 4;
+    repeated string role_keys = 4;
 }
 
 enum UserGrantState {

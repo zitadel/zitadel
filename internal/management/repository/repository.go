@@ -5,4 +5,6 @@ type Repository interface {
 	ProjectRepository
 	OrgRepository
 	OrgMemberRepository
+	UserRepository
+	UserGrantRepository
 }

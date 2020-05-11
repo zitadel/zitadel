@@ -1760,7 +1760,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v1ProjectGrantMember"
             }
           }
         },
@@ -1870,7 +1870,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v1ProjectGrantMember"
             }
           }
         },
@@ -1915,6 +1915,34 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1ProjectGrant"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "RemoveProjectGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
             }
           }
         },
@@ -3136,6 +3164,34 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserGrant"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "RemoveUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
             }
           }
         },
@@ -4435,7 +4491,7 @@
         "granted_org_domain": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4470,7 +4526,7 @@
         "granted_org_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4708,7 +4764,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4731,7 +4787,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -4787,7 +4843,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5228,7 +5284,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5449,6 +5505,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5468,6 +5532,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5486,7 +5558,7 @@
         "project_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5536,13 +5608,10 @@
         "user_id": {
           "type": "string"
         },
-        "org_id": {
-          "type": "string"
-        },
         "project_id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5645,7 +5714,7 @@
         "id": {
           "type": "string"
         },
-        "role_names": {
+        "role_keys": {
           "type": "array",
           "items": {
             "type": "string"
@@ -5677,6 +5746,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5685,9 +5762,6 @@
       "properties": {
         "id": {
           "type": "string"
-        },
-        "state": {
-          "$ref": "#/definitions/v1UserState"
         },
         "first_name": {
           "type": "string"
@@ -5713,6 +5787,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

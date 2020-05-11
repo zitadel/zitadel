@@ -1,12 +1,12 @@
 Tracing:
   Type: google
   Config:
-    ProjectID: $TRACING_PROJECT_ID
+    ProjectID: $ZITADEL_TRACING_PROJECT_ID
     MetricPrefix: ZITADEL-V1
-    Fraction: 1
+    Fraction: $ZITADEL_TRACING_FRACTION
 
 Log:
-  Level: debug
+  Level: $ZITADEL_LOG_LEVEL
   Formatter:
     Format: text
 
@@ -22,23 +22,15 @@ Mgmt:
       ServiceName: 'ManagementAPI'
       Repository:
         SQL:
-          Host: $CR_HOST
-          Port: $CR_PORT
-          User: 'eventstore'
-          Database: 'eventstore'
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'management'
+          Database: 'management'
           SSLmode: disable
       Cache:
         Type: 'fastcache'
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
-    PasswordSaltCost: 14
-    ClientSecretGenerator:
-      Length: 64
-      IncludeLowerLetters: true
-      IncludeUpperLetters: true
-      IncludeDigits: true
-      IncludeSymbols: true
-
 
 Auth:
   API:

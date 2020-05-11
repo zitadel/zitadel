@@ -17,6 +17,8 @@ type Server struct {
 	project   repository.ProjectRepository
 	org       repository.OrgRepository
 	orgMember repository.OrgMemberRepository
+	user      repository.UserRepository
+	usergrant repository.UserGrantRepository
 	verifier  *mgmt_auth.TokenVerifier
 	authZ     auth.Config
 }
@@ -27,6 +29,8 @@ func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository
 		project:   repo,
 		org:       repo,
 		orgMember: repo,
+		user:      repo,
+		usergrant: repo,
 		authZ:     authZ,
 		verifier:  mgmt_auth.Start(),
 	}
