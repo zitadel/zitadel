@@ -56,9 +56,9 @@ func ProjectRoleToModel(role *ProjectRoleView) *model.ProjectRoleView {
 }
 
 func ProjectRolesToModel(roles []*ProjectRoleView) []*model.ProjectRoleView {
-	result := make([]*model.ProjectRoleView, 0)
-	for _, r := range roles {
-		result = append(result, ProjectRoleToModel(r))
+	result := make([]*model.ProjectRoleView, len(roles))
+	for i, r := range roles {
+		result[i] = ProjectRoleToModel(r)
 	}
 	return result
 }
