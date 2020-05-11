@@ -14,6 +14,8 @@ var (
 	expectedGetByQueryCaseSensitive  = `SELECT \* FROM "%s" WHERE \(%s %s \$1\) LIMIT 1`
 	expectedSave                     = `UPDATE "%s" SET "test" = \$1 WHERE "%s"."%s" = \$2`
 	expectedRemove                   = `DELETE FROM "%s" WHERE \(%s = \$1\)`
+	expectedRemoveByObject           = `DELETE FROM "%s" WHERE "%s"."%s" = \$1`
+	expectedRemoveByObjectMultiplePK = `DELETE FROM "%s" WHERE "%s"."%s" = \$1 AND "%s"."%s" = \$2`
 	expectedSearch                   = `SELECT \* FROM "%s" OFFSET 0`
 	expectedSearchCount              = `SELECT count\(\*\) FROM "%s"`
 	expectedSearchLimit              = `SELECT \* FROM "%s" LIMIT %v OFFSET 0`
@@ -94,8 +96,14 @@ func (key TestSearchKey) ToColumnName() string {
 }
 
 type Test struct {
-	ID   string `json:"-" gorm:"column:id;primary_key"`
+	ID   string `json:"-" gorm:"column:primary_id;primary_key"`
 	Test string `json:"test" gorm:"column:test"`
+}
+
+type TestMultiplePK struct {
+	TestID  string `gorm:"column:testId;primary_key"`
+	HodorID string `gorm:"column:hodorId;primary_key"`
+	Test    string `gorm:"column:test"`
 }
 
 type dbMock struct {
@@ -201,7 +209,7 @@ func (db *dbMock) expectGetByQueryErr(table, key, method, value string, err erro
 }
 
 func (db *dbMock) expectSave(table string, object Test) *dbMock {
-	query := fmt.Sprintf(expectedSave, table, table, "id")
+	query := fmt.Sprintf(expectedSave, table, table, "primary_id")
 	db.mock.ExpectExec(query).
 		WithArgs(object.Test, object.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
@@ -222,6 +230,24 @@ func (db *dbMock) expectRemove(table, key, value string) *dbMock {
 	query := fmt.Sprintf(expectedRemove, table, key)
 	db.mock.ExpectExec(query).
 		WithArgs(value).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	return db
+}
+
+func (db *dbMock) expectRemoveByObject(table string, object Test) *dbMock {
+	query := fmt.Sprintf(expectedRemoveByObject, table, table, "primary_id")
+	db.mock.ExpectExec(query).
+		WithArgs(object.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	return db
+}
+
+func (db *dbMock) expectRemoveByObjectMultiplePKs(table string, object TestMultiplePK) *dbMock {
+	query := fmt.Sprintf(expectedRemoveByObjectMultiplePK, table, table, "testId", table, "hodorId")
+	db.mock.ExpectExec(query).
+		WithArgs(object.TestID, object.HodorID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	return db

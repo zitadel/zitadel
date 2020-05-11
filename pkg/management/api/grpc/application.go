@@ -7,7 +7,11 @@ import (
 )
 
 func (s *Server) SearchApplications(ctx context.Context, in *ApplicationSearchRequest) (*ApplicationSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-yW23f", "Not implemented")
+	response, err := s.project.SearchApplications(ctx, applicationSearchRequestsToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return applicationSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ApplicationByID(ctx context.Context, in *ApplicationID) (*Application, error) {

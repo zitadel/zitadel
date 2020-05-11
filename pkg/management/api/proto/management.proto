@@ -571,9 +571,9 @@ service ManagementService {
     }
 
     //PROJECTS
-    rpc SearchProjects(ProjectSearchRequest) returns (ProjectSearchResponse) {
+    rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (GrantedProjectSearchResponse) {
         option (google.api.http) = {
-            post: "/projects/_search"
+            post: "/grantedprojects/_search"
             body: "*"
         };
 
@@ -641,9 +641,9 @@ service ManagementService {
     }
 
     //GRANTED_PROJECT_GRANTS
-    rpc GetGrantedProjectGrantByID(GrantedGrantID) returns (ProjectGrant) {
+    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (ProjectGrant) {
         option (google.api.http) = {
-            get: "/grants/{id}"
+            get: "/grantedprojects/{project_id}/grants/{id}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1366,8 +1366,10 @@ enum SearchMethod {
     SEARCHMETHOD_EQUALS = 0;
     SEARCHMETHOD_STARTS_WITH = 1;
     SEARCHMETHOD_CONTAINS = 2;
+    SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
+    SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
+    SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
 }
-
 
 message UserProfile {
     string id = 1;
@@ -1693,13 +1695,7 @@ message Project {
     ProjectState state = 3;
     google.protobuf.Timestamp change_date = 4;
     google.protobuf.Timestamp creation_date = 5;
-    ProjectType type = 6;
-    string resource_owner = 7;
-    string org_id = 8;
-    string org_name = 9;
-    string org_domain = 10;
-    string grant_id = 11;
-    uint64 sequence = 12;
+    uint64 sequence = 6;
 }
 
 enum ProjectState {
@@ -1709,31 +1705,46 @@ enum ProjectState {
 }
 
 enum ProjectType {
-    PROJECTTYPE_UNKNOWN = 0;
-    PROJECTTYPE_SELF = 1;
+    PROJECTTYPE_UNSPECIFIED = 0;
+    PROJECTTYPE_OWNED = 1;
     PROJECTTYPE_GRANTED = 2;
 }
 
-message ProjectSearchResponse {
+message GrantedProjectSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated Project result = 4;
+    repeated GrantedProject result = 4;
 }
 
-message ProjectSearchRequest {
+message GrantedProject {
+    string id = 1;
+    string name = 2;
+    ProjectState state = 3;
+    google.protobuf.Timestamp change_date = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    ProjectType type = 6;
+    string resource_owner = 7;
+    string org_id = 8;
+    string org_name = 9;
+    string org_domain = 10;
+    string grant_id = 11;
+    uint64 sequence = 12;
+}
+
+message GrantedProjectSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
-    repeated ProjectSearchQuery queries = 3;
+    repeated GrantedProjectSearchQuery queries = 3;
 }
 
-message ProjectSearchQuery {
-    ProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+message GrantedProjectSearchQuery {
+    GrantedProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
     SearchMethod method = 2;
     string value = 3;
 }
 
-enum ProjectSearchKey {
+enum GrantedProjectSearchKey {
     PROJECTSEARCHKEY_UNSPECIFIED = 0;
     PROJECTSEARCHKEY_PROJECT_NAME = 1;
 }
@@ -1744,14 +1755,10 @@ message ProjectMemberRoles {
 
 message ProjectMember {
     string user_id = 1;
-    string user_name = 2;
-    string email = 3;
-    string first_name = 4;
-    string last_name = 5;
-    repeated string roles = 6;
-    google.protobuf.Timestamp change_date = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    uint64 sequence = 10;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
 }
 
 message ProjectMemberAdd {
@@ -1795,6 +1802,15 @@ message ProjectRole {
     uint64 sequence = 7;
 }
 
+message ProjectRoleView {
+    string project_id = 1;
+    string key = 2;
+    string display_name = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    string group = 6;
+    uint64 sequence = 7;
+}
+
 message ProjectRoleRemove {
     string id = 1;
     string key = 2;
@@ -1804,7 +1820,7 @@ message ProjectRoleSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated ProjectRole result = 4;
+    repeated ProjectRoleView result = 4;
 }
 
 message ProjectRoleSearchRequest {
@@ -1826,11 +1842,23 @@ enum ProjectRoleSearchKey {
     PROJECTROLESEARCHKEY_DISPLAY_NAME = 2;
 }
 
+message ProjectMemberView {
+    string user_id = 1;
+    string user_name = 2;
+    string email = 3;
+    string first_name = 4;
+    string last_name = 5;
+    repeated string roles = 6;
+    google.protobuf.Timestamp change_date = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    uint64 sequence = 10;
+}
+
 message ProjectMemberSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated ProjectMember result = 4;
+    repeated ProjectMemberView result = 4;
 }
 
 message ProjectMemberSearchRequest {
@@ -1852,6 +1880,7 @@ enum ProjectMemberSearchKey {
     PROJECTMEMBERSEARCHKEY_LAST_NAME = 2;
     PROJECTMEMBERSEARCHKEY_EMAIL = 3;
     PROJECTMEMBERSEARCHKEY_USER_ID = 4;
+    PROJECTMEMBERSEARCHKEY_USER_NAME = 5;
 }
 
 enum AppState {
@@ -1877,7 +1906,6 @@ message ApplicationUpdate {
     string id = 2;
     string name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
-
 
 message OIDCConfig {
     repeated string redirect_uris = 1;
@@ -1940,11 +1968,23 @@ message ClientSecret {
     string client_secret = 1;
 }
 
+message ApplicationView {
+    string id = 1;
+    AppState state = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+    string name = 5;
+    oneof app_config {
+        OIDCConfig oidc_config = 8;
+    }
+    uint64 sequence = 9;
+}
+
 message ApplicationSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated Application result = 4;
+    repeated ApplicationView result = 4;
 }
 
 message ApplicationSearchRequest {
@@ -1969,14 +2009,11 @@ message ProjectGrant {
     string id = 1;
     string project_id = 2;
     string granted_org_id = 3;
-    string granted_org_name = 4;
-    string granted_org_domain = 5;
-    repeated string role_keys = 6;
-    ProjectGrantState state = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    google.protobuf.Timestamp change_date = 9;
-    string project_name = 10;
-    uint64 sequence = 11;
+    repeated string role_keys = 4;
+    ProjectGrantState state = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+    uint64 sequence = 9;
 }
 
 message ProjectGrantCreate {
@@ -1996,21 +2033,31 @@ message ProjectGrantID {
     string id = 2;
 }
 
-message GrantedGrantID {
-    string id = 1;
-}
-
 enum ProjectGrantState {
     PROJECTGRANTSTATE_UNSPECIFIED = 0;
     PROJECTGRANTSTATE_ACTIVE = 1;
     PROJECTGRANTSTATE_INACTIVE = 2;
 }
 
+message ProjectGrantView {
+    string id = 1;
+    string project_id = 2;
+    string granted_org_id = 3;
+    string granted_org_name = 4;
+    string granted_org_domain = 5;
+    repeated string role_keys = 6;
+    ProjectGrantState state = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    google.protobuf.Timestamp change_date = 9;
+    string project_name = 10;
+    uint64 sequence = 11;
+}
+
 message ProjectGrantSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated ProjectGrant result = 4;
+    repeated ProjectGrantView result = 4;
 }
 
 message ProjectGrantSearchRequest {
@@ -2025,14 +2072,10 @@ message ProjectGrantMemberRoles {
 
 message ProjectGrantMember {
     string user_id = 1;
-    string user_name = 2;
-    string email = 3;
-    string first_name = 4;
-    string last_name = 5;
-    repeated string roles = 6;
-    google.protobuf.Timestamp change_date = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    uint64 sequence = 9;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
 }
 
 message ProjectGrantMemberAdd {
@@ -2055,11 +2098,23 @@ message ProjectGrantMemberRemove {
     string user_id = 3;
 }
 
+message ProjectGrantMemberView {
+    string user_id = 1;
+    string user_name = 2;
+    string email = 3;
+    string first_name = 4;
+    string last_name = 5;
+    repeated string roles = 6;
+    google.protobuf.Timestamp change_date = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    uint64 sequence = 9;
+}
+
 message ProjectGrantMemberSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated ProjectGrantMember result = 4;
+    repeated ProjectGrantMemberView result = 4;
 }
 
 message ProjectGrantMemberSearchRequest {
@@ -2082,6 +2137,7 @@ enum ProjectGrantMemberSearchKey {
     PROJECTGRANTMEMBERSEARCHKEY_LAST_NAME = 2;
     PROJECTGRANTMEMBERSEARCHKEY_EMAIL = 3;
     PROJECTGRANTMEMBERSEARCHKEY_USER_ID = 4;
+    PROJECTGRANTMEMBERSEARCHKEY_USER_NAME = 5;
 }
 
 message UserGrant {
