@@ -18,9 +18,6 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/pquerna/otp/totp"
-	"github.com/sony/sonyflake"
-	"strconv"
 )
 
 type UserEventstore struct {
@@ -336,11 +333,10 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "invalid password")
 }
 
-func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.PasswordCheck) es_sdk.AggregateFunc) error {
+func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc) error {
 	repoUser := model.UserFromModel(user)
 	repoAuthRequest := model.AuthRequestFromModel(authRequest)
-	passwordCheck := &model.PasswordCheck{UserAgentID: repoAuthRequest.UserAgentID, BrowserInfo: repoAuthRequest.BrowserInfo}
-	agg := check(es.AggregateCreator(), repoUser, passwordCheck)
+	agg := check(es.AggregateCreator(), repoUser, repoAuthRequest)
 	err := es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err

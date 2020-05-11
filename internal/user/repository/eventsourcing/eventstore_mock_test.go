@@ -13,9 +13,6 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/golang/mock/gomock"
-	"github.com/sony/sonyflake"
-	"time"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *UserEventstore {

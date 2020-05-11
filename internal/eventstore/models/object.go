@@ -28,6 +28,3 @@ func (o *ObjectRoot) AppendEvent(event *Event) {
 func (o *ObjectRoot) IsZero() bool {
 	return o.AggregateID == ""
 }
-func (o *ObjectRoot) IsZero() bool {
-	return o.AggregateID == ""
-}
