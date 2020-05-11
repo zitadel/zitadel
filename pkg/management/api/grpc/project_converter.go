@@ -173,9 +173,9 @@ func grantedProjectSearchRequestsToModel(project *GrantedProjectSearchRequest) *
 }
 
 func grantedProjectSearchQueriesToModel(queries []*GrantedProjectSearchQuery) []*proj_model.GrantedProjectSearchQuery {
-	converted := make([]*proj_model.GrantedProjectSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, grantedProjectSearchQueryToModel(q))
+	converted := make([]*proj_model.GrantedProjectSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = grantedProjectSearchQueryToModel(q)
 	}
 	return converted
 }
