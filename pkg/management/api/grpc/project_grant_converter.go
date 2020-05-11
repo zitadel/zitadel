@@ -73,9 +73,9 @@ func projectGrantSearchResponseFromModel(response *proj_model.GrantedProjectSear
 }
 
 func projectGrantsFromGrantedProjectModel(projects []*proj_model.GrantedProjectView) []*ProjectGrantView {
-	converted := make([]*ProjectGrantView, 0)
-	for _, q := range projects {
-		converted = append(converted, projectGrantFromGrantedProjectModel(q))
+	converted := make([]*ProjectGrantView, len(projects))
+	for i, project := range projects {
+		converted = projectGrantFromGrantedProjectModel(project)
 	}
 	return converted
 }

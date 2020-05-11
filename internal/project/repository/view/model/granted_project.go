@@ -75,9 +75,9 @@ func GrantedProjectToModel(project *GrantedProjectView) *model.GrantedProjectVie
 }
 
 func GrantedProjectsToModel(projects []*GrantedProjectView) []*model.GrantedProjectView {
-	result := make([]*model.GrantedProjectView, 0)
-	for _, p := range projects {
-		result = append(result, GrantedProjectToModel(p))
+	result := make([]*model.GrantedProjectView, len(projects))
+	for i, p := range projects {
+		result[i] = GrantedProjectToModel(p)
 	}
 	return result
 }

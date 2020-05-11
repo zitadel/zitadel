@@ -54,9 +54,9 @@ func projectGrantMemberSearchRequestsToModel(role *ProjectGrantMemberSearchReque
 }
 
 func projectGrantMemberSearchQueriesToModel(queries []*ProjectGrantMemberSearchQuery) []*proj_model.ProjectGrantMemberSearchQuery {
-	converted := make([]*proj_model.ProjectGrantMemberSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, projectGrantMemberSearchQueryToModel(q))
+	converted := make([]*proj_model.ProjectGrantMemberSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = projectGrantMemberSearchQueryToModel(q)
 	}
 	return converted
 }
@@ -94,9 +94,9 @@ func projectGrantMemberSearchResponseFromModel(response *proj_model.ProjectGrant
 }
 
 func projectGrantMemberViewsFromModel(roles []*proj_model.ProjectGrantMemberView) []*ProjectGrantMemberView {
-	converted := make([]*ProjectGrantMemberView, 0)
-	for _, q := range roles {
-		converted = append(converted, projectGrantMemberViewFromModel(q))
+	converted := make([]*ProjectGrantMemberView, len(roles))
+	for i, role := range roles {
+		converted[i] = projectGrantMemberViewFromModel(role)
 	}
 	return converted
 }
