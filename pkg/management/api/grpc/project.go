@@ -35,8 +35,14 @@ func (s *Server) ReactivateProject(ctx context.Context, in *ProjectID) (*Project
 	return projectFromModel(project), nil
 }
 
-func (s *Server) SearchProjects(ctx context.Context, in *ProjectSearchRequest) (*ProjectSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-2sFvd", "Not implemented")
+func (s *Server) SearchGrantedProjects(ctx context.Context, in *GrantedProjectSearchRequest) (*GrantedProjectSearchResponse, error) {
+	request := grantedProjectSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(ctx)
+	response, err := s.project.SearchGrantedProjects(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return grantedProjectSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, error) {
@@ -47,8 +53,12 @@ func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, erro
 	return projectFromModel(project), nil
 }
 
-func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, request *GrantedGrantID) (*ProjectGrant, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-974vd", "Not implemented")
+func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrant, error) {
+	project, err := s.project.ProjectGrantByID(ctx, in.ProjectId, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return projectGrantFromModel(project), nil
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*ProjectRole, error) {
@@ -72,7 +82,13 @@ func (s *Server) RemoveProjectRole(ctx context.Context, in *ProjectRoleRemove) (
 }
 
 func (s *Server) SearchProjectRoles(ctx context.Context, in *ProjectRoleSearchRequest) (*ProjectRoleSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-plV56", "Not implemented")
+	request := projectRoleSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(ctx)
+	response, err := s.project.SearchProjectRoles(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return projectRoleSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {

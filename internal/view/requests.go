@@ -58,7 +58,7 @@ func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
 	}
 }
 
-func PrepareDelete(table string, key ColumnKey, id string) func(db *gorm.DB) error {
+func PrepareDeleteByKey(table string, key ColumnKey, id string) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		err := db.Table(table).
 			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
@@ -66,6 +66,18 @@ func PrepareDelete(table string, key ColumnKey, id string) func(db *gorm.DB) err
 			Error
 		if err != nil {
 			return caos_errs.ThrowInternal(err, "VIEW-die73", "could not delete object")
+		}
+		return nil
+	}
+}
+
+func PrepareDeleteByObject(table string, object interface{}) func(db *gorm.DB) error {
+	return func(db *gorm.DB) error {
+		err := db.Table(table).
+			Delete(object).
+			Error
+		if err != nil {
+			return caos_errs.ThrowInternal(err, "VIEW-lso9w", "could not delete object")
 		}
 		return nil
 	}

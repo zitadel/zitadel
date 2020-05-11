@@ -1,15 +1,18 @@
-package eventsourcing
+package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/project/repository/view/model"
 
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type ProjectRepo struct {
+	SearchLimit   uint64
 	ProjectEvents *proj_event.ProjectEventstore
-	//view      *view.View
+	View          *view.View
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
@@ -33,6 +36,20 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 	return repo.ProjectEvents.ReactivateProject(ctx, id)
 }
 
+func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	projects, count, err := repo.View.SearchGrantedProjects(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.GrantedProjectSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.GrantedProjectsToModel(projects),
+	}, nil
+}
+
 func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
 	member = proj_model.NewProjectMember(projectID, userID)
 	return repo.ProjectEvents.ProjectMemberByIDs(ctx, member)
@@ -51,6 +68,20 @@ func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, use
 	return repo.ProjectEvents.RemoveProjectMember(ctx, member)
 }
 
+func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	members, count, err := repo.View.SearchProjectMembers(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectMemberSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectMembersToModel(members),
+	}, nil
+}
+
 func (repo *ProjectRepo) AddProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
 	return repo.ProjectEvents.AddProjectRole(ctx, member)
 }
@@ -62,6 +93,20 @@ func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_mod
 func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key string) error {
 	member := proj_model.NewProjectRole(projectID, key)
 	return repo.ProjectEvents.RemoveProjectRole(ctx, member)
+}
+
+func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	roles, count, err := repo.View.SearchProjectRoles(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectRoleSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectRolesToModel(roles),
+	}, nil
 }
 
 func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (app *proj_model.Application, err error) {
@@ -87,6 +132,20 @@ func (repo *ProjectRepo) ReactivateApplication(ctx context.Context, projectID, a
 func (repo *ProjectRepo) RemoveApplication(ctx context.Context, projectID, appID string) error {
 	app := proj_model.NewApplication(projectID, appID)
 	return repo.ProjectEvents.RemoveApplication(ctx, app)
+}
+
+func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	apps, count, err := repo.View.SearchApplications(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ApplicationSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ApplicationViewsToModel(apps),
+	}, nil
 }
 
 func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
@@ -138,4 +197,18 @@ func (repo *ProjectRepo) ChangeProjectGrantMember(ctx context.Context, member *p
 func (repo *ProjectRepo) RemoveProjectGrantMember(ctx context.Context, projectID, grantID, userID string) error {
 	member := proj_model.NewProjectGrantMember(projectID, grantID, userID)
 	return repo.ProjectEvents.RemoveProjectGrantMember(ctx, member)
+}
+
+func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request *proj_model.ProjectGrantMemberSearchRequest) (*proj_model.ProjectGrantMemberSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	members, count, err := repo.View.SearchProjectGrantMembers(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectGrantMemberSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectGrantMembersToModel(members),
+	}, nil
 }

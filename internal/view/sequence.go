@@ -51,7 +51,7 @@ func LatestSequence(db *gorm.DB, table, viewName string) (uint64, error) {
 		return sequence.ActualSequence, nil
 	}
 
-	if gorm.IsRecordNotFoundError(err) {
+	if caos_errs.IsNotFound(err) {
 		return 0, nil
 	}
 	return 0, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)

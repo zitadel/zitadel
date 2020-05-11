@@ -56,12 +56,7 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 		grantTypes[i] = int32(rt)
 	}
 	return &OIDCConfig{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  config.ObjectRoot.AggregateID,
-			Sequence:     config.Sequence,
-			ChangeDate:   config.ChangeDate,
-			CreationDate: config.CreationDate,
-		},
+		ObjectRoot:             config.ObjectRoot,
 		AppID:                  config.AppID,
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
@@ -84,12 +79,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		grantTypes[i] = model.OIDCGrantType(rt)
 	}
 	return &model.OIDCConfig{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  config.ObjectRoot.AggregateID,
-			Sequence:     config.Sequence,
-			ChangeDate:   config.ChangeDate,
-			CreationDate: config.CreationDate,
-		},
+		ObjectRoot:             config.ObjectRoot,
 		AppID:                  config.AppID,
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,

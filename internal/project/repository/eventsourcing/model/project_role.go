@@ -41,12 +41,7 @@ func ProjectRolesFromModel(roles []*model.ProjectRole) []*ProjectRole {
 
 func ProjectRoleFromModel(role *model.ProjectRole) *ProjectRole {
 	return &ProjectRole{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  role.ObjectRoot.AggregateID,
-			Sequence:     role.Sequence,
-			ChangeDate:   role.ChangeDate,
-			CreationDate: role.CreationDate,
-		},
+		ObjectRoot:  role.ObjectRoot,
 		Key:         role.Key,
 		DisplayName: role.DisplayName,
 		Group:       role.Group,
@@ -55,12 +50,7 @@ func ProjectRoleFromModel(role *model.ProjectRole) *ProjectRole {
 
 func ProjectRoleToModel(role *ProjectRole) *model.ProjectRole {
 	return &model.ProjectRole{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  role.AggregateID,
-			ChangeDate:   role.ChangeDate,
-			CreationDate: role.CreationDate,
-			Sequence:     role.Sequence,
-		},
+		ObjectRoot:  role.ObjectRoot,
 		Key:         role.Key,
 		DisplayName: role.DisplayName,
 		Group:       role.Group,

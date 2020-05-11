@@ -30,6 +30,9 @@ func (h *testHandler) Process(*models.Event) error {
 	<-time.After(h.processSleep)
 	return h.processError
 }
+func (h *testHandler) OnError(event *models.Event, err error) error {
+	return err
+}
 func (h *testHandler) MinimumCycleDuration() time.Duration { return h.cycleDuration }
 
 type eventstoreStub struct {

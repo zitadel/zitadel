@@ -2,10 +2,14 @@ package eventsourcing
 
 import (
 	"context"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-
+	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
+	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -13,18 +17,19 @@ import (
 )
 
 type Config struct {
-	Eventstore es_int.Config
-	//View       view.ViewConfig
-	//Spooler    spooler.SpoolerConfig
+	SearchLimit uint64
+	Eventstore  es_int.Config
+	View        types.SQL
+	Spooler     spooler.SpoolerConfig
 }
 
 type EsRepository struct {
-	//spooler *es_spooler.Spooler
-	ProjectRepo
-	OrgRepository
-	OrgMemberRepository
-	UserRepo
-	UserGrantRepo
+	spooler *es_spol.Spooler
+	eventstore.OrgRepository
+	eventstore.OrgMemberRepository
+	eventstore.ProjectRepo
+	eventstore.UserRepo
+	eventstore.UserGrantRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -33,15 +38,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
-	//view, sql, err := mgmt_view.StartView(conf.View)
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	//conf.Spooler.View = view
-	//conf.Spooler.EsClient = es.Client
-	//conf.Spooler.SQL = sql
-	//spool := spooler.StartSpooler(conf.Spooler)
+	sqlClient, err := conf.View.Start()
+	if err != nil {
+		return nil, err
+	}
+	view, err := mgmt_view.StartView(sqlClient)
+	if err != nil {
+		return nil, err
+	}
 
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
 		Eventstore: es,
@@ -66,12 +70,16 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
 
+	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project}
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
+
 	return &EsRepository{
-		ProjectRepo{project},
-		OrgRepository{org},
-		OrgMemberRepository{org},
-		UserRepo{user},
-		UserGrantRepo{usergrant},
+		spool,
+		eventstore.OrgRepository{org},
+		eventstore.OrgMemberRepository{org},
+		eventstore.ProjectRepo{conf.SearchLimit, project, view},
+		eventstore.UserRepo{user},
+		eventstore.UserGrantRepo{usergrant},
 	}, nil
 }
 
