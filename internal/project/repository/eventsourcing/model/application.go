@@ -57,16 +57,11 @@ func AppsFromModel(apps []*model.Application) []*Application {
 
 func AppFromModel(app *model.Application) *Application {
 	converted := &Application{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  app.ObjectRoot.AggregateID,
-			Sequence:     app.Sequence,
-			ChangeDate:   app.ChangeDate,
-			CreationDate: app.CreationDate,
-		},
-		AppID: app.AppID,
-		Name:  app.Name,
-		State: int32(app.State),
-		Type:  int32(app.Type),
+		ObjectRoot: app.ObjectRoot,
+		AppID:      app.AppID,
+		Name:       app.Name,
+		State:      int32(app.State),
+		Type:       int32(app.Type),
 	}
 	if app.OIDCConfig != nil {
 		converted.OIDCConfig = OIDCConfigFromModel(app.OIDCConfig)
@@ -76,16 +71,11 @@ func AppFromModel(app *model.Application) *Application {
 
 func AppToModel(app *Application) *model.Application {
 	converted := &model.Application{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  app.AggregateID,
-			ChangeDate:   app.ChangeDate,
-			CreationDate: app.CreationDate,
-			Sequence:     app.Sequence,
-		},
-		AppID: app.AppID,
-		Name:  app.Name,
-		State: model.AppState(app.State),
-		Type:  model.AppType(app.Type),
+		ObjectRoot: app.ObjectRoot,
+		AppID:      app.AppID,
+		Name:       app.Name,
+		State:      model.AppState(app.State),
+		Type:       model.AppType(app.Type),
 	}
 	if app.OIDCConfig != nil {
 		converted.OIDCConfig = OIDCConfigToModel(app.OIDCConfig)

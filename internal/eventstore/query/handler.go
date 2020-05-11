@@ -8,4 +8,5 @@ type Handler interface {
 	ViewModel() string
 	EventQuery() (*models.SearchQuery, error)
 	Process(*models.Event) error
+	OnError(event *models.Event, err error) error
 }

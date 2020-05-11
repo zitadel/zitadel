@@ -2,12 +2,15 @@ package grpc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) SearchProjectGrantMembers(ctx context.Context, request *ProjectGrantMemberSearchRequest) (*ProjectGrantMemberSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-pldE4", "Not implemented")
+func (s *Server) SearchProjectGrantMembers(ctx context.Context, in *ProjectGrantMemberSearchRequest) (*ProjectGrantMemberSearchResponse, error) {
+	response, err := s.project.SearchProjectGrantMembers(ctx, projectGrantMemberSearchRequestsToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return projectGrantMemberSearchResponseFromModel(response), nil
 }
 
 func (s *Server) AddProjectGrantMember(ctx context.Context, in *ProjectGrantMemberAdd) (*ProjectGrantMember, error) {

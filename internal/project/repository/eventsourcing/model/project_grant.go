@@ -59,12 +59,7 @@ func GrantsFromModel(grants []*model.ProjectGrant) []*ProjectGrant {
 func GrantFromModel(grant *model.ProjectGrant) *ProjectGrant {
 	members := GrantMembersFromModel(grant.Members)
 	return &ProjectGrant{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  grant.ObjectRoot.AggregateID,
-			Sequence:     grant.Sequence,
-			ChangeDate:   grant.ChangeDate,
-			CreationDate: grant.CreationDate,
-		},
+		ObjectRoot:   grant.ObjectRoot,
 		GrantID:      grant.GrantID,
 		GrantedOrgID: grant.GrantedOrgID,
 		State:        int32(grant.State),
@@ -76,12 +71,7 @@ func GrantFromModel(grant *model.ProjectGrant) *ProjectGrant {
 func GrantToModel(grant *ProjectGrant) *model.ProjectGrant {
 	members := GrantMembersToModel(grant.Members)
 	return &model.ProjectGrant{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  grant.AggregateID,
-			ChangeDate:   grant.ChangeDate,
-			CreationDate: grant.CreationDate,
-			Sequence:     grant.Sequence,
-		},
+		ObjectRoot:   grant.ObjectRoot,
 		GrantID:      grant.GrantID,
 		GrantedOrgID: grant.GrantedOrgID,
 		State:        model.ProjectGrantState(grant.State),
