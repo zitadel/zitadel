@@ -1,9 +1,6 @@
 package model
 
 import (
-	"context"
-	"github.com/caos/zitadel/internal/api"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/model"
 	"time"
 )
@@ -78,7 +75,6 @@ func (r *UserSearchRequest) EnsureLimit(limit uint64) {
 	}
 }
 
-func (r *UserSearchRequest) AppendMyOrgQuery(ctx context.Context) {
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserSearchQuery{Key: USERSEARCHKEY_RESOURCEOWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
 }

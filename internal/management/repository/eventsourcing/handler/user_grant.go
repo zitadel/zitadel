@@ -63,7 +63,7 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 	grant := new(view_model.UserGrantView)
 	switch event.Type {
 	case grant_es_model.UserGrantAdded:
-		grant.AppendEvent(event)
+		err = grant.AppendEvent(event)
 		if err != nil {
 			return err
 		}

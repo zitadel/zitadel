@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api"
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -24,7 +26,8 @@ func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *UserEmailID) (
 
 func (s *Server) SearchUsers(ctx context.Context, in *UserSearchRequest) (*UserSearchResponse, error) {
 	request := userSearchRequestsToModel(in)
-	request.AppendMyOrgQuery(ctx)
+	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	request.AppendMyOrgQuery(orgID)
 	response, err := s.user.SearchUsers(ctx, request)
 	if err != nil {
 		return nil, err
