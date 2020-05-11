@@ -206,9 +206,9 @@ func projectRoleSearchRequestsToModel(role *ProjectRoleSearchRequest) *proj_mode
 }
 
 func projectRoleSearchQueriesToModel(queries []*ProjectRoleSearchQuery) []*proj_model.ProjectRoleSearchQuery {
-	converted := make([]*proj_model.ProjectRoleSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, projectRoleSearchQueryToModel(q))
+	converted := make([]*proj_model.ProjectRoleSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = projectRoleSearchQueryToModel(q)
 	}
 	return converted
 }
