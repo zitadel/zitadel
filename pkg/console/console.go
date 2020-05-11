@@ -1,4 +1,4 @@
-//go:generate /Users/ffo/go/bin/statik -src=../../console/dist/app
+//go:generate statik -src=../../console/dist/app
 
 package console
 
