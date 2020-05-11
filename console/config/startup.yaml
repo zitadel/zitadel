@@ -1,3 +1,0 @@
-Console:
-  Port: '9090'
-  StaticDir: '/app/console/dist'
