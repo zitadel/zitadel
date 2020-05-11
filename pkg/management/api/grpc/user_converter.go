@@ -263,8 +263,8 @@ func userSearchResponseFromModel(response *usr_model.UserSearchResponse) *UserSe
 
 func userViewsFromModel(users []*usr_model.UserView) []*UserView {
 	converted := make([]*UserView, len(users))
-	for i, q := range users {
-		converted[i] = userViewFromModel(q)
+	for i, user := range users {
+		converted[i] = userViewFromModel(user)
 	}
 	return converted
 }
