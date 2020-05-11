@@ -68,9 +68,9 @@ func ProjectGrantMemberToModel(member *ProjectGrantMemberView) *model.ProjectGra
 }
 
 func ProjectGrantMembersToModel(roles []*ProjectGrantMemberView) []*model.ProjectGrantMemberView {
-	result := make([]*model.ProjectGrantMemberView, 0)
-	for _, r := range roles {
-		result = append(result, ProjectGrantMemberToModel(r))
+	result := make([]*model.ProjectGrantMemberView, len(roles))
+	for i, r := range roles {
+		result[i] = ProjectGrantMemberToModel(r)
 	}
 	return result
 }
