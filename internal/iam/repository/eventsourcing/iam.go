@@ -59,11 +59,26 @@ func IamSetupDoneAggregate(aggCreator *es_models.AggregateCreator, iam *model.Ia
 
 func IamSetGlobalOrgAggregate(aggCreator *es_models.AggregateCreator, iam *model.Iam, globalOrg string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if globalOrg == "" {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8siwa", "globalOrg must be set")
+		}
 		agg, err := IamAggregate(ctx, aggCreator, iam)
 		if err != nil {
 			return nil, err
 		}
+		return agg.AppendEvent(model.GlobalOrgSet, &model.Iam{GlobalOrgID: globalOrg})
+	}
+}
 
-		return agg.AppendEvent(model.IamSetupDone, nil)
+func IamSetIamProjectAggregate(aggCreator *es_models.AggregateCreator, iam *model.Iam, projectID string) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if projectID == "" {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sjuw3", "projectID must be set")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, iam)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.IamProjectSet, &model.Iam{IamProjectID: projectID})
 	}
 }

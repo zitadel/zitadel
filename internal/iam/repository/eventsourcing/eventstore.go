@@ -76,7 +76,39 @@ func (es *IamEventstore) SetupDone(ctx context.Context, iamID string) (*iam_mode
 		return nil, err
 	}
 	repoIam := model.IamFromModel(iam)
-	createAggregate := IamSetupStartedAggregate(es.AggregateCreator(), repoIam)
+	createAggregate := IamSetupDoneAggregate(es.AggregateCreator(), repoIam)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.iamCache.cacheIam(repoIam)
+	return model.IamToModel(repoIam), nil
+}
+
+func (es *IamEventstore) SetGlobalOrg(ctx context.Context, iamID, globalOrg string) (*iam_model.Iam, error) {
+	iam, err := es.IamByID(ctx, iamID)
+	if err != nil {
+		return nil, err
+	}
+	repoIam := model.IamFromModel(iam)
+	createAggregate := IamSetGlobalOrgAggregate(es.AggregateCreator(), repoIam, globalOrg)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	es.iamCache.cacheIam(repoIam)
+	return model.IamToModel(repoIam), nil
+}
+
+func (es *IamEventstore) SetIamProject(ctx context.Context, iamID, iamProjectID string) (*iam_model.Iam, error) {
+	iam, err := es.IamByID(ctx, iamID)
+	if err != nil {
+		return nil, err
+	}
+	repoIam := model.IamFromModel(iam)
+	createAggregate := IamSetIamProjectAggregate(es.AggregateCreator(), repoIam, iamProjectID)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err
