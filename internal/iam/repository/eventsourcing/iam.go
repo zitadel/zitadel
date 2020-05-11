@@ -38,15 +38,32 @@ func IamAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Agg
 
 func IamSetupStartedAggregate(aggCreator *es_models.AggregateCreator, iam *model.Iam) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if iam == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo0sw", "iam should not be nil")
+		agg, err := IamAggregate(ctx, aggCreator, iam)
+		if err != nil {
+			return nil, err
 		}
+		return agg.AppendEvent(model.IamSetupStarted, nil)
+	}
+}
 
+func IamSetupDoneAggregate(aggCreator *es_models.AggregateCreator, iam *model.Iam) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := IamAggregate(ctx, aggCreator, iam)
 		if err != nil {
 			return nil, err
 		}
 
-		return agg.AppendEvent(model.IamSetupStarted, iam)
+		return agg.AppendEvent(model.IamSetupDone, nil)
+	}
+}
+
+func IamSetGlobalOrgAggregate(aggCreator *es_models.AggregateCreator, iam *model.Iam, globalOrg string) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := IamAggregate(ctx, aggCreator, iam)
+		if err != nil {
+			return nil, err
+		}
+
+		return agg.AppendEvent(model.IamSetupDone, nil)
 	}
 }

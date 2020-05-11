@@ -1,10 +1,19 @@
 package setup
 
 import (
+	"context"
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -15,19 +24,277 @@ type Setup struct {
 }
 
 type EventstoreRepos struct {
+	IamEvents     *iam_event.IamEventstore
 	OrgEvents     *org_event.OrgEventstore
 	UserEvents    *usr_event.UserEventstore
 	ProjectEvents *proj_event.ProjectEventstore
 }
 
+type initializer struct {
+	*Setup
+	createdUsers    map[string]*usr_model.User
+	createdOrgs     map[string]*org_model.Org
+	createdProjects map[string]*proj_model.Project
+}
+
+const (
+	OrgOwnerRole                     = "ORG_OWNER"
+	OIDCResponseType_CODE            = "CODE"
+	OIDCResponseType_ID_TOKEN        = "ID_TOKEN"
+	OIDCResponseType_TOKEN           = "TOKEN"
+	OIDCGrantType_AUTHORIZATION_CODE = "AUTHORIZATION_CODE"
+	OIDCGrantType_IMPLICIT           = "IMPLICIT"
+	OIDCGrantType_REFRESH_TOKEN      = "REFRESH_TOKEN"
+	OIDCApplicationType_NATIVE       = "NATIVE"
+	OIDCApplicationType_USER_AGENT   = "USER_AGENT"
+	OIDCApplicationType_WEB          = "WEB"
+	OIDCAuthMethodType_NONE          = "NONE"
+	OIDCAuthMethodType_BASIC         = "BASIC"
+	OIDCAuthMethodType_POST          = "POST"
+)
+
 func StartSetup(sd systemdefaults.SystemDefaults, repos EventstoreRepos) *Setup {
 	return &Setup{
 		repos:       repos,
-		iamID:       sd.IamId,
+		iamID:       sd.IamID,
 		setUpConfig: sd.SetUp,
 	}
 }
 
 func (s *Setup) Execute() error {
+	ctx := context.Background()
+	iam, err := s.repos.IamEvents.IamByID(ctx, s.iamID)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return err
+	}
+	if iam != nil && iam.SetUpDone {
+		return nil
+	}
+
+	if (iam != nil && !iam.SetUpStarted) || caos_errs.IsNotFound(err) {
+		ctx = setSetUpContextData(ctx, s.iamID)
+		iam, err = s.repos.IamEvents.StartSetup(ctx, s.iamID)
+		if err != nil {
+			return err
+		}
+	}
+
+	setUp := &initializer{
+		createdUsers:    make(map[string]*usr_model.User),
+		createdOrgs:     make(map[string]*org_model.Org),
+		createdProjects: make(map[string]*proj_model.Project),
+	}
+
+	err = setUp.orgs(ctx, s.setUpConfig.Orgs)
+	if err != nil {
+		logging.Log("APP-p4oWq").WithError(err).Error("unable to set up orgs")
+		return err
+	}
 	return nil
+}
+
+func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
+	for _, iamOrg := range orgs {
+		org, err := setUp.org(ctx, iamOrg)
+		if err != nil {
+			logging.LogWithFields("APP-IlLif", "Org", iamOrg.Name).WithError(err).Error("unable to create org")
+			return err
+		}
+		setUp.createdOrgs[iamOrg.Name] = org
+
+		ctx = setSetUpContextData(ctx, org.AggregateID)
+		err = setUp.users(ctx, iamOrg.Users)
+		if err != nil {
+			logging.LogWithFields("APP-8zfwz", "Org", iamOrg.Name).WithError(err).Error("unable to set up org users")
+			return err
+		}
+
+		err = setUp.orgOwners(ctx, org, iamOrg.Owners)
+		if err != nil {
+			logging.LogWithFields("APP-0874m", "Org", iamOrg.Name).WithError(err).Error("unable to set up org owners")
+			return err
+		}
+
+		err = setUp.projects(ctx, iamOrg.Projects)
+		if err != nil {
+			logging.LogWithFields("APP-wUzqY", "Org", iamOrg.Name).WithError(err).Error("unable to set up org projects")
+			return err
+		}
+	}
+	return nil
+}
+
+func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Org, error) {
+	ctx = setSetUpContextData(ctx, "")
+	createOrg := &org_model.Org{
+		Name:   org.Name,
+		Domain: org.Domain,
+	}
+	//TODO: CreateOrg
+	return createOrg, nil
+	//return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
+}
+
+func (setUp *initializer) users(ctx context.Context, users []types.User) error {
+	for _, user := range users {
+		created, err := setUp.user(ctx, user)
+		if err != nil {
+			logging.LogWithFields("APP-9soer", "Email", user.Email).WithError(err).Error("unable to create iam user")
+			return err
+		}
+		setUp.createdUsers[user.Email] = created
+	}
+	return nil
+}
+
+func (setUp *initializer) user(ctx context.Context, user types.User) (*usr_model.User, error) {
+	createUser := &usr_model.User{
+		Profile: &usr_model.Profile{
+			UserName:  user.UserName,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+		},
+		Email: &usr_model.Email{
+			EmailAddress:    user.Email,
+			IsEmailVerified: true,
+		},
+		Password: &usr_model.Password{
+			SecretString: user.Password,
+		},
+	}
+	return setUp.repos.UserEvents.CreateUser(ctx, createUser)
+}
+
+func (setUp *initializer) orgOwners(ctx context.Context, org *org_model.Org, owners []string) error {
+	for _, orgOwner := range owners {
+		user, ok := setUp.createdUsers[orgOwner]
+		if !ok {
+			logging.LogWithFields("APP-s9ilr", "Owner", orgOwner).Error("unable to add user to org members")
+			return caos_errs.ThrowPreconditionFailedf(nil, "APP-s0prs", "unable to add user to org members: %v", orgOwner)
+		}
+		err := setUp.orgOwner(ctx, org, user)
+		if err != nil {
+			logging.Log("APP-s90oe").WithError(err).Error("unable to add global org admin to members of global org")
+			return err
+		}
+	}
+	return nil
+}
+
+func (setUp *initializer) orgOwner(ctx context.Context, org *org_model.Org, user *usr_model.User) error {
+	addMember := &org_model.OrgMember{
+		ObjectRoot: models.ObjectRoot{AggregateID: org.AggregateID},
+		UserID:     user.AggregateID,
+		Roles:      []string{OrgOwnerRole},
+	}
+	_, err := setUp.repos.OrgEvents.AddOrgMember(ctx, addMember)
+	return err
+}
+
+func (setUp *initializer) projects(ctx context.Context, projects []types.Project) error {
+	for _, project := range projects {
+		createdProject, err := setUp.project(ctx, project)
+		if err != nil {
+			return err
+		}
+		setUp.createdProjects[createdProject.Name] = createdProject
+		for _, oidc := range project.OIDCApps {
+			_, err := setUp.oidcApp(ctx, createdProject, oidc)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (setUp *initializer) project(ctx context.Context, project types.Project) (*proj_model.Project, error) {
+	addProject := &proj_model.Project{
+		Name: project.Name,
+	}
+	return setUp.repos.ProjectEvents.CreateProject(ctx, addProject)
+}
+
+func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Project, oidc types.OIDCApp) (*proj_model.Application, error) {
+	addOIDCApp := &proj_model.Application{
+		ObjectRoot: models.ObjectRoot{AggregateID: project.AggregateID},
+		Name:       oidc.Name,
+		OIDCConfig: &proj_model.OIDCConfig{
+			RedirectUris:           oidc.RedirectUris,
+			ResponseTypes:          getOIDCResponseTypes(oidc.ResponseTypes),
+			GrantTypes:             getOIDCGrantTypes(oidc.GrantTypes),
+			ApplicationType:        getOIDCApplicationType(oidc.ApplicationType),
+			AuthMethodType:         getOIDCAuthMethod(oidc.AuthMethodType),
+			PostLogoutRedirectUris: oidc.PostLogoutRedirectUris,
+		},
+	}
+	return setUp.repos.ProjectEvents.AddApplication(ctx, addOIDCApp)
+}
+
+func getOIDCResponseTypes(responseTypes []string) []proj_model.OIDCResponseType {
+	types := make([]proj_model.OIDCResponseType, 0)
+	for _, t := range responseTypes {
+		types = append(types, getOIDCResponseType(t))
+	}
+	return types
+}
+
+func getOIDCResponseType(responseType string) proj_model.OIDCResponseType {
+	switch responseType {
+	case OIDCResponseType_CODE:
+		return proj_model.OIDCRESPONSETYPE_CODE
+	case OIDCResponseType_ID_TOKEN:
+		return proj_model.OIDCRESPONSETYPE_ID_TOKEN
+	case OIDCResponseType_TOKEN:
+		return proj_model.OIDCRESPONSETYPE_TOKEN
+	}
+	return proj_model.OIDCRESPONSETYPE_CODE
+}
+
+func getOIDCGrantTypes(grantTypes []string) []proj_model.OIDCGrantType {
+	types := make([]proj_model.OIDCGrantType, 0)
+	for _, t := range grantTypes {
+		types = append(types, getOIDCGrantType(t))
+	}
+	return types
+}
+
+func getOIDCGrantType(grantTypes string) proj_model.OIDCGrantType {
+	switch grantTypes {
+	case OIDCGrantType_AUTHORIZATION_CODE:
+		return proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE
+	case OIDCGrantType_IMPLICIT:
+		return proj_model.OIDCGRANTTYPE_IMPLICIT
+	case OIDCGrantType_REFRESH_TOKEN:
+		return proj_model.OIDCGRANTTYPE_REFRESH_TOKEN
+	}
+	return proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE
+}
+
+func getOIDCApplicationType(appType string) proj_model.OIDCApplicationType {
+	switch appType {
+	case OIDCApplicationType_NATIVE:
+		return proj_model.OIDCAPPLICATIONTYPE_NATIVE
+	case OIDCApplicationType_USER_AGENT:
+		return proj_model.OIDCAPPLICATIONTYPE_USER_AGENT
+	case OIDCApplicationType_WEB:
+		return proj_model.OIDCAPPLICATIONTYPE_WEB
+	}
+	return proj_model.OIDCAPPLICATIONTYPE_WEB
+}
+
+func getOIDCAuthMethod(authMethod string) proj_model.OIDCAuthMethodType {
+	switch authMethod {
+	case OIDCAuthMethodType_NONE:
+		return proj_model.OIDCAUTHMETHODTYPE_NONE
+	case OIDCAuthMethodType_BASIC:
+		return proj_model.OIDCAUTHMETHODTYPE_BASIC
+	case OIDCAuthMethodType_POST:
+		return proj_model.OIDCAUTHMETHODTYPE_POST
+	}
+	return proj_model.OIDCAUTHMETHODTYPE_NONE
+}
+
+func setSetUpContextData(ctx context.Context, orgID string) context.Context {
+	return context.WithValue(ctx, auth.GetCtxDataKey(), &auth.CtxData{UserID: "setup", OrgID: orgID})
 }

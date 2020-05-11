@@ -9,7 +9,7 @@ type SystemDefaults struct {
 	SecretGenerators    SecretGenerators
 	UserVerificationKey *crypto.KeyConfig
 	Multifactors        MultifactorConfig
-	IamId               string
+	IamID               string
 	SetUp               types.IAMSetUp
 }
 

@@ -3,9 +3,9 @@ package types
 type IAMSetUp struct {
 	GlobalOrg  string
 	IAMProject string
-	Users      []User
-	Owners     []string
 	Orgs       []Org
+	Owners     []string
+	//Users      []User
 }
 
 type User struct {
