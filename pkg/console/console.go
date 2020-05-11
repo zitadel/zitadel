@@ -8,7 +8,7 @@ import (
 
 	"github.com/rakyll/statik/fs"
 
-	_ "./statik"
+	_ "github.com/caos/zitadel/pkg/console/statik"
 )
 
 type Config struct {
