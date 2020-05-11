@@ -35,6 +35,9 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
+	if esOrg.Sequence == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-kVLb2", "org not found")
+	}
 
 	return OrgToModel(esOrg), nil
 }
