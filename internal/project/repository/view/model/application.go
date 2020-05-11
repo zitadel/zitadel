@@ -105,9 +105,9 @@ func OIDCResponseTypesToModel(oidctypes []int64) []model.OIDCResponseType {
 }
 
 func OIDCGrantTypesToModel(granttypes []int64) []model.OIDCGrantType {
-	result := make([]model.OIDCGrantType, 0)
-	for _, t := range granttypes {
-		result = append(result, model.OIDCGrantType(t))
+	result := make([]model.OIDCGrantType, len(granttypes))
+	for i, t := range granttypes {
+		result[i] = model.OIDCGrantType(t)
 	}
 	return result
 }
