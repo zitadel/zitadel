@@ -7,6 +7,8 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 func TestOrgMemberAddedAggregate(t *testing.T) {
@@ -234,6 +236,7 @@ func Test_addMemberValidation(t *testing.T) {
 	type args struct {
 		aggregate *es_models.Aggregate
 		events    []*es_models.Event
+		member    *OrgMember
 	}
 	tests := []struct {
 		name string
@@ -255,14 +258,21 @@ func Test_addMemberValidation(t *testing.T) {
 				aggregate: &es_models.Aggregate{},
 				events: []*es_models.Event{
 					{
-						AggregateType: "org",
+						AggregateType: org_model.OrgAggregate,
 						Sequence:      13,
 					},
 					{
-						AggregateType: "org",
+						AggregateType: org_model.OrgAggregate,
 						Sequence:      142,
 					},
+					{
+						AggregateType: org_model.OrgAggregate,
+						Sequence:      1234,
+						Type:          org_model.OrgMemberAdded,
+						Data:          []byte(`{"userId":"hodor"}`),
+					},
 				},
+				member: &OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
@@ -274,43 +284,104 @@ func Test_addMemberValidation(t *testing.T) {
 				aggregate: &es_models.Aggregate{},
 				events: []*es_models.Event{
 					{
-						AggregateType: "user",
+						AggregateType: usr_model.UserAggregate,
 						Sequence:      13,
 					},
 					{
-						AggregateType: "user",
+						AggregateType: usr_model.UserAggregate,
 						Sequence:      142,
 					},
 				},
+				member: &OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
 			},
 		},
 		{
-			name: "user and org events success",
+			name: "user, org events success",
 			args: args{
 				aggregate: &es_models.Aggregate{},
 				events: []*es_models.Event{
 					{
-						AggregateType: "user",
+						AggregateType: usr_model.UserAggregate,
 						Sequence:      13,
 					},
 					{
-						AggregateType: "org",
+						AggregateType: org_model.OrgAggregate,
 						Sequence:      142,
 					},
 				},
+				member: &OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr:            nil,
 				preivousSequence: 142,
 			},
 		},
+		{
+			name: "user, org and member events success",
+			args: args{
+				aggregate: &es_models.Aggregate{},
+				events: []*es_models.Event{
+					{
+						AggregateType: usr_model.UserAggregate,
+						Sequence:      13,
+					},
+					{
+						AggregateType: org_model.OrgAggregate,
+						Sequence:      142,
+					},
+					{
+						AggregateType: org_model.OrgAggregate,
+						Sequence:      1234,
+						Type:          org_model.OrgMemberAdded,
+						Data:          []byte(`{"userId":"hodor"}`),
+					},
+					{
+						AggregateType: org_model.OrgAggregate,
+						Sequence:      1236,
+						Type:          org_model.OrgMemberRemoved,
+						Data:          []byte(`{"userId":"hodor"}`),
+					},
+				},
+				member: &OrgMember{UserID: "hodor"},
+			},
+			res: res{
+				isErr:            nil,
+				preivousSequence: 1236,
+			},
+		},
+		{
+			name: "user, org and member added events fail",
+			args: args{
+				aggregate: &es_models.Aggregate{},
+				events: []*es_models.Event{
+					{
+						AggregateType: usr_model.UserAggregate,
+						Sequence:      13,
+					},
+					{
+						AggregateType: org_model.OrgAggregate,
+						Sequence:      142,
+					},
+					{
+						AggregateType: org_model.OrgAggregate,
+						Sequence:      1234,
+						Type:          org_model.OrgMemberAdded,
+						Data:          []byte(`{"userId":"hodor"}`),
+					},
+				},
+				member: &OrgMember{UserID: "hodor"},
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validaiton := addMemberValidation(tt.args.aggregate)
+			validaiton := addMemberValidation(tt.args.aggregate, tt.args.member)
 			err := validaiton(tt.args.events...)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
