@@ -30,9 +30,9 @@ func (req GrantedProjectSearchRequest) GetAsc() bool {
 }
 
 func (req GrantedProjectSearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, 0)
-	for _, q := range req.Queries {
-		result = append(result, GrantedProjectSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method})
+	result := make([]view.SearchQuery, len(req.Queries))
+	for i, q := range req.Queries {
+		result[i] = GrantedProjectSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
