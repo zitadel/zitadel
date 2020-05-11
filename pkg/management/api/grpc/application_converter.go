@@ -145,9 +145,9 @@ func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchRe
 }
 
 func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*ApplicationView {
-	converted := make([]*ApplicationView, 0)
-	for _, q := range apps {
-		converted = append(converted, applicationViewFromModel(q))
+	converted := make([]*ApplicationView, len(apps))
+	for i, app := range apps {
+		converted[i] = applicationViewFromModel(app)
 	}
 	return converted
 }
