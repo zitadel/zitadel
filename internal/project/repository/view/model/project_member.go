@@ -65,9 +65,9 @@ func ProjectMemberToModel(member *ProjectMemberView) *model.ProjectMemberView {
 }
 
 func ProjectMembersToModel(roles []*ProjectMemberView) []*model.ProjectMemberView {
-	result := make([]*model.ProjectMemberView, 0)
-	for _, r := range roles {
-		result = append(result, ProjectMemberToModel(r))
+	result := make([]*model.ProjectMemberView, len(roles))
+	for i, r := range roles {
+		result[i] = ProjectMemberToModel(r)
 	}
 	return result
 }
