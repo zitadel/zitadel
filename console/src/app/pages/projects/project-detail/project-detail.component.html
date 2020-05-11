@@ -1,0 +1,113 @@
+<app-meta-layout>
+    <div class="max-width-container">
+        <div class="head" *ngIf="project?.id">
+            <a [routerLink]="[ '/projects' ]" mat-icon-button>
+                <mat-icon class="icon">arrow_back</mat-icon>
+            </a>
+            <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.name}}</h1>
+            <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
+                <button *ngIf="project?.type == ProjectType.PROJECT_TYPE_SELF" mat-icon-button
+                    (click)="editstate = !editstate" aria-label="Edit project name">
+                    <mat-icon *ngIf="!editstate">edit</mat-icon>
+                    <mat-icon *ngIf="editstate">close</mat-icon>
+                </button>
+            </ng-template>
+
+            <div class="full-width">
+                <ng-container *ngIf="editstate">
+                    <mat-form-field *ngIf="editstate && project?.name" class="formfield"
+                        hintLabel="The name is required!">
+                        <mat-label>Project Name</mat-label>
+                        <input matInput [(ngModel)]="project.name" />
+                    </mat-form-field>
+                    <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
+                        <mat-icon>check</mat-icon>
+                    </button>
+                    <button mat-stroked-button color="accent" *ngIf="project?.state === ProjectState.ACTIVE_PROJECT"
+                        class="second"
+                        (click)="changeState(ProjectState.INACTIVE_PROJECT)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
+                    <button mat-stroked-button color="accent" *ngIf="project?.state === ProjectState.INACTIVE_PROJECT"
+                        class="second"
+                        (click)="changeState(ProjectState.ACTIVE_PROJECT)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
+                </ng-container>
+                <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
+            </div>
+        </div>
+
+        <!-- show only on owned projects-->
+        <ng-container *ngIf="project?.type === ProjectType.PROJECT_TYPE_SELF; else granteddetail">
+            <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
+                <app-project-application-grid *ngIf="grid" [disabled]="project?.state !== ProjectState.ACTIVE_PROJECT"
+                    (changeView)="grid = false" [projectId]="projectId"></app-project-application-grid>
+                <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
+                    <card-actions class="card-actions">
+                        <button mat-icon-button (click)="grid = true">
+                            <mat-icon matTooltip="show grid view">grid_on</mat-icon>
+                        </button>
+                    </card-actions>
+                    <app-project-applications [disabled]="project?.state !== ProjectState.ACTIVE_PROJECT"
+                        [projectId]="projectId"></app-project-applications>
+                </app-card>
+            </ng-template>
+
+            <ng-container *ngIf="(isZitadel$ | async) == false">
+                <ng-template appHasRole [appHasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
+                    <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
+                        description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
+                        <app-project-grants [disabled]="project?.state !== ProjectState.ACTIVE_PROJECT"
+                            [projectId]="projectId">
+                        </app-project-grants>
+                    </app-card>
+                </ng-template>
+
+                <ng-template appHasRole [appHasRole]="['project.role.read:' + project.id, 'project.role.read']">
+                    <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
+                        description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
+                        <app-project-roles [disabled]="project?.state !== ProjectState.ACTIVE_PROJECT"
+                            [actionsVisible]="project?.type == ProjectType.PROJECT_TYPE_SELF" [projectId]="projectId">
+                        </app-project-roles>
+                    </app-card>
+                </ng-template>
+            </ng-container>
+        </ng-container>
+
+        <ng-template #granteddetail>
+            <app-card>
+                <app-project-grant-members *ngIf="project" [disabled]="project?.state !== ProjectState.ACTIVE_PROJECT"
+                    [project]="project">
+                </app-project-grant-members>
+            </app-card>
+        </ng-template>
+    </div>
+    <metainfo class="side">
+
+        <div class="details">
+            <div class="row">
+                <span class="first">{{'PROJECT.TYPE.TITLE' | translate}}:</span>
+                <span class="second" *ngIf="project?.type">{{'PROJECT.TYPE.'+ project.type | translate}}</span>
+            </div>
+            <div class="row">
+                <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
+                <span *ngIf="project && project.state !== undefined"
+                    class="second">{{'PROJECT.STATE.'+project.state | translate}}</span>
+            </div>
+        </div>
+
+        <ng-container *ngIf="project?.type === ProjectType.PROJECT_TYPE_SELF; else grantedmeta">
+            <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+                <mat-tab label="Details">
+                    <app-project-contributors *ngIf="project"
+                        [disabled]="project?.state !== ProjectState.ACTIVE_PROJECT" [project]="project">
+                    </app-project-contributors>
+                </mat-tab>
+                <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
+                    <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
+                </mat-tab>
+            </mat-tab-group>
+        </ng-container>
+
+        <ng-template #grantedmeta>
+            <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
+        </ng-template>
+    </metainfo>
+</app-meta-layout>

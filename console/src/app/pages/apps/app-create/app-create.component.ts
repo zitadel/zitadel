@@ -1,0 +1,186 @@
+import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
+import { Location } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { OIDCAuthMethodType } from 'src/app/proto/generated/auth_pb';
+import {
+    Application,
+    OIDCApplicationCreate,
+    OIDCApplicationType,
+    OIDCGrantType,
+    OIDCResponseType,
+} from 'src/app/proto/generated/management_pb';
+import { ProjectService } from 'src/app/services/project.service';
+import { ToastService } from 'src/app/services/toast.service';
+
+import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+
+@Component({
+    selector: 'app-app-create',
+    templateUrl: './app-create.component.html',
+    styleUrls: ['./app-create.component.scss'],
+})
+export class AppCreateComponent implements OnInit, OnDestroy {
+    private subscription?: Subscription;
+    public projectId: string = '';
+    public oidcApp: OIDCApplicationCreate.AsObject = new OIDCApplicationCreate().toObject();
+    public oidcResponseTypes: OIDCResponseType[] = [
+        OIDCResponseType.CODE,
+        OIDCResponseType.ID_TOKEN,
+        OIDCResponseType.TOKEN_ID_TOKEN,
+    ];
+    public oidcGrantTypes: OIDCGrantType[] = [
+        OIDCGrantType.AUTHORIZATION_CODE,
+        OIDCGrantType.IMPLICIT,
+        OIDCGrantType.REFRESH_TOKEN,
+    ];
+    public oidcAppTypes: OIDCApplicationType[] = [
+        OIDCApplicationType.WEB,
+        OIDCApplicationType.USER_AGENT,
+        OIDCApplicationType.NATIVE,
+    ];
+    public oidcAuthMethodType: OIDCAuthMethodType[] = [
+        OIDCAuthMethodType.AUTH_TYPE_BASIC,
+        OIDCAuthMethodType.AUTH_TYPE_NONE,
+        OIDCAuthMethodType.AUTH_TYPE_POST,
+    ];
+
+    public form!: FormGroup;
+    public createSteps: number = 1;
+    public currentCreateStep: number = 1;
+    public postLogoutRedirectUrisList: string[] = [];
+
+    public addOnBlur: boolean = true;
+    public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
+
+    constructor(
+        private router: Router,
+        private route: ActivatedRoute,
+        private toast: ToastService,
+        private dialog: MatDialog,
+        private projectService: ProjectService,
+        private fb: FormBuilder,
+        private _location: Location,
+    ) {
+        this.form = this.fb.group({
+            name: ['', [Validators.required]],
+            responseTypesList: ['', []],
+            grantTypesList: ['', []],
+            applicationType: ['', []],
+            authMethodType: [],
+        });
+    }
+
+    public ngOnInit(): void {
+        this.subscription = this.route.params.subscribe(params => this.getData(params));
+    }
+
+    public ngOnDestroy(): void {
+        this.subscription?.unsubscribe();
+    }
+
+    private async getData({ projectid }: Params): Promise<void> {
+        this.projectId = projectid;
+        this.oidcApp.projectId = projectid;
+    }
+
+    public close(): void {
+        this._location.back();
+    }
+
+    public saveOIDCApp(): void {
+        this.oidcApp.name = this.name?.value;
+        this.oidcApp.applicationType = this.applicationType?.value;
+        this.oidcApp.grantTypesList = this.grantTypesList?.value;
+        this.oidcApp.responseTypesList = this.responseTypesList?.value;
+        this.oidcApp.authMethodType = this.authMethodType?.value;
+
+        console.log(this.oidcApp);
+
+        this.projectService
+            .CreateOIDCApp(this.oidcApp)
+            .then((data: Application) => {
+                this.showSavedDialog(data.toObject());
+            })
+            .catch(data => {
+                this.toast.showError(data.message);
+            });
+    }
+
+    public showSavedDialog(app: Application.AsObject): void {
+        if (app.oidcConfig !== undefined) {
+            const dialogRef = this.dialog.open(AppSecretDialogComponent, {
+                data: app.oidcConfig,
+            });
+
+            dialogRef.afterClosed().subscribe(result => {
+                console.log('The dialog was closed');
+                this.router.navigate(['projects', this.projectId, 'apps', app.id]);
+            });
+        } else {
+            this.router.navigate(['projects', this.projectId, 'apps', app.id]);
+        }
+    }
+
+    public addUri(event: MatChipInputEvent, target: string): void {
+        const input = event.input;
+        const value = event.value.trim();
+
+        if (value !== '') {
+            if (target === 'REDIRECT') {
+                this.oidcApp.redirectUrisList.push(value);
+            } else if (target === 'POSTREDIRECT') {
+                this.oidcApp.postLogoutRedirectUrisList.push(value);
+            }
+        }
+
+        if (input) {
+            input.value = '';
+        }
+    }
+
+    public removeUri(uri: string, target: string): void {
+        if (target === 'REDIRECT') {
+            const index = this.oidcApp.redirectUrisList.indexOf(uri);
+
+            if (index !== undefined && index >= 0) {
+                this.oidcApp.redirectUrisList.splice(index, 1);
+            }
+        } else if (target === 'POSTREDIRECT') {
+            const index = this.oidcApp.postLogoutRedirectUrisList.indexOf(uri);
+
+            if (index !== undefined && index >= 0) {
+                this.oidcApp.postLogoutRedirectUrisList.splice(index, 1);
+            }
+        }
+
+    }
+
+    get name(): AbstractControl | null {
+        return this.form.get('name');
+    }
+
+
+    get responseTypesList(): AbstractControl | null {
+        return this.form.get('responseTypesList');
+    }
+
+
+    get grantTypesList(): AbstractControl | null {
+        return this.form.get('grantTypesList');
+    }
+
+
+    get applicationType(): AbstractControl | null {
+        return this.form.get('applicationType');
+    }
+
+    get authMethodType(): AbstractControl | null {
+        return this.form.get('authMethodType');
+    }
+}
+

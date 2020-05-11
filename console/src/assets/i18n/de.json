@@ -1,0 +1,501 @@
+{
+    "APP_NAME": "Citadel",
+    "HOME": {
+        "TITLE": "Citadel",
+        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+        "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
+        "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
+        "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
+        "PROTECTION": "Organisationsrichtlinien",
+        "PROTECTION_DESC": "Verwalten Sie Ihre Organisationsrichtlinien. Entdecken Sie einige vorgefertigte Lösungen, die Ihnen Zeit sparen und Sicherheit gewährleisten.",
+        "PROTECTION_BUTTON": "Erkunden",
+        "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
+        "PROJECTS_DESC": "Autorisieren Sie andere, Ihre eigenen Projekte zu verwenden oder definieren sie benutzerdefinierte Rollen für berechtigte Projekte",
+        "PROJECTS_BUTTON": "Projekt Übersicht",
+        "USERS": "Totale Kontrolle und Überwachbarkeit",
+        "USERS_DESC": "Überwachen Sie Ihr Rollenkonzept in Echtzeit. Ergreifen Sie sofort Maßnahmen.",
+        "USERS_BUTTON": "Benutzer anzeigen"
+    },
+    "MENU": {
+        "PERSONAL_INFO": "Persönliche Informationen",
+        "ORGANIZATION": "Organisation",
+        "PROJECT": "Projekte",
+        "USER": "Benutzer",
+        "LOGOUT": "abmelden",
+        "NEWORG":"Neue Organisation"
+    },
+    "ACTIONS": {
+        "SAVE": "speichern",
+        "NEW": "neu",
+        "CREATE": "create",
+        "CONTINUE": "Weiter",
+        "BACK": "zurück",
+        "CLOSE": "schliessen",
+        "INFO": "Info",
+        "OK": "Ok",
+        "VIEW": "Ansehen",
+        "DELETE": "löschen",
+        "REMOVE":"entfernen",
+        "VERIFY":"Verifizieren",
+        "FINISH":"Abschliessen"
+    },
+    "ERRORS": {
+        "REQUIRED": "Das Feld ist notwendig!"
+    },
+    "USER": {
+        "TITLE": "Persönliche Informationen",
+        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+        "PAGES": {
+            "LIST": "Benutzer",
+            "TITLE": "Benutzer",
+            "DESCRIPTION": "Hier können Sie neue User anlegen sowie bereits erfasste Userdaten bearbeiten, activieren oder deaktivieren",
+            "DETAIL": "Detail",
+            "CREATE": "Erstellen",
+            "MY": "Meine Informationen"
+        },
+        "MFA": {
+            "TITLE": "Multifaktor-Authentifizierung",
+            "DESCRIPTION": "Fügen Sie einen zweiten Faktor hinzu um optimale Sicherheit zu gewährleisten!",
+            "MANAGE_DESCRIPTION": "Managen Sie die Zweifaktormethoden von dem jeweilgen Nutzer",
+            "OTP": "OTP konfigurieren",
+            "OTP_DIALOG_TITLE": "OTP hinzufügen",
+            "OTP_DIALOG_DESCRIPTION": "Scannen Sie den OTP code mit einer Authenticatorapp und geben Sie den erhaltenen Code unten ein!",
+            "TYPE": {
+                "0":"Keine MFA definiert",
+                "1":"SMS",
+                "2":"OTP"
+            },
+            "STATE": {
+                "0": "Kein Status",
+                "1":"Nicht bereit",
+                "2":"Bereit",
+                "3":"gelöscht"
+            }
+        },
+        "CREATE": {
+            "TITLE": "Create User",
+            "DESCRIPTION": "Geben Sie die erforderlichen Daten unten ein!",
+            "NAMEANDEMAILSECTION":"Name und Email",
+            "GENDERLANGSECTION":"Geschlecht und Sprache",
+            "ADDRESSANDPHONESECTION":"Addresse und Erreichbarkeit",
+            "PASSWORDSECTION":"Vordefiniertes Passwort setzen"
+        },
+        "CODEDIALOG": {
+            "TITLE":"Nummer verifizieren",
+            "DESCRIPTION":"Geben Sie ihren erhaltenen Code ein!",
+            "CODE":"Code"
+        },
+        "DATA": {
+            "STATE": "Status",
+            "STATE1": "aktiv",
+            "STATE2": "inaktiv",
+            "STATE3": "gelöscht",
+            "STATE4": "gesperrt",
+            "STATE5": "supend",
+            "STATE6": "initial"
+        },
+        "PROFILE": {
+            "TITLE": "Profil",
+            "EMAIL": "Email",
+            "PHONE": "Phonenumber",
+            "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+            "USERNAME": "Benutzername",
+            "FIRSTNAME": "Vorname",
+            "LASTNAME": "Nachname",
+            "NICKNAME": "Spitzname",
+            "DISPLAYNAME": "Anzeigename",
+            "PREFERRED_LANGUAGE": "Sprache",
+            "GENDER": "Geschlecht"
+        },
+        "PASSWORD": {
+            "TITLE": "Passwort",
+            "DESCRIPTION": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
+            "OLD": "Aktuelles Passwort",
+            "NEW": "Neues Passwort",
+            "CONFIRM": "Neues Passwort Wiederholung",
+            "RESET": "Reset",
+            "SET":"Password setzen",
+            "RESENDNOTIFICATION": "Ànderung mitteilen",
+            "REQUIRED": "Das Feld ist notwendig!",
+            "MINLENGTHERROR":"Passwort muss mindestens {{value}} lang sein",
+            "NOTEQUAL":"Das Password muss übereinstimmen!"
+        },
+        "EMAIL": "Email",
+        "PHONE": "Telefonnummer",
+        "LOGINMETHODS": {
+            "TITLE": "Methoden zur Prüfung Ihrer Identität",
+            "DESCRIPTION": "Damit können wir bei der Anmeldung Ihre Identität bestätigen oder Sie kontaktieren, falls in Ihrem Konto verdächtige Aktivitäten festgestellt werden",
+            "EMAIL": {
+                "TITLE": "Email",
+                "VALID": "validiert",
+                "RESEND": "Verifikationsmail versenden"
+            },
+            "PHONE": {
+                "TITLE": "Telefon",
+                "VALID": "validiert",
+                "RESEND": "Verifikationsnachricht versenden"
+            },
+            "RESENDCODE": "Code senden",
+            "ENTERCODE":"Verifizieren",
+            "ENTERCODE_DESC":"Code verifizieren"
+        },
+        "ADDRESS": {
+            "TITLE": "Adresse",
+            "STREET": "Strasse/Nr",
+            "LOCALITY": "Ort",
+            "POSTAL_CODE": "Postleitzahl",
+            "REGION": "Kanton",
+            "COUNTRY": "Land"
+        },
+        "GRANTS": {
+            "TITLE": "Grants",
+            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden.",
+            "CREATE": {
+                "TITLE": "User Grant erstellen",
+                "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
+            }
+        },
+        "VALIDATION": {
+            "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
+            "REQUIRED": "Das Feld ist leer"
+        },
+        "STATE": {
+            "0":"unbekannt",
+            "1":"aktiv",
+            "2":"abgelaufen"
+        },
+        "SEARCH":{
+            "FOUND":"gefunden"
+        },
+        "TARGET": {
+            "SELF":"Suchen Sie oben nach Usern ihrer Organisation, Zum hinzufügen externer Benutzer",
+            "EXTERNAL":"Um User Ihrer Organisation hinzuzufügen",
+            "CLICKHERE":"Hier klicken"
+        },
+        "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
+        "SIGNEDOUT_BTN":"Anmelden",
+        "EDITACCOUNT":"Account bearbeiten",
+        "ADDACCOUNT":"Neuen Account hinzufügen"
+    },
+    "ORG": {
+        "PAGES": {
+            "LIST": "Organisationen",
+            "LISTDESCRIPTION":"Wählen Sie die Organisation für den neuen Kontext aus!",
+            "ACTIVE":"AKTIV",
+            "CREATE":"Organisation erstellen",
+            "ORGDETAIL_TITLE":"Geben Sie den Namen und die Domain für die neue Organisatino ein",
+            "ORGDOMAIN_TITLE":"Organisations Domain Verifikation",
+            "ORGDOMAIN_VERIFICATION":"Stellen Sie Ihre Webdomain bereit und überprüfen Sie deren Besitz indem sie eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken Sie zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
+            "ORGDOMAIN_VERIFICATION_SKIP":"Sie können die Überprüfung vorerst überspringen und Ihre Organisation weiter erstellen. Um Ihre Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
+            "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
+            "DOWNLOAD_FILE":"File download",
+            "SELECTORGTOOLTIP":"Wähle diese Organisation"
+        },
+        "STATE": {
+            "0": "nicht definiert",
+            "1": "aktiv",
+            "2": "inaktiv"
+        },
+        "POLICY": {
+            "TITLE":"Richtlinen festlegen",
+            "DESCRIPTION":"Vorgefertigte Lösungen, die Ihnen Zeit sparen und Ihre Sicherheit gewährleisten",
+            "PWD_COMPLEXITY": {
+                "TITLE":"Passwort Komplexität",
+                "DESCRIPTION":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
+                "TITLECREATE":"Kennwortkomplexitätsrichtlinie erstellen",
+                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen"
+            },
+            "PWD_AGE": {
+                "TITLE":"Passwort Maximaldauer",
+                "DESCRIPTION":"Sie können eine Maximalalter-Eigenschaft für Kennwörter festlegen. Diese Richtlinie enthält eine Warnung nach Ablauf einer bestimmten Zeit",
+                "TITLECREATE":"Password Maximaldauerrichtline festlegen",
+                "DESCRIPTIONCREATE":"Sie können eine Maximalalter-Eigenschaft für Kennwörter festlegen. Diese Richtlinie enthält eine Warnung nach Ablauf einer bestimmten Zeit"
+            },
+            "PWD_LOCKOUT": {
+                "TITLE":"Passwortsperre",
+                "DESCRIPTION":"Kennwortwiederholungen sind im Standardmodus unendlich. Sie müssen diese Erweiterung installieren, wenn Sie Wiederholungsversuche anzeigen oder eine maximale Versuchsnummer festlegen möchten.",
+                "TITLECREATE":"Kennwortsperrrichtlinie festlegen",
+                "DESCRIPTIONCREATE":"Kennwortwiederholungen sind im Standardmodus unendlich. Sie müssen diese Erweiterung installieren, wenn Sie Wiederholungsversuche anzeigen oder eine maximale Versuchsnummer festlegen möchten."
+            },
+            "BTN_INSTALL":"Installieren",
+            "BTN_EDIT":"Modifizieren",
+            "DATA": {
+                "DESCRIPTION":"Beschreibung",
+                "MINLENGTH":"Mindestlänge",
+                "HASNUMBER": "erfordert Zahl",
+                "HASSYMBOL": "erfordert Sonderzeichen",
+                "HASLOWERCASE": "erfordert Kleinbuchstaben",
+                "HASUPPERCASE": "erfordert Grossbuchstaben",
+                "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
+                "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
+                "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
+                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen"
+            },
+            "DELETE":"Richtlinie entfernen"
+        }
+    },
+    "ORG_DETAIL": {
+        "TITLE": "Organisation",
+        "DESCRIPTION": "Hier können Sie Ihre Organisationskonfiguration bearbeiten und Mitglieder verwalten",
+        "DETAIL": {
+            "TITLE": "Detail",
+            "NAME": "Name",
+            "DOMAIN": "Domain",
+            "STATE": {
+                "0": "nicht definiert",
+                "1": "aktiv",
+                "2": "inaktiv"
+            }
+        },
+        "MEMBER": {
+            "TITLE": "Members",
+            "USERNAME": "Benutzername",
+            "FIRSTNAME": "Vorname",
+            "LASTNAME": "Nachname",
+            "EMAIL": "Email",
+            "ROLES": "Rollen",
+            "ADD": "Member hinzufügen",
+            "ADDDESCRIPTION": "Geben Sie die mail addressen der hinzuzufügenden Nutzer ein!"
+        },
+        "TABLE": {
+            "TOTAL": "Einträge gesamt:",
+            "SELECTION": "Ausgewählte Elemente",
+            "DEACTIVATE": "User deaktivieren",
+            "ACTIVATE": "User aktivieren",
+            "DELETE": "User löschen"
+        }
+    },
+    "PROJECT": {
+        "PAGES": {
+            "TITLE": "Projekt",
+            "DESCRIPTION": "Hier können Sie wichtige Einstellungen prüfen und die Daten einsehen, mit denen das der Dienst konfiguriert worden ist",
+            "LIST": "Projekte",
+            "LISTDESCRIPTION":"Hier finden Sie alle Projekte, für die Sie Aktionen anzeigen oder ausführen dürfen. Wenn Sie kein Projekt finden können, wenden Sie sich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+            "DETAIL": "Detail",
+            "CREATE": "Projekt erstellen",
+            "CREATE_DESC": "Geben Sie den Namen ein",
+            "ROLE": "Rolle"
+        },
+        "STATE": {
+            "TITLE":"Status",
+            "0": "nicht definiert",
+            "1": "aktiv",
+            "2": "inaktiv"
+        },
+        "TYPE": {
+            "TITLE": "Typ",
+            "0": "unbekannter Typ",
+            "1": "selbsterstellt",
+            "2": "berechtigt"
+        },
+        "NAME": "Name",
+        "MEMBER": {
+            "TITLE": "Mitwirkende",
+            "TITLEDESC":"Mitwirkende können Änderungen an dieser Entität vornehmen",
+            "DESCRIPTION":"Hier finden Sie alle Mitwirkenden dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
+            "USERNAME": "Benutzername",
+            "FIRSTNAME": "Vorname",
+            "LASTNAME": "Nachname",
+            "EMAIL": "Email",
+            "ROLES": "Rollen"
+        },
+        "GRANT": {
+            "TITLE": "Grants",
+            "DESCRIPTION": "Gewähren Sie einer anderen Organisation Zugriff (Grant) auf dieses Projekt",
+            "CREATE": {
+                "TITLE": "Member Grant erstellen",
+                "SEL_USERS": "Selektieren Sie die gewünschten User für das Erstellen des Grants!",
+                "SEL_ROLES": "Selektieren Sie die gewünschten Rollen für das Erstellen des Grants!",
+                "SEL_PROJECT": "Suchen Sie nach dem Projekt",
+                "SEL_ORG": "Suchen Sie nach der Domain",
+                "ORG_TITLE":"Organisation",
+                "ORG_DESCRIPTION":"Sie sind im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
+                "ORG_DESCRIPTION_DESC":"Wechseln Sie den Context um die Organisation zu wechseln!",
+                "SEL_ORG_BUTTON": "Suche Organisation"
+            },
+            "PROJECTNAME":"Projekt Name",
+            "GRANTEDORG": "Granted Organization",
+            "GRANTEDORGDOMAIN": "Domain",
+            "CREATIONDATE": "Erstelldatum",
+            "CHANGEDATE": "Letzte Änderung",
+            "ROLENAMESLIST": "Rollen"
+        },
+        "APP": {
+            "TITLE": "Applikationen",
+            "NAME": "Name"
+        },
+        "ROLE": {
+            "TITLE": "Roles",
+            "DESCRIPTION":"Definieren Sie Rollen, die Sie bei der Erstellung eines Projekt-Grants vergeben können",
+            "NAME": "Name",
+            "DISPLAY_NAME": "Display Name",
+            "GROUP": "Gruppe",
+            "ACTIONS": "Aktion",
+            "ADDTITLE": "Rolle erstellen",
+            "ADDDESCRIPTION": "Geben Sie die Daten für die zu erstellende Rolle ein!",
+            "DELETE":"Rolle löschen"
+        },
+        "TABLE": {
+            "TOTAL": "Einträge gesamt:",
+            "SELECTION": "Ausgewählte Elemente",
+            "DEACTIVATE": "Projekt deaktivieren",
+            "ACTIVATE": "Projekt aktivieren",
+            "DELETE": "Projekt löschen",
+            "ORGNAME":"Org Name",
+            "ORGDOMAIN":"Org Domain",
+            "STATE":"Status",
+            "Type":"Typ",
+            "CREATIONDATE":"Erstelldatum",
+            "CHANGEDATE":"Letzte Änderung"
+        }
+    },
+    "APP": {
+        "LIST": "Applications",
+        "PAGES": {
+            "TITLE": "Applikation",
+            "DESCRIPTION": "Hier können Sie Ihre applikation bearbeiten und ihre Configuration ändern",
+            "CREATE_OIDC": "OIDC Applikation",
+            "CREATE_OIDC_DESc": "Geben Sie Ihre Applikationsdaten ein!",
+            "DETAIL": {
+                "TITLE": "Detail",
+                "STATE": {
+                    "0": "nicht definiert",
+                    "1": "aktiv",
+                    "2": "inaktiv"
+                }
+            }
+        },
+        "NAME": "Name",
+        "OIDC": {
+            "TITLE": "OIDC Konfiguration",
+            "CLIENTID": "Client ID",
+            "CLIENTSECRET": "Client Secret",
+            "CLIENTSECRET_DESCRIPTION": "Speichern Sie Ihr Clientsecret, da es verschwindet, sobald der Dialog geschlossen wird!",
+            "REGENERATESECRET": "Secret neu generieren",
+            "REDIRECT": "Redirect URIs",
+            "POSTLOGOUTREDIRECT":"Post logout URIs",
+            "RESPONSE": "Response Types",
+            "GRANT": "Grant Types",
+            "APPTYPE": "App Types",
+            "RESPONSE0": "Code",
+            "RESPONSE1": "Id Token",
+            "RESPONSE2": "Token-Id Token",
+            "GRANT0": "Authorization Code",
+            "GRANT1": "Implicit",
+            "GRANT2": "Refresh Token",
+            "APPTYPE0": "Web",
+            "APPTYPE1": "User Agent",
+            "APPTYPE2": "Native",
+            "AUTHMETHOD":"Auth Method",
+            "AUTHMETHOD0":"Basic",
+            "AUTHMETHOD1":"Post",
+            "AUTHMETHOD2":"None"
+        }
+    },
+    "GENDERS": {
+        "0":"unbekannt",
+        "1": "weiblich",
+        "2": "männlich",
+        "3": "anderes",
+        "4": "unbekannt"
+    },
+    "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "Englisch"
+    },
+    "MEMBER":{
+        "ADD":"Mitwirkenden hinzufügen"
+    },
+    "ROLES": {
+        "ORG_OWNER": "Org Owner",
+        "ORG_MEMBER_VIEWER": "Org Member Viewer",
+        "ORG_PROJECT_ROLE_VIEWER": "Org Project Role Viewer",
+        "ORG_EDITOR":"Org Editor",
+        "ORG_VIEWER":"Org Viewer",
+        "ORG_MEMBER_EDITOR":"Org Member Editor",
+        "ORG_PROJECT_CREATOR":"Org Project Creator",
+        "ORG_PROJECT_EDITOR":"Org Project Editor",
+        "ORG_PROJECT_VIEWER":"Org Project Viewer",
+        "ORG_PROJECT_MEMBER_EDITOR":"Org Project Member Editor",
+        "ORG_PROJECT_MEMBER_VIEWER":"Org Project Member Viewer",
+        "ORG_PROJECT_ROLE_EDITOR":"Org Project Role Editor",
+        "ORG_PROJECT_APP_EDITOR":"Org Project App Editor",
+        "ORG_PROJECT_APP_VIEWER":"Org Project App Viewer",
+        "ORG_PROJECT_GRANT_EDITOR":"Org Project Grant Editor" ,
+        "ORG_PROJECT_GRANT_VIEWER":"Org Project Grant Viewer",
+        "ORG_PROJECT_GRANT_MEMBER_EDITOR":"Org Project Grant Member Editor",
+        "ORG_PROJECT_GRANT_MEMBER_VIEWER":"Org Project Grant Member Viewer",
+        "ORG_USER_EDITOR":"Org User Editor",
+        "ORG_USER_VIEWER":"Org User Viewer",
+        "ORG_USER_GRANT_EDITOR":"Org User Grant Editor",
+        "ORG_USER_GRANT_VIEWER":"Org User Grant Viewer",
+        "ORG_POLICY_EDITOR":"Org Policy Editor",
+        "ORG_POLICY_VIEWER":"Org Policy Viewer",
+        "PROJECT_OWNER":"Project Owner",
+        "PROJECT_MEMBER_EDITOR":"Project Member Editor",
+        "PROJECT_APP_EDITOR":"Project App Editor",
+        "PROJECT_APP_VIEWER":"Project App Viewer",
+        "PROJECT_USER_GRANT_EDITOR":"Project User Grant Editor",
+        "PROJECT_USER_GRANT_VIEWER":"Project User Grant Viewer",
+        "PROJECT_ROLE_EDITOR": "Project Role Editor",
+        "PROJECT_MEMBER_VIEWER": "Project Member Viewer",
+        "PROJECT_GRANT_EDITOR":"Project Grant Editor",
+        "PROJECT_GRANT_VIEWER":"Project Grant Viewer",
+        "PROJECT_GRANT_MEMBER_EDITOR":"Project Grant Member Editor",
+        "PROJECT_GRANT_MEMBER_VIEWER":"Project Grant Member Viewer",
+        "PROJECT_GRANT_OWNER":"Project Grant Owner",
+        "PROJECT_GRANT_USER_GRANT_EDITOR":"Project Grant User Editor",
+        "PROJECT_GRANT_USER_GRANT_VIEWER":"Project Grant User Grant Viewer"
+    },
+    "GRANTS": {
+        "DELETE":"Grant löschen",
+        "ADD":"Grant erstellen",
+        "ADD_BTN":"Neu"
+    },
+    "CHANGES": {
+        "LISTTITLE":"Letzte Änderungen",
+        "ORG": {
+            "TITLE":"Aktivität",
+            "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die die Organisation betreffen"
+        },
+        "PROJECT": {
+            "TITLE":"Aktivität",
+            "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die das Project betreffen"
+        },
+        "USER": {
+            "TITLE":"Aktivität",
+            "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die den Benutzer betreffen"
+        },
+        "EVENTS": {
+            "org.added": "Org erstellt",
+            "org.changed":"Org editiert",
+            "org.member.added":"Organisation Member erstellt",
+            "org.member.removed":"Organisation Member gelöscht",
+            "project.added": "Projekt erstellt",
+            "project.changed":"Projekt editiert",
+            "project.deactivated":"Projekt deaktiviert",
+            "project.member.added":"Projekt Member erstellt",
+            "project.member.removed":"Projekt Member gelöscht",
+            "project.role.added":"Rolle erstellt",
+            "project.role.removed":"Rolle gelöscht",
+            "user.email.verification.sended": "User email verifiziert",
+            "user.phone.verificationsended":"User phone verifikation gesendet",
+            "user.phone.code":"User phone code erstellt",
+            "user.initialization.verification.sended":"User mail verifikation gesendet",
+            "user.initialization.code.created":"Initialisationscode gesendet",
+            "created.user.email.code":"User email code erstellt",
+            "created.user.phone.code":"Phone code erstellt",
+            "updated.user.password": "User password update",
+            "skipped.init.mfauser": "Mfa Methode übersprungen",
+            "verified.user.email":"User email verifiziert",
+            "registered.user":"User registriert",
+            "created.user":"User erstellt",
+            "skipped.init.mfa.user":"User MFA init überspungen",
+            "user.email.password.request.sended":"User Email Password Anfrage gesended",
+            "user.password.set.requested":"Password Anfrage",
+            "user.phone.verification.sended":"User Nummer verifikation gesended",
+            "updated.user.profile":"User Profil update",
+            "user.email.init.sended":"User Email init sended"
+        }
+    }
+}

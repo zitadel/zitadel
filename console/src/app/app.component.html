@@ -1,0 +1,101 @@
+<mat-toolbar class="root-header">
+    <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+    </button>
+    <a *ngIf="(isHandset$ | async) == false" class="title ailerons" [routerLink]="['/']">
+        <img class="logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
+            src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
+        <ng-template #lighttheme>
+            <img class="logo" src="../assets/images/zitadel-logo-oneline-lightdesign.svg" />
+        </ng-template>
+    </a>
+
+    <button (click)="loadOrgs()" *ngIf="profile?.id && org" mat-button
+        [matMenuTriggerFor]="menu">{{org?.name ? org.name : 'NO NAME'}}
+        <mat-icon>
+            arrow_drop_down</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+        <mat-progress-bar *ngIf="orgLoading" color="accent" mode="indeterminate"></mat-progress-bar>
+        <button class="show-all" mat-menu-item [routerLink]="[ '/orgs' ]">Show all organizations</button>
+
+        <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id" *ngFor="let temporg of orgs"
+            mat-menu-item (click)="setActiveOrg(temporg)">
+            <mat-icon class="avatar">business</mat-icon>
+            {{temporg?.name ? temporg.name : 'NO NAME'}}
+        </button>
+
+        <ng-template appHasRole [appHasRole]="['iam.write']">
+            <button mat-menu-item [routerLink]="[ '/orgs/create' ]">
+                <mat-icon class="avatar">add</mat-icon>
+                {{'MENU.NEWORG' | translate}}
+            </button>
+        </ng-template>
+    </mat-menu>
+    <span class="fill-space"></span>
+
+    <div matTooltip="IAM user" class="iamreadwrite"></div>
+    <div (clickOutside)="closeAccountCard()" class="icon-container">
+        <div class="avatar-wrapper dontcloseonclick" (click)="showAccount = !showAccount">
+            <div class="avatar-circle dontcloseonclick" [ngClass]="{'active': showAccount}">
+                <img class="avatar dontcloseonclick" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
+                    src="../assets/images/account-circle-outline.png" />
+                <ng-template #lighttheme>
+                    <img class="avatar dontcloseonclick" src="../assets/images/account-circle-outline-dark.png" />
+                </ng-template>
+            </div>
+        </div>
+        <app-accounts-card @accounts class="a_card  mat-elevation-z5" *ngIf="showAccount" (close)="showAccount = false"
+            [profile]="profile" [iamuser]="iamreadwrite">
+        </app-accounts-card>
+    </div>
+</mat-toolbar>
+
+<mat-drawer-container *ngIf="(authService.user | async) || {} as user" class="main-container">
+    <mat-drawer #drawer class="side" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)">
+        <div class="side-column">
+            <div class="list">
+                <a *ngIf="authService.authenticationChanged | async" class="nav-item" [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/user/me']">
+                    <mat-icon class="icon" svgIcon="mdi_account_circle_outline"></mat-icon>
+                    <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
+                </a>
+
+                <a *ngIf="showOrgSection && org?.id" class="nav-item" [routerLinkActive]="['active']"
+                    [routerLink]="[ '/orgs', org.id]">
+                    <mat-icon class="icon">business</mat-icon>
+                    <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
+                </a>
+
+                <a *ngIf="showProjectSection" class="nav-item" [routerLinkActive]="['active']"
+                    [routerLink]="[ '/projects']">
+                    <mat-icon class="icon">folder_open</mat-icon>
+                    <span class="label">{{ 'MENU.PROJECT' | translate }}</span>
+                </a>
+
+                <a *ngIf="showUserSection" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/users']"
+                    [routerLinkActiveOptions]="{ exact: true }">
+                    <mat-icon class="icon">people_outline</mat-icon>
+                    <span class="label">{{ 'MENU.USER' | translate }}</span>
+                </a>
+
+                <span class="fill-space"></span>
+                <a class="nav-item" (click)="authService.signout()">
+                    <mat-icon class="icon" svgIcon="mdi_logout"></mat-icon>
+                    <span class="label">{{ 'MENU.LOGOUT' | translate }}</span>
+                </a>
+
+            </div>
+            <span class="fill-space"></span>
+            <div class="footer">
+                <a href="https://caos.ch/impressum/" target="_blank" rel="noreferrer">AGB</a>
+                <a href="https://caos.ch/impressum/" target="_blank" rel="noreferrer">Impressum</a></div>
+        </div>
+    </mat-drawer>
+    <mat-drawer-content class="content">
+        <div class="router" [@routeAnimations]="prepareRoute(outlet)">
+            <router-outlet #outlet="outlet"></router-outlet>
+        </div>
+    </mat-drawer-content>
+</mat-drawer-container>

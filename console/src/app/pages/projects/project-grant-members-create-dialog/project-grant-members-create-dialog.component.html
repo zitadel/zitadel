@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>
+    <span class="title">{{'MEMBER.ADD' | translate}}</span>
+</h1>
+<p class="desc"> {{'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate}}</p>
+<div mat-dialog-content>
+    <app-search-user-autocomplete (selectionChanged)="selectUsers($event)">
+    </app-search-user-autocomplete>
+
+    <mat-form-field class="full-width">
+        <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
+        <mat-select [(ngModel)]="rolesList" multiple>
+            <mat-option *ngFor="let role of data.roles" [value]="role">
+                {{ role }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()">
+        cancel
+    </button>
+
+    <button [disabled]="userIds.length == 0 || rolesList.length == 0" color="primary" mat-raised-button
+        class="ok-button" (click)="closeDialogWithSuccess()">
+        Add
+    </button>
+</div>

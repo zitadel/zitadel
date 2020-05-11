@@ -1,0 +1,7 @@
+{
+    "authServiceUrl": "https://api-test.zitadel.dev",
+    "mgmtServiceUrl": "https://api-test.zitadel.dev",
+    "adminServiceUrl":"https://api-test.zitadel.dev",
+    "issuer": "https://issuer-test.zitadel.dev",
+    "clientid": "293876451759882777@Zitadel.DEFAULT"
+}

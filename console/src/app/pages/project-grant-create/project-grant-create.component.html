@@ -1,0 +1,59 @@
+<div class="max-width-container container">
+    <div class="abort-container">
+        <button (click)="close()" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+        <span class="abort">{{ 'PROJECT.GRANT.CREATE.TITLE' | translate }}</span><span class="abort-2">Step
+            {{ currentCreateStep }} of
+            {{ STEPS }}</span>
+    </div>
+
+    <ng-container *ngIf="currentCreateStep === 1">
+        <h1>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</h1>
+
+        <form (ngSubmit)="searchOrg(domain)">
+            <mat-form-field class="org-domain">
+                <mat-label>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</mat-label>
+                <input #domain matInput />
+            </mat-form-field>
+
+            <button [disabled]="domain.value.length == 0" color="primary" type="submit" class="domain-button"
+                mat-raised-button>
+                {{'PROJECT.GRANT.CREATE.SEL_ORG_BUTTON' | translate}}
+            </button>
+        </form>
+
+        <div class="card org" *ngIf="org">
+            <p>{{org?.name}}</p>
+            <span *ngIf="org.creationDate">created:
+                {{dateFromTimestamp(org.creationDate) | date: 'EEE dd. MMM, HH:mm'}}</span>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="currentCreateStep === 2">
+        <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
+
+        <app-card *ngIf="projectId">
+            <app-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId"></app-project-roles>
+        </app-card>
+    </ng-container>
+
+    <div class="btn-container">
+        <ng-container *ngIf="currentCreateStep === 1">
+            <button [disabled]="!org" (click)="next()" color="primary" mat-raised-button class="big-button"
+                cdkFocusInitial>
+                {{ 'ACTIONS.CONTINUE' | translate }}
+            </button>
+        </ng-container>
+
+        <ng-container *ngIf="currentCreateStep === STEPS">
+            <button (click)="previous()" color="primary" mat-button class="small-button">
+                {{ 'ACTIONS.BACK' | translate }}
+            </button>
+            <button color="primary" [disabled]="!org || rolesList.length == 0" (click)="addGrant()" mat-raised-button
+                class="big-button" cdkFocusInitial>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+        </ng-container>
+    </div>
+</div>
