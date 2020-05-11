@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"time"
 )
 
@@ -23,6 +24,7 @@ type handler struct {
 
 type EventstoreRepos struct {
 	ProjectEvents *proj_event.ProjectEventstore
+	UserEvents    *usr_event.UserEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []spooler.Handler {
@@ -33,7 +35,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&ProjectGrantMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount}},
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
-		&UserGrant{handler: handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount}},
+		&UserGrant{handler: handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount}, projectEvents: repos.ProjectEvents, userEvents: repos.UserEvents},
 	}
 }
 
