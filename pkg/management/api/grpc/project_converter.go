@@ -73,9 +73,9 @@ func projectRoleSearchResponseFromModel(response *proj_model.ProjectRoleSearchRe
 }
 
 func projectRoleViewsFromModel(roles []*proj_model.ProjectRoleView) []*ProjectRoleView {
-	converted := make([]*ProjectRoleView, 0)
-	for _, q := range roles {
-		converted = append(converted, projectRoleViewFromModel(q))
+	converted := make([]*ProjectRoleView, len(roles))
+	for i, role := range roles {
+		converted[i] = projectRoleViewFromModel(role)
 	}
 	return converted
 }
