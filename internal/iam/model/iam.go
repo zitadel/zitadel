@@ -10,4 +10,5 @@ type Iam struct {
 	IamProjectID string
 	SetUpDone    bool
 	SetUpStarted bool
+	Members      []*IamMember
 }

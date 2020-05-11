@@ -14,30 +14,35 @@ const (
 
 type Iam struct {
 	es_models.ObjectRoot
-	SetUpStarted bool   `json:"-"`
-	SetUpDone    bool   `json:"-"`
-	GlobalOrgID  string `json:"globalOrgId,omitempty"`
-	IamProjectID string `json:"iamProjectId,omitempty"`
+	SetUpStarted bool         `json:"-"`
+	SetUpDone    bool         `json:"-"`
+	GlobalOrgID  string       `json:"globalOrgId,omitempty"`
+	IamProjectID string       `json:"iamProjectId,omitempty"`
+	Members      []*IamMember `json:"-"`
 }
 
 func IamFromModel(iam *model.Iam) *Iam {
+	members := IamMembersFromModel(iam.Members)
 	converted := &Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
 		SetUpDone:    iam.SetUpDone,
 		GlobalOrgID:  iam.GlobalOrgID,
 		IamProjectID: iam.IamProjectID,
+		Members:      iam.Members,
 	}
 	return converted
 }
 
 func IamToModel(iam *Iam) *model.Iam {
+	members := IamMembersToModel(iam.Members)
 	converted := &model.Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
 		SetUpDone:    iam.SetUpDone,
 		GlobalOrgID:  iam.GlobalOrgID,
 		IamProjectID: iam.IamProjectID,
+		Members:      iam.Members,
 	}
 	return converted
 }
