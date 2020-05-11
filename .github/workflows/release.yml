@@ -22,21 +22,25 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm ci 
     - run: npm run lint
-    - run: npm run proto
     - run: npm run prodbuild
     - run: npm test
     - uses: actions/upload-artifact@v1
       with:
         name: angular
-        path: hodor.txt
+        path: dist/console
   
   go: # TODO Implement proper build and cache
     runs-on: ubuntu-18.04
+    needs: angular
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
       with:
         go-version: ${{ env.GO_VERSION }}
+    - uses: actions/download-artifact@v1
+      with:
+        name: angular
+        path: .build/angular
     - run: go test -race -v -coverprofile=profile.cov ./...
     - run: go build -o zitadel cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
@@ -54,21 +58,17 @@ jobs:
 
   container-prod: # Artifact paths need better place
     runs-on: ubuntu-18.04
-    needs: [angular, go]
+    needs: go
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
-    - uses: actions/download-artifact@v1
-      with:
-        name: angular
-        path: .build/angular
     - uses: actions/download-artifact@v1
       with:
         name: go-binary
         path: .build/go
     - uses: docker/build-push-action@v1
       with:
-        dockerfile: build/dockerfile-prod
+        dockerfile: build/docker/prod
         username: ${{ github.actor }}
         password: ${{ github.token }}
         registry: ${{ env.REGISTRY }}
@@ -78,7 +78,7 @@ jobs:
   
   container-vulnerability-scan:
     runs-on: ubuntu-18.04
-    needs: [container-prod]
+    needs: container-prod
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -92,7 +92,7 @@ jobs:
     - uses: anchore/scan-action@master
       with:
         image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ steps.vars.outputs.sha_short }}"
-        dockerfile-path: "./build/dockerfile-prod"
+        dockerfile-path: "./build/docker/prod"
         fail-build: false
     - name: anchore inline scan JSON results
       run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
@@ -103,7 +103,7 @@ jobs:
 
   container-test: # TODO Implement proper test
     runs-on: ubuntu-18.04
-    needs: [container-prod]
+    needs: container-prod
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
