@@ -56,11 +56,11 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	if err != nil {
 		return err
 	}
-	_ = request
-	//if request.PasswordChecked() {
-	//	return nil, errors.ThrowPreconditionFailed(nil, "EVENT-52NGs", "user already chosen")
-	//}
 	return errors.ThrowUnimplemented(nil, "EVENT-asjod", "user by username not yet implemented")
+	//check username
+	var userID string
+	request.UserID = userID
+	return repo.AuthRequests.SaveAuthRequest(ctx, request)
 }
 
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password string, info *model.BrowserInfo) error {
@@ -68,12 +68,9 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	if err != nil {
 		return err
 	}
-	//if request.UserID == 0 {
-	//
-	//}
-	//if request.PasswordChecked() {
-	//	return nil, errors.ThrowPreconditionFailed(nil, "EVENT-s6Gn3", "password already checked")
-	//}
+	if request.UserID == userID {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-ds35D", "user id does not match request id ")
+	}
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
 

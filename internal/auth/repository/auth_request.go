@@ -11,7 +11,6 @@ type AuthRequestRepository interface {
 	AuthRequestByID(ctx context.Context, id string) (*model.AuthRequest, error)
 	CheckUsername(ctx context.Context, id, username string) error
 	VerifyPassword(ctx context.Context, id, userID, password string, info *model.BrowserInfo) error
-	//RequestPasswordReset(ctx context.Context, id, userID string, info *model.BrowserInfo) (*model.AuthRequest, error) //?
 	VerifyMfaOTP(ctx context.Context, agentID, authRequestID string, code string, info *model.BrowserInfo) error
-	//CreateToken(ctx context.Context, agentID, userID string, lifetime time.Duration) (*model.Token, error)
+	//CreateToken(ctx context.Context, agentID, userID string, lifetime time.Duration) (*model.Token, error) TODO: ?
 }
