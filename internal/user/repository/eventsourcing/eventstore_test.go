@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
 	"net"
 	"testing"
 	"time"
@@ -15,6 +16,9 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	repo_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/golang/mock/gomock"
+	"testing"
+	"time"
 )
 
 func TestUserByID(t *testing.T) {

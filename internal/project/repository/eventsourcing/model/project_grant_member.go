@@ -41,29 +41,19 @@ func GrantMembersFromModel(members []*model.ProjectGrantMember) []*ProjectGrantM
 
 func GrantMemberFromModel(member *model.ProjectGrantMember) *ProjectGrantMember {
 	return &ProjectGrantMember{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  member.ObjectRoot.AggregateID,
-			Sequence:     member.Sequence,
-			ChangeDate:   member.ChangeDate,
-			CreationDate: member.CreationDate,
-		},
-		GrantID: member.GrantID,
-		UserID:  member.UserID,
-		Roles:   member.Roles,
+		ObjectRoot: member.ObjectRoot,
+		GrantID:    member.GrantID,
+		UserID:     member.UserID,
+		Roles:      member.Roles,
 	}
 }
 
 func GrantMemberToModel(member *ProjectGrantMember) *model.ProjectGrantMember {
 	return &model.ProjectGrantMember{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID:  member.AggregateID,
-			ChangeDate:   member.ChangeDate,
-			CreationDate: member.CreationDate,
-			Sequence:     member.Sequence,
-		},
-		GrantID: member.GrantID,
-		UserID:  member.UserID,
-		Roles:   member.Roles,
+		ObjectRoot: member.ObjectRoot,
+		GrantID:    member.GrantID,
+		UserID:     member.UserID,
+		Roles:      member.Roles,
 	}
 }
 

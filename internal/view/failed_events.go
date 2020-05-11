@@ -12,10 +12,10 @@ const (
 )
 
 type FailedEvent struct {
-	ViewName      string `gorm:"column:view_name;primary_key"`
-	FailedSequnce uint64 `gorm:"column:failed_sequence;primary_key`
-	FailureCount  uint64 `gorm:"column:failure_count`
-	ErrMsg        uint64 `gorm:"column:err_msg`
+	ViewName       string `gorm:"column:view_name;primary_key"`
+	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key`
+	FailureCount   uint64 `gorm:"column:failure_count`
+	ErrMsg         string `gorm:"column:err_msg`
 }
 
 type FailedEventSearchQuery struct {
@@ -71,18 +71,18 @@ func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*F
 	failedEvent := new(FailedEvent)
 	queries := []SearchQuery{
 		FailedEventSearchQuery{Key: FAILEDEVENTKEY_VIEW_NAME, Method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, Value: viewName},
-		FailedEventSearchQuery{Key: FAILEDEVENTKEY_FAILED_SEQUENCE, Method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, Value: sequence},
+		FailedEventSearchQuery{Key: FAILEDEVENTKEY_FAILED_SEQUENCE, Method: model.SEARCHMETHOD_EQUALS, Value: sequence},
 	}
 	query := PrepareGetByQuery(table, queries...)
-	err := query(db, sequence)
+	err := query(db, failedEvent)
 
 	if err == nil {
 		return failedEvent, nil
 	}
 
-	if gorm.IsRecordNotFoundError(err) {
+	if errors.IsNotFound(err) {
 		failedEvent.ViewName = viewName
-		failedEvent.FailedSequnce = sequence
+		failedEvent.FailedSequence = sequence
 		failedEvent.FailureCount = 0
 		return failedEvent, nil
 	}

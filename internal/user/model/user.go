@@ -16,12 +16,11 @@ type User struct {
 	*Email
 	*Phone
 	*Address
-	InitCode       *InitUserCode
-	EmailCode      *EmailCode
-	PhoneCode      *PhoneCode
-	PasswordCode   *PasswordCode
-	OTP            *OTP
-	SkippedMfaInit time.Time
+	InitCode     *InitUserCode
+	EmailCode    *EmailCode
+	PhoneCode    *PhoneCode
+	PasswordCode *PasswordCode
+	OTP          *OTP
 }
 
 type InitUserCode struct {

@@ -25,11 +25,6 @@ type PasswordCode struct {
 	NotificationType int32               `json:"notificationType,omitempty"`
 }
 
-type PasswordCheck struct {
-	UserAgentID string       `json:"userAgentID"`
-	BrowserInfo *BrowserInfo `json:"browserInfo"`
-}
-
 func PasswordFromModel(password *model.Password) *Password {
 	return &Password{
 		ObjectRoot:     password.ObjectRoot,

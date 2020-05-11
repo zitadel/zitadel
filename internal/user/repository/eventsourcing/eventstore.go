@@ -18,6 +18,9 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/pquerna/otp/totp"
+	"github.com/sony/sonyflake"
+	"strconv"
 )
 
 type UserEventstore struct {

@@ -13,6 +13,9 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/golang/mock/gomock"
+	"github.com/sony/sonyflake"
+	"time"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *UserEventstore {
@@ -41,11 +44,6 @@ func GetMockedEventstoreWithPw(ctrl *gomock.Controller, mockEs *mock.MockEventst
 	if password {
 		es.PasswordVerificationCode = GetMockPwGenerator(ctrl)
 		es.PasswordAlg = crypto.CreateMockHashAlg(ctrl)
-		//hash.EXPECT().Hash(gomock.Any()).Return(nil, nil)
-		//hash.EXPECT().Algorithm().Return("bcrypt")
-		//hash.EXPECT().CompareHash(gomock.Any(), gomock.Any()).Return(nil)
-		//hash.EXPECT().Algorithm().Return("bcrypt")
-		//
 	}
 	return es
 }
