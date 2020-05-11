@@ -12,6 +12,9 @@ jobs:
 
   angular: # TODO Implement proper build and cache and coverage upload
     runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./console
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
@@ -19,6 +22,7 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm ci 
     - run: npm run lint
+    - run: npm run proto
     - run: npm run prodbuild
     - run: npm test
     - uses: actions/upload-artifact@v1
