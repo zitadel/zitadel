@@ -111,9 +111,9 @@ func applicationSearchRequestsToModel(request *ApplicationSearchRequest) *proj_m
 }
 
 func applicationSearchQueriesToModel(queries []*ApplicationSearchQuery) []*proj_model.ApplicationSearchQuery {
-	converted := make([]*proj_model.ApplicationSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, applicationSearchQueryToModel(q))
+	converted := make([]*proj_model.ApplicationSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = applicationSearchQueryToModel(q)
 	}
 	return converted
 }
