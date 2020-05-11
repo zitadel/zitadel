@@ -71,6 +71,10 @@ Admin:
           User: 'eventstore'
           Database: 'eventstore'
           SSLmode: disable
+      Cache:
+        Type: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
 
 Console:
   Port: 50050

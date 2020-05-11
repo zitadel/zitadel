@@ -1,8 +1,11 @@
 package eventsourcing
 
 import (
+	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
@@ -13,10 +16,11 @@ type Config struct {
 
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
-	OrgRepo
+	eventstore.OrgRepo
+	eventstore.UserRepo
 }
 
-func Start(conf Config) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -34,8 +38,16 @@ func Start(conf Config) (*EsRepository, error) {
 
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
 
+	user, err := es_usr.StartUser(es_usr.UserConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
 	return &EsRepository{
-		OrgRepo{org},
+		eventstore.OrgRepo{org},
+		eventstore.UserRepo{user},
 	}, nil
 }
 
