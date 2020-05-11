@@ -994,7 +994,6 @@ service ManagementService {
         };
     }
 
-
     //USER_GRANT
     rpc SearchUserGrants(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
         option (google.api.http) = {
@@ -1058,6 +1057,16 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.write"
+        };
+    }
+
+    rpc RemoveUserGrant(UserGrantID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/grants/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.delete"
         };
     }
 
@@ -1362,15 +1371,16 @@ enum SearchMethod {
 
 message UserProfile {
     string id = 1;
-    UserState state = 2;
-    string first_name = 3;
-    string last_name = 4;
-    string nick_name = 5;
-    string display_name = 6;
-    string preferred_language = 7;
-    Gender gender = 8;
-    string user_name = 9;
-    uint64 sequence = 10;
+    string first_name = 2;
+    string last_name = 3;
+    string nick_name = 4;
+    string display_name = 5;
+    string preferred_language = 6;
+    Gender gender = 7;
+    string user_name = 8;
+    uint64 sequence = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp change_date = 11;
 }
 
 message UpdateUserProfileRequest {
@@ -1388,6 +1398,8 @@ message UserEmail {
     string email = 2;
     bool is_email_verified = 3;
     uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
 }
 
 message UpdateUserEmailRequest {
@@ -1401,6 +1413,8 @@ message UserPhone {
     string phone = 2;
     bool is_phone_verified = 3;
     uint64 sequence = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
 }
 
 message UpdateUserPhoneRequest {
@@ -1417,6 +1431,8 @@ message UserAddress {
     string region = 5;
     string street_address = 6;
     uint64 sequence = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    google.protobuf.Timestamp change_date = 9;
 }
 
 message UpdateUserAddressRequest {
@@ -2089,9 +2105,8 @@ message UserGrant {
 
 message UserGrantCreate {
     string user_id = 1;
-    string org_id = 2;
-    string project_id = 3;
-    repeated string role_keys = 4;
+    string project_id = 2;
+    repeated string role_keys = 3;
 }
 
 message UserGrantUpdate {

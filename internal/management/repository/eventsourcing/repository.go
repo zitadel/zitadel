@@ -6,6 +6,8 @@ import (
 
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
 
 type Config struct {
@@ -17,6 +19,8 @@ type Config struct {
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
 	ProjectRepo
+	UserRepo
+	UserGrantRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -42,9 +46,24 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
-
+	user, err := es_usr.StartUser(es_usr.UserConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+	usergrant, err := es_grant.StartUserGrant(es_grant.UserGrantConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	})
+	if err != nil {
+		return nil, err
+	}
 	return &EsRepository{
 		ProjectRepo{project},
+		UserRepo{user},
+		UserGrantRepo{usergrant},
 	}, nil
 }
 

@@ -3185,6 +3185,34 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "put": {
         "operationId": "UpdateUserGrant",
         "responses": {
@@ -5477,6 +5505,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5496,6 +5532,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5562,9 +5606,6 @@
       "type": "object",
       "properties": {
         "user_id": {
-          "type": "string"
-        },
-        "org_id": {
           "type": "string"
         },
         "project_id": {
@@ -5705,6 +5746,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -5713,9 +5762,6 @@
       "properties": {
         "id": {
           "type": "string"
-        },
-        "state": {
-          "$ref": "#/definitions/v1UserState"
         },
         "first_name": {
           "type": "string"
@@ -5741,6 +5787,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
