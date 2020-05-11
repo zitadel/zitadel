@@ -42,6 +42,7 @@ SystemDefaults:
       Issuer: 'Zitadel'
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
+  IamId: 'IAM'
   SetUp:
     GlobalOrg: 'Global'
       IAMProject: 'Zitadel'

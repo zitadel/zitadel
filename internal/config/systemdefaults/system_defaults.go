@@ -1,11 +1,16 @@
 package systemdefaults
 
-import "github.com/caos/zitadel/internal/crypto"
+import (
+	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/crypto"
+)
 
 type SystemDefaults struct {
 	SecretGenerators    SecretGenerators
 	UserVerificationKey *crypto.KeyConfig
 	Multifactors        MultifactorConfig
+	IamId               string
+	SetUp               types.IAMSetUp
 }
 
 type SecretGenerators struct {

@@ -1,7 +1,9 @@
 package eventsourcing
 
 import (
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/setup"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -12,6 +14,7 @@ type Config struct {
 	Eventstore es_int.Config
 	//View       view.ViewConfig
 	//Spooler    spooler.SpoolerConfig
+
 }
 
 type EsRepository struct {
@@ -45,6 +48,12 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+
+	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user}
+	setup := setup.StartSetup(systemDefaults, eventstoreRepos)
+	err = setup.Execute()
+	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to execute setup")
+
 	return &EsRepository{
 		eventstore.OrgRepo{org},
 		eventstore.UserRepo{user},
