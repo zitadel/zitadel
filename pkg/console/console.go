@@ -1,3 +1,5 @@
+//go:generate /Users/ffo/go/bin/statik -src=../../console/dist/app
+
 package console
 
 import (
