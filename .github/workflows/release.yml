@@ -28,7 +28,7 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: angular
-        path: dist/console
+        path: console/dist/console
   
   go: # TODO Implement proper build and cache
     runs-on: ubuntu-18.04
