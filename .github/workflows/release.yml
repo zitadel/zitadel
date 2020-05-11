@@ -42,9 +42,9 @@ jobs:
       with:
         name: angular
         path: console/dist/app
+    - run: go test -race -v -coverprofile=profile.cov ./...
     - run: ./build/console/generate-static.sh
     - run: cat pkg/console/statik/statik.go
-    - run: go test -race -v -coverprofile=profile.cov ./...
     - run: go build -o zitadel cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:
