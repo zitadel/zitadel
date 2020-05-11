@@ -7,6 +7,8 @@ import (
 	"path"
 
 	"github.com/rakyll/statik/fs"
+
+	_ "./statik"
 )
 
 type Config struct {
