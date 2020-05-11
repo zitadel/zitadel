@@ -22,6 +22,7 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm ci 
     - run: npm run lint
+    - run: npm run proto
     - run: npm run prodbuild
     - run: npm test
     - uses: actions/upload-artifact@v1
