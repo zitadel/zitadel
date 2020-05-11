@@ -2,8 +2,9 @@ package console
 
 import (
 	"context"
-
-	"github.com/caos/zitadel/internal/errors"
+	"net/http"
+	"os"
+	"path/filepath"
 )
 
 type Config struct {
@@ -11,6 +12,26 @@ type Config struct {
 	StaticDir string
 }
 
+type spaHandler struct {
+	dir       string
+	indexFile string
+}
+
 func Start(ctx context.Context, config Config) error {
-	return errors.ThrowUnimplemented(nil, "CONSO-4cT5D", "not implemented yet") //TODO: implement
+	http.Handle("/", &spaHandler{config.StaticDir, "index.html"})
+	return http.ListenAndServe(":"+config.Port, nil)
+}
+
+func (s *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	p := filepath.Join(s.dir, filepath.Clean(r.URL.Path))
+
+	if info, err := os.Stat(p); err != nil {
+		http.ServeFile(w, r, filepath.Join(s.dir, s.indexFile))
+		return
+	} else if info.IsDir() {
+		http.ServeFile(w, r, filepath.Join(s.dir, s.indexFile))
+		return
+	}
+
+	http.ServeFile(w, r, p)
 }
