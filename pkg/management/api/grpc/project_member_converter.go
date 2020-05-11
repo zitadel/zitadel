@@ -52,9 +52,9 @@ func projectMemberSearchRequestsToModel(role *ProjectMemberSearchRequest) *proj_
 }
 
 func projectMemberSearchQueriesToModel(queries []*ProjectMemberSearchQuery) []*proj_model.ProjectMemberSearchQuery {
-	converted := make([]*proj_model.ProjectMemberSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, projectMemberSearchQueryToModel(q))
+	converted := make([]*proj_model.ProjectMemberSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = projectMemberSearchQueryToModel(q)
 	}
 	return converted
 }
