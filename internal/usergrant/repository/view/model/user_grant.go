@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/usergrant/model"
 	es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
@@ -116,7 +117,7 @@ func (u *UserGrantView) setRootData(event *models.Event) {
 func (u *UserGrantView) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
 		logging.Log("EVEN-l9sw4").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(nil, "MODEL-7xhke", "could not unmarshal data")
 	}
 	return nil
 }
