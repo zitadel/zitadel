@@ -15,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go v1.30.16 // indirect
 	github.com/caos/logging v0.0.1
 	github.com/cockroachdb/cockroach-go v0.0.0-20200411195601-6f5842749cfc
-	github.com/envoyproxy/protoc-gen-validate v0.3.0
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
@@ -34,6 +34,7 @@ require (
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.0.3
+	github.com/pquerna/otp v1.2.0
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/sony/sonyflake v1.0.0

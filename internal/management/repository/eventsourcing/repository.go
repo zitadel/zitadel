@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -12,6 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
 
 type Config struct {
@@ -24,6 +25,8 @@ type Config struct {
 type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.ProjectRepo
+	eventstore.UserRepo
+	eventstore.UserGrantRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -48,13 +51,28 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
-
+	user, err := es_usr.StartUser(es_usr.UserConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+	usergrant, err := es_grant.StartUserGrant(es_grant.UserGrantConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	})
+	if err != nil {
+		return nil, err
+	}
 	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
 
 	return &EsRepository{
-		spool,
-		eventstore.ProjectRepo{conf.SearchLimit, project, view},
+		spool
+		ProjectRepo{conf.SearchLimit, project, view},
+		UserRepo{user},
+		UserGrantRepo{usergrant},
 	}, nil
 }
 

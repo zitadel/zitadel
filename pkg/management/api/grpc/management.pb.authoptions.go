@@ -470,6 +470,11 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveUserGrant": utils_auth.Option{
+		Permission: "user.grant.delete",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectUserGrants": utils_auth.Option{
 		Permission: "project.user.grant.read",
 		CheckParam: "ProjectId",

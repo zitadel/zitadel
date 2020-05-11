@@ -13,18 +13,22 @@ import (
 var _ ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
-	port     string
-	project  repository.ProjectRepository
-	verifier *mgmt_auth.TokenVerifier
-	authZ    auth.Config
+	port      string
+	project   repository.ProjectRepository
+	user      repository.UserRepository
+	usergrant repository.UserGrantRepository
+	verifier  *mgmt_auth.TokenVerifier
+	authZ     auth.Config
 }
 
 func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository.Repository) *Server {
 	return &Server{
-		port:     conf.Port,
-		project:  repo,
-		authZ:    authZ,
-		verifier: mgmt_auth.Start(),
+		port:      conf.Port,
+		project:   repo,
+		user:      repo,
+		usergrant: repo,
+		authZ:     authZ,
+		verifier:  mgmt_auth.Start(),
 	}
 }
 

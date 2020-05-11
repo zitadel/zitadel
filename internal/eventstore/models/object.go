@@ -25,3 +25,6 @@ func (o *ObjectRoot) AppendEvent(event *Event) {
 	o.Sequence = event.Sequence
 	o.ResourceOwner = event.ResourceOwner
 }
+func (o *ObjectRoot) IsZero() bool {
+	return o.AggregateID == ""
+}

@@ -31,8 +31,8 @@ type Config struct {
 }
 
 func main() {
-	var configPaths config.ArrayFlags
-	flag.Var(&configPaths, "config-files", "path to the config files")
+	configPaths := config.NewArrayFlags("authz.yaml", "startup.yaml", "system-defaults.yaml")
+	flag.Var(configPaths, "config-files", "paths to the config files")
 	managementEnabled := flag.Bool("management", true, "enable management api")
 	authEnabled := flag.Bool("auth", true, "enable auth api")
 	loginEnabled := flag.Bool("login", true, "enable login ui")
@@ -41,7 +41,7 @@ func main() {
 	flag.Parse()
 
 	conf := new(Config)
-	err := config.Read(conf, configPaths...)
+	err := config.Read(conf, configPaths.Values()...)
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
