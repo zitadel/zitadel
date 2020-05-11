@@ -18,10 +18,7 @@ func SearchApplications(db *gorm.DB, table string, req *proj_model.ApplicationSe
 	apps := make([]*model.ApplicationView, 0)
 	query := view.PrepareSearchQuery(table, model.ApplicationSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &apps)
-	if err != nil {
-		return nil, 0, err
-	}
-	return apps, count, nil
+	return apps, count, err
 }
 
 func PutApplication(db *gorm.DB, table string, app *model.ApplicationView) error {

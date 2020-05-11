@@ -115,7 +115,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserView"
+              "$ref": "#/definitions/v1User"
             }
           }
         },
@@ -5595,6 +5595,14 @@
           "type": "string",
           "format": "date-time"
         },
+        "last_login": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "password_changed": {
+          "type": "string",
+          "format": "date-time"
+        },
         "user_name": {
           "type": "string"
         },
@@ -5745,6 +5753,27 @@
           "type": "string",
           "format": "date-time"
         },
+        "user_name": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "org_name": {
+          "type": "string"
+        },
+        "org_domain": {
+          "type": "string"
+        },
+        "project_name": {
+          "type": "string"
+        },
         "sequence": {
           "type": "string",
           "format": "uint64"
@@ -5840,7 +5869,7 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1UserGrantView"
+            "$ref": "#/definitions/v1UserGrant"
           }
         }
       }
@@ -5868,68 +5897,6 @@
           "items": {
             "type": "string"
           }
-        }
-      }
-    },
-    "v1UserGrantView": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string"
-        },
-        "org_id": {
-          "type": "string"
-        },
-        "project_id": {
-          "type": "string"
-        },
-        "role_keys": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "state": {
-          "$ref": "#/definitions/v1UserGrantState"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "user_name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "org_name": {
-          "type": "string"
-        },
-        "org_domain": {
-          "type": "string"
-        },
-        "project_name": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "resource_owner": {
-          "type": "string"
         }
       }
     },
@@ -6081,7 +6048,7 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1UserView"
+            "$ref": "#/definitions/v1User"
           }
         }
       }
@@ -6098,90 +6065,6 @@
         "USERSTATE_INITIAL"
       ],
       "default": "USERSTATE_UNSPECIFIED"
-    },
-    "v1UserView": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "state": {
-          "$ref": "#/definitions/v1UserState"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "last_login": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "password_changed": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "user_name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "display_name": {
-          "type": "string"
-        },
-        "nick_name": {
-          "type": "string"
-        },
-        "preferred_language": {
-          "type": "string"
-        },
-        "gender": {
-          "$ref": "#/definitions/v1Gender"
-        },
-        "email": {
-          "type": "string"
-        },
-        "is_email_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "is_phone_verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "country": {
-          "type": "string"
-        },
-        "locality": {
-          "type": "string"
-        },
-        "postal_code": {
-          "type": "string"
-        },
-        "region": {
-          "type": "string"
-        },
-        "street_address": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "resource_owner": {
-          "type": "string"
-        }
-      }
     }
   }
 }

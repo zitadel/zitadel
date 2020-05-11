@@ -115,7 +115,7 @@ func (p *GrantedProject) updateExistingProjects(project *view_model.GrantedProje
 	for _, existing := range projects {
 		existing.Name = project.Name
 		err := p.view.PutGrantedProject(existing)
-		logging.LogWithFields("SPOOL-sjwi3", "id", existing.ProjectID).OnError(err).Warn("could not update existing project")
+		logging.LogWithFields("SPOOL-sjwi3", "id", existing.ProjectID).WithError(err).Warn("could not update existing project")
 	}
 }
 

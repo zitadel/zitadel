@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -55,9 +56,9 @@ func ProjectRoleToModel(role *ProjectRoleView) *model.ProjectRoleView {
 }
 
 func ProjectRolesToModel(roles []*ProjectRoleView) []*model.ProjectRoleView {
-	result := make([]*model.ProjectRoleView, 0)
-	for _, r := range roles {
-		result = append(result, ProjectRoleToModel(r))
+	result := make([]*model.ProjectRoleView, len(roles))
+	for i, r := range roles {
+		result[i] = ProjectRoleToModel(r)
 	}
 	return result
 }
@@ -84,7 +85,7 @@ func (r *ProjectRoleView) setRootData(event *models.Event) {
 func (r *ProjectRoleView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-slo9s").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-6z52s", "Could not unmarshal data")
 	}
 	return nil
 }

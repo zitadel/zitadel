@@ -27,6 +27,18 @@ func SearchProjectMembers(db *gorm.DB, table string, req *proj_model.ProjectMemb
 	}
 	return roles, count, nil
 }
+func ProjectMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.ProjectMemberView, error) {
+	members := make([]*model.ProjectMemberView, 0)
+	queries := []*proj_model.ProjectMemberSearchQuery{
+		&proj_model.ProjectMemberSearchQuery{Key: proj_model.PROJECTMEMBERSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS},
+	}
+	query := view.PrepareSearchQuery(table, model.ProjectMemberSearchRequest{Queries: queries})
+	_, err := query(db, &members)
+	if err != nil {
+		return nil, err
+	}
+	return members, nil
+}
 
 func PutProjectMember(db *gorm.DB, table string, role *model.ProjectMemberView) error {
 	save := view.PrepareSave(table)

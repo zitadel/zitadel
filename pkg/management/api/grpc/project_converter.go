@@ -34,9 +34,9 @@ func grantedProjectSearchResponseFromModel(response *proj_model.GrantedProjectSe
 }
 
 func grantedProjectsFromModel(projects []*proj_model.GrantedProjectView) []*GrantedProject {
-	converted := make([]*GrantedProject, 0)
-	for _, q := range projects {
-		converted = append(converted, grantedProjectFromModel(q))
+	converted := make([]*GrantedProject, len(projects))
+	for i, project := range projects {
+		converted[i] = grantedProjectFromModel(project)
 	}
 	return converted
 }
@@ -73,9 +73,9 @@ func projectRoleSearchResponseFromModel(response *proj_model.ProjectRoleSearchRe
 }
 
 func projectRoleViewsFromModel(roles []*proj_model.ProjectRoleView) []*ProjectRoleView {
-	converted := make([]*ProjectRoleView, 0)
-	for _, q := range roles {
-		converted = append(converted, projectRoleViewFromModel(q))
+	converted := make([]*ProjectRoleView, len(roles))
+	for i, role := range roles {
+		converted[i] = projectRoleViewFromModel(role)
 	}
 	return converted
 }
@@ -173,9 +173,9 @@ func grantedProjectSearchRequestsToModel(project *GrantedProjectSearchRequest) *
 }
 
 func grantedProjectSearchQueriesToModel(queries []*GrantedProjectSearchQuery) []*proj_model.GrantedProjectSearchQuery {
-	converted := make([]*proj_model.GrantedProjectSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, grantedProjectSearchQueryToModel(q))
+	converted := make([]*proj_model.GrantedProjectSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = grantedProjectSearchQueryToModel(q)
 	}
 	return converted
 }
@@ -206,9 +206,9 @@ func projectRoleSearchRequestsToModel(role *ProjectRoleSearchRequest) *proj_mode
 }
 
 func projectRoleSearchQueriesToModel(queries []*ProjectRoleSearchQuery) []*proj_model.ProjectRoleSearchQuery {
-	converted := make([]*proj_model.ProjectRoleSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, projectRoleSearchQueryToModel(q))
+	converted := make([]*proj_model.ProjectRoleSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = projectRoleSearchQueryToModel(q)
 	}
 	return converted
 }

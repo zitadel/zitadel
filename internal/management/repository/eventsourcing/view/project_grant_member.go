@@ -19,12 +19,16 @@ func (v *View) SearchProjectGrantMembers(request *proj_model.ProjectGrantMemberS
 	return view.SearchProjectGrantMembers(v.Db, projectGrantMemberTable, request)
 }
 
-func (v *View) PutProjectGrantMember(project *model.ProjectGrantMemberView) error {
+func (v *View) ProjectGrantMembersByUserID(userID string) ([]*model.ProjectGrantMemberView, error) {
+	return view.ProjectGrantMembersByUserID(v.Db, projectGrantMemberTable, userID)
+}
+
+func (v *View) PutProjectGrantMember(project *model.ProjectGrantMemberView, sequence uint64) error {
 	err := view.PutProjectGrantMember(v.Db, projectGrantMemberTable, project)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectGrantMemberSequence(project.Sequence)
+	return v.ProcessedProjectGrantMemberSequence(sequence)
 }
 
 func (v *View) DeleteProjectGrantMember(projectID, userID string, eventSequence uint64) error {

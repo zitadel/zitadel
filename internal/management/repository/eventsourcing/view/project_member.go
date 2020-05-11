@@ -19,12 +19,16 @@ func (v *View) SearchProjectMembers(request *proj_model.ProjectMemberSearchReque
 	return view.SearchProjectMembers(v.Db, projectMemberTable, request)
 }
 
-func (v *View) PutProjectMember(project *model.ProjectMemberView) error {
+func (v *View) ProjectMembersByUserID(userID string) ([]*model.ProjectMemberView, error) {
+	return view.ProjectMembersByUserID(v.Db, projectMemberTable, userID)
+}
+
+func (v *View) PutProjectMember(project *model.ProjectMemberView, sequence uint64) error {
 	err := view.PutProjectMember(v.Db, projectMemberTable, project)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedProjectMemberSequence(project.Sequence)
+	return v.ProcessedProjectMemberSequence(sequence)
 }
 
 func (v *View) DeleteProjectMember(projectID, userID string, eventSequence uint64) error {

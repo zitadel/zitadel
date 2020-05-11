@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -60,17 +61,17 @@ func ApplicationViewFromModel(app *model.ApplicationView) *ApplicationView {
 }
 
 func OIDCResponseTypesFromModel(oidctypes []model.OIDCResponseType) []int64 {
-	result := make([]int64, 0)
-	for _, t := range oidctypes {
-		result = append(result, int64(t))
+	result := make([]int64, len(oidctypes))
+	for i, t := range oidctypes {
+		result[i] = int64(t)
 	}
 	return result
 }
 
 func OIDCGrantTypesFromModel(granttypes []model.OIDCGrantType) []int64 {
-	result := make([]int64, 0)
-	for _, t := range granttypes {
-		result = append(result, int64(t))
+	result := make([]int64, len(granttypes))
+	for i, t := range granttypes {
+		result[i] = int64(t)
 	}
 	return result
 }
@@ -97,25 +98,25 @@ func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
 }
 
 func OIDCResponseTypesToModel(oidctypes []int64) []model.OIDCResponseType {
-	result := make([]model.OIDCResponseType, 0)
-	for _, t := range oidctypes {
-		result = append(result, model.OIDCResponseType(t))
+	result := make([]model.OIDCResponseType, len(oidctypes))
+	for i, t := range oidctypes {
+		result[i] = model.OIDCResponseType(t)
 	}
 	return result
 }
 
 func OIDCGrantTypesToModel(granttypes []int64) []model.OIDCGrantType {
-	result := make([]model.OIDCGrantType, 0)
-	for _, t := range granttypes {
-		result = append(result, model.OIDCGrantType(t))
+	result := make([]model.OIDCGrantType, len(granttypes))
+	for i, t := range granttypes {
+		result[i] = model.OIDCGrantType(t)
 	}
 	return result
 }
 
 func ApplicationViewsToModel(roles []*ApplicationView) []*model.ApplicationView {
-	result := make([]*model.ApplicationView, 0)
-	for _, r := range roles {
-		result = append(result, ApplicationViewToModel(r))
+	result := make([]*model.ApplicationView, len(roles))
+	for i, r := range roles {
+		result[i] = ApplicationViewToModel(r)
 	}
 	return result
 }
@@ -149,7 +150,7 @@ func (a *ApplicationView) setRootData(event *models.Event) {
 func (a *ApplicationView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo9ds").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-8suie", "Could not unmarshal data")
 	}
 	return nil
 }

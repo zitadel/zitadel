@@ -111,9 +111,9 @@ func applicationSearchRequestsToModel(request *ApplicationSearchRequest) *proj_m
 }
 
 func applicationSearchQueriesToModel(queries []*ApplicationSearchQuery) []*proj_model.ApplicationSearchQuery {
-	converted := make([]*proj_model.ApplicationSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, applicationSearchQueryToModel(q))
+	converted := make([]*proj_model.ApplicationSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = applicationSearchQueryToModel(q)
 	}
 	return converted
 }
@@ -145,9 +145,9 @@ func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchRe
 }
 
 func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*ApplicationView {
-	converted := make([]*ApplicationView, 0)
-	for _, q := range apps {
-		converted = append(converted, applicationViewFromModel(q))
+	converted := make([]*ApplicationView, len(apps))
+	for i, app := range apps {
+		converted[i] = applicationViewFromModel(app)
 	}
 	return converted
 }

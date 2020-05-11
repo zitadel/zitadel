@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -74,9 +75,9 @@ func GrantedProjectToModel(project *GrantedProjectView) *model.GrantedProjectVie
 }
 
 func GrantedProjectsToModel(projects []*GrantedProjectView) []*model.GrantedProjectView {
-	result := make([]*model.GrantedProjectView, 0)
-	for _, p := range projects {
-		result = append(result, GrantedProjectToModel(p))
+	result := make([]*model.GrantedProjectView, len(projects))
+	for i, p := range projects {
+		result[i] = GrantedProjectToModel(p)
 	}
 	return result
 }
@@ -142,7 +143,7 @@ func (p *GrantedProjectView) setProjectGrantData(event *models.Event) error {
 func (p *ProjectGrant) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-dlo92").WithError(err).Error("could not unmarshal event data")
-		return err
+		return caos_errs.ThrowInternal(err, "MODEL-s9ols", "Could not unmarshal data")
 	}
 	return nil
 }
