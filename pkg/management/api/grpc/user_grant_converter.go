@@ -73,9 +73,9 @@ func userGrantSearchRequestsToModel(project *UserGrantSearchRequest) *grant_mode
 }
 
 func userGrantSearchQueriesToModel(queries []*UserGrantSearchQuery) []*grant_model.UserGrantSearchQuery {
-	converted := make([]*grant_model.UserGrantSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, userGrantSearchQueryToModel(q))
+	converted := make([]*grant_model.UserGrantSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = userGrantSearchQueryToModel(q)
 	}
 	return converted
 }
@@ -110,10 +110,10 @@ func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchRespo
 	}
 }
 
-func userGrantViewsFromModel(projects []*grant_model.UserGrantView) []*UserGrantView {
-	converted := make([]*UserGrantView, 0)
-	for _, q := range projects {
-		converted = append(converted, userGrantViewFromModel(q))
+func userGrantViewsFromModel(users []*grant_model.UserGrantView) []*UserGrantView {
+	converted := make([]*UserGrantView, len(users))
+	for i, q := range users {
+		converted[i] = userGrantViewFromModel(q)
 	}
 	return converted
 }

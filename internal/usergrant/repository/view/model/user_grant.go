@@ -83,9 +83,9 @@ func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 }
 
 func UserGrantsToModel(grants []*UserGrantView) []*model.UserGrantView {
-	result := make([]*model.UserGrantView, 0)
-	for _, g := range grants {
-		result = append(result, UserGrantToModel(g))
+	result := make([]*model.UserGrantView, len(grants))
+	for i, g := range grants {
+		result[i] = UserGrantToModel(g)
 	}
 	return result
 }

@@ -111,9 +111,9 @@ func UserToModel(user *UserView) *model.UserView {
 }
 
 func UsersToModel(users []*UserView) []*model.UserView {
-	result := make([]*model.UserView, 0)
-	for _, p := range users {
-		result = append(result, UserToModel(p))
+	result := make([]*model.UserView, len(users))
+	for i, p := range users {
+		result[i] = UserToModel(p)
 	}
 	return result
 }

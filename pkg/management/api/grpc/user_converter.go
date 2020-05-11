@@ -98,9 +98,9 @@ func userSearchRequestsToModel(project *UserSearchRequest) *usr_model.UserSearch
 }
 
 func userSearchQueriesToModel(queries []*UserSearchQuery) []*usr_model.UserSearchQuery {
-	converted := make([]*usr_model.UserSearchQuery, 0)
-	for _, q := range queries {
-		converted = append(converted, userSearchQueryToModel(q))
+	converted := make([]*usr_model.UserSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = userSearchQueryToModel(q)
 	}
 	return converted
 }
@@ -261,10 +261,10 @@ func userSearchResponseFromModel(response *usr_model.UserSearchResponse) *UserSe
 	}
 }
 
-func userViewsFromModel(projects []*usr_model.UserView) []*UserView {
-	converted := make([]*UserView, 0)
-	for _, q := range projects {
-		converted = append(converted, userViewFromModel(q))
+func userViewsFromModel(users []*usr_model.UserView) []*UserView {
+	converted := make([]*UserView, len(users))
+	for i, q := range users {
+		converted[i] = userViewFromModel(q)
 	}
 	return converted
 }
@@ -308,9 +308,9 @@ func userViewFromModel(user *usr_model.UserView) *UserView {
 }
 
 func mfasFromModel(mfas []*usr_model.MultiFactor) []*MultiFactor {
-	converted := make([]*MultiFactor, 0)
-	for _, mfa := range mfas {
-		converted = append(converted, mfaFromModel(mfa))
+	converted := make([]*MultiFactor, len(mfas))
+	for i, mfa := range mfas {
+		converted[i] = mfaFromModel(mfa)
 	}
 	return converted
 }
