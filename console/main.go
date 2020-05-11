@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/caos/citadel/console/config"
-	"github.com/caos/citadel/console/service"
+	"github.com/caos/zitadel/console/config"
+	"github.com/caos/zitadel/console/service"
 	"github.com/caos/utils/logging"
 )
 

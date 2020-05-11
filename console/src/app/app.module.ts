@@ -77,7 +77,7 @@ export const authConfig: AuthConfig = {
         OverlayModule,
         OAuthModule.forRoot({
             resourceServer: {
-                allowedUrls: ['https://test.api.citadel.caos.ch/caos.citadel.auth.api.v1.AuthService', 'https://test.api.citadel.caos.ch/oauth/v2/userinfo', 'https://test.api.citadel.caos.ch/caos.citadel.management.api.v1.ManagementService/', 'https://preview.api.citadel.caos.ch'],
+                allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
                 sendAccessToken: true,
             },
         }),

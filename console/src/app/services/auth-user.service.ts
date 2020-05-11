@@ -134,16 +134,16 @@ export class AuthUserService {
         );
     }
 
-    private async getMyCitadelPermissions(): Promise<any> {
+    private async getMyzitadelPermissions(): Promise<any> {
         return await this.request(
-            c => c.getMyCitadelPermissions,
+            c => c.getMyzitadelPermissions,
             new Empty(),
             f => f,
         );
     }
 
-    public GetMyCitadelPermissions(): Observable<any> {
-        return from(this.getMyCitadelPermissions());
+    public GetMyzitadelPermissions(): Observable<any> {
+        return from(this.getMyzitadelPermissions());
     }
 
     public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
@@ -298,7 +298,7 @@ export class AuthUserService {
                 return of(this.hasRoles(this._roleCache, roles));
             }
 
-            return this.GetMyCitadelPermissions().pipe(
+            return this.GetMyzitadelPermissions().pipe(
                 switchMap(response => {
                     const userRoles = response.toObject().permissionsList;
                     this._roleCache = userRoles;

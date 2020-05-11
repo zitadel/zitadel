@@ -15,7 +15,7 @@ export class AuthInterceptorService implements HttpInterceptor {
         return next.handle(req);
         // req.clone({
         //     setHeaders: {
-        //         'x-tmp-citadel-custom': 'hello',
+        //         'x-tmp-zitadel-custom': 'hello',
         //     },
         // }),
         // );

@@ -34,9 +34,9 @@ static_resources:
                 allow_origin_string_match:
                   exact: 'http://localhost:4200'
                 allow_methods: GET, PUT, DELETE, POST, OPTIONS
-                allow_headers: keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,x-tmp-citadel-userid,x-tmp-citadel-login,x-tmp-citadel-orgid,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
+                allow_headers: keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,x-tmp-zitadel-userid,x-tmp-zitadel-login,x-tmp-zitadel-orgid,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
                 max_age: "1728000"
-                expose_headers: x-tmp-citadel-userid,x-tmp-citadel-login,x-tmp-citadel-orgid,grpc-status,grpc-message
+                expose_headers: x-tmp-zitadel-userid,x-tmp-zitadel-login,x-tmp-zitadel-orgid,grpc-status,grpc-message
           http_filters:
           - name: envoy.grpc_web
           - name: envoy.cors

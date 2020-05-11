@@ -222,7 +222,7 @@ export class AppComponent implements OnDestroy {
 
         this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
-                // this.userService.GetMyCitadelPermissions().pipe(take(1)).subscribe(perm => console.log(perm.toObject()));
+                // this.userService.GetMyzitadelPermissions().pipe(take(1)).subscribe(perm => console.log(perm.toObject()));
                 this.loadPermissions();
                 this.authService.GetActiveOrg().then(org => {
                     this.org = org;

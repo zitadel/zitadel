@@ -1,7 +1,7 @@
 {
-    "APP_NAME": "Citadel",
+    "APP_NAME": "zitadel",
     "HOME": {
-        "TITLE": "Citadel",
+        "TITLE": "zitadel",
         "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
         "SECURITYANDPRIVACY": "Data protection and personalization",
         "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",

@@ -30,7 +30,7 @@
     {
         "name": "api-freshness",
         "urls": [
-          "/GetMyCitadelPermissions"
+          "/GetMyzitadelPermissions"
         ],
         "cacheConfig": {
           "strategy": "freshness",

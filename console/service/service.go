@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/caos/citadel/console/config"
+	"github.com/caos/zitadel/console/config"
 )
 
 type spaHandler struct {
