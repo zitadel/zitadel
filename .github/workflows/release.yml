@@ -20,8 +20,8 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: npm ci 
-    - run: npm run lint
+    #- run: npm ci 
+    #- run: npm run lint
     #- run: npm run prodbuild
     #- run: npm test
     - run: mkdir -p dist/console && touch dist/console/test.txt

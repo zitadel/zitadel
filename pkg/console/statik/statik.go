@@ -1,3 +1,3 @@
-//go:generate statik -src=../../console/dist/app
+//go:generate statik -src=../../../console/dist/app
 
 package statik
