@@ -2,9 +2,11 @@ package eventsourcing
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
@@ -19,6 +21,32 @@ type OrgConfig struct {
 
 func StartOrg(conf OrgConfig) *OrgEventstore {
 	return &OrgEventstore{Eventstore: conf.Eventstore}
+}
+
+func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org) (*Org, []*es_models.Aggregate, error) {
+	if orgModel == nil || !orgModel.IsValid() {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-OeLSk", "org not valid")
+	}
+	id, err := idGenerator.NextID()
+	if err != nil {
+		return nil, nil, errors.ThrowInternal(err, "EVENT-OwciI", "id gen failed")
+	}
+	orgModel.AggregateID = strconv.FormatUint(id, 10)
+	org := OrgFromModel(orgModel)
+
+	aggregates, err := OrgCreatedAggregates(ctx, es.AggregateCreator(), org)
+
+	return org, aggregates, err
+}
+
+func (es *OrgEventstore) CreateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
+	org, aggregates, err := es.PrepareCreateOrg(ctx, orgModel)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, org.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	return OrgToModel(org), nil
 }
 
 func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
@@ -91,27 +119,23 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 	return nil, errors.ThrowNotFound(nil, "EVENT-SXji6", "member not found")
 }
 
-func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember) (*OrgMember, *es_models.Aggregate, error) {
 	if member == nil || !member.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
-	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+	repoMember := OrgMemberFromModel(member)
+	addAggregate, err := OrgMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoMember)
+
+	return repoMember, addAggregate, err
+}
+
+func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	repoMember, addAggregate, err := es.PrepareAddOrgMember(ctx, member)
 	if err != nil {
 		return nil, err
 	}
-	if existingOrg.Sequence == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-smze4", "org not found")
-	}
-
-	if existingOrg.ContainsMember(member.UserID) {
-		return nil, errors.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Org")
-	}
-	member.ObjectRoot = existingOrg.ObjectRoot
-	repoMember := OrgMemberFromModel(member)
-
-	addAggregate := OrgMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoMember)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, addAggregate)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoMember.AppendEvents, addAggregate)
 	if err != nil {
 		return nil, err
 	}

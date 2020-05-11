@@ -17,7 +17,6 @@ type Config struct {
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
 	eventstore.OrgRepo
-	eventstore.UserRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -46,8 +45,11 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 	return &EsRepository{
-		eventstore.OrgRepo{org},
-		eventstore.UserRepo{user},
+		OrgRepo: eventstore.OrgRepo{
+			Eventstore:     es,
+			OrgEventstore:  org,
+			UserEventstore: user,
+		},
 	}, nil
 }
 

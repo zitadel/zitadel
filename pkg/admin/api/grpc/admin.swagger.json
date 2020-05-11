@@ -452,6 +452,10 @@
         },
         "street_address": {
           "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

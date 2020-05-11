@@ -580,7 +580,8 @@ func TestOrgEventstore_AddOrgMember(t *testing.T) {
 						Data:     []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence: 6,
 					},
-				}, nil),
+				}, nil).
+				expectPushEvents(0, errors.ThrowAlreadyExists(nil, "EVENT-yLTI6", "weiss nöd wie teste")),
 			},
 			args: args{
 				ctx: auth.NewMockContext("user", "org"),
@@ -636,7 +637,8 @@ func TestOrgEventstore_AddOrgMember(t *testing.T) {
 			name: "org not exists error",
 			fields: fields{Eventstore: newTestEventstore(t).
 				expectAggregateCreator().
-				expectFilterEvents(nil, nil),
+				expectFilterEvents(nil, nil).
+				expectPushEvents(0, errors.ThrowAlreadyExists(nil, "EVENT-yLTI6", "weiss nöd wie teste")),
 			},
 			args: args{
 				ctx: auth.NewMockContext("user", "org"),
@@ -651,7 +653,7 @@ func TestOrgEventstore_AddOrgMember(t *testing.T) {
 			},
 			res: res{
 				expectedSequence: 0,
-				isErr:            errors.IsNotFound,
+				isErr:            errors.IsErrorAlreadyExists,
 			},
 		},
 	}

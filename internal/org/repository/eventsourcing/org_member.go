@@ -8,25 +8,23 @@ import (
 	"github.com/caos/zitadel/internal/org/model"
 )
 
-func OrgMemberAddedAggregate(aggCreator *es_models.AggregateCreator, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if member == nil {
-			return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "member must not be nil")
-		}
-
-		aggregate, err := aggCreator.NewAggregate(ctx, member.AggregateID, model.OrgAggregate, orgVersion, member.Sequence)
-		if err != nil {
-			return nil, err
-		}
-
-		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter("org", "user").
-			AggregateIDsFilter(member.AggregateID, member.UserID)
-
-		validation := addMemberValidation(aggregate)
-
-		return aggregate.SetPrecondition(validationQuery, validation).AppendEvent(model.OrgMemberAdded, member)
+func OrgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *OrgMember) (*es_models.Aggregate, error) {
+	if member == nil {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "member must not be nil")
 	}
+
+	aggregate, err := aggCreator.NewAggregate(ctx, member.AggregateID, model.OrgAggregate, orgVersion, member.Sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter("org", "user").
+		AggregateIDsFilter(member.AggregateID, member.UserID)
+
+	validation := addMemberValidation(aggregate)
+
+	return aggregate.SetPrecondition(validationQuery, validation).AppendEvent(model.OrgMemberAdded, member)
 }
 
 func OrgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *OrgMember, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
