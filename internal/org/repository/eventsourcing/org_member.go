@@ -40,7 +40,7 @@ func OrgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingM
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-VLMGn", "nothing changed")
 		}
 
-		agg, err := OrgAggregate(ctx, aggCreator, member.AggregateID, member.Sequence)
+		agg, err := OrgAggregate(ctx, aggCreator, existingMember.AggregateID, existingMember.Sequence)
 		if err != nil {
 			return nil, err
 		}

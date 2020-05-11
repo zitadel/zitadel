@@ -120,16 +120,13 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 }
 
 func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
-	if !member.IsValid() {
+	if member == nil || !member.IsValid() {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
 	existingMember, err := es.OrgMemberByIDs(ctx, member)
 	if err != nil {
 		return nil, err
-	}
-	if existingMember == nil {
-		return nil, errors.ThrowNotFound(nil, "EVENT-P2pde", "member doesn't exist")
 	}
 
 	member.ObjectRoot = existingMember.ObjectRoot
@@ -146,20 +143,19 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 }
 
 func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.OrgMember) error {
-	if member.UserID == "" {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-d43fs", "UserID and Roles are required")
+	if member == nil || member.UserID == "" {
+		return errors.ThrowInvalidArgument(nil, "EVENT-d43fs", "UserID is required")
 	}
 
-	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+	existingMember, err := es.OrgMemberByIDs(ctx, member)
+	if errors.IsNotFound(err) {
+		return nil
+	}
 	if err != nil {
 		return err
 	}
 
-	if !org.ContainsMember(member.UserID) {
-		return nil
-	}
-
-	member.ObjectRoot = org.ObjectRoot
+	member.ObjectRoot = existingMember.ObjectRoot
 	repoMember := OrgMemberFromModel(member)
 
 	orgAggregate := OrgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
