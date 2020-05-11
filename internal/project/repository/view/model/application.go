@@ -60,9 +60,9 @@ func ApplicationViewFromModel(app *model.ApplicationView) *ApplicationView {
 }
 
 func OIDCResponseTypesFromModel(oidctypes []model.OIDCResponseType) []int64 {
-	result := make([]int64, 0)
-	for _, t := range oidctypes {
-		result = append(result, int64(t))
+	result := make([]int64, len(oidctypes))
+	for i, t := range oidctypes {
+		result[i] = int64(t)
 	}
 	return result
 }
