@@ -91,6 +91,9 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
 	}
 	changes := existing.Changes(updated)
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-E0hc5", "no changes")
+	}
 
 	aggregates := make([]*es_models.Aggregate, 0, 3)
 
@@ -108,10 +111,6 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 			return nil, err
 		}
 		aggregates = append(aggregates, domainAggregate)
-	}
-
-	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-E0hc5", "no changes")
 	}
 
 	orgAggregate, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
@@ -140,6 +139,7 @@ func OrgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 		if err != nil {
 			return nil, err
 		}
+
 		return agg.AppendEvent(org_model.OrgDeactivated, nil)
 	}
 }
@@ -156,6 +156,7 @@ func OrgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 		if err != nil {
 			return nil, err
 		}
+
 		return agg.AppendEvent(org_model.OrgReactivated, nil)
 	}
 }

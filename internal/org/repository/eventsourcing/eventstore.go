@@ -69,29 +69,9 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgModel *org_model.
 	return OrgToModel(org), nil
 }
 
-func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, memberModel *org_model.OrgMember) (*org_model.OrgMember, error) {
-	if memberModel == nil || memberModel.UserID == "" || memberModel.AggregateID == "" {
+func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	if member == nil || member.UserID == "" || member.AggregateID == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ld93d", "member not set")
-	}
-
-	member := OrgMemberFromModel(memberModel)
-
-	query, err := OrgByIDQuery(member.AggregateID, member.Sequence)
-	if err != nil {
-		return nil, err
-	}
-
-	err = es_sdk.Filter(ctx, es.FilterEvents, member.AppendEvents, query)
-	if err != nil && !errors.IsNotFound(err) {
-		return nil, err
-	}
-
-	return OrgMemberToModel(member), nil
-}
-
-func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
-	if !member.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
 	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
@@ -99,11 +79,32 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 		return nil, err
 	}
 
-	if org.ContainsMember(member.UserID) {
-		return nil, errors.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Org")
+	for _, currentMember := range org.Members {
+		if currentMember.UserID == member.UserID {
+			return currentMember, nil
+		}
 	}
 
-	member.ObjectRoot = org.ObjectRoot
+	return nil, errors.ThrowNotFound(nil, "EVENT-SXji6", "member not found")
+}
+
+func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	if member == nil || !member.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
+	}
+
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	if existingOrg.Sequence == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-smze4", "org not found")
+	}
+
+	if existingOrg.ContainsMember(member.UserID) {
+		return nil, errors.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Org")
+	}
+	member.ObjectRoot = existingOrg.ObjectRoot
 	repoMember := OrgMemberFromModel(member)
 
 	addAggregate := OrgMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoMember)
@@ -120,17 +121,15 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
-	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+	existingMember, err := es.OrgMemberByIDs(ctx, member)
 	if err != nil {
 		return nil, err
 	}
-
-	existingMember := org.MemberByUserID(member.UserID)
 	if existingMember == nil {
 		return nil, errors.ThrowNotFound(nil, "EVENT-P2pde", "member doesn't exist")
 	}
 
-	member.ObjectRoot = org.ObjectRoot
+	member.ObjectRoot = existingMember.ObjectRoot
 	repoMember := OrgMemberFromModel(member)
 	repoExistingMember := OrgMemberFromModel(existingMember)
 

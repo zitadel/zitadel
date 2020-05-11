@@ -75,12 +75,23 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		o.State = int32(org_model.ORGSTATE_INACTIVE)
 	case org_model.OrgReactivated:
 		o.State = int32(org_model.ORGSTATE_ACTIVE)
-	case org_model.OrgMemberAdded, org_model.OrgMemberChanged:
+	case org_model.OrgMemberAdded:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
 			return err
 		}
-		o.Members = append(o.Members, member)
+		member.CreationDate = event.CreationDate
+
+		o.setMember(member)
+	case org_model.OrgMemberChanged:
+		member, err := OrgMemberFromEvent(nil, event)
+		if err != nil {
+			return err
+		}
+		existingMember := o.getMember(member.UserID)
+		member.CreationDate = existingMember.CreationDate
+
+		o.setMember(member)
 	case org_model.OrgMemberRemoved:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
@@ -92,8 +103,27 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 	return nil
 }
 
+func (o *Org) getMember(userID string) *OrgMember {
+	for _, member := range o.Members {
+		if member.UserID == userID {
+			return member
+		}
+	}
+	return nil
+}
+
+func (o *Org) setMember(member *OrgMember) {
+	for i, existingMember := range o.Members {
+		if existingMember.UserID == member.UserID {
+			o.Members[i] = member
+			return
+		}
+	}
+	o.Members = append(o.Members, member)
+}
+
 func (o *Org) removeMember(userID string) {
-	for i := len(o.Members) - 1; i > 0; i-- {
+	for i := len(o.Members) - 1; i >= 0; i-- {
 		if o.Members[i].UserID == userID {
 			copy(o.Members[i:], o.Members[i+1:])
 			o.Members[len(o.Members)-1] = nil

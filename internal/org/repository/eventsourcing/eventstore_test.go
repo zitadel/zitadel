@@ -127,7 +127,7 @@ func TestOrgEventstore_OrgByID(t *testing.T) {
 			}, nil)},
 			args: args{
 				ctx: auth.NewMockContext("user", "org"),
-				org: &org_model.Org{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "hodor", ChangeDate: time.Now(), CreationDate: time.Now()}},
+				org: &org_model.Org{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "hodor-org", ChangeDate: time.Now(), CreationDate: time.Now()}},
 			},
 			res: res{
 				expectedSequence: 6,
@@ -434,7 +434,7 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 		{
 			name: "new events found and added success",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
-				{Sequence: 6, Data: []byte("{\"roles\": [\"bananaa\"]}")},
+				{Sequence: 6, Data: []byte("{\"userId\": \"banana\", \"roles\": [\"bananaa\"]}"), Type: org_model.OrgMemberChanged},
 			}, nil)},
 			args: args{
 				ctx:    auth.NewMockContext("user", "org"),
@@ -443,6 +443,20 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 			res: res{
 				expectedSequence: 6,
 				isErr:            nil,
+			},
+		},
+		{
+			name: "not member of org error",
+			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
+				{Sequence: 6, Data: []byte("{\"userId\": \"banana\", \"roles\": [\"bananaa\"]}"), Type: org_model.OrgMemberAdded},
+			}, nil)},
+			args: args{
+				ctx:    auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{ObjectRoot: es_models.ObjectRoot{Sequence: 4, AggregateID: "plants", ChangeDate: time.Now(), CreationDate: time.Now()}, UserID: "apple"},
+			},
+			res: res{
+				expectedSequence: 0,
+				isErr:            errors.IsNotFound,
 			},
 		},
 	}
@@ -457,6 +471,200 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 			}
 			if got == nil && tt.res.expectedSequence != 0 {
 				t.Errorf("org should be nil but was %v", got)
+				t.FailNow()
+			}
+			if tt.res.expectedSequence != 0 && tt.res.expectedSequence != got.Sequence {
+				t.Errorf("org should have sequence %d but had %d", tt.res.expectedSequence, got.Sequence)
+			}
+		})
+	}
+}
+
+func TestOrgEventstore_AddOrgMember(t *testing.T) {
+	type fields struct {
+		Eventstore *testOrgEventstore
+	}
+	type res struct {
+		expectedSequence uint64
+		isErr            func(error) bool
+	}
+	type args struct {
+		ctx    context.Context
+		member *org_model.OrgMember
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name:   "no input member",
+			fields: fields{Eventstore: newTestEventstore(t)},
+			args: args{
+				ctx:    auth.NewMockContext("user", "org"),
+				member: nil,
+			},
+			res: res{
+				expectedSequence: 0,
+				isErr:            errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "push failed",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectFilterEvents([]*es_models.Event{
+					{
+						AggregateID: "hodor-org",
+						Type:        org_model.OrgAdded,
+						Sequence:    4,
+						Data:        []byte("{}"),
+					},
+				}, nil).
+				expectAggregateCreator().
+				expectPushEvents(0, errors.ThrowInternal(nil, "EVENT-S8WzW", "test"))},
+			args: args{
+				ctx: auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{
+					ObjectRoot: es_models.ObjectRoot{
+						Sequence:    4,
+						AggregateID: "hodor-org",
+					},
+					UserID: "hodor",
+					Roles:  []string{"nix"},
+				},
+			},
+			res: res{
+				expectedSequence: 0,
+				isErr:            errors.IsInternal,
+			},
+		},
+		{
+			name: "push correct",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectAggregateCreator().
+				expectFilterEvents([]*es_models.Event{
+					{
+						AggregateID: "hodor-org",
+						Type:        org_model.OrgAdded,
+						Sequence:    4,
+						Data:        []byte("{}"),
+					},
+				}, nil).
+				expectPushEvents(6, nil),
+			},
+			args: args{
+				ctx: auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{
+					ObjectRoot: es_models.ObjectRoot{
+						Sequence:    4,
+						AggregateID: "hodor-org",
+					},
+					UserID: "hodor",
+					Roles:  []string{"nix"},
+				},
+			},
+			res: res{
+				expectedSequence: 6,
+				isErr:            nil,
+			},
+		},
+		{
+			name: "member already exists error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectAggregateCreator().
+				expectFilterEvents([]*es_models.Event{
+					{
+						Type:     org_model.OrgMemberAdded,
+						Data:     []byte(`{"userId": "hodor", "roles": ["master"]}`),
+						Sequence: 6,
+					},
+				}, nil),
+			},
+			args: args{
+				ctx: auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{
+					ObjectRoot: es_models.ObjectRoot{
+						Sequence:    4,
+						AggregateID: "hodor-org",
+					},
+					UserID: "hodor",
+					Roles:  []string{"nix"},
+				},
+			},
+			res: res{
+				expectedSequence: 0,
+				isErr:            errors.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "member deleted success",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectAggregateCreator().
+				expectPushEvents(10, nil).
+				expectFilterEvents([]*es_models.Event{
+					{
+						Type:     org_model.OrgMemberAdded,
+						Data:     []byte(`{"userId": "hodor", "roles": ["master"]}`),
+						Sequence: 6,
+					},
+					{
+						Type:     org_model.OrgMemberRemoved,
+						Data:     []byte(`{"userId": "hodor"}`),
+						Sequence: 10,
+					},
+				}, nil),
+			},
+			args: args{
+				ctx: auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{
+					ObjectRoot: es_models.ObjectRoot{
+						Sequence:    4,
+						AggregateID: "hodor-org",
+					},
+					UserID: "hodor",
+					Roles:  []string{"nix"},
+				},
+			},
+			res: res{
+				expectedSequence: 10,
+				isErr:            nil,
+			},
+		},
+		{
+			name: "org not exists error",
+			fields: fields{Eventstore: newTestEventstore(t).
+				expectAggregateCreator().
+				expectFilterEvents(nil, nil),
+			},
+			args: args{
+				ctx: auth.NewMockContext("user", "org"),
+				member: &org_model.OrgMember{
+					ObjectRoot: es_models.ObjectRoot{
+						Sequence:    4,
+						AggregateID: "hodor-org",
+					},
+					UserID: "hodor",
+					Roles:  []string{"nix"},
+				},
+			},
+			res: res{
+				expectedSequence: 0,
+				isErr:            errors.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.fields.Eventstore.AddOrgMember(tt.args.ctx, tt.args.member)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got:%T %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			if got == nil && tt.res.expectedSequence != 0 {
+				t.Errorf("org should not be nil but was %v", got)
 				t.FailNow()
 			}
 			if tt.res.expectedSequence != 0 && tt.res.expectedSequence != got.Sequence {
