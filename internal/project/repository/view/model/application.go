@@ -113,9 +113,9 @@ func OIDCGrantTypesToModel(granttypes []int64) []model.OIDCGrantType {
 }
 
 func ApplicationViewsToModel(roles []*ApplicationView) []*model.ApplicationView {
-	result := make([]*model.ApplicationView, 0)
-	for _, r := range roles {
-		result = append(result, ApplicationViewToModel(r))
+	result := make([]*model.ApplicationView, len(roles))
+	for i, r := range roles {
+		result[i] = ApplicationViewToModel(r)
 	}
 	return result
 }
