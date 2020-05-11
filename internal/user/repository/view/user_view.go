@@ -54,10 +54,7 @@ func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return false, err
 	}
-	if user != nil {
-		return false, nil
-	}
-	return true, nil
+	return user == nil, nil
 }
 
 func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {

@@ -112,8 +112,8 @@ func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchRespo
 
 func userGrantViewsFromModel(users []*grant_model.UserGrantView) []*UserGrantView {
 	converted := make([]*UserGrantView, len(users))
-	for i, q := range users {
-		converted[i] = userGrantViewFromModel(q)
+	for i, user := range users {
+		converted[i] = userGrantViewFromModel(user)
 	}
 	return converted
 }
