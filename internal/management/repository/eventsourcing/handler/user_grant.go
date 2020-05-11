@@ -2,9 +2,14 @@ package handler
 
 import (
 	"context"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
+	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	grant_es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	"time"
 
 	"github.com/caos/logging"
@@ -12,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
@@ -38,27 +42,41 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserGrantQuery(sequence), nil
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
+		LatestSequenceFilter(sequence), nil
 }
 
 func (u *UserGrant) Process(event *models.Event) (err error) {
+	switch event.AggregateType {
+	case grant_es_model.UserGrantAggregate:
+		err = u.processUserGrant(event)
+	case usr_es_model.UserAggregate:
+		err = u.processUser(event)
+	case proj_es_model.ProjectAggregate:
+		err = u.processProject(event)
+	}
+	return err
+}
+
+func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 	grant := new(view_model.UserGrantView)
 	switch event.Type {
-	case es_model.UserGrantAdded:
+	case grant_es_model.UserGrantAdded:
 		grant.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = u.fillData(grant)
-	case es_model.UserGrantChanged,
-		es_model.UserGrantDeactivated,
-		es_model.UserGrantReactivated:
+	case grant_es_model.UserGrantChanged,
+		grant_es_model.UserGrantDeactivated,
+		grant_es_model.UserGrantReactivated:
 		grant, err = u.view.UserGrantByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = grant.AppendEvent(event)
-	case es_model.UserGrantRemoved:
+	case grant_es_model.UserGrantRemoved:
 		err = u.view.DeleteUserGrant(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
@@ -66,45 +84,86 @@ func (u *UserGrant) Process(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return u.view.PutUserGrant(grant)
+	return u.view.PutUserGrant(grant, grant.Sequence)
+}
+
+func (u *UserGrant) processUser(event *models.Event) (err error) {
+	switch event.Type {
+	case usr_es_model.UserProfileChanged,
+		usr_es_model.UserEmailChanged:
+		grants, err := u.view.UserGrantsByUserID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		user, err := u.userEvents.UserByID(context.Background(), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		for _, grant := range grants {
+			u.fillUserData(grant, user)
+			err = u.view.PutUserGrant(grant, event.Sequence)
+			if err != nil {
+				return err
+			}
+		}
+	default:
+		return u.view.ProcessedUserGrantSequence(event.Sequence)
+	}
+	return nil
+}
+
+func (u *UserGrant) processProject(event *models.Event) (err error) {
+	switch event.Type {
+	case proj_es_model.ProjectChanged:
+		grants, err := u.view.UserGrantsByProjectID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		project, err := u.projectEvents.ProjectByID(context.Background(), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		for _, grant := range grants {
+			u.fillProjectData(grant, project)
+			err = u.view.PutUserGrant(grant, event.Sequence)
+			if err != nil {
+				return err
+			}
+		}
+	default:
+		return u.view.ProcessedUserGrantSequence(event.Sequence)
+	}
+	return nil
 }
 
 func (u *UserGrant) fillData(grant *view_model.UserGrantView) (err error) {
-	err = u.fillUser(grant)
-	if err != nil {
-		return err
-	}
-	err = u.fillProject(grant)
-	if err != nil {
-		return err
-	}
-	return u.fillOrg(grant)
-}
-
-func (u *UserGrant) fillUser(grant *view_model.UserGrantView) error {
 	user, err := u.userEvents.UserByID(context.Background(), grant.UserID)
 	if err != nil {
 		return err
 	}
-	grant.UserName = user.UserName
-	grant.FirstName = user.FirstName
-	grant.LastName = user.LastName
-	grant.Email = user.EmailAddress
-	return nil
-}
-
-func (u *UserGrant) fillProject(grant *view_model.UserGrantView) error {
+	u.fillUserData(grant, user)
 	project, err := u.projectEvents.ProjectByID(context.Background(), grant.ProjectID)
 	if err != nil {
 		return err
 	}
-	grant.ProjectName = project.Name
+	u.fillProjectData(grant, project)
+	u.fillOrgData(grant)
 	return nil
 }
 
-func (u *UserGrant) fillOrg(grant *view_model.UserGrantView) error {
+func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_model.User) {
+	grant.UserName = user.UserName
+	grant.FirstName = user.FirstName
+	grant.LastName = user.LastName
+	grant.Email = user.EmailAddress
+}
+
+func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *proj_model.Project) {
+	grant.ProjectName = project.Name
+}
+
+func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView) {
 	//TODO: get ORG
-	return nil
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {
