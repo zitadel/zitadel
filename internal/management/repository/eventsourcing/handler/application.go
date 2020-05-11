@@ -68,7 +68,7 @@ func (p *Application) Process(event *models.Event) (err error) {
 	return p.view.PutApplication(app)
 }
 
-func (p *Application) OnError(event *models.Event, soolerError error) error {
-	logging.LogWithFields("SPOOL-ls9ew", "id", event.AggregateID).WithError(soolerError).Warn("something went wrong in project app handler")
-	return spooler.HandleError(event, soolerError, p.view.GetLatestApplicationFailedEvent, p.view.ProcessedApplicationFailedEvent, p.view.ProcessedApplicationSequence, p.errorCountUntilSkip)
+func (p *Application) OnError(event *models.Event, spoolerError error) error {
+	logging.LogWithFields("SPOOL-ls9ew", "id", event.AggregateID).WithError(spoolerError).Warn("something went wrong in project app handler")
+	return spooler.HandleError(event, spoolerError, p.view.GetLatestApplicationFailedEvent, p.view.ProcessedApplicationFailedEvent, p.view.ProcessedApplicationSequence, p.errorCountUntilSkip)
 }
