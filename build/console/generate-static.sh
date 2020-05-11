@@ -2,4 +2,4 @@
 
 set -eux
 
-go generate ../../pkg/console/statik/statik.go
+go generate pkg/console/statik/statik.go
