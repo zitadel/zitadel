@@ -449,6 +449,7 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 			name: "not member of org error",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
 				{Sequence: 6, Data: []byte("{\"userId\": \"banana\", \"roles\": [\"bananaa\"]}"), Type: org_model.OrgMemberAdded},
+				{Sequence: 7, Data: []byte("{\"userId\": \"apple\"}"), Type: org_model.OrgMemberRemoved},
 			}, nil)},
 			args: args{
 				ctx:    auth.NewMockContext("user", "org"),

@@ -74,7 +74,7 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ld93d", "member not set")
 	}
 
-	org, err := es.OrgByID(ctx, org_model.NewOrg(member.AggregateID))
+	org, err := es.OrgByID(ctx, &org_model.Org{ObjectRoot: member.ObjectRoot, Members: []*org_model.OrgMember{member}})
 	if err != nil {
 		return nil, err
 	}

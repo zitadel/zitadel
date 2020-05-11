@@ -406,11 +406,11 @@ func Test_precondtion(t *testing.T) {
 				t.FailNow()
 			}
 			err = precondtion(tx, tt.args.aggregate)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("precondtion() error = %v, wantErr %v", err, tt.wantErr)
+			if (err != nil) && (tt.isErr == nil) {
+				t.Errorf("no error expected got: %v", err)
 			}
-			if (tt.isErr != nil && err == nil) || (tt.isErr != nil && !tt.isErr(err)) {
-				t.Error("precondtion() wrong error", err)
+			if tt.isErr != nil && !tt.isErr(err) {
+				t.Errorf("precondtion() wrong error %T, %v", err, err)
 			}
 		})
 	}
