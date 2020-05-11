@@ -28,6 +28,19 @@ func SearchProjectGrantMembers(db *gorm.DB, table string, req *proj_model.Projec
 	return roles, count, nil
 }
 
+func ProjectGrantMembersByUserID(db *gorm.DB, table, userID string) ([]*model.ProjectGrantMemberView, error) {
+	members := make([]*model.ProjectGrantMemberView, 0)
+	queries := []*proj_model.ProjectGrantMemberSearchQuery{
+		&proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.PROJECTGRANTMEMBERSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS},
+	}
+	query := view.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Queries: queries})
+	_, err := query(db, &members)
+	if err != nil {
+		return nil, err
+	}
+	return members, nil
+}
+
 func PutProjectGrantMember(db *gorm.DB, table string, role *model.ProjectGrantMemberView) error {
 	save := view.PrepareSave(table)
 	return save(db, role)

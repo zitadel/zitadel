@@ -69,10 +69,10 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
 
 	return &EsRepository{
-		spool
-		ProjectRepo{conf.SearchLimit, project, view},
-		UserRepo{user},
-		UserGrantRepo{usergrant},
+		spool,
+		eventstore.ProjectRepo{conf.SearchLimit, project, view},
+		eventstore.UserRepo{user},
+		eventstore.UserGrantRepo{usergrant},
 	}, nil
 }
 
