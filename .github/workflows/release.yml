@@ -23,9 +23,8 @@ jobs:
     #- run: npm test 
     - run: echo "replace me with real test"
 
-  angular-build:
+  angular-lint: # will be added later on
     runs-on: ubuntu-18.04
-    needs: angular-test
     defaults:
       run:
         working-directory: ./console
@@ -34,8 +33,19 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: npm ci 
     - run: npm run lint
+
+  angular-build:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./console
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
     - run: npm run prodbuild
     - uses: actions/upload-artifact@v1
       with:
@@ -58,10 +68,21 @@ jobs:
       with:
         file: ./profile.cov
         name: codecov-go
+      
+  go-lint:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/checkout@v2
+    - name: Run golangci-lint
+      uses: actions-contrib/golangci-lint@v1
   
   go-build:
     runs-on: ubuntu-18.04
-    needs: [angular-build, go-test]
+    needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
