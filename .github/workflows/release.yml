@@ -162,7 +162,7 @@ jobs:
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Run Test
     #- run: npm test 
-    - run: echo "replace me with real test"
+      run: echo "replace me with real test"
 
   release:
     runs-on: ubuntu-18.04
