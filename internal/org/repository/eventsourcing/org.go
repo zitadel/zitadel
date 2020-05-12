@@ -78,7 +78,7 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 
 func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Org, updated *Org) ([]*es_models.Aggregate, error) {
 	if existing == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk83d", "existing org must not be nil")
 	}
 	if updated == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
