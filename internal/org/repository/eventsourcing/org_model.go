@@ -101,6 +101,8 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		o.removeMember(member.UserID)
 	}
 
+o.ObjectRoot.AppendEvent(event)
+
 	return nil
 }
 
