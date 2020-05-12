@@ -40,6 +40,7 @@ type initializer struct {
 
 const (
 	OrgOwnerRole                     = "ORG_OWNER"
+	SETUP_USER                       = "SETUP"
 	OIDCResponseType_CODE            = "CODE"
 	OIDCResponseType_ID_TOKEN        = "ID_TOKEN"
 	OIDCResponseType_TOKEN           = "TOKEN"
@@ -360,5 +361,5 @@ func getOIDCAuthMethod(authMethod string) proj_model.OIDCAuthMethodType {
 }
 
 func setSetUpContextData(ctx context.Context, orgID string) context.Context {
-	return context.WithValue(ctx, auth.GetCtxDataKey(), auth.CtxData{UserID: "setup", OrgID: orgID})
+	return context.WithValue(ctx, auth.GetCtxDataKey(), auth.CtxData{UserID: SETUP_USER, OrgID: orgID})
 }
