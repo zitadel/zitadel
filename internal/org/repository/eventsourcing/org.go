@@ -47,7 +47,7 @@ func OrgAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, i
 
 func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *Org) (_ []*es_models.Aggregate, err error) {
 	if org == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie7", "org should not be nil")
 	}
 
 	domainAgrregate, err := uniqueDomainAggregate(ctx, aggCreator, org.Domain)
