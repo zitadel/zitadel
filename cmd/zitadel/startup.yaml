@@ -50,31 +50,37 @@ Auth:
       GatewayPort: 50021
       CustomHeaders:
         - x-zitadel-
+  Repository:
+    SearchLimit: 100
+    Eventstore:
+      ServiceName: 'authAPI'
       Repository:
-        SearchLimit: 100
-        Eventstore:
-          ServiceName: 'ManagementAPI'
-          Repository:
-            SQL:
-              Host: $ZITADEL_EVENTSTORE_HOST
-              Port: $ZITADEL_EVENTSTORE_PORT
-              User: 'auth'
-              Database: 'auth'
-              SSLmode: disable
-          Cache:
-            Type: 'fastcache'
-            Config:
-              MaxCacheSizeInByte: 10485760 #10mb
-        View:
+        SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'auth'
           Database: 'auth'
           SSLmode: disable
-        Spooler:
-          ConcurrentTasks: 4
-          BulkLimit: 100
-          FailureCountUntilSkip: 5
+      Cache:
+        Type: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
+    AuthRequest:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'auth'
+      Database: 'auth'
+      SSLmode: disable
+    View:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'auth'
+      Database: 'auth'
+      SSLmode: disable
+    Spooler:
+      ConcurrentTasks: 4
+      BulkLimit: 100
+      FailureCountUntilSkip: 5
 
 Login:
 #  will get port range 5003x
