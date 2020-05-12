@@ -40,9 +40,9 @@ require (
 	go.opencensus.io v0.22.3
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
-	golang.org/x/sys v0.0.0-20200509044756-6aff5f38e54f // indirect
+	golang.org/x/sys v0.0.0-20200511232937-7e40ca221e25 // indirect
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20200511194401-8b0f8a79195e
+	golang.org/x/tools v0.0.0-20200512001501-aaeff5de670a
 	google.golang.org/api v0.24.0 // indirect
 	google.golang.org/genproto v0.0.0-20200511104702-f5ebc3bea380
 	google.golang.org/grpc v1.29.1
