@@ -40,3 +40,21 @@ func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_m
 	}
 	return repo.OrgEventstore.ReactivateOrg(ctx, org)
 }
+
+func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (member *org_model.OrgMember, err error) {
+	member = org_model.NewOrgMember(orgID, userID)
+	return repo.OrgEventstore.OrgMemberByIDs(ctx, member)
+}
+
+func (repo *OrgRepository) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	return repo.OrgEventstore.AddOrgMember(ctx, member)
+}
+
+func (repo *OrgRepository) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	return repo.OrgEventstore.ChangeOrgMember(ctx, member)
+}
+
+func (repo *OrgRepository) RemoveOrgMember(ctx context.Context, orgID, userID string) error {
+	member := org_model.NewOrgMember(orgID, userID)
+	return repo.OrgEventstore.RemoveOrgMember(ctx, member)
+}

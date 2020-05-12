@@ -66,7 +66,10 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 	switch event.Type {
 	case org_model.OrgAdded:
 		*o = Org{}
-		fallthrough
+		err := o.setData(event)
+		if err != nil {
+			return err
+		}
 	case org_model.OrgChanged:
 		err := o.setData(event)
 		if err != nil {

@@ -17,5 +17,5 @@ func NewOrgMemberWithRoles(orgID, userID string, roles ...string) *OrgMember {
 }
 
 func (member *OrgMember) IsValid() bool {
-	return member.AggregateID != "" && member.UserID != "" && len(member.Roles) != 0
+	return member.AggregateID != "" && member.UserID != ""
 }
