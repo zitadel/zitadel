@@ -1,9 +1,6 @@
 package model
 
 import (
-	"context"
-	"github.com/caos/zitadel/internal/api"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/model"
 	"time"
 )
@@ -63,18 +60,15 @@ type GrantedProjectSearchResponse struct {
 	Result      []*GrantedProjectView
 }
 
-func (r *GrantedProjectSearchRequest) AppendMyOrgQuery(ctx context.Context) {
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+func (r *GrantedProjectSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &GrantedProjectSearchQuery{Key: GRANTEDPROJECTSEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
 }
 
-func (r *GrantedProjectSearchRequest) AppendNotMyOrgQuery(ctx context.Context) {
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+func (r *GrantedProjectSearchRequest) AppendNotMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &GrantedProjectSearchQuery{Key: GRANTEDPROJECTSEARCHKEY_ORGID, Method: model.SEARCHMETHOD_NOT_EQUALS, Value: orgID})
 }
 
-func (r *GrantedProjectSearchRequest) AppendMyResourceOwnerQuery(ctx context.Context) {
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+func (r *GrantedProjectSearchRequest) AppendMyResourceOwnerQuery(orgID string) {
 	r.Queries = append(r.Queries, &GrantedProjectSearchQuery{Key: GRANTEDPROJECTSEARCHKEY_RESOURCE_OWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
 }
 

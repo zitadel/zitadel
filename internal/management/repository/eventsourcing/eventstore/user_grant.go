@@ -2,12 +2,16 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type UserGrantRepo struct {
+	SearchLimit     uint64
 	UserGrantEvents *grant_event.UserGrantEventStore
+	View            *view.View
 }
 
 func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrant, error) {
@@ -32,4 +36,18 @@ func (repo *UserGrantRepo) ReactivateUserGrant(ctx context.Context, grantID stri
 
 func (repo *UserGrantRepo) RemoveUserGrant(ctx context.Context, grantID string) error {
 	return repo.UserGrantEvents.RemoveUserGrant(ctx, grantID)
+}
+
+func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	grants, count, err := repo.View.SearchUserGrants(request)
+	if err != nil {
+		return nil, err
+	}
+	return &grant_model.UserGrantSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.UserGrantsToModel(grants),
+	}, nil
 }

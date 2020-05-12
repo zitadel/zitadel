@@ -6,8 +6,13 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) SearchUserGrants(ctx context.Context, request *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-dk3ds", "Not implemented")
+func (s *Server) SearchUserGrants(ctx context.Context, in *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
+	request := userGrantSearchRequestsToModel(in)
+	response, err := s.usergrant.SearchUserGrants(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantSearchResponseFromModel(response), nil
 }
 
 func (s *Server) UserGrantByID(ctx context.Context, request *UserGrantID) (*UserGrant, error) {
