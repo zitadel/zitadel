@@ -9,7 +9,7 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-func OrgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *OrgMember) (*es_models.Aggregate, error) {
+func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *OrgMember) (*es_models.Aggregate, error) {
 	if member == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "member must not be nil")
 	}
@@ -28,7 +28,7 @@ func OrgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 	return aggregate.SetPrecondition(validationQuery, validation).AppendEvent(org_model.OrgMemberAdded, member)
 }
 
-func OrgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *OrgMember, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *OrgMember, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil || existingMember == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "member should not be nil")
@@ -47,7 +47,7 @@ func OrgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingM
 	}
 }
 
-func OrgMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func orgMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member should not be nil")

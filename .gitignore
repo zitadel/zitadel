@@ -28,3 +28,6 @@ key.json
 .keys/*
 
 cockroach-data/*
+
+#binaries
+zitadel
