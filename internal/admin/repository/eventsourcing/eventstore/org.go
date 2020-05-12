@@ -64,7 +64,7 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context) ([]*org_model.Org, error) {
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	var found bool
 	err = sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), org_es.OrgNameUniqueQuery(name))
-	if err != nil && !errors.IsNotFound(err) {
+	if (err != nil && !errors.IsNotFound(err)) || found {
 		return false, err
 	}
 
