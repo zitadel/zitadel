@@ -5,7 +5,6 @@ type IAMSetUp struct {
 	IAMProject string
 	Orgs       []Org
 	Owners     []string
-	//Users      []User
 }
 
 type User struct {

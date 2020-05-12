@@ -297,9 +297,9 @@ func (setUp *initializer) oidcApp(ctx context.Context, project *proj_model.Proje
 }
 
 func getOIDCResponseTypes(responseTypes []string) []proj_model.OIDCResponseType {
-	types := make([]proj_model.OIDCResponseType, 0)
-	for _, t := range responseTypes {
-		types = append(types, getOIDCResponseType(t))
+	types := make([]proj_model.OIDCResponseType, len(responseTypes))
+	for i, t := range responseTypes {
+		types[i] = getOIDCResponseType(t)
 	}
 	return types
 }
@@ -317,9 +317,9 @@ func getOIDCResponseType(responseType string) proj_model.OIDCResponseType {
 }
 
 func getOIDCGrantTypes(grantTypes []string) []proj_model.OIDCGrantType {
-	types := make([]proj_model.OIDCGrantType, 0)
-	for _, t := range grantTypes {
-		types = append(types, getOIDCGrantType(t))
+	types := make([]proj_model.OIDCGrantType, len(grantTypes))
+	for i, t := range grantTypes {
+		types[i] = getOIDCGrantType(t)
 	}
 	return types
 }
