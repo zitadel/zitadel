@@ -47,10 +47,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 		return nil, err
 	}
 
-	setUp.Org = org_es.OrgToModel(org)
-	setUp.User = model.UserToModel(user)
-
-	return setUp, nil
+	return SetupToModel(setupModel), nil
 }
 
 func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
