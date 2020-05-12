@@ -92,7 +92,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
                 orgId: grant.grantedOrgId,
                 grantId: grant.id,
                 projectId: grant.projectId,
-                roles: grant.roleNamesList,
+                roleKeysList: grant.roleKeysList,
             },
             width: '400px',
         });
@@ -104,7 +104,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
                         this.projectId,
                         grant.id,
                         userid,
-                        dataToAdd.rolesList,
+                        dataToAdd.rolesKeyList,
                     ).then(() => {
                         this.toast.showInfo('Project Grant Member successfully added!');
                     }).catch(error => {

@@ -228,11 +228,11 @@ export class ProjectService {
     }
 
 
-    public async CreateProjectGrant(orgId: string, projectId: string, roleNames: string[]): Promise<ProjectGrant> {
+    public async CreateProjectGrant(orgId: string, projectId: string, roleKeys: string[]): Promise<ProjectGrant> {
         const req = new ProjectGrantCreate();
         req.setGrantedOrgId(orgId);
         req.setProjectId(projectId);
-        req.setRoleNamesList(roleNames);
+        req.setRoleKeysList(roleKeys);
         return await this.request(
             c => c.createProjectGrant,
             req,
@@ -293,8 +293,8 @@ export class ProjectService {
     public async AddProjectRole(role: ProjectRoleAdd.AsObject): Promise<Empty> {
         const req = new ProjectRoleAdd();
         req.setId(role.id);
-        req.setName(role.name);
         req.setDisplayName(role.displayName);
+        req.setKey(role.key);
         req.setGroup(role.group);
         return await this.request(
             c => c.addProjectRole,
@@ -303,10 +303,10 @@ export class ProjectService {
         );
     }
 
-    public async RemoveProjectRole(projectId: string, name: string): Promise<Empty> {
+    public async RemoveProjectRole(projectId: string, key: string): Promise<Empty> {
         const req = new ProjectRoleRemove();
         req.setId(projectId);
-        req.setName(name);
+        req.setKey(key);
         return await this.request(
             c => c.removeProjectRole,
             req,
@@ -420,15 +420,13 @@ export class ProjectService {
     }
 
     public async CreateProjectUserGrant(
-        orgId: string,
         projectId: string,
         userId: string,
-        rolesNamesList: string[],
+        roleKeysList: string[],
     ): Promise<UserGrant> {
         const req = new UserGrantCreate();
-        req.setOrgId(orgId);
         req.setProjectId(projectId);
-        req.setRoleNamesList(rolesNamesList);
+        req.setRoleKeysList(roleKeysList);
         req.setUserId(userId);
 
         return await this.request(

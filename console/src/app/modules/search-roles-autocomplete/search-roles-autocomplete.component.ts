@@ -5,7 +5,12 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from } from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
-import { ProjectRole, ProjectRoleSearchQuery } from 'src/app/proto/generated/management_pb';
+import {
+    ProjectRole,
+    ProjectRoleSearchKey,
+    ProjectRoleSearchQuery,
+    SearchMethod,
+} from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -37,8 +42,8 @@ export class SearchRolesAutocompleteComponent {
                 tap(() => this.isLoading = true),
                 switchMap(value => {
                     const query = new ProjectRoleSearchQuery();
-                    query.setKey(ProjectRoleSearchQuery.ProjectRoleSearchKey.NAME);
-                    query.setMethod(ProjectRoleSearchQuery.ProjectRoleSearchMethod.CONTAINS);
+                    query.setKey(ProjectRoleSearchKey.PROJECTROLESEARCHKEY_DISPLAY_NAME);
+                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
                     query.setValue(value);
                     return from(this.projectService.SearchProjectRoles(this.projectId, 10, 0, [query]));
                 }),
@@ -53,7 +58,7 @@ export class SearchRolesAutocompleteComponent {
     }
 
     public displayFn(project?: ProjectRole.AsObject): string | undefined {
-        return project ? `${project.name}` : undefined;
+        return project ? `${project.displayName}` : undefined;
     }
 
     public add(event: MatChipInputEvent): void {
@@ -63,8 +68,8 @@ export class SearchRolesAutocompleteComponent {
 
             if ((value || '').trim()) {
                 const index = this.filteredRoles.findIndex((role) => {
-                    if (role.name) {
-                        return role.name === value;
+                    if (role.key) {
+                        return role.key === value;
                     }
                 });
                 if (index > -1) {
@@ -91,7 +96,7 @@ export class SearchRolesAutocompleteComponent {
     }
 
     public selected(event: MatAutocompleteSelectedEvent): void {
-        const index = this.filteredRoles.findIndex((role) => role === event.option.value);
+        const index = this.filteredRoles.findIndex((role) => role.key === event.option.value);
         if (index !== -1) {
             if (this.singleOutput) {
                 this.selectionChanged.emit(this.filteredRoles[index]);

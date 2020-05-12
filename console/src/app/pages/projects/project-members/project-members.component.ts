@@ -95,8 +95,8 @@ export class ProjectMembersComponent implements AfterViewInit {
         const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
             data: {
                 creationType: this.project.type ===
-                    ProjectType.PROJECT_TYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-                    ProjectType.PROJECT_TYPE_SELF ? CreationType.PROJECT_OWNED : undefined,
+                    ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
+                    ProjectType.PROJECTTYPE_SELF ? CreationType.PROJECT_OWNED : undefined,
                 projectId: this.project.id,
             },
             width: '400px',

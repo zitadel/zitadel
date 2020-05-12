@@ -163,14 +163,12 @@ export class MgmtUserService {
     public async CreateUserGrant(
         projectId: string,
         userId: string,
-        orgId: string,
         roleNamesList: string[],
     ): Promise<UserGrant> {
         const req = new UserGrantCreate();
         req.setProjectId(projectId);
         req.setUserId(userId);
-        req.setOrgId(orgId);
-        req.setRoleNamesList(roleNamesList);
+        req.setRoleKeysList(roleNamesList);
 
         return await this.request(
             c => c.createUserGrant,
@@ -189,10 +187,10 @@ export class MgmtUserService {
         );
     }
 
-    public async AddRole(id: string, name: string, displayName: string, group: string): Promise<Empty> {
+    public async AddRole(id: string, key: string, displayName: string, group: string): Promise<Empty> {
         const req = new ProjectRoleAdd();
         req.setId(id);
-        req.setName(name);
+        req.setKey(key);
         req.setDisplayName(displayName);
         req.setGroup(group);
         return await this.request(

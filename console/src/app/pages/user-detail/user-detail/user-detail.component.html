@@ -73,10 +73,10 @@
                     <ng-container *ngIf="!emailEditState; else emailEdit">
                         <div class="actions">
                             <span class="name">{{email.email}}</span>
-                            <mat-icon *ngIf="email.isemailverified" color="primary" aria-hidden="false"
+                            <mat-icon *ngIf="email.isEmailVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
-                            <ng-container *ngIf="email.email && !email.isemailverified">
+                            <ng-container *ngIf="email.email && !email.isEmailVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
@@ -109,10 +109,10 @@
                     <ng-container *ngIf="!phoneEditState; else phoneEdit">
                         <div class="actions">
                             <span class="name">{{phone.phone}}</span>
-                            <mat-icon *ngIf="phone.isphoneverified" color="primary" aria-hidden="false"
+                            <mat-icon *ngIf="phone.isPhoneVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
-                            <ng-container *ngIf="phone.phone && !phone.isphoneverified">
+                            <ng-container *ngIf="phone.phone && !phone.isPhoneVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
 

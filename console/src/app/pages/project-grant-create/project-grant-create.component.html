@@ -50,7 +50,7 @@
             <button (click)="previous()" color="primary" mat-button class="small-button">
                 {{ 'ACTIONS.BACK' | translate }}
             </button>
-            <button color="primary" [disabled]="!org || rolesList.length == 0" (click)="addGrant()" mat-raised-button
+            <button color="primary" [disabled]="!org || rolesKeyList.length == 0" (click)="addGrant()" mat-raised-button
                 class="big-button" cdkFocusInitial>
                 {{ 'ACTIONS.SAVE' | translate }}
             </button>

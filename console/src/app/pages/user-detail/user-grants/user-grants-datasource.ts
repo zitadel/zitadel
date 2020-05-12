@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { UserGrant, UserGrantSearchQuery } from 'src/app/proto/generated/management_pb';
+import { UserGrant, UserGrantSearchKey, UserGrantSearchQuery } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
 export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
@@ -19,7 +19,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
 
         this.loadingSubject.next(true);
         const query = new UserGrantSearchQuery();
-        query.setKey(UserGrantSearchQuery.UserGrantSearchKey.USER_ID);
+        query.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
         query.setValue(userId);
         const queries: UserGrantSearchQuery[] = [query];
         from(this.userService.SearchUserGrants(10, 0, queries)).pipe(

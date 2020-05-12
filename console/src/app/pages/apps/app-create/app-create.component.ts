@@ -6,11 +6,11 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { OIDCAuthMethodType } from 'src/app/proto/generated/auth_pb';
 import {
     Application,
     OIDCApplicationCreate,
     OIDCApplicationType,
+    OIDCAuthMethodType,
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
@@ -29,24 +29,24 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public oidcApp: OIDCApplicationCreate.AsObject = new OIDCApplicationCreate().toObject();
     public oidcResponseTypes: OIDCResponseType[] = [
-        OIDCResponseType.CODE,
-        OIDCResponseType.ID_TOKEN,
-        OIDCResponseType.TOKEN_ID_TOKEN,
+        OIDCResponseType.OIDCRESPONSETYPE_CODE,
+        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
+        OIDCResponseType.OIDCRESPONSETYPE_TOKEN,
     ];
     public oidcGrantTypes: OIDCGrantType[] = [
-        OIDCGrantType.AUTHORIZATION_CODE,
-        OIDCGrantType.IMPLICIT,
-        OIDCGrantType.REFRESH_TOKEN,
+        OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
+        OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN,
     ];
     public oidcAppTypes: OIDCApplicationType[] = [
-        OIDCApplicationType.WEB,
-        OIDCApplicationType.USER_AGENT,
-        OIDCApplicationType.NATIVE,
+        OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
+        OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
+        OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
     ];
     public oidcAuthMethodType: OIDCAuthMethodType[] = [
-        OIDCAuthMethodType.AUTH_TYPE_BASIC,
-        OIDCAuthMethodType.AUTH_TYPE_NONE,
-        OIDCAuthMethodType.AUTH_TYPE_POST,
+        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
+        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
     ];
 
     public form!: FormGroup;

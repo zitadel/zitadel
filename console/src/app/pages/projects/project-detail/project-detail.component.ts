@@ -79,9 +79,9 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.projectId = id;
         this.projectService.GetProjectById(id).then(proj => {
             this.project = proj.toObject();
-            if (this.project.type !== ProjectType.PROJECT_TYPE_SELF ||
-                this.project.state === ProjectState.INACTIVE_PROJECT ||
-                this.project.state === ProjectState.UNKNOWN_PROJECT) {
+            if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||
+                this.project.state === ProjectState.PROJECTSTATE_INACTIVE ||
+                this.project.state === ProjectState.PROJECTSTATE_UNSPECIFIED) {
             }
 
             this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
@@ -96,13 +96,13 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
 
 
     public changeState(newState: ProjectState): void {
-        if (newState === ProjectState.ACTIVE_PROJECT) {
+        if (newState === ProjectState.PROJECTSTATE_ACTIVE) {
             this.projectService.ReactivateProject(this.projectId).then(() => {
                 this.toast.showInfo('Reactivated Project');
             }).catch(error => {
                 this.toast.showError(error.message);
             });
-        } else if (newState === ProjectState.INACTIVE_PROJECT) {
+        } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
             this.projectService.DeactivateProject(this.projectId).then(() => {
                 this.toast.showInfo('Deactivated Project');
             }).catch(error => {

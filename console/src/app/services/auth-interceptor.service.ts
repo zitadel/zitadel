@@ -13,12 +13,6 @@ export class AuthInterceptorService implements HttpInterceptor {
         console.log(req.url);
 
         return next.handle(req);
-        // req.clone({
-        //     setHeaders: {
-        //         'x-tmp-zitadel-custom': 'hello',
-        //     },
-        // }),
-        // );
     }
 
 }

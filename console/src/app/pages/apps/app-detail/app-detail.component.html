@@ -12,13 +12,13 @@
         <form [formGroup]="appNameForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
-                    <mat-button-toggle [value]="AppState.INACTIVE_APPLICATION" matTooltip="Deactivate Org">
+                    <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE" matTooltip="Deactivate Org">
                         <mat-icon svgIcon="mdi_light_off"></mat-icon>
-                        {{'APP.PAGES.DETAIL.STATE.'+AppState.INACTIVE_APPLICATION | translate}}
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
                     </mat-button-toggle>
-                    <mat-button-toggle [value]="AppState.ACTIVE_APPLICATION" matTooltip="Activate Org">
+                    <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE" matTooltip="Activate Org">
                         <mat-icon svgIcon="mdi_light_on"></mat-icon>
-                        {{'APP.PAGES.DETAIL.STATE.'+AppState.ACTIVE_APPLICATION | translate}}
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
                     </mat-button-toggle>
                 </mat-button-toggle-group>
 

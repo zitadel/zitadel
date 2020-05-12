@@ -131,12 +131,12 @@ export class OrgService {
     public async CreateProjectGrant(
         projectId: string,
         orgId: string,
-        roleNamesList: string[],
+        roleKeysList: string[],
     ): Promise<ProjectGrant> {
         const req = new ProjectGrantCreate();
         req.setProjectId(projectId);
         req.setGrantedOrgId(orgId);
-        req.setRoleNamesList(roleNamesList);
+        req.setRoleKeysList(roleKeysList);
         return await this.request(
             c => c.createProjectGrant,
             req,

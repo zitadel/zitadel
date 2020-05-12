@@ -40,9 +40,9 @@ export class ProjectContributorsComponent implements OnInit {
 
     public ngOnInit(): void {
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
-            this.project.type === ProjectType.PROJECT_TYPE_SELF ?
+            this.project.type === ProjectType.PROJECTTYPE_SELF ?
                 this.projectService.SearchProjectMembers(this.project.id, 100, 0) :
-                this.project.type === ProjectType.PROJECT_TYPE_GRANTED ?
+                this.project.type === ProjectType.PROJECTTYPE_GRANTED ?
                     this.projectService.SearchProjectGrantMembers(this.project.id, this.project.grantId, 100, 0) : undefined;
         if (promise) {
             from(promise).pipe(
@@ -63,8 +63,8 @@ export class ProjectContributorsComponent implements OnInit {
         const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
             data: {
                 creationType: this.project.type ===
-                    ProjectType.PROJECT_TYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-                    ProjectType.PROJECT_TYPE_SELF ? CreationType.PROJECT_OWNED : undefined,
+                    ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
+                    ProjectType.PROJECTTYPE_SELF ? CreationType.PROJECT_OWNED : undefined,
                 projectId: this.project.id,
             },
             width: '400px',
@@ -89,7 +89,7 @@ export class ProjectContributorsComponent implements OnInit {
     }
 
     public showDetail(): void {
-        if (this.project?.state === ProjectState.ACTIVE_PROJECT) {
+        if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
             this.router.navigate(['projects', this.project.id, 'members']);
         }
     }

@@ -18,7 +18,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     public org!: Org.AsObject;
     public projectId: string = '';
     public grantId: string = '';
-    public rolesList: string[] = [];
+    public rolesKeyList: string[] = [];
 
     public STEPS: number = 2;
     public currentCreateStep: number = 1;
@@ -65,7 +65,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
 
     public addGrant(): void {
         this.projectService
-            .CreateProjectGrant(this.org.id, this.projectId, this.rolesList)
+            .CreateProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
             .then((data) => {
                 console.log(data);
                 this.close();
@@ -83,7 +83,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
 
     public selectRoles(roles: ProjectRole.AsObject[]): void {
-        this.rolesList = roles.map(role => role.name);
+        this.rolesKeyList = roles.map(role => role.key);
     }
 
     public next(): void {

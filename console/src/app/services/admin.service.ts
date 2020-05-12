@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { Metadata } from 'grpc-web';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
-import { CreateOrgRequest, OrgSetUpRequest, OrgSetUpResponse } from '../proto/generated/admin_pb';
-import { RegisterUserRequest } from '../proto/generated/auth_pb';
+import { CreateOrgRequest, OrgSetUpRequest, OrgSetUpResponse, RegisterUserRequest } from '../proto/generated/admin_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
 

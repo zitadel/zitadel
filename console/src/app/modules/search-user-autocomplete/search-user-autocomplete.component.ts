@@ -5,7 +5,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { User, UserSearchKey, UserSearchMethod, UserSearchQuery } from 'src/app/proto/generated/management_pb';
+import { SearchMethod, User, UserSearchKey, UserSearchQuery } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -50,9 +50,9 @@ export class SearchUserAutocompleteComponent {
             tap(() => this.isLoading = true),
             switchMap(value => {
                 const query = new UserSearchQuery();
-                query.setKey(UserSearchKey.EMAIL);
+                query.setKey(UserSearchKey.USERSEARCHKEY_EMAIL);
                 query.setValue(value);
-                query.setMethod(UserSearchMethod.CONTAINS);
+                query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
                 if (this.target === UserTarget.SELF) {
                     return from(this.userService.SearchUsers(10, 0, [query]));
                 } else {

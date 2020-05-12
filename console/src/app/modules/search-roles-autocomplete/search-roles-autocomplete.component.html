@@ -7,7 +7,7 @@
         <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
             <mat-chip class="chip" *ngFor="let selectedRole of roles" [selectable]="selectable" [removable]="removable"
                 (removed)="remove(selectedRole)">
-                {{selectedRole.name}}
+                {{selectedRole.displayName}}
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
             <input placeholder="Role Name" #nameInput [formControl]="myControl" [matAutocomplete]="auto"
@@ -19,8 +19,8 @@
             <mat-option *ngIf="isLoading" class="is-loading">
                 <mat-spinner diameter="30"></mat-spinner>
             </mat-option>
-            <mat-option *ngFor="let role of filteredRoles" [value]="role">
-                {{role.name}}
+            <mat-option *ngFor="let role of filteredRoles" [value]="role.key">
+                {{role.displayName}}
             </mat-option>
         </mat-autocomplete>
     </mat-form-field>

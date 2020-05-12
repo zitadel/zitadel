@@ -6,7 +6,7 @@ import { GrpcHandler } from './grpc-handler';
 import { GrpcInterceptor } from './grpc-interceptor';
 import { StorageService } from './storage.service';
 
-const orgKey = 'x-tmp-zitadel-orgid';
+const orgKey = 'x-zitadel-orgid';
 
 @Injectable({ providedIn: 'root' })
 export class GrpcOrgInterceptor implements GrpcInterceptor {

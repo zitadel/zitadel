@@ -5,7 +5,7 @@ import { User } from 'src/app/proto/generated/management_pb';
 
 export interface ProjectGrantMembersCreateDialogExportType {
     userIds: string[];
-    rolesList: string[];
+    rolesKeyList: string[];
 }
 @Component({
     selector: 'app-project-grant-members-create-dialog',
@@ -15,7 +15,7 @@ export interface ProjectGrantMembersCreateDialogExportType {
 export class ProjectGrantMembersCreateDialogComponent {
     public form!: FormGroup;
     public userIds: string[] = [];
-    public rolesList: string[] = [];
+    public roleKeyList: string[] = [];
 
     constructor(
         public dialogRef: MatDialogRef<ProjectGrantMembersCreateDialogComponent>,
@@ -31,7 +31,10 @@ export class ProjectGrantMembersCreateDialogComponent {
     }
 
     public closeDialogWithSuccess(): void {
-        const exportData: ProjectGrantMembersCreateDialogExportType = { userIds: this.userIds, rolesList: this.rolesList };
+        const exportData: ProjectGrantMembersCreateDialogExportType = {
+            userIds: this.userIds,
+            rolesKeyList: this.roleKeyList,
+        };
         this.dialogRef.close(exportData);
     }
 }

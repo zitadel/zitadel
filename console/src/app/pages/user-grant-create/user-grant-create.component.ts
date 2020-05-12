@@ -50,7 +50,6 @@ export class UserGrantCreateComponent implements OnDestroy {
         this.userService.CreateUserGrant(
             this.projectId,
             this.userId,
-            this.org.id,
             this.rolesList,
         ).then((data: UserGrant) => {
             console.log(data);
@@ -66,7 +65,7 @@ export class UserGrantCreateComponent implements OnDestroy {
     }
 
     public selectRoles(roles: ProjectRole.AsObject[]): void {
-        this.rolesList = roles.map(role => role.name);
+        this.rolesList = roles.map(role => role.key);
     }
 
     public next(): void {

@@ -6,9 +6,6 @@ import { switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
-    GrantSearchQuery,
-    GrantSearchRequest,
-    GrantSearchResponse,
     MfaOtpResponse,
     MultiFactors,
     MyProjectOrgSearchQuery,
@@ -22,7 +19,6 @@ import {
     UpdateUserProfileRequest,
     UserAddress,
     UserEmail,
-    UserID,
     UserPhone,
     UserProfile,
     UserSessionViews,
@@ -136,7 +132,7 @@ export class AuthUserService {
 
     private async getMyzitadelPermissions(): Promise<any> {
         return await this.request(
-            c => c.getMyzitadelPermissions,
+            c => c.getMyZitadelPermissions,
             new Empty(),
             f => f,
         );
@@ -182,9 +178,8 @@ export class AuthUserService {
         );
     }
 
-    public async ResendEmailVerification(id: string): Promise<Empty> {
-        const req = new UserID();
-        req.setId(id);
+    public async ResendEmailVerification(): Promise<Empty> {
+        const req = new Empty();
         return await this.request(
             c => c.resendMyEmailVerificationMail,
             req,
@@ -192,9 +187,8 @@ export class AuthUserService {
         );
     }
 
-    public async ResendPhoneVerification(id: string): Promise<Empty> {
-        const req = new UserID();
-        req.setId(id);
+    public async ResendPhoneVerification(): Promise<Empty> {
+        const req = new Empty();
         return await this.request(
             c => c.resendMyPhoneVerificationCode,
             req,
@@ -269,24 +263,6 @@ export class AuthUserService {
         req.setCountry(address.country);
         return await this.request(
             c => c.updateMyUserAddress,
-            req,
-            f => f,
-        );
-    }
-
-    public async SearchGrant(
-        limit: number,
-        offset: number,
-        queryList?: GrantSearchQuery[],
-    ): Promise<GrantSearchResponse> {
-        const req = new GrantSearchRequest();
-        req.setLimit(limit);
-        req.setOffset(offset);
-        if (queryList) {
-            req.setQueriesList(queryList);
-        }
-        return await this.request(
-            c => c.searchGrant,
             req,
             f => f,
         );

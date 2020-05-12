@@ -25,7 +25,7 @@
     "@angular/platform-browser-dynamic": "~9.1.0",
     "@angular/router": "~9.1.0",
     "@angular/service-worker": "~9.1.0",
-    "@ngx-translate/core": "^12.1.1",
+    "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^4.0.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/uuid": "^7.0.0",

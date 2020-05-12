@@ -8,9 +8,9 @@
 
     <mat-form-field class="full-width">
         <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
-        <mat-select [(ngModel)]="rolesList" multiple>
-            <mat-option *ngFor="let role of data.roles" [value]="role">
-                {{ role }}
+        <mat-select [(ngModel)]="roleKeyList" multiple>
+            <mat-option *ngFor="let key of data.roleKeysList" [value]="key">
+                {{ key }}
             </mat-option>
         </mat-select>
     </mat-form-field>
@@ -20,7 +20,7 @@
         cancel
     </button>
 
-    <button [disabled]="userIds.length == 0 || rolesList.length == 0" color="primary" mat-raised-button
+    <button [disabled]="userIds.length == 0 || roleKeyList.length == 0" color="primary" mat-raised-button
         class="ok-button" (click)="closeDialogWithSuccess()">
         Add
     </button>

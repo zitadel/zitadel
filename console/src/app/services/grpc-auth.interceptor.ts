@@ -26,10 +26,5 @@ export class GrpcAuthInterceptor implements GrpcInterceptor {
         }
 
         return await next.handle(req, metadata);
-        // .catch(error => {
-        //     if (error.code === 7) {
-        //         this.authService.authenticate();
-        //     }
-        // });
     }
 }

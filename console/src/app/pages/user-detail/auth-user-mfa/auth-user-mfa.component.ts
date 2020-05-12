@@ -60,7 +60,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public deleteMFA(type: MfaType): void {
-        if (type === MfaType.MFA_OTP) {
+        if (type === MfaType.MFATYPE_OTP) {
             this.userService.RemoveMfaOTP().then(() => {
                 this.toast.showInfo('OTP Deleted');
 

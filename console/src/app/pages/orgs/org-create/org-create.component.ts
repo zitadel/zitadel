@@ -3,8 +3,7 @@ import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CreateOrgRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
-import { RegisterUserRequest } from 'src/app/proto/generated/auth_pb';
+import { CreateOrgRequest, Gender, OrgSetUpResponse, RegisterUserRequest } from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -43,7 +42,7 @@ export class OrgCreateComponent {
     public orgForm!: FormGroup;
     public userForm!: FormGroup;
 
-    public genders: Gender[] = [Gender.FEMALE, Gender.MALE, Gender.UNKNOWN_GENDER];
+    public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
     constructor(
         private router: Router,

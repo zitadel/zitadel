@@ -76,11 +76,11 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     public deleteSelectedRoles(): Promise<any> {
         const oldState = this.dataSource.rolesSubject.value;
         const indexes = this.selection.selected.map(sel => {
-            return oldState.findIndex(iter => iter.name === sel.name);
+            return oldState.findIndex(iter => iter.key === sel.key);
         });
 
         return Promise.all(this.selection.selected.map(role => {
-            return this.projectService.RemoveProjectRole(role.projectId, role.name);
+            return this.projectService.RemoveProjectRole(role.projectId, role.key);
         })).then(() => {
             this.toast.showInfo('Deleted');
             indexes.forEach(index => {
@@ -97,7 +97,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
 
     public removeRole(role: ProjectRole.AsObject, index: number): void {
         this.projectService
-            .RemoveProjectRole(role.projectId, role.name)
+            .RemoveProjectRole(role.projectId, role.key)
             .then(() => {
                 this.toast.showInfo('Role removed');
                 this.dataSource.rolesSubject.value.splice(index, 1);

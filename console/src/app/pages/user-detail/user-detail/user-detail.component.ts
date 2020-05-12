@@ -47,7 +47,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public email!: UserEmail.AsObject;
     public phone!: UserPhone.AsObject;
     public address!: UserAddress.AsObject;
-    public genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
+    public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
     public passwordForm!: FormGroup;
@@ -189,12 +189,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
 
     public sendSetPasswordNotification(): void {
-        this.mgmtUserService.SendSetPasswordNotification(this.profile.id, NotificationType.EMAIL).then((data: any) => {
-            this.toast.showInfo('Set initial Password');
-            this.email = data.toObject();
-        }).catch(data => {
-            this.toast.showError(data.message);
-        });
+        this.mgmtUserService.SendSetPasswordNotification(this.profile.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
+            .then((data: any) => {
+                this.toast.showInfo('Set initial Password');
+                this.email = data.toObject();
+            }).catch(data => {
+                this.toast.showError(data.message);
+            });
     }
 
     public saveEmail(): void {

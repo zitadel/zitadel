@@ -42,25 +42,25 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public app!: Application.AsObject;
     public oidcResponseTypes: OIDCResponseType[] = [
-        OIDCResponseType.CODE,
-        OIDCResponseType.ID_TOKEN,
-        OIDCResponseType.TOKEN_ID_TOKEN,
+        OIDCResponseType.OIDCRESPONSETYPE_CODE,
+        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
+        OIDCResponseType.OIDCRESPONSETYPE_TOKEN,
     ];
     public oidcGrantTypes: OIDCGrantType[] = [
-        OIDCGrantType.AUTHORIZATION_CODE,
-        OIDCGrantType.IMPLICIT,
-        OIDCGrantType.REFRESH_TOKEN,
+        OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
+        OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN,
     ];
     public oidcAppTypes: OIDCApplicationType[] = [
-        OIDCApplicationType.WEB,
-        OIDCApplicationType.USER_AGENT,
-        OIDCApplicationType.NATIVE,
+        OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
+        OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
+        OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
     ];
 
     public oidcAuthMethodType: OIDCAuthMethodType[] = [
-        OIDCAuthMethodType.AUTH_TYPE_BASIC,
-        OIDCAuthMethodType.AUTH_TYPE_POST,
-        OIDCAuthMethodType.AUTH_TYPE_NONE,
+        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
+        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
     ];
 
     public AppState: any = AppState;
@@ -105,7 +105,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.projectId = projectid;
         this.app = (await this.projectService.GetApplicationById(projectid, id)).toObject();
         this.appNameForm.patchValue(this.app);
-        if (this.app.state !== AppState.ACTIVE_APPLICATION) {
+        if (this.app.state !== AppState.APPSTATE_ACTIVE) {
             this.appNameForm.controls['name'].disable();
             this.appForm.disable();
         } else {
@@ -125,13 +125,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public changeState(event: MatButtonToggleChange): void {
-        if (event.value === AppState.ACTIVE_APPLICATION) {
+        if (event.value === AppState.APPSTATE_ACTIVE) {
             this.projectService.ReactivateApplication(this.app.id).then(() => {
                 this.toast.showInfo('Reactivated Application');
             }).catch((error: any) => {
                 this.toast.showError(error.message);
             });
-        } else if (event.value === AppState.INACTIVE_APPLICATION) {
+        } else if (event.value === AppState.APPSTATE_INACTIVE) {
             this.projectService.DectivateApplication(this.app.id).then(() => {
                 this.toast.showInfo('Deactivated Application');
             }).catch((error: any) => {
@@ -139,7 +139,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             });
         }
 
-        if (event.value !== AppState.ACTIVE_APPLICATION) {
+        if (event.value !== AppState.APPSTATE_ACTIVE) {
             this.appNameForm.controls['name'].disable();
             this.appForm.disable();
         } else {

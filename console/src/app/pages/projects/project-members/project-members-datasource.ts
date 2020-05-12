@@ -25,9 +25,9 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         this.loadingSubject.next(true);
 
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
-            project.type === ProjectType.PROJECT_TYPE_SELF ?
+            project.type === ProjectType.PROJECTTYPE_SELF ?
                 this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
-                project.type === ProjectType.PROJECT_TYPE_GRANTED ?
+                project.type === ProjectType.PROJECTTYPE_GRANTED ?
                     this.projectService.SearchProjectGrantMembers(project.id, project.grantId, pageSize, offset) : undefined;
         if (promise) {
             from(promise).pipe(

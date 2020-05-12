@@ -5,7 +5,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from } from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
-import { Project, ProjectSearchQuery } from 'src/app/proto/generated/management_pb';
+import { Project, ProjectSearchKey, ProjectSearchQuery, SearchMethod } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -35,9 +35,9 @@ export class SearchProjectAutocompleteComponent {
                 tap(() => this.isLoading = true),
                 switchMap(value => {
                     const query = new ProjectSearchQuery();
-                    query.setKey(ProjectSearchQuery.ProjectSearchKey.PROJECT_NAME);
+                    query.setKey(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
                     query.setValue(value);
-                    query.setMethod(ProjectSearchQuery.ProjectSearchMethod.CONTAINS);
+                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
                     return from(this.projectService.SearchProjects(10, 0, [query]));
                 }),
                 // finalize(() => this.isLoading = false),

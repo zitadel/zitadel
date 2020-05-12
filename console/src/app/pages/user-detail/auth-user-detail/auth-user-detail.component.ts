@@ -37,7 +37,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public email!: UserEmail.AsObject;
     public phone!: UserPhone.AsObject;
     public address!: UserAddress.AsObject;
-    public genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
+    public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
     public passwordForm!: FormGroup;
@@ -177,7 +177,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public resendVerification(): void {
-        this.userService.ResendEmailVerification(this.profile.id).then((data: any) => {
+        this.userService.ResendEmailVerification().then((data: any) => {
             this.toast.showInfo('Saved Email');
             this.email = data.toObject();
         }).catch(data => {
@@ -187,7 +187,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public resendPhoneVerification(): void {
         console.log('resendverification');
-        this.userService.ResendPhoneVerification(this.profile.id).then((data: any) => {
+        this.userService.ResendPhoneVerification().then((data: any) => {
             console.log(data);
             this.toast.showInfo('Phoneverification was successfully sent!');
             this.email = data.toObject();

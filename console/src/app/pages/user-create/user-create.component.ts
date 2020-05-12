@@ -13,7 +13,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class UserCreateComponent implements OnDestroy {
     public user: CreateUserRequest.AsObject = new CreateUserRequest().toObject();
-    public genders: Gender[] = [Gender.FEMALE, Gender.MALE, Gender.UNKNOWN_GENDER];
+    public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
     public userForm!: FormGroup;
 
@@ -29,7 +29,7 @@ export class UserCreateComponent implements OnDestroy {
             lastName: ['', Validators.required],
             nickName: [''],
             displayName: [{ value: '', disabled: false }],
-            gender: [Gender.UNKNOWN_GENDER],
+            gender: [Gender.GENDER_UNSPECIFIED],
             preferredLanguage: [''],
             phone: [''],
             streetAddress: [''],
