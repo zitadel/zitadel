@@ -66,7 +66,11 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 	o.ObjectRoot.AppendEvent(event)
 
 	switch event.Type {
-	case org_model.OrgAdded, org_model.OrgChanged:
+	case org_model.OrgAdded:
+		*o = Org{}
+		o.ObjectRoot.AppendEvent(event)
+		fallthrough
+	case org_model.OrgChanged:
 		err := json.Unmarshal(event.Data, o)
 		if err != nil {
 			return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")

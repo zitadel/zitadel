@@ -20,7 +20,6 @@ type Config struct {
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
 	eventstore.OrgRepo
-	eventstore.UserRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -55,8 +54,11 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to execute setup")
 
 	return &EsRepository{
-		eventstore.OrgRepo{org},
-		eventstore.UserRepo{user},
+		OrgRepo: eventstore.OrgRepo{
+			Eventstore:     es,
+			OrgEventstore:  org,
+			UserEventstore: user,
+		},
 	}, nil
 }
 

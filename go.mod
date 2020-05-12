@@ -12,7 +12,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/VictoriaMetrics/fastcache v1.5.7
 	github.com/allegro/bigcache v1.2.1
-	github.com/aws/aws-sdk-go v1.30.24 // indirect
+	github.com/aws/aws-sdk-go v1.30.25 // indirect
 	github.com/caos/logging v0.0.1
 	github.com/cockroachdb/cockroach-go v0.0.0-20200504194139-73ffeee90b62
 	github.com/envoyproxy/protoc-gen-validate v0.3.0
@@ -42,9 +42,9 @@ require (
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
 	golang.org/x/sys v0.0.0-20200509044756-6aff5f38e54f // indirect
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20200509030707-2212a7e161a5
-	google.golang.org/api v0.23.0 // indirect
-	google.golang.org/genproto v0.0.0-20200507105951-43844f6eee31
+	golang.org/x/tools v0.0.0-20200511194401-8b0f8a79195e
+	google.golang.org/api v0.24.0 // indirect
+	google.golang.org/genproto v0.0.0-20200511104702-f5ebc3bea380
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.22.0
 	gopkg.in/yaml.v2 v2.2.8 // indirect

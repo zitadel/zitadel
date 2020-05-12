@@ -6,49 +6,50 @@ import (
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 type OrgRepo struct {
-	*org_es.OrgEventstore
+	Eventstore     eventstore.Eventstore
+	OrgEventstore  *org_es.OrgEventstore
+	UserEventstore *usr_es.UserEventstore
 }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
-	eventstoreOrg := eventsourcing.OrgFromModel(setUp.Org)
-	aggregates, err := eventsourcing.OrgCreatedAggregates(ctx, repo.AggregateCreator(), eventstoreOrg)
+	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, setUp.Org)
 	if err != nil {
 		return nil, err
 	}
-	orgID := aggregates[0].ID
 
-	userAggregate, err := repo.AggregateCreator().NewAggregate(ctx, "user3", "user", "v0", 0, models.OverwriteResourceOwner(orgID)) //TODO: create user with org as resource owner
+	user, userAggregate, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	userAggregate, err = userAggregate.AppendEvent("user.created", setUp.User)
-	if err != nil {
-		return nil, err
-	}
-	userID := userAggregate.ID
+
 	aggregates = append(aggregates, userAggregate)
+	setupModel := &Setup{Org: org, User: user}
 
-	eventstoreMember := eventsourcing.OrgMemberFromModel(org_model.NewOrgMemberWithRoles(orgID, userID, "ORG_ADMIN")) //TODO: role as const
-	memberAggregate, err := eventsourcing.OrgMemberAddedAggregate(repo.AggregateCreator(), eventstoreMember)(ctx)
+	member := org_model.NewOrgMemberWithRoles(org.AggregateID, user.AggregateID, "ORG_ADMIN") //TODO: role as const
+	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member)
 	if err != nil {
 		return nil, err
 	}
 	aggregates = append(aggregates, memberAggregate)
 
-	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, eventstoreOrg.AppendEvents, aggregates...)
+	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, setupModel.AppendEvents, aggregates...)
 	if err != nil {
 		return nil, err
 	}
 
-	setUp.Org = eventsourcing.OrgToModel(eventstoreOrg)
+	setUp.Org = org_es.OrgToModel(org)
+	setUp.User = model.UserToModel(user)
+
 	return setUp, nil
 }
 
@@ -62,12 +63,12 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context) ([]*org_model.Org, error) {
 
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	var found bool
-	err = sdk.Filter(ctx, repo.FilterEvents, isUniqueValidation(&found), eventsourcing.OrgNameUniqueQuery(name))
+	err = sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), org_es.OrgNameUniqueQuery(name))
 	if err != nil && !errors.IsNotFound(err) {
 		return false, err
 	}
 
-	err = sdk.Filter(ctx, repo.FilterEvents, isUniqueValidation(&found), eventsourcing.OrgDomainUniqueQuery(domain))
+	err = sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), org_es.OrgDomainUniqueQuery(domain))
 	if err != nil && !errors.IsNotFound(err) {
 		return false, err
 	}
@@ -75,8 +76,8 @@ func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUn
 	return !found, nil
 }
 
-func isUniqueValidation(unique *bool) func(events ...*models.Event) error {
-	return func(events ...*models.Event) error {
+func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
 		if len(events) == 0 {
 			return nil
 		}

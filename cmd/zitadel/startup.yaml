@@ -66,8 +66,8 @@ Admin:
       ServiceName: 'Admin'
       Repository:
         SQL:
-          Host: $CR_HOST
-          Port: $CR_PORT
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
           User: 'eventstore'
           Database: 'eventstore'
           SSLmode: disable
