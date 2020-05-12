@@ -64,7 +64,5 @@ func (repo *EsRepository) Health() error {
 	if err != nil {
 		return err
 	}
-	err = repo.OrgEventstore.Health(context.TODO())
-
-	return err
+	return repo.OrgEventstore.Health(context.TODO())
 }

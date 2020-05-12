@@ -68,10 +68,7 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		*o = Org{}
 		fallthrough
 	case org_model.OrgChanged:
-		err := json.Unmarshal(event.Data, o)
-		if err != nil {
-			return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
-		}
+		return o.setData(event)
 	case org_model.OrgDeactivated:
 		o.State = int32(org_model.ORGSTATE_INACTIVE)
 	case org_model.OrgReactivated:
@@ -101,8 +98,16 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		o.removeMember(member.UserID)
 	}
 
-o.ObjectRoot.AppendEvent(event)
+	o.ObjectRoot.AppendEvent(event)
 
+	return nil
+}
+
+func (o *Org) setData(event *es_models.Event) error {
+	err := json.Unmarshal(event.Data, o)
+	if err != nil {
+		return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
+	}
 	return nil
 }
 
