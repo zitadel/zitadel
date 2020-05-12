@@ -918,14 +918,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserAddress(arg0, arg1 int
 }
 
 // GetUserByEmailGlobal mocks base method
-func (m *MockManagementServiceClient) GetUserByEmailGlobal(arg0 context.Context, arg1 *grpc.UserEmailID, arg2 ...grpc0.CallOption) (*grpc.User, error) {
+func (m *MockManagementServiceClient) GetUserByEmailGlobal(arg0 context.Context, arg1 *grpc.UserEmailID, arg2 ...grpc0.CallOption) (*grpc.UserView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetUserByEmailGlobal", varargs...)
-	ret0, _ := ret[0].(*grpc.User)
+	ret0, _ := ret[0].(*grpc.UserView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

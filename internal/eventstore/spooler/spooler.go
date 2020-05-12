@@ -103,7 +103,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 	return nil
 }
 
-func HandleError(event *models.Event,
+func HandleError(event *models.Event, failedErr error,
 	latestFailedEvent func(sequence uint64) (*global_view.FailedEvent, error),
 	processFailedEvent func(*global_view.FailedEvent) error,
 	processSequence func(uint64) error, errorCountUntilSkip uint64) error {
@@ -112,7 +112,7 @@ func HandleError(event *models.Event,
 		return err
 	}
 	failedEvent.FailureCount++
-	failedEvent.ErrMsg = err.Error()
+	failedEvent.ErrMsg = failedErr.Error()
 	err = processFailedEvent(failedEvent)
 	if err != nil {
 		return err

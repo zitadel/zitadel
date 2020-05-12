@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api"
+	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -12,8 +14,9 @@ func (s *Server) GetProjectGrantMemberRoles(ctx context.Context, _ *empty.Empty)
 
 func (s *Server) SearchProjectGrants(ctx context.Context, in *ProjectGrantSearchRequest) (*ProjectGrantSearchResponse, error) {
 	request := projectGrantSearchRequestsToModel(in)
-	request.AppendMyResourceOwnerQuery(ctx)
-	request.AppendNotMyOrgQuery(ctx)
+	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	request.AppendMyResourceOwnerQuery(orgID)
+	request.AppendNotMyOrgQuery(orgID)
 	response, err := s.project.SearchGrantedProjects(ctx, request)
 	if err != nil {
 		return nil, err

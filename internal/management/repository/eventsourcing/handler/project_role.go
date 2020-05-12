@@ -148,5 +148,5 @@ func getRoleFromProject(roleKey string, project *proj_model.Project) *proj_model
 
 func (p *ProjectRole) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-lso9w", "id", event.AggregateID).WithError(err).Warn("something went wrong in project role handler")
-	return spooler.HandleError(event, p.view.GetLatestProjectRoleFailedEvent, p.view.ProcessedProjectRoleFailedEvent, p.view.ProcessedProjectRoleSequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestProjectRoleFailedEvent, p.view.ProcessedProjectRoleFailedEvent, p.view.ProcessedProjectRoleSequence, p.errorCountUntilSkip)
 }
