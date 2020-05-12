@@ -15,7 +15,14 @@ func (es *PolicyEventstore) GetPasswordLockoutPolicy(ctx context.Context, id str
 	query := PasswordLockoutPolicyQuery(id, policy.Sequence)
 	err := es_sdk.Filter(ctx, es.FilterEvents, policy.AppendEvents, query)
 	if err != nil {
-		return nil, err
+		// load default values
+		if policy.Description == "" {
+			policy.Description = es.passwordComplexityPolicyDefault.Description
+			policy.MaxAttempts = es.passwordLockoutPolicyDefault.MaxAttempts
+			policy.ShowLockOutFailures = es.passwordLockoutPolicyDefault.ShowLockOutFailures
+		} else {
+			return nil, err
+		}
 	}
 	es.policyCache.cacheLockoutPolicy(policy)
 	return PasswordLockoutPolicyToModel(policy), nil

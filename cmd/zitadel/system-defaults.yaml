@@ -6,3 +6,19 @@ SecretGenerators:
     IncludeUpperLetters: true
     IncludeDigits: true
     IncludeSymbols: true
+DefaultPolicies:
+  Age:
+    Description: Age
+    MaxAgeDays: 365
+    ExpireWarnDays: 10 
+  Complexity:
+    Description: Complexity
+    MinLength: 8
+    HasLowercase: true
+    HasUppercase: false
+    HasNumber: true
+    HasSymbol: true
+  Lockout:
+    Description: Lockout
+    MaxAttempts: 5
+    ShowLockOutFailures: true

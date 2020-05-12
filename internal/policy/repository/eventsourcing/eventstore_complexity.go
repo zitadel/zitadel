@@ -15,7 +15,17 @@ func (es *PolicyEventstore) GetPasswordComplexityPolicy(ctx context.Context, id 
 	query := PasswordComplexityPolicyQuery(id, policy.Sequence)
 	err := es_sdk.Filter(ctx, es.FilterEvents, policy.AppendEvents, query)
 	if err != nil {
-		return nil, err
+		// load default values
+		if policy.Description == "" {
+			policy.Description = es.passwordComplexityPolicyDefault.Description
+			policy.MinLength = es.passwordComplexityPolicyDefault.MinLength
+			policy.HasLowercase = es.passwordComplexityPolicyDefault.HasLowercase
+			policy.HasUppercase = es.passwordComplexityPolicyDefault.HasUppercase
+			policy.HasNumber = es.passwordComplexityPolicyDefault.HasNumber
+			policy.HasSymbol = es.passwordComplexityPolicyDefault.HasSymbol
+		} else {
+			return nil, err
+		}
 	}
 	es.policyCache.cacheComplexityPolicy(policy)
 	return PasswordComplexityPolicyToModel(policy), nil
