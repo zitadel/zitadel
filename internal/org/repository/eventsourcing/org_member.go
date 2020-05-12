@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -77,7 +76,9 @@ func addMemberValidation(aggregate *es_models.Aggregate, member *OrgMember) func
 				switch event.Type {
 				case org_model.OrgMemberAdded, org_model.OrgMemberRemoved:
 					manipulatedMember, err := OrgMemberFromEvent(new(OrgMember), event)
-					logging.Log("EVENT-YoDqa").OnError(err).Debug("unable to get member from event")
+					if err != nil {
+						return errors.ThrowInternal(err, "EVENT-Eg8St", "unable to validate object")
+					}
 					if manipulatedMember.UserID == member.UserID {
 						isMember = event.Type == org_model.OrgMemberAdded
 					}
