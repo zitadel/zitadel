@@ -255,7 +255,7 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjects": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": utils_auth.Option{
 		Permission: "project.read",
 		CheckParam: "",
 	},
@@ -467,6 +467,11 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/ReactivateUserGrant": utils_auth.Option{
 		Permission: "user.grant.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveUserGrant": utils_auth.Option{
+		Permission: "user.grant.delete",
 		CheckParam: "",
 	},
 

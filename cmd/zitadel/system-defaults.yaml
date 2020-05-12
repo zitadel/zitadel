@@ -1,24 +1,61 @@
-SecretGenerators:
-  PasswordSaltCost: 14
-  ClientSecretGenerator:
-    Length: 64
-    IncludeLowerLetters: true
-    IncludeUpperLetters: true
-    IncludeDigits: true
-    IncludeSymbols: true
-DefaultPolicies:
-  Age:
-    Description: Age
-    MaxAgeDays: 365
-    ExpireWarnDays: 10 
-  Complexity:
-    Description: Complexity
-    MinLength: 8
-    HasLowercase: true
-    HasUppercase: false
-    HasNumber: true
-    HasSymbol: true
-  Lockout:
-    Description: Lockout
-    MaxAttempts: 5
-    ShowLockOutFailures: true
+SystemDefaults:
+  UserVerificationKey:
+    EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
+  SecretGenerators:
+    PasswordSaltCost: 14
+    ClientSecretGenerator:
+      Length: 64
+      IncludeLowerLetters: true
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: true
+    InitializeUserCode:
+      Length: 6
+      Expiry: '72h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    EmailVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    PhoneVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    PasswordVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+  Multifactors:
+    OTP:
+      Issuer: 'Zitadel'
+      VerificationKey:
+        EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
+  DefaultPolicies:
+    Age:
+      Description: Standard age policy
+      MaxAgeDays: 365
+      ExpireWarnDays: 10 
+    Complexity:
+      Description: Standard complexity policy
+      MinLength: 8
+      HasLowercase: true
+      HasUppercase: false
+      HasNumber: true
+      HasSymbol: true
+    Lockout:
+      Description: Standard lockout policy
+      MaxAttempts: 5
+      ShowLockOutFailures: true        
+

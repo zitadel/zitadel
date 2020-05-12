@@ -33,8 +33,8 @@ func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*Projec
 	if err != nil {
 		return nil, err
 	}
-	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerator.PasswordSaltCost)
-	pwGenerator := crypto.NewHashGenerator(systemDefaults.SecretGenerator.ClientSecretGenerator, passwordAlg)
+	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
+	pwGenerator := crypto.NewHashGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
 	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,

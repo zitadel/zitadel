@@ -14,15 +14,12 @@ func (es *PolicyEventstore) GetPasswordAgePolicy(ctx context.Context, id string)
 
 	query := PasswordAgePolicyQuery(id, policy.Sequence)
 	err := es_sdk.Filter(ctx, es.FilterEvents, policy.AppendEvents, query)
-	if err != nil {
-		// load default values
-		if policy.Description == "" {
-			policy.Description = es.passwordAgePolicyDefault.Description
-			policy.MaxAgeDays = es.passwordAgePolicyDefault.MaxAgeDays
-			policy.ExpireWarnDays = es.passwordAgePolicyDefault.ExpireWarnDays
-		} else {
-			return nil, err
-		}
+	if caos_errs.IsNotFound(err) {
+		policy.Description = es.passwordAgePolicyDefault.Description
+		policy.MaxAgeDays = es.passwordAgePolicyDefault.MaxAgeDays
+		policy.ExpireWarnDays = es.passwordAgePolicyDefault.ExpireWarnDays
+	} else if err != nil {
+		return nil, err
 	}
 	es.policyCache.cacheAgePolicy(policy)
 	return PasswordAgePolicyToModel(policy), nil

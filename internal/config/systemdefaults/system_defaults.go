@@ -6,13 +6,28 @@ import (
 )
 
 type SystemDefaults struct {
-	SecretGenerator SecretGenerator
-	DefaultPolicies DefaultPolicies
+	SecretGenerators    SecretGenerators
+	UserVerificationKey *crypto.KeyConfig
+	Multifactors        MultifactorConfig
+	DefaultPolicies     DefaultPolicies
 }
 
-type SecretGenerator struct {
-	PasswordSaltCost      int
-	ClientSecretGenerator crypto.GeneratorConfig
+type SecretGenerators struct {
+	PasswordSaltCost         int
+	ClientSecretGenerator    crypto.GeneratorConfig
+	InitializeUserCode       crypto.GeneratorConfig
+	EmailVerificationCode    crypto.GeneratorConfig
+	PhoneVerificationCode    crypto.GeneratorConfig
+	PasswordVerificationCode crypto.GeneratorConfig
+}
+
+type MultifactorConfig struct {
+	OTP OTPConfig
+}
+
+type OTPConfig struct {
+	Issuer          string
+	VerificationKey *crypto.KeyConfig
 }
 
 type DefaultPolicies struct {

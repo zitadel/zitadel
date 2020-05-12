@@ -1,12 +1,10 @@
 package sql
 
 import (
-	// postgres dialect
-	"database/sql"
+	_ "github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/errors"
-	_ "github.com/lib/pq"
 )
 
 type Config struct {
@@ -14,7 +12,7 @@ type Config struct {
 }
 
 func Start(conf Config) (*SQL, error) {
-	client, err := sql.Open("postgres", conf.SQL.ConnectionString())
+	client, err := conf.SQL.Start()
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
 	}
