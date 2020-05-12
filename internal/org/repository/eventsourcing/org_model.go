@@ -68,7 +68,10 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		*o = Org{}
 		fallthrough
 	case org_model.OrgChanged:
-		return o.setData(event)
+		err := o.setData(event)
+		if err != nil {
+			return err
+		}
 	case org_model.OrgDeactivated:
 		o.State = int32(org_model.ORGSTATE_INACTIVE)
 	case org_model.OrgReactivated:
