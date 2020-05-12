@@ -50,7 +50,7 @@ func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingM
 func orgMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member must not be nil")
 		}
 
 		agg, err := OrgAggregate(ctx, aggCreator, member.AggregateID, member.Sequence)
