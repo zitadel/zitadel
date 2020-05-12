@@ -12,7 +12,6 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 type OrgRepo struct {
@@ -61,7 +60,7 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context) ([]*org_model.Org, error) {
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	var found bool
 	err = sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), org_es.OrgNameUniqueQuery(name))
-	if (err != nil && !errors.IsNotFound(err)) || found {
+	if (err != nil && !errors.IsNotFound(err)) || found {
 		return false, err
 	}
 
