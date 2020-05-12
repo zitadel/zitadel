@@ -20,6 +20,7 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
     #- run: npm test 
     - run: echo "replace me with real test"
 
@@ -33,6 +34,7 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
     - run: npm run lint
 
   angular-build:
@@ -77,8 +79,7 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
     - uses: actions/checkout@v2
-    - name: Run golangci-lint
-      uses: actions-contrib/golangci-lint@v1
+    - run: echo "replace me with real lint"
   
   go-build:
     runs-on: ubuntu-18.04
