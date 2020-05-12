@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -18,8 +19,8 @@ type Config struct {
 
 type EsRepository struct {
 	//spooler *es_spooler.Spooler
-	UserRepo
-	AuthRequestRepo
+	eventstore.UserRepo
+	eventstore.AuthRequestRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -54,8 +55,8 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	}
 
 	return &EsRepository{
-		UserRepo{user},
-		AuthRequestRepo{
+		eventstore.UserRepo{user},
+		eventstore.AuthRequestRepo{
 			UserEvents:               user,
 			AuthRequests:             authReq,
 			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,

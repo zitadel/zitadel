@@ -1,9 +1,10 @@
-package eventsourcing
+package eventstore
 
 import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
@@ -14,7 +15,7 @@ import (
 type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
 	AuthRequests *cache.AuthRequestCache
-	//view      *view.View
+	view         *view.View
 
 	PasswordCheckLifeTime    time.Duration
 	MfaInitSkippedLifeTime   time.Duration
@@ -56,10 +57,11 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	if err != nil {
 		return err
 	}
-	return errors.ThrowUnimplemented(nil, "EVENT-asjod", "user by username not yet implemented")
-	//check username
-	var userID string
-	request.UserID = userID
+	user, err := repo.view.UserByUsername(username)
+	if err != nil {
+		return err
+	}
+	request.UserID = user.ID
 	return repo.AuthRequests.SaveAuthRequest(ctx, request)
 }
 
@@ -94,12 +96,20 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 		if request.Prompt != model.PromptNone {
 			steps = append(steps, &model.LoginStep{})
 		}
+		if request.Prompt == model.PromptSelectAccount {
+
+		}
 		//TODO: select account
 		return steps, nil
 	}
-	//userSession, err := repo.view.GetUserSessionByIDs(request.UserAgentID, request.UserID)
-	var userSession *UserSession
-	var user *User
+	userSession, err := repo.view.UserSessionByIDs(request.AgentID, request.UserID)
+	if err != nil {
+		return nil, err
+	}
+	user, err := repo.view.UserByID(request.UserID)
+	if err != nil {
+		return nil, err
+	}
 
 	if user.Password == nil {
 		steps = append(steps, &model.InitPasswordStep{})
@@ -127,7 +137,7 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 		return steps, nil
 	}
 
-	//TODO: consent step
+	//PLANNED: consent step
 	steps = append(steps, &model.RedirectToCallbackStep{})
 	return steps, nil
 }
@@ -174,7 +184,6 @@ func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) b
 
 type UserSession struct {
 	PasswordVerification    time.Time
-	MfaVerification         time.Time
 	MfaSoftwareVerification time.Time
 	MfaHardwareVerification time.Time
 }
