@@ -117,3 +117,74 @@ func (es *IamEventstore) SetIamProject(ctx context.Context, iamID, iamProjectID 
 	es.iamCache.cacheIam(repoIam)
 	return model.IamToModel(repoIam), nil
 }
+
+func (es *IamEventstore) AddIamMember(ctx context.Context, member *iam_model.IamMember) (*iam_model.IamMember, error) {
+	if !member.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-89osr", "UserID and Roles are required")
+	}
+	existing, err := es.IamByID(ctx, member.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, m := existing.GetMember(member.UserID); m != nil {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Iam")
+	}
+	repoIam := model.IamFromModel(existing)
+	repoMember := model.IamMemberFromModel(member)
+
+	addAggregate := IamMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+
+	if _, m := model.GetIamMember(repoIam.Members, member.UserID); m != nil {
+		return model.IamMemberToModel(m), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-s90pw", "Could not find member in list")
+}
+
+func (es *IamEventstore) ChangeIamMember(ctx context.Context, member *iam_model.IamMember) (*iam_model.IamMember, error) {
+	if !member.IsValid() {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s9ipe", "UserID and Roles are required")
+	}
+	existing, err := es.IamByID(ctx, member.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, m := existing.GetMember(member.UserID); m == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s7ucs", "User is not member of this project")
+	}
+	repoIam := model.IamFromModel(existing)
+	repoMember := model.IamMemberFromModel(member)
+
+	projectAggregate := IamMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
+	es.iamCache.cacheIam(repoIam)
+
+	if _, m := model.GetIamMember(repoIam.Members, member.UserID); m != nil {
+		return model.IamMemberToModel(m), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-29cws", "Could not find member in list")
+}
+
+func (es *IamEventstore) RemoveIamMember(ctx context.Context, member *iam_model.IamMember) error {
+	if member.UserID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0pors", "UserID and Roles are required")
+	}
+	existing, err := es.IamByID(ctx, member.AggregateID)
+	if err != nil {
+		return err
+	}
+	if _, m := existing.GetMember(member.UserID); m == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "User is not member of this project")
+	}
+	repoIam := model.IamFromModel(existing)
+	repoMember := model.IamMemberFromModel(member)
+
+	projectAggregate := IamMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoMember)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
+	es.iamCache.cacheIam(repoIam)
+	return err
+}

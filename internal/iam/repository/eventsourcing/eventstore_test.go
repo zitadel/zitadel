@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
 	"testing"
@@ -356,6 +357,277 @@ func TestSetIamProjectID(t *testing.T) {
 			}
 			if tt.res.errFunc == nil && result.IamProjectID != tt.res.iam.IamProjectID {
 				t.Errorf("got wrong result IamProjectID: expected: %v, actual: %v ", tt.res.iam.IamProjectID, result.IamProjectID)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestAddIamMember(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IamEventstore
+		ctx    context.Context
+		member *iam_model.IamMember
+	}
+	type res struct {
+		result  *iam_model.IamMember
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add iam member, ok",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+			res: res{
+				result: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"Roles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "no roles",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member already existing",
+			args: args{
+				es:     GetMockManipulateIamWithMember(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:     GetMockManipulateIamNotExisting(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddIamMember(tt.args.ctx, tt.args.member)
+
+			if tt.res.errFunc == nil && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if tt.res.errFunc == nil && result.UserID != tt.res.result.UserID {
+				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.result.UserID, result.UserID)
+			}
+			if tt.res.errFunc == nil && len(result.Roles) != len(tt.res.result.Roles) {
+				t.Errorf("got wrong result roles: expected: %v, actual: %v ", tt.res.result.Roles, result.Roles)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeIamMember(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *IamEventstore
+		ctx    context.Context
+		member *iam_model.IamMember
+	}
+	type res struct {
+		result  *iam_model.IamMember
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add iam member, ok",
+			args: args{
+				es:     GetMockManipulateIamWithMember(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+			},
+			res: res{
+				result: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "no roles",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member not existing",
+			args: args{
+				es:     GetMockManipulateIam(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:     GetMockManipulateIamNotExisting(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeIamMember(tt.args.ctx, tt.args.member)
+
+			if tt.res.errFunc == nil && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if tt.res.errFunc == nil && result.UserID != tt.res.result.UserID {
+				t.Errorf("got wrong result userid: expected: %v, actual: %v ", tt.res.result.UserID, result.UserID)
+			}
+			if tt.res.errFunc == nil && len(result.Roles) != len(tt.res.result.Roles) {
+				t.Errorf("got wrong result roles: expected: %v, actual: %v ", tt.res.result.Roles, result.Roles)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveIamMember(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *IamEventstore
+		ctx      context.Context
+		existing *model.Iam
+		member   *iam_model.IamMember
+	}
+	type res struct {
+		result  *iam_model.IamMember
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove iam member, ok",
+			args: args{
+				es:  GetMockManipulateIamWithMember(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					Members:    []*model.IamMember{&model.IamMember{UserID: "UserID", Roles: []string{"Roles"}}},
+				},
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
+			},
+			res: res{
+				result: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+		},
+		{
+			name: "no userid",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					Members:    []*model.IamMember{&model.IamMember{UserID: "UserID", Roles: []string{"Roles"}}},
+				},
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "member not existing",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+				},
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing not found",
+			args: args{
+				es:     GetMockManipulateIamNotExisting(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveIamMember(tt.args.ctx, tt.args.member)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("should not get err")
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)

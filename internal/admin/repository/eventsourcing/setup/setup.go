@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -87,7 +88,31 @@ func (s *Setup) Execute() error {
 
 	err = setUp.orgs(ctx, s.setUpConfig.Orgs)
 	if err != nil {
-		logging.Log("APP-p4oWq").WithError(err).Error("unable to set up orgs")
+		logging.Log("SETUP-p4oWq").WithError(err).Error("unable to set up orgs")
+		return err
+	}
+
+	ctx = setSetUpContextData(ctx, s.iamID)
+	err = setUp.iamOwners(ctx, s.setUpConfig.Owners)
+	if err != nil {
+		logging.Log("SETUP-WHr01").WithError(err).Error("unable to set up iam owners")
+		return err
+	}
+
+	err = setUp.setGlobalOrg(ctx)
+	if err != nil {
+		logging.Log("SETUP-0874m").WithError(err).Error("unable to set global org")
+		return err
+	}
+
+	err = setUp.setIamProject(ctx)
+	if err != nil {
+		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set citadel project")
+		return err
+	}
+
+	iam, err = s.repos.IamEvents.SetupDone(ctx, s.iamID)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -97,7 +122,7 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 	for _, iamOrg := range orgs {
 		org, err := setUp.org(ctx, iamOrg)
 		if err != nil {
-			logging.LogWithFields("APP-IlLif", "Org", iamOrg.Name).WithError(err).Error("unable to create org")
+			logging.LogWithFields("SETUP-IlLif", "Org", iamOrg.Name).WithError(err).Error("unable to create org")
 			return err
 		}
 		setUp.createdOrgs[iamOrg.Name] = org
@@ -105,19 +130,19 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 		ctx = setSetUpContextData(ctx, org.AggregateID)
 		err = setUp.users(ctx, iamOrg.Users)
 		if err != nil {
-			logging.LogWithFields("APP-8zfwz", "Org", iamOrg.Name).WithError(err).Error("unable to set up org users")
+			logging.LogWithFields("SETUP-8zfwz", "Org", iamOrg.Name).WithError(err).Error("unable to set up org users")
 			return err
 		}
 
 		err = setUp.orgOwners(ctx, org, iamOrg.Owners)
 		if err != nil {
-			logging.LogWithFields("APP-0874m", "Org", iamOrg.Name).WithError(err).Error("unable to set up org owners")
+			logging.LogWithFields("SETUP-0874m", "Org", iamOrg.Name).WithError(err).Error("unable to set up org owners")
 			return err
 		}
 
 		err = setUp.projects(ctx, iamOrg.Projects)
 		if err != nil {
-			logging.LogWithFields("APP-wUzqY", "Org", iamOrg.Name).WithError(err).Error("unable to set up org projects")
+			logging.LogWithFields("SETUP-wUzqY", "Org", iamOrg.Name).WithError(err).Error("unable to set up org projects")
 			return err
 		}
 	}
@@ -135,11 +160,51 @@ func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Or
 	//return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
 }
 
+func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error {
+	for _, iamOwner := range owners {
+		user, ok := setUp.createdUsers[iamOwner]
+		if !ok {
+			logging.LogWithFields("SETUP-8siew", "Owner", iamOwner).Error("unable to add user to iam members")
+			return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-su6L3", "unable to add user to iam members")
+		}
+		_, err := setUp.repos.IamEvents.AddIamMember(ctx, &iam_model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: setUp.iamID}, UserID: user.AggregateID, Roles: []string{"IAM_OWNER"}})
+		if err != nil {
+			logging.Log("SETUP-LM7rI").WithError(err).Error("unable to add iam administrator to iam members as owner")
+			return err
+		}
+	}
+	return nil
+}
+
+func (setUp *initializer) setGlobalOrg(ctx context.Context) error {
+	globalOrg, ok := setUp.createdOrgs[setUp.setUpConfig.GlobalOrg]
+	if !ok {
+		logging.LogWithFields("SETUP-FBhs9", "GlobalOrg", setUp.setUpConfig.GlobalOrg).Error("global org not created")
+		return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-4GwU7", "global org not created: %v", setUp.setUpConfig.GlobalOrg)
+	}
+
+	_, err := setUp.repos.IamEvents.SetGlobalOrg(ctx, setUp.iamID, globalOrg.AggregateID)
+	logging.Log("SETUP-uGMA3").OnError(err).Error("unable to set global org on iam")
+	return err
+}
+
+func (setUp *initializer) setIamProject(ctx context.Context) error {
+	iamProject, ok := setUp.createdProjects[setUp.setUpConfig.IAMProject]
+	if !ok {
+		logging.LogWithFields("SETUP-SJFWP", "Iam Project", setUp.setUpConfig.IAMProject).Error("iam project created")
+		return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-sGmQt", "iam project not created: %v", setUp.setUpConfig.IAMProject)
+	}
+
+	_, err := setUp.repos.IamEvents.SetIamProject(ctx, setUp.iamID, iamProject.AggregateID)
+	logging.Log("SETUP-i1pNh").OnError(err).Error("unable to set iam project on iam")
+	return err
+}
+
 func (setUp *initializer) users(ctx context.Context, users []types.User) error {
 	for _, user := range users {
 		created, err := setUp.user(ctx, user)
 		if err != nil {
-			logging.LogWithFields("APP-9soer", "Email", user.Email).WithError(err).Error("unable to create iam user")
+			logging.LogWithFields("SETUP-9soer", "Email", user.Email).WithError(err).Error("unable to create iam user")
 			return err
 		}
 		setUp.createdUsers[user.Email] = created
@@ -169,12 +234,12 @@ func (setUp *initializer) orgOwners(ctx context.Context, org *org_model.Org, own
 	for _, orgOwner := range owners {
 		user, ok := setUp.createdUsers[orgOwner]
 		if !ok {
-			logging.LogWithFields("APP-s9ilr", "Owner", orgOwner).Error("unable to add user to org members")
-			return caos_errs.ThrowPreconditionFailedf(nil, "APP-s0prs", "unable to add user to org members: %v", orgOwner)
+			logging.LogWithFields("SETUP-s9ilr", "Owner", orgOwner).Error("unable to add user to org members")
+			return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-s0prs", "unable to add user to org members: %v", orgOwner)
 		}
 		err := setUp.orgOwner(ctx, org, user)
 		if err != nil {
-			logging.Log("APP-s90oe").WithError(err).Error("unable to add global org admin to members of global org")
+			logging.Log("SETUP-s90oe").WithError(err).Error("unable to add global org admin to members of global org")
 			return err
 		}
 	}

@@ -82,3 +82,43 @@ func IamSetIamProjectAggregate(aggCreator *es_models.AggregateCreator, iam *mode
 		return agg.AppendEvent(model.IamProjectSet, &model.Iam{IamProjectID: projectID})
 	}
 }
+
+func IamMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, member *model.IamMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9sope", "member should not be nil")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.IamMemberAdded, member)
+	}
+}
+
+func IamMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, member *model.IamMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-38skf", "member should not be nil")
+		}
+
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.IamMemberChanged, member)
+	}
+}
+
+func IamMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, member *model.IamMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-90lsw", "member should not be nil")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.IamMemberRemoved, member)
+	}
+}

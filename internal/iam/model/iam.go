@@ -12,3 +12,12 @@ type Iam struct {
 	SetUpStarted bool
 	Members      []*IamMember
 }
+
+func (iam *Iam) GetMember(userID string) (int, *IamMember) {
+	for i, m := range iam.Members {
+		if m.UserID == userID {
+			return i, m
+		}
+	}
+	return -1, nil
+}

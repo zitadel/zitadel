@@ -29,7 +29,7 @@ func IamFromModel(iam *model.Iam) *Iam {
 		SetUpDone:    iam.SetUpDone,
 		GlobalOrgID:  iam.GlobalOrgID,
 		IamProjectID: iam.IamProjectID,
-		Members:      iam.Members,
+		Members:      members,
 	}
 	return converted
 }
@@ -42,7 +42,7 @@ func IamToModel(iam *Iam) *model.Iam {
 		SetUpDone:    iam.SetUpDone,
 		GlobalOrgID:  iam.GlobalOrgID,
 		IamProjectID: iam.IamProjectID,
-		Members:      iam.Members,
+		Members:      members,
 	}
 	return converted
 }
@@ -65,12 +65,15 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 		i.SetUpDone = true
 	case IamProjectSet,
 		GlobalOrgSet:
-		i.setData(event)
+		err = i.setData(event)
+	case IamMemberAdded:
+		err = i.appendAddMemberEvent(event)
+	case IamMemberChanged:
+		err = i.appendChangeMemberEvent(event)
+	case IamMemberRemoved:
+		err = i.appendRemoveMemberEvent(event)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (i *Iam) setData(event *es_models.Event) error {

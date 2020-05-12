@@ -52,6 +52,18 @@ func GetMockManipulateIam(ctrl *gomock.Controller) *IamEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
+func GetMockManipulateIamWithMember(ctrl *gomock.Controller) *IamEventstore {
+	memberData, _ := json.Marshal(model.IamMember{UserID: "UserID", Roles: []string{"Role"}})
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IamSetupStarted},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IamMemberAdded, Data: memberData},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstore(ctrl, mockEs)
+}
 func GetMockManipulateIamNotExisting(ctrl *gomock.Controller) *IamEventstore {
 	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
