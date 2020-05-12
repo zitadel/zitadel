@@ -63,8 +63,6 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (o *Org) AppendEvent(event *es_models.Event) error {
-	o.ObjectRoot.AppendEvent(event)
-
 	switch event.Type {
 	case org_model.OrgAdded:
 		*o = Org{}
