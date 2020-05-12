@@ -52,11 +52,11 @@ func UserSessionFromModel(userSession *model.UserSessionView) *UserSessionView {
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
-		ID:                      userSession.ID,
-		ChangeDate:              userSession.ChangeDate,
-		CreationDate:            userSession.CreationDate,
-		ResourceOwner:           userSession.ResourceOwner,
-		State:                   model.UserSessionState(userSession.State),
+		ID:            userSession.ID,
+		ChangeDate:    userSession.ChangeDate,
+		CreationDate:  userSession.CreationDate,
+		ResourceOwner: userSession.ResourceOwner,
+		//State:                   model.UserSessionState(userSession.State),
 		ApplicationID:           userSession.ApplicationID,
 		UserAgentID:             userSession.UserAgentID,
 		UserID:                  userSession.UserID,

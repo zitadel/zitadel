@@ -10,17 +10,28 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
 	AuthRequests *cache.AuthRequestCache
-	view         *view.View
+	View         *view.View
+
+	UserSessionViewProvider userSessionViewProvider
+	UserViewProvider        userViewProvider
 
 	PasswordCheckLifeTime    time.Duration
 	MfaInitSkippedLifeTime   time.Duration
 	MfaSoftwareCheckLifeTime time.Duration
 	MfaHardwareCheckLifeTime time.Duration
+}
+
+type userSessionViewProvider interface {
+	UserSessionByIDs(string, string) (*view_model.UserSessionView, error)
+}
+type userViewProvider interface {
+	UserByID(string) (*view_model.UserView, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -57,7 +68,7 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	if err != nil {
 		return err
 	}
-	user, err := repo.view.UserByUsername(username)
+	user, err := repo.View.UserByUsername(username)
 	if err != nil {
 		return err
 	}
@@ -102,16 +113,16 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 		//TODO: select account
 		return steps, nil
 	}
-	userSession, err := repo.view.UserSessionByIDs(request.AgentID, request.UserID)
+	userSession, err := userSessionByIDs(repo.UserSessionViewProvider, request.AgentID, request.UserID)
 	if err != nil {
 		return nil, err
 	}
-	user, err := repo.view.UserByID(request.UserID)
+	user, err := userByID(repo.UserViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	if user.Password == nil {
+	if !user.PasswordSet {
 		steps = append(steps, &model.InitPasswordStep{})
 		return steps, nil
 	}
@@ -126,14 +137,14 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 		return steps, nil
 	}
 
-	if user.Password.ChangeRequired {
+	if user.PasswordChangeRequired {
 		steps = append(steps, &model.ChangePasswordStep{})
 	}
 	if !user.IsEmailVerified {
 		steps = append(steps, &model.VerifyEMailStep{})
 	}
 
-	if user.Password.ChangeRequired || !user.IsEmailVerified {
+	if user.PasswordChangeRequired || !user.IsEmailVerified {
 		return steps, nil
 	}
 
@@ -142,9 +153,25 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	return steps, nil
 }
 
-func (repo *AuthRequestRepo) mfaChecked(userSession *UserSession, request *model.AuthRequest, user *User) (model.NextStep, bool) {
+func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
+	session, err := provider.UserSessionByIDs(agentID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserSessionToModel(session), nil
+}
+
+func userByID(provider userViewProvider, userID string) (*user_model.UserView, error) {
+	user, err := provider.UserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserToModel(user), nil
+}
+
+func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool) {
 	mfaLevel := request.MfaLevel()
-	required := user.MfaMaxSetup < mfaLevel
+	required := user.MfaMaxSetUp < mfaLevel
 	if required || !repo.mfaSkippedOrSetUp(user) {
 		return &model.MfaPromptStep{
 			Required:     required,
@@ -169,8 +196,8 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *UserSession, request *model
 	}, false
 }
 
-func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *User) bool {
-	if user.MfaMaxSetup >= 0 {
+func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
+	if user.MfaMaxSetUp >= 0 {
 		return true
 	}
 	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)
@@ -178,48 +205,4 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *User) bool {
 
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {
 	return verificationTime.Add(lifetime).After(time.Now().UTC())
-}
-
-//TODO: into view
-
-type UserSession struct {
-	PasswordVerification    time.Time
-	MfaSoftwareVerification time.Time
-	MfaHardwareVerification time.Time
-}
-
-type User struct {
-	MfaInitSkipped  time.Time
-	MfaMaxSetup     model.MfaLevel
-	Password        *user_model.Password
-	OTP             *user_model.OTP
-	IsEmailVerified bool
-}
-
-func (u *User) MfaTypesSetupPossible(level model.MfaLevel) []model.MfaType {
-	types := make([]model.MfaType, 0)
-	switch level {
-	case model.MfaLevelSoftware:
-		if u.OTP == nil {
-			types = append(types, model.MfaTypeOTP)
-		}
-		fallthrough
-	case model.MfaLevelHardware:
-	}
-	return types
-}
-
-func (u *User) MfaTypesAllowed(level model.MfaLevel) []model.MfaType {
-	types := make([]model.MfaType, 0)
-	switch level {
-	default:
-		fallthrough
-	case model.MfaLevelSoftware:
-		if u.OTP != nil {
-			types = append(types, model.MfaTypeOTP)
-		}
-		fallthrough
-	case model.MfaLevelHardware:
-	}
-	return types
 }

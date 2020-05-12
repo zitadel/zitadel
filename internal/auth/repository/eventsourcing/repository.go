@@ -4,21 +4,25 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
+	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
 	Eventstore  es_int.Config
 	AuthRequest cache.Config
-	//View       view.ViewConfig
-	//Spooler    spooler.SpoolerConfig
+	View        types.SQL
+	Spooler     spooler.SpoolerConfig
 }
 
 type EsRepository struct {
-	//spooler *es_spooler.Spooler
+	spooler *es_spol.Spooler
 	eventstore.UserRepo
 	eventstore.AuthRequestRepo
 }
@@ -29,10 +33,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
-	//view, sql, err := mgmt_view.StartView(conf.View)
-	//if err != nil {
-	//	return nil, err
-	//}
+	sqlClient, err := conf.View.Start()
+	if err != nil {
+		return nil, err
+	}
+	view, err := auth_view.StartView(sqlClient)
+	if err != nil {
+		return nil, err
+	}
 
 	//conf.Spooler.View = view
 	//conf.Spooler.EsClient = es.Client
@@ -54,11 +62,17 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient)
+
 	return &EsRepository{
+		spool,
 		eventstore.UserRepo{user},
 		eventstore.AuthRequestRepo{
 			UserEvents:               user,
 			AuthRequests:             authReq,
+			View:                     view,
+			UserSessionViewProvider:  view,
+			UserViewProvider:         view,
 			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
 			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,

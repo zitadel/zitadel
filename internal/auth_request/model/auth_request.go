@@ -25,8 +25,6 @@ type AuthRequest struct {
 	projectApplicationIDs []string         //aud?
 	UserID                string
 	PossibleSteps         []NextStep
-	//UserSession   *UserSession
-
 }
 
 type Prompt int32

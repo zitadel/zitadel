@@ -6,17 +6,66 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
+
+type mockViewNoUserSession struct{}
+
+func (m *mockViewNoUserSession) UserSessionByIDs(string, string) (*view_model.UserSessionView, error) {
+	return nil, errors.ThrowNotFound(nil, "id", "user session not found")
+}
+
+type mockViewUserSession struct {
+	PasswordVerification    time.Time
+	MfaSoftwareVerification time.Time
+}
+
+func (m *mockViewUserSession) UserSessionByIDs(string, string) (*view_model.UserSessionView, error) {
+	return &view_model.UserSessionView{
+		PasswordVerification:    m.PasswordVerification,
+		MfaSoftwareVerification: m.MfaSoftwareVerification,
+	}, nil
+}
+
+type mockViewNoUser struct{}
+
+func (m *mockViewNoUser) UserByID(string) (*view_model.UserView, error) {
+	return nil, errors.ThrowNotFound(nil, "id", "user not found")
+}
+
+type mockViewUser struct {
+	PasswordSet            bool
+	PasswordChangeRequired bool
+	IsEmailVerified        bool
+	OTPState               int32
+	MfaMaxSetUp            int32
+	MfaInitSkipped         time.Time
+}
+
+func (m *mockViewUser) UserByID(string) (*view_model.UserView, error) {
+	return &view_model.UserView{
+		PasswordSet:            m.PasswordSet,
+		PasswordChangeRequired: m.PasswordChangeRequired,
+		IsEmailVerified:        m.IsEmailVerified,
+		OTPState:               m.OTPState,
+		MfaMaxSetUp:            m.MfaMaxSetUp,
+		MfaInitSkipped:         m.MfaInitSkipped,
+	}, nil
+}
 
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
 		UserEvents               *user_event.UserEventstore
 		AuthRequests             *cache.AuthRequestCache
+		View                     *view.View
+		userSessionViewProvider  userSessionViewProvider
+		userViewProvider         userViewProvider
 		PasswordCheckLifeTime    time.Duration
 		MfaInitSkippedLifeTime   time.Duration
 		MfaSoftwareCheckLifeTime time.Duration
@@ -46,19 +95,149 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			[]model.NextStep{&model.LoginStep{}},
 			nil,
 		},
-		//{ //TODO: view
-		//	"password not set, init password step",
-		//	fields{},
-		//	args{&model.AuthRequest{UserID: "UserID"}},
-		//	[]model.NextStep{&model.InitPasswordStep{}},
-		//	nil,
-		//},
+		{
+			"usersession not found, not found error",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			nil,
+			errors.IsNotFound,
+		},
+		{
+			"user not not found, not found error",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider:        &mockViewNoUser{},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			nil,
+			errors.IsNotFound,
+		},
+		{
+			"password not set, init password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider:        &mockViewUser{},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.InitPasswordStep{}},
+			nil,
+		},
+		{
+			"password not verified, password check step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordSet: true,
+				},
+				PasswordCheckLifeTime: 10 * 24 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.PasswordStep{}},
+			nil,
+		},
+		{
+			"mfa not verified, mfa check step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet: true,
+					OTPState:    int32(user_model.MFASTATE_READY),
+					MfaMaxSetUp: int32(model.MfaLevelSoftware),
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.MfaVerificationStep{
+				MfaProviders: []model.MfaType{model.MfaTypeOTP},
+			}},
+			nil,
+		},
+		{
+			"password change required and email verified, password change step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:            true,
+					PasswordChangeRequired: true,
+					IsEmailVerified:        true,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.ChangePasswordStep{}},
+			nil,
+		},
+		{
+			"email not verified and no password change required, mail verification step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet: true,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.VerifyEMailStep{}},
+			nil,
+		},
+		{
+			"email not verified and password change required, mail verification step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:            true,
+					PasswordChangeRequired: true,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.ChangePasswordStep{}, &model.VerifyEMailStep{}},
+			nil,
+		},
+		{
+			"email verified and no password change required, redirect to callback step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+				},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := &AuthRequestRepo{
 				UserEvents:               tt.fields.UserEvents,
 				AuthRequests:             tt.fields.AuthRequests,
+				View:                     tt.fields.View,
+				UserSessionViewProvider:  tt.fields.userSessionViewProvider,
+				UserViewProvider:         tt.fields.userViewProvider,
 				PasswordCheckLifeTime:    tt.fields.PasswordCheckLifeTime,
 				MfaInitSkippedLifeTime:   tt.fields.MfaInitSkippedLifeTime,
 				MfaSoftwareCheckLifeTime: tt.fields.MfaSoftwareCheckLifeTime,
@@ -81,9 +260,9 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		MfaHardwareCheckLifeTime time.Duration
 	}
 	type args struct {
-		userSession *UserSession
+		userSession *user_model.UserSessionView
 		request     *model.AuthRequest
-		user        *User
+		user        *user_model.UserView
 	}
 	tests := []struct {
 		name        string
@@ -97,8 +276,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		//	fields{},
 		//	args{
 		//		request: &model.AuthRequest{PossibleLOAs: []model.LevelOfAssurance{}},
-		//		user: &User{
-		//			OTP: nil,
+		//		user: &user_model.UserView{
+		//			OTPState: user_model.MFASTATE_READY,
 		//		},
 		//	},
 		//	false,
@@ -110,8 +289,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			args{
 				request: &model.AuthRequest{},
-				user: &User{
-					MfaMaxSetup: -1,
+				user: &user_model.UserView{
+					MfaMaxSetUp: -1,
 				},
 			},
 			&model.MfaPromptStep{
@@ -126,10 +305,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			args{
 				request: &model.AuthRequest{},
-				user: &User{
-					OTP: &user_model.OTP{State: user_model.MFASTATE_READY},
+				user: &user_model.UserView{
+					OTPState: user_model.MFASTATE_READY,
 				},
-				userSession: &UserSession{MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Hour)},
+				userSession: &user_model.UserSessionView{MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Hour)},
 			},
 			nil,
 			true,
@@ -141,10 +320,10 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			args{
 				request: &model.AuthRequest{},
-				user: &User{
-					OTP: &user_model.OTP{State: user_model.MFASTATE_READY},
+				user: &user_model.UserView{
+					OTPState: user_model.MFASTATE_READY,
 				},
-				userSession: &UserSession{},
+				userSession: &user_model.UserSessionView{},
 			},
 
 			&model.MfaVerificationStep{
@@ -174,7 +353,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 		MfaInitSkippedLifeTime time.Duration
 	}
 	type args struct {
-		user *User
+		user *user_model.UserView
 	}
 	tests := []struct {
 		name   string
@@ -185,8 +364,8 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 		{
 			"mfa set up, true",
 			fields{},
-			args{&User{
-				MfaMaxSetup: model.MfaLevelSoftware,
+			args{&user_model.UserView{
+				MfaMaxSetUp: model.MfaLevelSoftware,
 			}},
 			true,
 		},
@@ -195,8 +374,8 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
-			args{&User{
-				MfaMaxSetup:    -1,
+			args{&user_model.UserView{
+				MfaMaxSetUp:    -1,
 				MfaInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
 			}},
 			true,
@@ -206,8 +385,8 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			fields{
 				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
 			},
-			args{&User{
-				MfaMaxSetup:    -1,
+			args{&user_model.UserView{
+				MfaMaxSetUp:    -1,
 				MfaInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
 			}},
 			false,
