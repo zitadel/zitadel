@@ -81,6 +81,7 @@ func (s *Setup) Execute() error {
 	}
 
 	setUp := &initializer{
+		Setup:           s,
 		createdUsers:    make(map[string]*usr_model.User),
 		createdOrgs:     make(map[string]*org_model.Org),
 		createdProjects: make(map[string]*proj_model.Project),
@@ -155,9 +156,7 @@ func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Or
 		Name:   org.Name,
 		Domain: org.Domain,
 	}
-	//TODO: CreateOrg
-	return createOrg, nil
-	//return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
+	return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
 }
 
 func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error {
@@ -361,5 +360,5 @@ func getOIDCAuthMethod(authMethod string) proj_model.OIDCAuthMethodType {
 }
 
 func setSetUpContextData(ctx context.Context, orgID string) context.Context {
-	return context.WithValue(ctx, auth.GetCtxDataKey(), &auth.CtxData{UserID: "setup", OrgID: orgID})
+	return context.WithValue(ctx, auth.GetCtxDataKey(), auth.CtxData{UserID: "setup", OrgID: orgID})
 }
