@@ -1,9 +1,13 @@
-FROM scratch
-
+FROM alpine:latest as user
 RUN addgroup -S zitadel && adduser -S zitadel -G zitadel
+
+FROM scratch
+COPY --from=user /etc/passwd /etc/passwd
+COPY .build/go /app
+COPY cmd/zitadel/*.yaml /app/
 
 USER zitadel
 
-COPY .build/go /app
-
 HEALTHCHECK NONE
+
+ENTRYPOINT ["/app/zitadel"]
