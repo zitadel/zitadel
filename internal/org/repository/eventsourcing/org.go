@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -46,7 +45,7 @@ func OrgAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, i
 	return aggCreator.NewAggregate(ctx, id, org_model.OrgAggregate, orgVersion, sequence)
 }
 
-func OrgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *Org) (_ []*es_models.Aggregate, err error) {
+func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *Org) (_ []*es_models.Aggregate, err error) {
 	if org == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
 	}
@@ -61,13 +60,7 @@ func OrgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 		return nil, err
 	}
 
-	id, err := idGenerator.NextID()
-	if err != nil {
-		return nil, err
-	}
-	org.AggregateID = strconv.FormatUint(id, 10)
-
-	agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
+	agg, err := aggCreator.NewAggregate(ctx, org.AggregateID, org_model.OrgAggregate, orgVersion, org.Sequence, es_models.OverwriteResourceOwner(org.AggregateID))
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +120,7 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 	return aggregates, nil
 }
 
-func OrgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
+func orgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
@@ -144,7 +137,7 @@ func OrgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 	}
 }
 
-func OrgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
+func orgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")

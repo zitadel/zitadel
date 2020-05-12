@@ -54,7 +54,7 @@ func TestOrgMemberAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregate, err := OrgMemberAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.member)
+			aggregate, err := orgMemberAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.member)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
@@ -149,7 +149,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregateCreator := OrgMemberChangedAggregate(tt.args.aggCreator, tt.args.existingMember, tt.args.member)
+			aggregateCreator := orgMemberChangedAggregate(tt.args.aggCreator, tt.args.existingMember, tt.args.member)
 			aggregate, err := aggregateCreator(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
@@ -210,7 +210,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregateCreator := OrgMemberRemovedAggregate(tt.args.aggCreator, tt.args.member)
+			aggregateCreator := orgMemberRemovedAggregate(tt.args.aggCreator, tt.args.member)
 			aggregate, err := aggregateCreator(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)

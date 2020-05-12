@@ -270,7 +270,7 @@ func TestOrgReactivateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregateCreator := OrgReactivateAggregate(tt.args.aggCreator, tt.args.org)
+			aggregateCreator := orgReactivateAggregate(tt.args.aggCreator, tt.args.org)
 			aggregate, err := aggregateCreator(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
@@ -344,7 +344,7 @@ func TestOrgDeactivateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregateCreator := OrgDeactivateAggregate(tt.args.aggCreator, tt.args.org)
+			aggregateCreator := orgDeactivateAggregate(tt.args.aggCreator, tt.args.org)
 			aggregate, err := aggregateCreator(tt.args.ctx)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
@@ -570,7 +570,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := OrgCreatedAggregates(tt.args.ctx, tt.args.aggCreator, tt.args.org)
+			got, err := orgCreatedAggregates(tt.args.ctx, tt.args.aggCreator, tt.args.org)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got %T: %v", err, err)
 			}

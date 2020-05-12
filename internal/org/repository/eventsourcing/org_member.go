@@ -3,14 +3,13 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-func OrgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *OrgMember) (*es_models.Aggregate, error) {
+func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *OrgMember) (*es_models.Aggregate, error) {
 	if member == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "member must not be nil")
 	}
@@ -29,7 +28,7 @@ func OrgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 	return aggregate.SetPrecondition(validationQuery, validation).AppendEvent(org_model.OrgMemberAdded, member)
 }
 
-func OrgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *OrgMember, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *OrgMember, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil || existingMember == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "member should not be nil")
@@ -48,7 +47,7 @@ func OrgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingM
 	}
 }
 
-func OrgMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
+func orgMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member should not be nil")
@@ -77,7 +76,9 @@ func addMemberValidation(aggregate *es_models.Aggregate, member *OrgMember) func
 				switch event.Type {
 				case org_model.OrgMemberAdded, org_model.OrgMemberRemoved:
 					manipulatedMember, err := OrgMemberFromEvent(new(OrgMember), event)
-					logging.Log("EVENT-YoDqa").OnError(err).Debug("unable to get member from event")
+					if err != nil {
+						return errors.ThrowInternal(err, "EVENT-Eg8St", "unable to validate object")
+					}
 					if manipulatedMember.UserID == member.UserID {
 						isMember = event.Type == org_model.OrgMemberAdded
 					}

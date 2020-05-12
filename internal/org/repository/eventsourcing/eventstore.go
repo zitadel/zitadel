@@ -34,7 +34,7 @@ func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_mod
 	orgModel.AggregateID = strconv.FormatUint(id, 10)
 	org := OrgFromModel(orgModel)
 
-	aggregates, err := OrgCreatedAggregates(ctx, es.AggregateCreator(), org)
+	aggregates, err := orgCreatedAggregates(ctx, es.AggregateCreator(), org)
 
 	return org, aggregates, err
 }
@@ -76,7 +76,7 @@ func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgModel *org_model.
 	}
 	org := OrgFromModel(orgModel)
 
-	aggregate := OrgDeactivateAggregate(es.AggregateCreator(), org)
+	aggregate := orgDeactivateAggregate(es.AggregateCreator(), org)
 	err := es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgModel *org_model.
 	}
 	org := OrgFromModel(orgModel)
 
-	aggregate := OrgReactivateAggregate(es.AggregateCreator(), org)
+	aggregate := orgReactivateAggregate(es.AggregateCreator(), org)
 	err := es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_mo
 	}
 
 	repoMember := OrgMemberFromModel(member)
-	addAggregate, err := OrgMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoMember)
+	addAggregate, err := orgMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoMember)
 
 	return repoMember, addAggregate, err
 }
@@ -157,7 +157,7 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 	repoMember := OrgMemberFromModel(member)
 	repoExistingMember := OrgMemberFromModel(existingMember)
 
-	orgAggregate := OrgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoExistingMember, repoMember)
+	orgAggregate := orgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoExistingMember, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 	if err != nil {
 		return nil, err
@@ -182,6 +182,6 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	member.ObjectRoot = existingMember.ObjectRoot
 	repoMember := OrgMemberFromModel(member)
 
-	orgAggregate := OrgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
+	orgAggregate := orgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
 }
