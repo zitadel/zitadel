@@ -81,7 +81,7 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk83d", "existing org must not be nil")
 	}
 	if updated == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "updated org must not be nil")
 	}
 	changes := existing.Changes(updated)
 	if len(changes) == 0 {
