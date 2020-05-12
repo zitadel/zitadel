@@ -71,8 +71,8 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	return &EsRepository{
 		spool,
 		eventstore.ProjectRepo{conf.SearchLimit, project, view},
-		eventstore.UserRepo{user},
-		eventstore.UserGrantRepo{usergrant},
+		eventstore.UserRepo{conf.SearchLimit, user, view},
+		eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 	}, nil
 }
 
