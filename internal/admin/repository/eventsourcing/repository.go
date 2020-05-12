@@ -1,6 +1,8 @@
 package eventsourcing
 
 import (
+	"context"
+
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -54,6 +56,15 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 }
 
 func (repo *EsRepository) Health() error {
-	// return repo.ProjectEvents.Health(context.Background())
-	return nil
+	err := repo.Eventstore.Health(context.TODO())
+	if err != nil {
+		return err
+	}
+	err = repo.UserEventstore.Health(context.TODO())
+	if err != nil {
+		return err
+	}
+	err = repo.OrgEventstore.Health(context.TODO())
+
+	return err
 }
