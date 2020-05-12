@@ -66,7 +66,6 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 	switch event.Type {
 	case org_model.OrgAdded:
 		*o = Org{}
-		o.ObjectRoot.AppendEvent(event)
 		fallthrough
 	case org_model.OrgChanged:
 		err := json.Unmarshal(event.Data, o)
