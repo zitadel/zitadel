@@ -1532,6 +1532,7 @@ message PasswordComplexityPolicy {
     bool has_number = 9;
     bool has_symbol = 10;
     uint64 sequence = 11;
+    bool is_default = 12;
 }
 
 message PasswordComplexityPolicyCreate {
@@ -1566,6 +1567,7 @@ message PasswordAgePolicy {
     uint64 max_age_days = 6;
     uint64 expire_warn_days = 7;
     uint64 sequence = 8;
+    bool is_default = 9;
 }
 
 message PasswordAgePolicyCreate {
@@ -1594,6 +1596,8 @@ message PasswordLockoutPolicy {
     uint64 max_attempts = 6;
     bool show_lock_out_failures = 7;
     uint64 sequence = 8;
+    bool is_default = 9
+    ;
 }
 
 message PasswordLockoutPolicyCreate {

@@ -22,6 +22,7 @@ func passwordLockoutPolicyFromModel(policy *model.PasswordLockoutPolicy) *Passwo
 		Description:         policy.Description,
 		MaxAttempts:         policy.MaxAttempts,
 		ShowLockOutFailures: policy.ShowLockOutFailures,
+		IsDefault:           policy.AggregateID == "",
 	}
 }
 

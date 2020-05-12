@@ -4249,6 +4249,10 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -4330,6 +4334,10 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -4423,6 +4431,10 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

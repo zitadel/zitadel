@@ -22,6 +22,7 @@ func passwordAgePolicyFromModel(policy *model.PasswordAgePolicy) *PasswordAgePol
 		Description:    policy.Description,
 		ExpireWarnDays: policy.ExpireWarnDays,
 		MaxAgeDays:     policy.MaxAgeDays,
+		IsDefault:      policy.AggregateID == "",
 	}
 }
 

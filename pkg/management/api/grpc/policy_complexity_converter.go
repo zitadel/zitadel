@@ -25,6 +25,7 @@ func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *
 		HasUppercase: policy.HasUppercase,
 		HasNumber:    policy.HasNumber,
 		HasSymbol:    policy.HasSymbol,
+		IsDefault:    policy.AggregateID == "",
 	}
 }
 
