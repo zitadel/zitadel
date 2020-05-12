@@ -21,3 +21,16 @@ const (
 	MFASTATE_NOTREADY
 	MFASTATE_READY
 )
+
+type MultiFactor struct {
+	Type  MFAType
+	State MfaState
+}
+
+type MFAType int32
+
+const (
+	MFATYPE_UNSPECIFIED MFAType = iota
+	MFATYPE_OTP
+	MFATYPE_SMS
+)

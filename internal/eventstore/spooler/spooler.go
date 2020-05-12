@@ -6,6 +6,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
+	global_view "github.com/caos/zitadel/internal/view"
+
 	"time"
 )
 
@@ -94,9 +96,29 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 			return nil
 		default:
 			if err := s.Process(event); err != nil {
-				return err
+				return s.OnError(event, err)
 			}
 		}
+	}
+	return nil
+}
+
+func HandleError(event *models.Event, failedErr error,
+	latestFailedEvent func(sequence uint64) (*global_view.FailedEvent, error),
+	processFailedEvent func(*global_view.FailedEvent) error,
+	processSequence func(uint64) error, errorCountUntilSkip uint64) error {
+	failedEvent, err := latestFailedEvent(event.Sequence)
+	if err != nil {
+		return err
+	}
+	failedEvent.FailureCount++
+	failedEvent.ErrMsg = failedErr.Error()
+	err = processFailedEvent(failedEvent)
+	if err != nil {
+		return err
+	}
+	if errorCountUntilSkip == failedEvent.FailureCount {
+		return processSequence(event.Sequence)
 	}
 	return nil
 }

@@ -24,6 +24,76 @@ func projectFromModel(project *proj_model.Project) *Project {
 	}
 }
 
+func grantedProjectSearchResponseFromModel(response *proj_model.GrantedProjectSearchResponse) *GrantedProjectSearchResponse {
+	return &GrantedProjectSearchResponse{
+		Offset:      response.Offset,
+		Limit:       response.Limit,
+		TotalResult: response.TotalResult,
+		Result:      grantedProjectsFromModel(response.Result),
+	}
+}
+
+func grantedProjectsFromModel(projects []*proj_model.GrantedProjectView) []*GrantedProject {
+	converted := make([]*GrantedProject, len(projects))
+	for i, project := range projects {
+		converted[i] = grantedProjectFromModel(project)
+	}
+	return converted
+}
+
+func grantedProjectFromModel(project *proj_model.GrantedProjectView) *GrantedProject {
+	creationDate, err := ptypes.TimestampProto(project.CreationDate)
+	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(project.ChangeDate)
+	logging.Log("GRPC-sope3").OnError(err).Debug("unable to parse timestamp")
+
+	return &GrantedProject{
+		Id:            project.ProjectID,
+		State:         projectStateFromModel(project.State),
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Name:          project.Name,
+		Sequence:      project.Sequence,
+		ResourceOwner: project.ResourceOwner,
+		OrgId:         project.OrgID,
+		OrgName:       project.OrgName,
+		OrgDomain:     project.OrgDomain,
+		GrantId:       project.GrantID,
+	}
+}
+
+func projectRoleSearchResponseFromModel(response *proj_model.ProjectRoleSearchResponse) *ProjectRoleSearchResponse {
+	return &ProjectRoleSearchResponse{
+		Offset:      response.Offset,
+		Limit:       response.Limit,
+		TotalResult: response.TotalResult,
+		Result:      projectRoleViewsFromModel(response.Result),
+	}
+}
+
+func projectRoleViewsFromModel(roles []*proj_model.ProjectRoleView) []*ProjectRoleView {
+	converted := make([]*ProjectRoleView, len(roles))
+	for i, role := range roles {
+		converted[i] = projectRoleViewFromModel(role)
+	}
+	return converted
+}
+
+func projectRoleViewFromModel(role *proj_model.ProjectRoleView) *ProjectRoleView {
+	creationDate, err := ptypes.TimestampProto(role.CreationDate)
+	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
+
+	return &ProjectRoleView{
+		ProjectId:    role.ProjectID,
+		CreationDate: creationDate,
+		Key:          role.Key,
+		Group:        role.Group,
+		DisplayName:  role.DisplayName,
+		Sequence:     role.Sequence,
+	}
+}
+
 func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 	switch state {
 	case proj_model.PROJECTSTATE_ACTIVE:
@@ -32,6 +102,17 @@ func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 		return ProjectState_PROJECTSTATE_INACTIVE
 	default:
 		return ProjectState_PROJECTSTATE_UNSPECIFIED
+	}
+}
+
+func projectTypeFromModel(projecttype proj_model.ProjectType) ProjectType {
+	switch projecttype {
+	case proj_model.PROJECTTYPE_OWNED:
+		return ProjectType_PROJECTTYPE_OWNED
+	case proj_model.PROJECTTYPE_GRANTED:
+		return ProjectType_PROJECTTYPE_GRANTED
+	default:
+		return ProjectType_PROJECTTYPE_UNSPECIFIED
 	}
 }
 
@@ -80,5 +161,73 @@ func projectRoleChangeToModel(role *ProjectRoleChange) *proj_model.ProjectRole {
 		Key:         role.Key,
 		DisplayName: role.DisplayName,
 		Group:       role.Group,
+	}
+}
+
+func grantedProjectSearchRequestsToModel(project *GrantedProjectSearchRequest) *proj_model.GrantedProjectSearchRequest {
+	return &proj_model.GrantedProjectSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: grantedProjectSearchQueriesToModel(project.Queries),
+	}
+}
+
+func grantedProjectSearchQueriesToModel(queries []*GrantedProjectSearchQuery) []*proj_model.GrantedProjectSearchQuery {
+	converted := make([]*proj_model.GrantedProjectSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = grantedProjectSearchQueryToModel(q)
+	}
+	return converted
+}
+
+func grantedProjectSearchQueryToModel(query *GrantedProjectSearchQuery) *proj_model.GrantedProjectSearchQuery {
+	return &proj_model.GrantedProjectSearchQuery{
+		Key:    projectSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func projectSearchKeyToModel(key GrantedProjectSearchKey) proj_model.GrantedProjectSearchKey {
+	switch key {
+	case GrantedProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
+		return proj_model.GRANTEDPROJECTSEARCHKEY_NAME
+	default:
+		return proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED
+	}
+}
+
+func projectRoleSearchRequestsToModel(role *ProjectRoleSearchRequest) *proj_model.ProjectRoleSearchRequest {
+	return &proj_model.ProjectRoleSearchRequest{
+		Offset:  role.Offset,
+		Limit:   role.Limit,
+		Queries: projectRoleSearchQueriesToModel(role.Queries),
+	}
+}
+
+func projectRoleSearchQueriesToModel(queries []*ProjectRoleSearchQuery) []*proj_model.ProjectRoleSearchQuery {
+	converted := make([]*proj_model.ProjectRoleSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = projectRoleSearchQueryToModel(q)
+	}
+	return converted
+}
+
+func projectRoleSearchQueryToModel(query *ProjectRoleSearchQuery) *proj_model.ProjectRoleSearchQuery {
+	return &proj_model.ProjectRoleSearchQuery{
+		Key:    projectRoleSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func projectRoleSearchKeyToModel(key ProjectRoleSearchKey) proj_model.ProjectRoleSearchKey {
+	switch key {
+	case ProjectRoleSearchKey_PROJECTROLESEARCHKEY_KEY:
+		return proj_model.PROJECTROLESEARCHKEY_KEY
+	case ProjectRoleSearchKey_PROJECTROLESEARCHKEY_DISPLAY_NAME:
+		return proj_model.PROJECTROLESEARCHKEY_DISPLAY_NAME
+	default:
+		return proj_model.PROJECTROLESEARCHKEY_UNSPECIFIED
 	}
 }

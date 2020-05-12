@@ -718,7 +718,7 @@ func (mr *MockManagementServiceClientMockRecorder) DeleteUser(arg0, arg1 interfa
 }
 
 // GetGrantedProjectGrantByID mocks base method
-func (m *MockManagementServiceClient) GetGrantedProjectGrantByID(arg0 context.Context, arg1 *grpc.GrantedGrantID, arg2 ...grpc0.CallOption) (*grpc.ProjectGrant, error) {
+func (m *MockManagementServiceClient) GetGrantedProjectGrantByID(arg0 context.Context, arg1 *grpc.ProjectGrantID, arg2 ...grpc0.CallOption) (*grpc.ProjectGrant, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -918,14 +918,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserAddress(arg0, arg1 int
 }
 
 // GetUserByEmailGlobal mocks base method
-func (m *MockManagementServiceClient) GetUserByEmailGlobal(arg0 context.Context, arg1 *grpc.UserEmailID, arg2 ...grpc0.CallOption) (*grpc.User, error) {
+func (m *MockManagementServiceClient) GetUserByEmailGlobal(arg0 context.Context, arg1 *grpc.UserEmailID, arg2 ...grpc0.CallOption) (*grpc.UserView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetUserByEmailGlobal", varargs...)
-	ret0, _ := ret[0].(*grpc.User)
+	ret0, _ := ret[0].(*grpc.UserView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1637,6 +1637,26 @@ func (mr *MockManagementServiceClientMockRecorder) SearchAuthGrant(arg0, arg1 in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchAuthGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchAuthGrant), varargs...)
 }
 
+// SearchGrantedProjects mocks base method
+func (m *MockManagementServiceClient) SearchGrantedProjects(arg0 context.Context, arg1 *grpc.GrantedProjectSearchRequest, arg2 ...grpc0.CallOption) (*grpc.GrantedProjectSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchGrantedProjects", varargs...)
+	ret0, _ := ret[0].(*grpc.GrantedProjectSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchGrantedProjects indicates an expected call of SearchGrantedProjects
+func (mr *MockManagementServiceClientMockRecorder) SearchGrantedProjects(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchGrantedProjects", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchGrantedProjects), varargs...)
+}
+
 // SearchOrgMembers mocks base method
 func (m *MockManagementServiceClient) SearchOrgMembers(arg0 context.Context, arg1 *grpc.OrgMemberSearchRequest, arg2 ...grpc0.CallOption) (*grpc.OrgMemberSearchResponse, error) {
 	m.ctrl.T.Helper()
@@ -1775,26 +1795,6 @@ func (mr *MockManagementServiceClientMockRecorder) SearchProjectUserGrants(arg0,
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchProjectUserGrants", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchProjectUserGrants), varargs...)
-}
-
-// SearchProjects mocks base method
-func (m *MockManagementServiceClient) SearchProjects(arg0 context.Context, arg1 *grpc.ProjectSearchRequest, arg2 ...grpc0.CallOption) (*grpc.ProjectSearchResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SearchProjects", varargs...)
-	ret0, _ := ret[0].(*grpc.ProjectSearchResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SearchProjects indicates an expected call of SearchProjects
-func (mr *MockManagementServiceClientMockRecorder) SearchProjects(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchProjects", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchProjects), varargs...)
 }
 
 // SearchUserGrants mocks base method

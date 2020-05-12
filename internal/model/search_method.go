@@ -9,12 +9,5 @@ const (
 	SEARCHMETHOD_EQUALS_IGNORE_CASE
 	SEARCHMETHOD_STARTS_WITH_IGNORE_CASE
 	SEARCHMETHOD_CONTAINS_IGNORE_CASE
+	SEARCHMETHOD_NOT_EQUALS
 )
-
-func SearchMethodToInt(s SearchMethod) int32 {
-	return int32(s)
-}
-
-func SearchMethodFromInt(index int32) SearchMethod {
-	return SearchMethod(index)
-}

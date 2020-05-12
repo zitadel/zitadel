@@ -1,13 +1,17 @@
-package eventsourcing
+package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type UserRepo struct {
-	UserEvents *usr_event.UserEventstore
+	SearchLimit uint64
+	UserEvents  *usr_event.UserEventstore
+	View        *view.View
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.User, err error) {
@@ -36,6 +40,36 @@ func (repo *UserRepo) LockUser(ctx context.Context, id string) (*usr_model.User,
 
 func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.User, error) {
 	return repo.UserEvents.UnlockUser(ctx, id)
+}
+
+func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	projects, count, err := repo.View.SearchUsers(request)
+	if err != nil {
+		return nil, err
+	}
+	return &usr_model.UserSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.UsersToModel(projects),
+	}, nil
+}
+
+func (repo *UserRepo) GetGlobalUserByEmail(ctx context.Context, email string) (*usr_model.UserView, error) {
+	user, err := repo.View.GetGlobalUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserToModel(user), nil
+}
+
+func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) (bool, error) {
+	return repo.View.IsUserUnique(userName, email)
+}
+
+func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
+	return repo.View.UserMfas(userID)
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
