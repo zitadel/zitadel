@@ -10,8 +10,22 @@ env:
 
 jobs:
 
-  angular: # TODO Implement proper build and cache and coverage upload
+  angular-test: # will be added later on
     runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./console
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    #- run: npm test 
+    - run: echo "replace me with real test"
+
+  angular-build:
+    runs-on: ubuntu-18.04
+    needs: angular-test
     defaults:
       run:
         working-directory: ./console
@@ -23,15 +37,31 @@ jobs:
     - run: npm ci 
     - run: npm run lint
     - run: npm run prodbuild
-    # - run: npm test
     - uses: actions/upload-artifact@v1
       with:
         name: angular
         path: console/dist/console
-  
-  go: # TODO Implement proper build and cache
+
+  go-test:
     runs-on: ubuntu-18.04
-    needs: angular
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - run: go test -race -v -coverprofile=profile.cov ./...
+    - uses: actions/upload-artifact@v1
+      with:
+        name: go-coverage
+        path: profile.cov
+    - uses: codecov/codecov-action@v1
+      with:
+        file: ./profile.cov
+        name: codecov-go
+  
+  go-build:
+    runs-on: ubuntu-18.04
+    needs: [angular-build, go-test]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
@@ -43,25 +73,16 @@ jobs:
         path: console/dist/app
     - run: go get github.com/rakyll/statik
     - run: ./build/console/generate-static.sh
-    - run: go test -race -v -coverprofile=profile.cov ./...
     - run: cat pkg/console/statik/statik.go
     - run: go build -o zitadel cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:
-        name: go-coverage
-        path: profile.cov
-    - uses: actions/upload-artifact@v1
-      with:
         name: go-binary
         path: zitadel
-    - uses: codecov/codecov-action@v1
-      with:
-        file: ./profile.cov
-        name: codecov-go
 
-  container-prod: # Artifact paths need better place
+  container-prod:
     runs-on: ubuntu-18.04
-    needs: go
+    needs: go-build
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -104,7 +125,7 @@ jobs:
         name: anchore-reports
         path: ./anchore-reports/
 
-  container-test: # TODO Implement proper test
+  container-test:
     runs-on: ubuntu-18.04
     needs: container-prod
     steps:
