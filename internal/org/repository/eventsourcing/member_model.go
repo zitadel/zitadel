@@ -37,7 +37,7 @@ func (m *OrgMember) AppendEvent(event *es_models.Event) error {
 }
 
 func (m *OrgMember) Changes(updatedMember *OrgMember) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
+	changes := make(map[string]interface{}, 2)
 
 	if !reflect.DeepEqual(m.Roles, updatedMember.Roles) {
 		changes["roles"] = updatedMember.Roles
