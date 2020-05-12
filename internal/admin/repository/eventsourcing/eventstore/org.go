@@ -2,12 +2,10 @@ package eventstore
 
 import (
 	"context"
-	"strings"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -70,15 +68,4 @@ func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUn
 	}
 
 	return !found, nil
-}
-
-func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
-	return func(events ...*es_models.Event) error {
-		if len(events) == 0 {
-			return nil
-		}
-		*unique = *unique || strings.HasSuffix(string(events[0].Type), "reserved")
-
-		return nil
-	}
 }
