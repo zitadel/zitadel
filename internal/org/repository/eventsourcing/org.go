@@ -50,12 +50,12 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
 	}
 
-	domainAgrregate, err := uniqueDomainAggregate(ctx, aggCreator, org.Domain)
+	domainAgrregate, err := uniqueDomainAggregate(ctx, aggCreator, org.AggregateID, org.Domain)
 	if err != nil {
 		return nil, err
 	}
 
-	nameAggregate, err := uniqueNameAggregate(ctx, aggCreator, org.Name)
+	nameAggregate, err := uniqueNameAggregate(ctx, aggCreator, org.AggregateID, org.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 	aggregates := make([]*es_models.Aggregate, 0, 3)
 
 	if name, ok := changes["name"]; ok {
-		nameAggregate, err := uniqueNameAggregate(ctx, aggCreator, name.(string))
+		nameAggregate, err := uniqueNameAggregate(ctx, aggCreator, "", name.(string))
 		if err != nil {
 			return nil, err
 		}
@@ -99,7 +99,7 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 	}
 
 	if name, ok := changes["domain"]; ok {
-		domainAggregate, err := uniqueDomainAggregate(ctx, aggCreator, name.(string))
+		domainAggregate, err := uniqueDomainAggregate(ctx, aggCreator, "", name.(string))
 		if err != nil {
 			return nil, err
 		}
@@ -154,8 +154,8 @@ func orgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 	}
 }
 
-func uniqueDomainAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, domain string) (*es_models.Aggregate, error) {
-	aggregate, err := aggCreator.NewAggregate(ctx, domain, org_model.OrgDomainAggregate, orgVersion, 0)
+func uniqueDomainAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, domain string) (*es_models.Aggregate, error) {
+	aggregate, err := aggCreator.NewAggregate(ctx, domain, org_model.OrgDomainAggregate, orgVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,11 @@ func uniqueDomainAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	return aggregate.SetPrecondition(OrgDomainUniqueQuery(domain), isReservedValidation(aggregate, org_model.OrgDomainReserved)), nil
 }
 
-func uniqueNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, name string) (*es_models.Aggregate, error) {
-	aggregate, err := aggCreator.NewAggregate(ctx, name, org_model.OrgNameAggregate, orgVersion, 0)
+func uniqueNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, name string) (aggregate *es_models.Aggregate, err error) {
+	aggregate, err = aggCreator.NewAggregate(ctx, name, org_model.OrgNameAggregate, orgVersion, 0)
+	if resourceOwner != "" {
+		aggregate, err = aggCreator.NewAggregate(ctx, name, org_model.OrgNameAggregate, orgVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+	}
 	if err != nil {
 		return nil, err
 	}
