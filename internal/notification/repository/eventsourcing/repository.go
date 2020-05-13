@@ -45,7 +45,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 	eventstoreRepos := handler.EventstoreRepos{UserEvents: user}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults)
 
 	return &EsRepository{
 		spool,

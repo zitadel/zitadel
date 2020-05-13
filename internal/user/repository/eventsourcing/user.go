@@ -143,6 +143,16 @@ func UserInitCodeAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 	}
 }
 
+func UserInitCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.InitializedUserCodeSent, nil)
+	}
+}
+
 func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)
@@ -176,6 +186,16 @@ func RequestSetPassword(aggCreator *es_models.AggregateCreator, existing *model.
 			return nil, err
 		}
 		return agg.AppendEvent(model.UserPasswordCodeAdded, request)
+	}
+}
+
+func PasswordCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserPasswordCodeSent, nil)
 	}
 }
 
@@ -245,6 +265,16 @@ func EmailVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, exis
 	}
 }
 
+func EmailCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserEmailCodeSent, nil)
+	}
+}
+
 func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, phone *model.Phone, code *model.PhoneCode) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if phone == nil {
@@ -294,6 +324,16 @@ func PhoneVerificationCodeAggregate(aggCreator *es_models.AggregateCreator, exis
 			return nil, err
 		}
 		return agg.AppendEvent(model.UserPhoneCodeAdded, code)
+	}
+}
+
+func PhoneCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserPhoneCodeSent, nil)
 	}
 }
 

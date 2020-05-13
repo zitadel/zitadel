@@ -25,11 +25,11 @@ func InitChatProvider(config *ChatConfig) (*Chat, error) {
 
 func (chat *Chat) CanHandleMessage(message providers.Message) bool {
 	chatMsg := message.(ChatMessage)
-	return message.Content != ""
+	return chatMsg.Content != ""
 }
 
 func (chat *Chat) HandleMessage(message providers.Message) error {
-	req, err := json.Marshal(&message.Content)
+	req, err := json.Marshal(message.GetContent())
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-s8uie", "Could not unmarshal content")
 	}

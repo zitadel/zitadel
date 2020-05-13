@@ -43,11 +43,35 @@ SystemDefaults:
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
   Notifications:
-    PasswordReset:
-      Title: 'Zitadel - Passwort zurücksetzen'
-      PreHeader: 'Passwort zurücksetzen'
-      Subject: 'Passwort zurücksetzen'
-      Greeting: 'Hallo {{.Name}},'
-      Text: 'Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen. Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.'
-      Href: '{{.URL}}'
-      ButtonText: 'Passwort zurücksetzen'
+    Providers:
+      Chat:
+        ChatUrl: ${CHAT_URL}
+      Email:
+        SMTP:
+          Host: ${SMTP_HOST}
+          User: ${SMTP_USER}
+          Password: ${SMTP_PASSWORD}
+        From: ${EMAIL_SENDER_ADDRESS}
+        FromName: ${EMAIL_SENDER_NAME}
+        Tls: ${SMTP_TLS}
+      Twilio:
+        SID:   ${TWILIO_SERVICE_SID}
+        Token: ${TWILIO_TOKEN}
+        From:  ${TWILIO_SENDER_NAME}
+    TemplateData:
+      InitCode:
+        Title: 'Zitadel - User Initialisieren'
+        PreHeader: 'User Initialisieren'
+        Subject: 'User Initialisieren'
+        Greeting: 'Hallo {{.Name}},'
+        Text: 'Dieser Benutzer wurde soeben im Zitadel erstellt. Du kannst den Button unten verwenden, um die Initialisierung abzuschliesen. Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.'
+        Href: '{{.URL}}'
+        ButtonText: 'Initialisierung abschliessen'
+      PasswordReset:
+        Title: 'Zitadel - Passwort zurücksetzen'
+        PreHeader: 'Passwort zurücksetzen'
+        Subject: 'Passwort zurücksetzen'
+        Greeting: 'Hallo {{.Name}},'
+        Text: 'Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen. Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.'
+        Href: '{{.URL}}'
+        ButtonText: 'Passwort zurücksetzen'

@@ -9,7 +9,7 @@ const (
 	templateFileName = "template.html"
 )
 
-func ParseTemplate(fileName string, data interface{}) (string, error) {
+func ParseTemplateFile(fileName string, data interface{}) (string, error) {
 	if fileName == "" {
 		fileName = templateFileName
 	}

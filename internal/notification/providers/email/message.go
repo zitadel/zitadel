@@ -23,7 +23,7 @@ type EmailMessage struct {
 	Content string
 }
 
-func (msg *EmailMessage) GetContent() string {
+func (msg EmailMessage) GetContent() string {
 	plainContent := toPlain(msg.Content)
 
 	// Setup headers

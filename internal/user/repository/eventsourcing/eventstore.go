@@ -276,6 +276,25 @@ func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, user
 	return model.InitCodeToModel(repoUser.InitCode), nil
 }
 
+func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0posw", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := UserInitCodeSentAggregate(es.AggregateCreator(), repoUser)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
 func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
@@ -362,6 +381,25 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 
 	repoUser := model.UserFromModel(user)
 	agg := RequestSetPassword(es.AggregateCreator(), repoUser, passwordCode)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s09ow", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := PasswordCodeSentAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err
@@ -508,6 +546,25 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 	return nil
 }
 
+func (es *UserEventstore) EmailVerificationCodeSent(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-spo0w", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := EmailCodeSentAggregate(es.AggregateCreator(), repoUser)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
 func (es *UserEventstore) PhoneByID(ctx context.Context, userID string) (*usr_model.Phone, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "userID missing")
@@ -607,6 +664,25 @@ func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userI
 	}
 
 	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
+func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID string) error {
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0wa", "userID missing")
+	}
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	repoUser := model.UserFromModel(user)
+	agg := PhoneCodeSentAggregate(es.AggregateCreator(), repoUser)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.userCache.cacheUser(repoUser)
 	return nil
 }
 

@@ -6,6 +6,6 @@ type TwilioMessage struct {
 	Content              string
 }
 
-func (msg *TwilioMessage) GetContent() string {
+func (msg TwilioMessage) GetContent() string {
 	return msg.Content
 }

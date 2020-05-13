@@ -1,6 +1,7 @@
 package handler
 
 import (
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
@@ -25,9 +26,10 @@ type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []spooler.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []spooler.Handler {
 	return []spooler.Handler{
 		&NotifyUser{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
+		&Notification{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, userEvents: repos.UserEvents, systemDefaults: systemDefaults},
 	}
 }
 
