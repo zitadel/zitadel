@@ -1,0 +1,37 @@
+<app-meta-layout>
+    <div class="max-width-container">
+        <!-- {{ 'ORG_DETAIL.TITLE' | translate }}  -->
+        <h1>{{org?.name}}</h1>
+        <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}
+        </p>
+
+        <ng-template appHasRole [appHasRole]="['org.member.read']">
+            <h3>{{ 'ORG_DETAIL.MEMBER.TITLE' | translate }}</h3>
+
+            <app-org-members [orgId]="orgId"></app-org-members>
+        </ng-template>
+    </div>
+
+    <ng-template appHasRole [appHasRole]="['policy.read']">
+        <div class="enlarged-container">
+            <app-policy-grid></app-policy-grid>
+        </div>
+    </ng-template>
+
+    <metainfo class="side">
+        <div class="details">
+            <div class="row">
+                <span class="first">Domain:</span>
+                <span class="second" *ngIf="org?.domain">{{org.domain}}</span>
+            </div>
+            <div class="row">
+                <span class="first">State:</span>
+                <span *ngIf="org && org.state !== undefined"
+                    class="second">{{'ORG.STATE.'+org.state | translate}}</span>
+            </div>
+        </div>
+
+        <p class="side-section">{{ 'CHANGES.ORG.TITLE' | translate }}</p>
+        <app-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></app-changes>
+    </metainfo>
+</app-meta-layout>

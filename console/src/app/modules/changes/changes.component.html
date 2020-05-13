@@ -1,0 +1,13 @@
+<span class="header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
+
+<div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)">
+    <li class="item change-item-back" *ngFor="let event of data | async">
+        <span class="seq">
+            {{dateFromTimestamp(event.changeDate) | localizedDate: 'EEE dd. MMM, HH:mm'}}
+        </span>
+        <span class="desc">{{'CHANGES.EVENTS.'+event.eventType | translate}}</span>
+    </li>
+    <div class="sp-wrapper">
+        <mat-spinner *ngIf="loading | async" diameter="25"></mat-spinner>
+    </div>
+</div>

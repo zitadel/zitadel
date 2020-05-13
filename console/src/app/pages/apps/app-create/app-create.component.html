@@ -1,0 +1,86 @@
+<div class="container">
+    <div class="abort-container">
+        <button (click)="close()" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+        <span class="abort">{{ 'APP.PAGES.CREATE_OIDC' | translate }}</span><span class="abort-2">Step
+            {{ currentCreateStep }} of
+            {{ createSteps }}</span>
+    </div>
+
+    <h1>{{'APP.PAGES.CREATE_OIDC_DESc' | translate}}</h1>
+    <form [formGroup]="form" (ngSubmit)="saveOIDCApp()">
+        <div class="content">
+            <mat-form-field appearance="outline" class="formfield">
+                <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
+                <input matInput formControlName="name" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
+                <mat-select formControlName="responseTypesList" multiple>
+                    <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
+                        {{ 'APP.OIDC.RESPONSE'+type | translate }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>{{ 'APP.OIDC.GRANT' | translate }}</mat-label>
+                <mat-select formControlName="grantTypesList" multiple>
+                    <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
+                        {{ 'APP.OIDC.GRANT'+grant | translate }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="formfield">
+                <mat-label>{{ 'APP.OIDC.APPTYPE' | translate }}</mat-label>
+                <mat-select formControlName="applicationType">
+                    <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
+                        {{ 'APP.OIDC.APPTYPE'+type | translate }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="formfield">
+                <mat-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</mat-label>
+                <mat-select formControlName="authMethodType">
+                    <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
+                        {{ 'APP.OIDC.AUTHMETHOD'+type | translate }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
+                <mat-chip-list #chipRedirectList aria-label="uri selection">
+                    <mat-chip *ngFor="let uri of oidcApp.redirectUrisList" removable
+                        (removed)="removeUri(uri, 'REDIRECT')">
+                        {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                    <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
+                </mat-chip-list>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
+                <mat-chip-list #chipPostRedirectList aria-label="uri selection">
+                    <mat-chip *ngFor="let uri of oidcApp.postLogoutRedirectUrisList" removable
+                        (removed)="removeUri(uri, 'POSTREDIRECT')">
+                        {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                    <input [matChipInputFor]="chipPostRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
+                </mat-chip-list>
+            </mat-form-field>
+
+        </div>
+
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" cdkFocusInitial
+            type="submit">
+            {{ 'ACTIONS.SAVE' | translate }}
+        </button>
+    </form>
+</div>

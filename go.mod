@@ -33,6 +33,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.0.3
 	github.com/pquerna/otp v1.2.0
+	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.6.0 // indirect
 	github.com/sony/sonyflake v1.0.0

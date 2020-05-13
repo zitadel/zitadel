@@ -1,0 +1,102 @@
+<h1>{{'ORG.POLICY.TITLE' | translate}}</h1>
+
+<p class="top-desc">{{'ORG.POLICY.DESCRIPTION' | translate}}</p>
+
+<div class="row-lyt">
+    <div class="p-item card">
+        <div class="avatar">
+            <mat-icon svgIcon="mdi_lock_reset"></mat-icon>
+        </div>
+        <div class="title">
+            <span>{{'ORG.POLICY.PWD_AGE.TITLE' | translate}}</span>
+            <button mat-icon-button disabled>
+                <mat-icon class="icon" *ngIf="agePolicy">check_circle</mat-icon>
+            </button>
+
+            <ng-template appHasRole [appHasRole]="['policy.delete']">
+                <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" (click)="deletePolicy(PolicyComponentType.AGE)"
+                    mat-icon-button>
+                    <mat-icon>delete_outline</mat-icon>
+                </button>
+            </ng-template>
+        </div>
+
+        <p *ngIf="agePolicy?.description; else showDescAge" class="desc">{{ agePolicy.description }}</p>
+        <ng-template #showDescAge>
+            <p class="desc">
+                {{'ORG.POLICY.PWD_AGE.DESCRIPTION' | translate}}
+            </p>
+        </ng-template>
+
+        <span class="fill-space"></span>
+        <div class="btn-wrapper">
+            <ng-template appHasRole [appHasRole]="['policy.write']">
+                <button [disabled]="agePolicy" [routerLink]="[ 'policy', PolicyComponentType.AGE,'create'  ]"
+                    [disabled]="agePolicy?.state === PolicyState.ACTIVE_POLICY" color="primary"
+                    mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
+            </ng-template>
+            <button [disabled]="!agePolicy" [routerLink]="[ 'policy', PolicyComponentType.AGE  ]"
+                mat-raised-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+        </div>
+    </div>
+    <div class="p-item card">
+        <div class="avatar">
+            <mat-icon svgIcon="mdi_textbox_password"></mat-icon>
+        </div>
+        <div class="title">
+            <span>{{'ORG.POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
+            <button mat-icon-button disabled>
+                <mat-icon class="icon" *ngIf="complexityPolicy">
+                    check_circle</mat-icon>
+            </button>
+            <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}"
+                (click)="deletePolicy(PolicyComponentType.COMPLEXITY)" mat-icon-button>
+                <mat-icon>delete_outline</mat-icon>
+            </button>
+        </div>
+
+        <p *ngIf="complexityPolicy?.description; else showDescComplexity" class="desc">
+            {{ complexityPolicy.description }}</p>
+        <ng-template #showDescComplexity>
+            <p class="desc">
+                {{'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION' | translate}}</p>
+        </ng-template>
+
+        <span class="fill-space"></span>
+        <div class="btn-wrapper">
+            <button [disabled]="complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY,'create' ]"
+                color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
+            <button [disabled]="!complexityPolicy" [routerLink]="[ 'policy', PolicyComponentType.COMPLEXITY ]"
+                mat-raised-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+        </div>
+    </div>
+    <div class="p-item card">
+        <div class="avatar">
+            <mat-icon svgIcon="mdi_lock_question"></mat-icon>
+        </div>
+        <div class="title"><span>{{'ORG.POLICY.PWD_LOCKOUT.TITLE' | translate}}</span>
+            <button mat-icon-button disabled>
+                <mat-icon class="icon" *ngIf="lockoutPolicy">check_circle
+                </mat-icon>
+            </button>
+            <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" (click)="deletePolicy(PolicyComponentType.LOCKOUT)"
+                mat-icon-button>
+                <mat-icon>delete_outline</mat-icon>
+            </button>
+        </div>
+
+        <p *ngIf="lockoutPolicy?.description; else showDescLockout" class="desc">{{ lockoutPolicy.description }}</p>
+        <ng-template #showDescLockout>
+            <p class="desc">
+                {{'ORG.POLICY.PWD_LOCKOUT.DESCRIPTION' | translate}}
+            </p>
+        </ng-template>
+        <span class="fill-space"></span>
+        <div class="btn-wrapper">
+            <button [disabled]="lockoutPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOCKOUT,'create' ]"
+                color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
+            <button [disabled]="!lockoutPolicy" [routerLink]="[ 'policy', PolicyComponentType.LOCKOUT ]"
+                mat-raised-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+        </div>
+    </div>
+</div>

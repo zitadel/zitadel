@@ -2,7 +2,13 @@ version: 1
 update_configs:
   - package_manager: "go:modules"
     directory: "/"
-    update_schedule: "daily"
+    update_schedule: "weekly"
+    commit_message:
+      prefix: "chore"
+      include_scope: true
+  - package_manager: "javascript"
+    directory: "/console"
+    update_schedule: "weekly"
     commit_message:
       prefix: "chore"
       include_scope: true
