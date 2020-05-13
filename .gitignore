@@ -27,3 +27,4 @@ google-credentials
 key.json
 
 cockroach-data/*
+.build/
