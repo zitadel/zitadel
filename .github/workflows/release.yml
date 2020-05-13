@@ -84,7 +84,7 @@ jobs:
   go-build:
     runs-on: ubuntu-18.04
     needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
-    name: Go ${{ matrix.goos }}-${{ matrix.goarch }} build
+    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
         goos: [ 'linux', 'darwin', 'windows' ]
@@ -116,7 +116,7 @@ jobs:
     - uses: actions/download-artifact@v1
       with:
         name: zitadel-linux-amd64
-        path: .build/go
+        path: .artifacts
     - uses: docker/build-push-action@v1
       with:
         dockerfile: build/docker/prod
@@ -180,6 +180,12 @@ jobs:
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - uses: actions/download-artifact@v1
+      with:
+        path: .artifacts
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: .artifacts
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Pull short-sha
@@ -187,7 +193,7 @@ jobs:
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
       with:
-        dry_run:  false
+        dry_run: true
         semantic_version: 17.0.4
         extra_plugins: |
           @semantic-release/exec@5.0.0
