@@ -70,14 +70,15 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 	return OrgToModel(esOrg), nil
 }
 
-func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
-	if orgModel == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not set")
+func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgID string) (*org_model.Org, error) {
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not found")
 	}
-	org := OrgFromModel(orgModel)
+	org := OrgFromModel(existingOrg)
 
 	aggregate := orgDeactivateAggregate(es.AggregateCreator(), org)
-	err := es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
+	err = es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 	}
@@ -85,14 +86,15 @@ func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgModel *org_model.
 	return OrgToModel(org), nil
 }
 
-func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
-	if orgModel == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-9t73w", "org not set")
+func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_model.Org, error) {
+	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not set")
 	}
-	org := OrgFromModel(orgModel)
+	org := OrgFromModel(existingOrg)
 
 	aggregate := orgReactivateAggregate(es.AggregateCreator(), org)
-	err := es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
+	err = es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 
