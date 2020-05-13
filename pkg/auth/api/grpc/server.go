@@ -39,6 +39,7 @@ func (s *Server) GRPCServer() (*grpc.Server, error) {
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(),
+				AuthService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),
 		),
 	)
