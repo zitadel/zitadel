@@ -66,6 +66,9 @@ func (es *PolicyEventstore) UpdatePasswordLockoutPolicy(ctx context.Context, pol
 	if err != nil {
 		return nil, err
 	}
+	if existingPolicy.Sequence <= 0 {
+		return es.CreatePasswordLockoutPolicy(ctx, policy)
+	}
 	repoExisting := PasswordLockoutPolicyFromModel(existingPolicy)
 	repoNew := PasswordLockoutPolicyFromModel(policy)
 

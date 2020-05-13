@@ -69,6 +69,9 @@ func (es *PolicyEventstore) UpdatePasswordComplexityPolicy(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
+	if existingPolicy.Sequence <= 0 {
+		return es.CreatePasswordComplexityPolicy(ctx, policy)
+	}
 	repoExisting := PasswordComplexityPolicyFromModel(existingPolicy)
 	repoNew := PasswordComplexityPolicyFromModel(policy)
 

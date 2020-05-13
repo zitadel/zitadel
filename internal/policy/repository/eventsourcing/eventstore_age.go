@@ -60,6 +60,9 @@ func (es *PolicyEventstore) UpdatePasswordAgePolicy(ctx context.Context, policy 
 	if err != nil {
 		return nil, err
 	}
+	if existingPolicy.Sequence <= 0 {
+		return es.CreatePasswordAgePolicy(ctx, policy)
+	}
 	repoExisting := PasswordAgePolicyFromModel(existingPolicy)
 	repoNew := PasswordAgePolicyFromModel(policy)
 
