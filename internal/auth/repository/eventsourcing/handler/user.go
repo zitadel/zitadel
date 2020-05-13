@@ -19,7 +19,7 @@ type User struct {
 }
 
 const (
-	userTable = "management.users"
+	userTable = "auth.users"
 )
 
 func (p *User) MinimumCycleDuration() time.Duration { return p.cycleDuration }
