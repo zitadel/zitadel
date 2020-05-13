@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -29,13 +28,6 @@ func PasswordComplexityPolicyCreateAggregate(aggCreator *es_models.AggregateCrea
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "policy should not be nil")
 		}
-		var err error
-		id, err := idGenerator.NextID()
-		if err != nil {
-			return nil, err
-		}
-		policy.AggregateID = strconv.FormatUint(id, 10)
-
 		agg, err := PasswordComplexityPolicyAggregate(ctx, aggCreator, policy)
 		if err != nil {
 			return nil, err
@@ -47,9 +39,6 @@ func PasswordComplexityPolicyCreateAggregate(aggCreator *es_models.AggregateCrea
 
 func PasswordComplexityPolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *PasswordComplexityPolicy, new *PasswordComplexityPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if existing == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing policy should not be nil")
-		}
 		if new == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new policy should not be nil")
 		}

@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -34,6 +35,12 @@ func (es *PolicyEventstore) CreatePasswordAgePolicy(ctx context.Context, policy 
 	if existingPolicy != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
 	}
+
+	id, err := idGenerator.NextID()
+	if err != nil {
+		return nil, err
+	}
+	policy.AggregateID = strconv.FormatUint(id, 10)
 
 	repoPolicy := PasswordAgePolicyFromModel(policy)
 
