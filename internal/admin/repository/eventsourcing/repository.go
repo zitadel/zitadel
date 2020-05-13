@@ -55,14 +55,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	}, nil
 }
 
-func (repo *EsRepository) Health() error {
-	err := repo.Eventstore.Health(context.TODO())
+func (repo *EsRepository) Health(ctx context.Context) error {
+	err := repo.Eventstore.Health(ctx)
 	if err != nil {
 		return err
 	}
-	err = repo.UserEventstore.Health(context.TODO())
+	err = repo.UserEventstore.Health(ctx)
 	if err != nil {
 		return err
 	}
-	return repo.OrgEventstore.Health(context.TODO())
+	return repo.OrgEventstore.Health(ctx)
 }

@@ -1,6 +1,8 @@
 package repository
 
+import "context"
+
 type Repository interface {
-	Health() error
+	Health(ctx context.Context) error
 	OrgRepository
 }

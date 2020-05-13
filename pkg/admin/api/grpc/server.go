@@ -17,12 +17,14 @@ type Server struct {
 	org      repository.OrgRepository
 	verifier auth.TokenVerifier
 	authZ    auth.Config
+	repo     repository.Repository
 }
 
 func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository.Repository) *Server {
 	return &Server{
 		port:     conf.Port,
 		org:      repo,
+		repo:     repo,
 		authZ:    authZ,
 		verifier: admin_auth.Start(),
 	}
