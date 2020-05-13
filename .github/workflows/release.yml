@@ -193,7 +193,7 @@ jobs:
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
       with:
-        dry_run: true
+        dry_run: false
         semantic_version: 17.0.4
         extra_plugins: |
           @semantic-release/exec@5.0.0
