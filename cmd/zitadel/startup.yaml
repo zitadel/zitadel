@@ -65,3 +65,30 @@ Admin:
 Console:
   Port: 50050
   StaticDir: /app/console/dist
+
+
+Notification:
+  Repository:
+    Eventstore:
+      ServiceName: 'Notification'
+      Repository:
+        SQL:
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'notification'
+          Database: 'eventstore'
+          SSLmode: disable
+      Cache:
+        Type: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
+    View:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'notification'
+      Database: 'notification'
+      SSLmode: disable
+    Spooler:
+      ConcurrentTasks: 4
+      BulkLimit: 100
+      FailureCountUntilSkip: 5

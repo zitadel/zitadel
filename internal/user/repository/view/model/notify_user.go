@@ -19,7 +19,6 @@ type NotifyUser struct {
 	CreationDate      time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate        time.Time `json:"-" gorm:"column:change_date"`
 	ResourceOwner     string    `json:"-" gorm:"column:resource_owner"`
-	State             int32     `json:"-" gorm:"column:user_state"`
 	UserName          string    `json:"userName" gorm:"column:user_name"`
 	FirstName         string    `json:"firstName" gorm:"column:first_name"`
 	LastName          string    `json:"lastName" gorm:"column:last_name"`
@@ -40,7 +39,6 @@ func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
 		ChangeDate:        user.ChangeDate,
 		CreationDate:      user.CreationDate,
 		ResourceOwner:     user.ResourceOwner,
-		State:             int32(user.State),
 		UserName:          user.UserName,
 		FirstName:         user.FirstName,
 		LastName:          user.LastName,
@@ -62,7 +60,6 @@ func NotifyUserToModel(user *NotifyUser) *model.NotifyUser {
 		ChangeDate:        user.ChangeDate,
 		CreationDate:      user.CreationDate,
 		ResourceOwner:     user.ResourceOwner,
-		State:             model.UserState(user.State),
 		UserName:          user.UserName,
 		FirstName:         user.FirstName,
 		LastName:          user.LastName,

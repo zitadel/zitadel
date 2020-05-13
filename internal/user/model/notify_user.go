@@ -9,7 +9,6 @@ type NotifyUser struct {
 	ID                string
 	CreationDate      time.Time
 	ChangeDate        time.Time
-	State             UserState
 	ResourceOwner     string
 	UserName          string
 	FirstName         string

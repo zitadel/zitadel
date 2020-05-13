@@ -19,7 +19,7 @@ type NotifyUser struct {
 }
 
 const (
-	userTable = "notifications.notify_users"
+	userTable = "notification.notify_users"
 )
 
 func (p *NotifyUser) MinimumCycleDuration() time.Duration { return p.cycleDuration }
@@ -29,7 +29,7 @@ func (p *NotifyUser) ViewModel() string {
 }
 
 func (p *NotifyUser) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestUserSequence()
+	sequence, err := p.view.GetLatestNotifyUserSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (p *NotifyUser) Process(event *models.Event) (err error) {
 	case es_model.UserDeleted:
 		err = p.view.DeleteNotifyUser(event.AggregateID, event.Sequence)
 	default:
-		return p.view.ProcessedUserSequence(event.Sequence)
+		return p.view.ProcessedNotifyUserSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
@@ -65,5 +65,5 @@ func (p *NotifyUser) Process(event *models.Event) (err error) {
 
 func (p *NotifyUser) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
-	return spooler.HandleError(event, err, p.view.GetLatestUserFailedEvent, p.view.ProcessedUserFailedEvent, p.view.ProcessedUserSequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestNotifyUserFailedEvent, p.view.ProcessedNotifyUserFailedEvent, p.view.ProcessedNotifyUserSequence, p.errorCountUntilSkip)
 }
