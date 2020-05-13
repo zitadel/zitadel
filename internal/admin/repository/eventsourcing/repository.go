@@ -3,10 +3,6 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	es_int "github.com/caos/zitadel/internal/eventstore"
-	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/setup"
