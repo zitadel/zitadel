@@ -10,3 +10,7 @@ type PasswordAgePolicy struct {
 	MaxAgeDays     uint64
 	ExpireWarnDays uint64
 }
+
+func (p *PasswordAgePolicy) IsValid() bool {
+	return p.Description != ""
+}

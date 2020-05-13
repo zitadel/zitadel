@@ -15,8 +15,8 @@ func (es *PolicyEventstore) GetPasswordLockoutPolicy(ctx context.Context, id str
 
 	query := PasswordLockoutPolicyQuery(id, policy.Sequence)
 	err := es_sdk.Filter(ctx, es.FilterEvents, policy.AppendEvents, query)
-	if caos_errs.IsNotFound(err) {
-		policy.Description = es.passwordComplexityPolicyDefault.Description
+	if caos_errs.IsNotFound(err) && es.passwordLockoutPolicyDefault.Description != "" {
+		policy.Description = es.passwordLockoutPolicyDefault.Description
 		policy.MaxAttempts = es.passwordLockoutPolicyDefault.MaxAttempts
 		policy.ShowLockOutFailures = es.passwordLockoutPolicyDefault.ShowLockOutFailures
 	} else if err != nil {
