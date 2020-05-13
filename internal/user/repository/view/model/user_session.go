@@ -1,8 +1,10 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -17,29 +19,36 @@ const (
 )
 
 type UserSessionView struct {
-	ID                      string    `json:"-" gorm:"column:id;primary_key"`
-	CreationDate            time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate              time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner           string    `json:"-" gorm:"column:resource_owner"`
-	State                   int32     `json:"-" gorm:"column:user_state"`
-	ApplicationID           string    `json:"applicationID" gorm:"column:application_id"`
+	ID            string    `json:"-" gorm:"column:id;primary_key"`
+	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
+	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
+	//State                   int32     `json:"-" gorm:"column:user_state"`
 	UserAgentID             string    `json:"userAgentID" gorm:"column:user_agent_id"`
 	UserID                  string    `json:"userID" gorm:"column:user_id"`
 	UserName                string    `json:"userName" gorm:"column:user_name"`
-	PasswordVerification    time.Time `json:"passwordVerification" gorm:"column:password_verification"`
-	MfaSoftwareVerification time.Time `json:"mfaSoftwareVerification" gorm:"column:mfa_software_verification"`
-	MfaHardwareVerification time.Time `json:"mfaHardwareVerification" gorm:"column:mfa_hardware_verification"`
+	PasswordVerification    time.Time `json:"-" gorm:"column:password_verification"`
+	MfaSoftwareVerification time.Time `json:"-" gorm:"column:mfa_software_verification"`
+	MfaHardwareVerification time.Time `json:"-" gorm:"column:mfa_hardware_verification"`
 	Sequence                uint64    `json:"-" gorm:"column:sequence"`
+}
+
+func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
+	v := new(UserSessionView)
+	if err := json.Unmarshal(event.Data, v); err != nil {
+		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
+		return nil, caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
+	}
+	return v, nil
 }
 
 func UserSessionFromModel(userSession *model.UserSessionView) *UserSessionView {
 	return &UserSessionView{
-		ID:                      userSession.ID,
-		ChangeDate:              userSession.ChangeDate,
-		CreationDate:            userSession.CreationDate,
-		ResourceOwner:           userSession.ResourceOwner,
-		State:                   int32(userSession.State),
-		ApplicationID:           userSession.ApplicationID,
+		ID:            userSession.ID,
+		ChangeDate:    userSession.ChangeDate,
+		CreationDate:  userSession.CreationDate,
+		ResourceOwner: userSession.ResourceOwner,
+		//State:                   int32(userSession.State),
 		UserAgentID:             userSession.UserAgentID,
 		UserID:                  userSession.UserID,
 		UserName:                userSession.UserName,
@@ -57,7 +66,6 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		CreationDate:  userSession.CreationDate,
 		ResourceOwner: userSession.ResourceOwner,
 		//State:                   model.UserSessionState(userSession.State),
-		ApplicationID:           userSession.ApplicationID,
 		UserAgentID:             userSession.UserAgentID,
 		UserID:                  userSession.UserID,
 		UserName:                userSession.UserName,
@@ -76,19 +84,20 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 	return result
 }
 
-func (p *UserSessionView) AppendEvent(event *models.Event) (err error) {
-	p.ChangeDate = event.CreationDate
+func (v *UserSessionView) AppendEvent(event *models.Event) (err error) {
+	v.ChangeDate = event.CreationDate
+	//p.
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded:
-		p.PasswordVerification = event.CreationDate
+		v.PasswordVerification = event.CreationDate
 	case es_model.UserPasswordCheckFailed,
 		es_model.UserPasswordChanged:
-		p.PasswordVerification = time.Time{}
+		v.PasswordVerification = time.Time{}
 	case es_model.MfaOtpCheckSucceeded:
-		p.MfaSoftwareVerification = event.CreationDate
+		v.MfaSoftwareVerification = event.CreationDate
 	case es_model.MfaOtpCheckFailed,
 		es_model.MfaOtpRemoved:
-		p.MfaSoftwareVerification = time.Time{}
+		v.MfaSoftwareVerification = time.Time{}
 	}
 	return err
 }

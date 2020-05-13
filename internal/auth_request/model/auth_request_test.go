@@ -157,7 +157,7 @@ func TestAuthRequest_MfaLevel(t *testing.T) {
 		fields fields
 		want   MfaLevel
 	}{
-		// TODO: Add / replace  test cases.
+		//PLANNED: Add / replace test cases when LOA is set
 		{"-1",
 			fields{},
 			-1,

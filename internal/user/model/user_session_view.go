@@ -12,7 +12,6 @@ type UserSessionView struct {
 	ChangeDate              time.Time
 	State                   UserState
 	ResourceOwner           string
-	ApplicationID           string
 	UserAgentID             string
 	UserID                  string
 	UserName                string
@@ -59,8 +58,3 @@ func (r *UserSessionSearchRequest) EnsureLimit(limit uint64) {
 		r.Limit = limit
 	}
 }
-
-//TODO: ?
-//func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
-//	r.Queries = append(r.Queries, &UserSearchQuery{Key: USERSEARCHKEY_RESOURCEOWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
-//}

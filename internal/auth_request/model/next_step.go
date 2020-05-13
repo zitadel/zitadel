@@ -32,32 +32,6 @@ const (
 	UserSessionStateTerminated
 )
 
-//
-//type Mfa interface {
-//	Type() MfaType
-//	AuthLevel() AuthLevel
-//}
-//
-//type AuthLevel int32
-//
-//type OTP struct{}
-//
-//func (o *OTP) MfaType() MfaType {
-//	return MfaTypeOTP
-//}
-//
-//func (o *OTP) AuthLevel() AuthLevel {
-//	return 1
-//}
-//
-//type MfaType int32
-//
-//const (
-//	MfaTypeNone MfaType = iota
-//	MfaTypeOTP
-//	MFaTypeSMS
-//)
-
 type LoginStep struct {
 	NotFound bool
 }

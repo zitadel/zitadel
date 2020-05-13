@@ -33,11 +33,3 @@ func BrowserInfoFromModel(info *model.BrowserInfo) *BrowserInfo {
 		RemoteIP:       info.RemoteIP,
 	}
 }
-
-//
-//func AuthRequestToModel(request *AuthRequest) *model.AuthRequest {
-//	return &model.AuthRequest{
-//		UserAgentID: request.UserAgentID,
-//		BrowserInfo: BrowserInfoToModel(request.BrowserInfo),
-//	}
-//}

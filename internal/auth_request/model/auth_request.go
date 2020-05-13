@@ -73,7 +73,7 @@ func (a *AuthRequest) IsValid() bool {
 
 func (a *AuthRequest) MfaLevel() MfaLevel {
 	return -1
-	//TODO: check a.PossibleLOAs (and Prompt Login?)
+	//PLANNED: check a.PossibleLOAs (and Prompt Login?)
 }
 
 func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
