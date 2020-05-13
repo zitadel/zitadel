@@ -84,6 +84,10 @@ jobs:
   go-build:
     runs-on: ubuntu-18.04
     needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
+    name: Go ${{ matrix.go }} sample
+    strategy:
+      matrix:
+        go: [ 'linux', 'darwin' ]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
@@ -96,11 +100,11 @@ jobs:
     - run: go get github.com/rakyll/statik
     - run: ./build/console/generate-static.sh
     - run: cat pkg/console/statik/statik.go
-    - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel cmd/zitadel/main.go
+    - run: CGO_ENABLED=0 GOOS=${{ matrix.go }} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-${{ matrix.go }} cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:
-        name: go-binary
-        path: zitadel
+        name: zitadel-${{ matrix.go }}
+        path: zitadel-${{ matrix.go }}
 
   container-prod:
     runs-on: ubuntu-18.04
@@ -110,7 +114,7 @@ jobs:
       uses: actions/checkout@v2
     - uses: actions/download-artifact@v1
       with:
-        name: go-binary
+        name: zitadel-linux
         path: .build/go
     - uses: docker/build-push-action@v1
       with:
