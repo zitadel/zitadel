@@ -31,7 +31,7 @@ func (u *UserSession) ViewModel() string {
 }
 
 func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+	sequence, err := u.view.GetLatestUserSessionSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 		es_model.MfaOtpRemoved:
 		err = session.AppendEvent(event)
 	default:
-		return u.view.ProcessedUserSequence(event.Sequence)
+		return u.view.ProcessedUserSessionSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
