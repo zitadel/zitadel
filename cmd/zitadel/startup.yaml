@@ -68,7 +68,7 @@ Admin:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'eventstore'
+          User: 'admin'
           Database: 'eventstore'
           SSLmode: disable
       Cache:
