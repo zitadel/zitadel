@@ -20,12 +20,12 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
     #- run: npm test 
     - run: echo "replace me with real test"
 
-  angular-build:
+  angular-lint: # will be added later on
     runs-on: ubuntu-18.04
-    needs: angular-test
     defaults:
       run:
         working-directory: ./console
@@ -34,8 +34,20 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: npm ci 
+    - run: npm ci
     - run: npm run lint
+
+  angular-build:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./console
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
     - run: npm run prodbuild
     - uses: actions/upload-artifact@v1
       with:
@@ -58,10 +70,20 @@ jobs:
       with:
         file: ./profile.cov
         name: codecov-go
+      
+  go-lint:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/checkout@v2
+    - run: echo "replace me with real lint"
   
   go-build:
     runs-on: ubuntu-18.04
-    needs: [angular-build, go-test]
+    needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
@@ -74,7 +96,7 @@ jobs:
     - run: go get github.com/rakyll/statik
     - run: ./build/console/generate-static.sh
     - run: cat pkg/console/statik/statik.go
-    - run: go build -o zitadel cmd/zitadel/main.go
+    - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:
         name: go-binary
@@ -139,7 +161,7 @@ jobs:
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Run Test
-      run: docker run $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "ls -la ./app"
+      run: echo "replace me with real test"
 
   release:
     runs-on: ubuntu-18.04
