@@ -96,7 +96,7 @@ jobs:
     - run: go get github.com/rakyll/statik
     - run: ./build/console/generate-static.sh
     - run: cat pkg/console/statik/statik.go
-    - run: go build -o zitadel cmd/zitadel/main.go
+    - run: env GOOS=linux GOARCH=amd64 go build -o zitadel cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:
         name: go-binary
