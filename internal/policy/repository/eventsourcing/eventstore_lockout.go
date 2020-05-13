@@ -35,7 +35,7 @@ func (es *PolicyEventstore) CreatePasswordLockoutPolicy(ctx context.Context, pol
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
-	if existingPolicy != nil {
+	if existingPolicy != nil && existingPolicy.Sequence > 0 {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
 	}
 

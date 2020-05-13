@@ -32,7 +32,7 @@ func (es *PolicyEventstore) CreatePasswordAgePolicy(ctx context.Context, policy 
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
-	if existingPolicy != nil {
+	if existingPolicy != nil && existingPolicy.Sequence > 0 {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
 	}
 
