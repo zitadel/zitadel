@@ -24,6 +24,7 @@ func InitChatProvider(config *ChatConfig) (*Chat, error) {
 }
 
 func (chat *Chat) CanHandleMessage(message providers.Message) bool {
+	chatMsg := message.(ChatMessage)
 	return message.Content != ""
 }
 

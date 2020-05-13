@@ -42,3 +42,12 @@ SystemDefaults:
       Issuer: 'Zitadel'
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
+  Notifications:
+    PasswordReset:
+      Title: 'Zitadel - Passwort zurücksetzen'
+      PreHeader: 'Passwort zurücksetzen'
+      Subject: 'Passwort zurücksetzen'
+      Greeting: 'Hallo {{.Name}},'
+      Text: 'Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen. Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.'
+      Href: '{{.URL}}'
+      ButtonText: 'Passwort zurücksetzen'
