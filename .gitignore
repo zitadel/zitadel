@@ -30,4 +30,4 @@ key.json
 cockroach-data/*
 
 #binaries
-zitadel
+cmd/zitadel/zitadel
