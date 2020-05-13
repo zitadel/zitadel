@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -26,7 +27,6 @@ type Config struct {
 type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.OrgRepository
-	eventstore.OrgMemberRepository
 	eventstore.ProjectRepo
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
@@ -74,12 +74,11 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
 
 	return &EsRepository{
-		spool,
-		eventstore.OrgRepository{org},
-		eventstore.OrgMemberRepository{org},
-		eventstore.ProjectRepo{conf.SearchLimit, project, view},
-		eventstore.UserRepo{user},
-		eventstore.UserGrantRepo{usergrant},
+		spooler:       spool,
+		OrgRepository: eventstore.OrgRepository{org},
+		ProjectRepo:   eventstore.ProjectRepo{conf.SearchLimit, project, view},
+		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, view},
+		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 	}, nil
 }
 

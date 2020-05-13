@@ -12,4 +12,5 @@ type UserGrantRepository interface {
 	DeactivateUserGrant(ctx context.Context, grantID string) (*model.UserGrant, error)
 	ReactivateUserGrant(ctx context.Context, grantID string) (*model.UserGrant, error)
 	RemoveUserGrant(ctx context.Context, grantID string) error
+	SearchUserGrants(ctx context.Context, request *model.UserGrantSearchRequest) (*model.UserGrantSearchResponse, error)
 }

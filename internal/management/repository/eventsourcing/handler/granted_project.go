@@ -121,5 +121,5 @@ func (p *GrantedProject) updateExistingProjects(project *view_model.GrantedProje
 
 func (p *GrantedProject) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
-	return spooler.HandleError(event, p.view.GetLatestGrantedProjectFailedEvent, p.view.ProcessedGrantedProjectFailedEvent, p.view.ProcessedGrantedProjectSequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, err, p.view.GetLatestGrantedProjectFailedEvent, p.view.ProcessedGrantedProjectFailedEvent, p.view.ProcessedGrantedProjectSequence, p.errorCountUntilSkip)
 }

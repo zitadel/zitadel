@@ -26,7 +26,7 @@ Mgmt:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'management'
-          Database: 'management'
+          Database: 'eventstore'
           SSLmode: disable
       Cache:
         Type: 'fastcache'
@@ -68,7 +68,7 @@ Admin:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'eventstore'
+          User: 'admin_api'
           Database: 'eventstore'
           SSLmode: disable
       Cache:

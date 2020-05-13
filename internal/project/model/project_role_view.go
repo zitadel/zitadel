@@ -1,9 +1,6 @@
 package model
 
 import (
-	"context"
-	"github.com/caos/zitadel/internal/api"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/model"
 	"time"
 )
@@ -51,8 +48,7 @@ type ProjectRoleSearchResponse struct {
 	Result      []*ProjectRoleView
 }
 
-func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(ctx context.Context) {
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: PROJECTROLESEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
 }
 

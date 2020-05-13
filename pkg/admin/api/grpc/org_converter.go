@@ -12,7 +12,7 @@ import (
 func setUpRequestToModel(setUp *OrgSetUpRequest) *admin_model.SetupOrg {
 	return &admin_model.SetupOrg{
 		Org:  orgCreateRequestToModel(setUp.Org),
-		User: userRegisterRequestToModel(setUp.User),
+		User: userCreateRequestToModel(setUp.User),
 	}
 }
 
@@ -23,12 +23,13 @@ func orgCreateRequestToModel(org *CreateOrgRequest) *org_model.Org {
 	}
 }
 
-func userRegisterRequestToModel(user *RegisterUserRequest) *usr_model.User {
+func userCreateRequestToModel(user *CreateUserRequest) *usr_model.User {
 	preferredLanguage, err := language.Parse(user.PreferredLanguage)
 	logging.Log("GRPC-30hwz").OnError(err).Debug("unable to parse language")
 
 	return &usr_model.User{
 		Profile: &usr_model.Profile{
+			UserName:          user.UserName,
 			DisplayName:       user.DisplayName,
 			FirstName:         user.FirstName,
 			LastName:          user.LastName,
@@ -40,7 +41,19 @@ func userRegisterRequestToModel(user *RegisterUserRequest) *usr_model.User {
 			SecretString: user.Password,
 		},
 		Email: &usr_model.Email{
-			EmailAddress: user.Email,
+			EmailAddress:    user.Email,
+			IsEmailVerified: user.IsEmailVerified,
+		},
+		Phone: &usr_model.Phone{
+			IsPhoneVerified: user.IsPhoneVerified,
+			PhoneNumber:     user.Phone,
+		},
+		Address: &usr_model.Address{
+			Country:       user.Country,
+			Locality:      user.Locality,
+			PostalCode:    user.PostalCode,
+			Region:        user.Region,
+			StreetAddress: user.StreetAddress,
 		},
 	}
 }

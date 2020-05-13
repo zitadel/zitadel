@@ -1,0 +1,145 @@
+<div class="max-width-container container">
+    <div class="abort-container">
+        <button (click)="close()" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+        <span class="abort">{{ 'ORG.PAGES.CREATE' | translate }}</span><span class="abort-2">Step
+            {{ currentCreateStep }} of
+            {{ createSteps }}</span>
+    </div>
+
+    <ng-container *ngIf="currentCreateStep == 1">
+        <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}}</h1>
+        <form [formGroup]="orgForm">
+            <div class="content">
+                <mat-form-field class="formfield">
+                    <mat-label>{{ 'ORG_DETAIL.DETAIL.NAME' | translate }}</mat-label>
+                    <input matInput formControlName="name" />
+                </mat-form-field>
+                <mat-form-field class="formfield">
+                    <mat-label>{{ 'ORG_DETAIL.DETAIL.DOMAIN' | translate }}</mat-label>
+                    <input matInput formControlName="domain" />
+                </mat-form-field>
+            </div>
+        </form>
+
+        <div *ngIf="name?.touched" @openClose>
+            <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate }}</p>
+
+            <p>{{domain?.value}}/.well-known/caos-developer-domain-association.txt</p>
+
+            <div class="btn-container">
+                <button color="primary" type="submit"
+                    mat-stroked-button>{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
+
+                <button color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.VERIFY' | translate }}</button>
+            </div>
+
+            <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_SKIP' | translate }}</p>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="currentCreateStep == createSteps">
+        <h1>{{'ORG.PAGES.ORGDETAILUSER_TITLE' | translate}}</h1>
+
+        <div class="user">
+            <form [formGroup]="userForm" (ngSubmit)="finish()" class="form">
+                <div class="content">
+                    <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PROFILE.EMAIL' | translate }}</mat-label>
+                        <input matInput formControlName="email" required />
+                        <mat-error *ngIf="email?.invalid && email?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</mat-label>
+                        <input matInput formControlName="firstName" required />
+                        <mat-error *ngIf="firstName?.invalid && firstName?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</mat-label>
+                        <input matInput formControlName="lastName" required />
+                        <mat-error *ngIf="lastName?.invalid && lastName?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</mat-label>
+                        <input matInput formControlName="nickName" />
+                        <mat-error *ngIf="nickName?.invalid && nickName?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PROFILE.DISPLAYNAME' | translate }}</mat-label>
+                        <input matInput formControlName="displayName" />
+                        <mat-error *ngIf="displayName?.invalid && displayName?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+
+                    <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
+
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PROFILE.GENDER' | translate }}</mat-label>
+                        <mat-select formControlName="gender">
+                            <mat-option *ngFor="let gender of genders" [value]="gender">
+                                {{ 'GENDERS.'+gender | translate }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="gender?.invalid && gender?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</mat-label>
+                        <mat-select formControlName="preferredLanguage">
+                            <mat-option *ngFor="let language of languages" [value]="language">
+                                {{ 'LANGUAGES.'+language | translate }}
+                            </mat-option>
+                            <mat-error *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
+                                {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                            </mat-error>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
+
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
+                        <input autocomplete="off" name="firstpassword" matInput formControlName="password"
+                            type="password" />
+                        <mat-error *ngIf="password?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.pattern">{{ 'USER.VALIDATION.INVALIDPATTERN' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
+                        <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
+                        <input autocomplete="off" name="firstpasswordRepeat" matInput formControlName="confirmPassword"
+                            type="password" />
+                        <mat-error *ngIf="confirmPassword?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+
+                </div>
+                <div class="btn-container">
+                    <button color="accent" class="continue-button" [disabled]="orgForm.invalid || userForm.invalid"
+                        type="submit" mat-raised-button>{{ 'ACTIONS.FINISH' | translate }}</button>
+                </div>
+            </form>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="currentCreateStep == 1">
+        <button (click)="next()" color="primary" mat-raised-button class="continue-button" cdkFocusInitial
+            type="submit">
+            {{'CONTINUE' | translate}}
+        </button>
+    </ng-container>
+</div>

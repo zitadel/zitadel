@@ -26,17 +26,27 @@ func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*
 }
 
 func (repo *OrgRepository) DeactivateOrg(ctx context.Context, id string) (*org_model.Org, error) {
-	org, err := repo.OrgByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	return repo.OrgEventstore.DeactivateOrg(ctx, org)
+	return repo.OrgEventstore.DeactivateOrg(ctx, id)
 }
 
 func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_model.Org, error) {
-	org, err := repo.OrgByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	return repo.OrgEventstore.ReactivateOrg(ctx, org)
+	return repo.OrgEventstore.ReactivateOrg(ctx, id)
+}
+
+func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (member *org_model.OrgMember, err error) {
+	member = org_model.NewOrgMember(orgID, userID)
+	return repo.OrgEventstore.OrgMemberByIDs(ctx, member)
+}
+
+func (repo *OrgRepository) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	return repo.OrgEventstore.AddOrgMember(ctx, member)
+}
+
+func (repo *OrgRepository) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	return repo.OrgEventstore.ChangeOrgMember(ctx, member)
+}
+
+func (repo *OrgRepository) RemoveOrgMember(ctx context.Context, orgID, userID string) error {
+	member := org_model.NewOrgMember(orgID, userID)
+	return repo.OrgEventstore.RemoveOrgMember(ctx, member)
 }

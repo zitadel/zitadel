@@ -31,7 +31,7 @@ func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *OrgMember, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil || existingMember == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "member should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "member must not be nil")
 		}
 
 		changes := existingMember.Changes(member)
@@ -50,7 +50,7 @@ func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingM
 func orgMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, member *OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dieu7", "member must not be nil")
 		}
 
 		agg, err := OrgAggregate(ctx, aggCreator, member.AggregateID, member.Sequence)

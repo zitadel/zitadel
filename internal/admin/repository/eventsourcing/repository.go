@@ -1,6 +1,12 @@
 package eventsourcing
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/setup"
@@ -16,7 +22,6 @@ type Config struct {
 	Eventstore es_int.Config
 	//View       view.ViewConfig
 	//Spooler    spooler.SpoolerConfig
-
 }
 
 type EsRepository struct {
@@ -79,7 +84,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	}, nil
 }
 
-func (repo *EsRepository) Health() error {
-	// return repo.ProjectEvents.Health(context.Background())
-	return nil
+func (repo *EsRepository) Health(ctx context.Context) error {
+	err := repo.Eventstore.Health(ctx)
+	if err != nil {
+		return err
+	}
+	err = repo.UserEventstore.Health(ctx)
+	if err != nil {
+		return err
+	}
+	return repo.OrgEventstore.Health(ctx)
 }

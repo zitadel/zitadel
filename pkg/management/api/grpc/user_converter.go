@@ -89,6 +89,51 @@ func passwordRequestToModel(r *PasswordRequest) *usr_model.Password {
 	}
 }
 
+func userSearchRequestsToModel(project *UserSearchRequest) *usr_model.UserSearchRequest {
+	return &usr_model.UserSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: userSearchQueriesToModel(project.Queries),
+	}
+}
+
+func userSearchQueriesToModel(queries []*UserSearchQuery) []*usr_model.UserSearchQuery {
+	converted := make([]*usr_model.UserSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = userSearchQueryToModel(q)
+	}
+	return converted
+}
+
+func userSearchQueryToModel(query *UserSearchQuery) *usr_model.UserSearchQuery {
+	return &usr_model.UserSearchQuery{
+		Key:    userSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func userSearchKeyToModel(key UserSearchKey) usr_model.UserSearchKey {
+	switch key {
+	case UserSearchKey_USERSEARCHKEY_USER_NAME:
+		return usr_model.USERSEARCHKEY_USER_NAME
+	case UserSearchKey_USERSEARCHKEY_FIRST_NAME:
+		return usr_model.USERSEARCHKEY_FIRST_NAME
+	case UserSearchKey_USERSEARCHKEY_LAST_NAME:
+		return usr_model.USERSEARCHKEY_LAST_NAME
+	case UserSearchKey_USERSEARCHKEY_NICK_NAME:
+		return usr_model.USERSEARCHKEY_NICK_NAME
+	case UserSearchKey_USERSEARCHKEY_DISPLAY_NAME:
+		return usr_model.USERSEARCHKEY_DISPLAY_NAME
+	case UserSearchKey_USERSEARCHKEY_EMAIL:
+		return usr_model.USERSEARCHKEY_EMAIL
+	case UserSearchKey_USERSEARCHKEY_STATE:
+		return usr_model.USERSEARCHKEY_STATE
+	default:
+		return usr_model.USERSEARCHKEY_UNSPECIFIED
+	}
+}
+
 func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
 	logging.Log("GRPC-dkso3").OnError(err).Debug("unable to parse timestamp")
@@ -207,6 +252,76 @@ func updateAddressToModel(address *UpdateUserAddressRequest) *usr_model.Address 
 	}
 }
 
+func userSearchResponseFromModel(response *usr_model.UserSearchResponse) *UserSearchResponse {
+	return &UserSearchResponse{
+		Offset:      response.Offset,
+		Limit:       response.Limit,
+		TotalResult: response.TotalResult,
+		Result:      userViewsFromModel(response.Result),
+	}
+}
+
+func userViewsFromModel(users []*usr_model.UserView) []*UserView {
+	converted := make([]*UserView, len(users))
+	for i, user := range users {
+		converted[i] = userViewFromModel(user)
+	}
+	return converted
+}
+
+func userViewFromModel(user *usr_model.UserView) *UserView {
+	creationDate, err := ptypes.TimestampProto(user.CreationDate)
+	logging.Log("GRPC-dl9we").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
+	logging.Log("GRPC-lpsg5").OnError(err).Debug("unable to parse timestamp")
+
+	lastLogin, err := ptypes.TimestampProto(user.LastLogin)
+	logging.Log("GRPC-dksi3").OnError(err).Debug("unable to parse timestamp")
+
+	passwordChanged, err := ptypes.TimestampProto(user.PasswordChanged)
+	logging.Log("GRPC-dl9ws").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserView{
+		Id:              user.ID,
+		State:           userStateFromModel(user.State),
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		LastLogin:       lastLogin,
+		PasswordChanged: passwordChanged,
+		Sequence:        user.Sequence,
+		ResourceOwner:   user.ResourceOwner,
+		UserName:        user.UserName,
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		NickName:        user.NickName,
+		Email:           user.Email,
+		IsEmailVerified: user.IsEmailVerified,
+		Phone:           user.Phone,
+		IsPhoneVerified: user.IsPhoneVerified,
+		Country:         user.Country,
+		Locality:        user.Locality,
+		Region:          user.Region,
+		PostalCode:      user.PostalCode,
+		StreetAddress:   user.StreetAddress,
+	}
+}
+
+func mfasFromModel(mfas []*usr_model.MultiFactor) []*MultiFactor {
+	converted := make([]*MultiFactor, len(mfas))
+	for i, mfa := range mfas {
+		converted[i] = mfaFromModel(mfa)
+	}
+	return converted
+}
+
+func mfaFromModel(mfa *usr_model.MultiFactor) *MultiFactor {
+	return &MultiFactor{
+		State: mfaStateFromModel(mfa.State),
+		Type:  mfaTypeFromModel(mfa.Type),
+	}
+}
+
 func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
 	switch state {
 	case NotificationType_NOTIFICATIONTYPE_EMAIL:
@@ -254,5 +369,27 @@ func genderToModel(gender Gender) usr_model.Gender {
 		return usr_model.GENDER_DIVERSE
 	default:
 		return usr_model.GENDER_UNDEFINED
+	}
+}
+
+func mfaTypeFromModel(mfatype usr_model.MFAType) MfaType {
+	switch mfatype {
+	case usr_model.MFATYPE_OTP:
+		return MfaType_MFATYPE_OTP
+	case usr_model.MFATYPE_SMS:
+		return MfaType_MFATYPE_SMS
+	default:
+		return MfaType_MFATYPE_UNSPECIFIED
+	}
+}
+
+func mfaStateFromModel(state usr_model.MfaState) MFAState {
+	switch state {
+	case usr_model.MFASTATE_READY:
+		return MFAState_MFASTATE_READY
+	case usr_model.MFASTATE_NOTREADY:
+		return MFAState_MFASTATE_NOT_READY
+	default:
+		return MFAState_MFASTATE_UNSPECIFIED
 	}
 }

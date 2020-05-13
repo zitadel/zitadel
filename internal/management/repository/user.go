@@ -13,6 +13,10 @@ type UserRepository interface {
 	ReactivateUser(ctx context.Context, id string) (*model.User, error)
 	LockUser(ctx context.Context, id string) (*model.User, error)
 	UnlockUser(ctx context.Context, id string) (*model.User, error)
+	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
+	GetGlobalUserByEmail(ctx context.Context, email string) (*model.UserView, error)
+	IsUserUnique(ctx context.Context, userName, email string) (bool, error)
+	UserMfas(ctx context.Context, userID string) ([]*model.MultiFactor, error)
 
 	SetOneTimePassword(ctx context.Context, password *model.Password) (*model.Password, error)
 	RequestSetPassword(ctx context.Context, id string, notifyType model.NotificationType) error

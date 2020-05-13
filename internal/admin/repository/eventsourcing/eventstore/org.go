@@ -2,17 +2,14 @@ package eventstore
 
 import (
 	"context"
-	"strings"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 type OrgRepo struct {
@@ -47,10 +44,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 		return nil, err
 	}
 
-	setUp.Org = org_es.OrgToModel(org)
-	setUp.User = model.UserToModel(user)
-
-	return setUp, nil
+	return SetupToModel(setupModel), nil
 }
 
 func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
@@ -62,27 +56,5 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context) ([]*org_model.Org, error) {
 }
 
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
-	var found bool
-	err = sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), org_es.OrgNameUniqueQuery(name))
-	if err != nil && !errors.IsNotFound(err) {
-		return false, err
-	}
-
-	err = sdk.Filter(ctx, repo.Eventstore.FilterEvents, isUniqueValidation(&found), org_es.OrgDomainUniqueQuery(domain))
-	if err != nil && !errors.IsNotFound(err) {
-		return false, err
-	}
-
-	return !found, nil
-}
-
-func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
-	return func(events ...*es_models.Event) error {
-		if len(events) == 0 {
-			return nil
-		}
-		*unique = *unique || strings.HasSuffix(string(events[0].Type), "reserved")
-
-		return nil
-	}
+	return repo.OrgEventstore.IsOrgUnique(ctx, name, domain)
 }

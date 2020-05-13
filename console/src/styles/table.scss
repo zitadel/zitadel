@@ -1,0 +1,26 @@
+@import '~@angular/material/theming';
+
+@mixin table-theme($theme) {
+    $primary: map-get($theme, primary);
+    $primary-dark: mat-color($primary, A900);
+    $secondary-dark: mat-color($primary, A800);
+    $foreground: map-get($theme, foreground);
+
+    .mat-table,
+    mat-paginator {
+        background-color: $secondary-dark !important;
+
+        &.background-style {
+            background-color: $primary-dark !important;
+        }
+    }
+
+    .app-label {
+        font-size: 12px;
+        border-radius: 1rem;
+        color: mat-color($foreground, text);
+        white-space: nowrap;
+        background-color: #81868a;
+        padding: .5rem 1rem;
+    }
+}

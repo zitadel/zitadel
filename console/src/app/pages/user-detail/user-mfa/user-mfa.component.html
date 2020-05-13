@@ -1,0 +1,11 @@
+<app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.MANAGE_DESCRIPTION' | translate}}">
+    <div class="table-wrapper">
+        <div class="spinner-container" *ngIf="loading$ | async">
+            <mat-spinner diameter="50"></mat-spinner>
+        </div>
+
+        <div class="col">
+            <div class="row"></div>
+        </div>
+    </div>
+</app-card>

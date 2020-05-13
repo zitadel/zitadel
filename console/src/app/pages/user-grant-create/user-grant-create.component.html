@@ -1,0 +1,67 @@
+<div class="container">
+    <div class="abort-container">
+        <button (click)="close()" mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+        <span class="abort">{{ 'USER.GRANTS.CREATE.TITLE' | translate }}</span><span class="abort-2">Step
+            {{ currentCreateStep }} of
+            {{ STEPS }}</span>
+    </div>
+
+
+    <ng-container *ngIf="currentCreateStep === 1">
+        <h1>{{'PROJECT.GRANT.CREATE.ORG_TITLE' | translate}}</h1>
+
+        <p class="desc">{{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION' | translate: org}}</p>
+        <p class="org" *ngIf="org">{{org?.name}}</p>
+
+        <p class="desc">{{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION_DESC' | translate}}</p>
+        <!-- <app-search-org-autocomplete class="block" singleOutput="true" (selectionChanged)="selectOrg($event)">
+        </app-search-org-autocomplete> -->
+    </ng-container>
+
+    <ng-container *ngIf="currentCreateStep === 2">
+        <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
+
+        <app-search-project-autocomplete class="block" singleOutput="true" (selectionChanged)="selectProject($event)">
+        </app-search-project-autocomplete>
+    </ng-container>
+
+    <ng-container *ngIf="currentCreateStep === STEPS">
+        <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
+
+        <app-card *ngIf="projectId">
+            <app-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId"></app-project-roles>
+        </app-card>
+    </ng-container>
+
+    <div class="btn-container">
+        <ng-container *ngIf="currentCreateStep === 1">
+            <!-- <span></span> -->
+            <button [disabled]="!org || !userId" (click)="next()" color="primary" mat-raised-button class="big-button"
+                cdkFocusInitial>
+                {{ 'ACTIONS.CONTINUE' | translate }}
+            </button>
+        </ng-container>
+
+        <ng-container *ngIf="currentCreateStep === 2">
+            <button (click)="previous()" color="primary" mat-button class="small-button" cdkFocusInitial>
+                {{ 'ACTIONS.BACK' | translate }}
+            </button>
+            <button [disabled]="!org || !userId" (click)="next()" color="primary" mat-raised-button class="big-button"
+                cdkFocusInitial>
+                {{ 'ACTIONS.CONTINUE' | translate }}
+            </button>
+        </ng-container>
+
+
+        <ng-container *ngIf="currentCreateStep === STEPS">
+            <button (click)="previous()" color="primary" mat-button class="small-button" cdkFocusInitial>
+                {{ 'ACTIONS.BACK' | translate }}
+            </button>
+            <button color="primary" (click)="addGrant()" mat-raised-button class="big-button" cdkFocusInitial>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+        </ng-container>
+    </div>
+</div>

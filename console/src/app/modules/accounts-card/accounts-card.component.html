@@ -1,0 +1,32 @@
+<div class="card" appOutsideClick (clickOutside)="closeCard($event)">
+    <mat-icon class="avatar">account_circle</mat-icon>
+    <span class="u-name">{{profile?.firstName}} {{profile?.lastName}}</span>
+    <span class="u-email">{{profile?.userName}}</span>
+    <span class="iamuser" *ngIf="iamuser">IAM USER</span>
+
+    <button color="accent" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
+    <div class="l-accounts">
+        <mat-progress-bar *ngIf="loadingUsers" color="accent" mode="indeterminate"></mat-progress-bar>
+        <a class="row" *ngFor="let user of users" (click)="selectAccount(user.userName)">
+            <mat-icon class="small-avatar" svgIcon="mdi_account_circle_outline"></mat-icon>
+            <div class="col">
+                <span class="title">{{user.userName}}</span>
+                <span class="email">{{'USER.STATE.'+user.authState | translate}}</span>
+            </div>
+            <span class="fill-space"></span>
+            <mat-icon>keyboard_arrow_right</mat-icon>
+        </a>
+        <a class="row" (click)="selectAccount()">
+            <div class="icon-wrapper">
+                <mat-icon>add</mat-icon>
+            </div>
+            <span class="col">
+                <span class="title">{{'USER.ADDACCOUNT' | translate}}</span>
+            </span>
+            <span class="fill-space"></span>
+            <mat-icon>keyboard_arrow_right</mat-icon>
+        </a>
+    </div>
+
+    <button color="accent" (click)="logout()" mat-stroked-button>logout everywhere</button>
+</div>

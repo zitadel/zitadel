@@ -1,0 +1,49 @@
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { RoleGuard } from 'src/app/guards/role.guard';
+
+import { OrgCreateComponent } from './org-create/org-create.component';
+import { OrgDetailComponent } from './org-detail/org-detail.component';
+import { OrgGridComponent } from './org-grid/org-grid.component';
+import { PasswordPolicyComponent, PolicyComponentAction } from './password-policy/password-policy.component';
+
+const routes: Routes = [
+    {
+        path: 'create',
+        component: OrgCreateComponent,
+        canActivate: [RoleGuard],
+        data: {
+            roles: ['iam.write'],
+        },
+        loadChildren: () => import('./org-create/org-create.module').then(m => m.OrgCreateModule),
+    },
+    {
+        path: ':id/policy/:policytype/create',
+        component: PasswordPolicyComponent,
+        data: {
+            action: PolicyComponentAction.CREATE,
+        },
+    },
+    {
+        path: ':id/policy/:policytype',
+        component: PasswordPolicyComponent,
+        data: {
+            action: PolicyComponentAction.MODIFY,
+        },
+        loadChildren: () => import('./password-policy/password-policy.module').then(m => m.PasswordPolicyModule),
+    },
+    {
+        path: ':id',
+        component: OrgDetailComponent,
+    },
+    {
+        path: '',
+        component: OrgGridComponent,
+    },
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
+})
+export class OrgsRoutingModule { }

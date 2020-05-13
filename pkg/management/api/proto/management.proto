@@ -62,7 +62,7 @@ service ManagementService {
         };
     }
 
-    rpc GetUserByEmailGlobal(UserEmailID) returns (User) {
+    rpc GetUserByEmailGlobal(UserEmailID) returns (UserView) {
         option (google.api.http) = {
             get: "/global/users/email/{email}"
         };
@@ -527,7 +527,7 @@ service ManagementService {
         };
     }
 
-    rpc AddOrgMember(AddOrgMemberRequest) returns (google.protobuf.Empty) {
+    rpc AddOrgMember(AddOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/members"
             body: "*"
@@ -538,7 +538,7 @@ service ManagementService {
         };
     }
 
-    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (google.protobuf.Empty) {
+    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
             put: "/orgs/{org_id}/members/{user_id}"
             body: "*"
@@ -1292,6 +1292,47 @@ message User {
     UserState state = 2;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
+    string user_name = 5;
+    string first_name = 6;
+    string last_name = 7;
+    string display_name = 8;
+    string nick_name = 9;
+    string preferred_language = 10;
+    Gender gender = 11;
+    string email = 12;
+    bool is_email_verified = 13;
+    string phone = 14;
+    bool is_phone_verified = 15;
+    string country = 16;
+    string locality = 17;
+    string postal_code = 18;
+    string region = 19;
+    string street_address = 20;
+    uint64 sequence = 21;
+}
+
+enum UserState {
+    USERSTATE_UNSPECIFIED = 0;
+    USERSTATE_ACTIVE = 1;
+    USERSTATE_INACTIVE = 2;
+    USERSTATE_DELETED = 3;
+    USERSTATE_LOCKED = 4;
+    USERSTATE_SUSPEND = 5;
+    USERSTATE_INITIAL= 6;
+}
+
+enum Gender {
+    GENDER_UNSPECIFIED = 0;
+    GENDER_FEMALE = 1;
+    GENDER_MALE = 2;
+    GENDER_DIVERSE = 3;
+}
+
+message UserView {
+    string id = 1;
+    UserState state = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
     google.protobuf.Timestamp last_login = 5;
     google.protobuf.Timestamp password_changed = 6;
     string user_name = 7;
@@ -1311,23 +1352,7 @@ message User {
     string region = 21;
     string street_address = 22;
     uint64 sequence = 23;
-}
-
-enum UserState {
-    USERSTATE_UNSPECIFIED = 0;
-    USERSTATE_ACTIVE = 1;
-    USERSTATE_INACTIVE = 2;
-    USERSTATE_DELETED = 3;
-    USERSTATE_LOCKED = 4;
-    USERSTATE_SUSPEND = 5;
-    USERSTATE_INITIAL= 6;
-}
-
-enum Gender {
-    GENDER_UNSPECIFIED = 0;
-    GENDER_FEMALE = 1;
-    GENDER_MALE = 2;
-    GENDER_DIVERSE = 3;
+    string resource_owner = 24;
 }
 
 message UserSearchRequest {
@@ -1359,7 +1384,7 @@ message UserSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated User result = 4;
+    repeated UserView result = 4;
 }
 
 enum SearchMethod {
@@ -1621,14 +1646,10 @@ message OrgMemberRoles {
 
 message OrgMember {
     string user_id = 1;
-    string user_name = 2;
-    string email = 3;
-    string first_name = 4;
-    string last_name = 5;
-    repeated string roles = 6;
-    google.protobuf.Timestamp change_date = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    uint64 sequence = 9;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
 }
 
 message AddOrgMemberRequest {
@@ -2149,14 +2170,7 @@ message UserGrant {
     UserGrantState state = 6;
     google.protobuf.Timestamp creation_date = 7;
     google.protobuf.Timestamp change_date = 8;
-    string user_name = 9;
-    string first_name = 10;
-    string last_name = 11;
-    string email = 12;
-    string org_name = 13;
-    string org_domain = 14;
-    string project_name = 15;
-    uint64 sequence = 16;
+    uint64 sequence = 9;
 }
 
 message UserGrantCreate {
@@ -2216,12 +2230,32 @@ enum UserGrantState {
     USERGRANTSTATE_INACTIVE = 2;
 }
 
+message UserGrantView {
+    string id = 1;
+    string user_id = 2;
+    string org_id = 3;
+    string project_id = 4;
+    repeated string role_keys = 5;
+    UserGrantState state = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    google.protobuf.Timestamp change_date = 8;
+    string user_name = 9;
+    string first_name = 10;
+    string last_name = 11;
+    string email = 12;
+    string org_name = 13;
+    string org_domain = 14;
+    string project_name = 15;
+    uint64 sequence = 16;
+    string resource_owner = 17;
+}
+
 
 message UserGrantSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated UserGrant result = 4;
+    repeated UserGrantView result = 4;
 }
 
 message UserGrantSearchRequest {

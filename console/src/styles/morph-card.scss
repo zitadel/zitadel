@@ -1,0 +1,32 @@
+@import '~@angular/material/theming';
+
+@mixin morph-card-theme($theme) {
+    $accent: map-get($theme, accent);
+    $background: map-get($theme, background);
+    $background-color: mat-color($background, card);
+    $primary: map-get($theme, primary);
+    $primary-dark: mat-color($primary, A900);
+    $secondary-dark: mat-color($primary, A800);
+    $accent: map-get($theme, accent);
+    $accent-color: mat-color($accent, 500);
+
+    .morph-card {
+        cursor: pointer;
+        animation: all .2s;
+        height: 80px;
+        width: 80px;
+        margin: 1rem;
+        border-radius: 16px;
+        background: $primary-dark;
+        box-shadow:  5px 5px 20px rgba($color: black, $alpha: 0.5), -5px -5px 20px rgba($color: $secondary-dark, $alpha: 1);
+
+        &.add {
+            background: $accent-color;
+            box-shadow:  5px 5px 20px rgba($color: black, $alpha: 0.5), -5px -5px 20px rgba($color: $secondary-dark, $alpha: 1);
+        }
+
+        // &:hover {
+        //     @include mat-elevation(5);
+        // }
+    }
+}

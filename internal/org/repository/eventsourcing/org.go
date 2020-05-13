@@ -47,7 +47,7 @@ func OrgAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, i
 
 func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, org *Org) (_ []*es_models.Aggregate, err error) {
 	if org == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie7", "org should not be nil")
 	}
 
 	domainAgrregate, err := uniqueDomainAggregate(ctx, aggCreator, org.AggregateID, org.Domain)
@@ -78,10 +78,10 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 
 func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *Org, updated *Org) ([]*es_models.Aggregate, error) {
 	if existing == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk93d", "existing project should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dk83d", "existing org must not be nil")
 	}
 	if updated == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new project should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "updated org must not be nil")
 	}
 	changes := existing.Changes(updated)
 	if len(changes) == 0 {
@@ -123,7 +123,7 @@ func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCre
 func orgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if org == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-R03z8", "existing org must not be nil")
 		}
 		if org.State == int32(org_model.ORGSTATE_INACTIVE) {
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already inactive")
@@ -140,10 +140,10 @@ func orgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 func orgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if org == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-37dur", "existing project should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-cTHLd", "existing org must not be nil")
 		}
 		if org.State == int32(org_model.ORGSTATE_ACTIVE) {
-			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "org already active")
+			return nil, errors.ThrowInvalidArgument(nil, "EVENT-pUSMs", "org already active")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
 		if err != nil {
@@ -155,7 +155,10 @@ func orgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *Org) fu
 }
 
 func uniqueDomainAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, domain string) (*es_models.Aggregate, error) {
-	aggregate, err := aggCreator.NewAggregate(ctx, domain, org_model.OrgDomainAggregate, orgVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+	aggregate, err := aggCreator.NewAggregate(ctx, domain, org_model.OrgDomainAggregate, orgVersion, 0)
+	if resourceOwner != "" {
+		aggregate, err = aggCreator.NewAggregate(ctx, name, org_model.OrgNameAggregate, orgVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +193,7 @@ func isReservedValidation(aggregate *es_models.Aggregate, resevedEventType es_mo
 			return nil
 		}
 		if events[0].Type == resevedEventType {
-			return errors.ThrowPreconditionFailed(nil, "EVENT-WMKO4", "org already reseved")
+			return errors.ThrowPreconditionFailed(nil, "EVENT-eJQqe", "org already reseved")
 		}
 		aggregate.PreviousSequence = events[0].Sequence
 		return nil

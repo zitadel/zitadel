@@ -1,0 +1,72 @@
+<div class="table-header-row" *ngIf="projectId">
+    <div class="col">
+        <ng-container *ngIf="!selection.hasValue()">
+            <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
+            <span class="count">{{dataSource?.rolesSubject.value.length}}</span>
+        </ng-container>
+        <ng-container *ngIf="selection.hasValue()">
+            <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
+            <span class="count">{{selection?.selected?.length}}</span>
+        </ng-container>
+    </div>
+    <span class="fill-space"></span>
+    <ng-template appHasRole [appHasRole]="['project.role.delete']">
+        <button [disabled]="disabled" matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" class="icon-button"
+            (click)="deleteSelectedRoles()" mat-icon-button *ngIf="selection.hasValue() && actionsVisible">
+            <mat-icon>delete_outline</mat-icon>
+        </button>
+    </ng-template>
+    <ng-template appHasRole [appHasRole]="['project.role.write:' + projectId, 'project.role.write']">
+        <a *ngIf="actionsVisible" [disabled]="disabled" class="add-button"
+            [routerLink]="[ '/projects', projectId, 'roles', 'create']" color="primary" mat-raised-button>
+            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+        </a>
+    </ng-template>
+</div>
+
+<div class="table-wrapper">
+    <div class="spinner-container" *ngIf="dataSource.loading$ | async">
+        <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <table [dataSource]="dataSource" mat-table class="full-width-table" matSort aria-label="Elements">
+        <ng-container matColumnDef="select">
+            <th class="selection" mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td class="selection" mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.NAME' | translate }} </th>
+            <td mat-cell *matCellDef="let role"> {{role.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="displayname">
+            <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }} </th>
+            <td mat-cell *matCellDef="let role"> {{role.displayName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="group">
+            <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.GROUP' | translate }} </th>
+            <td mat-cell *matCellDef="let role">
+                <span class="role app-label" *ngIf="role.group"
+                    matTooltip="Add all of group {{role.group}} to selection"
+                    (click)="selectAllOfGroup(role.group)">{{role.group}}</span>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
+    </mat-paginator>
+</div>
