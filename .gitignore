@@ -25,5 +25,9 @@ debug
 # credential
 google-credentials
 key.json
+.keys/*
 
 cockroach-data/*
+
+#binaries
+cmd/zitadel/zitadel

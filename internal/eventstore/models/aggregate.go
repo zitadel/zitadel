@@ -15,7 +15,7 @@ func (at AggregateType) String() string {
 type Aggregates []*Aggregate
 
 type Aggregate struct {
-	id               string
+	ID               string
 	typ              AggregateType
 	PreviousSequence uint64
 	version          Version
@@ -45,7 +45,7 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 		CreationDate:     time.Now(),
 		Data:             data,
 		Type:             typ,
-		AggregateID:      a.id,
+		AggregateID:      a.ID,
 		AggregateType:    a.typ,
 		AggregateVersion: a.version,
 		EditorService:    a.editorService,
@@ -66,7 +66,7 @@ func (a *Aggregate) Validate() error {
 	if a == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-yi5AC", "aggregate is nil")
 	}
-	if a.id == "" {
+	if a.ID == "" {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-FSjKV", "id not set")
 	}
 	if string(a.typ) == "" {

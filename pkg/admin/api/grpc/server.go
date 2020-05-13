@@ -1,28 +1,32 @@
 package grpc
 
 import (
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"google.golang.org/grpc"
-
+	admin_auth "github.com/caos/zitadel/internal/admin/auth"
+	"github.com/caos/zitadel/internal/admin/repository"
+	"github.com/caos/zitadel/internal/api/auth"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"google.golang.org/grpc"
 )
 
 var _ AdminServiceServer = (*Server)(nil)
 
-type Config struct {
-	Port        string
-	SearchLimit int
-}
-
 type Server struct {
-	port        string
-	searchLimit int
+	port     string
+	org      repository.OrgRepository
+	verifier auth.TokenVerifier
+	authZ    auth.Config
+	repo     repository.Repository
 }
 
-func StartServer(conf grpc_util.ServerConfig) *Server {
+func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository.Repository) *Server {
 	return &Server{
-		port: conf.Port,
+		port:     conf.Port,
+		org:      repo,
+		repo:     repo,
+		authZ:    authZ,
+		verifier: admin_auth.Start(),
 	}
 }
 
@@ -36,6 +40,7 @@ func (s *Server) GRPCServer() (*grpc.Server, error) {
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(),
+				AdminService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),
 		),
 	)
