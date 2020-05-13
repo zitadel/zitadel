@@ -1,9 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"time"
 )
 
 type User struct {
@@ -92,26 +93,26 @@ func (u *User) HashPasswordIfExisting(passwordAlg crypto.HashAlgorithm, onetime 
 }
 
 func (u *User) GenerateInitCodeIfNeeded(initGenerator crypto.Generator) error {
-	u.InitCode = new(InitUserCode)
 	if !u.IsInitialState() {
 		return nil
 	}
+	u.InitCode = new(InitUserCode)
 	return u.InitCode.GenerateInitUserCode(initGenerator)
 }
 
 func (u *User) GeneratePhoneCodeIfNeeded(phoneGenerator crypto.Generator) error {
-	u.PhoneCode = new(PhoneCode)
 	if u.Phone == nil || u.IsPhoneVerified {
 		return nil
 	}
+	u.PhoneCode = new(PhoneCode)
 	return u.PhoneCode.GeneratePhoneCode(phoneGenerator)
 }
 
 func (u *User) GenerateEmailCodeIfNeeded(emailGenerator crypto.Generator) error {
-	u.EmailCode = new(EmailCode)
 	if u.Email == nil || u.IsEmailVerified {
 		return nil
 	}
+	u.EmailCode = new(EmailCode)
 	return u.EmailCode.GenerateEmailCode(emailGenerator)
 }
 

@@ -89,7 +89,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 						ResourceOwner:    "ro",
 						PreviousSequence: 34,
 						Type:             "eventTyp",
-						Data:             []byte("{}"),
 						AggregateVersion: "v0.0.1",
 					},
 						"asdfölk-234", 45).
@@ -101,7 +100,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 						ResourceOwner:    "ro2",
 						PreviousSequence: 45,
 						Type:             "eventTyp",
-						Data:             []byte("{}"),
 						AggregateVersion: "v0.0.1",
 					}, "asdfölk-233", 46).
 					expectReleaseSavepoint(nil).
@@ -151,7 +149,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 						EditorUser:       "usr",
 						ResourceOwner:    "ro",
 						PreviousSequence: 34,
-						Data:             []byte("{}"),
 						Type:             "eventTyp",
 						AggregateVersion: "v0.0.1",
 					}, "asdfölk-233", 47).
@@ -162,7 +159,6 @@ func TestSQL_PushAggregates(t *testing.T) {
 						EditorUser:       "usr",
 						ResourceOwner:    "ro",
 						PreviousSequence: 40,
-						Data:             []byte("{}"),
 						Type:             "eventTyp",
 						AggregateVersion: "v0.0.1",
 					}, "asdfölk-233", 48).
@@ -410,8 +406,11 @@ func Test_precondtion(t *testing.T) {
 				t.FailNow()
 			}
 			err = precondtion(tx, tt.args.aggregate)
-			if (tt.isErr != nil && err == nil) || (tt.isErr != nil && !tt.isErr(err)) {
-				t.Error("precondtion() wrong error", err)
+			if (err != nil) && (tt.isErr == nil) {
+				t.Errorf("no error expected got: %v", err)
+			}
+			if tt.isErr != nil && !tt.isErr(err) {
+				t.Errorf("precondtion() wrong error %T, %v", err, err)
 			}
 		})
 	}

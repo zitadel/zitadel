@@ -5,16 +5,16 @@ import (
 )
 
 // Sequence represents a number that may be null.
-// Sequence implements the sql.Scanner interface so
+// Sequence implements the sql.Scanner interface
 type Sequence uint64
 
 // Scan implements the Scanner interface.
-func (n *Sequence) Scan(value interface{}) error {
+func (seq *Sequence) Scan(value interface{}) error {
 	if value == nil {
-		*n = 0
+		*seq = 0
 		return nil
 	}
-	*n = Sequence(value.(int64))
+	*seq = Sequence(value.(int64))
 	return nil
 }
 

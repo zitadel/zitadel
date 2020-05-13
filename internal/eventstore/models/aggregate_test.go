@@ -114,7 +114,7 @@ func TestAggregate_Validate(t *testing.T) {
 			name:    "no type error",
 			wantErr: true,
 			fields: fields{aggregate: &Aggregate{
-				id:               "aggID",
+				ID:               "aggID",
 				version:          "v1.0.0",
 				editorService:    "svc",
 				editorUser:       "hodor",
@@ -135,7 +135,7 @@ func TestAggregate_Validate(t *testing.T) {
 			name:    "invalid version error",
 			wantErr: true,
 			fields: fields{aggregate: &Aggregate{
-				id:               "aggID",
+				ID:               "aggID",
 				typ:              "user",
 				editorService:    "svc",
 				editorUser:       "hodor",
@@ -156,7 +156,7 @@ func TestAggregate_Validate(t *testing.T) {
 			name:    "no query in precondition error",
 			wantErr: true,
 			fields: fields{aggregate: &Aggregate{
-				id:               "aggID",
+				ID:               "aggID",
 				typ:              "user",
 				version:          "v1.0.0",
 				editorService:    "svc",
@@ -182,7 +182,7 @@ func TestAggregate_Validate(t *testing.T) {
 			name:    "no func in precondition error",
 			wantErr: true,
 			fields: fields{aggregate: &Aggregate{
-				id:               "aggID",
+				ID:               "aggID",
 				typ:              "user",
 				version:          "v1.0.0",
 				editorService:    "svc",
@@ -208,7 +208,7 @@ func TestAggregate_Validate(t *testing.T) {
 			name:    "validation without precondition ok",
 			wantErr: false,
 			fields: fields{aggregate: &Aggregate{
-				id:               "aggID",
+				ID:               "aggID",
 				typ:              "user",
 				version:          "v1.0.0",
 				editorService:    "svc",
@@ -231,7 +231,7 @@ func TestAggregate_Validate(t *testing.T) {
 			name:    "validation with precondition ok",
 			wantErr: false,
 			fields: fields{aggregate: &Aggregate{
-				id:               "aggID",
+				ID:               "aggID",
 				typ:              "user",
 				version:          "v1.0.0",
 				editorService:    "svc",

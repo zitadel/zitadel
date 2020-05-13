@@ -54,6 +54,7 @@ func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_m
 	for rows.Next() {
 		event := new(models.Event)
 		var previousSequence Sequence
+		data := make(Data, 0)
 
 		err = rows.Scan(
 			&event.ID,
@@ -61,7 +62,7 @@ func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_m
 			&event.Type,
 			&event.Sequence,
 			&previousSequence,
-			&event.Data,
+			&data,
 			&event.EditorService,
 			&event.EditorUser,
 			&event.ResourceOwner,
@@ -76,6 +77,10 @@ func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_m
 		}
 
 		event.PreviousSequence = uint64(previousSequence)
+
+		event.Data = make([]byte, len(data))
+		copy(event.Data, data)
+
 		events = append(events, event)
 	}
 

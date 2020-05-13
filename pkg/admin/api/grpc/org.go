@@ -2,21 +2,38 @@ package grpc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/errors"
 )
 
 func (s *Server) GetOrgByID(ctx context.Context, orgID *OrgID) (_ *Org, err error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mvn3R", "Not implemented")
+	org, err := s.org.OrgByID(ctx, orgID.Id)
+	if err != nil {
+		return nil, err
+	}
+	return orgFromModel(org), nil
 }
 
 func (s *Server) SearchOrgs(ctx context.Context, request *OrgSearchRequest) (_ *OrgSearchResponse, err error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-Po9Hd", "Not implemented")
+	orgs, err := s.org.SearchOrgs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &OrgSearchResponse{Result: orgsFromModel(orgs),
+		Limit:  request.Limit,
+		Offset: request.Offset,
+		// TotalResult: , TODO: total result from search
+	}, nil
 }
 
 func (s *Server) IsOrgUnique(ctx context.Context, request *UniqueOrgRequest) (org *UniqueOrgResponse, err error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-0p6Fw", "Not implemented")
+	isUnique, err := s.org.IsOrgUnique(ctx, request.Name, request.Domain)
+
+	return &UniqueOrgResponse{IsUnique: isUnique}, err
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, orgSetUp *OrgSetUpRequest) (_ *OrgSetUpResponse, err error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-hdj5D", "Not implemented")
+	setUp, err := s.org.SetUpOrg(ctx, setUpRequestToModel(orgSetUp))
+	if err != nil {
+		return nil, err
+	}
+	return setUpOrgResponseFromModel(setUp), err
 }

@@ -15,6 +15,8 @@ var _ ManagementServiceServer = (*Server)(nil)
 type Server struct {
 	port      string
 	project   repository.ProjectRepository
+	org       repository.OrgRepository
+	orgMember repository.OrgMemberRepository
 	user      repository.UserRepository
 	usergrant repository.UserGrantRepository
 	verifier  *mgmt_auth.TokenVerifier
@@ -25,6 +27,8 @@ func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository
 	return &Server{
 		port:      conf.Port,
 		project:   repo,
+		org:       repo,
+		orgMember: repo,
 		user:      repo,
 		usergrant: repo,
 		authZ:     authZ,
