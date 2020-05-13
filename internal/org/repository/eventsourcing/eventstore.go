@@ -70,6 +70,32 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 	return OrgToModel(esOrg), nil
 }
 
+func (es *OrgEventstore) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
+	var found bool
+	err = es_sdk.Filter(ctx, es.FilterEvents, isUniqueValidation(&found), OrgNameUniqueQuery(name))
+	if (err != nil && !errors.IsNotFound(err)) || found {
+		return false, err
+	}
+
+	err = es_sdk.Filter(ctx, es.FilterEvents, isUniqueValidation(&found), OrgDomainUniqueQuery(domain))
+	if err != nil && !errors.IsNotFound(err) {
+		return false, err
+	}
+
+	return !found, nil
+}
+
+func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		if len(events) == 0 {
+			return nil
+		}
+		*unique = *unique || events[0].Type == org_model.OrgDomainReserved || events[0].Type == org_model.OrgNameReserved
+
+		return nil
+	}
+}
+
 func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgID string) (*org_model.Org, error) {
 	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil {
