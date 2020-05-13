@@ -29,6 +29,7 @@ type AuthRequestRepo struct {
 
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string) (*view_model.UserSessionView, error)
+	UserSessionsByAgentID(string) ([]*view_model.UserSessionView, error)
 }
 type userViewProvider interface {
 	UserByID(string) (*view_model.UserView, error)
@@ -54,7 +55,6 @@ func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*m
 	if err != nil {
 		return nil, err
 	}
-	//query view
 	steps, err := repo.nextSteps(request)
 	if err != nil {
 		return nil, err
@@ -108,9 +108,20 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 			steps = append(steps, &model.LoginStep{})
 		}
 		if request.Prompt == model.PromptSelectAccount {
-
+			userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
+			if err != nil {
+				return nil, err
+			}
+			users := make([]model.UserSelection, len(userSessions))
+			for i, session := range userSessions {
+				users[i] = model.UserSelection{
+					UserID:   session.UserID,
+					UserName: session.UserName,
+					//TODO: UserSessionState: session.State,
+				}
+			}
+			steps = append(steps, &model.SelectUserStep{Users: users})
 		}
-		//TODO: select account
 		return steps, nil
 	}
 	userSession, err := userSessionByIDs(repo.UserSessionViewProvider, request.AgentID, request.UserID)
@@ -153,6 +164,14 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	return steps, nil
 }
 
+func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string) ([]*user_model.UserSessionView, error) {
+	session, err := provider.UserSessionsByAgentID(agentID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserSessionsToModel(session), nil
+}
+
 func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
 	session, err := provider.UserSessionByIDs(agentID, userID)
 	if err != nil {
@@ -185,7 +204,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		if checkVerificationTime(userSession.MfaSoftwareVerification, repo.MfaSoftwareCheckLifeTime) {
 			return nil, true
 		}
-		//fallthrough?
+		fallthrough
 	case model.MfaLevelHardware:
 		if checkVerificationTime(userSession.MfaHardwareVerification, repo.MfaHardwareCheckLifeTime) {
 			return nil, true

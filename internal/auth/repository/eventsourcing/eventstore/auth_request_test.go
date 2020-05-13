@@ -21,9 +21,19 @@ func (m *mockViewNoUserSession) UserSessionByIDs(string, string) (*view_model.Us
 	return nil, errors.ThrowNotFound(nil, "id", "user session not found")
 }
 
+func (m *mockViewNoUserSession) UserSessionsByAgentID(string) ([]*view_model.UserSessionView, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
 type mockViewUserSession struct {
 	PasswordVerification    time.Time
 	MfaSoftwareVerification time.Time
+	Users                   []mockUser
+}
+
+type mockUser struct {
+	UserID   string
+	UserName string
 }
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string) (*view_model.UserSessionView, error) {
@@ -31,6 +41,17 @@ func (m *mockViewUserSession) UserSessionByIDs(string, string) (*view_model.User
 		PasswordVerification:    m.PasswordVerification,
 		MfaSoftwareVerification: m.MfaSoftwareVerification,
 	}, nil
+}
+
+func (m *mockViewUserSession) UserSessionsByAgentID(string) ([]*view_model.UserSessionView, error) {
+	sessions := make([]*view_model.UserSessionView, len(m.Users))
+	for i, user := range m.Users {
+		sessions[i] = &view_model.UserSessionView{
+			UserID:   user.UserID,
+			UserName: user.UserName,
+		}
+	}
+	return sessions, nil
 }
 
 type mockViewNoUser struct{}
@@ -93,6 +114,55 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{},
 			args{&model.AuthRequest{}},
 			[]model.NextStep{&model.LoginStep{}},
+			nil,
+		},
+		{
+			"user not set and prompt none, no step",
+			fields{},
+			args{&model.AuthRequest{Prompt: model.PromptNone}},
+			[]model.NextStep{},
+			nil,
+		},
+		{
+			"user not set, prompt select account and internal error, internal error",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}},
+			nil,
+			errors.IsInternal,
+		},
+		{
+			"user not set, prompt select account, login and select account steps",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					Users: []mockUser{
+						{
+							"id1",
+							"username1",
+						},
+						{
+							"id2",
+							"username2",
+						},
+					},
+				},
+			},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}},
+			[]model.NextStep{
+				&model.LoginStep{},
+				&model.SelectUserStep{
+					Users: []model.UserSelection{
+						{
+							UserID:   "id1",
+							UserName: "username1",
+						},
+						{
+							UserID:   "id2",
+							UserName: "username2",
+						},
+					},
+				}},
 			nil,
 		},
 		{
