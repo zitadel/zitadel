@@ -14,12 +14,13 @@ var (
 )
 
 type EmailMessage struct {
-	Recipients []string
-	BCC        []string
-	CC         []string
-	Sender     string
-	Subject    string
-	Content    string
+	Recipients  []string
+	BCC         []string
+	CC          []string
+	SenderEmail string
+	//SenderDisplayName     string
+	Subject string
+	Content string
 }
 
 func (msg *EmailMessage) GetContent() string {
@@ -27,7 +28,7 @@ func (msg *EmailMessage) GetContent() string {
 
 	// Setup headers
 	headers := make(map[string]string)
-	headers["From"] = msg.Sender
+	headers["From"] = msg.SenderEmail
 	headers["To"] = strings.Join(msg.Recipients, ", ")
 	headers["Cc"] = strings.Join(msg.CC, ", ")
 

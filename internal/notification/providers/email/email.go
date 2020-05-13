@@ -11,31 +11,29 @@ import (
 
 type Email struct {
 	smtpClient *smtp.Client
-	host       string
 }
 
 func InitEmailProvider(config *EmailConfig) (*Email, error) {
-	client, host, err := connectToSMTP(config.SMTP, config.Tls)
+	client, err := config.SMTP.connectToSMTP(config.Tls)
 	if err != nil {
 		return nil, err
 	}
 	return &Email{
 		smtpClient: client,
-		host:       host,
 	}, nil
 }
 
 func (email *Email) CanHandleMessage(message providers.Message) bool {
 	msg := message.(EmailMessage)
-	return msg.GetContent() != "" && msg.Subject != "" && len(msg.Recipients) > 0
+	return msg.Content != "" && msg.Subject != "" && len(msg.Recipients) > 0
 }
 
 func (email *Email) HandleMessage(message providers.Message) error {
 	emailMsg := message.(EmailMessage)
 
 	// To && From
-	if err := email.smtpClient.Mail(emailMsg.Sender); err != nil {
-		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.Sender)
+	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
+		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)
 	}
 
 	for _, recp := range append(append(emailMsg.Recipients, emailMsg.CC...), emailMsg.BCC...) {
@@ -64,7 +62,7 @@ func (email *Email) HandleMessage(message providers.Message) error {
 	return email.smtpClient.Quit()
 }
 
-func connectToSMTP(smtpConfig SMTP, tlsRequired bool) (*smtp.Client, string, error) {
+func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (*smtp.Client, error) {
 	host, _, _ := net.SplitHostPort(smtpConfig.Host)
 	tlsconfig := &tls.Config{}
 
@@ -73,31 +71,43 @@ func connectToSMTP(smtpConfig SMTP, tlsRequired bool) (*smtp.Client, string, err
 		var err error
 		client, err = smtp.Dial(smtpConfig.Host)
 		if err != nil {
-			return nil, "", caos_errs.ThrowInternal(err, "EMAIL-skwos", "Could not make smtp dial")
+			return nil, caos_errs.ThrowInternal(err, "EMAIL-skwos", "Could not make smtp dial")
 		}
 		client.StartTLS(tlsconfig)
-		return client, host, nil
+		defer client.Close()
+		err = smtpConfig.smtpAuth(client, host)
+		if err != nil {
+			return nil, err
+		}
+		return client, nil
 	}
 
 	conn, err := tls.Dial("tcp", smtpConfig.Host, tlsconfig)
 	if err != nil {
-		return nil, "", caos_errs.ThrowInternal(err, "EMAIL-sl39s", "Could not make tls dial")
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-sl39s", "Could not make tls dial")
 	}
 
 	client, err = smtp.NewClient(conn, host)
 	if err != nil {
-		return nil, "", caos_errs.ThrowInternal(err, "EMAIL-skwi4", "Could not create smtp client")
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwi4", "Could not create smtp client")
 	}
 	defer client.Close()
-
-	// Auth
-	if smtpConfig.User != "" && smtpConfig.Password != "" {
-		auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host)
-		if err := client.Auth(auth); err != nil {
-			logging.Log("EMAIL-s9kfs").WithField("smtp user", smtpConfig.User).Debug("Could not add smtp auth")
-			return nil, "", err
-		}
+	err = smtpConfig.smtpAuth(client, host)
+	if err != nil {
+		return nil, err
 	}
+	return client, nil
+}
 
-	return client, host, nil
+func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
+	if smtpConfig.User == "" || smtpConfig.Password == "" {
+		return nil
+	}
+	// Auth
+	auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host)
+	if err := client.Auth(auth); err != nil {
+		logging.Log("EMAIL-s9kfs").WithField("smtp user", smtpConfig.User).Debug("Could not add smtp auth")
+		return err
+	}
+	return nil
 }
