@@ -88,7 +88,6 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 
 func (v *UserSessionView) AppendEvent(event *models.Event) (err error) {
 	v.ChangeDate = event.CreationDate
-	//p.
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded:
 		v.PasswordVerification = event.CreationDate

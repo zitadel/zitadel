@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/errors"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
@@ -39,11 +40,22 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 }
 
 func (u *UserSession) Process(event *models.Event) (err error) {
-	session, err := view_model.UserSessionFromEvent(event)
+	eventData, err := view_model.UserSessionFromEvent(event)
 	if err != nil {
 		return err
 	}
-	session, err = u.view.UserSessionByIDs(session.UserAgentID, session.UserID)
+	session, err := u.view.UserSessionByIDs(eventData.UserAgentID, event.AggregateID)
+	if err != nil {
+		if !errors.IsNotFound(err) {
+			return err
+		}
+		session = &view_model.UserSessionView{
+			CreationDate:  event.CreationDate,
+			ResourceOwner: event.ResourceOwner,
+			UserAgentID:   eventData.UserAgentID,
+			UserID:        event.AggregateID,
+		}
+	}
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded,
 		es_model.UserPasswordCheckFailed,
