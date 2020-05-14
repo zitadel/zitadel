@@ -59,7 +59,7 @@ Auth:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'auth'
-          Database: 'auth'
+          Database: 'eventstore'
           SSLmode: disable
       Cache:
         Type: 'fastcache'

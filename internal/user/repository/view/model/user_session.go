@@ -17,7 +17,7 @@ const (
 	UserSessionKeySessionID     = "id"
 	UserSessionKeyUserAgentID   = "user_agent_id"
 	UserSessionKeyUserID        = "user_id"
-	UserSessionKeyState         = "session_state"
+	UserSessionKeyState         = "state"
 	UserSessionKeyResourceOwner = "resource_owner"
 )
 

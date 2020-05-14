@@ -10,19 +10,19 @@ type AuthRequest struct {
 	CreationDate      time.Time
 	ChangeDate        time.Time
 	BrowserInfo       *BrowserInfo
-	ApplicationID     string             //clientID
-	CallbackURI       string             //redirectURi
-	TransferState     string             //state //oidc only?
-	Prompt            Prompt             //name?
-	PossibleLOAs      []LevelOfAssurance //acr_values
-	UiLocales         []string           //language.Tag?
+	ApplicationID     string
+	CallbackURI       string
+	TransferState     string
+	Prompt            Prompt
+	PossibleLOAs      []LevelOfAssurance
+	UiLocales         []string
 	LoginHint         string
 	PreselectedUserID string
 	MaxAuthAge        uint32
 	Request           Request
 
-	levelOfAssurance      LevelOfAssurance //acr
-	projectApplicationIDs []string         //aud?
+	levelOfAssurance      LevelOfAssurance
+	projectApplicationIDs []string
 	UserID                string
 	PossibleSteps         []NextStep
 }
