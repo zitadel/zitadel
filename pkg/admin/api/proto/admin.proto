@@ -164,7 +164,7 @@ enum OrgSearchMethod {
 
 message OrgSetUpRequest {
     CreateOrgRequest org = 1;
-    RegisterUserRequest user = 2;
+    CreateUserRequest user = 2;
 }
 
 message OrgSetUpResponse {
@@ -172,16 +172,24 @@ message OrgSetUpResponse {
     User user = 2;
 }
 
-message RegisterUserRequest {
-    string email = 1 [(validate.rules).string.email = true];
-    string first_name = 2 [(validate.rules).string.min_len = 1];
-    string last_name = 3 [(validate.rules).string.min_len = 1];
-    string nick_name = 4;
-    string display_name = 5;
-    string preferred_language = 6;
+message CreateUserRequest {
+    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string nick_name = 4 [(validate.rules).string = {max_len: 200}];
+    string display_name = 5 [(validate.rules).string = {max_len: 200}];
+    string preferred_language = 6 [(validate.rules).string = {max_len: 200}];
     Gender gender = 7;
-    string password = 8 [(validate.rules).string.min_len = 1];
-    string org_id = 9 [(validate.rules).string.min_len = 1];
+    string email = 8 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+    bool is_email_verified = 9;
+    string phone = 11 [(validate.rules).string = {max_len: 20}];
+    bool is_phone_verified = 12;
+    string country = 13 [(validate.rules).string = {max_len: 200}];
+    string locality = 14 [(validate.rules).string = {max_len: 200}];
+    string postal_code = 15 [(validate.rules).string = {max_len: 200}];
+    string region = 16 [(validate.rules).string = {max_len: 200}];
+    string street_address = 17 [(validate.rules).string = {max_len: 200}];
+    string password = 18 [(validate.rules).string = {max_len: 72}];
 }
 
 message User {
@@ -205,6 +213,7 @@ message User {
     string postal_code = 18;
     string region = 19;
     string street_address = 20;
+    uint64 sequence = 21;
 }
 
 enum UserState {

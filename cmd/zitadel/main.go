@@ -59,7 +59,7 @@ func main() {
 		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
 	}
 	if *adminEnabled {
-		admin.Start(ctx, conf.Admin, conf.AuthZ)
+		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
 	}
 	if *notificationEnabled {
 		notification.Start(ctx, conf.Notification, conf.SystemDefaults)

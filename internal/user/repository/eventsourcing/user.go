@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -36,72 +37,72 @@ func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Ag
 	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
 }
 
-func UserCreateAggregate(aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if user == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user should not be nil")
-		}
-
-		agg, err := UserAggregate(ctx, aggCreator, user)
-		if err != nil {
-			return nil, err
-		}
-
-		agg, err = agg.AppendEvent(model.UserAdded, user)
-		if err != nil {
-			return nil, err
-		}
-		if user.Email != nil && user.EmailAddress != "" && user.IsEmailVerified {
-			agg, err = agg.AppendEvent(model.UserEmailVerified, nil)
-			if err != nil {
-				return nil, err
-			}
-		}
-		if user.Phone != nil && user.PhoneNumber != "" && user.IsPhoneVerified {
-			agg, err = agg.AppendEvent(model.UserPhoneVerified, nil)
-			if err != nil {
-				return nil, err
-			}
-		}
-		if user.Password != nil {
-			agg, err = agg.AppendEvent(model.UserPasswordCodeAdded, user.Password)
-			if err != nil {
-				return nil, err
-			}
-		}
-		if initCode != nil {
-			agg, err = agg.AppendEvent(model.InitializedUserCodeAdded, initCode)
-			if err != nil {
-				return nil, err
-			}
-		}
-		if phoneCode != nil {
-			agg, err = agg.AppendEvent(model.UserPhoneCodeAdded, phoneCode)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return agg, err
+func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string) (agg *es_models.Aggregate, err error) {
+	if user == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user should not be nil")
 	}
+
+	if resourceOwner != "" {
+		agg, err = UserAggregateOverwriteContext(ctx, aggCreator, user, user.AggregateID, resourceOwner)
+	} else {
+		agg, err = UserAggregate(ctx, aggCreator, user)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	agg, err = agg.AppendEvent(model.UserAdded, user)
+	if err != nil {
+		return nil, err
+	}
+	if user.Email != nil && user.EmailAddress != "" && user.IsEmailVerified {
+		agg, err = agg.AppendEvent(model.UserEmailVerified, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if user.Phone != nil && user.PhoneNumber != "" && user.IsPhoneVerified {
+		agg, err = agg.AppendEvent(model.UserPhoneVerified, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if user.Password != nil {
+		agg, err = agg.AppendEvent(model.UserPasswordCodeAdded, user.Password)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if initCode != nil {
+		agg, err = agg.AppendEvent(model.InitializedUserCodeAdded, initCode)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if phoneCode != nil {
+		agg, err = agg.AppendEvent(model.UserPhoneCodeAdded, phoneCode)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return agg, err
 }
 
-func UserRegisterAggregate(aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, emailCode *model.EmailCode) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if user == nil || resourceOwner == "" || emailCode == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, emailcode should not be nothing")
-		}
-
-		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
-		if err != nil {
-			return nil, err
-		}
-
-		agg, err = agg.AppendEvent(model.UserRegistered, user)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.UserEmailCodeAdded, emailCode)
+func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, emailCode *model.EmailCode) (*es_models.Aggregate, error) {
+	if user == nil || resourceOwner == "" || emailCode == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, emailcode should not be nothing")
 	}
+
+	agg, err := UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	agg, err = agg.AppendEvent(model.UserRegistered, user)
+	if err != nil {
+		return nil, err
+	}
+	return agg.AppendEvent(model.UserEmailCodeAdded, emailCode)
 }
 
 func UserDeactivateAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {

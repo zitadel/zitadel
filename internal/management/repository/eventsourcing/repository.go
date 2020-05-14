@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -10,6 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	es_pol "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
@@ -24,9 +27,11 @@ type Config struct {
 
 type EsRepository struct {
 	spooler *es_spol.Spooler
+	eventstore.OrgRepository
 	eventstore.ProjectRepo
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
+	PolicyRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -51,6 +56,13 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+	policy, err := es_pol.StartPolicy(es_pol.PolicyConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
 	user, err := es_usr.StartUser(es_usr.UserConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -65,14 +77,18 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
+
 	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
 
 	return &EsRepository{
-		spool,
-		eventstore.ProjectRepo{conf.SearchLimit, project, view},
-		eventstore.UserRepo{conf.SearchLimit, user, view},
-		eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
+		spooler:       spool,
+		OrgRepository: eventstore.OrgRepository{org},
+		ProjectRepo:   eventstore.ProjectRepo{conf.SearchLimit, project, view},
+		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, view},
+		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
+		PolicyRepo:    PolicyRepo{policy},
 	}, nil
 }
 

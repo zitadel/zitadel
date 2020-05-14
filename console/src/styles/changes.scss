@@ -1,0 +1,10 @@
+@import '~@angular/material/theming';
+
+@mixin changes-theme($theme) {
+    $primary: map-get($theme, primary);
+    $secondary-dark: mat-color($primary, A800);
+    
+    .change-item-back {
+        background-color: $secondary-dark;
+    }
+}

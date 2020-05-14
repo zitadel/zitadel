@@ -1,0 +1,66 @@
+<div class="view-toggle">
+    <div class="anim-list" @list *ngIf="selection.selected.length > 0">
+        <ng-template appHasRole [appHasRole]="['project.write']">
+            <button (click)="deactivateProjects(selection.selected)" @animate
+                matTooltip="{{'PROJECT.TABLE.DEACTIVATE' | translate}}" class="left-button" mat-icon-button>
+                <mat-icon svgIcon="mdi_light_off"></mat-icon>
+            </button>
+            <button @animate (click)="reactivateProjects(selection.selected)" class="left-button"
+                matTooltip="{{'PROJECT.TABLE.ACTIVATE' | translate}}" mat-icon-button>
+                <mat-icon svgIcon="mdi_light_on"></mat-icon>
+            </button>
+        </ng-template>
+    </div>
+    <button [disabled]="selection.selected.length > 0" (click)="changedView.emit(true)" mat-icon-button>
+        <mat-icon matTooltip="show list view">list</mat-icon>
+    </button>
+</div>
+
+<div class="container">
+    <mat-progress-bar *ngIf="loading" class="spinner" color="accent" mode="indeterminate"></mat-progress-bar>
+    <div class="item card" *ngFor="let item of items; index as i" (click)="selectItem(item, $event)"
+        [ngClass]="{ selected: selection.isSelected(item), inactive: item.state !== ProjectState.ACTIVE_PROJECT}">
+        <mat-icon matTooltip="select item" (click)="selection.toggle(item)" class="selection-icon">
+            check_circle</mat-icon>
+        <div class="text-part">
+            <!-- <span *ngIf="item?.creationDate"
+                class="top">{{item?.creationDate?.toDate() | date: 'dd. MMM, HH:mm'}}</span> -->
+            <span *ngIf="item.changeDate" class="top">last modified on
+                {{
+                        dateFromTimestamp(item.changeDate) | date: 'EEE dd. MMM, HH:mm'
+            }}</span>
+            <span class="name" *ngIf="item.name">{{ item.name }}</span>
+            <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span>
+            <span class="description" *ngIf="item.type">{{'PROJECT.TYPE.TITLE' | translate}}:
+                {{'PROJECT.TYPE.'+item.type | translate}}</span>
+            <span *ngIf="item.changeDate" class="created">created on
+                {{
+                        dateFromTimestamp(item.creationDate) | date: 'EEE dd. MMM, HH:mm'
+            }}</span>
+            <span class="fill-space"></span>
+            <div class="icons">
+                <mat-icon class="icon">apps</mat-icon>
+            </div>
+        </div>
+        <button [matMenuTriggerFor]="editMenu" class="edit-button" mat-icon-button>
+            <mat-icon>more_vert</mat-icon>
+        </button>
+
+        <mat-menu #editMenu="matMenu">
+            <ng-template matMenuContent>
+                <button (click)="selectItem(item)" mat-menu-item>
+                    {{'ACTIONS.VIEW' | translate}}
+                </button>
+                <button (click)="selection.toggle(item)" mat-menu-item>
+                    {{'ACTIONS.INFO' | translate}}
+                </button>
+
+                <button (click)="deleteProject(item)" mat-menu-item> {{'ACTIONS.DELETE' | translate}}</button>
+            </ng-template>
+        </mat-menu>
+    </div>
+    <div class="add-project-button card" (click)="addItem()">
+        <mat-icon class="icon">add</mat-icon>
+        <span>Add new project</span>
+    </div>
+</div>

@@ -1,0 +1,47 @@
+
+.container {
+	padding: 4rem 4rem 2rem 4rem;
+
+	.abort-container {
+		display: flex;
+		align-items: center;
+		margin-bottom: 2rem;
+
+		.abort {
+			font-size: 1.2rem;
+			margin-left: 2rem;
+		}
+
+		.abort-2 {
+			font-size: 1.2rem;
+			margin-left: 2rem;
+		}
+    }
+    
+    .add-line-btn {
+        margin-bottom: 1rem;
+        border-radius: .5rem;
+    }
+}
+
+.margin-right {
+	margin-right: 0.5rem;
+}
+
+.content {
+    display: flex;
+    margin: 0 -.5rem;
+    flex-wrap: wrap;
+    // align-items: center;
+
+    mat-form-field {
+        margin: 0 .5rem;
+    }
+}
+
+.continue-button {
+    margin-top: 3rem;
+    display: block;
+    padding: 0.5rem 4rem;
+    border-radius: 0.5rem;
+}

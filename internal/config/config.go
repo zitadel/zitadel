@@ -74,5 +74,5 @@ func readerFuncForFile(configFile string) (ReaderFunc, error) {
 	case ".toml":
 		return TOMLReader, nil
 	}
-	return nil, errors.ThrowUnimplementedf(nil, "file extension (%s) not supported", ext)
+	return nil, errors.ThrowUnimplementedf(nil, "CONFI-ZLk4u", "file extension (%s) not supported", ext)
 }

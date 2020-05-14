@@ -42,6 +42,22 @@ SystemDefaults:
       Issuer: 'Zitadel'
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
+  DefaultPolicies:
+    Age:
+      Description: Standard age policy
+      MaxAgeDays: 365
+      ExpireWarnDays: 10
+    Complexity:
+      Description: Standard complexity policy
+      MinLength: 8
+      HasLowercase: true
+      HasUppercase: false
+      HasNumber: true
+      HasSymbol: true
+    Lockout:
+      Description: Standard lockout policy
+      MaxAttempts: 5
+      ShowLockOutFailures: true
   Notifications:
     DebugMode: $DEBUG_MODE
     Providers:

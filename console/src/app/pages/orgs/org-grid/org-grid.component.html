@@ -1,0 +1,50 @@
+<div class="max-width-container">
+    <h1>{{ 'ORG.PAGES.LIST' | translate }}</h1>
+    <p class="top-desc">{{'ORG.PAGES.LISTDESCRIPTION' | translate}}</p>
+
+    <div class="view-toggle">
+        <div class="anim-list" *ngIf="selection.selected.length > 0">
+        </div>
+        <button disabled mat-icon-button>
+            <mat-icon></mat-icon>
+        </button>
+    </div>
+
+    <div class="container">
+        <div matTooltip="{{'ORG.PAGES.SELECTORGTOOLTIP' | translate}}" class="item card"
+            *ngFor="let org of orgList; index as i" (click)="selectOrg(org, $event)"
+            [ngClass]="{ selected: selection.isSelected(org) }">
+            <!-- <mat-icon matTooltip="select org" (click)="selection.toggle(org)" class="selection-icon">
+                check_circle</mat-icon> -->
+            <div class="text-part">
+                <span *ngIf="org?.changeDate" class="top">last modified on
+                    {{
+                        dateFromTimestamp(org.changeDate) | date: 'EEE dd. MMM, HH:mm'
+            }}</span>
+                <span class="name" *ngIf="org.name">{{ org.name }}</span>
+                <span class="name" *ngIf="!org.name">No Name</span>
+
+                <span class="description">{{org.id}}</span>
+                <span class="fill-space"></span>
+                <div class="icons">
+                    <div class="current" *ngIf="activeOrg?.id === org?.id">
+                        <span>{{'ORG.PAGES.ACTIVE' | translate}}</span></div>
+                </div>
+            </div>
+            <button [matMenuTriggerFor]="editMenu" class="edit-button" mat-icon-button>
+                <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #editMenu="matMenu">
+                <ng-template matMenuContent>
+                    <button (click)="selectOrg(org)" mat-menu-item>
+                        {{'ACTIONS.VIEW' | translate}}
+                    </button>
+                    <button (click)="selection.toggle(org)" mat-menu-item>
+                        {{'ACTIONS.INFO' | translate}}
+                    </button>
+                </ng-template>
+            </mat-menu>
+        </div>
+    </div>
+</div>

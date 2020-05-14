@@ -1,0 +1,129 @@
+h1 {
+  font-family: ailerons;
+  margin-top: 0;
+}
+
+.avatar-section {
+  display: flex;
+  align-items: center;
+
+  span {
+    color: #81868a;
+    text-transform: uppercase;
+    margin-right: 3rem;
+    font-size: .9rem;
+  }
+  img {
+    height: 80px;
+    width: 80px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    margin: .5rem;
+    border: 2px solid #81868a;
+  }
+}
+  
+  .sub {
+    color: #81868a;
+    margin-bottom: 2rem;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 -.5rem; 
+  
+    &.nowrap{
+      flex-wrap: nowrap;
+    }
+  
+    mat-form-field {
+      flex: 1;
+      margin: 0 .5rem;
+    }
+  }
+
+.btn-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 -.5rem;
+  
+    button {
+      border-radius: .5rem;
+      margin: 0 .5rem;
+    }
+  }
+  
+.method-col {
+  display: flex;
+  flex-direction: column;
+  margin: -.5rem;
+
+  .method-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: .5rem;
+    border-bottom: 1px solid #ffffff20;
+
+    .label, .name {
+      margin-right: 1rem;
+    }
+
+    .actions {
+        flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .label {
+    flex: 1;
+      font-size: .9rem;
+      color: #818a8a;
+      text-transform: uppercase;
+    }
+
+    mat-icon {
+      margin-right: .5rem;
+    }
+
+    .submit-button {
+      border-radius: .5rem;
+    }
+
+    .verify {
+      text-decoration: none;
+      font-size: .8rem;
+      color: #81868a;
+      border-radius: .5rem;
+      cursor: pointer;
+      word-wrap: none;
+      white-space: nowrap;
+      margin-right: 1rem;
+
+      &:hover {
+          color: white;
+          text-decoration: underline;
+      }
+    }
+  }
+}
+
+.col {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    margin: -.5rem;
+    app-card {
+        flex: 1;
+        margin: .5rem
+    }
+
+    .theme-card {
+        max-width: 300px;
+    }
+}

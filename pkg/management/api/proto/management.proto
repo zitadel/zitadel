@@ -368,7 +368,7 @@ service ManagementService {
 
     rpc UpdatePasswordComplexityPolicy(PasswordComplexityPolicyUpdate) returns (PasswordComplexityPolicy) {
         option (google.api.http) = {
-            put: "/policies/passwords/complexity/{id}"
+            put: "/policies/passwords/complexity"
             body: "*"
         };
 
@@ -379,7 +379,7 @@ service ManagementService {
 
     rpc DeletePasswordComplexityPolicy(PasswordComplexityPolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/passwords/complexity/{id}"
+            delete: "/policies/passwords/complexity"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -411,7 +411,7 @@ service ManagementService {
 
     rpc UpdatePasswordAgePolicy(PasswordAgePolicyUpdate) returns (PasswordAgePolicy) {
         option (google.api.http) = {
-            put: "/policies/passwords/age/{id}"
+            put: "/policies/passwords/age"
             body: "*"
         };
 
@@ -422,7 +422,7 @@ service ManagementService {
 
     rpc DeletePasswordAgePolicy(PasswordAgePolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/passwords/age/{id}"
+            delete: "/policies/passwords/age"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -454,7 +454,7 @@ service ManagementService {
 
     rpc UpdatePasswordLockoutPolicy(PasswordLockoutPolicyUpdate) returns (PasswordLockoutPolicy) {
         option (google.api.http) = {
-            put: "/policies/passwords/lockout/{id}"
+            put: "/policies/passwords/lockout"
             body: "*"
         };
 
@@ -465,7 +465,7 @@ service ManagementService {
 
     rpc DeletePasswordLockoutPolicy(PasswordLockoutPolicyID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/policies/passwords/lockout/{id}"
+            delete: "/policies/passwords/lockout"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -527,7 +527,7 @@ service ManagementService {
         };
     }
 
-    rpc AddOrgMember(AddOrgMemberRequest) returns (google.protobuf.Empty) {
+    rpc AddOrgMember(AddOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/members"
             body: "*"
@@ -538,7 +538,7 @@ service ManagementService {
         };
     }
 
-    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (google.protobuf.Empty) {
+    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
             put: "/orgs/{org_id}/members/{user_id}"
             body: "*"
@@ -1532,6 +1532,7 @@ message PasswordComplexityPolicy {
     bool has_number = 9;
     bool has_symbol = 10;
     uint64 sequence = 11;
+    bool is_default = 12;
 }
 
 message PasswordComplexityPolicyCreate {
@@ -1566,6 +1567,7 @@ message PasswordAgePolicy {
     uint64 max_age_days = 6;
     uint64 expire_warn_days = 7;
     uint64 sequence = 8;
+    bool is_default = 9;
 }
 
 message PasswordAgePolicyCreate {
@@ -1594,6 +1596,8 @@ message PasswordLockoutPolicy {
     uint64 max_attempts = 6;
     bool show_lock_out_failures = 7;
     uint64 sequence = 8;
+    bool is_default = 9
+    ;
 }
 
 message PasswordLockoutPolicyCreate {
@@ -1646,14 +1650,10 @@ message OrgMemberRoles {
 
 message OrgMember {
     string user_id = 1;
-    string user_name = 2;
-    string email = 3;
-    string first_name = 4;
-    string last_name = 5;
-    repeated string roles = 6;
-    google.protobuf.Timestamp change_date = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    uint64 sequence = 9;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
 }
 
 message AddOrgMemberRequest {

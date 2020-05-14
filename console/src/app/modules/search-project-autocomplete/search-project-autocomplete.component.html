@@ -1,0 +1,28 @@
+<form>
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Project Name</mat-label>
+        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the project name" #nameInput
+            [formControl]="myControl" [matAutocomplete]="auto" />
+
+        <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
+            <mat-chip class="chip" *ngFor="let selectedProject of projects" [selectable]="selectable"
+                [removable]="removable" (removed)="remove(selectedProject)">
+                {{selectedProject.name}}
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input placeholder="{{'PROJECT.NAME' | translate}}" #nameInput [formControl]="myControl"
+                [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                (matChipInputTokenEnd)="add($event)" />
+        </mat-chip-list>
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+            <mat-option *ngIf="isLoading" class="is-loading">
+                <mat-spinner diameter="30"></mat-spinner>
+            </mat-option>
+            <mat-option *ngFor="let project of filteredProjects" [value]="project">
+                {{project.name}}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+</form>

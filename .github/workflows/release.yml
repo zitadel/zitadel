@@ -10,24 +10,51 @@ env:
 
 jobs:
 
-  angular: # TODO Implement proper build and cache and coverage upload
+  angular-test: # will be added later on
     runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./console
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: echo "hodor" > hodor.txt
-    # - run: npm ci 
-    # - run: npm run lint
-    # - run: npm run prodbuild
-    # - run: npm test
+    - run: npm ci
+    #- run: npm test 
+    - run: echo "replace me with real test"
+
+  angular-lint: # will be added later on
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./console
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
+    - run: npm run lint
+
+  angular-build:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./console
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
+    - run: npm run prodbuild
     - uses: actions/upload-artifact@v1
       with:
         name: angular
-        path: hodor.txt
-  
-  go: # TODO Implement proper build and cache
+        path: console/dist/console
+
+  go-test:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -35,37 +62,64 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
     - run: go test -race -v -coverprofile=profile.cov ./...
-    - run: go build -o zitadel cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:
         name: go-coverage
         path: profile.cov
-    - uses: actions/upload-artifact@v1
-      with:
-        name: go-binary
-        path: zitadel
     - uses: codecov/codecov-action@v1
       with:
         file: ./profile.cov
         name: codecov-go
-
-  container-prod: # Artifact paths need better place
+      
+  go-lint:
     runs-on: ubuntu-18.04
-    needs: [angular, go]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/checkout@v2
+    - run: echo "replace me with real lint"
+  
+  go-build:
+    runs-on: ubuntu-18.04
+    needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
+    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    strategy:
+      matrix:
+        goos: [ 'linux', 'darwin', 'windows' ]
+        goarch: ['amd64']
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - uses: actions/download-artifact@v2
+      with:
+        name: angular
+        path: console/dist/app
+    - run: go get github.com/rakyll/statik
+    - run: ./build/console/generate-static.sh
+    - run: cat pkg/console/statik/statik.go
+    - run: CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-${{ matrix.goos }}-${{ matrix.goarch }} cmd/zitadel/main.go
+    - uses: actions/upload-artifact@v1
+      with:
+        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+
+  container-prod:
+    runs-on: ubuntu-18.04
+    needs: go-build
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
-    - uses: actions/download-artifact@v1
+    - uses: actions/download-artifact@v2
       with:
-        name: angular
-        path: .build/angular
-    - uses: actions/download-artifact@v1
-      with:
-        name: go-binary
-        path: .build/go
+        name: zitadel-linux-amd64
+        path: .artifacts
     - uses: docker/build-push-action@v1
       with:
-        dockerfile: build/dockerfile-prod
+        dockerfile: build/docker/prod
         username: ${{ github.actor }}
         password: ${{ github.token }}
         registry: ${{ env.REGISTRY }}
@@ -75,7 +129,7 @@ jobs:
   
   container-vulnerability-scan:
     runs-on: ubuntu-18.04
-    needs: [container-prod]
+    needs: container-prod
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -89,7 +143,7 @@ jobs:
     - uses: anchore/scan-action@master
       with:
         image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ steps.vars.outputs.sha_short }}"
-        dockerfile-path: "./build/dockerfile-prod"
+        dockerfile-path: "./build/docker/prod"
         fail-build: false
     - name: anchore inline scan JSON results
       run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
@@ -98,9 +152,9 @@ jobs:
         name: anchore-reports
         path: ./anchore-reports/
 
-  container-test: # TODO Implement proper test
+  container-test:
     runs-on: ubuntu-18.04
-    needs: [container-prod]
+    needs: container-prod
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
@@ -112,7 +166,7 @@ jobs:
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Run Test
-      run: docker run $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:${{ steps.vars.outputs.sha_short }} /bin/sh -c "ls -la ./app"
+      run: echo "replace me with real test"
 
   release:
     runs-on: ubuntu-18.04
@@ -126,6 +180,12 @@ jobs:
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - uses: actions/download-artifact@v2
+      with:
+        path: .artifacts
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: .artifacts
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Pull short-sha
@@ -133,7 +193,7 @@ jobs:
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
       with:
-        dry_run:  false
+        dry_run: false
         semantic_version: 17.0.4
         extra_plugins: |
           @semantic-release/exec@5.0.0

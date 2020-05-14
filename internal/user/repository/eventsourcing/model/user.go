@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
-	"time"
 )
 
 const (
@@ -22,11 +23,11 @@ type User struct {
 	*Email
 	*Phone
 	*Address
-	InitCode     *InitUserCode
-	EmailCode    *EmailCode
-	PhoneCode    *PhoneCode
-	PasswordCode *PasswordCode
-	OTP          *OTP
+	InitCode     *InitUserCode `json:"-"`
+	EmailCode    *EmailCode    `json:"-"`
+	PhoneCode    *PhoneCode    `json:"-"`
+	PasswordCode *PasswordCode `json:"-"`
+	OTP          *OTP          `json:"-"`
 }
 
 type InitUserCode struct {
