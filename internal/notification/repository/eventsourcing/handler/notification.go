@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/notification/types"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -20,6 +21,7 @@ type Notification struct {
 	handler
 	userEvents     *usr_event.UserEventstore
 	systemDefaults sd.SystemDefaults
+	AesCrypto      crypto.EncryptionAlgorithm
 }
 
 const (
@@ -70,7 +72,7 @@ func (p *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendUserInitCode(user, initCode, p.systemDefaults)
+	err = types.SendUserInitCode(user, initCode, p.systemDefaults, p.AesCrypto)
 	return err
 }
 

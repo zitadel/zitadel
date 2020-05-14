@@ -2,11 +2,11 @@ package systemdefaults
 
 import (
 	"github.com/caos/zitadel/internal/crypto"
-	pol "github.com/caos/zitadel/internal/policy"
 	"github.com/caos/zitadel/internal/notification/providers/chat"
 	"github.com/caos/zitadel/internal/notification/providers/email"
 	"github.com/caos/zitadel/internal/notification/providers/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
+	pol "github.com/caos/zitadel/internal/policy"
 )
 
 type SystemDefaults struct {
@@ -43,8 +43,15 @@ type DefaultPolicies struct {
 
 type Notifications struct {
 	Debug        bool
+	Endpoints    Endpoints
 	Providers    Providers
 	TemplateData TemplateData
+}
+
+type Endpoints struct {
+	InitCode      string
+	PasswordReset string
+	VerifyEmail   string
 }
 
 type Providers struct {

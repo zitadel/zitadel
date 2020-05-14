@@ -2,45 +2,38 @@ package types
 
 import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/providers/email"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type InitCodeEmailData struct {
+	templates.TemplateData
 	FirstName string
 	LastName  string
-	UserID    string
-	Code      string
+	URL       string
 }
 
-func SendUserInitCode(user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults) error {
-	template, err := templates.ParseTemplateFile("", systemDefaults.Notifications.TemplateData.InitCode)
+type UrlData struct {
+	UserID string
+	Code   string
+}
+
+func SendUserInitCode(user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
+	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
 	}
-	_ = &InitCodeEmailData{FirstName: user.FirstName, LastName: user.LastName, UserID: user.ID}
+	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.InitCode, &UrlData{UserID: user.ID, Code: codeString})
+	if err != nil {
+		return err
+	}
+	initCodeData := &InitCodeEmailData{TemplateData: systemDefaults.Notifications.TemplateData.InitCode, FirstName: user.FirstName, LastName: user.LastName, URL: url}
 
+	template, err := templates.GetParsedTemplate(initCodeData)
+	if err != nil {
+		return err
+	}
 	return generateEmail(user, template, systemDefaults.Notifications)
-}
-
-func generateEmail(user *view_model.NotifyUser, content string, config systemdefaults.Notifications) error {
-
-	provider, err := email.InitEmailProvider(&config.Providers.Email)
-	if err != nil {
-		return err
-	}
-	message := &email.EmailMessage{
-		SenderEmail: config.Providers.Email.From,
-		Recipients:  []string{user.LastEmail},
-		Subject:     config.TemplateData.InitCode.Subject,
-		Content:     content,
-	}
-	if provider.CanHandleMessage(message) {
-
-		return provider.HandleMessage(message)
-	}
-	return caos_errs.ThrowInternalf(nil, "NOTIF-s8ipw", "Could not send init message: userid: %v", user.ID)
 }
