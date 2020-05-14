@@ -67,8 +67,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	}
 
 	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user, ProjectEvents: project, IamEvents: iam}
-	setup := setup.StartSetup(systemDefaults, eventstoreRepos)
-	err = setup.Execute()
+	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute()
 	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to execute setup")
 
 	return &EsRepository{
