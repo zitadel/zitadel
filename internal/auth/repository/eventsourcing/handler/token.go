@@ -12,16 +12,14 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	user_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Token struct {
 	handler
-	userEvents *user_events.UserEventstore
 }
 
 const (
-	tokenTable = "auth.token"
+	tokenTable = "auth.tokens"
 )
 
 func (u *Token) MinimumCycleDuration() time.Duration { return u.cycleDuration }

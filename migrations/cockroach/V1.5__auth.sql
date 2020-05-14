@@ -86,20 +86,33 @@ CREATE TABLE auth.users (
 );
 
 CREATE TABLE auth.user_sessions (
-    id TEXT,
-
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
 
     resource_owner TEXT,
 --     state
-    application_id TEXT,
     user_agent_id TEXT,
     user_id TEXT,
     user_name TEXT,
     password_verification TIMESTAMPTZ,
     mfa_software_verification TIMESTAMPTZ,
     mfa_hardware_verification TIMESTAMPTZ,
+    sequence BIGINT,
+
+    PRIMARY KEY (user_agent_id, user_id)
+);
+
+CREATE TABLE auth.tokens (
+    id TEXT,
+
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+
+    resource_owner TEXT,
+    application_id TEXT,
+    user_agent_id TEXT,
+    user_id TEXT,
+    expiration TIMESTAMPTZ,
     sequence BIGINT,
 
     PRIMARY KEY (id)
