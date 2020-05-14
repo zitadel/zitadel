@@ -83,7 +83,7 @@ func TestAggregateCreator_NewAggregate(t *testing.T) {
 			creator: &AggregateCreator{serviceName: "admin"},
 			wantErr: false,
 			want: &Aggregate{
-				id:            "hodor",
+				ID:            "hodor",
 				Events:        make([]*Event, 0, 2),
 				typ:           "user",
 				version:       "v1.0.0",

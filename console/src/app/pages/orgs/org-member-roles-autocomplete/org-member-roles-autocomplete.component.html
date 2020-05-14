@@ -1,0 +1,14 @@
+<form>
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Role Name</mat-label>
+
+        <mat-select [formControl]="myControl" multiple>
+            <mat-option *ngIf="isLoading" class="is-loading">
+                <mat-spinner diameter="30"></mat-spinner>
+            </mat-option>
+            <mat-option *ngFor="let role of allRoles" [value]="role">
+                {{'ROLES.'+role | translate}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</form>

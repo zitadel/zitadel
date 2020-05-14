@@ -1,0 +1,54 @@
+<form>
+    <mat-form-field *ngIf="target == UserTarget.SELF" appearance="outline" class="full-width">
+        <mat-label>Organizations User Email</mat-label>
+
+        <input matInput *ngIf="singleOutput" type="text" placeholder="Search for the user email" #usernameInput
+            [formControl]="myControl" [matAutocomplete]="auto" />
+
+        <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="useremail selection">
+            <mat-chip class="chip" *ngFor="let selecteduser of users" [selectable]="selectable" [removable]="removable"
+                (removed)="remove(selecteduser)">
+                {{ selecteduser?.firstName }} {{selecteduser.lastName}} | <small> {{selecteduser.email}}</small>
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input placeholder="{{'ORG_DETAIL.MEMBER.EMAIL' | translate}}" #usernameInput [formControl]="myControl"
+                [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                (matChipInputTokenEnd)="add($event)" />
+        </mat-chip-list>
+
+        <!-- <mat-hint *ngIf="hint">
+            {{hint}}
+            <a (click)=" changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+        </mat-hint> -->
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+            <mat-option *ngIf="isLoading" class="is-loading">
+                <mat-spinner diameter="30"></mat-spinner>
+            </mat-option>
+            <mat-option *ngFor="let user of filteredUsers" [value]="user">
+                {{user.firstName}} {{user.lastName}}
+                <small>{{user.email}}</small>
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+
+    <div *ngIf="target == UserTarget.EXTERNAL" class="line">
+        <mat-form-field appearance="outline">
+            <mat-label>Global User Email</mat-label>
+            <input matInput type="text" [formControl]="globalEmailControl" />
+        </mat-form-field>
+
+        <button mat-icon-button (click)="getGlobalUser()">
+            <mat-icon>search</mat-icon>
+        </button>
+    </div>
+
+    <p *ngIf="target == UserTarget.EXTERNAL && users.length > 0">{{'USER.SEARCH.FOUND' | translate}}: <span
+            *ngFor="let user of users; index as i">{{user.email}} <mat-icon class="sm-dlt" (click)="users.splice(i, 1)">
+                remove_circle</mat-icon></span></p>
+
+    <p class="target-desc">{{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
+        <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+    </p>
+</form>

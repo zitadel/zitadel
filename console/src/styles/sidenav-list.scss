@@ -1,0 +1,50 @@
+@import '~@angular/material/theming';
+
+@mixin sidenav-list-theme($theme) {
+    $primary: map-get($theme, primary);
+    $primary-color: mat-color($primary, 500);
+    $primary-dark: mat-color($primary, A800);
+
+    .mat-menu-item {
+        &.show-all {
+            height: 2rem;
+            line-height: 2rem;
+            color: mat-color($primary, A700);
+        } 
+    }
+
+    .nav-item {
+        color: inherit;
+
+        &:hover {
+            background-color: #00000020;
+            border-top-right-radius: 1.5rem;
+            border-bottom-right-radius: 1.5rem;
+        }
+
+        &.active {
+            color: $primary-color !important;
+            background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
+        }
+    }
+
+    .mat-menu-content, .mat-menu-panel {
+        background-color: $primary-dark;
+        border-radius: .5rem;
+        @include mat-elevation(5);
+
+        .active {
+            color: $primary-color !important;
+            background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
+
+            mat-icon {
+                color: $primary-color !important;
+            }
+        }
+    }
+
+    .root-header {
+        @include mat-elevation(3);
+        background: $primary-dark !important;
+    }
+}

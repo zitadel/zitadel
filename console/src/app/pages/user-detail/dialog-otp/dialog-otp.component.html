@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>{{'USER.MFA.OTP_DIALOG_TITLE' | translate}}</h1>
+<div mat-dialog-content>
+    <p translate>{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
+    <div class="qrcode-wrapper">
+        <qrcode *ngIf="data" class="qrcode" [qrdata]="data" [size]="150" [level]="'M'"></qrcode>
+    </div>
+
+    <mat-form-field label="Access Code" required="true">
+        <mat-label>Code</mat-label>
+        <input matInput [(ngModel)]="code" />
+    </mat-form-field>
+</div>
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()"><span translate>ACTIONS.CLOSE</span></button>
+    <button mat-raised-button class="ok-button" color="primary" (click)="closeDialogWithCode()"><span
+            translate>ACTIONS.OK</span>
+    </button>
+</div>

@@ -1,0 +1,36 @@
+.full-width {
+    width: 100%;
+}
+
+.target-desc {
+    color: #81868a;
+    font-size: .8rem;
+    margin: 0;
+    margin-bottom: 1rem;
+    a {
+        color: white;
+        &:hover {
+            cursor: pointer;
+            color: white;
+            text-decoration: underline;
+        }
+    }
+}
+
+.line {
+    width: 100%;
+    display: flex;
+
+    mat-form-field {
+        flex: 1;
+    }
+
+    button {
+        margin-top: 1rem;
+    }
+}
+
+.sm-dlt {
+    cursor: pointer;
+    font-size: .8rem;
+}

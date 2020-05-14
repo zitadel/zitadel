@@ -1,0 +1,113 @@
+h1 {
+    font-family: ailerons;
+    margin-top: 0;
+}
+
+.sub {
+    color: #81868a;
+    margin-bottom: 2rem;
+}
+
+.state-label {
+    font-size: .9rem;
+    color: #81868a;
+    margin-bottom: .5rem;
+}
+  
+.content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 -.5rem; 
+
+    mat-form-field {
+        flex: 1 1 33%;
+        margin: 0 .5rem;
+    }
+}
+
+.table-header-row {
+    display: flex;
+    align-items: center;
+
+    .col {
+        display: flex;
+        flex-direction: column;
+        .desc {
+            font-size: .8rem;
+            color: #81868a;
+        }
+        .count {
+            font-size: 2rem;
+        }
+    }
+
+    .fill-space {
+        flex: 1;
+    }
+
+    .icon-button {
+        margin-right: .5rem;
+    }
+
+    .add-button {
+        border-radius: .5rem;
+    }
+}
+
+.side {
+    .details {
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #81868a40;
+        padding-bottom: 1rem;
+    
+        .row {
+            display: flex;
+            margin-bottom: 0.5rem;
+            align-items: center;
+    
+            button {
+                display: none;
+                visibility: hidden;
+            }
+    
+            &:hover {
+                button {
+                    display: inline-block;
+                    visibility: visible;
+                    mat-icon {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+    
+            .first {
+                flex: 1;
+                font-size: 0.8rem;
+                margin-right: 0.5rem;
+            }
+    
+            .fill-space {
+                flex: 1;
+            }
+    
+            .second {
+                font-size: 0.8rem;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-left: 1rem;
+            }
+
+            a {
+                &:hover {
+                    cursor: pointer;
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .side-section {
+            color: #81868a;
+        }
+    }    
+}

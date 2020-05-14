@@ -22,7 +22,7 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 	resourceOwner := ctxData.OrgID
 
 	aggregate := &Aggregate{
-		id:               id,
+		ID:               id,
 		typ:              typ,
 		PreviousSequence: previousSequence,
 		version:          version,
