@@ -497,6 +497,28 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "DeletePasswordAgePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "post": {
         "operationId": "CreatePasswordAgePolicy",
         "responses": {
@@ -520,30 +542,6 @@
         "tags": [
           "ManagementService"
         ]
-      }
-    },
-    "/policies/passwords/age/{id}": {
-      "delete": {
-        "operationId": "DeletePasswordAgePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
       },
       "put": {
         "operationId": "UpdatePasswordAgePolicy",
@@ -556,12 +554,6 @@
           }
         },
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
@@ -592,6 +584,28 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "DeletePasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "post": {
         "operationId": "CreatePasswordComplexityPolicy",
         "responses": {
@@ -615,30 +629,6 @@
         "tags": [
           "ManagementService"
         ]
-      }
-    },
-    "/policies/passwords/complexity/{id}": {
-      "delete": {
-        "operationId": "DeletePasswordComplexityPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
       },
       "put": {
         "operationId": "UpdatePasswordComplexityPolicy",
@@ -651,12 +641,6 @@
           }
         },
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
@@ -687,6 +671,28 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "DeletePasswordLockoutPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "post": {
         "operationId": "CreatePasswordLockoutPolicy",
         "responses": {
@@ -710,30 +716,6 @@
         "tags": [
           "ManagementService"
         ]
-      }
-    },
-    "/policies/passwords/lockout/{id}": {
-      "delete": {
-        "operationId": "DeletePasswordLockoutPolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
       },
       "put": {
         "operationId": "UpdatePasswordLockoutPolicy",
@@ -746,12 +728,6 @@
           }
         },
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
@@ -4261,6 +4237,10 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -4342,6 +4322,10 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -4435,6 +4419,10 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

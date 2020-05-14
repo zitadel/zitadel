@@ -1,11 +1,15 @@
 package systemdefaults
 
-import "github.com/caos/zitadel/internal/crypto"
+import (
+	"github.com/caos/zitadel/internal/crypto"
+	pol "github.com/caos/zitadel/internal/policy"
+)
 
 type SystemDefaults struct {
 	SecretGenerators    SecretGenerators
 	UserVerificationKey *crypto.KeyConfig
 	Multifactors        MultifactorConfig
+	DefaultPolicies     DefaultPolicies
 }
 
 type SecretGenerators struct {
@@ -24,4 +28,10 @@ type MultifactorConfig struct {
 type OTPConfig struct {
 	Issuer          string
 	VerificationKey *crypto.KeyConfig
+}
+
+type DefaultPolicies struct {
+	Age        pol.PasswordAgePolicyDefault
+	Complexity pol.PasswordComplexityPolicyDefault
+	Lockout    pol.PasswordLockoutPolicyDefault
 }

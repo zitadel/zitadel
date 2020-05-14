@@ -15,6 +15,7 @@ var _ ManagementServiceServer = (*Server)(nil)
 type Server struct {
 	port      string
 	project   repository.ProjectRepository
+	policy    repository.PolicyRepository
 	org       repository.OrgRepository
 	orgMember repository.OrgMemberRepository
 	user      repository.UserRepository
@@ -27,6 +28,7 @@ func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository
 	return &Server{
 		port:      conf.Port,
 		project:   repo,
+		policy:    repo,
 		org:       repo,
 		orgMember: repo,
 		user:      repo,
