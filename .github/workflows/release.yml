@@ -84,23 +84,28 @@ jobs:
   go-build:
     runs-on: ubuntu-18.04
     needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
+    name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
+    strategy:
+      matrix:
+        goos: [ 'linux', 'darwin', 'windows' ]
+        goarch: ['amd64']
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
       with:
         go-version: ${{ env.GO_VERSION }}
-    - uses: actions/download-artifact@v1
+    - uses: actions/download-artifact@v2
       with:
         name: angular
         path: console/dist/app
     - run: go get github.com/rakyll/statik
     - run: ./build/console/generate-static.sh
     - run: cat pkg/console/statik/statik.go
-    - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel cmd/zitadel/main.go
+    - run: CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-${{ matrix.goos }}-${{ matrix.goarch }} cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:
-        name: go-binary
-        path: zitadel
+        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
 
   container-prod:
     runs-on: ubuntu-18.04
@@ -108,10 +113,10 @@ jobs:
     steps:
     - name: Source checkout
       uses: actions/checkout@v2
-    - uses: actions/download-artifact@v1
+    - uses: actions/download-artifact@v2
       with:
-        name: go-binary
-        path: .build/go
+        name: zitadel-linux-amd64
+        path: .artifacts
     - uses: docker/build-push-action@v1
       with:
         dockerfile: build/docker/prod
@@ -175,6 +180,12 @@ jobs:
     - name: Generate Short SHA Container Tag
       id: vars
       run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
+    - uses: actions/download-artifact@v2
+      with:
+        path: .artifacts
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: .artifacts
     - name: Docker Login
       run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
     - name: Docker Pull short-sha
@@ -182,7 +193,7 @@ jobs:
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
       with:
-        dry_run:  false
+        dry_run: false
         semantic_version: 17.0.4
         extra_plugins: |
           @semantic-release/exec@5.0.0
