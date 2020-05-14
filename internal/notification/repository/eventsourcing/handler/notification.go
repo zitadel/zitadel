@@ -46,23 +46,20 @@ func (p *Notification) EventQuery() (*models.SearchQuery, error) {
 func (p *Notification) Process(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.InitializedUserCodeAdded:
-		err := p.handleInitUserCode(event)
-		if err != nil {
-			return err
-		}
-		err = p.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
-		if err != nil {
-			return err
-		}
-		return p.view.ProcessedNotificationSequence(event.Sequence)
-	case es_model.UserEmailCodeAdded,
-		es_model.UserPhoneCodeAdded,
-		es_model.UserPasswordCodeAdded:
-
+		err = p.handleInitUserCode(event)
+	case es_model.UserEmailCodeAdded:
+		err = p.handleEmailVerificationCode(event)
+	case es_model.UserPhoneCodeAdded:
+		err = p.handlePhoneVerificationCode(event)
+	case es_model.UserPasswordCodeAdded:
+		err = p.handlePasswordCode(event)
 	default:
 		return p.view.ProcessedNotificationSequence(event.Sequence)
 	}
-	return nil
+	if err != nil {
+		return err
+	}
+	return p.view.ProcessedNotificationSequence(event.Sequence)
 }
 
 func (p *Notification) handleInitUserCode(event *models.Event) (err error) {
@@ -73,7 +70,52 @@ func (p *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 	err = types.SendUserInitCode(user, initCode, p.systemDefaults, p.AesCrypto)
-	return err
+	if err != nil {
+		return err
+	}
+	return p.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+}
+
+func (p *Notification) handlePasswordCode(event *models.Event) (err error) {
+	pwCode := new(es_model.PasswordCode)
+	pwCode.SetData(event)
+	user, err := p.view.NotifyUserByID(event.AggregateID)
+	if err != nil {
+		return err
+	}
+	return types.SendPasswordCodeCode(user, pwCode, p.systemDefaults, p.AesCrypto)
+	if err != nil {
+		return err
+	}
+	return p.userEvents.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+}
+
+func (p *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
+	emailCode := new(es_model.EmailCode)
+	emailCode.SetData(event)
+	user, err := p.view.NotifyUserByID(event.AggregateID)
+	if err != nil {
+		return err
+	}
+	err = types.SendEmailVerificationCode(user, emailCode, p.systemDefaults, p.AesCrypto)
+	if err != nil {
+		return err
+	}
+	return p.userEvents.EmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+}
+
+func (p *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
+	phoneCode := new(es_model.PhoneCode)
+	phoneCode.SetData(event)
+	user, err := p.view.NotifyUserByID(event.AggregateID)
+	if err != nil {
+		return err
+	}
+	err = types.SendPhoneVerificationCode(user, phoneCode, p.systemDefaults, p.AesCrypto)
+	if err != nil {
+		return err
+	}
+	return p.userEvents.PhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
 }
 
 func (p *Notification) OnError(event *models.Event, err error) error {

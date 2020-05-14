@@ -63,4 +63,6 @@ type Providers struct {
 type TemplateData struct {
 	InitCode      templates.TemplateData
 	PasswordReset templates.TemplateData
+	VerifyEmail   templates.TemplateData
+	VerifyPhone   templates.TemplateData
 }
