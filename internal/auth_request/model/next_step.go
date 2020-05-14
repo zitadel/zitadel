@@ -1,11 +1,5 @@
 package model
 
-type possibleSteps []NextStep
-
-func (p possibleSteps) add(step NextStep) {
-	p = append(p, step)
-}
-
 type NextStep interface {
 	Type() NextStepType
 }
