@@ -308,7 +308,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1MfaOtpResponse"
+              "properties": {}
             }
           }
         },

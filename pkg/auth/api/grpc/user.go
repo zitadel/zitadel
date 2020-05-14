@@ -109,12 +109,9 @@ func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpRespon
 	return otpFromModel(otp), nil
 }
 
-func (s *Server) VerifyMfaOTP(ctx context.Context, request *VerifyMfaOtp) (_ *MfaOtpResponse, err error) {
-	otp, err := s.repo.VerifyMyMfaOTP(ctx, request.Code)
-	if err != nil {
-		return nil, err
-	}
-	return otpFromModel(otp), nil
+func (s *Server) VerifyMfaOTP(ctx context.Context, request *VerifyMfaOtp) (*empty.Empty, error) {
+	err := s.repo.VerifyMyMfaOTP(ctx, request.Code)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {

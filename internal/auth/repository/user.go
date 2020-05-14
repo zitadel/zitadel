@@ -37,6 +37,6 @@ type myUserRepo interface {
 	ChangeMyPassword(ctx context.Context, old, new string) error
 
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
-	VerifyMyMfaOTP(ctx context.Context, code string) (*model.OTP, error)
+	VerifyMyMfaOTP(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
 }

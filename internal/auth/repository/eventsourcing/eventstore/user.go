@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -12,6 +13,7 @@ import (
 
 type UserRepo struct {
 	UserEvents *user_event.UserEventstore
+	View       *view.View
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
@@ -91,8 +93,8 @@ func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	return repo.UserEvents.AddOTP(ctx, auth.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMyMfaOTP(ctx context.Context, code string) (*model.OTP, error) {
-	return nil, repo.UserEvents.CheckMfaOTPSetup(ctx, auth.GetCtxData(ctx).UserID, code) //TODO: return?
+func (repo *UserRepo) VerifyMyMfaOTP(ctx context.Context, code string) error {
+	return repo.UserEvents.CheckMfaOTPSetup(ctx, auth.GetCtxData(ctx).UserID, code)
 }
 
 func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
@@ -104,9 +106,11 @@ func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
 }
 
 func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string) error {
-	//TODO: get id from view
-	var userID string
-	return repo.UserEvents.RequestSetPassword(ctx, userID, model.NOTIFICATIONTYPE_EMAIL) //TODO: ?
+	user, err := repo.View.UserByUsername(username)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NOTIFICATIONTYPE_EMAIL)
 }
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
