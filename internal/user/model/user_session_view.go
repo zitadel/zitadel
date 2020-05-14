@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/model"
 )
 
@@ -10,7 +11,7 @@ type UserSessionView struct {
 	ID                      string
 	CreationDate            time.Time
 	ChangeDate              time.Time
-	State                   UserState
+	State                   req_model.UserSessionState
 	ResourceOwner           string
 	UserAgentID             string
 	UserID                  string

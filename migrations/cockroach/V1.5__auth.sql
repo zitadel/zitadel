@@ -90,7 +90,7 @@ CREATE TABLE auth.user_sessions (
     change_date TIMESTAMPTZ,
 
     resource_owner TEXT,
---     state
+    state SMALLINT,
     user_agent_id TEXT,
     user_id TEXT,
     user_name TEXT,

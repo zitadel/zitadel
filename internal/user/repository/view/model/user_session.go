@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/logging"
 
+	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
@@ -21,11 +22,11 @@ const (
 )
 
 type UserSessionView struct {
-	ID            string    `json:"-" gorm:"column:id;primary_key"`
-	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
-	//State                   int32     `json:"-" gorm:"column:user_state"`
+	ID                      string    `json:"-" gorm:"column:id;primary_key"`
+	CreationDate            time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate              time.Time `json:"-" gorm:"column:change_date"`
+	ResourceOwner           string    `json:"-" gorm:"column:resource_owner"`
+	State                   int32     `json:"-" gorm:"column:state"`
 	UserAgentID             string    `json:"userAgentID" gorm:"column:user_agent_id"`
 	UserID                  string    `json:"userID" gorm:"column:user_id"`
 	UserName                string    `json:"userName" gorm:"column:user_name"`
@@ -46,11 +47,11 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 
 func UserSessionFromModel(userSession *model.UserSessionView) *UserSessionView {
 	return &UserSessionView{
-		ID:            userSession.ID,
-		ChangeDate:    userSession.ChangeDate,
-		CreationDate:  userSession.CreationDate,
-		ResourceOwner: userSession.ResourceOwner,
-		//State:                   int32(userSession.State),
+		ID:                      userSession.ID,
+		ChangeDate:              userSession.ChangeDate,
+		CreationDate:            userSession.CreationDate,
+		ResourceOwner:           userSession.ResourceOwner,
+		State:                   int32(userSession.State),
 		UserAgentID:             userSession.UserAgentID,
 		UserID:                  userSession.UserID,
 		UserName:                userSession.UserName,
@@ -63,11 +64,11 @@ func UserSessionFromModel(userSession *model.UserSessionView) *UserSessionView {
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
-		ID:            userSession.ID,
-		ChangeDate:    userSession.ChangeDate,
-		CreationDate:  userSession.CreationDate,
-		ResourceOwner: userSession.ResourceOwner,
-		//State:                   model.UserSessionState(userSession.State),
+		ID:                      userSession.ID,
+		ChangeDate:              userSession.ChangeDate,
+		CreationDate:            userSession.CreationDate,
+		ResourceOwner:           userSession.ResourceOwner,
+		State:                   req_model.UserSessionState(userSession.State),
 		UserAgentID:             userSession.UserAgentID,
 		UserID:                  userSession.UserID,
 		UserName:                userSession.UserName,
@@ -99,6 +100,10 @@ func (v *UserSessionView) AppendEvent(event *models.Event) (err error) {
 	case es_model.MfaOtpCheckFailed,
 		es_model.MfaOtpRemoved:
 		v.MfaSoftwareVerification = time.Time{}
+	case es_model.SignedOut:
+		v.PasswordVerification = time.Time{}
+		v.MfaSoftwareVerification = time.Time{}
+		v.State = int32(req_model.UserSessionStateTerminated)
 	}
 	return err
 }

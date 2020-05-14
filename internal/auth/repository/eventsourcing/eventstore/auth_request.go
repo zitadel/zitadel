@@ -115,9 +115,9 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 			users := make([]model.UserSelection, len(userSessions))
 			for i, session := range userSessions {
 				users[i] = model.UserSelection{
-					UserID:   session.UserID,
-					UserName: session.UserName,
-					//TODO: UserSessionState: session.State,
+					UserID:           session.UserID,
+					UserName:         session.UserName,
+					UserSessionState: session.State,
 				}
 			}
 			steps = append(steps, &model.SelectUserStep{Users: users})

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
@@ -54,6 +55,7 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 			ResourceOwner: event.ResourceOwner,
 			UserAgentID:   eventData.UserAgentID,
 			UserID:        event.AggregateID,
+			State:         int32(req_model.UserSessionStateActive),
 		}
 	}
 	switch event.Type {
