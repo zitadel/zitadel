@@ -173,8 +173,10 @@ func GetMockManipulateUserWithPhoneCodeGen(ctrl *gomock.Controller, user model.U
 
 func GetMockManipulateUserWithPasswordCodeGen(ctrl *gomock.Controller, user model.User) *UserEventstore {
 	data, _ := json.Marshal(user)
+	code, _ := json.Marshal(user.PasswordCode)
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserAdded, Data: data},
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.UserPasswordCodeAdded, Data: code},
 	}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
