@@ -133,49 +133,52 @@ func UsersToModel(users []*UserView) []*model.UserView {
 	return result
 }
 
-func (p *UserView) AppendEvent(event *models.Event) (err error) {
-	p.ChangeDate = event.CreationDate
-	p.Sequence = event.Sequence
+func (u *UserView) AppendEvent(event *models.Event) (err error) {
+	u.ChangeDate = event.CreationDate
+	u.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered:
-		p.CreationDate = event.CreationDate
-		p.setRootData(event)
-		err = p.setData(event)
-		//TODO: password set
+		u.CreationDate = event.CreationDate
+		u.setRootData(event)
+		err = u.setData(event)
+		if err != nil {
+			return err
+		}
+		err = u.setPasswordData(event)
 	case es_model.UserPasswordChanged:
-		err = p.setData(event)
+		err = u.setPasswordData(event)
 	case es_model.UserProfileChanged,
 		es_model.UserAddressChanged:
-		err = p.setData(event)
+		err = u.setData(event)
 	case es_model.UserEmailChanged:
-		p.IsEmailVerified = false
-		err = p.setData(event)
+		u.IsEmailVerified = false
+		err = u.setData(event)
 	case es_model.UserEmailVerified:
-		p.IsEmailVerified = true
+		u.IsEmailVerified = true
 	case es_model.UserPhoneChanged:
-		p.IsPhoneVerified = false
-		err = p.setData(event)
+		u.IsPhoneVerified = false
+		err = u.setData(event)
 	case es_model.UserPhoneVerified:
-		p.IsPhoneVerified = true
+		u.IsPhoneVerified = true
 	case es_model.UserDeactivated:
-		p.State = int32(model.USERSTATE_INACTIVE)
+		u.State = int32(model.USERSTATE_INACTIVE)
 	case es_model.UserReactivated,
 		es_model.UserUnlocked:
-		p.State = int32(model.USERSTATE_ACTIVE)
+		u.State = int32(model.USERSTATE_ACTIVE)
 	case es_model.UserLocked:
-		p.State = int32(model.USERSTATE_LOCKED)
+		u.State = int32(model.USERSTATE_LOCKED)
 	case es_model.MfaOtpAdded:
-		p.OTPState = int32(model.MFASTATE_NOTREADY)
+		u.OTPState = int32(model.MFASTATE_NOTREADY)
 	case es_model.MfaOtpVerified:
-		p.OTPState = int32(model.MFASTATE_READY)
-		p.MfaInitSkipped = time.Time{}
+		u.OTPState = int32(model.MFASTATE_READY)
+		u.MfaInitSkipped = time.Time{}
 	case es_model.MfaOtpRemoved:
-		p.OTPState = int32(model.MFASTATE_UNSPECIFIED)
+		u.OTPState = int32(model.MFASTATE_UNSPECIFIED)
 	case es_model.MfaInitSkipped:
-		p.MfaInitSkipped = event.CreationDate
+		u.MfaInitSkipped = event.CreationDate
 	}
-	p.ComputeObject()
+	u.ComputeObject()
 	return err
 }
 
@@ -186,9 +189,20 @@ func (u *UserView) setRootData(event *models.Event) {
 
 func (u *UserView) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
-		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
+		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
+	return nil
+}
+
+func (u *UserView) setPasswordData(event *models.Event) error {
+	password := new(es_model.Password)
+	if err := json.Unmarshal(event.Data, password); err != nil {
+		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+	}
+	u.PasswordSet = password.Secret != nil
+	u.PasswordChangeRequired = password.ChangeRequired
 	return nil
 }
 
