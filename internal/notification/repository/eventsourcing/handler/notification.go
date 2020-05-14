@@ -48,7 +48,11 @@ func (p *Notification) Process(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return p.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+		err = p.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+		if err != nil {
+			return err
+		}
+		return p.view.ProcessedNotificationSequence(event.Sequence)
 	case es_model.UserEmailCodeAdded,
 		es_model.UserPhoneCodeAdded,
 		es_model.UserPasswordCodeAdded:
@@ -66,7 +70,7 @@ func (p *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendUserInitCode(user, initCode, p.systemDefaults.Notifications)
+	err = types.SendUserInitCode(user, initCode, p.systemDefaults)
 	return err
 }
 

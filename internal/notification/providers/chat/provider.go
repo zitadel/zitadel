@@ -23,9 +23,8 @@ func InitChatProvider(config *ChatConfig) (*Chat, error) {
 	}, nil
 }
 
-func (chat *Chat) CanHandleMessage(message providers.Message) bool {
-	chatMsg := message.(ChatMessage)
-	return chatMsg.Content != ""
+func (chat *Chat) CanHandleMessage(_ providers.Message) bool {
+	return true
 }
 
 func (chat *Chat) HandleMessage(message providers.Message) error {

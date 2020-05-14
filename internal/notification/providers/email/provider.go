@@ -24,12 +24,13 @@ func InitEmailProvider(config *EmailConfig) (*Email, error) {
 }
 
 func (email *Email) CanHandleMessage(message providers.Message) bool {
-	msg := message.(EmailMessage)
+	msg := message.(*EmailMessage)
 	return msg.Content != "" && msg.Subject != "" && len(msg.Recipients) > 0
 }
 
 func (email *Email) HandleMessage(message providers.Message) error {
-	emailMsg := message.(EmailMessage)
+	defer email.smtpClient.Close()
+	emailMsg := message.(*EmailMessage)
 
 	// To && From
 	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
@@ -62,41 +63,41 @@ func (email *Email) HandleMessage(message providers.Message) error {
 	return email.smtpClient.Quit()
 }
 
-func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (*smtp.Client, error) {
+func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err error) {
 	host, _, _ := net.SplitHostPort(smtpConfig.Host)
-	tlsconfig := &tls.Config{}
 
-	var client *smtp.Client
 	if !tlsRequired {
-		var err error
-		client, err = smtp.Dial(smtpConfig.Host)
-		if err != nil {
-			return nil, caos_errs.ThrowInternal(err, "EMAIL-skwos", "Could not make smtp dial")
-		}
-		client.StartTLS(tlsconfig)
-		defer client.Close()
-		err = smtpConfig.smtpAuth(client, host)
-		if err != nil {
-			return nil, err
-		}
-		return client, nil
+		client, err = smtpConfig.getSMPTClient()
+	} else {
+		client, err = smtpConfig.getSMPTClientWithTls(host)
 	}
 
-	conn, err := tls.Dial("tcp", smtpConfig.Host, tlsconfig)
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-sl39s", "Could not make tls dial")
-	}
-
-	client, err = smtp.NewClient(conn, host)
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwi4", "Could not create smtp client")
-	}
-	defer client.Close()
 	err = smtpConfig.smtpAuth(client, host)
 	if err != nil {
 		return nil, err
 	}
 	return client, nil
+}
+
+func (smtpConfig SMTP) getSMPTClient() (*smtp.Client, error) {
+	client, err := smtp.Dial(smtpConfig.Host)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwos", "Could not make smtp dial")
+	}
+	return client, nil
+}
+
+func (smtpConfig SMTP) getSMPTClientWithTls(host string) (*smtp.Client, error) {
+	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-sl39s", "Could not make tls dial")
+	}
+
+	client, err := smtp.NewClient(conn, host)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwi4", "Could not create smtp client")
+	}
+	return client, err
 }
 
 func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {

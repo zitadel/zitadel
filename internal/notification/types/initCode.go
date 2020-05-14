@@ -9,15 +9,25 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-func SendUserInitCode(user *view_model.NotifyUser, code *es_model.InitUserCode, config systemdefaults.Notifications) error {
-	template, err := templates.ParseTemplateFile("", config.TemplateData.InitCode)
+type InitCodeEmailData struct {
+	FirstName string
+	LastName  string
+	UserID    string
+	Code      string
+}
+
+func SendUserInitCode(user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults) error {
+	template, err := templates.ParseTemplateFile("", systemDefaults.Notifications.TemplateData.InitCode)
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, template, config)
+	_ = &InitCodeEmailData{FirstName: user.FirstName, LastName: user.LastName, UserID: user.ID}
+
+	return generateEmail(user, template, systemDefaults.Notifications)
 }
 
 func generateEmail(user *view_model.NotifyUser, content string, config systemdefaults.Notifications) error {
+
 	provider, err := email.InitEmailProvider(&config.Providers.Email)
 	if err != nil {
 		return err
@@ -29,7 +39,8 @@ func generateEmail(user *view_model.NotifyUser, content string, config systemdef
 		Content:     content,
 	}
 	if provider.CanHandleMessage(message) {
-		provider.HandleMessage(message)
+
+		return provider.HandleMessage(message)
 	}
 	return caos_errs.ThrowInternalf(nil, "NOTIF-s8ipw", "Could not send init message: userid: %v", user.ID)
 }

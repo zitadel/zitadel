@@ -34,6 +34,7 @@ type OTPConfig struct {
 }
 
 type Notifications struct {
+	Debug        bool
 	Providers    Providers
 	TemplateData TemplateData
 }
