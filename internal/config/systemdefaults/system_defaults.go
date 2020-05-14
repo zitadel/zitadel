@@ -12,6 +12,7 @@ type SystemDefaults struct {
 	Multifactors          MultifactorConfig
 	VerificationLifetimes VerificationLifetimes
 	DefaultPolicies       DefaultPolicies
+}
 
 type SecretGenerators struct {
 	PasswordSaltCost         int
