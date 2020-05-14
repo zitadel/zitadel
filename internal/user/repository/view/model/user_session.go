@@ -45,23 +45,6 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 	return v, nil
 }
 
-func UserSessionFromModel(userSession *model.UserSessionView) *UserSessionView {
-	return &UserSessionView{
-		ID:                      userSession.ID,
-		ChangeDate:              userSession.ChangeDate,
-		CreationDate:            userSession.CreationDate,
-		ResourceOwner:           userSession.ResourceOwner,
-		State:                   int32(userSession.State),
-		UserAgentID:             userSession.UserAgentID,
-		UserID:                  userSession.UserID,
-		UserName:                userSession.UserName,
-		PasswordVerification:    userSession.PasswordVerification,
-		MfaSoftwareVerification: userSession.MfaSoftwareVerification,
-		MfaHardwareVerification: userSession.MfaHardwareVerification,
-		Sequence:                userSession.Sequence,
-	}
-}
-
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
 		ID:                      userSession.ID,
