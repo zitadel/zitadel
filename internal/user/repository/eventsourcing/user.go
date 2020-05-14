@@ -393,3 +393,13 @@ func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 		return agg.AppendEvent(model.MfaOtpRemoved, nil)
 	}
 }
+
+func SignOutAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, agentID string) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.SignedOut, map[string]interface{}{"agentID": agentID})
+	}
+}

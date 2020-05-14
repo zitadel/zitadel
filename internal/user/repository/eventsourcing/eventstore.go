@@ -827,3 +827,18 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 	}
 	return nil
 }
+
+func (es *UserEventstore) SignOut(ctx context.Context, agentID, userID string) error {
+	user, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	repoUser := model.UserFromModel(user)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, SignOutAggregate(es.AggregateCreator(), repoUser, agentID))
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoUser)
+	return nil
+}

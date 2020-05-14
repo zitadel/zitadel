@@ -13,6 +13,8 @@ type UserRepository interface {
 	SkipMfaInit(ctx context.Context, userID string) error
 	RequestPasswordReset(ctx context.Context, username string) error
 	SetPassword(ctx context.Context, userID, code, password string) error
+
+	SignOut(ctx context.Context, agentID, userID string) error
 }
 
 type myUserRepo interface {

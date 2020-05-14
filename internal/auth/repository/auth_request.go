@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
