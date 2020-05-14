@@ -64,7 +64,10 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 
 	return &EsRepository{
 		spool,
-		eventstore.UserRepo{user},
+		eventstore.UserRepo{
+			UserEvents: user,
+			View:       view,
+		},
 		eventstore.AuthRequestRepo{
 			UserEvents:               user,
 			AuthRequests:             authReq,
