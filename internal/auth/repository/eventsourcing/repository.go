@@ -26,6 +26,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.UserRepo
 	eventstore.AuthRequestRepo
+	eventstore.TokenRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -75,6 +76,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
 			MfaHardwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
 		},
+		eventstore.TokenRepo{View: view},
 	}, nil
 }
 

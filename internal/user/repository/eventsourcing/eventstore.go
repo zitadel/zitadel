@@ -8,8 +8,6 @@ import (
 	"github.com/sony/sonyflake"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
-	"strconv"
-
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -20,8 +18,6 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/pquerna/otp/totp"
-	"github.com/sony/sonyflake"
 )
 
 type UserEventstore struct {

@@ -8,4 +8,5 @@ type Repository interface {
 	Health(context.Context) error
 	UserRepository
 	AuthRequestRepository
+	TokenRepository
 }
