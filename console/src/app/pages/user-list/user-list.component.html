@@ -1,0 +1,83 @@
+<div class="max-width-container">
+    <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
+    <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
+
+    <div class="table-header-row">
+        <div class="col">
+            <ng-container *ngIf="!selection.hasValue()">
+                <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
+                <span class="count">{{dataSource?.data?.length}}</span>
+            </ng-container>
+            <ng-container *ngIf="selection.hasValue()">
+                <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
+                <span class="count">{{selection?.selected?.length}}</span>
+            </ng-container>
+        </div>
+        <span class="fill-space"></span>
+        <ng-template appHasRole [appHasRole]="['user.write']">
+            <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
+                class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
+                <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
+            </button>
+            <button (click)="reactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.ACTIVATE' | translate}}"
+                class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
+                <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
+            </button>
+            <a class="add-button" [routerLink]="[ '/users', 'create']" color="primary" mat-raised-button>
+                <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+            </a>
+        </ng-template>
+    </div>
+    <div class="table-wrapper">
+        <div class="spinner-container" *ngIf="loading$ | async">
+            <mat-spinner diameter="50"></mat-spinner>
+        </div>
+        <table class="background-style" mat-table [dataSource]="dataSource">
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="firstname">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.FIRSTNAME' | translate }} </th>
+                <td mat-cell *matCellDef="let user"> {{user.firstName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastname">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.LASTNAME' | translate }} </th>
+                <td mat-cell *matCellDef="let user"> {{user.lastName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="username">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.USERNAME' | translate }} </th>
+                <td mat-cell *matCellDef="let user"> {{user.userName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.EMAIL' | translate }} </th>
+                <td mat-cell *matCellDef="let user"> {{user.email}} </td>
+            </ng-container>
+            <ng-container matColumnDef="state">
+                <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
+                <td mat-cell *matCellDef="let user"> {{ 'USER.DATA.STATE'+user.state | translate }} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
+                [routerLink]="['/user', row.id]">
+            </tr>
+
+        </table>
+        <mat-paginator class="background-style" [length]="userResult?.totalResult || 0" [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></mat-paginator>
+    </div>
+</div>

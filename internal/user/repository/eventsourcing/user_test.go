@@ -2,12 +2,13 @@ package eventsourcing
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"testing"
-	"time"
 )
 
 func TestUserByIDQuery(t *testing.T) {
@@ -212,7 +213,7 @@ func TestUserCreateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserCreateAggregate(tt.args.aggCreator, tt.args.new, tt.args.initCode, tt.args.phoneCode)(tt.args.ctx)
+			agg, err := UserCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.initCode, tt.args.phoneCode, "")
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -329,7 +330,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserRegisterAggregate(tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.emailCode)(tt.args.ctx)
+			agg, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.emailCode)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

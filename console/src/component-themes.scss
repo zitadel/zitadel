@@ -1,0 +1,14 @@
+@import './styles/card';
+@import './styles/table';
+@import './styles/sidenav-list';
+@import './styles/morph-card';
+@import './styles/changes';
+
+
+@mixin component-themes($theme) {
+  @include card-theme($theme);
+  @include table-theme($theme);
+  @include sidenav-list-theme($theme);
+  @include morph-card-theme($theme);
+  @include changes-theme($theme);
+}

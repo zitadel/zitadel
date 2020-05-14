@@ -1,0 +1,24 @@
+<div class="header">
+    <h3>{{'APP.LIST' | translate}}</h3>
+    <span class="fill-space"></span>
+    <button mat-icon-button (click)="closeView()">
+        <mat-icon matTooltip="show list view">list</mat-icon>
+    </button>
+</div>
+<div class="app-container">
+    <div [routerLink]="['/projects', projectId, 'apps', app.id ]" class="app-wrap"
+        *ngFor="let app of appsSubject | async">
+        <div class="morph-card">
+            {{ app.name.charAt(0)}}
+        </div>
+        <span class="name">{{app.name}}</span>
+    </div>
+    <ng-template appHasRole [appHasRole]="['project.app.write']">
+        <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']">
+            <div class="morph-card add">
+                <mat-icon>add</mat-icon>
+            </div>
+            <span class="name">{{ 'ACTIONS.NEW' | translate }}</span>
+        </div>
+    </ng-template>
+</div>

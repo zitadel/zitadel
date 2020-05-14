@@ -527,7 +527,7 @@ service ManagementService {
         };
     }
 
-    rpc AddOrgMember(AddOrgMemberRequest) returns (google.protobuf.Empty) {
+    rpc AddOrgMember(AddOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/members"
             body: "*"
@@ -538,7 +538,7 @@ service ManagementService {
         };
     }
 
-    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (google.protobuf.Empty) {
+    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
             put: "/orgs/{org_id}/members/{user_id}"
             body: "*"
@@ -1650,14 +1650,10 @@ message OrgMemberRoles {
 
 message OrgMember {
     string user_id = 1;
-    string user_name = 2;
-    string email = 3;
-    string first_name = 4;
-    string last_name = 5;
-    repeated string roles = 6;
-    google.protobuf.Timestamp change_date = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    uint64 sequence = 9;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
 }
 
 message AddOrgMemberRequest {

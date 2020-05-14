@@ -1,0 +1,53 @@
+<div class="wrapper">
+    <div class="header">
+        <img *ngIf="dark; else lighttheme" src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
+        <ng-template #lighttheme>
+            <img src="../assets/images/zitadel-logo-oneline-lightdesign.svg" />
+        </ng-template>
+        <p>{{'HOME.DESCRIPTION' | translate}}</p>
+    </div>
+
+    <div class="container">
+        <div class="item">
+            <div class="top">
+                <h2>{{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
+                <p>{{'HOME.SECURITYANDPRIVACY_DESC'| translate}}</p>
+            </div>
+            <span class="fill-space"></span>
+            <div class="footer">
+                <a color="accent" mat-button
+                    [routerLink]="['/users/me']">{{'HOME.SECURITYANDPRIVACY_BUTTON' | translate}}</a>
+            </div>
+        </div>
+        <div class="item">
+            <div class="top">
+                <h2>{{'HOME.PROJECTS'| translate}}</h2>
+                <p>{{'HOME.PROJECTS_DESC'| translate}}</p>
+            </div>
+            <span class="fill-space"></span>
+            <div class="footer">
+                <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.PROJECTS_BUTTON' | translate}}</a>
+            </div>
+        </div>
+        <div class="item">
+            <div class="top">
+                <h2>{{'HOME.PROTECTION'| translate}}</h2>
+                <p>{{'HOME.PROTECTION_DESC'| translate}}</p>
+            </div>
+            <span class="fill-space"></span>
+            <div class="footer">
+                <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.PROTECTION_BUTTON' | translate}}</a>
+            </div>
+        </div>
+        <div class="item">
+            <div class="top">
+                <h2>{{'HOME.USERS'| translate}}</h2>
+                <p>{{'HOME.USERS_DESC'| translate}}</p>
+            </div>
+            <span class="fill-space"></span>
+            <div class="footer">
+                <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.USERS_BUTTON' | translate}}</a>
+            </div>
+        </div>
+    </div>
+</div>

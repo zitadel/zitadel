@@ -358,7 +358,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v1OrgMember"
             }
           }
         },
@@ -450,7 +450,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "properties": {}
+              "$ref": "#/definitions/v1OrgMember"
             }
           }
         },
@@ -4094,18 +4094,6 @@
       "type": "object",
       "properties": {
         "user_id": {
-          "type": "string"
-        },
-        "user_name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "last_name": {
           "type": "string"
         },
         "roles": {

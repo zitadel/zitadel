@@ -1,0 +1,43 @@
+<form [formGroup]="profileForm" *ngIf="profileForm" (ngSubmit)="submitForm()">
+    <div class="content">
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'USER.PROFILE.USERNAME' | translate }}</mat-label>
+            <input matInput formControlName="userName" />
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</mat-label>
+            <input matInput formControlName="firstName" />
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</mat-label>
+            <input matInput formControlName="lastName" />
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</mat-label>
+            <input matInput formControlName="nickName" />
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'USER.PROFILE.DISPLAYNAME' | translate }}</mat-label>
+            <input matInput formControlName="displayName" />
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'USER.PROFILE.GENDER' | translate }}</mat-label>
+            <mat-select formControlName="gender">
+                <mat-option *ngFor="let gender of genders" [value]="gender">
+                    {{ 'GENDERS.'+gender | translate }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</mat-label>
+            <mat-select formControlName="preferredLanguage">
+                <mat-option *ngFor="let language of languages" [value]="language">
+                    {{ 'LANGUAGES.'+language | translate }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="btn-container">
+        <button type="submit" color="primary" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+    </div>
+</form>
