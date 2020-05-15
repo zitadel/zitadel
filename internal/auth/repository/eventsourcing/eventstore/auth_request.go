@@ -108,17 +108,9 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 			steps = append(steps, &model.LoginStep{})
 		}
 		if request.Prompt == model.PromptSelectAccount {
-			userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
+			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
-			}
-			users := make([]model.UserSelection, len(userSessions))
-			for i, session := range userSessions {
-				users[i] = model.UserSelection{
-					UserID:           session.UserID,
-					UserName:         session.UserName,
-					UserSessionState: session.State,
-				}
 			}
 			steps = append(steps, &model.SelectUserStep{Users: users})
 		}
@@ -160,28 +152,20 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	return append(steps, &model.RedirectToCallbackStep{}), nil
 }
 
-func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string) ([]*user_model.UserSessionView, error) {
-	session, err := provider.UserSessionsByAgentID(agentID)
+func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) ([]model.UserSelection, error) {
+	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
 	if err != nil {
 		return nil, err
 	}
-	return view_model.UserSessionsToModel(session), nil
-}
-
-func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
-	session, err := provider.UserSessionByIDs(agentID, userID)
-	if err != nil {
-		return nil, err
+	users := make([]model.UserSelection, len(userSessions))
+	for i, session := range userSessions {
+		users[i] = model.UserSelection{
+			UserID:           session.UserID,
+			UserName:         session.UserName,
+			UserSessionState: session.State,
+		}
 	}
-	return view_model.UserSessionToModel(session), nil
-}
-
-func userByID(provider userViewProvider, userID string) (*user_model.UserView, error) {
-	user, err := provider.UserByID(userID)
-	if err != nil {
-		return nil, err
-	}
-	return view_model.UserToModel(user), nil
+	return users, nil
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool) {
@@ -220,4 +204,28 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {
 	return verificationTime.Add(lifetime).After(time.Now().UTC())
+}
+
+func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string) ([]*user_model.UserSessionView, error) {
+	session, err := provider.UserSessionsByAgentID(agentID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserSessionsToModel(session), nil
+}
+
+func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
+	session, err := provider.UserSessionByIDs(agentID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserSessionToModel(session), nil
+}
+
+func userByID(provider userViewProvider, userID string) (*user_model.UserView, error) {
+	user, err := provider.UserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserToModel(user), nil
 }
