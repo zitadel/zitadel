@@ -1,8 +1,6 @@
 package model
 
 import (
-	"encoding/json"
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -30,37 +28,16 @@ type PhoneCode struct {
 }
 
 func (p *Phone) IsValid() bool {
-	err := p.normalizePhoneNumber()
+	err := p.formatPhone()
 	return p.PhoneNumber != "" && err == nil
 }
 
-func (p *Phone) normalizePhoneNumber() error {
+func (p *Phone) formatPhone() error {
 	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-so0wa", "Phonenumber is invalid")
 	}
 	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
-	return nil
-}
-
-func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {
-	u.Phone = new(Phone)
-	u.Phone.setData(event)
-	u.IsPhoneVerified = false
-	return nil
-}
-
-func (u *User) appendUserPhoneVerifiedEvent() error {
-	u.IsPhoneVerified = true
-	return nil
-}
-
-func (p *Phone) setData(event *es_models.Event) error {
-	p.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, p); err != nil {
-		logging.Log("EVEN-dlo9s").WithError(err).Error("could not unmarshal event data")
-		return err
-	}
 	return nil
 }
 
