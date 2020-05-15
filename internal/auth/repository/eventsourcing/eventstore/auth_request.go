@@ -134,8 +134,7 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	}
 
 	if !user.PasswordSet {
-		steps = append(steps, &model.InitPasswordStep{})
-		return steps, nil
+		return append(steps, &model.InitPasswordStep{}), nil
 	}
 
 	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
