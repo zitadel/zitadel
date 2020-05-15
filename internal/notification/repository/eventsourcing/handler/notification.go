@@ -41,6 +41,7 @@ func (p *Notification) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("Query Sequence: ", sequence)
 	return eventsourcing.UserQuery(sequence), nil
 }
 
@@ -68,13 +69,18 @@ func (p *Notification) handleInitUserCode(event *models.Event) (err error) {
 	initCode.SetData(event)
 	user, err := p.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
+		fmt.Println("1: Error reading Notify User: ", err)
 		return err
 	}
+	fmt.Println("2: After Get Notify User")
 	err = types.SendUserInitCode(user, initCode, p.systemDefaults, p.AesCrypto)
 	if err != nil {
+		fmt.Println("3: Error send Init Code User: ", err)
 		return err
 	}
-	return p.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	err = p.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	fmt.Println("4: Error init code sent: ", err)
+	return err
 }
 
 func (p *Notification) handlePasswordCode(event *models.Event) (err error) {
@@ -120,7 +126,8 @@ func (p *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 }
 
 func (p *Notification) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID, "sequence", event.Sequence).WithError(err).Warn("something went wrong in notification handler")
+	fmt.Printf("ONError ", event)
 	return spooler.HandleError(event, err, p.view.GetLatestNotificationFailedEvent, p.view.ProcessedNotificationFailedEvent, p.view.ProcessedNotificationSequence, p.errorCountUntilSkip)
 }
 

@@ -106,3 +106,6 @@ Notification:
       ConcurrentTasks: 4
       BulkLimit: 100
       FailureCountUntilSkip: 5
+      Handlers:
+        Notification:
+          MinimumCycleDucationMillisecond: 100 * 1000

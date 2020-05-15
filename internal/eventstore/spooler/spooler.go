@@ -2,6 +2,7 @@ package spooler
 
 import (
 	"context"
+	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -74,6 +75,7 @@ func (s *spooledHandler) load() {
 		if err != nil {
 			errs <- err
 		} else {
+			fmt.Println("before process")
 			errs <- s.process(ctx, events)
 		}
 	}
@@ -96,6 +98,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 			return nil
 		default:
 			if err := s.Process(event); err != nil {
+				fmt.Println("Error in spooler process: ", err)
 				return s.OnError(event, err)
 			}
 		}

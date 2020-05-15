@@ -35,7 +35,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 	}
 	return []spooler.Handler{
 		&NotifyUser{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
-		&Notification{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, userEvents: repos.UserEvents, systemDefaults: systemDefaults, AesCrypto: aesCrypto},
+		&Notification{handler: handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount}, userEvents: repos.UserEvents, systemDefaults: systemDefaults, AesCrypto: aesCrypto},
 	}
 }
 
