@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/caos/zitadel/internal/api/auth"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -83,7 +84,7 @@ func (p *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return types.SendPasswordCodeCode(user, pwCode, p.systemDefaults, p.AesCrypto)
+	err = types.SendPasswordCodeCode(user, pwCode, p.systemDefaults, p.AesCrypto)
 	if err != nil {
 		return err
 	}
