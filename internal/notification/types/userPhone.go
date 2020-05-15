@@ -23,7 +23,7 @@ func generateSms(user *view_model.NotifyUser, content string, config systemdefau
 		message.RecipientPhoneNumber = user.LastPhone
 	}
 	if provider.CanHandleMessage(message) {
-		if config.Debug {
+		if config.DebugMode {
 			return sendDebugPhone(message, config)
 		}
 		return provider.HandleMessage(message)

@@ -24,7 +24,7 @@ func generateEmail(user *view_model.NotifyUser, content string, config systemdef
 		message.Recipients = []string{user.LastEmail}
 	}
 	if provider.CanHandleMessage(message) {
-		if config.Debug {
+		if config.DebugMode {
 			return sendDebugEmail(message, config)
 		}
 		return provider.HandleMessage(message)

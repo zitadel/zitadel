@@ -942,9 +942,9 @@ func TestChangeProfileAggregate(t *testing.T) {
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Profile: &model.Profile{UserName: "UserName"},
+					Profile: &model.Profile{FirstName: "FirstName"},
 				},
-				profile:    &model.Profile{FirstName: ""},
+				profile:    &model.Profile{FirstName: "FirstNameChanged"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -1282,9 +1282,9 @@ func TestChangePhoneAggregate(t *testing.T) {
 			args: args{
 				ctx: auth.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
-					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+					Phone: &model.Phone{PhoneNumber: "+41791234567"},
 				},
-				phone:      &model.Phone{PhoneNumber: "Changed", IsPhoneVerified: true},
+				phone:      &model.Phone{PhoneNumber: "+41799876543", IsPhoneVerified: true},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{

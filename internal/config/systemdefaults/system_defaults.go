@@ -42,7 +42,7 @@ type DefaultPolicies struct {
 }
 
 type Notifications struct {
-	Debug        bool
+	DebugMode    bool
 	Endpoints    Endpoints
 	Providers    Providers
 	TemplateData TemplateData

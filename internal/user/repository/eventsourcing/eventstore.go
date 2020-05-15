@@ -92,7 +92,7 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, *es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
 	//TODO: Check Uniqueness
 	id, err := es.idGenerator.NextID()

@@ -4,8 +4,15 @@ import (
 	"encoding/json"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/ttacon/libphonenumber"
 	"time"
+)
+
+const (
+	//TODO: How do we get region?
+	defaultRegion = "CH"
 )
 
 type Phone struct {
@@ -23,7 +30,17 @@ type PhoneCode struct {
 }
 
 func (p *Phone) IsValid() bool {
-	return p.PhoneNumber != ""
+	err := p.normalizePhoneNumber()
+	return p.PhoneNumber != "" && err == nil
+}
+
+func (p *Phone) normalizePhoneNumber() error {
+	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-so0wa", "Phonenumber is invalid")
+	}
+	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
+	return nil
 }
 
 func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {

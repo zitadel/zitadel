@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"github.com/caos/zitadel/internal/api/auth"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -173,7 +172,6 @@ func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.
 
 func (n *Notification) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID, "sequence", event.Sequence).WithError(err).Warn("something went wrong in notification handler")
-	fmt.Printf("ONError ", event)
 	return spooler.HandleError(event, err, n.view.GetLatestNotificationFailedEvent, n.view.ProcessedNotificationFailedEvent, n.view.ProcessedNotificationSequence, n.errorCountUntilSkip)
 }
 

@@ -22,7 +22,7 @@ export ZITADEL_USER_VERIFICATION_KEY=UserVerificationKey_1
 export ZITADEL_OTP_VERIFICATION_KEY=OTPVerificationKey_1
 
 # Notifications
-export DEBUG_MODE=false
+export DEBUG_MODE=TRUE
 export TWILIO_SERVICE_SID=AC983b9e61d074abae7d3be7b56ecbc697
 export TWILIO_TOKEN=$(gopass citadel-secrets/citadel/developer/default/twilio-auth-token)
 export TWILIO_SENDER_NAME=CAOS AG

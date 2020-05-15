@@ -156,7 +156,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "with verified phone number",
 			args: args{
-				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber", IsPhoneVerified: true}}),
+				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}, Phone: &repo_model.Phone{PhoneNumber: "+41711234567", IsPhoneVerified: true}}),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
@@ -169,7 +169,7 @@ func TestCreateUser(t *testing.T) {
 						IsEmailVerified: true,
 					},
 					Phone: &model.Phone{
-						PhoneNumber:     "UserName",
+						PhoneNumber:     "+41711234567",
 						IsPhoneVerified: true,
 					},
 				},
@@ -186,7 +186,7 @@ func TestCreateUser(t *testing.T) {
 						IsEmailVerified: true,
 					},
 					Phone: &model.Phone{
-						PhoneNumber:     "UserName",
+						PhoneNumber:     "+41711234567",
 						IsPhoneVerified: true,
 					},
 				},
@@ -1868,10 +1868,10 @@ func TestChangePhone(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateUserFull(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: true},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "0711234567", IsPhoneVerified: true},
 			},
 			res: res{
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: true},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: true},
 			},
 		},
 		{
@@ -1879,10 +1879,10 @@ func TestChangePhone(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber"}}),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: false},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: false},
 			},
 			res: res{
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: false},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: false},
 			},
 		},
 		{
@@ -1901,7 +1901,7 @@ func TestChangePhone(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateUserNoEvents(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: true},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: true},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
