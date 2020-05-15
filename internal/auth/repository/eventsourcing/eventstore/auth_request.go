@@ -138,8 +138,7 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	}
 
 	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
-		steps = append(steps, &model.PasswordStep{})
-		return steps, nil
+		return append(steps, &model.PasswordStep{}), nil
 	}
 
 	if step, ok := repo.mfaChecked(userSession, request, user); !ok {
