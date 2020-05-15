@@ -15,6 +15,8 @@ type UserRepository interface {
 	SetPassword(ctx context.Context, userID, code, password string) error
 
 	SignOut(ctx context.Context, agentID, userID string) error
+
+	UserByID(ctx context.Context, userID string) (*model.User, error)
 }
 
 type myUserRepo interface {
