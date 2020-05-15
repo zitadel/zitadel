@@ -100,7 +100,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCodeCode(user, pwCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendPasswordCode(user, pwCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
