@@ -1,6 +1,7 @@
 package systemdefaults
 
 import (
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	pol "github.com/caos/zitadel/internal/policy"
 )

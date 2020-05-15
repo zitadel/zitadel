@@ -361,5 +361,5 @@ func getOIDCAuthMethod(authMethod string) proj_model.OIDCAuthMethodType {
 }
 
 func setSetUpContextData(ctx context.Context, orgID string) context.Context {
-	return context.WithValue(ctx, auth.GetCtxDataKey(), auth.CtxData{UserID: SETUP_USER, OrgID: orgID})
+	return auth.SetCtxData(ctx, auth.CtxData{UserID: SETUP_USER, OrgID: orgID})
 }
