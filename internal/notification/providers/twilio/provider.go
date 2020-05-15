@@ -17,12 +17,12 @@ func InitTwilioProvider(config *TwilioConfig) (*Twilio, error) {
 }
 
 func (t *Twilio) CanHandleMessage(message providers.Message) bool {
-	twilioMsg := message.(TwilioMessage)
+	twilioMsg := message.(*TwilioMessage)
 	return twilioMsg.Content != "" && twilioMsg.RecipientPhoneNumber != "" && twilioMsg.SenderPhoneNumber != ""
 }
 
 func (t *Twilio) HandleMessage(message providers.Message) error {
-	twilioMsg := message.(TwilioMessage)
+	twilioMsg := message.(*TwilioMessage)
 	m, err := t.client.Messages.SendMessage(twilioMsg.SenderPhoneNumber, twilioMsg.RecipientPhoneNumber, twilioMsg.GetContent(), nil)
 	if err != nil {
 		return err

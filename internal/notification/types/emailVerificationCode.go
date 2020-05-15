@@ -30,5 +30,5 @@ func SendEmailVerificationCode(user *view_model.NotifyUser, code *es_model.Email
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, template, systemDefaults.Notifications)
+	return generateEmail(user, template, systemDefaults.Notifications, true)
 }

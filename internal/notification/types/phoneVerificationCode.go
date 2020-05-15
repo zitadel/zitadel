@@ -9,7 +9,6 @@ import (
 )
 
 type PhoneVerificationCodeData struct {
-	templates.TemplateData
 	FirstName string
 	LastName  string
 	Code      string
@@ -21,8 +20,10 @@ func SendPhoneVerificationCode(user *view_model.NotifyUser, code *es_model.Phone
 	if err != nil {
 		return err
 	}
-	_ = &PhoneVerificationCodeData{TemplateData: systemDefaults.Notifications.TemplateData.VerifyPhone, FirstName: user.FirstName, LastName: user.LastName, UserID: user.ID, Code: codeString}
-
-	//TODO: generateSMS
-	return nil
+	codeData := &PhoneVerificationCodeData{FirstName: user.FirstName, LastName: user.LastName, UserID: user.ID, Code: codeString}
+	template, err := templates.ParseTemplateText(systemDefaults.Notifications.TemplateData.VerifyPhone.Text, codeData)
+	if err != nil {
+		return err
+	}
+	return generateSms(user, template, systemDefaults.Notifications, true)
 }

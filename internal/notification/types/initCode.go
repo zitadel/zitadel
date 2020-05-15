@@ -35,5 +35,5 @@ func SendUserInitCode(user *view_model.NotifyUser, code *es_model.InitUserCode, 
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, template, systemDefaults.Notifications)
+	return generateEmail(user, template, systemDefaults.Notifications, false)
 }
