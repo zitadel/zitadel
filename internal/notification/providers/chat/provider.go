@@ -52,13 +52,11 @@ func (chat *Chat) SendMessage(message providers.Message) error {
 	}
 
 	response, err := http.Post(chat.URL.String(), "application/json; charset=UTF-8", bytes.NewReader(req))
-	fmt.Println("RESPONSE", response)
 	bodyBytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 	bodyString := string(bodyBytes)
-	fmt.Println("BODY: ", bodyString)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-si93s", "unable to send message")
 	}

@@ -1,7 +1,6 @@
 package view
 
 import (
-	"fmt"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/model"
 	"github.com/jinzhu/gorm"
@@ -63,7 +62,6 @@ func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error 
 	err := save(db, failedEvent)
 
 	if err != nil {
-		fmt.Println("Error in save failed event:  ", failedEvent, err)
 		return errors.ThrowInternal(err, "VIEW-5kOhP", "unable to updated failed events")
 	}
 	return nil
