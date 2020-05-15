@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/notification/types"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -20,6 +21,7 @@ import (
 
 type Notification struct {
 	handler
+	eventstore     eventstore.Eventstore
 	userEvents     *usr_event.UserEventstore
 	systemDefaults sd.SystemDefaults
 	AesCrypto      crypto.EncryptionAlgorithm
@@ -30,105 +32,149 @@ const (
 	NOTIFY_USER       = "NOTIFICATION"
 )
 
-func (p *Notification) MinimumCycleDuration() time.Duration { return p.cycleDuration }
+func (n *Notification) MinimumCycleDuration() time.Duration { return n.cycleDuration }
 
-func (p *Notification) ViewModel() string {
+func (n *Notification) ViewModel() string {
 	return notificationTable
 }
 
-func (p *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestNotificationSequence()
+func (n *Notification) EventQuery() (*models.SearchQuery, error) {
+	sequence, err := n.view.GetLatestNotificationSequence()
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Query Sequence: ", sequence)
 	return eventsourcing.UserQuery(sequence), nil
 }
 
-func (p *Notification) Process(event *models.Event) (err error) {
+func (n *Notification) Process(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.InitializedUserCodeAdded:
-		err = p.handleInitUserCode(event)
+		err = n.handleInitUserCode(event)
 	case es_model.UserEmailCodeAdded:
-		err = p.handleEmailVerificationCode(event)
+		err = n.handleEmailVerificationCode(event)
 	case es_model.UserPhoneCodeAdded:
-		err = p.handlePhoneVerificationCode(event)
+		err = n.handlePhoneVerificationCode(event)
 	case es_model.UserPasswordCodeAdded:
-		err = p.handlePasswordCode(event)
+		err = n.handlePasswordCode(event)
 	default:
-		return p.view.ProcessedNotificationSequence(event.Sequence)
+		return n.view.ProcessedNotificationSequence(event.Sequence)
 	}
 	if err != nil {
 		return err
 	}
-	return p.view.ProcessedNotificationSequence(event.Sequence)
+	return n.view.ProcessedNotificationSequence(event.Sequence)
 }
 
-func (p *Notification) handleInitUserCode(event *models.Event) (err error) {
+func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	if err != nil {
+		return err
+	}
+	if alreadyHandled {
+		return nil
+	}
 	initCode := new(es_model.InitUserCode)
 	initCode.SetData(event)
-	user, err := p.view.NotifyUserByID(event.AggregateID)
+	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
-		fmt.Println("1: Error reading Notify User: ", err)
 		return err
 	}
-	fmt.Println("2: After Get Notify User")
-	err = types.SendUserInitCode(user, initCode, p.systemDefaults, p.AesCrypto)
+	err = types.SendUserInitCode(user, initCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
-		fmt.Println("3: Error send Init Code User: ", err)
 		return err
 	}
-	err = p.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
-	fmt.Println("4: Error init code sent: ", err)
-	return err
+	return n.userEvents.InitCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
 }
 
-func (p *Notification) handlePasswordCode(event *models.Event) (err error) {
+func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	if err != nil {
+		return err
+	}
+	if alreadyHandled {
+		return nil
+	}
 	pwCode := new(es_model.PasswordCode)
 	pwCode.SetData(event)
-	user, err := p.view.NotifyUserByID(event.AggregateID)
+	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCodeCode(user, pwCode, p.systemDefaults, p.AesCrypto)
+	err = types.SendPasswordCodeCode(user, pwCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
-	return p.userEvents.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.userEvents.PasswordCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
 }
 
-func (p *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
+func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	if err != nil {
+		return err
+	}
+	if alreadyHandled {
+		return nil
+	}
 	emailCode := new(es_model.EmailCode)
 	emailCode.SetData(event)
-	user, err := p.view.NotifyUserByID(event.AggregateID)
+	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendEmailVerificationCode(user, emailCode, p.systemDefaults, p.AesCrypto)
+	err = types.SendEmailVerificationCode(user, emailCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
-	return p.userEvents.EmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.userEvents.EmailVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
 }
 
-func (p *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
+func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	if err != nil {
+		return err
+	}
+	if alreadyHandled {
+		return nil
+	}
 	phoneCode := new(es_model.PhoneCode)
 	phoneCode.SetData(event)
-	user, err := p.view.NotifyUserByID(event.AggregateID)
+	user, err := n.view.NotifyUserByID(event.AggregateID)
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(user, phoneCode, p.systemDefaults, p.AesCrypto)
+	err = types.SendPhoneVerificationCode(user, phoneCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
-	return p.userEvents.PhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
+	return n.userEvents.PhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.AggregateID)
 }
 
-func (p *Notification) OnError(event *models.Event, err error) error {
+func (n *Notification) checkIfCodeAlreadyHandled(userID string, sequence uint64, addedType, sentType models.EventType) (bool, error) {
+	events, err := n.getUserEvents(userID, sequence)
+	if err != nil {
+		return false, err
+	}
+	for _, event := range events {
+		if event.Type == addedType || event.Type == sentType {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+	query, err := eventsourcing.UserByIDQuery(userID, sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	return n.eventstore.FilterEvents(context.Background(), query)
+}
+
+func (n *Notification) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-s9opc", "id", event.AggregateID, "sequence", event.Sequence).WithError(err).Warn("something went wrong in notification handler")
 	fmt.Printf("ONError ", event)
-	return spooler.HandleError(event, err, p.view.GetLatestNotificationFailedEvent, p.view.ProcessedNotificationFailedEvent, p.view.ProcessedNotificationSequence, p.errorCountUntilSkip)
+	return spooler.HandleError(event, err, n.view.GetLatestNotificationFailedEvent, n.view.ProcessedNotificationFailedEvent, n.view.ProcessedNotificationSequence, n.errorCountUntilSkip)
 }
 
 func getSetNotifyContextData(orgID string) context.Context {

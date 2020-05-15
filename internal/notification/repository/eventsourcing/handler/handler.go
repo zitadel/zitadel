@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/caos/logging"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -14,7 +15,7 @@ import (
 type Configs map[string]*Config
 
 type Config struct {
-	MinimumCycleDurationMillisecond int
+	MinimumCycleDuration types.Duration
 }
 
 type handler struct {
@@ -35,7 +36,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 	}
 	return []spooler.Handler{
 		&NotifyUser{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
-		&Notification{handler: handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount}, userEvents: repos.UserEvents, systemDefaults: systemDefaults, AesCrypto: aesCrypto},
+		&Notification{handler: handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount}, eventstore: eventstore, userEvents: repos.UserEvents, systemDefaults: systemDefaults, AesCrypto: aesCrypto},
 	}
 }
 
@@ -44,5 +45,5 @@ func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	if !ok {
 		return 1 * time.Second
 	}
-	return time.Duration(c.MinimumCycleDurationMillisecond) * time.Millisecond
+	return c.MinimumCycleDuration.Duration
 }

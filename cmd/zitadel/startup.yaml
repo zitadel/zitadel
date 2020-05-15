@@ -108,4 +108,4 @@ Notification:
       FailureCountUntilSkip: 5
       Handlers:
         Notification:
-          MinimumCycleDucationMillisecond: 100 * 1000
+          MinimumCycleDuration: 10s

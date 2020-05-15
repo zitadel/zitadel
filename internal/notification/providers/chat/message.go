@@ -1,9 +1,9 @@
 package chat
 
 type ChatMessage struct {
-	Content string
+	Text string `json:"text"`
 }
 
 func (msg ChatMessage) GetContent() string {
-	return msg.Content
+	return msg.Text
 }

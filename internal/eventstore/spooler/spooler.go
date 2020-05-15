@@ -75,7 +75,6 @@ func (s *spooledHandler) load() {
 		if err != nil {
 			errs <- err
 		} else {
-			fmt.Println("before process")
 			errs <- s.process(ctx, events)
 		}
 	}

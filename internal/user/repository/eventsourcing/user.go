@@ -210,6 +210,9 @@ func ProfileChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 			return nil, err
 		}
 		changes := existing.Profile.Changes(profile)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0spow", "no changes found")
+		}
 		return agg.AppendEvent(model.UserProfileChanged, changes)
 	}
 }
@@ -227,6 +230,9 @@ func EmailChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 			return nil, err
 		}
 		changes := existing.Email.Changes(email)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-s90pw", "no changes found")
+		}
 		agg, err = agg.AppendEvent(model.UserEmailChanged, changes)
 		if err != nil {
 			return nil, err
@@ -292,6 +298,9 @@ func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 			existing.Phone = new(model.Phone)
 		}
 		changes := existing.Phone.Changes(phone)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sp0oc", "no changes found")
+		}
 		agg, err = agg.AppendEvent(model.UserPhoneChanged, changes)
 		if err != nil {
 			return nil, err
@@ -351,6 +360,9 @@ func AddressChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 			existing.Address = new(model.Address)
 		}
 		changes := existing.Address.Changes(address)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-2tszw", "no changes found")
+		}
 		return agg.AppendEvent(model.UserAddressChanged, changes)
 	}
 }
