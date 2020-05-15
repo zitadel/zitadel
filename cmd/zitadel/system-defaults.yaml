@@ -107,4 +107,4 @@ SystemDefaults:
         Subject: 'Telefonnummer Verifizieren'
         Greeting: 'Hallo {{.FirstName}} {{.LastName}},'
         Text: 'Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst: {{.Code}}'
-        ButtonText: 'Passwort zurücksetzen'
+        ButtonText: 'Telefon verifizieren'
