@@ -15,9 +15,8 @@ type EmailMessage struct {
 	BCC         []string
 	CC          []string
 	SenderEmail string
-	//SenderDisplayName     string
-	Subject string
-	Content string
+	Subject     string
+	Content     string
 }
 
 func (msg *EmailMessage) GetContent() string {
@@ -42,21 +41,6 @@ func (msg *EmailMessage) GetContent() string {
 
 	return message
 }
-
-//
-//func (msg *EmailMessage) toHtml() bool {
-//	if !isHTML(msg.Content) {
-//		return false
-//	}
-//
-//	content, err := html2text.FromString(msg.Content, html2text.Options{PrettyTables: true})
-//	if err != nil {
-//		logging.Log("EMAIL-2ks94").OnError(err).Warn("could not get htmltext")
-//		return true
-//	}
-//	msg.Content = content
-//	return true
-//}
 
 func isHTML(input string) bool {
 	return isHTMLRgx.MatchString(input)

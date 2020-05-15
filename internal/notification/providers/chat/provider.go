@@ -3,11 +3,8 @@ package chat
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/providers"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"unicode/utf8"
@@ -19,13 +16,13 @@ type Chat struct {
 }
 
 func InitChatProvider(config *ChatConfig) (*Chat, error) {
-	url, err := url.Parse(config.URL)
+	url, err := url.Parse(config.Url)
 	if err != nil {
 		return nil, err
 	}
 	return &Chat{
 		URL:        url,
-		SplitCount: 4000,
+		SplitCount: config.SplitCount,
 	}, nil
 }
 
@@ -51,12 +48,7 @@ func (chat *Chat) SendMessage(message providers.Message) error {
 		return caos_errs.ThrowInternal(err, "PROVI-s8uie", "Could not unmarshal content")
 	}
 
-	response, err := http.Post(chat.URL.String(), "application/json; charset=UTF-8", bytes.NewReader(req))
-	bodyBytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bodyString := string(bodyBytes)
+	_, err = http.Post(chat.URL.String(), "application/json; charset=UTF-8", bytes.NewReader(req))
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-si93s", "unable to send message")
 	}

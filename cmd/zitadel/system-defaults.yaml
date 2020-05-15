@@ -67,6 +67,7 @@ SystemDefaults:
     Providers:
       Chat:
         Url: $CHAT_URL
+        SplitCount: 4000
       Email:
         SMTP:
           Host: $SMTP_HOST

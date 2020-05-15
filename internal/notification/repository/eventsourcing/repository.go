@@ -19,7 +19,6 @@ type Config struct {
 
 type EsRepository struct {
 	spooler *es_spol.Spooler
-	//eventstore.UserRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -49,7 +48,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 
 	return &EsRepository{
 		spool,
-		//eventstore.UserRepo{user, view},
 	}, nil
 }
 

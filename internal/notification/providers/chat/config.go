@@ -1,5 +1,6 @@
 package chat
 
 type ChatConfig struct {
-	URL string
+	Url        string
+	SplitCount int
 }

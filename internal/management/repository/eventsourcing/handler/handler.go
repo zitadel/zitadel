@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -12,7 +13,7 @@ import (
 type Configs map[string]*Config
 
 type Config struct {
-	MinimumCycleDurationMillisecond int
+	MinimumCycleDuration types.Duration
 }
 
 type handler struct {
@@ -44,5 +45,5 @@ func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	if !ok {
 		return 1 * time.Second
 	}
-	return time.Duration(c.MinimumCycleDurationMillisecond) * time.Millisecond
+	return c.MinimumCycleDuration.Duration
 }
