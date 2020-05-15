@@ -74,15 +74,15 @@ func PrepareDeleteByKey(table string, key ColumnKey, id string) func(db *gorm.DB
 }
 
 type Key struct {
-	Key ColumnKey
-	Id  string
+	Key   ColumnKey
+	Value string
 }
 
 func PrepareDeleteByKeys(table string, keys ...Key) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		for _, key := range keys {
 			db = db.Table(table).
-				Where(fmt.Sprintf("%s = ?", key.Key.ToColumnName()), key.Id)
+				Where(fmt.Sprintf("%s = ?", key.Key.ToColumnName()), key.Value)
 		}
 		err := db.
 			Delete(nil).
