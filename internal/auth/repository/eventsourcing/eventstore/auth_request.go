@@ -142,8 +142,7 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	}
 
 	if step, ok := repo.mfaChecked(userSession, request, user); !ok {
-		steps = append(steps, step)
-		return steps, nil
+		return append(steps, step), nil
 	}
 
 	if user.PasswordChangeRequired {
