@@ -87,7 +87,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 }
 
 func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserPasswordCodeAdded, es_model.UserPasswordCodeSent)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 }
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserEmailCodeAdded, es_model.UserEmailCodeSent)
 	if err != nil {
 		return err
 	}
@@ -129,7 +129,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 }
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
+	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserPhoneCodeAdded, es_model.UserPhoneCodeSent)
 	if err != nil {
 		return err
 	}
