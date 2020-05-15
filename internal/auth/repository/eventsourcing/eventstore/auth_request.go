@@ -157,8 +157,7 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	}
 
 	//PLANNED: consent step
-	steps = append(steps, &model.RedirectToCallbackStep{})
-	return steps, nil
+	return append(steps, &model.RedirectToCallbackStep{}), nil
 }
 
 func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string) ([]*user_model.UserSessionView, error) {
