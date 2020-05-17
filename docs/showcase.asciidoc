@@ -153,9 +153,9 @@ Continuing ...
 ----
 enum ANSIITerminalColour: CustomConvertibleString {
     var description: String { self.rawValue }
-    case .reset = "\{1b}[0m"
-    case .bold = "\{1b}[1m"
-    case .red = "\{1b}[31m"
+    case .reset = "\u{1b}[0m"
+    case .bold = "\u{1b}[1m"
+    case .red = "\u{1b}[31m"
 }
 ----
 ====
