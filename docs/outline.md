@@ -1,6 +1,5 @@
 ![ZITADEL](/docs/img/zitadel-logo-oneline-lightdesign@2x.png "Zitadel Logo")
 
-***
 # Before you begin
 This documentation has been carefully compiled to accommodate the requirements of three personas.
 
@@ -10,13 +9,11 @@ This documentation has been carefully compiled to accommodate the requirements o
 | Administrator | Creating new logins, groups, and grants. … |
 | Developer | Extending or fixing Zitadel. … |
 
-When navigating the documentation you should always be able to find all information needed to accomplish the tasks of one of the personas—it should be “persona-complete”. This is also our statement and promise, and should be granted by people who are willing to contribute to the documentation.
+When navigating the documentation you should always be able to find all information needed to accomplish the tasks of one of the personas—the documentation should be “persona-complete”. This is also our statement and promise, and should be granted by people who are willing to contribute to the documentation.
 
-***
 # Getting started
 ## Features
 
-***
 # Using Zitadel
 
 ## I’m a user
@@ -40,7 +37,6 @@ When navigating the documentation you should always be able to find all informat
 * Pushing versus creating pull requests
 * Testing you code
 
-***
 # Learning Zitadel
 ## I’m a user
 ## I’m an administrator
@@ -60,10 +56,8 @@ When navigating the documentation you should always be able to find all informat
 * Extending the data model
 * Using your favourite programming language
 
-***
 # Troubleshooting Zitadel
 
-***
 # Learning More
 ```swift
 import Foundation
@@ -75,6 +69,5 @@ enum ZitadelComError {
 }
 ```
 
-***
 # FAQ
 
