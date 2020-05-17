@@ -1,0 +1,198 @@
+:toc:
+:toc-placement: manual
+
+image::/docs/img/zitadel-logo-oneline-lightdesign@2x.png[ZITADEL Logo]
+
+= Test Document
+
+toc::[]
+
+== Tables
+.Windtrainer workouts
+[width="80%",cols="3,^2,^2,10",options="header"]
+|=========================================================
+|Date |Duration |Avg HR |Notes
+
+|22-Aug-08 |10:24 | 157 |
+Worked out MSHR (max sustainable heart rate) by going hard
+for this interval.
+
+|22-Aug-08 |23:03 | 152 |
+Back-to-back with previous interval.
+
+|24-Aug-08 |40:00 | 145 |
+Moderately hard interspersed with 3x 3min intervals (2min
+hard + 1min really hard taking the HR up to 160).
+|=========================================================
+
+{nbsp}
+
+[latex]
+C = \alpha + \beta Y^{\gamma} + \epsilon
+
+{nbsp}
+
+.Another table *with* caption
+|===
+|Persona |Role
+| User | The user
+| Administrator | The admin
+| Developer | The nerd
+|===
+
+== Text
+
+[quote, Sir Arthur Conan Doyle, The Adventures of Sherlock Holmes]
+____________________________________________________________________
+As he spoke there was the sharp sound of horses' hoofs and
+grating wheels against the curb, followed by a sharp pull at the
+bell. Holmes whistled.
+
+"A pair, by the sound," said he. "Yes," he continued, glancing
+out of the window. "A nice little brougham and a pair of
+beauties. A hundred and fifty guineas apiece. There's money in
+this case, Watson, if there is nothing else."
+____________________________________________________________________
+
+{nbsp}
+
+{nbsp}
+
+.An example with a custom caption
+=====================================================================
+Qui in magna commodo, est labitur dolorum an. Est ne magna primis
+adolescens.
+=====================================================================
+
+{nbsp}
+
+{nbsp}
+
+[NOTE]
+.A NOTE admonition block
+=====================================================================
+Qui in magna commodo, est labitur dolorum an. Est ne magna primis
+adolescens.
+
+. Fusce euismod commodo velit.
+. Vivamus fringilla mi eu lacus.
+  .. Fusce euismod commodo velit.
+  .. Vivamus fringilla mi eu lacus.
+. Donec eget arcu bibendum
+  nunc consequat lobortis.
+=====================================================================
+
+
+A footnote footnote:[An example footnote.];
+a second footnote with a reference ID footnoteref:[note2,Second footnote.];
+finally a reference to the second footnote footnoteref:[note2].
+
+.MS-DOS directory listing
+-----------------------------------------------------
+ 10/17/97   9:04         <DIR>    bin
+ 10/16/97  14:11         <DIR>    DOS            <1>
+ 10/16/97  14:40         <DIR>    Program Files
+ 10/16/97  14:46         <DIR>    TEMP
+ 10/17/97   9:04         <DIR>    tmp
+ 10/16/97  14:37         <DIR>    WINNT
+ 10/16/97  14:25             119  AUTOEXEC.BAT   <2>
+  2/13/94   6:21          54,619  COMMAND.COM    <2>
+ 10/16/97  14:25             115  CONFIG.SYS     <2>
+ 11/16/97  17:17      61,865,984  pagefile.sys
+  2/13/94   6:21           9,349  WINA20.386     <3>
+-----------------------------------------------------
+
+<1> This directory holds MS-DOS.
+<2> System startup code for DOS.
+<3> Some sort of Windows 3.1 hack.
+
+
+[TIP]
+This is a tip.
+
+[NOTE]
+This is a note.
+
+[IMPORTANT]
+This is an importance.
+
+[WARNING]
+This is a warning.
+
+[CAUTION]
+This causes caution.
+
+{nbsp}
+{nbsp}
+
+.An example of Swift code
+[caption="Code Snippet {counter:example}. "]
+====
+[source,swift]
+----
+import Foundation
+import SwiftNIO
+
+enum ZitadelComError {
+    case .OK
+    case .ServerError(Error)
+    case .NetworkError(Error)
+}
+
+/*
+ This is a multiline comment.
+ */
+----
+====
+Continuing ...
+
+.Another example of Swift code
+[caption="Code Snippet {counter:example}. "]
+====
+[source,swift]
+----
+enum ANSIITerminalColour: CustomConvertibleString {
+    var description: String { self.rawValue }
+    case .reset = "\{1b}[0m"
+    case .bold = "\{1b}[1m"
+    case .red = "\{1b}[31m"
+}
+----
+====
+
+== Diagrammes
+Some diagrammes tests.
+
+.A ditaa diagramme
+[caption="Figure {counter:figure}. "]
+[ditaa]
+....
+                   +-------------+
+                   | Asciidoctor |-------+
+                   |   diagram   |       |
+                   +-------------+       | PNG out
+                       ^                 |
+                       | ditaa in        |
+                       |                 v
+ +--------+   +--------+----+    /---------------\
+ |        | --+ Asciidoctor +--> |               |
+ |  Text  |   +-------------+    |   Beautiful   |
+ |Document|   |   !magic!   |    |    Output     |
+ |     {d}|   |             |    |               |
+ +---+----+   +-------------+    \---------------/
+     :                                   ^
+     |          Lots of work             |
+     +-----------------------------------+
+....
+
+.A a2s diagramme
+[caption="Figure {counter:figure}. "]
+[a2s]
+....
+.-------------.  .--------------.
+|[Red Box]    |  |[Blue Box]    |
+'-------------'  '--------------'
+
+[Red Box]: {"fill":"#aa4444"}
+[Blue Box]: {"fill":"#ccccff"}
+....
