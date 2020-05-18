@@ -66,11 +66,8 @@ func (n *Notification) Process(event *models.Event) (err error) {
 
 func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent)
-	if err != nil {
+	if err != nil || alreadyHandled {
 		return err
-	}
-	if alreadyHandled {
-		return nil
 	}
 	initCode := new(es_model.InitUserCode)
 	initCode.SetData(event)
