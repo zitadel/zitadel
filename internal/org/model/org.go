@@ -41,3 +41,4 @@ func (o *Org) ContainsMember(userID string) bool {
 	}
 	return false
 }
+
