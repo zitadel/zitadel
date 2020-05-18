@@ -114,9 +114,7 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	}
 	// Auth
 	auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host)
-	if err := client.Auth(auth); err != nil {
-		logging.Log("EMAIL-s9kfs").WithField("smtp user", smtpConfig.User).Debug("Could not add smtp auth")
-		return err
-	}
-	return nil
+	err := client.Auth(auth)
+	logging.Log("EMAIL-s9kfs").WithField("smtp user", smtpConfig.User).OnError(err).Debug("Could not add smtp auth")
+	return err
 }
