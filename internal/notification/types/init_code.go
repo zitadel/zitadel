@@ -35,5 +35,6 @@ func SendUserInitCode(user *view_model.NotifyUser, code *es_model.InitUserCode, 
 	if err != nil {
 		return err
 	}
+	systemDefaults.Notifications.DebugMode = false
 	return generateEmail(user, template, systemDefaults.Notifications, false)
 }

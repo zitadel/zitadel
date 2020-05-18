@@ -12,3 +12,7 @@ type SMTP struct {
 	User     string
 	Password string
 }
+
+func (smtp *SMTP) HasAuth() bool {
+	return smtp.User != "" && smtp.Password != ""
+}

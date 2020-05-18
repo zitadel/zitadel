@@ -24,14 +24,19 @@ func InitEmailProvider(config *EmailConfig) (*Email, error) {
 }
 
 func (email *Email) CanHandleMessage(message providers.Message) bool {
-	msg := message.(*EmailMessage)
+	msg, ok := message.(*EmailMessage)
+	if !ok {
+		return false
+	}
 	return msg.Content != "" && msg.Subject != "" && len(msg.Recipients) > 0
 }
 
 func (email *Email) HandleMessage(message providers.Message) error {
 	defer email.smtpClient.Close()
-	emailMsg := message.(*EmailMessage)
-
+	emailMsg, ok := message.(*EmailMessage)
+	if !ok {
+		return caos_errs.ThrowInternal(nil, "EMAIL-s8JLs", "message is not EmailMessage")
+	}
 	// To && From
 	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
 		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)
@@ -71,6 +76,9 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	} else {
 		client, err = smtpConfig.getSMPTClientWithTls(host)
 	}
+	if err != nil {
+		return nil, err
+	}
 
 	err = smtpConfig.smtpAuth(client, host)
 	if err != nil {
@@ -101,7 +109,7 @@ func (smtpConfig SMTP) getSMPTClientWithTls(host string) (*smtp.Client, error) {
 }
 
 func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
-	if smtpConfig.User == "" || smtpConfig.Password == "" {
+	if !smtpConfig.HasAuth() {
 		return nil
 	}
 	// Auth

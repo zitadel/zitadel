@@ -33,7 +33,7 @@ func (chat *Chat) CanHandleMessage(_ providers.Message) bool {
 func (chat *Chat) HandleMessage(message providers.Message) error {
 	contentText := message.GetContent()
 	for _, splittedMsg := range splitMessage(contentText, chat.SplitCount) {
-		chatMsg := ChatMessage{Text: splittedMsg}
+		chatMsg := &ChatMessage{Text: splittedMsg}
 		if err := chat.SendMessage(chatMsg); err != nil {
 			return err
 		}
@@ -42,7 +42,10 @@ func (chat *Chat) HandleMessage(message providers.Message) error {
 }
 
 func (chat *Chat) SendMessage(message providers.Message) error {
-	chatMsg := message.(ChatMessage)
+	chatMsg, ok := message.(*ChatMessage)
+	if !ok {
+		return caos_errs.ThrowInternal(nil, "EMAIL-s8JLs", "message is not ChatMessage")
+	}
 	req, err := json.Marshal(chatMsg)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-s8uie", "Could not unmarshal content")

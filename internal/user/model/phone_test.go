@@ -79,6 +79,17 @@ func TestFormatPhoneNumber(t *testing.T) {
 				PhoneNumber: "+41711234567",
 			},
 		},
+		{
+			name: "format non swiss phone 004371 xxx xx xx",
+			args: args{
+				phone: &Phone{
+					PhoneNumber: "004371 123 45 67",
+				},
+			},
+			result: &Phone{
+				PhoneNumber: "+43711234567",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

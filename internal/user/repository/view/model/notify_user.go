@@ -75,25 +75,25 @@ func NotifyUserToModel(user *NotifyUser) *model.NotifyUser {
 	}
 }
 
-func (p *NotifyUser) AppendEvent(event *models.Event) (err error) {
-	p.ChangeDate = event.CreationDate
-	p.Sequence = event.Sequence
+func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
+	u.ChangeDate = event.CreationDate
+	u.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.UserAdded,
 		es_model.UserRegistered:
-		p.CreationDate = event.CreationDate
-		p.setRootData(event)
-		err = p.setData(event)
+		u.CreationDate = event.CreationDate
+		u.setRootData(event)
+		err = u.setData(event)
 	case es_model.UserProfileChanged:
-		err = p.setData(event)
+		err = u.setData(event)
 	case es_model.UserEmailChanged:
-		err = p.setData(event)
+		err = u.setData(event)
 	case es_model.UserEmailVerified:
-		p.VerifiedEmail = p.LastEmail
+		u.VerifiedEmail = u.LastEmail
 	case es_model.UserPhoneChanged:
-		err = p.setData(event)
+		err = u.setData(event)
 	case es_model.UserPhoneVerified:
-		p.VerifiedPhone = p.LastPhone
+		u.VerifiedPhone = u.LastPhone
 	}
 	return err
 }

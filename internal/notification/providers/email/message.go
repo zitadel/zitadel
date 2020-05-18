@@ -8,6 +8,7 @@ import (
 
 var (
 	isHTMLRgx = regexp.MustCompile(`.*<html.*>.*`)
+	lineBreak = "\n"
 )
 
 type EmailMessage struct {
@@ -31,12 +32,12 @@ func (msg *EmailMessage) GetContent() string {
 	}
 
 	//default mime-type is html
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	mime := "MIME-version: 1.0;" + lineBreak + "Content-Type: text/html; charset=\"UTF-8\";" + lineBreak + lineBreak
 	if !isHTML(msg.Content) {
-		mime = "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
+		mime = "MIME-version: 1.0;" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\";" + lineBreak + lineBreak
 	}
-	subject := "Subject: " + msg.Subject + "\n"
-	message += subject + mime + "\r\n" + msg.Content
+	subject := "Subject: " + msg.Subject + lineBreak
+	message += subject + mime + lineBreak + msg.Content
 
 	return message
 }
