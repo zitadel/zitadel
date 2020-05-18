@@ -84,11 +84,8 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 
 func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserPasswordCodeAdded, es_model.UserPasswordCodeSent)
-	if err != nil {
+	if err != nil || alreadyHandled {
 		return err
-	}
-	if alreadyHandled {
-		return nil
 	}
 	pwCode := new(es_model.PasswordCode)
 	pwCode.SetData(event)
