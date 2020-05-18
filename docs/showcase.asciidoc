@@ -1,11 +1,21 @@
+:imagesdir: img/
+
 :toc:
-:toc-placement: manual
+:toc-placement!:
 
-image::/docs/img/zitadel-logo-oneline-lightdesign@2x.png[ZITADEL Logo]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
 
-= Test Document
+
+
+image::zitadel-logo-oneline-lightdesign@2x.png[ZITADEL Logo]
 
 toc::[]
+
+= Test Document
 
 == Tables
 .Windtrainer workouts
@@ -151,7 +161,7 @@ Continuing ...
 ====
 [source,swift]
 ----
-enum ANSIITerminalColour: CustomConvertibleString {
+enum ANSITerminalColour: CustomConvertibleString {
     var description: String { self.rawValue }
     case .reset = "\u{1b}[0m"
     case .bold = "\u{1b}[1m"
@@ -185,7 +195,7 @@ Some diagrammes tests.
      +-----------------------------------+
 ....
 
-.A a2s diagramme
+.An a2s diagramme
 [caption="Figure {counter:figure}. "]
 [a2s]
 ....
@@ -196,3 +206,12 @@ Some diagrammes tests.
 [Red Box]: {"fill":"#aa4444"}
 [Blue Box]: {"fill":"#ccccff"}
 ....
+
+[stem]
+sqrt(4) = 2
+
+kbd:[Opt+A]
+
+btn:[Save]
+
+
