@@ -176,5 +176,5 @@ func (n *Notification) OnError(event *models.Event, err error) error {
 }
 
 func getSetNotifyContextData(orgID string) context.Context {
-	return context.WithValue(context.Background(), auth.GetCtxDataKey(), auth.CtxData{UserID: NOTIFY_USER, OrgID: orgID})
+	return auth.SetCtxData(context.Background(), auth.CtxData{UserID: NOTIFY_USER, OrgID: orgID})
 }

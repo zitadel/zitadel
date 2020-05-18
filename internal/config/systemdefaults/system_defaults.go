@@ -18,7 +18,7 @@ type SystemDefaults struct {
 	DefaultPolicies       DefaultPolicies
 	IamID                 string
 	SetUp                 types.IAMSetUp
-	Notifications       Notifications
+	Notifications         Notifications
 }
 
 type SecretGenerators struct {
