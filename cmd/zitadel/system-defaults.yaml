@@ -42,6 +42,11 @@ SystemDefaults:
       Issuer: 'Zitadel'
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
+  VerificationLifetimes:
+    PasswordCheck: 240h #10d
+    MfaInitSkip: 720h #30d
+    MfaSoftwareCheck: 18h
+    MfaHardwareCheck: 12h
   DefaultPolicies:
     Age:
       Description: Standard age policy
@@ -58,6 +63,52 @@ SystemDefaults:
       Description: Standard lockout policy
       MaxAttempts: 5
       ShowLockOutFailures: true
+  IamID: 'IAM'
+  SetUp:
+    GlobalOrg: 'Global'
+    IAMProject: 'Zitadel'
+    Orgs:
+      - Name: 'Global'
+        Domain: 'global.caos.ch'
+        Default: true
+        Users:
+          - FirstName: 'Global Org'
+            LastName: 'Administrator'
+            UserName: 'zitadel-global-org-admin@caos.ch'
+            Email: 'zitadel-global-org-admin@caos.ch'
+            Password: 'Password'
+        Owners:
+          - 'zitadel-global-org-admin@caos.ch'
+      - Name: 'CAOS AG'
+        Domain: 'caos.ch'
+        Users:
+          - FirstName: 'Zitadel'
+            LastName: 'Administrator'
+            UserName: 'zitadel-admin@caos.ch'
+            Email: 'zitadel-admin@caos.ch'
+            Password: 'Password'
+        Owners:
+          - 'zitadel-admin@caos.ch'
+        Projects:
+          - Name: 'Zitadel'
+            OIDCApps:
+              - Name: 'Management-API'
+              - Name: 'Auth-API'
+              - Name: 'Admin-API'
+              - Name: 'Zitadel Console'
+                RedirectUris:
+                  - '$CITADEL_CONSOLE/auth/callback'
+                PostLogoutRedirectUris:
+                  - '$CITADEL_CONSOLE/signedout'
+                ResponseTypes:
+                  - 'CODE'
+                GrantTypes:
+                  - 'AUTHORIZATION_CODE'
+                  - 'IMPLICIT'
+                ApplicationType: 'NATIVE'
+                AuthMethodType: 'AUTH_TYPE_NONE'
+    Owners:
+      - 'zitadel-admin@caos.ch'
   Notifications:
     DebugMode: $DEBUG_MODE
     Endpoints:

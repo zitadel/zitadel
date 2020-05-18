@@ -85,11 +85,6 @@ var AuthService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/SetMyPassword": utils_auth.Option{
-		Permission: "authenticated",
-		CheckParam: "",
-	},
-
 	"/zitadel.auth.api.v1.AuthService/ChangeMyPassword": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",

@@ -1,6 +1,7 @@
 package systemdefaults
 
 import (
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/notification/providers/chat"
 	"github.com/caos/zitadel/internal/notification/providers/email"
@@ -10,10 +11,13 @@ import (
 )
 
 type SystemDefaults struct {
-	SecretGenerators    SecretGenerators
-	UserVerificationKey *crypto.KeyConfig
-	Multifactors        MultifactorConfig
-	DefaultPolicies     DefaultPolicies
+	SecretGenerators      SecretGenerators
+	UserVerificationKey   *crypto.KeyConfig
+	Multifactors          MultifactorConfig
+	VerificationLifetimes VerificationLifetimes
+	DefaultPolicies       DefaultPolicies
+	IamID                 string
+	SetUp                 types.IAMSetUp
 	Notifications       Notifications
 }
 
@@ -33,6 +37,13 @@ type MultifactorConfig struct {
 type OTPConfig struct {
 	Issuer          string
 	VerificationKey *crypto.KeyConfig
+}
+
+type VerificationLifetimes struct {
+	PasswordCheck    types.Duration
+	MfaInitSkip      types.Duration
+	MfaSoftwareCheck types.Duration
+	MfaHardwareCheck types.Duration
 }
 
 type DefaultPolicies struct {

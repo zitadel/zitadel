@@ -1,36 +1,42 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/model"
 )
 
 type UserView struct {
-	ID                string
-	CreationDate      time.Time
-	ChangeDate        time.Time
-	State             UserState
-	ResourceOwner     string
-	PasswordChanged   time.Time
-	LastLogin         time.Time
-	UserName          string
-	FirstName         string
-	LastName          string
-	NickName          string
-	DisplayName       string
-	PreferredLanguage string
-	Gender            Gender
-	Email             string
-	IsEmailVerified   bool
-	Phone             string
-	IsPhoneVerified   bool
-	Country           string
-	Locality          string
-	PostalCode        string
-	Region            string
-	StreetAddress     string
-	OTPState          MfaState
-	Sequence          uint64
+	ID                     string
+	CreationDate           time.Time
+	ChangeDate             time.Time
+	State                  UserState
+	ResourceOwner          string
+	PasswordSet            bool
+	PasswordChangeRequired bool
+	PasswordChanged        time.Time
+	LastLogin              time.Time
+	UserName               string
+	FirstName              string
+	LastName               string
+	NickName               string
+	DisplayName            string
+	PreferredLanguage      string
+	Gender                 Gender
+	Email                  string
+	IsEmailVerified        bool
+	Phone                  string
+	IsPhoneVerified        bool
+	Country                string
+	Locality               string
+	PostalCode             string
+	Region                 string
+	StreetAddress          string
+	OTPState               MfaState
+	MfaMaxSetUp            req_model.MfaLevel
+	MfaInitSkipped         time.Time
+	Sequence               uint64
 }
 
 type UserSearchRequest struct {
@@ -77,4 +83,36 @@ func (r *UserSearchRequest) EnsureLimit(limit uint64) {
 
 func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserSearchQuery{Key: USERSEARCHKEY_RESOURCEOWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+}
+
+func (u *UserView) MfaTypesSetupPossible(level req_model.MfaLevel) []req_model.MfaType {
+	types := make([]req_model.MfaType, 0)
+	switch level {
+	case req_model.MfaLevelSoftware:
+		if u.OTPState != MFASTATE_READY {
+			types = append(types, req_model.MfaTypeOTP)
+		}
+		//PLANNED: add sms
+		fallthrough
+	case req_model.MfaLevelHardware:
+		//PLANNED: add token
+	}
+	return types
+}
+
+func (u *UserView) MfaTypesAllowed(level req_model.MfaLevel) []req_model.MfaType {
+	types := make([]req_model.MfaType, 0)
+	switch level {
+	default:
+		fallthrough
+	case req_model.MfaLevelSoftware:
+		if u.OTPState == MFASTATE_READY {
+			types = append(types, req_model.MfaTypeOTP)
+		}
+		//PLANNED: add sms
+		fallthrough
+	case req_model.MfaLevelHardware:
+		//PLANNED: add token
+	}
+	return types
 }

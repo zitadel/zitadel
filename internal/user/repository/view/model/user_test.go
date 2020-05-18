@@ -2,14 +2,22 @@ package model
 
 import (
 	"encoding/json"
+	"testing"
+	"time"
+
+	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"testing"
 )
 
 func mockUserData(user *es_model.User) []byte {
 	data, _ := json.Marshal(user)
+	return data
+}
+
+func mockPasswordData(password *es_model.Password) []byte {
+	data, _ := json.Marshal(password)
 	return data
 }
 
@@ -33,7 +41,7 @@ func mockAddressData(address *es_model.Address) []byte {
 	return data
 }
 
-func getFullUser() *es_model.User {
+func getFullUser(password *es_model.Password) *es_model.User {
 	return &es_model.User{
 		Profile: &es_model.Profile{
 			UserName:  "UserName",
@@ -49,6 +57,7 @@ func getFullUser() *es_model.User {
 		Address: &es_model.Address{
 			Country: "Country",
 		},
+		Password: password,
 	}
 }
 
@@ -65,10 +74,42 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser())},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(nil))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_INITIAL)},
+		},
+		{
+			name: "append added user with password event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
+				user:  &UserView{},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_INITIAL), PasswordSet: true},
+		},
+		{
+			name: "append added user with password but change required event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserAdded, ResourceOwner: "OrgID", Data: mockUserData(getFullUser(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
+				user:  &UserView{},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_INITIAL), PasswordSet: true, PasswordChangeRequired: true},
+		},
+		{
+			name: "append password change event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_ACTIVE)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_ACTIVE), PasswordSet: true},
+		},
+		{
+			name: "append password change with change required event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserPasswordChanged, ResourceOwner: "OrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_ACTIVE)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_ACTIVE), PasswordSet: true, PasswordChangeRequired: true},
 		},
 		{
 			name: "append change user profile event",
@@ -174,6 +215,14 @@ func TestUserAppendEvent(t *testing.T) {
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_ACTIVE), OTPState: int32(model.MFASTATE_UNSPECIFIED)},
 		},
+		{
+			name: "append mfa init skipped event",
+			args: args{
+				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_model.MfaInitSkipped, AggregateID: "AggregateID", ResourceOwner: "OrgID"},
+				user:  &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_ACTIVE)},
+			},
+			result: &UserView{ID: "AggregateID", ResourceOwner: "OrgID", UserName: "UserName", FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", State: int32(model.USERSTATE_ACTIVE), MfaInitSkipped: time.Now().UTC()},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -210,6 +259,15 @@ func TestUserAppendEvent(t *testing.T) {
 			}
 			if tt.args.user.OTPState != tt.result.OTPState {
 				t.Errorf("got wrong result OTPState: expected: %v, actual: %v ", tt.result.OTPState, tt.args.user.OTPState)
+			}
+			if tt.args.user.MfaInitSkipped.Round(1*time.Second) != tt.result.MfaInitSkipped.Round(1*time.Second) {
+				t.Errorf("got wrong result MfaInitSkipped: expected: %v, actual: %v ", tt.result.MfaInitSkipped.Round(1*time.Second), tt.args.user.MfaInitSkipped.Round(1*time.Second))
+			}
+			if tt.args.user.PasswordSet != tt.result.PasswordSet {
+				t.Errorf("got wrong result PasswordSet: expected: %v, actual: %v ", tt.result.PasswordSet, tt.args.user.PasswordSet)
+			}
+			if tt.args.user.PasswordChangeRequired != tt.result.PasswordChangeRequired {
+				t.Errorf("got wrong result PasswordChangeRequired: expected: %v, actual: %v ", tt.result.PasswordChangeRequired, tt.args.user.PasswordChangeRequired)
 			}
 		})
 	}

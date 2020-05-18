@@ -27,8 +27,8 @@ func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
 	return mCrypto
 }
 
-func createMockHashAlg(t *testing.T) HashAlgorithm {
-	mCrypto := NewMockHashAlgorithm(gomock.NewController(t))
+func CreateMockHashAlg(ctrl *gomock.Controller) HashAlgorithm {
+	mCrypto := NewMockHashAlgorithm(ctrl)
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("hash")
 	mCrypto.EXPECT().Hash(gomock.Any()).DoAndReturn(
 		func(code []byte) ([]byte, error) {

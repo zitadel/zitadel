@@ -1,19 +1,31 @@
 package view
 
 import (
+	"database/sql/driver"
 	"fmt"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/caos/zitadel/internal/model"
-	"github.com/jinzhu/gorm"
+	"strconv"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jinzhu/gorm"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 var (
-	expectedGetByID                  = `SELECT \* FROM "%s" WHERE \(%s = \$1\) LIMIT 1`
-	expectedGetByQuery               = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) LIMIT 1`
-	expectedGetByQueryCaseSensitive  = `SELECT \* FROM "%s" WHERE \(%s %s \$1\) LIMIT 1`
-	expectedSave                     = `UPDATE "%s" SET "test" = \$1 WHERE "%s"."%s" = \$2`
-	expectedRemove                   = `DELETE FROM "%s" WHERE \(%s = \$1\)`
+	expectedGetByID                 = `SELECT \* FROM "%s" WHERE \(%s = \$1\) LIMIT 1`
+	expectedGetByQuery              = `SELECT \* FROM "%s" WHERE \(LOWER\(%s\) %s LOWER\(\$1\)\) LIMIT 1`
+	expectedGetByQueryCaseSensitive = `SELECT \* FROM "%s" WHERE \(%s %s \$1\) LIMIT 1`
+	expectedSave                    = `UPDATE "%s" SET "test" = \$1 WHERE "%s"."%s" = \$2`
+	expectedRemove                  = `DELETE FROM "%s" WHERE \(%s = \$1\)`
+	expectedRemoveByKeys            = func(i int, table string) string {
+		sql := fmt.Sprintf(`DELETE FROM "%s"`, table)
+		sql += ` WHERE \(%s = \$1\)`
+		for j := 1; j < i; j++ {
+			sql = sql + ` AND \(%s = \$` + strconv.Itoa(j+1) + `\)`
+		}
+		return sql
+	}
 	expectedRemoveByObject           = `DELETE FROM "%s" WHERE "%s"."%s" = \$1`
 	expectedRemoveByObjectMultiplePK = `DELETE FROM "%s" WHERE "%s"."%s" = \$1 AND "%s"."%s" = \$2`
 	expectedSearch                   = `SELECT \* FROM "%s" OFFSET 0`
@@ -230,6 +242,21 @@ func (db *dbMock) expectRemove(table, key, value string) *dbMock {
 	query := fmt.Sprintf(expectedRemove, table, key)
 	db.mock.ExpectExec(query).
 		WithArgs(value).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	return db
+}
+
+func (db *dbMock) expectRemoveKeys(table string, keys ...Key) *dbMock {
+	keynames := make([]interface{}, len(keys))
+	keyvalues := make([]driver.Value, len(keys))
+	for i, key := range keys {
+		keynames[i] = key.Key.ToColumnName()
+		keyvalues[i] = key.Value
+	}
+	query := fmt.Sprintf(expectedRemoveByKeys(len(keys), table), keynames...)
+	db.mock.ExpectExec(query).
+		WithArgs(keyvalues...).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	return db

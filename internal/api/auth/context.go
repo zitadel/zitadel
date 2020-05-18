@@ -59,8 +59,8 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t Toke
 	return context.WithValue(ctx, dataKey, CtxData{UserID: userID, OrgID: orgID, ProjectID: projectID, AgentID: agentID}), nil
 }
 
-func GetCtxDataKey() key {
-	return dataKey
+func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {
+	return context.WithValue(ctx, dataKey, ctxData)
 }
 
 func GetCtxData(ctx context.Context) CtxData {

@@ -391,6 +391,97 @@ func TestPrepareDelete(t *testing.T) {
 	}
 }
 
+func TestPrepareDeleteByKeys(t *testing.T) {
+	type args struct {
+		table string
+		keys  []Key
+	}
+	type res struct {
+		result  Test
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		db   *dbMock
+		args args
+		res  res
+	}{
+		{
+			"delete single key",
+			mockDB(t).
+				expectBegin(nil).
+				expectRemoveKeys("TESTTABLE", Key{Key: TestSearchKey_ID, Value: "VALUE"}).
+				expectCommit(nil),
+			args{
+				table: "TESTTABLE",
+				keys: []Key{
+					{Key: TestSearchKey_ID, Value: "VALUE"},
+				},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: false,
+			},
+		},
+		{
+			"delete multiple keys",
+			mockDB(t).
+				expectBegin(nil).
+				expectRemoveKeys("TESTTABLE", Key{Key: TestSearchKey_ID, Value: "VALUE"}, Key{Key: TestSearchKey_TEST, Value: "VALUE2"}).
+				expectCommit(nil),
+			args{
+				table: "TESTTABLE",
+				keys: []Key{
+					{Key: TestSearchKey_ID, Value: "VALUE"},
+					{Key: TestSearchKey_TEST, Value: "VALUE2"},
+				},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: false,
+			},
+		},
+		{
+			"db error",
+			mockDB(t).
+				expectBegin(nil).
+				expectRemoveErr("TESTTABLE", "id", "VALUE", gorm.ErrUnaddressable).
+				expectCommit(nil),
+			args{
+				table: "TESTTABLE",
+				keys: []Key{
+					{Key: TestSearchKey_ID, Value: "VALUE"},
+				},
+			},
+			res{
+				result:  Test{ID: "VALUE"},
+				wantErr: true,
+				errFunc: caos_errs.IsInternal,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			getDelete := PrepareDeleteByKeys(tt.args.table, tt.args.keys...)
+			err := getDelete(tt.db.db)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("got wrong err should be nil: %v ", err)
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if err := tt.db.mock.ExpectationsWereMet(); !tt.res.wantErr && err != nil {
+				t.Errorf("there were unfulfilled expectations: %s", err)
+			}
+
+			tt.db.close()
+		})
+	}
+}
+
 func TestPrepareDeleteByObject(t *testing.T) {
 	type args struct {
 		table  string
