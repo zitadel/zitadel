@@ -30,11 +30,10 @@ func (msg *EmailMessage) GetContent() string {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 
-	mime := ""
+	//default mime-type is html
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	if !isHTML(msg.Content) {
 		mime = "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	} else {
-		mime = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	}
 	subject := "Subject: " + msg.Subject + "\n"
 	message += subject + mime + "\r\n" + msg.Content
