@@ -83,7 +83,11 @@ Auth:
       FailureCountUntilSkip: 5
 
 Login:
-#  will get port range 5003x
+  Port: 50031
+  StaticDir: './internal/static'
+  ZitadelURL: '/zitadel'
+  LanguageCookieName: 'ch.caos.zitadel.login.lang'
+  DefaultLanguage: 'de'
 
 Admin:
   API:

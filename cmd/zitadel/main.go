@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/login"
 
 	"github.com/caos/logging"
 
@@ -13,7 +14,6 @@ import (
 	"github.com/caos/zitadel/pkg/admin"
 	"github.com/caos/zitadel/pkg/auth"
 	"github.com/caos/zitadel/pkg/console"
-	"github.com/caos/zitadel/pkg/login"
 	"github.com/caos/zitadel/pkg/management"
 )
 
@@ -52,8 +52,7 @@ func main() {
 		auth.Start(ctx, conf.Auth, conf.AuthZ, conf.SystemDefaults)
 	}
 	if *loginEnabled {
-		err = login.Start(ctx, conf.Login)
-		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
+		login.Start(ctx, conf.Login, conf.SystemDefaults)
 	}
 	if *adminEnabled {
 		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
