@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"net/http"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
@@ -20,6 +21,11 @@ const (
 type UserAgentStorage interface {
 	//GetUserAgent(context.Context, string) (*model.Agent, error)
 	//CreateUserAgent(context.Context, *model.CreateAgent) (*model.Agent, error)
+}
+
+func UserAgentIDFromCtx(ctx context.Context) (string, bool) {
+	userAgentID, ok := ctx.Value(userAgentKey).(string)
+	return userAgentID, ok
 }
 
 func UserAgentCookieHandler(cookieHandler *http_utils.UserAgentHandler, storage UserAgentStorage, nextHandlerFunc func(http.HandlerFunc) http.HandlerFunc) func(http.HandlerFunc) http.HandlerFunc {

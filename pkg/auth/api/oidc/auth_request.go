@@ -14,7 +14,10 @@ import (
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (op.AuthRequest, error) {
 	//userAgentCtx := ctx.Value(UserAgentContext)
-	var userAgentID string
+	userAgentID, ok := UserAgentIDFromCtx(ctx)
+	if !ok {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
+	}
 	//var err error
 	//if userAgentCtx != nil {
 	//	userAgent, err = o.processor.GetUserAgent(ctx, userAgentCtx.(string))
@@ -53,11 +56,15 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
 }
 
 func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (string, time.Time, error) {
-	ids := strings.Split(authReq.GetID(), ":")
-	if len(ids) != 2 {
-		return "", time.Time{}, errors.ThrowInvalidArgument(nil, "OIDC-seM5E6", "invalid id")
+	//ids := strings.Split(authReq.GetID(), ":")
+	//if len(ids) != 2 {
+	//	return "", time.Time{}, errors.ThrowInvalidArgument(nil, "OIDC-seM5E6", "invalid id")
+	//}
+	req, err := o.repo.AuthRequestByID(ctx, authReq.GetID())
+	if err != nil {
+		return "", time.Time{}, err
 	}
-	resp, err := o.repo.CreateToken(ctx, &model.CreateToken{AgentID: ids[0], AuthSessionID: ids[1]})
+	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, lifetime)
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -65,13 +72,11 @@ func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (st
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) error {
-
-	userAgentID := ctx.Value(UserAgentContext).(string)
-	userAgent, err := o.processor.GetUserAgent(ctx, userAgentID)
-	if err != nil {
-		return err
+	userAgentID, ok := UserAgentIDFromCtx(ctx)
+	if !ok {
+		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
-	return o.repo.SignOut(ctx, "", userID)
+	return o.repo.SignOut(ctx, userAgentID, userID)
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, errCh chan<- error, timer <-chan time.Time) {

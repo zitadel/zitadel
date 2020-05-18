@@ -191,23 +191,23 @@ func UILocalesToBusiness(tags []language.Tag) []string {
 func ResponseTypeToBusiness(responseType oidc.ResponseType) model.OIDCResponseType {
 	switch responseType {
 	case oidc.ResponseTypeCode:
-		return model.CODE
+		return model.OIDCResponseTypeCode
 	case oidc.ResponseTypeIDToken:
-		return model.ID_TOKEN_TOKEN
+		return model.OIDCResponseTypeIdToken
 	case oidc.ResponseTypeIDTokenOnly:
-		return model.ID_TOKEN
+		return model.OIDCResponseTypeToken
 	default:
-		return model.CODE
+		return model.OIDCResponseTypeCode
 	}
 }
 
 func ResponseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
 	switch responseType {
-	case model.CODE:
+	case model.OIDCResponseTypeCode:
 		return oidc.ResponseTypeCode
-	case model.ID_TOKEN_TOKEN:
+	case model.OIDCResponseTypeToken:
 		return oidc.ResponseTypeIDToken
-	case model.ID_TOKEN:
+	case model.OIDCResponseTypeIdToken:
 		return oidc.ResponseTypeIDTokenOnly
 	default:
 		return oidc.ResponseTypeCode
