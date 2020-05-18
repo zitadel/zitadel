@@ -15,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go v1.30.25 // indirect
 	github.com/caos/logging v0.0.1
 	github.com/cockroachdb/cockroach-go v0.0.0-20200504194139-73ffeee90b62
-	github.com/envoyproxy/protoc-gen-validate v0.3.0
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3

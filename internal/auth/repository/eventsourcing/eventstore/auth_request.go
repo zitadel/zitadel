@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/id"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -20,6 +21,8 @@ type AuthRequestRepo struct {
 
 	UserSessionViewProvider userSessionViewProvider
 	UserViewProvider        userViewProvider
+
+	IdGenerator id.Generator
 
 	PasswordCheckLifeTime    time.Duration
 	MfaInitSkippedLifeTime   time.Duration
@@ -43,7 +46,12 @@ func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 }
 
 func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *model.AuthRequest) (*model.AuthRequest, error) {
-	err := repo.AuthRequests.SaveAuthRequest(ctx, request)
+	reqID, err := repo.IdGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	request.ID = reqID
+	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
 		return nil, err
 	}
