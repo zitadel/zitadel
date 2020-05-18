@@ -10,28 +10,28 @@ import (
 )
 
 type Client struct {
-	*model.Application
+	*model.ApplicationView
 	defaultLoginURL string
 	tokenLifetime   time.Duration
 }
 
-func ClientFromBusiness(app *model.Application, defaultLoginURL string, tokenLifetime time.Duration) (op.Client, error) {
-	if app.Type != model.APPTYPE_OIDC || app.OIDCConfig == nil {
+func ClientFromBusiness(app *model.ApplicationView, defaultLoginURL string, tokenLifetime time.Duration) (op.Client, error) {
+	if !app.IsOIDC {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-d5bhD", "client is not a proper oidc application")
 	}
-	return &Client{Application: app, defaultLoginURL: defaultLoginURL, tokenLifetime: tokenLifetime}, nil
+	return &Client{ApplicationView: app, defaultLoginURL: defaultLoginURL, tokenLifetime: tokenLifetime}, nil
 }
 
 func (c *Client) ApplicationType() op.ApplicationType {
-	return op.ApplicationType(c.Type)
+	return op.ApplicationType(c.OIDCApplicationType)
 }
 
 func (c *Client) GetAuthMethod() op.AuthMethod {
-	return authMethodToOIDC(c.OIDCConfig.AuthMethodType)
+	return authMethodToOIDC(c.OIDCAuthMethodType)
 }
 
 func (c *Client) GetID() string {
-	return c.OIDCConfig.ClientID
+	return c.OIDCClientID
 }
 
 func (c *Client) LoginURL(id string) string {
@@ -39,11 +39,11 @@ func (c *Client) LoginURL(id string) string {
 }
 
 func (c *Client) RedirectURIs() []string {
-	return c.OIDCConfig.RedirectUris
+	return c.OIDCRedirectUris
 }
 
 func (c *Client) PostLogoutRedirectURIs() []string {
-	return c.OIDCConfig.PostLogoutRedirectUris
+	return c.OIDCPostLogoutRedirectUris
 }
 
 func (c *Client) AccessTokenLifetime() time.Duration {

@@ -15,6 +15,7 @@ type Token struct {
 	ApplicationID string
 	UserAgentID   string
 	Expiration    time.Time
+	Scopes        []string
 	Sequence      uint64
 }
 

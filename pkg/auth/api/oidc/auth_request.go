@@ -9,6 +9,7 @@ import (
 	"github.com/caos/oidc/pkg/op"
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -38,10 +39,6 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 }
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequest, error) {
-	//ids := strings.Split(id, ":")
-	//if len(ids) != 2 {
-	//	return nil, errors.ThrowInvalidArgument(nil, "OIDC-seM5E6", "invalid id")
-	//}
 	resp, err := o.repo.AuthRequestByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -56,15 +53,11 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
 }
 
 func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (string, time.Time, error) {
-	//ids := strings.Split(authReq.GetID(), ":")
-	//if len(ids) != 2 {
-	//	return "", time.Time{}, errors.ThrowInvalidArgument(nil, "OIDC-seM5E6", "invalid id")
-	//}
 	req, err := o.repo.AuthRequestByID(ctx, authReq.GetID())
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, lifetime)
+	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Request.(*model.AuthRequestOIDC).Scopes, lifetime)
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -80,13 +73,13 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, errCh chan<- error, timer <-chan time.Time) {
-	o.processor.GetSigningKey(ctx, keyCh, errCh, timer)
+	o.repo.GetSigningKey(ctx, keyCh, errCh, timer)
 }
 
 func (o *OPStorage) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, error) {
-	return o.processor.GetKeySet(ctx)
+	return o.repo.GetKeySet(ctx)
 }
 
 func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
-	return o.processor.SaveKeyPair(ctx)
+	return o.repo.SaveKeyPair(ctx)
 }
