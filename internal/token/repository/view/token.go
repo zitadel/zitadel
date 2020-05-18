@@ -41,8 +41,8 @@ func DeleteToken(db *gorm.DB, table, tokenID string) error {
 
 func DeleteTokens(db *gorm.DB, table, agentID, userID string) error {
 	delete := view.PrepareDeleteByKeys(table,
-		view.Key{Key: model.TokenSearchKey(token_model.TOKENSEARCHKEY_USER_AGENT_ID), Id: agentID},
-		view.Key{Key: model.TokenSearchKey(token_model.TOKENSEARCHKEY_USER_ID), Id: userID},
+		view.Key{Key: model.TokenSearchKey(token_model.TOKENSEARCHKEY_USER_AGENT_ID), Value: agentID},
+		view.Key{Key: model.TokenSearchKey(token_model.TOKENSEARCHKEY_USER_ID), Value: userID},
 	)
 	return delete(db)
 }

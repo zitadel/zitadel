@@ -45,8 +45,9 @@ func (u *Token) Process(event *models.Event) (err error) {
 		}
 		err = u.view.DeleteSessionTokens(id, event.AggregateID, event.Sequence)
 		if err != nil {
-			return u.view.ProcessedTokenSequence(event.Sequence)
+			return err
 		}
+		return u.view.ProcessedTokenSequence(event.Sequence)
 	default:
 		return u.view.ProcessedTokenSequence(event.Sequence)
 	}
@@ -55,7 +56,7 @@ func (u *Token) Process(event *models.Event) (err error) {
 
 func (u *Token) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-3jkl4", "id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
-	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
+	return spooler.HandleError(event, err, u.view.GetLatestTokenFailedEvent, u.view.ProcessedTokenFailedEvent, u.view.ProcessedTokenSequence, u.errorCountUntilSkip)
 }
 
 func agentIDFromSession(event *models.Event) (string, error) {

@@ -12,6 +12,8 @@ type SystemDefaults struct {
 	Multifactors          MultifactorConfig
 	VerificationLifetimes VerificationLifetimes
 	DefaultPolicies       DefaultPolicies
+	IamID                 string
+	SetUp                 types.IAMSetUp
 }
 
 type SecretGenerators struct {

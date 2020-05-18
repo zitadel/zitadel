@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/id"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -74,6 +75,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 			View:                     view,
 			UserSessionViewProvider:  view,
 			UserViewProvider:         view,
+			IdGenerator:              id.SonyFlakeGenerator,
 			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
 			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,

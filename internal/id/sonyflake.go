@@ -2,6 +2,7 @@ package id
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/sony/sonyflake"
 )
@@ -18,8 +19,10 @@ func (s *sonyflakeGenerator) Next() (string, error) {
 	return strconv.FormatUint(id, 10), nil
 }
 
-func NewSonyFlake(s *sonyflake.Sonyflake) Generator {
-	return &sonyflakeGenerator{
-		s,
-	}
-}
+var (
+	SonyFlakeGenerator = Generator(&sonyflakeGenerator{
+		sonyflake.NewSonyflake(sonyflake.Settings{
+			StartTime: time.Date(2019, 4, 29, 0, 0, 0, 0, time.UTC),
+		}),
+	})
+)

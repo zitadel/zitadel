@@ -42,7 +42,7 @@ func (a *AuthRequestSAML) IsValid() bool {
 type OIDCResponseType int32
 
 const (
-	CODE OIDCResponseType = iota
-	ID_TOKEN
-	ID_TOKEN_TOKEN
+	OIDCResponseTypeCode OIDCResponseType = iota
+	OIDCResponseTypeIdToken
+	OIDCResponseTypeToken
 )

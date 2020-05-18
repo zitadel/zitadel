@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/id"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -20,6 +21,8 @@ type AuthRequestRepo struct {
 
 	UserSessionViewProvider userSessionViewProvider
 	UserViewProvider        userViewProvider
+
+	IdGenerator id.Generator
 
 	PasswordCheckLifeTime    time.Duration
 	MfaInitSkippedLifeTime   time.Duration
@@ -43,7 +46,12 @@ func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 }
 
 func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *model.AuthRequest) (*model.AuthRequest, error) {
-	err := repo.AuthRequests.SaveAuthRequest(ctx, request)
+	reqID, err := repo.IdGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	request.ID = reqID
+	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -108,17 +116,9 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 			steps = append(steps, &model.LoginStep{})
 		}
 		if request.Prompt == model.PromptSelectAccount {
-			userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
+			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
-			}
-			users := make([]model.UserSelection, len(userSessions))
-			for i, session := range userSessions {
-				users[i] = model.UserSelection{
-					UserID:           session.UserID,
-					UserName:         session.UserName,
-					UserSessionState: session.State,
-				}
 			}
 			steps = append(steps, &model.SelectUserStep{Users: users})
 		}
@@ -134,18 +134,15 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	}
 
 	if !user.PasswordSet {
-		steps = append(steps, &model.InitPasswordStep{})
-		return steps, nil
+		return append(steps, &model.InitPasswordStep{}), nil
 	}
 
 	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
-		steps = append(steps, &model.PasswordStep{})
-		return steps, nil
+		return append(steps, &model.PasswordStep{}), nil
 	}
 
 	if step, ok := repo.mfaChecked(userSession, request, user); !ok {
-		steps = append(steps, step)
-		return steps, nil
+		return append(steps, step), nil
 	}
 
 	if user.PasswordChangeRequired {
@@ -160,32 +157,23 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 	}
 
 	//PLANNED: consent step
-	steps = append(steps, &model.RedirectToCallbackStep{})
-	return steps, nil
+	return append(steps, &model.RedirectToCallbackStep{}), nil
 }
 
-func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string) ([]*user_model.UserSessionView, error) {
-	session, err := provider.UserSessionsByAgentID(agentID)
+func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) ([]model.UserSelection, error) {
+	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
 	if err != nil {
 		return nil, err
 	}
-	return view_model.UserSessionsToModel(session), nil
-}
-
-func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
-	session, err := provider.UserSessionByIDs(agentID, userID)
-	if err != nil {
-		return nil, err
+	users := make([]model.UserSelection, len(userSessions))
+	for i, session := range userSessions {
+		users[i] = model.UserSelection{
+			UserID:           session.UserID,
+			UserName:         session.UserName,
+			UserSessionState: session.State,
+		}
 	}
-	return view_model.UserSessionToModel(session), nil
-}
-
-func userByID(provider userViewProvider, userID string) (*user_model.UserView, error) {
-	user, err := provider.UserByID(userID)
-	if err != nil {
-		return nil, err
-	}
-	return view_model.UserToModel(user), nil
+	return users, nil
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool) {
@@ -224,4 +212,28 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 
 func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) bool {
 	return verificationTime.Add(lifetime).After(time.Now().UTC())
+}
+
+func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string) ([]*user_model.UserSessionView, error) {
+	session, err := provider.UserSessionsByAgentID(agentID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserSessionsToModel(session), nil
+}
+
+func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
+	session, err := provider.UserSessionByIDs(agentID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserSessionToModel(session), nil
+}
+
+func userByID(provider userViewProvider, userID string) (*user_model.UserView, error) {
+	user, err := provider.UserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return view_model.UserToModel(user), nil
 }

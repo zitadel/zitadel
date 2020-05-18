@@ -65,12 +65,9 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 		es_model.MfaOtpCheckSucceeded,
 		es_model.MfaOtpCheckFailed,
 		es_model.MfaOtpRemoved:
-		err = session.AppendEvent(event)
+		session.AppendEvent(event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event.Sequence)
-	}
-	if err != nil {
-		return err
 	}
 	if err := u.FillUserInfo(session, event.AggregateID); err != nil {
 		return err
@@ -80,7 +77,7 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 
 func (u *UserSession) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-sdfw3s", "id", event.AggregateID).WithError(err).Warn("something went wrong in user session handler")
-	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
+	return spooler.HandleError(event, err, u.view.GetLatestUserSessionFailedEvent, u.view.ProcessedUserSessionFailedEvent, u.view.ProcessedUserSessionSequence, u.errorCountUntilSkip)
 }
 
 func (u *UserSession) FillUserInfo(session *view_model.UserSessionView, id string) error {

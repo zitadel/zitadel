@@ -404,6 +404,7 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new s
 }
 
 func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, password string, onetime bool) (*usr_model.Password, error) {
+	//TODO: check password policy
 	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
 	if err != nil {
 		return nil, err

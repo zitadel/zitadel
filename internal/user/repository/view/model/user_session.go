@@ -70,7 +70,7 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 	return result
 }
 
-func (v *UserSessionView) AppendEvent(event *models.Event) (err error) {
+func (v *UserSessionView) AppendEvent(event *models.Event) {
 	v.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded:
@@ -88,5 +88,4 @@ func (v *UserSessionView) AppendEvent(event *models.Event) (err error) {
 		v.MfaSoftwareVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)
 	}
-	return err
 }
