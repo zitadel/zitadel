@@ -141,7 +141,7 @@ func Test_uniqueNameAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := uniqueNameAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.orgName)
+			got, err := uniqueNameAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgName)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
@@ -197,7 +197,7 @@ func Test_uniqueDomainAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := uniqueDomainAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.orgDomain)
+			got, err := uniqueDomainAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgDomain)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
