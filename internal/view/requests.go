@@ -3,9 +3,11 @@ package view
 import (
 	"errors"
 	"fmt"
+
 	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/jinzhu/gorm"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 func PrepareGetByKey(table string, key ColumnKey, id string) func(db *gorm.DB, res interface{}) error {
@@ -62,6 +64,27 @@ func PrepareDeleteByKey(table string, key ColumnKey, id string) func(db *gorm.DB
 	return func(db *gorm.DB) error {
 		err := db.Table(table).
 			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
+			Delete(nil).
+			Error
+		if err != nil {
+			return caos_errs.ThrowInternal(err, "VIEW-die73", "could not delete object")
+		}
+		return nil
+	}
+}
+
+type Key struct {
+	Key   ColumnKey
+	Value string
+}
+
+func PrepareDeleteByKeys(table string, keys ...Key) func(db *gorm.DB) error {
+	return func(db *gorm.DB) error {
+		for _, key := range keys {
+			db = db.Table(table).
+				Where(fmt.Sprintf("%s = ?", key.Key.ToColumnName()), key.Value)
+		}
+		err := db.
 			Delete(nil).
 			Error
 		if err != nil {

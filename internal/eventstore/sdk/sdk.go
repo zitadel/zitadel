@@ -10,7 +10,7 @@ import (
 
 type filterFunc func(context.Context, *es_models.SearchQuery) ([]*es_models.Event, error)
 type appendFunc func(...*es_models.Event) error
-type aggregateFunc func(context.Context) (*es_models.Aggregate, error)
+type AggregateFunc func(context.Context) (*es_models.Aggregate, error)
 type pushFunc func(context.Context, ...*es_models.Aggregate) error
 
 func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *es_models.SearchQuery) error {
@@ -32,7 +32,7 @@ func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *
 // Push creates the aggregates from aggregater
 // and pushes the aggregates to the given pushFunc
 // the given events are appended by the appender
-func Push(ctx context.Context, push pushFunc, appender appendFunc, aggregaters ...aggregateFunc) (err error) {
+func Push(ctx context.Context, push pushFunc, appender appendFunc, aggregaters ...AggregateFunc) (err error) {
 	if len(aggregaters) < 1 {
 		return errors.ThrowPreconditionFailed(nil, "SDK-q9wjp", "no aggregaters passed")
 	}
@@ -73,7 +73,7 @@ func appendAggregates(appender appendFunc, aggregates []*models.Aggregate) error
 	return nil
 }
 
-func makeAggregates(ctx context.Context, aggregaters []aggregateFunc) (aggregates []*models.Aggregate, err error) {
+func makeAggregates(ctx context.Context, aggregaters []AggregateFunc) (aggregates []*models.Aggregate, err error) {
 	aggregates = make([]*models.Aggregate, len(aggregaters))
 	for i, aggregater := range aggregaters {
 		aggregates[i], err = aggregater(ctx)

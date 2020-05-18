@@ -308,7 +308,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1MfaOtpResponse"
+              "properties": {}
             }
           }
         },
@@ -343,34 +343,9 @@
         ]
       }
     },
-    "/users/me/passwords": {
-      "put": {
-        "operationId": "SetMyPassword",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
     "/users/me/passwords/_change": {
       "put": {
+        "summary": "Password",
         "operationId": "ChangeMyPassword",
         "responses": {
           "200": {
@@ -732,14 +707,6 @@
         }
       }
     },
-    "v1PasswordRequest": {
-      "type": "object",
-      "properties": {
-        "password": {
-          "type": "string"
-        }
-      }
-    },
     "v1SearchMethod": {
       "type": "string",
       "enum": [
@@ -832,6 +799,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -851,6 +826,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -870,6 +853,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -903,6 +894,14 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

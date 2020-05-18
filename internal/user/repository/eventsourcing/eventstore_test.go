@@ -2,14 +2,19 @@ package eventsourcing
 
 import (
 	"context"
+	"net"
+	"testing"
+	"time"
+
+	"github.com/golang/mock/gomock"
+
 	"github.com/caos/zitadel/internal/api/auth"
+	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
 	repo_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/golang/mock/gomock"
-	"testing"
-	"time"
 )
 
 func TestUserByID(t *testing.T) {
@@ -1025,16 +1030,17 @@ func TestSetOneTimePassword(t *testing.T) {
 	}
 }
 
-func TestSetPassword(t *testing.T) {
+func TestCheckPassword(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		password *model.Password
+		es          *UserEventstore
+		ctx         context.Context
+		userID      string
+		password    string
+		authRequest *req_model.AuthRequest
 	}
 	type res struct {
-		password *model.Password
-		errFunc  func(err error) bool
+		errFunc func(err error) bool
 	}
 	tests := []struct {
 		name string
@@ -1042,22 +1048,40 @@ func TestSetPassword(t *testing.T) {
 		res  res
 	}{
 		{
-			name: "create pw",
+			name: "check pw ok",
 			args: args{
-				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
+				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							Crypted:    []byte("password"),
+						}},
+					},
+				),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
+				userID:   "userID",
+				password: "password",
+				authRequest: &req_model.AuthRequest{
+					ID:      "id",
+					AgentID: "agentID",
+					BrowserInfo: &req_model.BrowserInfo{
+						UserAgent:      "user agent",
+						AcceptLanguage: "accept langugage",
+						RemoteIP:       net.IPv4(29, 4, 20, 19),
+					},
+				},
 			},
-			res: res{
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, ChangeRequired: false},
-			},
+			res: res{},
 		},
 		{
 			name: "empty userid",
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: ""}, SecretString: "Password"},
+				userID:   "",
+				password: "password",
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1068,25 +1092,311 @@ func TestSetPassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
+				userID:   "userID",
+				password: "password",
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
 			},
 		},
+		{
+			name: "no password",
+			args: args{
+				es: GetMockUserByIDOK(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+					},
+				),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				password: "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid password",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							Crypted:    []byte("password"),
+						}},
+					},
+				),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				password: "wrong password",
+				authRequest: &req_model.AuthRequest{
+					ID:      "id",
+					AgentID: "agentID",
+					BrowserInfo: &req_model.BrowserInfo{
+						UserAgent:      "user agent",
+						AcceptLanguage: "accept langugage",
+						RemoteIP:       net.IPv4(29, 4, 20, 19),
+					},
+				},
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.SetPassword(tt.args.ctx, tt.args.password)
+			err := tt.args.es.CheckPassword(tt.args.ctx, tt.args.userID, tt.args.password, tt.args.authRequest)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("result has error: %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v", err)
+			}
+		})
+	}
+}
+
+func TestSetPassword(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		userID   string
+		code     string
+		password string
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "create pw",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						PasswordCode: &repo_model.PasswordCode{Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "enc",
+							KeyID:      "id",
+							Crypted:    []byte("code"),
+						}},
+					},
+				),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				code:     "code",
+				password: "password",
+			},
+			res: res{},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "",
+				code:     "code",
+				password: "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				code:     "code",
+				password: "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "no passcode",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+					},
+				),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				code:     "code",
+				password: "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid passcode",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						PasswordCode: &repo_model.PasswordCode{Code: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "enc2",
+							KeyID:      "id",
+							Crypted:    []byte("code2"),
+						}},
+					},
+				),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				userID:   "userID",
+				code:     "code",
+				password: "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.SetPassword(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.password)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("result has error: %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v", err)
+			}
+		})
+	}
+}
+
+func TestChangePassword(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+		old    string
+		new    string
+	}
+	type res struct {
+		password string
+		errFunc  func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change pw",
+			args: args{
+				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							Crypted:    []byte("old"),
+						}},
+					},
+				),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				password: "new",
+			},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "no password",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+					},
+				),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "invalid password",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							Crypted:    []byte("older"),
+						}},
+					},
+				),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangePassword(tt.args.ctx, tt.args.userID, tt.args.old, tt.args.new)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.ChangeRequired != false {
-				t.Errorf("should not be one time")
+			if tt.res.errFunc == nil && string(result.SecretCrypto.Crypted) != tt.res.password {
+				t.Errorf("got wrong result crypted: expected: %v, actual: %v ", tt.res.password, result.SecretString)
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
+				t.Errorf("got wrong err: %v", err)
 			}
 		})
 	}
@@ -2036,69 +2346,6 @@ func TestChangeAddress(t *testing.T) {
 	}
 }
 
-func TestOTPByID(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
-	}
-	type res struct {
-		errFunc func(err error) bool
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "get by id, ok",
-			args: args{
-				es:       GetMockManipulateUserWithOTP(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
-			},
-		},
-		{
-			name: "empty userid",
-			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
-			},
-			res: res{
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "existing user not found",
-			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
-			},
-			res: res{
-				errFunc: caos_errs.IsNotFound,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.OTPByID(tt.args.ctx, tt.args.existing.AggregateID)
-
-			if tt.res.errFunc == nil && result.AggregateID == "" {
-				t.Errorf("result has no id")
-			}
-			if tt.res.errFunc == nil && result == nil {
-				t.Errorf("got wrong result change required: actual: %v ", result)
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-		})
-	}
-}
-
 func TestAddOTP(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
@@ -2168,78 +2415,7 @@ func TestAddOTP(t *testing.T) {
 	}
 }
 
-func TestRemoveOTP(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	type args struct {
-		es       *UserEventstore
-		ctx      context.Context
-		existing *model.User
-	}
-	type res struct {
-		errFunc func(err error) bool
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "remove ok",
-			args: args{
-				es:       GetMockManipulateUserWithOTP(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
-			},
-		},
-		{
-			name: "empty userid",
-			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
-			},
-			res: res{
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "existing user not found",
-			args: args{
-				es:       GetMockManipulateUserNoEvents(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
-			},
-			res: res{
-				errFunc: caos_errs.IsNotFound,
-			},
-		},
-		{
-			name: "user has no otp",
-			args: args{
-				es:       GetMockManipulateUser(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
-			},
-			res: res{
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.RemoveOTP(tt.args.ctx, tt.args.existing.AggregateID)
-
-			if tt.res.errFunc == nil && err != nil {
-				t.Errorf("result should not get err")
-			}
-			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-		})
-	}
-}
-
-func TestCheckOTP(t *testing.T) {
+func TestCheckMfaOTPSetup(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
 		es     *UserEventstore
@@ -2255,6 +2431,40 @@ func TestCheckOTP(t *testing.T) {
 		args args
 		res  res
 	}{
+		{
+			name: "setup ok",
+			args: args{
+				es: func() *UserEventstore {
+					es := GetMockManipulateUserWithOTP(ctrl, true, false)
+					es.validateTOTP = func(string, string) bool {
+						return true
+					}
+					return es
+				}(),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "id",
+				code:   "code",
+			},
+			res: res{},
+		},
+		{
+			name: "wrong code",
+			args: args{
+				es: func() *UserEventstore {
+					es := GetMockManipulateUserWithOTP(ctrl, true, false)
+					es.validateTOTP = func(string, string) bool {
+						return false
+					}
+					return es
+				}(),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "id",
+				code:   "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
 		{
 			name: "empty userid",
 			args: args{
@@ -2304,7 +2514,206 @@ func TestCheckOTP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.CheckMfaOTP(tt.args.ctx, tt.args.userID, tt.args.code)
+			err := tt.args.es.CheckMfaOTPSetup(tt.args.ctx, tt.args.userID, tt.args.code)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("result should not get err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCheckMfaOTP(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es          *UserEventstore
+		ctx         context.Context
+		userID      string
+		code        string
+		authRequest *req_model.AuthRequest
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "check ok",
+			args: args{
+				es: func() *UserEventstore {
+					es := GetMockManipulateUserWithOTP(ctrl, true, true)
+					es.validateTOTP = func(string, string) bool {
+						return true
+					}
+					return es
+				}(),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "id",
+				code:   "code",
+				authRequest: &req_model.AuthRequest{
+					ID:      "id",
+					AgentID: "agentID",
+					BrowserInfo: &req_model.BrowserInfo{
+						UserAgent:      "user agent",
+						AcceptLanguage: "accept langugage",
+						RemoteIP:       net.IPv4(29, 4, 20, 19),
+					},
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "wrong code",
+			args: args{
+				es: func() *UserEventstore {
+					es := GetMockManipulateUserWithOTP(ctrl, true, true)
+					es.validateTOTP = func(string, string) bool {
+						return false
+					}
+					return es
+				}(),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "id",
+				code:   "code",
+				authRequest: &req_model.AuthRequest{
+					ID:      "id",
+					AgentID: "agentID",
+					BrowserInfo: &req_model.BrowserInfo{
+						UserAgent:      "user agent",
+						AcceptLanguage: "accept langugage",
+						RemoteIP:       net.IPv4(29, 4, 20, 19),
+					},
+				},
+			},
+			res: res{},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				code: "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "empty code",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				code:   "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "user has no otp",
+			args: args{
+				es:     GetMockManipulateUser(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				code:   "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.CheckMfaOTP(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.authRequest)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("result should not get err, got : %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveOTP(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove ok",
+			args: args{
+				es:       GetMockManipulateUserWithOTP(ctrl, false, true),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "user has no otp",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveOTP(tt.args.ctx, tt.args.existing.AggregateID)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("result should not get err")

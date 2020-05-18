@@ -42,6 +42,11 @@ SystemDefaults:
       Issuer: 'Zitadel'
       VerificationKey:
         EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
+  VerificationLifetimes:
+    PasswordCheck: 240h #10d
+    MfaInitSkip: 720h #30d
+    MfaSoftwareCheck: 18h
+    MfaHardwareCheck: 12h
   DefaultPolicies:
     Age:
       Description: Standard age policy

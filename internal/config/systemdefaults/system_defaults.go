@@ -7,12 +7,13 @@ import (
 )
 
 type SystemDefaults struct {
-	SecretGenerators    SecretGenerators
-	UserVerificationKey *crypto.KeyConfig
-	Multifactors        MultifactorConfig
-	DefaultPolicies     DefaultPolicies
-	IamID               string
-	SetUp               types.IAMSetUp
+	SecretGenerators      SecretGenerators
+	UserVerificationKey   *crypto.KeyConfig
+	Multifactors          MultifactorConfig
+	VerificationLifetimes VerificationLifetimes
+	DefaultPolicies       DefaultPolicies
+	IamID                 string
+	SetUp                 types.IAMSetUp
 }
 
 type SecretGenerators struct {
@@ -31,6 +32,13 @@ type MultifactorConfig struct {
 type OTPConfig struct {
 	Issuer          string
 	VerificationKey *crypto.KeyConfig
+}
+
+type VerificationLifetimes struct {
+	PasswordCheck    types.Duration
+	MfaInitSkip      types.Duration
+	MfaSoftwareCheck types.Duration
+	MfaHardwareCheck types.Duration
 }
 
 type DefaultPolicies struct {
