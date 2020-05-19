@@ -1,9 +1,8 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
 )
 
 const (
@@ -16,20 +15,20 @@ type loginData struct {
 }
 
 func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
-	authSession, err := l.getAuthSession(r)
+	authReq, err := l.getAuthRequest(r)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	if authSession == nil {
-		http.Redirect(w, r, l.citadelURL, http.StatusFound)
+	if authReq == nil {
+		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
 		return
 	}
-	l.renderNextStep(w, r, authSession)
+	l.renderNextStep(w, r, authReq)
 }
 
 func (l *Login) handleUsername(w http.ResponseWriter, r *http.Request) {
-	authSession, err := l.getAuthSession(r)
+	authSession, err := l.getAuthRequest(r)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return
@@ -39,37 +38,37 @@ func (l *Login) handleUsername(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleUsernameCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(loginData)
-	authSession, err := l.getAuthSessionAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	if datl.Register {
-		l.renderRegister(w, r, authSession, nil, nil)
+	if data.Register {
+		l.renderRegister(w, r, authReq, nil, nil)
 		return
 	}
-	browserInfo := &model.BrowserInformation{RemoteIP: &model.IP{}} //TODO: impl
-	authSession, err = l.service.Auth.VerifyUser(r.Context(), authSession, datl.UserName, browserInfo)
+	err = l.authRepo.CheckUsername(r.Context(), authReq.UserID, data.UserName)
 	if err != nil {
-		l.renderLogin(w, r, authSession, err)
+		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	l.renderNextStep(w, r, authSession)
+	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, err error) {
+func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage, username string
 	if err != nil {
 		errMessage = err.Error()
 	}
-	if authSession.PossibleSteps[0].LoginData != nil {
-		errMessage = authSession.PossibleSteps[0].LoginDatl.ErrMsg
+	switch step := authReq.PossibleSteps[0].(type) {
+	case *model.LoginStep:
+		if step.NotFound {
+			errMessage = "User not found"
+		}
 	}
-	if authSession.UserSession != nil && authSession.UserSession.User != nil {
-		username = authSession.UserSession.User.UserName
-	}
+	//TODO: fill UserName if on auth request
 	data := userData{
-		baseData: l.getBaseData(r, authSession, "Login", errType, errMessage),
+		baseData: l.getBaseData(r, authReq, "Login", errType, errMessage),
 		UserName: username,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, nil)

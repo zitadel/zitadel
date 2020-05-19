@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
+	"net"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
 )
 
 const (
@@ -14,30 +14,31 @@ type passwordData struct {
 	Password string `schema:"password"`
 }
 
-func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, passwordData *model.PasswordData) {
+func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, passwordStep *model.PasswordStep) {
 	var errType, errMessage string
-	if passwordData != nil {
-		errMessage = passwordData.ErrMsg
+	if passwordStep != nil {
+		errMessage = "Failure Count: " + string(passwordStep.FailureCount)
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authSession, "Password", errType, errMessage),
-		UserName: authSession.UserSession.User.UserName,
+		baseData: l.getBaseData(r, authReq, "Password", errType, errMessage),
+		//TODO: Add Username
+		//UserName: authReq.UserName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPassword], data, nil)
 }
 
 func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(passwordData)
-	authSession, err := l.getAuthSessionAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	browserInfo := &model.BrowserInformation{RemoteIP: &model.IP{}} //TODO: impl
-	authSession, err = l.service.Auth.VerifyPassword(r.Context(), authSession, data.Password, browserInfo)
+	browserInfo := &model.BrowserInfo{RemoteIP: net.IP{}} //TODO: impl
+	err = l.authRepo.VerifyPassword(r.Context(), authReq.ID, authReq.UserID, data.Password, browserInfo)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.renderNextStep(w, r, authSession)
+	l.renderNextStep(w, r, authReq)
 }

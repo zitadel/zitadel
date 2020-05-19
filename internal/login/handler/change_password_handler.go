@@ -1,9 +1,8 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
 )
 
 const (
@@ -18,36 +17,38 @@ type changePasswordData struct {
 
 func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 	data := new(changePasswordData)
-	authSession, err := l.getAuthSessionAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.service.Auth.ChangePassword(r.Context(), authSession.UserSession.User.UserID, datl.OldPassword, datl.NewPassword)
+	err = l.authRepo.ChangePassword(r.Context(), authReq.UserID, data.OldPassword, data.NewPassword)
 	if err != nil {
-		l.renderChangePassword(w, r, authSession, err)
+		l.renderChangePassword(w, r, authReq, err)
 		return
 	}
-	l.renderChangePasswordDone(w, r, authSession)
+	l.renderChangePasswordDone(w, r, authReq)
 }
 
-func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, err error) {
+func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authSession, "Change Password", errType, errMessage),
-		UserName: authSession.UserSession.User.UserName,
+		baseData: l.getBaseData(r, authReq, "Change Password", errType, errMessage),
+		//TODO: fill username
+		//UserName: authReq.UserName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePassword], data, nil)
 }
 
-func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthSession) {
+func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	var errType, errMessage string
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Password Change Done", errType, errMessage),
-		UserName: authReq.UserSession.User.UserName,
+		//TODO: fill username
+		//UserName: authReq.UserName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

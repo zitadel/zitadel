@@ -1,11 +1,9 @@
 package handler
 
 import (
-	"context"
+	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
-	"github.com/caos/citadel/utils/auth"
 )
 
 const (
@@ -39,31 +37,33 @@ func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(mailVerificationFormData)
-	authSession, err := l.getAuthSessionAndParseData(r, data)
+	authSession, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return
 	}
-	if !datl.Resend {
-		l.checkMailCode(w, r, authSession, datl.UserID, datl.Code)
+	if !data.Resend {
+		l.checkMailCode(w, r, authSession, data.UserID, data.Code)
 		return
 	}
-	if authSession == nil || authSession.UserSession != nil && authSession.UserSession.User == nil {
-		err = l.service.Auth.ResendEmailVerificationMail(r.Context(), datl.UserID)
+	//TODO: Check UserSession?
+	if authSession == nil /*|| authSession.UserSession != nil && authSession.UserSession.User == nil*/ {
+		err = l.authRepo.ResendEmailVerificationMail(r.Context(), data.UserID)
 	} else {
-		ctx := context.WithValue(r.Context(), auth.CtxKeyData{}, &auth.CtxData{UserID: authSession.UserSession.User.UserID, OrgID: "LOGIN"})
-		err = l.service.Auth.ResendMyEmailVerificationMail(ctx)
+		ctx := auth.SetCtxData(r.Context(), auth.CtxData{UserID: authSession.UserID, OrgID: "LOGIN"})
+		err = l.authRepo.ResendMyEmailVerificationMail(ctx)
 	}
-	l.renderMailVerification(w, r, authSession, datl.UserID, err)
+	l.renderMailVerification(w, r, authSession, data.UserID, err)
 }
 
-func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, userID, code string) {
+func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, userID, code string) {
 	var err error
-	if authSession != nil && authSession.UserSession != nil && authSession.UserSession.User != nil {
-		ctx := context.WithValue(r.Context(), auth.CtxKeyData{}, &auth.CtxData{UserID: authSession.UserSession.User.UserID, OrgID: "LOGIN"})
-		err = l.service.Auth.VerifyMyEmail(ctx, code)
+	//TODO: Check UserSession
+	if authSession != nil /* && authSession.UserSession != nil && authSession.UserSession.User != nil */ {
+		ctx := auth.SetCtxData(r.Context(), auth.CtxData{UserID: authSession.UserID, OrgID: "LOGIN"})
+		err = l.authRepo.VerifyMyEmail(ctx, code)
 	} else {
-		err = l.service.Auth.VerifyEmail(r.Context(), userID, code)
+		err = l.authRepo.VerifyEmail(r.Context(), userID, code)
 	}
 	if err != nil {
 		l.renderMailVerification(w, r, authSession, userID, err)
@@ -72,13 +72,14 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authSessio
 	l.renderMailVerified(w, r, authSession)
 }
 
-func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, userID string, err error) {
+func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, userID string, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
-	if userID == "" && authSession != nil && authSession.UserSession != nil && authSession.UserSession.User != nil {
-		userID = authSession.UserSession.User.UserID
+	//TODO: Check UserSession?
+	if userID == "" /* && authSession != nil && authSession.UserSession != nil && authSession.UserSession.User != nil */ {
+		userID = authSession.UserID
 	}
 	data := mailVerificationData{
 		baseData: l.getBaseData(r, authSession, "Mail Verification", errType, errMessage),
@@ -87,7 +88,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
-func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *model.AuthSession) {
+func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	data := mailVerificationData{
 		baseData: l.getBaseData(r, authReq, "Mail Verified", "", ""),
 	}

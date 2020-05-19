@@ -1,36 +1,24 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"net/http"
-	"strings"
 )
 
 const (
-	queryAuthSessionID = "authSessionID"
+	queryAuthRequestID = "authRequestID"
 )
 
-func (l *Login) getAuthSession(r *http.Request) (*model.AuthSession, error) {
-	authSessionID := r.FormValue(queryAuthSessionID)
-	if authSessionID == "" {
+func (l *Login) getAuthRequest(r *http.Request) (*model.AuthRequest, error) {
+	authRequestID := r.FormValue(queryAuthRequestID)
+	if authRequestID == "" {
 		return nil, nil
 	}
-	userAgent, err := l.userAgentHandler.GetUserAgent(r)
-	if err != nil {
-		return nil, err
-	}
-	ids := strings.Split(authSessionID, ":")
-	if len(ids) != 2 {
-		return nil, errors.ThrowInvalidArgument(nil, "APP-QfSSPm", "invalid id")
-	}
-	if ids[0] != userAgent.GetID() {
-		return nil, errors.ThrowInvalidArgument(nil, "APP-x0UPKz", "invalid id")
-	}
-	return l.service.Auth.GetAuthSession(r.Context(), ids[1], userAgent.GetID(), &model.BrowserInformation{RemoteIP: &model.IP{}})
+	return l.authRepo.AuthRequestByID(r.Context(), authRequestID)
 }
 
-func (l *Login) getAuthSessionAndParseData(r *http.Request, data interface{}) (*model.AuthSession, error) {
-	authSession, err := l.getAuthSession(r)
+func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*model.AuthRequest, error) {
+	authSession, err := l.getAuthRequest(r)
 	if err != nil {
 		return nil, err
 	}

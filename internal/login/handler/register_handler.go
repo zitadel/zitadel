@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	usr_model "github.com/caos/zitadel/internal/user/model"
+	"golang.org/x/text/language"
 	"net/http"
-
 )
 
 const (
@@ -28,7 +30,7 @@ type registerData struct {
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 	data := new(registerFormData)
-	authSession, err := l.getAuthSessionAndParseData(r, data)
+	authSession, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return
@@ -38,7 +40,8 @@ func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authSession, data, err)
 		return
 	}
-	_, err = l.service.Auth.RegisterUser(r.Context(), data.toProto())
+	//TODO: How to get ResourceOwner?
+	_, err = l.authRepo.Register(r.Context(), data.toUserModel(), "GlobalResourceOwner")
 	if err != nil {
 		l.renderRegister(w, r, authSession, data, err)
 		return
@@ -47,7 +50,7 @@ func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 	l.renderNextStep(w, r, authSession)
 }
 
-func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, formData *registerFormData, err error) {
+func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, formData *registerFormData, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
@@ -76,14 +79,20 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authSessi
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplRegister], data, funcs)
 }
 
-func (d registerFormData) toProto() *auth_api.RegisterUserRequest { //TODO: refactoring?
-	return &auth_api.RegisterUserRequest{
-		Email:             d.Email,
-		FirstName:         d.Firstname,
-		LastName:          d.Lastname,
-		NickName:          d.Nickname,
-		PreferredLanguage: d.Language,
-		Gender:            auth_api.Gender(d.Gender),
-		Password:          d.Password,
+func (d registerFormData) toUserModel() *usr_model.User {
+	return &usr_model.User{
+		Profile: &usr_model.Profile{
+			FirstName:         d.Firstname,
+			LastName:          d.Lastname,
+			NickName:          d.Nickname,
+			PreferredLanguage: language.Make(d.Language),
+			Gender:            usr_model.Gender(d.Gender),
+		},
+		Password: &usr_model.Password{
+			SecretString: d.Password,
+		},
+		Email: &usr_model.Email{
+			EmailAddress: d.Email,
+		},
 	}
 }

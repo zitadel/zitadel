@@ -1,9 +1,8 @@
 package handler
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"net/http"
-
-	"github.com/caos/utils/errors"
 )
 
 const (
@@ -34,38 +33,38 @@ func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
 	l.renderInitUser(w, r, userID, code, nil)
 }
 
-func (l *Login) handleInitUSerCheck(w http.ResponseWriter, r *http.Request) {
+func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(initUserFormData)
-	_, err := l.getAuthSessionAndParseData(r, data)
+	_, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
 	}
 
-	if datl.Resend {
-		l.resendUserInit(w, r, datl.UserID)
+	if data.Resend {
+		l.resendUserInit(w, r, data.UserID)
 		return
 	}
 	l.checkUserInitCode(w, r, data, nil)
 }
 
 func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, data *initUserFormData, err error) {
-	if datl.Password != datl.PasswordConfirm {
-		err := errors.ThrowInvalidArgument(nil, "VIEW-fsdfd", "passwords dont match")
-		l.renderInitUser(w, r, datl.UserID, datl.Code, err)
+	if data.Password != data.PasswordConfirm {
+		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "passwords dont match")
+		l.renderInitUser(w, r, data.UserID, data.Code, err)
 		return
 	}
-	err = l.service.Auth.VerifyUserInit(r.Context(), datl.UserID, datl.Code, datl.Password)
+	//err = l.authRepo.VerifyUserInit(r.Context(), data.UserID, data.Code, data.Password)
 	if err != nil {
-		l.renderInitUser(w, r, datl.UserID, "", err)
+		l.renderInitUser(w, r, data.UserID, "", err)
 		return
 	}
 	l.renderInitUserDone(w, r)
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, userID string) {
-	err := l.service.Auth.ResendUserInit(r.Context(), userID)
-	l.renderInitUser(w, r, userID, "", err)
+	//err := l.service.Auth.ResendUserInit(r.Context(), userID)
+	//l.renderInitUser(w, r, userID, "", err)
 }
 
 func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, userID, code string, err error) {

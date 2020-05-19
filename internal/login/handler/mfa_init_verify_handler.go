@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/base64"
+	//"encoding/base64"
+	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/skip2/go-qrcode"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
-	qrcode "github.com/skip2/go-qrcode"
+	//qrcode "github.com/skip2/go-qrcode"
 )
 
 const (
@@ -13,7 +14,7 @@ const (
 )
 
 type mfaInitVerifyData struct {
-	MfaType model.MFAType `schema:"mfaType"`
+	MfaType model.MfaType `schema:"mfaType"`
 	Code    string        `schema:"code"`
 	URL     string        `schema:"url"`
 	Secret  string        `schema:"secret"`
@@ -21,30 +22,30 @@ type mfaInitVerifyData struct {
 
 func (l *Login) handleMfaInitVerify(w http.ResponseWriter, r *http.Request) {
 	data := new(mfaInitVerifyData)
-	authSession, err :=l.getAuthSessionAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	var verifyData *mfaVerifyData
 	switch data.MfaType {
-	case model.MFA_OTP:
-		verifyData =l.handleOtpVerify(w, r, authSession, data)
+	case model.MfaTypeOTP:
+		verifyData = l.handleOtpVerify(w, r, authReq, data)
 	}
 
 	if verifyData != nil {
-		l.renderMfaInitVerify(w, r, authSession, verifyData, err)
+		l.renderMfaInitVerify(w, r, authReq, verifyData, err)
 		return
 	}
 
 	done := &mfaDoneData{
 		MfaType: data.MfaType,
 	}
-	l.renderMfaInitDone(w, r, authSession, done)
+	l.renderMfaInitDone(w, r, authReq, done)
 }
 
-func (l *Login) handleOtpVerify(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, data *mfaInitVerifyData) *mfaVerifyData {
-	_, err :=l.service.Auth.VerifyMfaOTP(r.Context(), data.Code, authSession.UserSession.User.UserID)
+func (l *Login) handleOtpVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaInitVerifyData) *mfaVerifyData {
+	err := l.authRepo.VerifyMfaOTPSetup(r.Context(), authReq.UserID, data.Code)
 	if err == nil {
 		return nil
 	}
@@ -59,19 +60,20 @@ func (l *Login) handleOtpVerify(w http.ResponseWriter, r *http.Request, authSess
 	return mfadata
 }
 
-func (l *Login) renderMfaInitVerify(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, data *mfaVerifyData, err error) {
+func (l *Login) renderMfaInitVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
-	data.baseData = l.getBaseData(r, authSession, "Mfa Init Verify", errType, errMessage)
-	data.UserName = authSession.UserSession.User.UserName
-	if data.MfaType == model.MFA_OTP {
+	data.baseData = l.getBaseData(r, authReq, "Mfa Init Verify", errType, errMessage)
+	//TODO: Fill Username
+	//data.UserName = authReq.UserName
+	if data.MfaType == model.MfaTypeOTP {
 		qrCode, err := qrcode.Encode(data.otpData.Url, qrcode.Medium, 256)
 		if err == nil {
 			data.otpData.QrCode = base64.StdEncoding.EncodeToString(qrCode)
 		}
 	}
 
-	l.renderer.RenderTemplate(w, r,l.renderer.Templates[tmplMfaInitVerify], data, nil)
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaInitVerify], data, nil)
 }

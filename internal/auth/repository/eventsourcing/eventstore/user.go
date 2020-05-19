@@ -46,8 +46,16 @@ func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*m
 	return repo.UserEvents.ChangeEmail(ctx, email)
 }
 
+func (repo *UserRepo) VerifyEmail(ctx context.Context, userID, code string) error {
+	return repo.UserEvents.VerifyEmail(ctx, userID, code)
+}
+
 func (repo *UserRepo) VerifyMyEmail(ctx context.Context, code string) error {
 	return repo.UserEvents.VerifyEmail(ctx, auth.GetCtxData(ctx).UserID, code)
+}
+
+func (repo *UserRepo) ResendEmailVerificationMail(ctx context.Context, userID string) error {
+	return repo.UserEvents.CreateEmailVerificationCode(ctx, userID)
 }
 
 func (repo *UserRepo) ResendMyEmailVerificationMail(ctx context.Context) error {
@@ -89,11 +97,24 @@ func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) err
 	return err
 }
 
+func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) error {
+	_, err := repo.UserEvents.ChangePassword(ctx, userID, old, new)
+	return err
+}
+
+func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {
+	return repo.UserEvents.AddOTP(ctx, userID)
+}
+
 func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
 	return repo.UserEvents.AddOTP(ctx, auth.GetCtxData(ctx).UserID)
 }
 
-func (repo *UserRepo) VerifyMyMfaOTP(ctx context.Context, code string) error {
+func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code string) error {
+	return repo.UserEvents.CheckMfaOTPSetup(ctx, userID, code)
+}
+
+func (repo *UserRepo) VerifyMyMfaOTPSetup(ctx context.Context, code string) error {
 	return repo.UserEvents.CheckMfaOTPSetup(ctx, auth.GetCtxData(ctx).UserID, code)
 }
 

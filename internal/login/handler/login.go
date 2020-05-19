@@ -12,35 +12,37 @@ import (
 )
 
 type Login struct {
-	endpoint string
-	router   *mux.Router
+	endpoint            string
+	router              *mux.Router
 	renderer            *Renderer
 	parser              *form.Parser
-	authRepo 			*eventsourcing.EsRepository
+	authRepo            *eventsourcing.EsRepository
 	zitadelURL          string
 	oidcAuthCallbackURL string
 	//userAgentHandler    *auth.UserAgentHandler
 }
 
 type Config struct {
-	Port                  string
-	StaticDir             string
-	OidcAuthCallbackURL   string
-	ZitadelURL            string
-	LanguageCookieName    string
-	DefaultLanguage       language.Tag
+	Port                string
+	StaticDir           string
+	OidcAuthCallbackURL string
+	ZitadelURL          string
+	LanguageCookieName  string
+	DefaultLanguage     language.Tag
 	//UserAgentCookieConfig *auth.UserAgentCookieConfig
 
 }
 
 func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRepository) (err error) {
 	login := &Login{
-		endpoint: config.Port,
+		endpoint:            config.Port,
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
-		zitadelURL: config.ZitadelURL,
-		authRepo: authRepo,
+		zitadelURL:          config.ZitadelURL,
+		authRepo:            authRepo,
 	}
 	login.router = CreateRouter(login, config.StaticDir)
+	login.renderer = CreateRenderer(config.StaticDir, config.LanguageCookieName, config.DefaultLanguage)
+	login.parser = form.NewParser()
 	login.Listen(ctx)
 	return err
 }

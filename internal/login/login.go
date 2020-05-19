@@ -8,10 +8,9 @@ import (
 )
 
 type Config struct {
-	handler.Config
+	Handler handler.Config
 }
 
-
 func Start(ctx context.Context, config Config, systemDefaults sd.SystemDefaults, authRepo *eventsourcing.EsRepository) {
-	handler.StartLogin(ctx, config.Config, authRepo)
+	handler.StartLogin(ctx, config.Handler, authRepo)
 }

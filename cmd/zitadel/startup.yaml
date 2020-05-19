@@ -83,11 +83,12 @@ Auth:
       FailureCountUntilSkip: 5
 
 Login:
-  Port: 50031
-  StaticDir: './internal/static'
-  ZitadelURL: '/zitadel'
-  LanguageCookieName: 'ch.caos.zitadel.login.lang'
-  DefaultLanguage: 'de'
+  Handler:
+    Port: 50031
+    StaticDir: '../../internal/login/static'
+    ZitadelURL: '/zitadel'
+    LanguageCookieName: 'ch.caos.zitadel.login.lang'
+    DefaultLanguage: 'de'
 
 Admin:
   API:

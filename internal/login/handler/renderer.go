@@ -2,10 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
-	"github.com/caos/zitadel/internal/user/model"
 	"net/http"
 	"path"
 
@@ -61,13 +61,13 @@ func CreateRenderer(staticDir, cookieName string, defaultLanguage language.Tag) 
 			return EndpointUsername
 		},
 		"usernameChangeUrl": func(id string) string {
-			return fmt.Sprintf("%s?%s=%s", EndpointUsername, queryAuthSessionID, id)
+			return fmt.Sprintf("%s?%s=%s", EndpointUsername, queryAuthRequestID, id)
 		},
 		"userSelectionUrl": func() string {
 			return EndpointUserSelection
 		},
 		"passwordResetUrl": func(id string) string {
-			return fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthSessionID, id)
+			return fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id)
 		},
 		"passwordUrl": func() string {
 			return EndpointPassword
@@ -112,66 +112,70 @@ func CreateRenderer(staticDir, cookieName string, defaultLanguage language.Tag) 
 	return r
 }
 
-func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession) {
-	if len(authSession.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authSession, errors.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
+func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID)
+	if err != nil {
+		l.renderInternalError(w, r, authReq, errors.ThrowInternal(nil, "APP-sio0W", "could not get authreq"))
+	}
+	if len(authReq.PossibleSteps) == 0 {
+		l.renderInternalError(w, r, authReq, errors.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
 		return
 	}
-	l.chooseNextStep(w, r, authSession, 0, nil)
+	l.chooseNextStep(w, r, authReq, 0, nil)
 }
 
-func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, err error) {
-	if authSession == nil || len(authSession.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authSession, errors.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
+func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
+	if authReq == nil || len(authReq.PossibleSteps) == 0 {
+		l.renderInternalError(w, r, authReq, errors.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
 		return
 	}
-	l.chooseNextStep(w, r, authSession, 0, err)
+	l.chooseNextStep(w, r, authReq, 0, err)
 }
 
-func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, stepNumber int, err error) {
-	switch authSession.PossibleSteps[stepNumber].Type {
-	case model.NEXT_STEP_LOGIN:
-		if len(authSession.PossibleSteps) > 1 {
-			l.chooseNextStep(w, r, authSession, 1, err)
+func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, stepNumber int, err error) {
+	switch step := authReq.PossibleSteps[stepNumber].(type) {
+	case *model.LoginStep:
+		if len(authReq.PossibleSteps) > 1 {
+			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
-		l.renderLogin(w, r, authSession, err)
-	case model.NEXT_STEP_CHOOSE_USER:
-		l.renderUserSelection(w, r, authSession, authSession.PossibleSteps[stepNumber].UserSelectionData)
-	case model.NEXT_STEP_INIT_PASSWORD:
-		l.renderInitPassword(w, r, authSession, authSession.UserSession.User.UserID, "", err)
-	case model.NEXT_STEP_PASSWORD:
-		l.renderPassword(w, r, authSession, authSession.PossibleSteps[stepNumber].PasswordData)
-	case model.NEXT_STEP_MFA_VERIFY:
-		l.renderMfaVerify(w, r, authSession, authSession.PossibleSteps[stepNumber].MfaVerifyData, err)
-	case model.NEXT_STEP_REDIRECT_TO_CALLBACK:
-		if len(authSession.PossibleSteps) > 1 {
-			l.chooseNextStep(w, r, authSession, 1, err)
+		l.renderLogin(w, r, authReq, err)
+	case *model.SelectUserStep:
+		l.renderUserSelection(w, r, authReq, step)
+	case *model.InitPasswordStep:
+		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
+	case *model.PasswordStep:
+		l.renderPassword(w, r, authReq, step)
+	case *model.MfaVerificationStep:
+		l.renderMfaVerify(w, r, authReq, step, err)
+	case *model.RedirectToCallbackStep:
+		if len(authReq.PossibleSteps) > 1 {
+			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
-		l.redirectToCallback(w, r, authSession)
-	case model.NEXT_STEP_CHANGE_PASSWORD:
-		l.renderChangePassword(w, r, authSession, err)
-	case model.NEXT_STEP_VERIFY_EMAIL:
-		l.renderMailVerification(w, r, authSession, "", err)
-	case model.NEXT_STEP_MFA_PROMPT:
-		l.renderMfaPrompt(w, r, authSession, authSession.PossibleSteps[stepNumber].MfaPromptData, err)
+		l.redirectToCallback(w, r, authReq)
+	case *model.ChangePasswordStep:
+		l.renderChangePassword(w, r, authReq, err)
+	case *model.VerifyEMailStep:
+		l.renderMailVerification(w, r, authReq, "", err)
+	case *model.MfaPromptStep:
+		l.renderMfaPrompt(w, r, authReq, step, err)
 	default:
 		//TODO: err
 	}
 	// NEXT_STEP_MFA_VERIFY_ASYNC
 }
 
-func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, err error) {
+func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var msg string
 	if err != nil {
 		msg = err.Error()
 	}
-	data := l.getBaseData(r, authSession, "Error", "Internal", msg)
+	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getBaseData(r *http.Request, authSession *model.AuthSession, title string, errType, errMessage string) baseData {
+func (l *Login) getBaseData(r *http.Request, authSession *model.AuthRequest, title string, errType, errMessage string) baseData {
 	return baseData{
 		errorData: errorData{
 			ErrType:    errType,
@@ -186,18 +190,18 @@ func (l *Login) getBaseData(r *http.Request, authSession *model.AuthSession, tit
 }
 
 func (l *Login) getTheme(r *http.Request) string {
-	return "citadel" //TODO: impl
+	return "zitadel" //TODO: impl
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
 	return "" //TODO: impl
 }
 
-func getRequestID(authSession *model.AuthSession, r *http.Request) string {
-	if authSession != nil {
-		return authSession.GetFullID()
-	}
-	return r.FormValue(queryAuthSessionID)
+func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
+	//if authReq != nil {
+	//	return authReq.GetFullID()
+	//}
+	return r.FormValue(queryAuthRequestID)
 }
 
 type baseData struct {
@@ -218,8 +222,8 @@ type userData struct {
 	baseData
 	UserName            string
 	PasswordChecked     string
-	MfaProviders        []model.MFAType
-	SelectedMfaProvider model.MFAType
+	MfaProviders        []model.MfaType
+	SelectedMfaProvider model.MfaType
 }
 
 type userSelectionData struct {
@@ -230,22 +234,23 @@ type userSelectionData struct {
 type mfaData struct {
 	baseData
 	UserName     string
-	MfaProviders []model.MFAType
+	MfaProviders []model.MfaType
 	MfaRequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
 	UserName string
-	MfaType  model.MFAType
+	MfaType  model.MfaType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
 	UserName string
-	MfaType  model.MFAType
+	MfaType  model.MfaType
 }
+
 type otpData struct {
 	Url    string
 	Secret string

@@ -43,7 +43,7 @@ func CreateRouter(login *Login, staticDir string) *mux.Router {
 	router.HandleFunc(EndpointInitPassword, login.handleInitPasswordCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointPasswordReset, login.handlePasswordReset).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitUser, login.handleInitUser).Methods(http.MethodGet)
-	router.HandleFunc(EndpointInitUser, login.handleInitUSerCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointInitUser, login.handleInitUserCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMfaVerify, login.handleMfaVerify).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMfaPrompt, login.handleMfaPrompt).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMfaInitVerify, login.handleMfaInitVerify).Methods(http.MethodPost)

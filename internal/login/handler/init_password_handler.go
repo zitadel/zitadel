@@ -1,10 +1,9 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/errors"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
-	"github.com/caos/utils/errors"
 )
 
 const (
@@ -37,45 +36,47 @@ func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleInitPasswordCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(initPasswordFormData)
-	authReq, err := l.getAuthSessionAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
 
-	if datl.Resend {
+	if data.Resend {
 		l.resendPasswordSet(w, r, authReq)
 		return
 	}
 	l.checkPWCode(w, r, authReq, data, nil)
 }
 
-func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, data *initPasswordFormData, err error) {
-	if datl.Password != datl.PasswordConfirm {
+func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *initPasswordFormData, err error) {
+	if data.Password != data.PasswordConfirm {
 		err := errors.ThrowInvalidArgument(nil, "VIEW-KaGue", "passwords dont match")
-		l.renderInitPassword(w, r, authSession, datl.UserID, datl.Code, err)
+		l.renderInitPassword(w, r, authReq, data.UserID, data.Code, err)
 		return
 	}
-	err = l.service.Auth.PasswordReset(r.Context(), datl.UserID, datl.Code, datl.Password)
+	err = l.authRepo.SetPassword(r.Context(), data.UserID, data.Code, data.Password)
 	if err != nil {
-		l.renderInitPassword(w, r, authSession, datl.UserID, "", err)
+		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
 	}
-	l.renderInitPasswordDone(w, r, authSession)
+	l.renderInitPasswordDone(w, r, authReq)
 }
 
-func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *model.AuthSession) {
-	err := l.service.Auth.RequestPasswordReset(r.Context(), authReq.UserSession.User.UserName)
-	l.renderInitPassword(w, r, authReq, authReq.UserSession.User.UserID, "", err)
+func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+	//TODO: Username
+	var err error
+	//err := l.authRepo.RequestPasswordReset(r.Context(), authReq.UserName)
+	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 
-func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthSession, userID, code string, err error) {
+func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
-	if userID == "" && authReq != nil && authReq.UserSession != nil && authReq.UserSession.User != nil {
-		userID = authReq.UserSession.User.UserID
+	if userID == "" && authReq != nil {
+		userID = authReq.UserID
 	}
 	data := initPasswordData{
 		baseData: l.getBaseData(r, authReq, "Init Password", errType, errMessage),
@@ -85,11 +86,12 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 
-func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession) {
+func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest) {
 	var errType, errMessage, userName string
-	if authSession != nil && authSession.UserSession != nil && authSession.UserSession.User != nil {
-		userName = authSession.UserSession.User.UserName
-	}
+	//TODO: fill Username
+	//if authSession != nil && authSession.UserSession != nil && authSession.UserSession.User != nil {
+	//	userName = authSession.UserSession.User.UserName
+	//}
 	data := userData{
 		baseData: l.getBaseData(r, authSession, "Password Init Done", errType, errMessage),
 		UserName: userName,

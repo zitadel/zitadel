@@ -21,7 +21,7 @@ require (
 	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.4.1
 	github.com/google/uuid v1.1.1 // indirect
-	github.com/gorilla/mux v1.7.4 // indirect
+	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
@@ -37,6 +37,7 @@ require (
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.6.0 // indirect
+	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
 	github.com/sony/sonyflake v1.0.0
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3

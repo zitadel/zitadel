@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
+	"net"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
 )
 
 const (
@@ -11,42 +11,44 @@ const (
 )
 
 type mfaVerifyFormData struct {
-	MfaType model.MFAType `schema:"mfaType"`
+	MfaType model.MfaType `schema:"mfaType"`
 	Code    string        `schema:"code"`
 }
 
 func (l *Login) handleMfaVerify(w http.ResponseWriter, r *http.Request) {
 	data := new(mfaVerifyFormData)
-	authSession, err := l.getAuthSessionAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	authSession.UserSession.MfaType = data.MfaType
-	browserInfo := &model.BrowserInformation{RemoteIP: &model.IP{}} //TODO: impl
-	authSession, err = l.service.Auth.VerifyMfa(r.Context(), authSession, data.Code, browserInfo)
+	browserInfo := &model.BrowserInfo{RemoteIP: net.IP{}} //TODO: impl
+	if data.MfaType == model.MfaTypeOTP {
+		err = l.authRepo.VerifyMfaOTP(r.Context(), authReq.ID, authReq.UserID, data.Code, browserInfo)
+	}
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.renderNextStep(w, r, authSession)
+	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderMfaVerify(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, verifyData *model.MfaVerifyData, err error) {
+func (l *Login) renderMfaVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, verificationStep *model.MfaVerificationStep, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
-	if verifyData != nil {
-		errMessage = verifyData.ErrMsg
+	if verificationStep != nil && verificationStep.FailureCount != 0 {
+		errMessage = "Failure Count: " + string(verificationStep.FailureCount)
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authSession, "Mfa Verify", errType, errMessage),
-		UserName: authSession.UserSession.User.UserName,
+		baseData: l.getBaseData(r, authReq, "Mfa Verify", errType, errMessage),
+		//TODO: Fill Username
+		//UserName: authReq.UserName,
 	}
-	if verifyData != nil {
-		data.MfaProviders = verifyData.MfaProviders
-		data.SelectedMfaProvider = verifyData.MfaProviders[0]
+	if verificationStep != nil {
+		data.MfaProviders = verificationStep.MfaProviders
+		data.SelectedMfaProvider = verificationStep.MfaProviders[0]
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaVerify], data, nil)
 }

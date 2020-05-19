@@ -11,8 +11,16 @@ type UserRepository interface {
 
 	myUserRepo
 	SkipMfaInit(ctx context.Context, userID string) error
+
 	RequestPasswordReset(ctx context.Context, username string) error
 	SetPassword(ctx context.Context, userID, code, password string) error
+	ChangePassword(ctx context.Context, userID, old, new string) error
+
+	VerifyEmail(ctx context.Context, userID, code string) error
+	ResendEmailVerificationMail(ctx context.Context, userID string) error
+
+	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
+	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
 	SignOut(ctx context.Context, agentID, userID string) error
 }
@@ -37,6 +45,6 @@ type myUserRepo interface {
 	ChangeMyPassword(ctx context.Context, old, new string) error
 
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
-	VerifyMyMfaOTP(ctx context.Context, code string) error
+	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
 }

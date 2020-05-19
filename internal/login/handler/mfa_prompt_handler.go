@@ -1,11 +1,9 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"net/http"
-
-	"github.com/caos/citadel/login/internal/model"
-
-	caos_errs "github.com/caos/utils/errors"
 )
 
 const (
@@ -13,13 +11,13 @@ const (
 )
 
 type mfaPromptData struct {
-	MfaProvider model.MFAType `schema:"provider"`
+	MfaProvider model.MfaType `schema:"provider"`
 	Skip        bool          `schema:"skip"`
 }
 
 func (l *Login) handleMfaPrompt(w http.ResponseWriter, r *http.Request) {
 	data := new(mfaPromptData)
-	authSession, err := l.getAuthSessionAndParseData(r, data)
+	authSession, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return
@@ -30,7 +28,7 @@ func (l *Login) handleMfaPrompt(w http.ResponseWriter, r *http.Request) {
 		l.handleMfaCreation(w, r, authSession, mfaVerifyData)
 		return
 	}
-	err = l.service.Auth.SkipMfaInit(r.Context(), authSession.UserSession.User.UserID)
+	err = l.authRepo.SkipMfaInit(r.Context(), authSession.UserID)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return
@@ -38,14 +36,15 @@ func (l *Login) handleMfaPrompt(w http.ResponseWriter, r *http.Request) {
 	l.handleLogin(w, r)
 }
 
-func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, mfaPromptData *model.MfaPromptData, err error) {
+func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, mfaPromptData *model.MfaPromptStep, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
 	data := mfaData{
 		baseData: l.getBaseData(r, authSession, "Mfa Prompt", errType, errMessage),
-		UserName: authSession.UserSession.User.UserName,
+		//TODO: Fill UserName
+		//UserName: authSession.UserName,
 	}
 
 	if mfaPromptData == nil {
@@ -63,27 +62,27 @@ func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSess
 		l.handleMfaCreation(w, r, authSession, data)
 		return
 	}
-	l.renderer.RenderTemplate(w, r, a.renderer.Templates[tmplMfaPrompt], data, nil)
+	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaPrompt], data, nil)
 }
 
-func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, data *mfaVerifyData) {
+func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, data *mfaVerifyData) {
 	switch data.MfaType {
-	case model.MFA_OTP:
+	case model.MfaTypeOTP:
 		l.handleOtpCreation(w, r, authSession, data)
 		return
 	}
 	l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "No available mfa providers"))
 }
 
-func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authSession *model.AuthSession, data *mfaVerifyData) {
-	otp, err := l.service.Auth.AddMfaOTP(r.Context(), authSession.UserSession.User.UserID)
+func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, data *mfaVerifyData) {
+	otp, err := l.authRepo.AddMfaOTP(r.Context(), authSession.UserID)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return
 	}
 
 	data.otpData = otpData{
-		Secret: otp.Secret,
+		Secret: otp.SecretString,
 		Url:    otp.Url,
 	}
 
