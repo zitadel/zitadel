@@ -68,12 +68,6 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 			return nil, err
 		}
 	}
-	if user.Password != nil {
-		agg, err = agg.AppendEvent(model.UserPasswordCodeAdded, user.Password)
-		if err != nil {
-			return nil, err
-		}
-	}
 	if initCode != nil {
 		agg, err = agg.AppendEvent(model.InitializedUserCodeAdded, initCode)
 		if err != nil {

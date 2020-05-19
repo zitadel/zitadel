@@ -10,10 +10,7 @@ import (
 )
 
 func generateSms(user *view_model.NotifyUser, content string, config systemdefaults.Notifications, lastPhone bool) error {
-	provider, err := twilio.InitTwilioProvider(&config.Providers.Twilio)
-	if err != nil {
-		return err
-	}
+	provider := twilio.InitTwilioProvider(&config.Providers.Twilio)
 	message := &twilio.TwilioMessage{
 		SenderPhoneNumber:    config.Providers.Twilio.From,
 		RecipientPhoneNumber: user.VerifiedPhone,
