@@ -34,16 +34,42 @@ func KeyPairFromModel(pair *model.KeyPair) *KeyPair {
 		ObjectRoot: pair.ObjectRoot,
 		Usage:      int32(pair.Usage),
 		Algorithm:  pair.Algorithm,
+		PrivateKey: KeyFromModel(pair.PrivateKey),
+		PublicKey:  KeyFromModel(pair.PublicKey),
+	}
+}
+
+func KeyPairToModel(pair *KeyPair) *model.KeyPair {
+	return &model.KeyPair{
+		ObjectRoot: pair.ObjectRoot,
+		Usage:      model.KeyUsage(pair.Usage),
+		Algorithm:  pair.Algorithm,
 		PrivateKey: KeyToModel(pair.PrivateKey),
 		PublicKey:  KeyToModel(pair.PublicKey),
 	}
 }
 
-func KeyToModel(key *model.Key) *Key {
+func KeyFromModel(key *model.Key) *Key {
 	return &Key{
 		Key:    key.Key,
 		Expiry: key.Expiry,
 	}
+}
+
+func KeyToModel(key *Key) *model.Key {
+	return &model.Key{
+		Key:    key.Key,
+		Expiry: key.Expiry,
+	}
+}
+
+func (k *KeyPair) AppendEvents(events ...*es_models.Event) error {
+	for _, event := range events {
+		if err := k.AppendEvent(event); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (k *KeyPair) AppendEvent(event *es_models.Event) error {

@@ -75,7 +75,7 @@ func PrepareDeleteByKey(table string, key ColumnKey, id string) func(db *gorm.DB
 
 type Key struct {
 	Key   ColumnKey
-	Value string
+	Value interface{}
 }
 
 func PrepareDeleteByKeys(table string, keys ...Key) func(db *gorm.DB) error {

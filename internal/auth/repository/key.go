@@ -8,7 +8,7 @@ import (
 )
 
 type KeyRepository interface {
-	SaveKeyPair(ctx context.Context) error
+	GenerateSigningKeyPair(ctx context.Context) error
 	GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, errCh chan<- error, timer <-chan time.Time)
 	GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, error)
 }

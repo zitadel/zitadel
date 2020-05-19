@@ -22,7 +22,25 @@ const (
 	KeyUsageSigning KeyUsage = iota
 )
 
+func (u KeyUsage) String() string {
+	switch u {
+	case KeyUsageSigning:
+		return "sig"
+	}
+	return ""
+}
+
 type Key struct {
 	Key    *crypto.CryptoValue
 	Expiry time.Time
+}
+
+func (k *KeyPair) IsValid() bool {
+	return k.Algorithm != "" &&
+		k.PrivateKey != nil && k.PrivateKey.IsValid() &&
+		k.PublicKey != nil && k.PublicKey.IsValid()
+}
+
+func (k *Key) IsValid() bool {
+	return k.Key != nil
 }
