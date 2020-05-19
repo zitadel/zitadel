@@ -41,23 +41,7 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 }
 
 func (u *UserSession) Process(event *models.Event) (err error) {
-	eventData, err := view_model.UserSessionFromEvent(event)
-	if err != nil {
-		return err
-	}
-	session, err := u.view.UserSessionByIDs(eventData.UserAgentID, event.AggregateID)
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			return err
-		}
-		session = &view_model.UserSessionView{
-			CreationDate:  event.CreationDate,
-			ResourceOwner: event.ResourceOwner,
-			UserAgentID:   eventData.UserAgentID,
-			UserID:        event.AggregateID,
-			State:         int32(req_model.UserSessionStateActive),
-		}
-	}
+	var session *view_model.UserSessionView
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded,
 		es_model.UserPasswordCheckFailed,
@@ -65,6 +49,23 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 		es_model.MfaOtpCheckSucceeded,
 		es_model.MfaOtpCheckFailed,
 		es_model.MfaOtpRemoved:
+		eventData, err := view_model.UserSessionFromEvent(event)
+		if err != nil {
+			return err
+		}
+		session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.AggregateID)
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				return err
+			}
+			session = &view_model.UserSessionView{
+				CreationDate:  event.CreationDate,
+				ResourceOwner: event.ResourceOwner,
+				UserAgentID:   eventData.UserAgentID,
+				UserID:        event.AggregateID,
+				State:         int32(req_model.UserSessionStateActive),
+			}
+		}
 		session.AppendEvent(event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event.Sequence)
