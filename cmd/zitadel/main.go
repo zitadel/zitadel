@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/login"
 
@@ -48,11 +49,15 @@ func main() {
 	if *managementEnabled {
 		management.Start(ctx, conf.Mgmt, conf.AuthZ, conf.SystemDefaults)
 	}
+	var authRepo *eventsourcing.EsRepository
+	if *authEnabled || *loginEnabled {
+		authRepo, err = eventsourcing.Start(conf.Auth.Repository, conf.SystemDefaults)
+	}
 	if *authEnabled {
-		auth.Start(ctx, conf.Auth, conf.AuthZ, conf.SystemDefaults)
+		auth.Start(ctx, conf.Auth, conf.AuthZ, conf.SystemDefaults, authRepo)
 	}
 	if *loginEnabled {
-		login.Start(ctx, conf.Login, conf.SystemDefaults)
+		login.Start(ctx, conf.Login, conf.SystemDefaults, authRepo)
 	}
 	if *adminEnabled {
 		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
