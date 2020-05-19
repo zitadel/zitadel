@@ -15,7 +15,7 @@ type Chat struct {
 	SplitCount int
 }
 
-func InitChatProvider(config *ChatConfig) (*Chat, error) {
+func InitChatProvider(config ChatConfig) (*Chat, error) {
 	url, err := url.Parse(config.Url)
 	if err != nil {
 		return nil, err

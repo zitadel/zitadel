@@ -13,7 +13,7 @@ type Email struct {
 	smtpClient *smtp.Client
 }
 
-func InitEmailProvider(config *EmailConfig) (*Email, error) {
+func InitEmailProvider(config EmailConfig) (*Email, error) {
 	client, err := config.SMTP.connectToSMTP(config.Tls)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,10 @@ func (email *Email) HandleMessage(message providers.Message) error {
 }
 
 func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err error) {
-	host, _, _ := net.SplitHostPort(smtpConfig.Host)
+	host, _, err := net.SplitHostPort(smtpConfig.Host)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "EMAIL-spR56", "could not split host and port for connect to smtp")
+	}
 
 	if !tlsRequired {
 		client, err = smtpConfig.getSMPTClient()

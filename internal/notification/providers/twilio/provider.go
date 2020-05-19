@@ -11,7 +11,7 @@ type Twilio struct {
 	client *twilio.Client
 }
 
-func InitTwilioProvider(config *TwilioConfig) *Twilio {
+func InitTwilioProvider(config TwilioConfig) *Twilio {
 	return &Twilio{
 		client: twilio.NewClient(config.SID, config.Token, nil),
 	}

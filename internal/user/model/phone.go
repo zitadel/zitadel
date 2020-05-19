@@ -38,7 +38,6 @@ func (p *Phone) formatPhone() error {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-so0wa", "Phonenumber is invalid")
 	}
 	p.PhoneNumber = libphonenumber.Format(phoneNr, libphonenumber.E164)
-	libphonenumber.GetSupportedGlobalNetworkCallingCodes()
 	return nil
 }
 

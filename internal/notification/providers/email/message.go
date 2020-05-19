@@ -8,7 +8,7 @@ import (
 
 var (
 	isHTMLRgx = regexp.MustCompile(`.*<html.*>.*`)
-	lineBreak = "\n"
+	lineBreak = "\r\n"
 )
 
 type EmailMessage struct {

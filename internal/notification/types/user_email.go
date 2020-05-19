@@ -10,7 +10,7 @@ import (
 )
 
 func generateEmail(user *view_model.NotifyUser, content string, config systemdefaults.Notifications, lastEmail bool) error {
-	provider, err := email.InitEmailProvider(&config.Providers.Email)
+	provider, err := email.InitEmailProvider(config.Providers.Email)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func generateEmail(user *view_model.NotifyUser, content string, config systemdef
 }
 
 func sendDebugEmail(message providers.Message, config systemdefaults.Notifications) error {
-	provider, err := chat.InitChatProvider(&config.Providers.Chat)
+	provider, err := chat.InitChatProvider(config.Providers.Chat)
 	if err != nil {
 		return err
 	}

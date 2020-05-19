@@ -10,7 +10,7 @@ import (
 )
 
 func generateSms(user *view_model.NotifyUser, content string, config systemdefaults.Notifications, lastPhone bool) error {
-	provider := twilio.InitTwilioProvider(&config.Providers.Twilio)
+	provider := twilio.InitTwilioProvider(config.Providers.Twilio)
 	message := &twilio.TwilioMessage{
 		SenderPhoneNumber:    config.Providers.Twilio.From,
 		RecipientPhoneNumber: user.VerifiedPhone,
@@ -29,7 +29,7 @@ func generateSms(user *view_model.NotifyUser, content string, config systemdefau
 }
 
 func sendDebugPhone(message providers.Message, config systemdefaults.Notifications) error {
-	provider, err := chat.InitChatProvider(&config.Providers.Chat)
+	provider, err := chat.InitChatProvider(config.Providers.Chat)
 	if err != nil {
 		return err
 	}
