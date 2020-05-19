@@ -2,10 +2,16 @@ package model
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
+	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/key/model"
+	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
 )
 
 const (
@@ -26,6 +32,33 @@ type KeyView struct {
 	Sequence  uint64              `json:"-" gorm:"column:sequence"`
 }
 
+func KeysFromPairEvent(event *models.Event) (*KeyView, *KeyView, error) {
+	pair := new(es_model.KeyPair)
+	if err := json.Unmarshal(event.Data, pair); err != nil {
+		logging.Log("MODEL-s3Ga1").WithError(err).Error("could not unmarshal event data")
+		return nil, nil, caos_errs.ThrowInternal(nil, "MODEL-G3haa", "could not unmarshal data")
+	}
+	privateKey := &KeyView{
+		ID:        pair.AggregateID,
+		Private:   sql.NullBool{Bool: true, Valid: true},
+		Expiry:    pair.PrivateKey.Expiry,
+		Algorithm: pair.Algorithm,
+		Usage:     pair.Usage,
+		Key:       pair.PrivateKey.Key,
+		Sequence:  pair.Sequence,
+	}
+	publicKey := &KeyView{
+		ID:        pair.AggregateID,
+		Private:   sql.NullBool{Bool: false, Valid: true},
+		Expiry:    pair.PublicKey.Expiry,
+		Algorithm: pair.Algorithm,
+		Usage:     pair.Usage,
+		Key:       pair.PublicKey.Key,
+		Sequence:  pair.Sequence,
+	}
+	return privateKey, publicKey, nil
+}
+
 func KeyViewsToModel(keys []*KeyView) []*model.KeyView {
 	converted := make([]*model.KeyView, len(keys))
 	for i, key := range keys {
@@ -44,4 +77,23 @@ func KeyViewToModel(key *KeyView) *model.KeyView {
 		Key:       key.Key,
 		Sequence:  key.Sequence,
 	}
+}
+
+func (k *KeyView) AppendEvent(event *models.Event) (err error) {
+	k.Sequence = event.Sequence
+	switch event.Type {
+	case es_model.KeyPairAdded:
+		err = k.setData(event)
+		if err != nil {
+			return err
+		}
+	}
+}
+
+func (k *KeyView) setData(event *models.Event) error {
+	if err := json.Unmarshal(event.Data, k); err != nil {
+		logging.Log("MODEL-4ag41").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(nil, "MODEL-GFQ31", "could not unmarshal data")
+	}
+	return nil
 }

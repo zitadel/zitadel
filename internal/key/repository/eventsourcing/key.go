@@ -8,6 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
 )
 
+func KeyPairQuery(latestSequence uint64) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.KeyPairAggregate).
+		LatestSequenceFilter(latestSequence)
+}
+
 func KeyPairAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, pair *model.KeyPair) (*es_models.Aggregate, error) {
 	if pair == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d5HNJA", "existing key pair must not be nil")

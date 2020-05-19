@@ -47,9 +47,13 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 	return keys, err
 }
 
-func PutKey(db *gorm.DB, table string, key *model.KeyView) error {
+func PutKeys(db *gorm.DB, table string, privateKey, publicKey *model.KeyView) error {
 	save := view.PrepareSave(table)
-	return save(db, key)
+	err := save(db, privateKey)
+	if err != nil {
+		return err
+	}
+	return save(db, publicKey)
 }
 
 func DeleteKey(db *gorm.DB, table, keyID string, private bool) error {

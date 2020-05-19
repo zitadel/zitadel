@@ -31,12 +31,12 @@ func (v *View) GetActiveKeySet() ([]*key_model.PublicKey, error) {
 	return key_model.PublicKeysFromKeyView(model.KeyViewsToModel(keys), v.keyAlgorithm)
 }
 
-func (v *View) PutKey(key *model.KeyView) error {
-	err := view.PutKey(v.Db, keyTable, key)
+func (v *View) PutKeys(privateKey, publicKey *model.KeyView, eventSequence uint64) error {
+	err := view.PutKeys(v.Db, keyTable, privateKey, publicKey)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedKeySequence(key.Sequence)
+	return v.ProcessedKeySequence(eventSequence)
 }
 
 func (v *View) DeleteKey(keyID string, private bool, eventSequence uint64) error {
