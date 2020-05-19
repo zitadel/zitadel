@@ -31,7 +31,7 @@ type EsRepository struct {
 	eventstore.ProjectRepo
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
-	PolicyRepo
+	eventstore.PolicyRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -88,7 +88,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		ProjectRepo:   eventstore.ProjectRepo{conf.SearchLimit, project, view},
 		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, view},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
-		PolicyRepo:    PolicyRepo{policy},
+		PolicyRepo:    eventstore.PolicyRepo{policy},
 	}, nil
 }
 
