@@ -65,10 +65,10 @@ func setUpOrgResponseFromModel(setUp *admin_model.SetupOrg) *OrgSetUpResponse {
 	}
 }
 
-func orgsFromModel(orgs []*org_model.Org) []*Org {
+func orgViewsFromModel(orgs []*org_model.OrgView) []*Org {
 	result := make([]*Org, len(orgs))
 	for i, org := range orgs {
-		result[i] = orgFromModel(org)
+		result[i] = orgViewFromModel(org)
 	}
 
 	return result
@@ -86,6 +86,23 @@ func orgFromModel(org *org_model.Org) *Org {
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.AggregateID,
+		Name:         org.Name,
+		State:        orgStateFromModel(org.State),
+	}
+}
+
+func orgViewFromModel(org *org_model.OrgView) *Org {
+	creationDate, err := ptypes.TimestampProto(org.CreationDate)
+	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
+
+	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
+	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
+
+	return &Org{
+		Domain:       org.Domain,
+		ChangeDate:   changeDate,
+		CreationDate: creationDate,
+		Id:           org.ID,
 		Name:         org.Name,
 		State:        orgStateFromModel(org.State),
 	}

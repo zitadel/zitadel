@@ -93,6 +93,7 @@ Admin:
       CustomHeaders:
         - x-zitadel-
   Repository:
+    SearchLimit: 100
     Eventstore:
       ServiceName: 'Admin'
       Repository:
@@ -106,6 +107,16 @@ Admin:
         Type: 'fastcache'
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
+    View:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'admin_api'
+      Database: 'admin_api'
+      SSLmode: disable
+    Spooler:
+      ConcurrentTasks: 1
+      BulkLimit: 100
+      FailureCountUntilSkip: 5
 
 Console:
   Port: 50050
