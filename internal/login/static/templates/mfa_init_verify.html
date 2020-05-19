@@ -1,0 +1,37 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "MfaInitVerify.Title"}}</h1>
+<p>{{t "MfaInitVerify.Description"}}</p>
+
+<form action="{{ mfaInitVerifyUrl }}" method="POST">
+
+    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="mfaType" value="{{ .MfaType }}" />
+    <input type="hidden" name="url" value="{{ .Url }}" />
+    <input type="hidden" name="secret" value="{{ .Secret }}" />
+
+
+    {{if (eq .MfaType 2) }}
+        <p>{{t "MfaInitVerify.OtpDescription"}}</p>
+        <img src="data:image/png;base64,{{.QrCode}}">
+        <div class="fields">
+            <div class="field">
+                <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</label>
+                <span class="input" id="secret">{{.Secret}}</span>
+            </div>
+            <div class="field">
+               <label class="label" for="code">{{t "MfaInitVerify.Code"}}</label>
+                <input class="input" type="text" id="code" name="code" placeholder="{{t "MfaInitVerify.Code"}}" autocomplete="off" autofocus required>
+            </div>
+        </div>
+    {{end}}
+   
+    <div class="actions">
+        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

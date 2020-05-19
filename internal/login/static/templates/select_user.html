@@ -1,0 +1,25 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "UserSelection.Title"}}</h1>
+<p>{{t "UserSelection.Description"}}</p>
+
+<form action="{{ userSelectionUrl }}" method="POST">
+
+    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+
+    <div class="actions">
+        {{ range $user := .Users }}
+        {{ $sessionState := (t (printf "UserSelection.SessionState%v" $user.UserSessionState)) }}
+        <button type="submit" name="userSessionID" value="{{$user.SessionID}}" class="primary">
+            <span class="username">{{$user.UserName}}</span>
+            <span class="sessionstate">({{$sessionState}})</span>
+        </button>
+        {{ end }}
+        <button type="submit" name="userSessionID" value="0" class="primary">{{t "UserSelection.OtherUser"}}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

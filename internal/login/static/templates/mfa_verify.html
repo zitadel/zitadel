@@ -1,0 +1,28 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "MfaVerify.Title"}}</h1>
+<p>{{t "MfaVerify.Description"}}</p>
+
+<form action="{{ mfaVerifyUrl }}" method="POST">
+
+    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="mfaType" value="{{ .SelectedMfaProvider }}" />
+
+    <div class="fields">
+        <div class="field">
+            <label class="label" for="code">{{t "MfaVerify.Code"}}</label>
+            <input class="input" type="text" id="code" name="code" placeholder="{{t "MfaVerify.Code"}}" autocomplete="off" autofocus required>
+        </div>
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="actions">
+        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

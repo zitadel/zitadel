@@ -1,0 +1,116 @@
+@import "fonts";
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    font-family: $standardFont;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+body {
+    margin: 0;
+}
+
+html {
+    background-color: $backgroundColor;
+    color: $fontColor;
+}
+
+h1 {
+    font-family: $headerFont;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 40px;
+}
+
+header {
+    padding: 8px;
+
+    .logo {
+        background-image: url($logoImgDark);
+        background-repeat: no-repeat;
+        background-size: contain;
+        height: 80px;
+    }
+}
+
+.content {
+    margin: auto;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+button {
+    text-transform: uppercase;
+    background-color: $backgroundColor;
+    color: $primaryColor;
+    border: 2px solid $primaryColor;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 600px;
+    height: 40px; 
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+    outline: none;
+    &:hover {
+        background-color: $primaryColorHover;
+        border: 2px solid $primaryColorHover;
+    }
+
+    &.primary {
+        background-color: $primaryColor;
+        color: $fontColor;
+        border: none;
+        &:hover {
+            background-color: $primaryColorHover;
+        }
+    }
+
+    & > .sessionstate {
+        text-transform: lowercase;
+    }
+}
+
+input {
+    background-color: $backgroundColor;
+    color: $fontColor;
+    height: 40px;;
+}
+
+form {
+    .field {
+        display: grid;
+        padding: 10px 0;
+    }
+
+    .field.radio-button {
+        display: inherit;
+    }
+
+    .label {
+        text-transform: uppercase;
+    }
+
+    .actions {
+        padding: 20px 0;
+
+        .right {
+            float: right;
+        }
+
+        button {
+            margin: 10px 0;
+        }
+    }
+}
+
+footer {
+    background-image: url($footerimgDark);
+    width: 100%;
+    background-size: cover;
+    height: 44vw;
+    position: absolute;
+    bottom: 0;
+    z-index: -1;
+}

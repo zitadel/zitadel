@@ -1,0 +1,37 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "InitUser.Title" }}</h1>
+<p>{{t "InitUser.Description" }}</p>
+
+<form action="{{ initUserUrl }}" method="POST">
+
+    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="userID" value="{{ .UserID }}" />
+
+    <div class="fields">
+        <div class="field">
+            <label class="label" for="code">{{t "InitUser.Code"}}</label>
+            <input class="input" type="text" id="code" name="code" value="{{.Code}}" placeholder="{{t "InitUser.Code"}}" autocomplete="off" autofocus required>
+        </div>
+        <div class="field">
+            <label class="label" for="password">{{t "InitUser.NewPassword"}}</label>
+            <input class="input" type="password" id="password" name="password" placeholder="{{t "InitUser.NewPassword"}}" autocomplete="new-password" autofocus required>
+        </div>
+        <div class="field">
+            <label class="label" for="passwordconfirm">{{t "InitUser.NewPasswordConfirm"}}</label>
+            <input class="input" type="password" id="passwordconfirm" name="passwordconfirm" placeholder="{{t "InitUser.NewPasswordConfirm"}}" autocomplete="new-password" autofocus required>
+        </div>
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="actions">
+        <button type="submit" name="resend" value="false" class="primary right" >{{t "Actions.Next"}}</buttontype="submit">
+        <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend" }}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

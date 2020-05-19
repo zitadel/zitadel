@@ -1,0 +1,18 @@
+// ----- FONTS ------------
+$standardFont: Lato;
+$headerFont: Aileron;
+
+// ----- COLORS ------------
+
+// ------ DARK-THEME -------
+$backgroundColor: #282828;
+$fontColor: white;
+$primaryColor: #1e00ff;
+$primaryColorHover: lighten($primaryColor, 10%);
+
+
+// ------ LIGHT-THEME -------
+$backgroundColorLight: $fontColor;
+$fontColorLight: $backgroundColor;
+$primaryColorLight: $primaryColor;
+$primaryColorHoverLight: lighten($primaryColorLight, 10%);

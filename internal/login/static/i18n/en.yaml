@@ -1,0 +1,113 @@
+Login:
+  Title: Login
+  Description: Enter your logindata.
+  Username: Username
+
+UserSelection:
+  Title: Select account
+  Description: Select your account.
+  OtherUser: Other User
+  SessionState1: active
+  SessionState2: inactive
+
+Password:
+  Title: Password
+  Description: Enter your logindata.
+  Password: Password
+
+MfaVerify:
+  Title: Verify Multificator
+  Description: Verify your multifactor
+  OTP: OTP
+  Code: Code
+
+InitPassword: 
+  Title: Set Password
+  Description: You have received a code, which you have to enter in the form below, to set your new password.
+  Code: Code
+  NewPassword: New Password
+  NewPasswordConfirm: Confirm Password
+
+InitPasswordDone:
+  Title: Passwortd set
+  Description: Password successfully set
+
+InitUser:
+  Title: Activate User
+  Description: You have received a code, which you have to enter in the form below, to verify your email and set your new password.
+  Code: Code
+  NewPassword: New Password
+  NewPasswordConfirm: Confirm Password
+
+InitUserDone:
+  Title: User activated
+  Description: Email verified and Password successfully set
+
+MfaPrompt:
+  Title: Multifactor Setup
+  Description: Would you like to setup multifactor authentication?
+  Provider1: SMS
+  Provider2: OTP
+
+MfaInitVerify:
+  Title: Multifactor Verification
+  Description: Verify your multifactor.
+  OtpDescription: Scan the code (e.g Google-Authentificator) and insert your code
+  Secret: Secret
+  Code: Code
+
+MfaInitDone:
+  Title: Multifcator Verification done
+  Description: Multifactor verification successfully done. The multifactor has to be entered on each login, even in the actual authentification process.
+
+PasswordChange:
+  Title: Change Password
+  Description: Change your password. Enter your old and new password.
+  OldPassword: Old Password
+  NewPassword: New Password
+
+PasswordChangeDone:
+  Title: Change Password
+  Description: Your password was changed successfully.
+
+PasswordSetDone:
+  Title: Password set
+  Description: Your password was set successfully.
+
+EmailVerification:
+  Title: E-Mail Verification
+  Description: We have sent you an email to verify your address. Please enter the code in the form below.
+  Code: Code
+
+EmailVerificationDone:
+  Title: E-Mail Verification
+  Description: Your email address has been successfully verified.
+
+Registration:
+  Title: Registration
+  Description: Enter your Userdata. Your email address will be used as username.
+  Email: E-Mail
+  Firstname: Firstname
+  Lastname: Lastname
+  Nickname: Nickname
+  Language: Language
+  German: Deutsch
+  English: English
+  Gender: Gender
+  Female: Female
+  Male: Male
+  Password: Password
+  Password2: Password confirmation
+
+LogoutDone:
+  Title: Logged out
+  Description: You have logged out successfully.
+
+Actions:
+  Login: login
+  Next: next
+  Back: back
+  Resend: resend
+  Skip: skip
+  Register: register
+  ForgotPassword: Forgot password
