@@ -81,7 +81,7 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 		return err
 	}
 	request.UserID = user.ID
-	return repo.AuthRequests.SaveAuthRequest(ctx, request)
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password string, info *model.BrowserInfo) error {

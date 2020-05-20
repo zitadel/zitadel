@@ -65,3 +65,19 @@ func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *model.Aut
 	}
 	return nil
 }
+
+func (c *AuthRequestCache) UpdateAuthRequest(_ context.Context, request *model.AuthRequest) error {
+	b, err := json.Marshal(request)
+	if err != nil {
+		return caos_errs.ThrowInternal(err, "CACHE-os0GH", "unable to marshal auth request")
+	}
+	stmt, err := c.client.Prepare("UPDATE auth.auth_requests SET request = $2 WHERE id = $1")
+	if err != nil {
+		return caos_errs.ThrowInternal(err, "CACHE-su3GK", "sql prepare failed")
+	}
+	_, err = stmt.Exec(request.ID, b)
+	if err != nil {
+		return caos_errs.ThrowInternal(err, "CACHE-sj8iS", "unable to save auth request")
+	}
+	return nil
+}

@@ -47,7 +47,7 @@ func (l *Login) handleUsernameCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authReq, nil, nil)
 		return
 	}
-	err = l.authRepo.CheckUsername(r.Context(), authReq.UserID, data.UserName)
+	err = l.authRepo.CheckUsername(r.Context(), authReq.ID, data.UserName)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
