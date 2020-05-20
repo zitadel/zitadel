@@ -76,7 +76,7 @@ func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*F
 	query := PrepareGetByQuery(table, queries...)
 	err := query(db, failedEvent)
 
-	if err == nil {
+	if err == nil && failedEvent.ViewName != "" {
 		return failedEvent, nil
 	}
 

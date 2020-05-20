@@ -76,7 +76,7 @@ func (u *User) appendUserEmailChangedEvent(event *es_models.Event) error {
 
 func (u *User) appendUserEmailCodeAddedEvent(event *es_models.Event) error {
 	u.EmailCode = new(EmailCode)
-	return u.EmailCode.setData(event)
+	return u.EmailCode.SetData(event)
 }
 
 func (u *User) appendUserEmailVerifiedEvent() {
@@ -92,7 +92,7 @@ func (a *Email) setData(event *es_models.Event) error {
 	return nil
 }
 
-func (a *EmailCode) setData(event *es_models.Event) error {
+func (a *EmailCode) SetData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo9s").WithError(err).Error("could not unmarshal event data")

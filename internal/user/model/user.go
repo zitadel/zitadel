@@ -58,7 +58,7 @@ func (u *User) SetEmailAsUsername() {
 }
 
 func (u *User) IsValid() bool {
-	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.UserName != "" && u.Email != nil && u.EmailAddress != ""
+	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.UserName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.IsValid())
 }
 
 func (u *User) IsInitialState() bool {

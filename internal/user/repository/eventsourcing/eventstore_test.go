@@ -161,7 +161,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "with verified phone number",
 			args: args{
-				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber", IsPhoneVerified: true}}),
+				es:  GetMockManipulateUserWithInitCodeGen(ctrl, repo_model.User{Profile: &repo_model.Profile{UserName: "EmailAddress", FirstName: "FirstName", LastName: "LastName"}, Email: &repo_model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true}, Phone: &repo_model.Phone{PhoneNumber: "+41711234567", IsPhoneVerified: true}}),
 				ctx: auth.NewMockContext("orgID", "userID"),
 				user: &model.User{ObjectRoot: es_models.ObjectRoot{Sequence: 1},
 					Profile: &model.Profile{
@@ -174,7 +174,7 @@ func TestCreateUser(t *testing.T) {
 						IsEmailVerified: true,
 					},
 					Phone: &model.Phone{
-						PhoneNumber:     "UserName",
+						PhoneNumber:     "+41711234567",
 						IsPhoneVerified: true,
 					},
 				},
@@ -191,7 +191,7 @@ func TestCreateUser(t *testing.T) {
 						IsEmailVerified: true,
 					},
 					Phone: &model.Phone{
-						PhoneNumber:     "UserName",
+						PhoneNumber:     "+41711234567",
 						IsPhoneVerified: true,
 					},
 				},
@@ -816,6 +816,67 @@ func TestCreateInitCode(t *testing.T) {
 			}
 			if tt.res.errFunc == nil && result.Expiry != tt.res.code.Expiry {
 				t.Errorf("got wrong result expiry: expected: %v, actual: %v ", tt.res.code.Expiry, result.Expiry)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestInitCodeSent(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "sent init",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.InitCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("rshould not get err")
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -1468,6 +1529,67 @@ func TestRequestSetPassword(t *testing.T) {
 	}
 }
 
+func TestPasswordCodeSent(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "sent password code",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.PasswordCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("rshould not get err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestProfileByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
@@ -1907,6 +2029,67 @@ func TestCreateEmailVerificationCode(t *testing.T) {
 	}
 }
 
+func TestEmailVerificationCodeSent(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "sent email verify code",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.EmailVerificationCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("rshould not get err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestPhoneByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
@@ -1995,10 +2178,10 @@ func TestChangePhone(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateUserFull(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: true},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "0711234567", IsPhoneVerified: true},
 			},
 			res: res{
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: true},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: true},
 			},
 		},
 		{
@@ -2006,10 +2189,10 @@ func TestChangePhone(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateUserWithPhoneCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Profile: &repo_model.Profile{UserName: "UserName"}, Phone: &repo_model.Phone{PhoneNumber: "PhoneNumber"}}),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: false},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: false},
 			},
 			res: res{
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: false},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: false},
 			},
 		},
 		{
@@ -2028,7 +2211,7 @@ func TestChangePhone(t *testing.T) {
 			args: args{
 				es:    GetMockManipulateUserNoEvents(ctrl),
 				ctx:   auth.NewMockContext("orgID", "userID"),
-				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "PhoneNumberChanged", IsPhoneVerified: true},
+				phone: &model.Phone{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, PhoneNumber: "+41711234567", IsPhoneVerified: true},
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2204,6 +2387,67 @@ func TestCreatePhoneVerificationCode(t *testing.T) {
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("should not ger err")
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestPhoneVerificationCodeSent(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es       *UserEventstore
+		ctx      context.Context
+		existing *model.User
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "sent phone verification code",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:       GetMockManipulateUser(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:       GetMockManipulateUserNoEvents(ctrl),
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.PhoneVerificationCodeSent(tt.args.ctx, tt.args.existing.AggregateID)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("rshould not get err")
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
