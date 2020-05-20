@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -17,7 +16,8 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	//userAgentCtx := ctx.Value(UserAgentContext)
 	userAgentID, ok := UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
+		userAgentID = "ua"
+		//TODO: return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
 	//var err error
 	//if userAgentCtx != nil {
@@ -57,7 +57,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (st
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Request.(*model.AuthRequestOIDC).Scopes, lifetime)
+	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Request.(*model.AuthRequestOIDC).Scopes, 5*time.Minute) //TODO: lifetime
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -81,5 +81,5 @@ func (o *OPStorage) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, error) 
 }
 
 func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
-	return o.repo.SaveKeyPair(ctx)
+	return o.repo.GenerateSigningKeyPair(ctx)
 }

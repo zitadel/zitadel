@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -25,9 +26,10 @@ type KeyEventstore struct {
 
 type KeyConfig struct {
 	Size               int
-	PrivateKeyLifetime time.Duration
-	PublicKeyLifetime  time.Duration
+	PrivateKeyLifetime types.Duration
+	PublicKeyLifetime  types.Duration
 	EncryptionConfig   *crypto.KeyConfig
+	SigningKeyRotation types.Duration
 }
 
 func StartKey(eventstore es_int.Eventstore, config KeyConfig, keyAlgorithm crypto.EncryptionAlgorithm, generator id.Generator) (*KeyEventstore, error) {
@@ -35,8 +37,8 @@ func StartKey(eventstore es_int.Eventstore, config KeyConfig, keyAlgorithm crypt
 		Eventstore:         eventstore,
 		keySize:            config.Size,
 		keyAlgorithm:       keyAlgorithm,
-		privateKeyLifetime: config.PrivateKeyLifetime,
-		publicKeyLifetime:  config.PublicKeyLifetime,
+		privateKeyLifetime: config.PrivateKeyLifetime.Duration,
+		publicKeyLifetime:  config.PublicKeyLifetime.Duration,
 		idGenerator:        generator,
 	}, nil
 }
@@ -67,7 +69,7 @@ func (es *KeyEventstore) GenerateKeyPair(ctx context.Context, usage key_model.Ke
 	return es.CreateKeyPair(ctx, &key_model.KeyPair{
 		ObjectRoot: models.ObjectRoot{},
 		Usage:      usage,
-		Algorithm:  es.keyAlgorithm.Algorithm(),
+		Algorithm:  "RS256", //TODO: ?
 		PrivateKey: &key_model.Key{
 			Key:    privateKey,
 			Expiry: privateKeyExp,

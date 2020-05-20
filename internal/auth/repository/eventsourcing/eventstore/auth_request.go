@@ -224,10 +224,13 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string)
 
 func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
 	session, err := provider.UserSessionByIDs(agentID, userID)
-	if err != nil {
-		return nil, err
+	if err == nil {
+		return view_model.UserSessionToModel(session), nil
 	}
-	return view_model.UserSessionToModel(session), nil
+	if errors.IsNotFound(err) {
+		return &user_model.UserSessionView{}, nil
+	}
+	return nil, err
 }
 
 func userByID(provider userViewProvider, userID string) (*user_model.UserView, error) {

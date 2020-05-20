@@ -15,6 +15,7 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -32,6 +33,7 @@ type EsRepository struct {
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
 	eventstore.KeyRepository
+	eventstore.ApplicationRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -75,6 +77,17 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
+	project, err := es_proj.StartProject(
+		es_proj.ProjectConfig{
+			Cache:      conf.Eventstore.Cache,
+			Eventstore: es,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	repos := handler.EventstoreRepos{UserEvents: user}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos)
 
@@ -98,8 +111,13 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		},
 		eventstore.TokenRepo{View: view},
 		eventstore.KeyRepository{
-			KeyEvents: key,
-			View:      view,
+			KeyEvents:          key,
+			View:               view,
+			SigningKeyRotation: conf.KeyConfig.SigningKeyRotation.Duration,
+		},
+		eventstore.ApplicationRepo{
+			View:          view,
+			ProjectEvents: project,
 		},
 	}, nil
 }

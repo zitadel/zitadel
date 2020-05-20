@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
@@ -268,11 +269,41 @@ func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 		if err != nil {
 			return nil, err
 		}
-		changes := make(map[string]interface{}, 1)
+		changes := make(map[string]interface{}, 2)
 		changes["appId"] = appID
 		changes["clientSecret"] = secret
 
 		agg.AppendEvent(model.OIDCConfigSecretChanged, changes)
+
+		return agg, nil
+	}
+}
+
+func OIDCClientSecretCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, appID string) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := make(map[string]interface{}, 1)
+		changes["appId"] = appID
+
+		agg.AppendEvent(model.OIDCClientSecretCheckSucceeded, changes)
+
+		return agg, nil
+	}
+}
+
+func OIDCClientSecretCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, appID string) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := make(map[string]interface{}, 1)
+		changes["appId"] = appID
+
+		agg.AppendEvent(model.OIDCClientSecretCheckFailed, changes)
 
 		return agg, nil
 	}

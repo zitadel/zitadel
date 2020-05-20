@@ -121,6 +121,10 @@ func (repo *UserRepo) SignOut(ctx context.Context, agentID, userID string) error
 	return repo.UserEvents.SignOut(ctx, agentID, userID)
 }
 
+func (repo *UserRepo) UserByID(ctx context.Context, userID string) (*model.User, error) {
+	return repo.UserEvents.UserByID(ctx, userID)
+}
+
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
 	if obj.AggregateID != auth.GetCtxData(ctx).UserID {
 		return errors.ThrowPermissionDenied(nil, "EVENT-kFi9w", "object does not belong to user")

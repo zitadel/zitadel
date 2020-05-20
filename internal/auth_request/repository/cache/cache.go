@@ -35,15 +35,15 @@ func (c *AuthRequestCache) Health(ctx context.Context) error {
 
 func (c *AuthRequestCache) GetAuthRequestByID(_ context.Context, id string) (*model.AuthRequest, error) {
 	var b []byte
-	err := c.client.QueryRow("SELECT request FROM auth.authrequests WHERE id = ?", id).Scan(&b)
+	err := c.client.QueryRow("SELECT request FROM auth.auth_requests WHERE id = $1", id).Scan(&b)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, caos_errs.ThrowNotFound(err, "CACHE-d24aD", "auth request not found")
 		}
 		return nil, caos_errs.ThrowInternal(err, "CACHE-as3kj", "unable to get auth request from database")
 	}
-	request := new(model.AuthRequest)
-	err = json.Unmarshal(b, &request)
+	request := &model.AuthRequest{Request: &model.AuthRequestOIDC{}} //TODO: ?
+	err = json.Unmarshal(b, request)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "CACHE-2wshg", "unable to unmarshal auth request")
 	}
@@ -55,7 +55,7 @@ func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *model.Aut
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-32FH9", "unable to marshal auth request")
 	}
-	stmt, err := c.client.Prepare("INSERT INTO auth.authrequests (id, request) VALUES($1, $2)")
+	stmt, err := c.client.Prepare("INSERT INTO auth.auth_requests (id, request) VALUES($1, $2)")
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-dswfF", "sql prepare failed")
 	}

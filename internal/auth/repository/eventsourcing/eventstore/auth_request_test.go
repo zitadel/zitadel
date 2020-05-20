@@ -25,6 +25,16 @@ func (m *mockViewNoUserSession) UserSessionsByAgentID(string) ([]*view_model.Use
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
+type mockViewErrUserSession struct{}
+
+func (m *mockViewErrUserSession) UserSessionByIDs(string, string) (*view_model.UserSessionView, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockViewErrUserSession) UserSessionsByAgentID(string) ([]*view_model.UserSessionView, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
 type mockViewUserSession struct {
 	PasswordVerification    time.Time
 	MfaSoftwareVerification time.Time
@@ -166,13 +176,25 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"usersession not found, not found error",
+			"usersession not found, new user session, password step",
 			fields{
 				userSessionViewProvider: &mockViewNoUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordSet: true,
+				},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			[]model.NextStep{&model.PasswordStep{}},
+			nil,
+		},
+		{
+			"usersession error, internal error",
+			fields{
+				userSessionViewProvider: &mockViewErrUserSession{},
 			},
 			args{&model.AuthRequest{UserID: "UserID"}},
 			nil,
-			errors.IsNotFound,
+			errors.IsInternal,
 		},
 		{
 			"user not not found, not found error",

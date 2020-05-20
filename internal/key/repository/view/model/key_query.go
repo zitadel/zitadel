@@ -51,7 +51,7 @@ func (req KeySearchQuery) GetValue() interface{} {
 
 func (key KeySearchKey) ToColumnName() string {
 	switch key_model.KeySearchKey(key) {
-	case key_model.KEYSEARCHKEY_APP_ID:
+	case key_model.KEYSEARCHKEY_ID:
 		return KeyKeyID
 	case key_model.KEYSEARCHKEY_PRIVATE:
 		return KeyPrivate

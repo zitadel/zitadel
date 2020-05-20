@@ -23,12 +23,12 @@ const (
 )
 
 type KeyView struct {
-	ID        string              `json:"-" gorm:"column:key_id;primary_key"`
+	ID        string              `json:"-" gorm:"column:id;primary_key"`
 	Private   sql.NullBool        `json:"-" gorm:"column:private;primary_key"`
 	Expiry    time.Time           `json:"-" gorm:"column:expiry"`
 	Algorithm string              `json:"-" gorm:"column:algorithm"`
 	Usage     int32               `json:"-" gorm:"column:usage"`
-	Key       *crypto.CryptoValue `json:"key" gorm:"column:key"`
+	Key       *crypto.CryptoValue `json:"-" gorm:"column:key"`
 	Sequence  uint64              `json:"-" gorm:"column:sequence"`
 }
 
@@ -39,7 +39,7 @@ func KeysFromPairEvent(event *models.Event) (*KeyView, *KeyView, error) {
 		return nil, nil, caos_errs.ThrowInternal(nil, "MODEL-G3haa", "could not unmarshal data")
 	}
 	privateKey := &KeyView{
-		ID:        pair.AggregateID,
+		ID:        event.AggregateID,
 		Private:   sql.NullBool{Bool: true, Valid: true},
 		Expiry:    pair.PrivateKey.Expiry,
 		Algorithm: pair.Algorithm,
@@ -48,7 +48,7 @@ func KeysFromPairEvent(event *models.Event) (*KeyView, *KeyView, error) {
 		Sequence:  pair.Sequence,
 	}
 	publicKey := &KeyView{
-		ID:        pair.AggregateID,
+		ID:        event.AggregateID,
 		Private:   sql.NullBool{Bool: false, Valid: true},
 		Expiry:    pair.PublicKey.Expiry,
 		Algorithm: pair.Algorithm,
@@ -76,17 +76,6 @@ func KeyViewToModel(key *KeyView) *model.KeyView {
 		Usage:     model.KeyUsage(key.Usage),
 		Key:       key.Key,
 		Sequence:  key.Sequence,
-	}
-}
-
-func (k *KeyView) AppendEvent(event *models.Event) (err error) {
-	k.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.KeyPairAdded:
-		err = k.setData(event)
-		if err != nil {
-			return err
-		}
 	}
 }
 

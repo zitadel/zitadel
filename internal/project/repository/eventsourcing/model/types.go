@@ -34,7 +34,9 @@ const (
 	ApplicationDeactivated models.EventType = "project.application.deactivated"
 	ApplicationReactivated models.EventType = "project.application.reactivated"
 
-	OIDCConfigAdded         models.EventType = "project.application.config.oidc.added"
-	OIDCConfigChanged       models.EventType = "project.application.config.oidc.changed"
-	OIDCConfigSecretChanged models.EventType = "project.application.config.oidc.secret.changed"
+	OIDCConfigAdded                models.EventType = "project.application.config.oidc.added"
+	OIDCConfigChanged              models.EventType = "project.application.config.oidc.changed"
+	OIDCConfigSecretChanged        models.EventType = "project.application.config.oidc.secret.changed"
+	OIDCClientSecretCheckSucceeded models.EventType = "project.application.oidc.secret.check.succeeded"
+	OIDCClientSecretCheckFailed    models.EventType = "project.application.oidc.secret.check.failed"
 )

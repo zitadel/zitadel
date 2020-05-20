@@ -20,7 +20,7 @@ type AuthRequest struct {
 }
 
 func (a *AuthRequest) GetID() string {
-	return a.AgentID + ":" + a.ID //TODO: necessary?
+	return a.ID
 }
 
 func (a *AuthRequest) GetACR() string {
@@ -30,10 +30,10 @@ func (a *AuthRequest) GetACR() string {
 
 func (a *AuthRequest) GetAMR() []string {
 	amr := make([]string, 0)
-	if a.UserSession.PasswordVerified {
+	if a.PasswordVerified {
 		amr = append(amr, "password")
 	}
-	if a.UserSession.MfaVerified {
+	if len(a.MfasVerified) > 0 {
 		amr = append(amr, "mfa") //PLANNED: add types
 	} //PLANNED: impl
 	return amr
@@ -41,10 +41,12 @@ func (a *AuthRequest) GetAMR() []string {
 
 func (a *AuthRequest) GetAudience() []string {
 	//return a.ProjectClientIDs
+	return []string{a.ApplicationID}
 }
 
 func (a *AuthRequest) GetAuthTime() time.Time {
-	return a.UserSession.AuthTime
+	return time.Now().UTC()
+	//TODO: return a.AuthTime
 }
 
 func (a *AuthRequest) GetClientID() string {

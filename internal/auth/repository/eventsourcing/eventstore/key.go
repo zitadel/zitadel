@@ -6,18 +6,25 @@ import (
 
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/key/model"
 	key_event "github.com/caos/zitadel/internal/key/repository/eventsourcing"
 )
 
+const (
+	oidcUser = "OIDC"
+	iamOrg   = "IAM"
+)
+
 type KeyRepository struct {
 	KeyEvents          *key_event.KeyEventstore
 	View               *view.View
-	signingKeyRotation time.Duration
+	SigningKeyRotation time.Duration
 }
 
 func (k *KeyRepository) GenerateSigningKeyPair(ctx context.Context) error {
+	ctx = setOIDCCtx(ctx)
 	_, err := k.KeyEvents.GenerateKeyPair(ctx, model.KeyUsageSigning)
 	return err
 }
@@ -30,7 +37,7 @@ func (k *KeyRepository) GetSigningKey(ctx context.Context, keyCh chan<- jose.Sig
 				return
 			case <-renewTimer:
 				k.refreshSigningKey(keyCh, errCh)
-				renewTimer = time.After(k.signingKeyRotation)
+				renewTimer = time.After(k.SigningKeyRotation)
 			}
 		}
 	}()
@@ -61,4 +68,8 @@ func (k *KeyRepository) refreshSigningKey(keyCh chan<- jose.SigningKey, errCh ch
 			Key:   key.Key,
 		},
 	}
+}
+
+func setOIDCCtx(ctx context.Context) context.Context {
+	return auth.SetCtxData(ctx, auth.CtxData{UserID: oidcUser, OrgID: iamOrg})
 }
