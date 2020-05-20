@@ -44,7 +44,7 @@ func (email *Email) HandleMessage(message providers.Message) error {
 
 	for _, recp := range append(append(emailMsg.Recipients, emailMsg.CC...), emailMsg.BCC...) {
 		if err := email.smtpClient.Rcpt(recp); err != nil {
-			return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set recipient: %v", recp)
+			return caos_errs.ThrowInternalf(err, "EMAIL-s4is4", "could not set recipient: %v", recp)
 		}
 	}
 
