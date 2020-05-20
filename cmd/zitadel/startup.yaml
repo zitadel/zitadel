@@ -50,6 +50,29 @@ Auth:
       GatewayPort: 50021
       CustomHeaders:
         - x-zitadel-
+    OIDC:
+      OPConfig:
+        Issuer: $ZITADEL_ISSUER
+        DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
+        Port: 50022
+      StorageConfig:
+        DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authSessionID=
+      Endpoints:
+        Auth:
+          Path: 'authorize'
+          URL: '$ZITADEL_AUTHORIZE/authorize'
+        Token:
+          Path: 'token'
+          URL: '$ZITADEL_OAUTH/token'
+        EndSession:
+          Path: 'endsession'
+          URL: '$ZITADEL_AUTHORIZE/endsession'
+        Userinfo:
+          Path: 'userinfo'
+          URL: '$ZITADEL_OAUTH/userinfo'
+        Keys:
+          Path: 'keys'
+          URL: '$ZITADEL_OAUTH/keys'
   Repository:
     SearchLimit: 100
     Eventstore:
@@ -66,11 +89,12 @@ Auth:
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
     AuthRequest:
-      Host: $ZITADEL_EVENTSTORE_HOST
-      Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'auth'
-      Database: 'auth'
-      SSLmode: disable
+      Connection:
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'auth'
+        Database: 'auth'
+        SSLmode: disable
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
@@ -81,6 +105,13 @@ Auth:
       ConcurrentTasks: 4
       BulkLimit: 100
       FailureCountUntilSkip: 5
+    KeyConfig:
+      Size: 2048
+      PrivateKeyLifetime: 10m
+      PublicKeyLifetime: 30m
+      EncryptionConfig:
+        EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
+      SigningKeyRotation: 10s
 
 Login:
   Handler:

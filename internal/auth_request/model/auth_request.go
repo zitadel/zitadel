@@ -25,6 +25,8 @@ type AuthRequest struct {
 	projectApplicationIDs []string
 	UserID                string
 	PossibleSteps         []NextStep
+	PasswordVerified      bool
+	MfasVerified          []MfaType
 }
 
 type Prompt int32

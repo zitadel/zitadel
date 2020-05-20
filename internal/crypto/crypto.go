@@ -1,6 +1,9 @@
 package crypto
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -33,6 +36,23 @@ type CryptoValue struct {
 	Algorithm  string
 	KeyID      string
 	Crypted    []byte
+}
+
+func (c *CryptoValue) Value() (driver.Value, error) {
+	if c == nil {
+		return nil, nil
+	}
+	return json.Marshal(c)
+}
+
+func (c *CryptoValue) Scan(src interface{}) error {
+	if b, ok := src.([]byte); ok {
+		return json.Unmarshal(b, c)
+	}
+	if s, ok := src.(string); ok {
+		return json.Unmarshal([]byte(s), c)
+	}
+	return nil
 }
 
 type CryptoType int

@@ -14,6 +14,7 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/aws/aws-sdk-go v1.30.25 // indirect
 	github.com/caos/logging v0.0.1
+	github.com/caos/oidc v0.6.0
 	github.com/cockroachdb/cockroach-go v0.0.0-20200504194139-73ffeee90b62
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/ghodss/yaml v1.0.0
@@ -50,5 +51,6 @@ require (
 	google.golang.org/genproto v0.0.0-20200511104702-f5ebc3bea380
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.22.0
+	gopkg.in/square/go-jose.v2 v2.5.0
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

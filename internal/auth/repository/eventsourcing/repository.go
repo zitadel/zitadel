@@ -10,9 +10,12 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/crypto"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/id"
+	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -21,6 +24,7 @@ type Config struct {
 	AuthRequest cache.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
+	KeyConfig   es_key.KeyConfig
 }
 
 type EsRepository struct {
@@ -28,6 +32,8 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
+	eventstore.KeyRepository
+	eventstore.ApplicationRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -40,7 +46,12 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
-	view, err := auth_view.StartView(sqlClient)
+
+	keyAlgorithm, err := crypto.NewAESCrypto(conf.KeyConfig.EncryptionConfig)
+	if err != nil {
+		return nil, err
+	}
+	view, err := auth_view.StartView(sqlClient, keyAlgorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +71,23 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
+	idGenerator := id.SonyFlakeGenerator
+	key, err := es_key.StartKey(es, conf.KeyConfig, keyAlgorithm, idGenerator)
+	if err != nil {
+		return nil, err
+	}
+
+	project, err := es_proj.StartProject(
+		es_proj.ProjectConfig{
+			Cache:      conf.Eventstore.Cache,
+			Eventstore: es,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	repos := handler.EventstoreRepos{UserEvents: user}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos)
 
@@ -75,13 +103,22 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 			View:                     view,
 			UserSessionViewProvider:  view,
 			UserViewProvider:         view,
-			IdGenerator:              id.SonyFlakeGenerator,
+			IdGenerator:              idGenerator,
 			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
 			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
 			MfaHardwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
 		},
 		eventstore.TokenRepo{View: view},
+		eventstore.KeyRepository{
+			KeyEvents:          key,
+			View:               view,
+			SigningKeyRotation: conf.KeyConfig.SigningKeyRotation.Duration,
+		},
+		eventstore.ApplicationRepo{
+			View:          view,
+			ProjectEvents: project,
+		},
 	}, nil
 }
 

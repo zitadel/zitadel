@@ -23,6 +23,8 @@ type UserRepository interface {
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
 	SignOut(ctx context.Context, agentID, userID string) error
+
+	UserByID(ctx context.Context, userID string) (*model.User, error)
 }
 
 type myUserRepo interface {

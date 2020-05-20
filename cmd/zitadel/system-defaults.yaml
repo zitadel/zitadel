@@ -97,9 +97,9 @@ SystemDefaults:
               - Name: 'Admin-API'
               - Name: 'Zitadel Console'
                 RedirectUris:
-                  - '$CITADEL_CONSOLE/auth/callback'
+                  - '$ZITADEL_CONSOLE/auth/callback'
                 PostLogoutRedirectUris:
-                  - '$CITADEL_CONSOLE/signedout'
+                  - '$ZITADEL_CONSOLE/signedout'
                 ResponseTypes:
                   - 'CODE'
                 GrantTypes:
