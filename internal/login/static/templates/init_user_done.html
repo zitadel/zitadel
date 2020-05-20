@@ -5,7 +5,7 @@
 <p>{{t "InitUserDone.Description"}}</p>
 <form action="{{ loginUrl }}" method="POST">
 
-    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>

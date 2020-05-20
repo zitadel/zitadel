@@ -6,7 +6,7 @@
 
 <form action="{{ userSelectionUrl }}" method="POST">
 
-    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="actions">
         {{ range $user := .Users }}

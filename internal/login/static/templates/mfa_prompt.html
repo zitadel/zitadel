@@ -5,7 +5,7 @@
 
 <form action="{{ mfaPromptUrl }}" method="POST">
 
-    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
     
     <div class="fields">
         {{ range $provider := .MfaProviders}}

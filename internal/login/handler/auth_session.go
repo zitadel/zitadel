@@ -18,10 +18,10 @@ func (l *Login) getAuthRequest(r *http.Request) (*model.AuthRequest, error) {
 }
 
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*model.AuthRequest, error) {
-	authSession, err := l.getAuthRequest(r)
+	authReq, err := l.getAuthRequest(r)
 	if err != nil {
 		return nil, err
 	}
 	err = l.parser.Parse(r, data)
-	return authSession, err
+	return authReq, err
 }

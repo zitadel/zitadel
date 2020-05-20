@@ -6,7 +6,7 @@
 
 <form action="{{ mfaInitVerifyUrl }}" method="POST">
 
-    <input type="hidden" name="authSessionID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
     <input type="hidden" name="mfaType" value="{{ .MfaType }}" />
     <input type="hidden" name="url" value="{{ .Url }}" />
     <input type="hidden" name="secret" value="{{ .Secret }}" />
