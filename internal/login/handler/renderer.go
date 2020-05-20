@@ -198,9 +198,9 @@ func (l *Login) getThemeMode(r *http.Request) string {
 }
 
 func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
-	//if authReq != nil {
-	//	return authReq.GetFullID()
-	//}
+	if authReq != nil {
+		return authReq.ID
+	}
 	return r.FormValue(queryAuthRequestID)
 }
 
