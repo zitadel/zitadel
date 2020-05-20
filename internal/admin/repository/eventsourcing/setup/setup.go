@@ -2,6 +2,8 @@ package setup
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -63,8 +65,7 @@ func StartSetup(sd systemdefaults.SystemDefaults, repos EventstoreRepos) *Setup 
 	}
 }
 
-func (s *Setup) Execute() error {
-	ctx := context.Background()
+func (s *Setup) Execute(ctx context.Context) error {
 	iam, err := s.repos.IamEvents.IamByID(ctx, s.iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
@@ -73,12 +74,14 @@ func (s *Setup) Execute() error {
 		return nil
 	}
 
-	if (iam != nil && !iam.SetUpStarted) || caos_errs.IsNotFound(err) {
-		ctx = setSetUpContextData(ctx, s.iamID)
-		iam, err = s.repos.IamEvents.StartSetup(ctx, s.iamID)
-		if err != nil {
-			return err
-		}
+	if iam != nil && iam.SetUpStarted {
+		return s.waitForSetupDone(ctx)
+	}
+
+	ctx = setSetUpContextData(ctx, s.iamID)
+	iam, err = s.repos.IamEvents.StartSetup(ctx, s.iamID)
+	if err != nil {
+		return err
 	}
 
 	setUp := &initializer{
@@ -118,6 +121,23 @@ func (s *Setup) Execute() error {
 		return err
 	}
 	return nil
+}
+
+func (s *Setup) waitForSetupDone(ctx context.Context) error {
+	ctx, cancel := context.WithDeadline(ctx, time.Now().UTC().Add(10*time.Second))
+	defer cancel()
+
+	for {
+		select {
+		case <-time.After(1 * time.Second):
+			iam, _ := s.repos.IamEvents.IamByID(ctx, s.iamID)
+			if iam != nil && iam.SetUpDone {
+				return nil
+			}
+		case <-ctx.Done():
+			return caos_errs.ThrowInternal(ctx.Err(), "SETUP-dsjg3", "Timeout exceeded for setup")
+		}
+	}
 }
 
 func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
