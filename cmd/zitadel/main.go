@@ -55,8 +55,8 @@ func main() {
 		auth.Start(ctx, conf.Auth, conf.AuthZ, conf.SystemDefaults)
 	}
 	if *loginEnabled {
-		//err = login.Start(ctx, conf.Login)
-		//logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
+		err = login.Start(ctx, conf.Login)
+		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
 	}
 	if *consoleEnabled {
 		err = console.Start(ctx, conf.Console)
