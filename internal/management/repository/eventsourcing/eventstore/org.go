@@ -4,12 +4,15 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/errors"
+	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/org/repository/view"
 )
 
 type OrgRepository struct {
 	*org_es.OrgEventstore
+	View *mgmt_view.View
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
@@ -17,8 +20,12 @@ func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.O
 	return repo.OrgEventstore.OrgByID(ctx, org)
 }
 
-func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.Org, error) {
-	return nil, errors.ThrowUnimplemented(nil, "EVENT-GQoS8", "not implemented")
+func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error) {
+	org, err := repo.View.OrgByDomain(domain)
+	if err != nil {
+		return nil, err
+	}
+	return view.OrgToModel(org), nil
 }
 
 func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {

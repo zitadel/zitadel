@@ -1,12 +1,13 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	"time"
 )
 
 type Configs map[string]*Config
@@ -36,6 +37,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
 		&UserGrant{handler: handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount}, projectEvents: repos.ProjectEvents, userEvents: repos.UserEvents},
+		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 	}
 }
 

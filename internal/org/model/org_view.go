@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/model"
 )
 
@@ -53,5 +54,20 @@ type OrgSearchResult struct {
 func (r *OrgSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
+	}
+}
+
+func OrgViewToOrg(o *OrgView) *Org {
+	return &Org{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   o.ID,
+			ChangeDate:    o.ChangeDate,
+			CreationDate:  o.CreationDate,
+			ResourceOwner: o.ResourceOwner,
+			Sequence:      o.Sequence,
+		},
+		Domain: o.Domain,
+		Name:   o.Name,
+		State:  o.State,
 	}
 }
