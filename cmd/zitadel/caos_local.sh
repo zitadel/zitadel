@@ -27,3 +27,5 @@ export ZITADEL_ISSUER=http://localhost:50022
 export ZITADEL_ACCOUNTS=http://localhost:50030
 export ZITADEL_AUTHORIZE=http://localhost:50022
 export ZITADEL_OAUTH=http://localhost:50022
+export ZITADEL_CONSOLE=http://localhost:4200
+export CAOS_OIDC_DEV=true
