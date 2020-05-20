@@ -102,10 +102,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 
 func (n *Notification) handleEmailVerificationCode(event *models.Event) (err error) {
 	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserEmailCodeAdded, es_model.UserEmailCodeSent)
-	if err != nil {
-		return err
-	}
-	if alreadyHandled {
+	if err != nil || alreadyHandled {
 		return nil
 	}
 	emailCode := new(es_model.EmailCode)
