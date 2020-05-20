@@ -120,10 +120,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 
 func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err error) {
 	alreadyHandled, err := n.checkIfCodeAlreadyHandled(event.AggregateID, event.Sequence, es_model.UserPhoneCodeAdded, es_model.UserPhoneCodeSent)
-	if err != nil {
-		return err
-	}
-	if alreadyHandled {
+	if err != nil || alreadyHandled {
 		return nil
 	}
 	phoneCode := new(es_model.PhoneCode)
