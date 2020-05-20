@@ -56,7 +56,7 @@ Auth:
         DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
         Port: 50022
       StorageConfig:
-        DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authSessionID=
+        DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
       Endpoints:
         Auth:
           Path: 'authorize'
