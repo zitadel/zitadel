@@ -69,16 +69,14 @@ func (s *Setup) Execute() error {
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
-	if iam != nil && iam.SetUpDone {
+	if iam != nil && (iam.SetUpDone || iam.SetUpStarted) {
 		return nil
 	}
 
-	if (iam != nil && !iam.SetUpStarted) || caos_errs.IsNotFound(err) {
-		ctx = setSetUpContextData(ctx, s.iamID)
-		iam, err = s.repos.IamEvents.StartSetup(ctx, s.iamID)
-		if err != nil {
-			return err
-		}
+	ctx = setSetUpContextData(ctx, s.iamID)
+	iam, err = s.repos.IamEvents.StartSetup(ctx, s.iamID)
+	if err != nil {
+		return err
 	}
 
 	setUp := &initializer{
