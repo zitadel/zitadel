@@ -9,6 +9,7 @@ import (
 
 	authz "github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/config"
+	"github.com/caos/zitadel/internal/notification"
 	tracing "github.com/caos/zitadel/internal/tracing/config"
 	"github.com/caos/zitadel/pkg/admin"
 	"github.com/caos/zitadel/pkg/auth"
@@ -18,11 +19,12 @@ import (
 )
 
 type Config struct {
-	Mgmt    management.Config
-	Auth    auth.Config
-	Login   login.Config
-	Admin   admin.Config
-	Console console.Config
+	Mgmt         management.Config
+	Auth         auth.Config
+	Login        login.Config
+	Admin        admin.Config
+	Console      console.Config
+	Notification notification.Config
 
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
@@ -38,6 +40,7 @@ func main() {
 	loginEnabled := flag.Bool("login", true, "enable login ui")
 	adminEnabled := flag.Bool("admin", true, "enable admin api")
 	consoleEnabled := flag.Bool("console", true, "enable console ui")
+	notificationEnabled := flag.Bool("notification", true, "enable notification handler")
 	flag.Parse()
 
 	conf := new(Config)
@@ -57,6 +60,9 @@ func main() {
 	}
 	if *adminEnabled {
 		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
+	}
+	if *notificationEnabled {
+		notification.Start(ctx, conf.Notification, conf.SystemDefaults)
 	}
 	if *consoleEnabled {
 		err = console.Start(ctx, conf.Console)

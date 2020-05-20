@@ -74,7 +74,7 @@ func (u *User) appendUserPhoneChangedEvent(event *es_models.Event) error {
 
 func (u *User) appendUserPhoneCodeAddedEvent(event *es_models.Event) error {
 	u.PhoneCode = new(PhoneCode)
-	return u.PhoneCode.setData(event)
+	return u.PhoneCode.SetData(event)
 }
 
 func (u *User) appendUserPhoneVerifiedEvent() {
@@ -90,7 +90,7 @@ func (p *Phone) setData(event *es_models.Event) error {
 	return nil
 }
 
-func (a *PhoneCode) setData(event *es_models.Event) error {
+func (a *PhoneCode) SetData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-sk8ws").WithError(err).Error("could not unmarshal event data")

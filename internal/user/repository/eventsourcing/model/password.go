@@ -62,7 +62,7 @@ func (u *User) appendUserPasswordChangedEvent(event *es_models.Event) error {
 
 func (u *User) appendPasswordSetRequestedEvent(event *es_models.Event) error {
 	u.PasswordCode = new(PasswordCode)
-	return u.PasswordCode.setData(event)
+	return u.PasswordCode.SetData(event)
 }
 
 func (pw *Password) setData(event *es_models.Event) error {
@@ -74,7 +74,7 @@ func (pw *Password) setData(event *es_models.Event) error {
 	return nil
 }
 
-func (a *PasswordCode) setData(event *es_models.Event) error {
+func (a *PasswordCode) SetData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")
