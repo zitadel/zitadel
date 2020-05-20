@@ -28,7 +28,7 @@ func (msg *EmailMessage) GetContent() string {
 
 	message := ""
 	for k, v := range headers {
-		message += fmt.Sprintf("%s: %s\r\n", k, v)
+		message += fmt.Sprintf("%s: %s"+lineBreak, k, v)
 	}
 
 	//default mime-type is html
