@@ -93,6 +93,14 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 	return model.UserToModel(user), nil
 }
 
+func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+	query, err := UserByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return es.FilterEvents(ctx, query)
+}
+
 func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, *es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() {

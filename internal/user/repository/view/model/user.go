@@ -203,6 +203,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 	}
 	u.PasswordSet = password.Secret != nil
 	u.PasswordChangeRequired = password.ChangeRequired
+	u.PasswordChanged = event.CreationDate
 	return nil
 }
 

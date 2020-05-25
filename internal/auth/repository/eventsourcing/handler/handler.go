@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )

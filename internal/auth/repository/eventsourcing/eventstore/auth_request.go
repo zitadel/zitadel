@@ -4,10 +4,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/id"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -21,6 +24,7 @@ type AuthRequestRepo struct {
 
 	UserSessionViewProvider userSessionViewProvider
 	UserViewProvider        userViewProvider
+	UserEventProvider       userEventProvider
 
 	IdGenerator id.Generator
 
@@ -36,6 +40,10 @@ type userSessionViewProvider interface {
 }
 type userViewProvider interface {
 	UserByID(string) (*view_model.UserView, error)
+}
+
+type userEventProvider interface {
+	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -63,7 +71,7 @@ func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*m
 	if err != nil {
 		return nil, err
 	}
-	steps, err := repo.nextSteps(request)
+	steps, err := repo.nextSteps(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +114,7 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.NextStep, error) {
+func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest) ([]model.NextStep, error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "request must not be nil")
 	}
@@ -124,11 +132,11 @@ func (repo *AuthRequestRepo) nextSteps(request *model.AuthRequest) ([]model.Next
 		}
 		return steps, nil
 	}
-	userSession, err := userSessionByIDs(repo.UserSessionViewProvider, request.AgentID, request.UserID)
+	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, request.UserID)
 	if err != nil {
 		return nil, err
 	}
-	user, err := userByID(repo.UserViewProvider, request.UserID)
+	user, err := userByID(ctx, repo.UserViewProvider, repo.UserEventProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -227,21 +235,40 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string)
 	return view_model.UserSessionsToModel(session), nil
 }
 
-func userSessionByIDs(provider userSessionViewProvider, agentID, userID string) (*user_model.UserSessionView, error) {
+func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID, userID string) (*user_model.UserSessionView, error) {
 	session, err := provider.UserSessionByIDs(agentID, userID)
-	if err == nil {
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return &user_model.UserSessionView{}, nil
+		}
+		return nil, err
+	}
+	events, err := eventProvider.UserEventsByID(ctx, userID, session.Sequence)
+	if err != nil {
+		logging.Log("EVENT-Hse6s").WithError(err).Debug("error retrieving new events")
 		return view_model.UserSessionToModel(session), nil
 	}
-	if errors.IsNotFound(err) {
-		return &user_model.UserSessionView{}, nil
+	for _, event := range events {
+		session.AppendEvent(event)
 	}
-	return nil, err
+	return view_model.UserSessionToModel(session), nil
 }
 
-func userByID(provider userViewProvider, userID string) (*user_model.UserView, error) {
-	user, err := provider.UserByID(userID)
+func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider userEventProvider, userID string) (*user_model.UserView, error) {
+	user, err := viewProvider.UserByID(userID)
 	if err != nil {
 		return nil, err
 	}
-	return view_model.UserToModel(user), nil
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
+	if err != nil {
+		logging.Log("EVENT-dfg42").WithError(err).Debug("error retrieving new events")
+		return view_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return view_model.UserToModel(user), nil
+		}
+	}
+	return view_model.UserToModel(&userCopy), nil
 }

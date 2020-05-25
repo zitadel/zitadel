@@ -103,6 +103,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 			View:                     view,
 			UserSessionViewProvider:  view,
 			UserViewProvider:         view,
+			UserEventProvider:        user,
 			IdGenerator:              idGenerator,
 			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
