@@ -3,12 +3,15 @@ package grpc
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
+const (
+	orgRolePrefix = "ORG_"
+)
+
 func (s *Server) GetOrgMemberRoles(ctx context.Context, _ *empty.Empty) (*OrgMemberRoles, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-wz4vc", "Not implemented")
+	return &OrgMemberRoles{Roles: s.getOrgMemberRoles()}, nil
 }
 
 func (s *Server) SearchOrgMembers(ctx context.Context, in *OrgMemberSearchRequest) (*OrgMemberSearchResponse, error) {

@@ -2,12 +2,16 @@ package grpc
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/errors"
+
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
+const (
+	projectMemberRolesPrefix = "PROJECT_MEMBER"
+)
+
 func (s *Server) GetProjectMemberRoles(ctx context.Context, _ *empty.Empty) (*ProjectMemberRoles, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-qw34d", "Not implemented")
+	return &ProjectMemberRoles{Roles: s.getProjectMemberRoles()}, nil
 }
 
 func (s *Server) SearchProjectMembers(ctx context.Context, in *ProjectMemberSearchRequest) (*ProjectMemberSearchResponse, error) {

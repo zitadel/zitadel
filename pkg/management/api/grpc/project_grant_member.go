@@ -2,8 +2,17 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/golang/protobuf/ptypes/empty"
 )
+
+const (
+	projectGrantRolesPrefix = "PROJECT_GRANT_"
+)
+
+func (s *Server) GetProjectGrantMemberRoles(ctx context.Context, _ *empty.Empty) (*ProjectGrantMemberRoles, error) {
+	return &ProjectGrantMemberRoles{Roles: s.getProjectGrantMemberRoles()}, nil
+}
 
 func (s *Server) SearchProjectGrantMembers(ctx context.Context, in *ProjectGrantMemberSearchRequest) (*ProjectGrantMemberSearchResponse, error) {
 	response, err := s.project.SearchProjectGrantMembers(ctx, projectGrantMemberSearchRequestsToModel(in))
