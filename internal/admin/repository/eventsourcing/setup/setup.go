@@ -284,10 +284,11 @@ func (setUp *initializer) projects(ctx context.Context, projects []types.Project
 		}
 		setUp.createdProjects[createdProject.Name] = createdProject
 		for _, oidc := range project.OIDCApps {
-			_, err := setUp.oidcApp(ctx, createdProject, oidc)
+			app, err := setUp.oidcApp(ctx, createdProject, oidc)
 			if err != nil {
 				return err
 			}
+			logging.LogWithFields("SETUP-asd32f", "name", app.Name, "clientID", app.OIDCConfig.ClientID).Info("created OIDC application")
 		}
 	}
 	return nil
