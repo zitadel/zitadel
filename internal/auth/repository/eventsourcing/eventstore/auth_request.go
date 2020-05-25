@@ -80,7 +80,7 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	if err != nil {
 		return err
 	}
-	request.UserID = user.ID
+	request.SetUserInfo(user.ID, user.UserName)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
