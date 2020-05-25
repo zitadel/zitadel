@@ -14,7 +14,7 @@ func (v *View) OrgMemberByIDs(orgID, userID string) (*view.OrgMemberView, error)
 	return view.OrgMemberByIDs(v.Db, orgMemberTable, orgID, userID)
 }
 
-func (v *View) SearchOrgMembers(request *org_model.OrgMemberSearchRequest) ([]*org_model.OrgMemberView, int, error) {
+func (v *View) SearchOrgMembers(request *org_model.OrgMemberSearchRequest) ([]*view.OrgMemberView, int, error) {
 	return view.SearchOrgMembers(v.Db, orgMemberTable, request)
 }
 

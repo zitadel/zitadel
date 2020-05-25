@@ -69,6 +69,6 @@ func (repo *OrgRepository) SearchOrgMembers(ctx context.Context, request *org_mo
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      members,
+		Result:      view.OrgMembersToModel(members),
 	}, nil
 }

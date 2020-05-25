@@ -2,7 +2,6 @@ package view
 
 import (
 	global_model "github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/org/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/view"
 	"github.com/jinzhu/gorm"
@@ -18,8 +17,8 @@ func OrgMemberByIDs(db *gorm.DB, table, orgID, userID string) (*OrgMemberView, e
 	return member, err
 }
 
-func SearchOrgMembers(db *gorm.DB, table string, req *org_model.OrgMemberSearchRequest) ([]*model.OrgMemberView, int, error) {
-	members := make([]*model.OrgMemberView, 0)
+func SearchOrgMembers(db *gorm.DB, table string, req *org_model.OrgMemberSearchRequest) ([]*OrgMemberView, int, error) {
+	members := make([]*OrgMemberView, 0)
 	query := view.PrepareSearchQuery(table, OrgMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &members)
 	if err != nil {
