@@ -16,7 +16,7 @@ CREATE TABLE management.orgs (
 
 CREATE TABLE management.org_members (
     user_id TEXT,
-    project_id TEXT,
+    org_id TEXT,
 
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
@@ -28,7 +28,7 @@ CREATE TABLE management.org_members (
     roles TEXT ARRAY,
     sequence BIGINT,
 
-    PRIMARY KEY (project_id, user_id)
+    PRIMARY KEY (org_id, user_id)
 );
 
 COMMIT;

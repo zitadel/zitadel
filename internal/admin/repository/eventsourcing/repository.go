@@ -30,7 +30,7 @@ type EsRepository struct {
 	eventstore.OrgRepo
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	}
 
 	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user, ProjectEvents: project, IamEvents: iam}
-	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute()
+	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute(ctx)
 	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to execute setup")
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient)

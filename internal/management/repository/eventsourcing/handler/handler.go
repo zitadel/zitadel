@@ -3,6 +3,7 @@ package handler
 import (
 	"time"
 
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -13,7 +14,7 @@ import (
 type Configs map[string]*Config
 
 type Config struct {
-	MinimumCycleDurationMillisecond int
+	MinimumCycleDuration types.Duration
 }
 
 type handler struct {
@@ -33,7 +34,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&GrantedProject{handler: handler{view, bulkLimit, configs.cycleDuration("GrantedProject"), errorCount}, eventstore: eventstore, projectEvents: repos.ProjectEvents},
 		&ProjectRole{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount}, projectEvents: repos.ProjectEvents},
 		&ProjectMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount}, userEvents: repos.UserEvents},
-		&ProjectGrantMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount}},
+		&ProjectGrantMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount}, userEvents: repos.UserEvents},
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
 		&UserGrant{handler: handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount}, projectEvents: repos.ProjectEvents, userEvents: repos.UserEvents},
@@ -47,5 +48,5 @@ func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	if !ok {
 		return 1 * time.Second
 	}
-	return time.Duration(c.MinimumCycleDurationMillisecond) * time.Millisecond
+	return c.MinimumCycleDuration.Duration
 }
