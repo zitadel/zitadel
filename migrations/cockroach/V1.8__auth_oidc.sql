@@ -41,4 +41,6 @@ CREATE TABLE auth.applications (
      PRIMARY KEY (id)
 );
 
+ALTER TABLE auth.tokens ADD COLUMN scopes TEXT ARRAY;
+
 COMMIT;

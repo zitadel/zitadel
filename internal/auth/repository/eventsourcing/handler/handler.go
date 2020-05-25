@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/config/types"
 	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"

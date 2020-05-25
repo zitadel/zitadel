@@ -21,8 +21,13 @@ func (v *View) IsTokenValid(tokenID string) (bool, error) {
 }
 
 func (v *View) CreateToken(agentID, applicationID, userID string, scopes []string, lifetime time.Duration) (*model.Token, error) {
+	id, err := v.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
 	now := time.Now().UTC()
 	token := &model.Token{
+		ID:            id,
 		CreationDate:  now,
 		UserID:        userID,
 		ApplicationID: applicationID,
@@ -30,8 +35,7 @@ func (v *View) CreateToken(agentID, applicationID, userID string, scopes []strin
 		Scopes:        scopes,
 		Expiration:    now.Add(lifetime),
 	}
-	err := view.PutToken(v.Db, tokenTable, token)
-	if err != nil {
+	if err := view.PutToken(v.Db, tokenTable, token); err != nil {
 		return nil, err
 	}
 	return token, nil

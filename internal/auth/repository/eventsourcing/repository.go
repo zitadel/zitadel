@@ -51,7 +51,9 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
-	view, err := auth_view.StartView(sqlClient, keyAlgorithm)
+	idGenerator := id.SonyFlakeGenerator
+
+	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +73,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
-	idGenerator := id.SonyFlakeGenerator
 	key, err := es_key.StartKey(es, conf.KeyConfig, keyAlgorithm, idGenerator)
 	if err != nil {
 		return nil, err

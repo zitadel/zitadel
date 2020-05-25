@@ -60,12 +60,6 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 	if err != nil {
 		errMessage = err.Error()
 	}
-	switch step := authReq.PossibleSteps[0].(type) {
-	case *model.LoginStep:
-		if step.NotFound {
-			errMessage = "User not found"
-		}
-	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Login", errType, errMessage),
 		UserName: authReq.UserName,

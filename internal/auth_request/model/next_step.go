@@ -26,9 +26,7 @@ const (
 	UserSessionStateTerminated
 )
 
-type LoginStep struct {
-	NotFound bool
-}
+type LoginStep struct{}
 
 func (s *LoginStep) Type() NextStepType {
 	return NextStepLogin
@@ -48,30 +46,25 @@ type UserSelection struct {
 	UserSessionState UserSessionState
 }
 
-type PasswordStep struct {
-	FailureCount uint16
-}
+type PasswordStep struct{}
 
 func (s *PasswordStep) Type() NextStepType {
 	return NextStepPassword
 }
 
-type ChangePasswordStep struct {
-}
+type ChangePasswordStep struct{}
 
 func (s *ChangePasswordStep) Type() NextStepType {
 	return NextStepChangePassword
 }
 
-type InitPasswordStep struct {
-}
+type InitPasswordStep struct{}
 
 func (s *InitPasswordStep) Type() NextStepType {
 	return NextStepInitPassword
 }
 
-type VerifyEMailStep struct {
-}
+type VerifyEMailStep struct{}
 
 func (s *VerifyEMailStep) Type() NextStepType {
 	return NextStepVerifyEmail
@@ -87,7 +80,6 @@ func (s *MfaPromptStep) Type() NextStepType {
 }
 
 type MfaVerificationStep struct {
-	FailureCount uint16
 	MfaProviders []MfaType
 }
 
@@ -95,8 +87,7 @@ func (s *MfaVerificationStep) Type() NextStepType {
 	return NextStepMfaVerify
 }
 
-type RedirectToCallbackStep struct {
-}
+type RedirectToCallbackStep struct{}
 
 func (s *RedirectToCallbackStep) Type() NextStepType {
 	return NextStepRedirectToCallback
