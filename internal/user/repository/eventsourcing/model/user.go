@@ -228,7 +228,7 @@ func (u *User) appendUnlockedEvent() {
 
 func (u *User) appendInitUsercodeCreatedEvent(event *es_models.Event) error {
 	initCode := new(InitUserCode)
-	err := initCode.setData(event)
+	err := initCode.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -237,7 +237,7 @@ func (u *User) appendInitUsercodeCreatedEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (c *InitUserCode) setData(event *es_models.Event) error {
+func (c *InitUserCode) SetData(event *es_models.Event) error {
 	c.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-7duwe").WithError(err).Error("could not unmarshal event data")
