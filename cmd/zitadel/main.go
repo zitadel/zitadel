@@ -48,6 +48,9 @@ func main() {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
+	if *adminEnabled {
+		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
+	}
 	if *managementEnabled {
 		management.Start(ctx, conf.Mgmt, conf.AuthZ, conf.SystemDefaults)
 	}
@@ -57,9 +60,6 @@ func main() {
 	if *loginEnabled {
 		err = login.Start(ctx, conf.Login)
 		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
-	}
-	if *adminEnabled {
-		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
 	}
 	if *notificationEnabled {
 		notification.Start(ctx, conf.Notification, conf.SystemDefaults)
