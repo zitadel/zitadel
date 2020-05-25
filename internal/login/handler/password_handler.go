@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"net"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -35,7 +36,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	browserInfo := &model.BrowserInfo{RemoteIP: net.IP{}} //TODO: impl
-	err = l.authRepo.VerifyPassword(r.Context(), authReq.ID, authReq.UserID, data.Password, browserInfo)
+	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Password, browserInfo)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

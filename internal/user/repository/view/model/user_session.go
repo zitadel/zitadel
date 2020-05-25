@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	UserSessionKeySessionID     = "id"
 	UserSessionKeyUserAgentID   = "user_agent_id"
 	UserSessionKeyUserID        = "user_id"
 	UserSessionKeyState         = "state"
@@ -22,13 +21,12 @@ const (
 )
 
 type UserSessionView struct {
-	ID                      string    `json:"-" gorm:"column:id;primary_key"`
 	CreationDate            time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate              time.Time `json:"-" gorm:"column:change_date"`
 	ResourceOwner           string    `json:"-" gorm:"column:resource_owner"`
 	State                   int32     `json:"-" gorm:"column:state"`
-	UserAgentID             string    `json:"userAgentID" gorm:"column:user_agent_id"`
-	UserID                  string    `json:"userID" gorm:"column:user_id"`
+	UserAgentID             string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
+	UserID                  string    `json:"userID" gorm:"column:user_id;primary_key"`
 	UserName                string    `json:"userName" gorm:"column:user_name"`
 	PasswordVerification    time.Time `json:"-" gorm:"column:password_verification"`
 	MfaSoftwareVerification time.Time `json:"-" gorm:"column:mfa_software_verification"`
@@ -47,7 +45,6 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
-		ID:                      userSession.ID,
 		ChangeDate:              userSession.ChangeDate,
 		CreationDate:            userSession.CreationDate,
 		ResourceOwner:           userSession.ResourceOwner,

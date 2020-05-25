@@ -8,7 +8,6 @@ import (
 )
 
 type UserSessionView struct {
-	ID                      string
 	CreationDate            time.Time
 	ChangeDate              time.Time
 	State                   req_model.UserSessionState
@@ -34,7 +33,6 @@ type UserSessionSearchKey int32
 
 const (
 	USERSESSIONSEARCHKEY_UNSPECIFIED UserSessionSearchKey = iota
-	USERSESSIONSEARCHKEY_SESSION_ID
 	USERSESSIONSEARCHKEY_USER_AGENT_ID
 	USERSESSIONSEARCHKEY_USER_ID
 	USERSESSIONSEARCHKEY_STATE
