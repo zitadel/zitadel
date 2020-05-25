@@ -260,6 +260,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
 					IsEmailVerified:        true,
+					MfaMaxSetUp:            int32(model.MfaLevelSoftware),
 				},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
@@ -277,6 +278,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
+					MfaMaxSetUp: int32(model.MfaLevelSoftware),
 				},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
@@ -295,6 +297,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
+					MfaMaxSetUp:            int32(model.MfaLevelSoftware),
 				},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
@@ -313,6 +316,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
 				},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
@@ -382,13 +386,28 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					MfaMaxSetUp: -1,
+					MfaMaxSetUp: model.MfaLevelNotSetUp,
 				},
 			},
 			&model.MfaPromptStep{
 				MfaProviders: []model.MfaType{},
 			},
 			false,
+		},
+		{
+			"not set up and skipped, true",
+			fields{
+				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
+			},
+			args{
+				request: &model.AuthRequest{},
+				user: &user_model.UserView{
+					MfaMaxSetUp:    model.MfaLevelNotSetUp,
+					MfaInitSkipped: time.Now().UTC(),
+				},
+			},
+			nil,
+			true,
 		},
 		{
 			"checked mfa software, true",
@@ -398,7 +417,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					OTPState: user_model.MFASTATE_READY,
+					MfaMaxSetUp: model.MfaLevelSoftware,
+					OTPState:    user_model.MFASTATE_READY,
 				},
 				userSession: &user_model.UserSessionView{MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Hour)},
 			},
@@ -413,7 +433,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					OTPState: user_model.MFASTATE_READY,
+					MfaMaxSetUp: model.MfaLevelSoftware,
+					OTPState:    user_model.MFASTATE_READY,
 				},
 				userSession: &user_model.UserSessionView{},
 			},
