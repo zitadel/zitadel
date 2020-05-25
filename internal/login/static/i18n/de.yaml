@@ -46,8 +46,8 @@ InitUserDone:
 MfaPrompt:
   Title: Multifacktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
+  Provider0: OTP
   Provider1: SMS
-  Provider2: OTP
 
 MfaInitVerify:
   Title: Multifaktor Verifizierung

@@ -145,7 +145,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *model.InitPasswordStep:
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 	case *model.PasswordStep:
-		l.renderPassword(w, r, authReq, step)
+		l.renderPassword(w, r, authReq, nil)
 	case *model.MfaVerificationStep:
 		l.renderMfaVerify(w, r, authReq, step, err)
 	case *model.RedirectToCallbackStep:

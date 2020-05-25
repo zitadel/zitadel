@@ -45,7 +45,7 @@ func (l *Login) handleMfaInitVerify(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleOtpVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaInitVerifyData) *mfaVerifyData {
-	err := l.authRepo.VerifyMfaOTPSetup(r.Context(), authReq.UserID, data.Code)
+	err := l.authRepo.VerifyMfaOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code)
 	if err == nil {
 		return nil
 	}
@@ -66,8 +66,7 @@ func (l *Login) renderMfaInitVerify(w http.ResponseWriter, r *http.Request, auth
 		errMessage = err.Error()
 	}
 	data.baseData = l.getBaseData(r, authReq, "Mfa Init Verify", errType, errMessage)
-	//TODO: Fill Username
-	//data.UserName = authReq.UserName
+	data.UserName = authReq.UserName
 	if data.MfaType == model.MfaTypeOTP {
 		qrCode, err := qrcode.Encode(data.otpData.Url, qrcode.Medium, 256)
 		if err == nil {

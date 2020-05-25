@@ -12,7 +12,7 @@
     <input type="hidden" name="secret" value="{{ .Secret }}" />
 
 
-    {{if (eq .MfaType 2) }}
+    {{if (eq .MfaType 0) }}
         <p>{{t "MfaInitVerify.OtpDescription"}}</p>
         <img src="data:image/png;base64,{{.QrCode}}">
         <div class="fields">

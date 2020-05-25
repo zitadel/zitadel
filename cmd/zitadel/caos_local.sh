@@ -1,7 +1,5 @@
 BASEDIR=$(dirname "$0")
 
-gopass sync
-
 # Tracing
 gopass citadel-secrets/citadel/developer/default/citadel-svc-account-eventstore-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
 export GOOGLE_APPLICATION_CREDENTIALS="$BASEDIR/local_svc-account-tracing.json"

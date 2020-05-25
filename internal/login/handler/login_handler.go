@@ -56,7 +56,7 @@ func (l *Login) handleUsernameCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
-	var errType, errMessage, username string
+	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
@@ -66,10 +66,9 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 			errMessage = "User not found"
 		}
 	}
-	//TODO: fill UserName if on auth request
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Login", errType, errMessage),
-		UserName: username,
+		UserName: authReq.UserName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, nil)
 }

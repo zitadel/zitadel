@@ -46,8 +46,8 @@ InitUserDone:
 MfaPrompt:
   Title: Multifactor Setup
   Description: Would you like to setup multifactor authentication?
+  Provider0: OTP
   Provider1: SMS
-  Provider2: OTP
 
 MfaInitVerify:
   Title: Multifactor Verification

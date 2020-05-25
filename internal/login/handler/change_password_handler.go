@@ -37,8 +37,7 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Change Password", errType, errMessage),
-		//TODO: fill username
-		//UserName: authReq.UserName,
+		UserName: authReq.UserName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePassword], data, nil)
 }
@@ -47,8 +46,7 @@ func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request,
 	var errType, errMessage string
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Password Change Done", errType, errMessage),
-		//TODO: fill username
-		//UserName: authReq.UserName,
+		UserName: authReq.UserName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

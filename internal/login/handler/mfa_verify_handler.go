@@ -24,7 +24,7 @@ func (l *Login) handleMfaVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	browserInfo := &model.BrowserInfo{RemoteIP: net.IP{}} //TODO: impl
 	if data.MfaType == model.MfaTypeOTP {
-		err = l.authRepo.VerifyMfaOTP(r.Context(), authReq.ID, authReq.UserID, data.Code, browserInfo)
+		err = l.authRepo.VerifyMfaOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Code, browserInfo)
 	}
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -43,8 +43,7 @@ func (l *Login) renderMfaVerify(w http.ResponseWriter, r *http.Request, authReq 
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Mfa Verify", errType, errMessage),
-		//TODO: Fill Username
-		//UserName: authReq.UserName,
+		UserName: authReq.UserName,
 	}
 	if verificationStep != nil {
 		data.MfaProviders = verificationStep.MfaProviders

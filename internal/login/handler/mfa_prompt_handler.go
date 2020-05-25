@@ -74,10 +74,10 @@ func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authSe
 	l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "No available mfa providers"))
 }
 
-func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, data *mfaVerifyData) {
-	otp, err := l.authRepo.AddMfaOTP(r.Context(), authSession.UserID)
+func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {
+	otp, err := l.authRepo.AddMfaOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 
@@ -85,6 +85,5 @@ func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authSe
 		Secret: otp.SecretString,
 		Url:    otp.Url,
 	}
-
-	l.renderMfaInitVerify(w, r, authSession, data, nil)
+	l.renderMfaInitVerify(w, r, authReq, data, nil)
 }
