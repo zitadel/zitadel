@@ -89,7 +89,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	if err != nil {
 		return err
 	}
-	if request.UserID == userID {
+	if request.UserID != userID {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-ds35D", "user id does not match request id ")
 	}
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
