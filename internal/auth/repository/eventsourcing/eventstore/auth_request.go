@@ -238,10 +238,10 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string)
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID, userID string) (*user_model.UserSessionView, error) {
 	session, err := provider.UserSessionByIDs(agentID, userID)
 	if err != nil {
-		if errors.IsNotFound(err) {
-			return &user_model.UserSessionView{}, nil
+		if !errors.IsNotFound(err) {
+			return nil, err
 		}
-		return nil, err
+		session = &view_model.UserSessionView{}
 	}
 	events, err := eventProvider.UserEventsByID(ctx, userID, session.Sequence)
 	if err != nil {
