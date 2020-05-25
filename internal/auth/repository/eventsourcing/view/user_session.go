@@ -14,6 +14,10 @@ func (v *View) UserSessionByIDs(agentID, userID string) (*model.UserSessionView,
 	return view.UserSessionByIDs(v.Db, userSessionTable, agentID, userID)
 }
 
+func (v *View) UserSessionsByUserID(userID string) ([]*model.UserSessionView, error) {
+	return view.UserSessionsByUserID(v.Db, userSessionTable, userID)
+}
+
 func (v *View) UserSessionsByAgentID(agentID string) ([]*model.UserSessionView, error) {
 	return view.UserSessionsByAgentID(v.Db, userSessionTable, agentID)
 }

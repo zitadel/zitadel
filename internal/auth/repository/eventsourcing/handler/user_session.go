@@ -45,10 +45,8 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded,
 		es_model.UserPasswordCheckFailed,
-		es_model.UserPasswordChanged,
 		es_model.MfaOtpCheckSucceeded,
-		es_model.MfaOtpCheckFailed,
-		es_model.MfaOtpRemoved:
+		es_model.MfaOtpCheckFailed:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {
 			return err
@@ -66,14 +64,22 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 				State:         int32(req_model.UserSessionStateActive),
 			}
 		}
-		session.AppendEvent(event)
+		return u.updateSession(session, event)
+	case es_model.UserPasswordChanged,
+		es_model.MfaOtpRemoved:
+		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
+		if err != nil {
+			return err
+		}
+		for _, session := range sessions {
+			if err := u.updateSession(session, event); err != nil {
+				return err
+			}
+		}
+		return nil
 	default:
 		return u.view.ProcessedUserSessionSequence(event.Sequence)
 	}
-	if err := u.FillUserInfo(session, event.AggregateID); err != nil {
-		return err
-	}
-	return u.view.PutUserSession(session)
 }
 
 func (u *UserSession) OnError(event *models.Event, err error) error {
@@ -81,7 +87,15 @@ func (u *UserSession) OnError(event *models.Event, err error) error {
 	return spooler.HandleError(event, err, u.view.GetLatestUserSessionFailedEvent, u.view.ProcessedUserSessionFailedEvent, u.view.ProcessedUserSessionSequence, u.errorCountUntilSkip)
 }
 
-func (u *UserSession) FillUserInfo(session *view_model.UserSessionView, id string) error {
+func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
+	session.AppendEvent(event)
+	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
+		return err
+	}
+	return u.view.PutUserSession(session)
+}
+
+func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {
 	user, err := u.userEvents.UserByID(context.Background(), id)
 	if err != nil {
 		return err
