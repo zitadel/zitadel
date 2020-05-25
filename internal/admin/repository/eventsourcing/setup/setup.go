@@ -2,6 +2,8 @@ package setup
 
 import (
 	"context"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -63,16 +65,20 @@ func StartSetup(sd systemdefaults.SystemDefaults, repos EventstoreRepos) *Setup 
 	}
 }
 
-func (s *Setup) Execute() error {
-	ctx := context.Background()
+func (s *Setup) Execute(ctx context.Context) error {
 	iam, err := s.repos.IamEvents.IamByID(ctx, s.iamID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
-	if iam != nil && (iam.SetUpDone || iam.SetUpStarted) {
+	if iam != nil && iam.SetUpDone {
 		return nil
 	}
 
+	if iam != nil && iam.SetUpStarted {
+		return s.waitForSetupDone(ctx)
+	}
+
+	logging.Log("SETUP-hwG32").Info("starting setup")
 	ctx = setSetUpContextData(ctx, s.iamID)
 	iam, err = s.repos.IamEvents.StartSetup(ctx, s.iamID)
 	if err != nil {
@@ -113,12 +119,34 @@ func (s *Setup) Execute() error {
 
 	iam, err = s.repos.IamEvents.SetupDone(ctx, s.iamID)
 	if err != nil {
+		logging.Log("SETUP-de342").WithError(err).Error("unable to finish setup")
 		return err
 	}
+	logging.Log("SETUP-ds31h").Info("setup done")
 	return nil
 }
 
+func (s *Setup) waitForSetupDone(ctx context.Context) error {
+	logging.Log("SETUP-hws22").Info("waiting for setup to be done")
+	ctx, cancel := context.WithDeadline(ctx, time.Now().UTC().Add(10*time.Second))
+	defer cancel()
+
+	for {
+		select {
+		case <-time.After(1 * time.Second):
+			iam, _ := s.repos.IamEvents.IamByID(ctx, s.iamID)
+			if iam != nil && iam.SetUpDone {
+				return nil
+			}
+			logging.Log("SETUP-d23g1").Info("setup not done yet")
+		case <-ctx.Done():
+			return caos_errs.ThrowInternal(ctx.Err(), "SETUP-dsjg3", "Timeout exceeded for setup")
+		}
+	}
+}
+
 func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
+	logging.Log("SETUP-dsTh3").Info("setting up orgs")
 	for _, iamOrg := range orgs {
 		org, err := setUp.org(ctx, iamOrg)
 		if err != nil {
@@ -146,6 +174,7 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 			return err
 		}
 	}
+	logging.Log("SETUP-dgjT4").Info("orgs set up")
 	return nil
 }
 
@@ -159,6 +188,7 @@ func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Or
 }
 
 func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error {
+	logging.Log("SETUP-dtxfj").Info("setting iam owners")
 	for _, iamOwner := range owners {
 		user, ok := setUp.createdUsers[iamOwner]
 		if !ok {
@@ -171,31 +201,40 @@ func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error 
 			return err
 		}
 	}
+	logging.Log("SETUP-fg5aq").Info("iam owners set")
 	return nil
 }
 
 func (setUp *initializer) setGlobalOrg(ctx context.Context) error {
+	logging.Log("SETUP-dsj75").Info("setting global org")
 	globalOrg, ok := setUp.createdOrgs[setUp.setUpConfig.GlobalOrg]
 	if !ok {
 		logging.LogWithFields("SETUP-FBhs9", "GlobalOrg", setUp.setUpConfig.GlobalOrg).Error("global org not created")
 		return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-4GwU7", "global org not created: %v", setUp.setUpConfig.GlobalOrg)
 	}
 
-	_, err := setUp.repos.IamEvents.SetGlobalOrg(ctx, setUp.iamID, globalOrg.AggregateID)
-	logging.Log("SETUP-uGMA3").OnError(err).Error("unable to set global org on iam")
-	return err
+	if _, err := setUp.repos.IamEvents.SetGlobalOrg(ctx, setUp.iamID, globalOrg.AggregateID); err != nil {
+		logging.Log("SETUP-uGMA3").WithError(err).Error("unable to set global org on iam")
+		return err
+	}
+	logging.Log("SETUP-d32h1").Info("global org set")
+	return nil
 }
 
 func (setUp *initializer) setIamProject(ctx context.Context) error {
+	logging.Log("SETUP-HE3qa").Info("setting iam project")
 	iamProject, ok := setUp.createdProjects[setUp.setUpConfig.IAMProject]
 	if !ok {
 		logging.LogWithFields("SETUP-SJFWP", "Iam Project", setUp.setUpConfig.IAMProject).Error("iam project created")
 		return caos_errs.ThrowPreconditionFailedf(nil, "SETUP-sGmQt", "iam project not created: %v", setUp.setUpConfig.IAMProject)
 	}
 
-	_, err := setUp.repos.IamEvents.SetIamProject(ctx, setUp.iamID, iamProject.AggregateID)
-	logging.Log("SETUP-i1pNh").OnError(err).Error("unable to set iam project on iam")
-	return err
+	if _, err := setUp.repos.IamEvents.SetIamProject(ctx, setUp.iamID, iamProject.AggregateID); err != nil {
+		logging.Log("SETUP-i1pNh").WithError(err).Error("unable to set iam project on iam")
+		return err
+	}
+	logging.Log("SETUP-d7WEU").Info("iam project set")
+	return nil
 }
 
 func (setUp *initializer) users(ctx context.Context, users []types.User) error {
@@ -262,10 +301,11 @@ func (setUp *initializer) projects(ctx context.Context, projects []types.Project
 		}
 		setUp.createdProjects[createdProject.Name] = createdProject
 		for _, oidc := range project.OIDCApps {
-			_, err := setUp.oidcApp(ctx, createdProject, oidc)
+			app, err := setUp.oidcApp(ctx, createdProject, oidc)
 			if err != nil {
 				return err
 			}
+			logging.LogWithFields("SETUP-asd32f", "name", app.Name, "clientID", app.OIDCConfig.ClientID).Info("created OIDC application")
 		}
 	}
 	return nil

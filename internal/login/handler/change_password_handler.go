@@ -22,7 +22,7 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.ChangePassword(r.Context(), authReq.UserID, data.OldPassword, data.NewPassword)
+	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
 	if err != nil {
 		l.renderChangePassword(w, r, authReq, err)
 		return

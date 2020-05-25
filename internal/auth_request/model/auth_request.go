@@ -24,6 +24,8 @@ type AuthRequest struct {
 	levelOfAssurance      LevelOfAssurance
 	projectApplicationIDs []string
 	UserID                string
+	UserName              string
+	UserOrgID             string
 	PossibleSteps         []NextStep
 	PasswordVerified      bool
 	MfasVerified          []MfaType
@@ -81,4 +83,10 @@ func (a *AuthRequest) MfaLevel() MfaLevel {
 func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
 	a.BrowserInfo = info
 	return a
+}
+
+func (a *AuthRequest) SetUserInfo(userID string, userName string, userOrgID string) {
+	a.UserID = userID
+	a.UserName = userName
+	a.UserOrgID = userOrgID
 }

@@ -54,7 +54,9 @@ func (p *User) Process(event *models.Event) (err error) {
 		es_model.UserUnlocked,
 		es_model.MfaOtpAdded,
 		es_model.MfaOtpVerified,
-		es_model.MfaOtpRemoved:
+		es_model.MfaOtpRemoved,
+		es_model.MfaInitSkipped,
+		es_model.UserPasswordChanged:
 		user, err = p.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err

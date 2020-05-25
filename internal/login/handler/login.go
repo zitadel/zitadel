@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/form"
 	"github.com/gorilla/mux"
@@ -73,4 +74,12 @@ func (login *Login) Listen(ctx context.Context) {
 		err := httpServer.Serve(httpListener)
 		logging.Log("APP-oSklt").OnError(err).Panic("unable to start listener")
 	}()
+}
+
+func setContext(ctx context.Context, resourceOwner string) context.Context {
+	data := auth.CtxData{
+		UserID: "LOGIN",
+		OrgID:  resourceOwner,
+	}
+	return auth.SetCtxData(ctx, data)
 }

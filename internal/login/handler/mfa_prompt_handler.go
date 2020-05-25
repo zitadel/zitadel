@@ -28,7 +28,7 @@ func (l *Login) handleMfaPrompt(w http.ResponseWriter, r *http.Request) {
 		l.handleMfaCreation(w, r, authSession, mfaVerifyData)
 		return
 	}
-	err = l.authRepo.SkipMfaInit(r.Context(), authSession.UserID)
+	err = l.authRepo.SkipMfaInit(setContext(r.Context(), authSession.UserOrgID), authSession.UserID)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return

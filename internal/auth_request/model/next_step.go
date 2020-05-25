@@ -111,7 +111,8 @@ const (
 type MfaLevel int
 
 const (
-	MfaLevelSoftware MfaLevel = iota
+	MfaLevelNotSetUp MfaLevel = iota
+	MfaLevelSoftware
 	MfaLevelHardware
 	MfaLevelHardwareCertified
 )

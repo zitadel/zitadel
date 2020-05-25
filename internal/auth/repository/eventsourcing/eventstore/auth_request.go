@@ -80,7 +80,7 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	if err != nil {
 		return err
 	}
-	request.UserID = user.ID
+	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -89,8 +89,8 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 	if err != nil {
 		return err
 	}
-	if request.UserID == userID {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-ds35D", "user id does not match request id ")
+	if request.UserID != userID {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-ds35D", "user id does not match request id")
 	}
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
@@ -178,15 +178,20 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *model.AuthRequest, user *user_model.UserView) (model.NextStep, bool) {
 	mfaLevel := request.MfaLevel()
-	required := user.MfaMaxSetUp < mfaLevel
-	if required || !repo.mfaSkippedOrSetUp(user) {
+	promptRequired := user.MfaMaxSetUp < mfaLevel
+	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
 		return &model.MfaPromptStep{
-			Required:     required,
+			Required:     promptRequired,
 			MfaProviders: user.MfaTypesSetupPossible(mfaLevel),
 		}, false
 	}
 	switch mfaLevel {
 	default:
+		fallthrough
+	case model.MfaLevelNotSetUp:
+		if user.MfaMaxSetUp == model.MfaLevelNotSetUp {
+			return nil, true
+		}
 		fallthrough
 	case model.MfaLevelSoftware:
 		if checkVerificationTime(userSession.MfaSoftwareVerification, repo.MfaSoftwareCheckLifeTime) {
@@ -204,7 +209,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 }
 
 func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
-	if user.MfaMaxSetUp >= 0 {
+	if user.MfaMaxSetUp > model.MfaLevelNotSetUp {
 		return true
 	}
 	return checkVerificationTime(user.MfaInitSkipped, repo.MfaInitSkippedLifeTime)

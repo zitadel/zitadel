@@ -49,6 +49,9 @@ func main() {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
+	if *adminEnabled {
+		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
+	}
 	if *managementEnabled {
 		management.Start(ctx, conf.Mgmt, conf.AuthZ, conf.SystemDefaults)
 	}
@@ -62,9 +65,6 @@ func main() {
 	}
 	if *loginEnabled {
 		login.Start(ctx, conf.Login, conf.SystemDefaults, authRepo)
-	}
-	if *adminEnabled {
-		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
 	}
 	if *notificationEnabled {
 		notification.Start(ctx, conf.Notification, conf.SystemDefaults)
