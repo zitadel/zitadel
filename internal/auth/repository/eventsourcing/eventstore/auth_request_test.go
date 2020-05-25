@@ -570,7 +570,8 @@ func Test_userSessionByIDs(t *testing.T) {
 		{
 			"not found, new session",
 			args{
-				userProvider: &mockViewNoUserSession{},
+				userProvider:  &mockViewNoUserSession{},
+				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserSessionView{},
 			nil,
