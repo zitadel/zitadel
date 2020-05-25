@@ -11,6 +11,7 @@ import (
 )
 
 type OrgRepository struct {
+	SearchLimit uint64
 	*org_es.OrgEventstore
 	View *mgmt_view.View
 }
@@ -56,4 +57,18 @@ func (repo *OrgRepository) ChangeOrgMember(ctx context.Context, member *org_mode
 func (repo *OrgRepository) RemoveOrgMember(ctx context.Context, orgID, userID string) error {
 	member := org_model.NewOrgMember(orgID, userID)
 	return repo.OrgEventstore.RemoveOrgMember(ctx, member)
+}
+
+func (repo *OrgRepository) SearchOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	members, count, err := repo.View.SearchOrgMembers(request)
+	if err != nil {
+		return nil, err
+	}
+	return &org_model.OrgMemberSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      members,
+	}, nil
 }

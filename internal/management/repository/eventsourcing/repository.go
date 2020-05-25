@@ -84,7 +84,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 
 	return &EsRepository{
 		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{org, view},
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, view},
 		ProjectRepo:   eventstore.ProjectRepo{conf.SearchLimit, project, view},
 		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, view},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},

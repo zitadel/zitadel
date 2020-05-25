@@ -55,15 +55,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 	aesOtpCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
-	if err != nil {
-		return nil, err
-	}
-	mfa := global_model.Multifactors{
-		OTP: global_model.OTP{
-			CryptoMFA: aesOtpCrypto,
-			Issuer:    systemDefaults.Multifactors.OTP.Issuer,
-		},
-	}
+
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
@@ -72,9 +64,14 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
 		PasswordVerificationCode: passwordVerificationCode,
-		Multifactors:             mfa,
-		PasswordAlg:              passwordAlg,
-		validateTOTP:             totp.Validate,
+		Multifactors: global_model.Multifactors{
+			OTP: global_model.OTP{
+				CryptoMFA: aesOtpCrypto,
+				Issuer:    systemDefaults.Multifactors.OTP.Issuer,
+			},
+		},
+		PasswordAlg:  passwordAlg,
+		validateTOTP: totp.Validate,
 	}, nil
 }
 
