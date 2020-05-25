@@ -36,7 +36,7 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSes
 	query := view.PrepareSearchQuery(table, model.UserSessionSearchRequest{
 		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
 	})
-	_, err := query(db, userSessions)
+	_, err := query(db, &userSessions)
 	return userSessions, err
 }
 
