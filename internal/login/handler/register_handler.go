@@ -41,12 +41,12 @@ func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//TODO: How to get ResourceOwner?
-	_, err = l.authRepo.Register(r.Context(), data.toUserModel(), "GlobalResourceOwner")
+	user, err := l.authRepo.Register(r.Context(), data.toUserModel(), "GlobalResourceOwner")
 	if err != nil {
 		l.renderRegister(w, r, authSession, data, err)
 		return
 	}
-	// authSession.UserSession.User.UserName = user.UserName //TODO: ?
+	authSession.UserName = user.UserName
 	l.renderNextStep(w, r, authSession)
 }
 

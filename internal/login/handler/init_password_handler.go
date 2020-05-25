@@ -84,15 +84,10 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 
-func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest) {
-	var errType, errMessage, userName string
-	//TODO: fill Username
-	//if authSession != nil && authSession.UserSession != nil && authSession.UserSession.User != nil {
-	//	userName = authSession.UserSession.User.UserName
-	//}
+func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	data := userData{
-		baseData: l.getBaseData(r, authSession, "Password Init Done", errType, errMessage),
-		UserName: userName,
+		baseData: l.getBaseData(r, authReq, "Password Init Done", "", ""),
+		UserName: authReq.UserName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitPasswordDone], data, nil)
 }
