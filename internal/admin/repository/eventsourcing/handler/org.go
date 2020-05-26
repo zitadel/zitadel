@@ -16,7 +16,7 @@ type Org struct {
 }
 
 const (
-	orgTable = "admin.orgs"
+	orgTable = "admin_api.orgs"
 )
 
 func (o *Org) MinimumCycleDuration() time.Duration { return o.cycleDuration }

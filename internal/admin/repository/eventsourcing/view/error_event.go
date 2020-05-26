@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	errTable = "admin.failed_event"
+	errTable = "admin_api.failed_event"
 )
 
 func (v *View) saveFailedEvent(failedEvent *view.FailedEvent) error {
