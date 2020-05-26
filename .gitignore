@@ -32,4 +32,3 @@ cockroach-data/*
 
 #binaries
 cmd/zitadel/zitadel
-zitadel

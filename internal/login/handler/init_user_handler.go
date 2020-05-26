@@ -68,7 +68,11 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string) {
-	err := l.authRepo.ResendInitVerificationMail(r.Context(), userID)
+	userOrgID := "LOGIN"
+	if authReq != nil {
+		userOrgID = authReq.UserOrgID
+	}
+	err := l.authRepo.ResendInitVerificationMail(setContext(r.Context(), userOrgID), userID)
 	l.renderInitUser(w, r, authReq, userID, "", err)
 }
 

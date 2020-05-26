@@ -1,0 +1,170 @@
+@font-face {
+  font-family: Aileron;
+  src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Thin.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-ThinItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Light.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-LightItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Regular.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Italic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Bold.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Black.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 800;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BlackItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 800;
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: Lato;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+}
+
+html {
+  background-color: #282828;
+  color: white;
+}
+
+h1 {
+  font-family: Aileron;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 40px;
+}
+
+header {
+  padding: 8px;
+}
+header .logo {
+  background-image: url("../logo-dark.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 80px;
+}
+
+.content {
+  margin: auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+
+button {
+  text-transform: uppercase;
+  background-color: #282828;
+  color: #1e00ff;
+  border: 2px solid #1e00ff;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 600px;
+  height: 40px;
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+button:hover {
+  background-color: #4b33ff;
+  border: 2px solid #4b33ff;
+}
+button.primary {
+  background-color: #1e00ff;
+  color: white;
+  border: none;
+}
+button.primary:hover {
+  background-color: #4b33ff;
+}
+button > .sessionstate {
+  text-transform: lowercase;
+}
+
+input {
+  background-color: #282828;
+  color: white;
+  height: 40px;
+}
+
+form .field {
+  display: grid;
+  padding: 10px 0;
+}
+form .field.radio-button {
+  display: inherit;
+}
+form .label {
+  text-transform: uppercase;
+}
+form .actions {
+  padding: 20px 0;
+}
+form .actions .right {
+  float: right;
+}
+form .actions button {
+  margin: 10px 0;
+}
+
+footer {
+  background-image: url("../gradientdeco-full.svg");
+  width: 100%;
+  background-size: cover;
+  height: 44vw;
+  position: absolute;
+  bottom: 0;
+  z-index: -1;
+}
+
+/*# sourceMappingURL=dark.css.map */
