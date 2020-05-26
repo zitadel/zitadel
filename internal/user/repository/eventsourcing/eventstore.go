@@ -615,17 +615,23 @@ func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationC
 	if existing.EmailCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "code not found")
 	}
-	if err := crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, verificationCode, es.EmailVerificationCode); err != nil {
+
+	err = crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, verificationCode, es.EmailVerificationCode)
+	if err == nil {
+		return es.setEmailVerifyResult(ctx, existing, EmailVerifiedAggregate)
+	}
+	if err := es.setEmailVerifyResult(ctx, existing, EmailVerificationFailedAggregate); err != nil {
 		return err
 	}
+	return caos_errs.ThrowInvalidArgument(err, "EVENT-dtGaa", "invalid code")
+}
 
+func (es *UserEventstore) setEmailVerifyResult(ctx context.Context, existing *usr_model.User, check func(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc) error {
 	repoExisting := model.UserFromModel(existing)
-	updateAggregate := EmailVerifiedAggregate(es.AggregateCreator(), repoExisting)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, check(es.AggregateCreator(), repoExisting))
 	if err != nil {
 		return err
 	}
-
 	es.userCache.cacheUser(repoExisting)
 	return nil
 }
@@ -736,17 +742,23 @@ func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationC
 	if existing.PhoneCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-slp0s", "code not found")
 	}
-	if err := crypto.VerifyCode(existing.PhoneCode.CreationDate, existing.PhoneCode.Expiry, existing.PhoneCode.Code, verificationCode, es.PhoneVerificationCode); err != nil {
+
+	err = crypto.VerifyCode(existing.PhoneCode.CreationDate, existing.PhoneCode.Expiry, existing.PhoneCode.Code, verificationCode, es.PhoneVerificationCode)
+	if err == nil {
+		return es.setPhoneVerifyResult(ctx, existing, PhoneVerifiedAggregate)
+	}
+	if err := es.setPhoneVerifyResult(ctx, existing, PhoneVerificationFailedAggregate); err != nil {
 		return err
 	}
+	return caos_errs.ThrowInvalidArgument(err, "EVENT-dsf4G", "invalid code")
+}
 
+func (es *UserEventstore) setPhoneVerifyResult(ctx context.Context, existing *usr_model.User, check func(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc) error {
 	repoExisting := model.UserFromModel(existing)
-	updateAggregate := PhoneVerifiedAggregate(es.AggregateCreator(), repoExisting)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, check(es.AggregateCreator(), repoExisting))
 	if err != nil {
 		return err
 	}
-
 	es.userCache.cacheUser(repoExisting)
 	return nil
 }
