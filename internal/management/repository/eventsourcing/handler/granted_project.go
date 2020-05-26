@@ -9,8 +9,9 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	"github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
@@ -20,6 +21,7 @@ type GrantedProject struct {
 	handler
 	eventstore    eventstore.Eventstore
 	projectEvents *proj_event.ProjectEventstore
+	orgEvents     eventsourcing.OrgEventstore
 }
 
 const (
@@ -37,7 +39,7 @@ func (p *GrantedProject) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence), nil
+	return proj_event.ProjectQuery(sequence), nil
 }
 
 func (p *GrantedProject) Process(event *models.Event) (err error) {
@@ -71,7 +73,12 @@ func (p *GrantedProject) Process(event *models.Event) (err error) {
 			return err
 		}
 		grantedProject.Name = project.Name
-		//TODO: read org
+
+		org, err := p.orgEvents.OrgByID(context.TODO(), org_model.NewOrg(grantedProject.OrgID))
+		if err != nil {
+			return err
+		}
+		p.fillOrgData(grantedProject, org)
 	case es_model.ProjectGrantChanged:
 		grant := new(view_model.ProjectGrant)
 		err := grant.SetData(event)
@@ -99,11 +106,12 @@ func (p *GrantedProject) Process(event *models.Event) (err error) {
 	return p.view.PutGrantedProject(grantedProject)
 }
 
-func (p *GrantedProject) getOrg(orgID string) {
-	//TODO: Get Org
+func (p *GrantedProject) fillOrgData(grantedProject *view_model.GrantedProjectView, org *org_model.Org) {
+	grantedProject.OrgDomain = org.Domain
+	grantedProject.OrgName = org.Name
 }
 
-func (p *GrantedProject) getProject(projectID string) (*model.Project, error) {
+func (p *GrantedProject) getProject(projectID string) (*proj_model.Project, error) {
 	return p.projectEvents.ProjectByID(context.Background(), projectID)
 }
 
