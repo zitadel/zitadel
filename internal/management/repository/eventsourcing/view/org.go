@@ -1,9 +1,6 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/view"
 )
@@ -17,22 +14,7 @@ func (v *View) OrgByID(orgID string) (*org_view.OrgView, error) {
 }
 
 func (v *View) OrgByDomain(domain string) (*org_view.OrgView, error) {
-	orgs, _, err := org_view.SearchOrgs(v.Db, orgTable, &org_model.OrgSearchRequest{
-		Limit: 1,
-		Queries: []*org_model.OrgSearchQuery{
-			{
-				Key:    org_model.ORGSEARCHKEY_ORG_DOMAIN,
-				Method: model.SEARCHMETHOD_EQUALS,
-				Value:  domain,
-			},
-		}})
-	if err != nil {
-		return nil, err
-	}
-	if len(orgs) == 0 {
-		return nil, errors.ThrowNotFound(nil, "VIEW-ByecF", "no org found")
-	}
-	return orgs[0], nil
+	return org_view.GetGlobalOrgByDomain(v.Db, orgTable, domain)
 }
 
 func (v *View) PutOrg(org *org_view.OrgView) error {
