@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
@@ -23,6 +22,22 @@ func UserQuery(latestSequence uint64) *es_models.SearchQuery {
 		LatestSequenceFilter(latestSequence)
 }
 
+func UserUserNameUniqueQuery(userName string) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserUserNameAggregate).
+		AggregateIDFilter(userName).
+		OrderDesc().
+		SetLimit(1)
+}
+
+func UserEmailUniqueQuery(email string) *es_models.SearchQuery {
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserEmailAggregate).
+		AggregateIDFilter(email).
+		OrderDesc().
+		SetLimit(1)
+}
+
 func UserAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User) (*es_models.Aggregate, error) {
 	if user == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing user should not be nil")
@@ -38,11 +53,12 @@ func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Ag
 	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
 }
 
-func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string) (agg *es_models.Aggregate, err error) {
+func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string) (_ []*es_models.Aggregate, err error) {
 	if user == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user should not be nil")
 	}
 
+	var agg *es_models.Aggregate
 	if resourceOwner != "" {
 		agg, err = UserAggregateOverwriteContext(ctx, aggCreator, user, user.AggregateID, resourceOwner)
 	} else {
@@ -80,10 +96,18 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 			return nil, err
 		}
 	}
-	return agg, err
+	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		uniqueAggregates[0],
+		uniqueAggregates[1],
+	}, nil
 }
 
-func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, emailCode *model.EmailCode) (*es_models.Aggregate, error) {
+func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, emailCode *model.EmailCode) ([]*es_models.Aggregate, error) {
 	if user == nil || resourceOwner == "" || emailCode == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, emailcode should not be nothing")
 	}
@@ -97,7 +121,66 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	if err != nil {
 		return nil, err
 	}
-	return agg.AppendEvent(model.UserEmailCodeAdded, emailCode)
+	agg, err = agg.AppendEvent(model.UserEmailCodeAdded, emailCode)
+	if err != nil {
+		return nil, err
+	}
+	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		uniqueAggregates[0],
+		uniqueAggregates[1],
+	}, nil
+}
+
+func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string) ([]*es_models.Aggregate, error) {
+	userNameAggregate, err := uniqueUserNameAggregate(ctx, aggCreator, resourceOwner, user.UserName)
+	if err != nil {
+		return nil, err
+	}
+
+	emailAggregate, err := uniqueEmailAggregate(ctx, aggCreator, resourceOwner, user.EmailAddress)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		userNameAggregate,
+		emailAggregate,
+	}, nil
+}
+func uniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userName string) (*es_models.Aggregate, error) {
+	aggregate, err := aggCreator.NewAggregate(ctx, userName, model.UserUserNameAggregate, model.UserVersion, 0)
+	if resourceOwner != "" {
+		aggregate, err = aggCreator.NewAggregate(ctx, userName, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+	}
+	if err != nil {
+		return nil, err
+	}
+	aggregate, err = aggregate.AppendEvent(model.UserUserNameReserved, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aggregate.SetPrecondition(UserUserNameUniqueQuery(userName), isReservedValidation(aggregate, model.UserUserNameReserved)), nil
+}
+
+func uniqueEmailAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, email string) (aggregate *es_models.Aggregate, err error) {
+	aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0)
+	if resourceOwner != "" {
+		aggregate, err = aggCreator.NewAggregate(ctx, email, model.UserEmailAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+	}
+	if err != nil {
+		return nil, err
+	}
+	aggregate, err = aggregate.AppendEvent(model.UserEmailReserved, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aggregate.SetPrecondition(UserEmailUniqueQuery(email), isReservedValidation(aggregate, model.UserEmailReserved)), nil
 }
 
 func UserDeactivateAggregate(aggCreator *es_models.AggregateCreator, user *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
@@ -447,5 +530,19 @@ func SignOutAggregate(aggCreator *es_models.AggregateCreator, existing *model.Us
 			return nil, err
 		}
 		return agg.AppendEvent(model.SignedOut, map[string]interface{}{"agentID": agentID})
+	}
+}
+
+func isReservedValidation(aggregate *es_models.Aggregate, reservedEventType es_models.EventType) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		if len(events) == 0 {
+			aggregate.PreviousSequence = 0
+			return nil
+		}
+		if events[0].Type == reservedEventType {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-eJQqe", "org already reseved")
+		}
+		aggregate.PreviousSequence = events[0].Sequence
+		return nil
 	}
 }

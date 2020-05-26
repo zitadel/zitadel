@@ -41,7 +41,6 @@ func (es *eventstore) PushAggregates(ctx context.Context, aggregates ...*models.
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
