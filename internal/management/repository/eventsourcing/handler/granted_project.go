@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -21,7 +21,7 @@ type GrantedProject struct {
 	handler
 	eventstore    eventstore.Eventstore
 	projectEvents *proj_event.ProjectEventstore
-	orgEvents     eventsourcing.OrgEventstore
+	orgEvents     *org_event.OrgEventstore
 }
 
 const (
