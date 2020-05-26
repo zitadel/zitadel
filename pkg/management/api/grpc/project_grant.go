@@ -2,15 +2,11 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
-
-func (s *Server) GetProjectGrantMemberRoles(ctx context.Context, _ *empty.Empty) (*ProjectGrantMemberRoles, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mGo89", "Not implemented")
-}
 
 func (s *Server) SearchProjectGrants(ctx context.Context, in *ProjectGrantSearchRequest) (*ProjectGrantSearchResponse, error) {
 	request := projectGrantSearchRequestsToModel(in)

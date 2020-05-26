@@ -6,8 +6,12 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/setup"
+	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
+	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -15,13 +19,14 @@ import (
 )
 
 type Config struct {
-	Eventstore es_int.Config
-	//View       view.ViewConfig
-	//Spooler    spooler.SpoolerConfig
+	SearchLimit uint64
+	Eventstore  es_int.Config
+	View        types.SQL
+	Spooler     spooler.SpoolerConfig
 }
 
 type EsRepository struct {
-	//spooler *es_spooler.Spooler
+	spooler *es_spol.Spooler
 	eventstore.OrgRepo
 }
 
@@ -31,15 +36,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 
-	//view, sql, err := mgmt_view.StartView(conf.View)
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	//conf.Spooler.View = view
-	//conf.Spooler.EsClient = es.Client
-	//conf.Spooler.SQL = sql
-	//spool := spooler.StartSpooler(conf.Spooler)
 	iam, err := es_iam.StartIam(es_iam.IamConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -66,15 +62,29 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 
+	sqlClient, err := conf.View.Start()
+	if err != nil {
+		return nil, err
+	}
+	view, err := admin_view.StartView(sqlClient)
+	if err != nil {
+		return nil, err
+	}
+
 	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user, ProjectEvents: project, IamEvents: iam}
 	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute(ctx)
 	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to execute setup")
 
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient)
+
 	return &EsRepository{
+		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
 			Eventstore:     es,
 			OrgEventstore:  org,
 			UserEventstore: user,
+			View:           view,
+			SearchLimit:    conf.SearchLimit,
 		},
 	}, nil
 }

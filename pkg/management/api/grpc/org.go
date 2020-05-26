@@ -19,7 +19,7 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *OrgDomain) (*Org,
 	if err != nil {
 		return nil, err
 	}
-	return orgFromModel(org), nil
+	return orgFromView(org), nil
 }
 
 func (s *Server) DeactivateOrg(ctx context.Context, in *OrgID) (*Org, error) {
