@@ -92,6 +92,19 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID string) error {
+	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	user, err := repo.View.UserByID(userID)
+	if err != nil {
+		return err
+	}
+	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner)
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, password string, info *model.BrowserInfo) error {
 	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
 	if err != nil {

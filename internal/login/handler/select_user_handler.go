@@ -10,7 +10,7 @@ const (
 )
 
 type userSelectionFormData struct {
-	UserSessionID string `schema:"userSessionID"`
+	UserID string `schema:"userID"`
 }
 
 func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, selectionData *model.SelectUserStep) {
@@ -29,15 +29,14 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authSession, err)
 		return
 	}
-	if data.UserSessionID == "0" {
+	if data.UserID == "0" {
 		l.renderLogin(w, r, authSession, nil)
 		return
 	}
-	//TODO: Choose User
-	//authSession, err = l.authRepo.SelectUser(r.Context(), authSession, data.UserSessionID, browserInfo)
-	//if err != nil {
-	//	l.renderError(w, r, authSession, err)
-	//	return
-	//}
+	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID)
+	if err != nil {
+		l.renderError(w, r, authSession, err)
+		return
+	}
 	l.renderNextStep(w, r, authSession)
 }

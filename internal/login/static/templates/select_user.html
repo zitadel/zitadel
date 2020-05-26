@@ -11,12 +11,12 @@
     <div class="actions">
         {{ range $user := .Users }}
         {{ $sessionState := (t (printf "UserSelection.SessionState%v" $user.UserSessionState)) }}
-        <button type="submit" name="userSessionID" value="{{$user.SessionID}}" class="primary">
+        <button type="submit" name="userID" value="{{$user.UserID}}" class="primary">
             <span class="username">{{$user.UserName}}</span>
             <span class="sessionstate">({{$sessionState}})</span>
         </button>
         {{ end }}
-        <button type="submit" name="userSessionID" value="0" class="primary">{{t "UserSelection.OtherUser"}}</button>
+        <button type="submit" name="userID" value="0" class="primary">{{t "UserSelection.OtherUser"}}</button>
     </div>
 </form>
 
