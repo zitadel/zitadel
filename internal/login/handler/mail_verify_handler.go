@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"net/http"
 )
@@ -37,52 +36,48 @@ func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(mailVerificationFormData)
-	authSession, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	if !data.Resend {
-		l.checkMailCode(w, r, authSession, data.UserID, data.Code)
+		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
 	}
-	//TODO: Check UserSession?
-	if authSession == nil /*|| authSession.UserSession != nil && authSession.UserSession.User == nil*/ {
-		err = l.authRepo.ResendEmailVerificationMail(r.Context(), data.UserID)
-	} else {
-		ctx := auth.SetCtxData(r.Context(), auth.CtxData{UserID: authSession.UserID, OrgID: "LOGIN"})
-		err = l.authRepo.ResendMyEmailVerificationMail(ctx)
+	userOrg := "LOGIN"
+	if authReq != nil {
+		userOrg = authReq.UserOrgID
 	}
-	l.renderMailVerification(w, r, authSession, data.UserID, err)
+	err = l.authRepo.ResendEmailVerificationMail(setContext(r.Context(), userOrg), data.UserID)
+	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
-func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, userID, code string) {
-	var err error
-	//TODO: Check UserSession
-	if authSession != nil /* && authSession.UserSession != nil && authSession.UserSession.User != nil */ {
-		ctx := auth.SetCtxData(r.Context(), auth.CtxData{UserID: authSession.UserID, OrgID: "LOGIN"})
-		err = l.authRepo.VerifyMyEmail(ctx, code)
-	} else {
-		err = l.authRepo.VerifyEmail(r.Context(), userID, code)
+func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string) {
+	//TODO: Where do we get org id, if its not in login flow
+	userOrg := "LOGIN"
+	if authReq != nil {
+		userID = authReq.UserID
+		userOrg = authReq.UserOrgID
 	}
+	err := l.authRepo.VerifyEmail(setContext(r.Context(), userOrg), userID, code)
 	if err != nil {
-		l.renderMailVerification(w, r, authSession, userID, err)
+		l.renderMailVerification(w, r, authReq, userID, err)
 		return
 	}
-	l.renderMailVerified(w, r, authSession)
+	l.renderMailVerified(w, r, authReq)
 }
 
-func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, userID string, err error) {
+func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
 	}
-	//TODO: Check UserSession?
-	if userID == "" /* && authSession != nil && authSession.UserSession != nil && authSession.UserSession.User != nil */ {
-		userID = authSession.UserID
+	if userID == "" {
+		userID = authReq.UserID
 	}
 	data := mailVerificationData{
-		baseData: l.getBaseData(r, authSession, "Mail Verification", errType, errMessage),
+		baseData: l.getBaseData(r, authReq, "Mail Verification", errType, errMessage),
 		UserID:   userID,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerification], data, nil)

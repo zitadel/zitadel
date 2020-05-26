@@ -160,6 +160,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderMailVerification(w, r, authReq, "", err)
 	case *model.MfaPromptStep:
 		l.renderMfaPrompt(w, r, authReq, step, err)
+	case *model.InitUserStep:
+		l.renderInitUser(w, r, authReq, "", "", nil)
 	default:
 		//TODO: err
 	}
@@ -175,7 +177,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getBaseData(r *http.Request, authSession *model.AuthRequest, title string, errType, errMessage string) baseData {
+func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) baseData {
 	return baseData{
 		errorData: errorData{
 			ErrType:    errType,
@@ -185,7 +187,7 @@ func (l *Login) getBaseData(r *http.Request, authSession *model.AuthRequest, tit
 		Title:     title,
 		Theme:     l.getTheme(r),
 		ThemeMode: l.getThemeMode(r),
-		AuthReqID: getRequestID(authSession, r),
+		AuthReqID: getRequestID(authReq, r),
 	}
 }
 

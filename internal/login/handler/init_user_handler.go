@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"net/http"
 )
@@ -30,47 +31,54 @@ type initUserData struct {
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
 	userID := r.FormValue(queryInitUserUserID)
 	code := r.FormValue(queryInitUserCode)
-	l.renderInitUser(w, r, userID, code, nil)
+	l.renderInitUser(w, r, nil, userID, code, nil)
 }
 
 func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(initUserFormData)
-	_, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
 	}
 
 	if data.Resend {
-		l.resendUserInit(w, r, data.UserID)
+		l.resendUserInit(w, r, authReq, data.UserID)
 		return
 	}
-	l.checkUserInitCode(w, r, data, nil)
+	l.checkUserInitCode(w, r, authReq, data, nil)
 }
 
-func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, data *initUserFormData, err error) {
+func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *initUserFormData, err error) {
 	if data.Password != data.PasswordConfirm {
 		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "passwords dont match")
-		l.renderInitUser(w, r, data.UserID, data.Code, err)
+		l.renderInitUser(w, r, nil, data.UserID, data.Code, err)
 		return
 	}
-	err = l.authRepo.VerifyInitCode(r.Context(), data.UserID, data.Code, data.Password)
+	userOrgID := "LOGIN"
+	if authReq != nil {
+		userOrgID = authReq.UserOrgID
+	}
+	err = l.authRepo.VerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, data.Code, data.Password)
 	if err != nil {
-		l.renderInitUser(w, r, data.UserID, "", err)
+		l.renderInitUser(w, r, nil, data.UserID, "", err)
 		return
 	}
-	l.renderInitUserDone(w, r)
+	l.renderInitUserDone(w, r, nil)
 }
 
-func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, userID string) {
+func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string) {
 	err := l.authRepo.ResendInitVerificationMail(r.Context(), userID)
-	l.renderInitUser(w, r, userID, "", err)
+	l.renderInitUser(w, r, authReq, userID, "", err)
 }
 
-func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, userID, code string, err error) {
+func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
+	}
+	if authReq != nil {
+		userID = authReq.UserID
 	}
 	data := initUserData{
 		baseData: l.getBaseData(r, nil, "Init User", errType, errMessage),
@@ -80,10 +88,13 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, userID, c
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUser], data, nil)
 }
 
-func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request) {
+func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	var errType, errMessage, userName string
+	if authReq != nil {
+		userName = authReq.UserName
+	}
 	data := userData{
-		baseData: l.getBaseData(r, nil, "User Init Done", errType, errMessage),
+		baseData: l.getBaseData(r, authReq, "User Init Done", errType, errMessage),
 		UserName: userName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUserDone], data, nil)
