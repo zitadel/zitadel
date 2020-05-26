@@ -6,10 +6,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-const (
-	projectGrantRolesPrefix = "PROJECT_GRANT_"
-)
-
 func (s *Server) GetProjectGrantMemberRoles(ctx context.Context, _ *empty.Empty) (*ProjectGrantMemberRoles, error) {
 	return &ProjectGrantMemberRoles{Roles: s.getProjectGrantMemberRoles()}, nil
 }

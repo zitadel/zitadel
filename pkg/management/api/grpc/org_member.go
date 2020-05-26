@@ -6,10 +6,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-const (
-	orgRolePrefix = "ORG_"
-)
-
 func (s *Server) GetOrgMemberRoles(ctx context.Context, _ *empty.Empty) (*OrgMemberRoles, error) {
 	return &OrgMemberRoles{Roles: s.getOrgMemberRoles()}, nil
 }
