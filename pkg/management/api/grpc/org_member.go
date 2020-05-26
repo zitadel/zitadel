@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) GetOrgMemberRoles(ctx context.Context, _ *empty.Empty) (*OrgMemberRoles, error) {
-	return &OrgMemberRoles{Roles: s.getOrgMemberRoles()}, nil
+	return &OrgMemberRoles{Roles: s.org.GetOrgMemberRoles()}, nil
 }
 
 func (s *Server) SearchOrgMembers(ctx context.Context, in *OrgMemberSearchRequest) (*OrgMemberSearchResponse, error) {

@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 
@@ -13,6 +15,7 @@ type ProjectRepo struct {
 	SearchLimit   uint64
 	ProjectEvents *proj_event.ProjectEventstore
 	View          *view.View
+	Roles         []string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
@@ -211,4 +214,24 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantMembersToModel(members),
 	}, nil
+}
+
+func (repo *ProjectRepo) GetProjectMemberRoles() []string {
+	roles := make([]string, 0)
+	for _, roleMap := range repo.Roles {
+		if strings.HasPrefix(roleMap, "PROJECT") && !strings.HasPrefix(roleMap, "PROJECT_GRANT") {
+			roles = append(roles, roleMap)
+		}
+	}
+	return roles
+}
+
+func (repo *ProjectRepo) GetProjectGrantMemberRoles() []string {
+	roles := make([]string, 0)
+	for _, roleMap := range repo.Roles {
+		if strings.HasPrefix(roleMap, "PROJECT_GRANT") {
+			roles = append(roles, roleMap)
+		}
+	}
+	return roles
 }

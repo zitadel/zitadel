@@ -34,7 +34,7 @@ type EsRepository struct {
 	eventstore.PolicyRepo
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -84,8 +84,8 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 
 	return &EsRepository{
 		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, view},
-		ProjectRepo:   eventstore.ProjectRepo{conf.SearchLimit, project, view},
+		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, view, roles},
+		ProjectRepo:   eventstore.ProjectRepo{conf.SearchLimit, project, view, roles},
 		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, view},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		PolicyRepo:    eventstore.PolicyRepo{policy},

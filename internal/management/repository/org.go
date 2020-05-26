@@ -17,4 +17,6 @@ type OrgRepository interface {
 	AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
 	ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
 	RemoveOrgMember(ctx context.Context, orgID, userID string) error
+
+	GetOrgMemberRoles() []string
 }

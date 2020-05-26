@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -13,7 +14,8 @@ import (
 type OrgRepository struct {
 	SearchLimit uint64
 	*org_es.OrgEventstore
-	View *mgmt_view.View
+	View  *mgmt_view.View
+	Roles []string
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
@@ -71,4 +73,14 @@ func (repo *OrgRepository) SearchOrgMembers(ctx context.Context, request *org_mo
 		TotalResult: uint64(count),
 		Result:      view.OrgMembersToModel(members),
 	}, nil
+}
+
+func (repo *OrgRepository) GetOrgMemberRoles() []string {
+	roles := make([]string, 0)
+	for _, roleMap := range repo.Roles {
+		if strings.HasPrefix(roleMap, "ORG") {
+			roles = append(roles, roleMap)
+		}
+	}
+	return roles
 }

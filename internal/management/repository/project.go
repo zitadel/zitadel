@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/project/model"
 )
 
@@ -18,6 +19,7 @@ type ProjectRepository interface {
 	ChangeProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)
 	RemoveProjectMember(ctx context.Context, projectID, userID string) error
 	SearchProjectMembers(ctx context.Context, request *model.ProjectMemberSearchRequest) (*model.ProjectMemberSearchResponse, error)
+	GetProjectMemberRoles() []string
 
 	AddProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
@@ -46,4 +48,5 @@ type ProjectRepository interface {
 	AddProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
 	ChangeProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
 	RemoveProjectGrantMember(ctx context.Context, projectID, grantID, userID string) error
+	GetProjectGrantMemberRoles() []string
 }

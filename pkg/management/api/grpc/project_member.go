@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) GetProjectMemberRoles(ctx context.Context, _ *empty.Empty) (*ProjectMemberRoles, error) {
-	return &ProjectMemberRoles{Roles: s.getProjectMemberRoles()}, nil
+	return &ProjectMemberRoles{Roles: s.project.GetProjectMemberRoles()}, nil
 }
 
 func (s *Server) SearchProjectMembers(ctx context.Context, in *ProjectMemberSearchRequest) (*ProjectMemberSearchResponse, error) {
