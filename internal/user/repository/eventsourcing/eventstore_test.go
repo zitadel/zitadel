@@ -2014,6 +2014,18 @@ func TestVerifyEmail(t *testing.T) {
 			res: res{},
 		},
 		{
+			name: "verify email code wrong",
+			args: args{
+				es:     GetMockManipulateUserWithEmailCode(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "wrong",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "empty userid",
 			args: args{
 				es:   GetMockManipulateUser(ctrl),
@@ -2378,6 +2390,18 @@ func TestVerifyPhone(t *testing.T) {
 				code:   "code",
 			},
 			res: res{},
+		},
+		{
+			name: "verify code wrong",
+			args: args{
+				es:     GetMockManipulateUserWithPhoneCode(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "wrong",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
 		},
 		{
 			name: "empty userid",
