@@ -551,8 +551,11 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	repoNew := model.EmailFromModel(email)
 	repoEmailCode := model.EmailCodeFromModel(emailCode)
 
-	updateAggregate := EmailChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	updateAggregates, err := EmailChangeAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregates...)
 	if err != nil {
 		return nil, err
 	}
