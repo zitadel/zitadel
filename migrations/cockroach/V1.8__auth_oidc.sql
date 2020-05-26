@@ -43,4 +43,7 @@ CREATE TABLE auth.applications (
 
 ALTER TABLE auth.tokens ADD COLUMN scopes TEXT ARRAY;
 
+ALTER TABLE auth.users ADD COLUMN init_required BOOLEAN;
+ALTER TABLE management.users ADD COLUMN init_required BOOLEAN;
+
 COMMIT;

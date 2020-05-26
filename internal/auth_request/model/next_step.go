@@ -10,6 +10,7 @@ const (
 	NextStepUnspecified NextStepType = iota
 	NextStepLogin
 	NextStepUserSelection
+	NextStepInitUser
 	NextStepPassword
 	NextStepChangePassword
 	NextStepInitPassword
@@ -44,6 +45,14 @@ type UserSelection struct {
 	UserID           string
 	UserName         string
 	UserSessionState UserSessionState
+}
+
+type InitUserStep struct {
+	PasswordSet bool
+}
+
+func (s *InitUserStep) Type() NextStepType {
+	return NextStepInitUser
 }
 
 type PasswordStep struct{}

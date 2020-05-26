@@ -7,10 +7,12 @@ const (
 	UserUserNameAggregate models.AggregateType = "user.username"
 	UserEmailAggregate    models.AggregateType = "user.email"
 
-	UserAdded                models.EventType = "user.added"
-	UserRegistered           models.EventType = "user.selfregistered"
-	InitializedUserCodeAdded models.EventType = "user.initialization.code.added"
-	InitializedUserCodeSent  models.EventType = "user.initialization.code.sent"
+	UserAdded                     models.EventType = "user.added"
+	UserRegistered                models.EventType = "user.selfregistered"
+	InitializedUserCodeAdded      models.EventType = "user.initialization.code.added"
+	InitializedUserCodeSent       models.EventType = "user.initialization.code.sent"
+	InitializedUserCheckSucceeded models.EventType = "user.initialization.check.succeeded"
+	InitializedUserCheckFailed    models.EventType = "user.initialization.check.failed"
 
 	UserUserNameReserved models.EventType = "user.username.reserved"
 	UserUserNameReleased models.EventType = "user.username.released"

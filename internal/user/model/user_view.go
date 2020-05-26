@@ -36,6 +36,7 @@ type UserView struct {
 	OTPState               MfaState
 	MfaMaxSetUp            req_model.MfaLevel
 	MfaInitSkipped         time.Time
+	InitRequired           bool
 	Sequence               uint64
 }
 

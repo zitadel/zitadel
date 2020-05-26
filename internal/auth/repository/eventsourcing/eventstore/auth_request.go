@@ -154,6 +154,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		return nil, err
 	}
 
+	if user.InitRequired {
+		return append(steps, &model.InitUserStep{PasswordSet: user.PasswordSet}), nil
+	}
 	if !user.PasswordSet {
 		return append(steps, &model.InitPasswordStep{}), nil
 	}

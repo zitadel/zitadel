@@ -54,6 +54,7 @@ type UserView struct {
 	OTPState               int32     `json:"-" gorm:"column:otp_state"`
 	MfaMaxSetUp            int32     `json:"-" gorm:"column:mfa_max_set_up"`
 	MfaInitSkipped         time.Time `json:"-" gorm:"column:mfa_init_skipped"`
+	InitRequired           bool      `json:"-" gorm:"column:init_required"`
 	Sequence               uint64    `json:"-" gorm:"column:sequence"`
 }
 
@@ -87,6 +88,7 @@ func UserFromModel(user *model.UserView) *UserView {
 		OTPState:               int32(user.OTPState),
 		MfaMaxSetUp:            int32(user.MfaMaxSetUp),
 		MfaInitSkipped:         user.MfaInitSkipped,
+		InitRequired:           user.InitRequired,
 		Sequence:               user.Sequence,
 	}
 }
@@ -121,6 +123,7 @@ func UserToModel(user *UserView) *model.UserView {
 		OTPState:               model.MfaState(user.OTPState),
 		MfaMaxSetUp:            req_model.MfaLevel(user.MfaMaxSetUp),
 		MfaInitSkipped:         user.MfaInitSkipped,
+		InitRequired:           user.InitRequired,
 		Sequence:               user.Sequence,
 	}
 }
@@ -177,6 +180,10 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.OTPState = int32(model.MFASTATE_UNSPECIFIED)
 	case es_model.MfaInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
+	case es_model.InitializedUserCodeAdded:
+		u.InitRequired = true
+	case es_model.InitializedUserCheckSucceeded:
+		u.InitRequired = false
 	}
 	u.ComputeObject()
 	return err
