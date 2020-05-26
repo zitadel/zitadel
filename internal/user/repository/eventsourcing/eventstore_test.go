@@ -753,8 +753,8 @@ func TestGetInitCodeByID(t *testing.T) {
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.Expiry != tt.res.code.Expiry {
-				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.code.Expiry, result.Expiry)
+			if tt.res.errFunc == nil && result == nil {
+				t.Error("got wrong result code should not be nil", result)
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -975,7 +975,7 @@ func TestInitCodeVerify(t *testing.T) {
 		{
 			name: "existing user not found",
 			args: args{
-				es:         GetMockManipulateUserNoEvents(ctrl),
+				es:         GetMockManipulateUserNoEventsWithPw(ctrl),
 				ctx:        auth.NewMockContext("orgID", "userID"),
 				userID:     "userID",
 				password:   "password",
