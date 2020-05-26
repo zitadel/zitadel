@@ -90,9 +90,10 @@ func (p *Phone) setData(event *es_models.Event) error {
 	return nil
 }
 
-func (a *PhoneCode) SetData(event *es_models.Event) error {
-	a.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, a); err != nil {
+func (c *PhoneCode) SetData(event *es_models.Event) error {
+	c.ObjectRoot.AppendEvent(event)
+	c.CreationDate = event.CreationDate
+	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-sk8ws").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-7hdj3", "could not unmarshal event")
 	}
