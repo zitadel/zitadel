@@ -330,6 +330,37 @@ func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error
 	return nil
 }
 
+func (es *UserEventstore) VerifyInitCode(ctx context.Context, userID, verificationCode, password string) error {
+	if userID == "" || verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "userId or Code empty")
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.InitCode == nil {
+		return caos_errs.ThrowNotFound(nil, "EVENT-spo9W", "code not found")
+	}
+	if err := crypto.VerifyCode(existing.InitCode.CreationDate, existing.InitCode.Expiry, existing.InitCode.Code, verificationCode, es.InitializeUserCode); err != nil {
+		return err
+	}
+	//TODO: Check PW Policy
+	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
+	if err != nil {
+		return err
+	}
+	repoPassword := &model.Password{Secret: secret, ChangeRequired: false}
+	repoExisting := model.UserFromModel(existing)
+	updateAggregate := InitCodeVerifiedAggregate(es.AggregateCreator(), repoExisting, repoPassword)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
 func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error {
 	if userID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")

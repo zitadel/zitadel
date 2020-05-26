@@ -122,6 +122,15 @@ func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
 	return repo.UserEvents.RemoveOTP(ctx, auth.GetCtxData(ctx).UserID)
 }
 
+func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID string) error {
+	_, err := repo.UserEvents.CreateInitializeUserCodeByID(ctx, userID)
+	return err
+}
+
+func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
+	return repo.UserEvents.VerifyInitCode(ctx, userID, code, password)
+}
+
 func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
 	return repo.UserEvents.SkipMfaInit(ctx, userID)
 }

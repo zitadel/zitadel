@@ -54,7 +54,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, data *
 		l.renderInitUser(w, r, data.UserID, data.Code, err)
 		return
 	}
-	//err = l.authRepo.VerifyUserInit(r.Context(), data.UserID, data.Code, data.Password)
+	err = l.authRepo.VerifyInitCode(r.Context(), data.UserID, data.Code, data.Password)
 	if err != nil {
 		l.renderInitUser(w, r, data.UserID, "", err)
 		return
@@ -63,8 +63,8 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, data *
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, userID string) {
-	//err := l.service.Auth.ResendUserInit(r.Context(), userID)
-	//l.renderInitUser(w, r, userID, "", err)
+	err := l.authRepo.ResendInitVerificationMail(r.Context(), userID)
+	l.renderInitUser(w, r, userID, "", err)
 }
 
 func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, userID, code string, err error) {

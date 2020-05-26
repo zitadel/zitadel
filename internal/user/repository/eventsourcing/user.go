@@ -149,6 +149,25 @@ func UserInitCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
+func InitCodeVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, password *model.Password) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		if existing.Email != nil && !existing.Email.IsEmailVerified {
+			agg, err = agg.AppendEvent(model.UserEmailVerified, nil)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if password != nil {
+			return agg.AppendEvent(model.UserPasswordChanged, password)
+		}
+		return agg, nil
+	}
+}
+
 func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)
