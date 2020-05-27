@@ -13,7 +13,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.5.7
 	github.com/allegro/bigcache v1.2.1
 	github.com/aws/aws-sdk-go v1.30.25 // indirect
-	github.com/caos/logging v0.0.1
+	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.6.0
 	github.com/cockroachdb/cockroach-go v0.0.0-20200504194139-73ffeee90b62
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
@@ -52,7 +52,7 @@ require (
 	go.opencensus.io v0.22.3
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
-	golang.org/x/sys v0.0.0-20200511232937-7e40ca221e25 // indirect
+	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200512001501-aaeff5de670a
 	google.golang.org/api v0.24.0 // indirect
