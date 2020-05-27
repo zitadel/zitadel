@@ -6,7 +6,9 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
@@ -86,7 +88,12 @@ func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existin
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.ProjectMemberAdded, member)
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(usr_model.UserAggregate).
+			AggregateIDFilter(member.UserID)
+
+		validation := addProjectMemberValidation()
+		return agg.SetPrecondition(validationQuery, validation).AppendEvent(model.ProjectMemberAdded, member)
 	}
 }
 
@@ -287,7 +294,12 @@ func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existing
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.ProjectGrantAdded, grant)
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(org_model.OrgAggregate).
+			AggregateIDFilter(grant.GrantedOrgID)
+
+		validation := addProjectGrantValidation()
+		agg.SetPrecondition(validationQuery, validation).AppendEvent(model.ProjectGrantAdded, grant)
 		return agg, nil
 	}
 }
@@ -352,9 +364,7 @@ func ProjectGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, ex
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.ProjectGrantReactivated, &model.ProjectGrantID{GrantID: grant.GrantID})
-
-		return agg, nil
+		return agg.AppendEvent(model.ProjectGrantReactivated, &model.ProjectGrantID{GrantID: grant.GrantID})
 	}
 }
 
@@ -367,8 +377,12 @@ func ProjectGrantMemberAddedAggregate(aggCreator *es_models.AggregateCreator, ex
 		if err != nil {
 			return nil, err
 		}
-		agg.AppendEvent(model.ProjectGrantMemberAdded, member)
-		return agg, nil
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(usr_model.UserAggregate).
+			AggregateIDFilter(member.UserID)
+
+		validation := addProjectGrantMemberValidation()
+		return agg.SetPrecondition(validationQuery, validation).AppendEvent(model.ProjectGrantMemberAdded, member)
 	}
 }
 
@@ -402,4 +416,56 @@ func ProjectGrantMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, 
 		}
 		return agg.AppendEvent(model.ProjectGrantMemberRemoved, member)
 	}
+}
+
+func addProjectMemberValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		return checkExistsUser(events...)
+	}
+}
+
+func addProjectGrantValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		existsOrg := false
+		for _, event := range events {
+			switch event.AggregateType {
+			case org_model.OrgAggregate:
+				switch event.Type {
+				case org_model.OrgAdded:
+					existsOrg = true
+				case org_model.OrgRemoved:
+					existsOrg = false
+				}
+			}
+		}
+		if existsOrg {
+			return nil
+		}
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "conditions not met")
+	}
+}
+
+func addProjectGrantMemberValidation() func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		return checkExistsUser(events...)
+	}
+}
+
+func checkExistsUser(events ...*es_models.Event) error {
+	existsUser := false
+	for _, event := range events {
+		switch event.AggregateType {
+		case usr_model.UserAggregate:
+			switch event.Type {
+			case usr_model.UserAdded, usr_model.UserRegistered:
+				existsUser = true
+			case usr_model.UserRemoved:
+				existsUser = false
+			}
+		}
+	}
+	if existsUser {
+		return nil
+	}
+	return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "conditions not met")
 }
