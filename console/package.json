@@ -65,7 +65,7 @@
     "prettier": "^2.0.5",
     "protractor": "~5.4.0",
     "ts-node": "~8.6.2",
-    "tslint": "~6.1.0",
+    "tslint": "~6.1.2",
     "typescript": "^3.7.5"
   }
 }
