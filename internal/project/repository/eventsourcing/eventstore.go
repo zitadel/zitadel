@@ -2,25 +2,22 @@ package eventsourcing
 
 import (
 	"context"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"strconv"
-
-	"github.com/sony/sonyflake"
-
 	"github.com/caos/zitadel/internal/cache/config"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 type ProjectEventstore struct {
 	es_int.Eventstore
 	projectCache *ProjectCache
 	pwGenerator  crypto.Generator
-	idGenerator  *sonyflake.Sonyflake
+	idGenerator  id.Generator
 }
 
 type ProjectConfig struct {
@@ -35,12 +32,11 @@ func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*Projec
 	}
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
 	pwGenerator := crypto.NewHashGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
-	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
 		projectCache: projectCache,
 		pwGenerator:  pwGenerator,
-		idGenerator:  idGenerator,
+		idGenerator:  id.SonyFlakeGenerator,
 	}, nil
 }
 
@@ -63,11 +59,11 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	project.AggregateID = strconv.FormatUint(id, 10)
+	project.AggregateID = id
 	project.State = proj_model.PROJECTSTATE_ACTIVE
 	repoProject := model.ProjectFromModel(project)
 
@@ -321,16 +317,16 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	if err != nil {
 		return nil, err
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	app.AppID = strconv.FormatUint(id, 10)
+	app.AppID = id
 
 	var stringPw string
 	var cryptoPw *crypto.CryptoValue
 	if app.OIDCConfig != nil {
-		app.OIDCConfig.AppID = strconv.FormatUint(id, 10)
+		app.OIDCConfig.AppID = id
 		stringPw, cryptoPw, err = generateNewClientSecret(es.pwGenerator)
 		if err != nil {
 			return nil, err
@@ -539,11 +535,11 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	if !existing.ContainsRoles(grant.RoleKeys) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	grant.GrantID = strconv.FormatUint(id, 10)
+	grant.GrantID = id
 
 	repoProject := model.ProjectFromModel(existing)
 	repoGrant := model.GrantFromModel(grant)

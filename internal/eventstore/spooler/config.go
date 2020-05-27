@@ -3,8 +3,7 @@ package spooler
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/sony/sonyflake"
-	"strconv"
+	"github.com/caos/zitadel/internal/id"
 )
 
 type Config struct {
@@ -15,12 +14,12 @@ type Config struct {
 }
 
 func (c *Config) New() *Spooler {
-	lockID, err := sonyflake.NewSonyflake(sonyflake.Settings{}).NextID()
+	lockID, err := id.SonyFlakeGenerator.Next()
 	logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
 
 	return &Spooler{
 		handlers:        c.ViewHandlers,
-		lockID:          strconv.FormatUint(lockID, 10),
+		lockID:          lockID,
 		eventstore:      c.Eventstore,
 		locker:          c.Locker,
 		queue:           make(chan *spooledHandler),

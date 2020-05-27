@@ -2,10 +2,8 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
-
+	"github.com/caos/zitadel/internal/id"
 	"github.com/pquerna/otp/totp"
-	"github.com/sony/sonyflake"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/cache/config"
@@ -23,7 +21,7 @@ import (
 type UserEventstore struct {
 	es_int.Eventstore
 	userCache                *UserCache
-	idGenerator              *sonyflake.Sonyflake
+	idGenerator              id.Generator
 	PasswordAlg              crypto.HashAlgorithm
 	InitializeUserCode       crypto.Generator
 	EmailVerificationCode    crypto.Generator
@@ -44,7 +42,6 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	if err != nil {
 		return nil, err
 	}
-	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	if err != nil {
 		return nil, err
@@ -59,7 +56,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
-		idGenerator:              idGenerator,
+		idGenerator:              id.SonyFlakeGenerator,
 		InitializeUserCode:       initCodeGen,
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
@@ -96,11 +93,11 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
 	//TODO: Check Uniqueness
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	user.AggregateID = strconv.FormatUint(id, 10)
+	user.AggregateID = id
 
 	err = user.HashPasswordIfExisting(es.PasswordAlg, true)
 	if err != nil {
@@ -145,11 +142,11 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
 	}
 	//TODO: Check Uniqueness
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	user.AggregateID = strconv.FormatUint(id, 10)
+	user.AggregateID = id
 
 	err = user.HashPasswordIfExisting(es.PasswordAlg, false)
 	if err != nil {
