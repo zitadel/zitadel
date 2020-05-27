@@ -42,7 +42,7 @@
     "prettier-stylelint": "^0.4.2",
     "rxjs": "~6.5.5",
     "ts-protoc-gen": "^0.12.0",
-    "tslib": "^1.10.0",
+    "tslib": "^1.13.0",
     "uuid": "^7.0.1",
     "zone.js": "~0.10.2"
   },
