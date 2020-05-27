@@ -200,6 +200,16 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"user not not found, not found error",
+			fields{
+				userViewProvider:  &mockViewNoUser{},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}},
+			nil,
+			errors.IsNotFound,
+		},
+		{
 			"usersession not found, new user session, password step",
 			fields{
 				userSessionViewProvider: &mockViewNoUserSession{},
@@ -216,22 +226,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"usersession error, internal error",
 			fields{
 				userSessionViewProvider: &mockViewErrUserSession{},
+				userViewProvider:        &mockViewUser{},
 				userEventProvider:       &mockEventUser{},
 			},
 			args{&model.AuthRequest{UserID: "UserID"}},
 			nil,
 			errors.IsInternal,
-		},
-		{
-			"user not not found, not found error",
-			fields{
-				userSessionViewProvider: &mockViewUserSession{},
-				userViewProvider:        &mockViewNoUser{},
-				userEventProvider:       &mockEventUser{},
-			},
-			args{&model.AuthRequest{UserID: "UserID"}},
-			nil,
-			errors.IsNotFound,
 		},
 		{
 			"password not set, init password step",
@@ -559,7 +559,7 @@ func Test_userSessionByIDs(t *testing.T) {
 		userProvider  userSessionViewProvider
 		eventProvider userEventProvider
 		agentID       string
-		userID        string
+		user          *user_model.UserView
 	}
 	tests := []struct {
 		name    string
@@ -572,6 +572,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			args{
 				userProvider:  &mockViewNoUserSession{},
 				eventProvider: &mockEventErrUser{},
+				user:          &user_model.UserView{ID: "id"},
 			},
 			&user_model.UserSessionView{},
 			nil,
@@ -580,6 +581,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			"internal error, internal error",
 			args{
 				userProvider: &mockViewErrUserSession{},
+				user:         &user_model.UserView{ID: "id"},
 			},
 			nil,
 			errors.IsInternal,
@@ -590,7 +592,58 @@ func Test_userSessionByIDs(t *testing.T) {
 				userProvider: &mockViewUserSession{
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
+				user:          &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventErrUser{},
+			},
+			&user_model.UserSessionView{
+				PasswordVerification:    time.Now().UTC().Round(1 * time.Second),
+				MfaSoftwareVerification: time.Time{},
+				MfaHardwareVerification: time.Time{},
+			},
+			nil,
+		},
+		{
+			"new user events but error, old view model state",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+				},
+				agentID: "agentID",
+				user:    &user_model.UserView{ID: "id"},
+				eventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.MfaOtpCheckSucceeded,
+						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+					},
+				},
+			},
+			&user_model.UserSessionView{
+				PasswordVerification:    time.Now().UTC().Round(1 * time.Second),
+				MfaSoftwareVerification: time.Time{},
+				MfaHardwareVerification: time.Time{},
+			},
+			nil,
+		},
+		{
+			"new user events but other agentID, old view model state",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+				},
+				agentID: "agentID",
+				user:    &user_model.UserView{ID: "id"},
+				eventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.MfaOtpCheckSucceeded,
+						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						Data: func() []byte {
+							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+							return data
+						}(),
+					},
+				},
 			},
 			&user_model.UserSessionView{
 				PasswordVerification:    time.Now().UTC().Round(1 * time.Second),
@@ -605,11 +658,17 @@ func Test_userSessionByIDs(t *testing.T) {
 				userProvider: &mockViewUserSession{
 					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
 				},
+				agentID: "agentID",
+				user:    &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
 						Type:          user_es_model.MfaOtpCheckSucceeded,
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						Data: func() []byte {
+							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+							return data
+						}(),
 					},
 				},
 			},
@@ -623,7 +682,7 @@ func Test_userSessionByIDs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := userSessionByIDs(context.Background(), tt.args.userProvider, tt.args.eventProvider, tt.args.agentID, tt.args.userID)
+			got, err := userSessionByIDs(context.Background(), tt.args.userProvider, tt.args.eventProvider, tt.args.agentID, tt.args.user)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return
