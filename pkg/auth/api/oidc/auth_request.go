@@ -34,9 +34,7 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequ
 }
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
-	//TODO: What to do?
-	// return o.processor.TerminateAuthSession(ctx, id)
-	return nil
+	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
 func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (string, time.Time, error) {

@@ -6,9 +6,11 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
-type Repository interface {
+type AuthRequestCache interface {
 	Health(ctx context.Context) error
 
 	GetAuthRequestByID(ctx context.Context, id string) (*model.AuthRequest, error)
-	SaveAuthRequest(ctx context.Context, id string) (*model.AuthRequest, error)
+	SaveAuthRequest(ctx context.Context, request *model.AuthRequest) error
+	UpdateAuthRequest(ctx context.Context, request *model.AuthRequest) error
+	DeleteAuthRequest(ctx context.Context, id string) error
 }

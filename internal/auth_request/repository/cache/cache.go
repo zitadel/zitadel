@@ -51,27 +51,27 @@ func (c *AuthRequestCache) GetAuthRequestByID(_ context.Context, id string) (*mo
 }
 
 func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *model.AuthRequest) error {
-	b, err := json.Marshal(request)
+	return c.saveAuthRequest(request, "INSERT INTO auth.auth_requests (id, request) VALUES($1, $2)")
+}
+
+func (c *AuthRequestCache) UpdateAuthRequest(_ context.Context, request *model.AuthRequest) error {
+	return c.saveAuthRequest(request, "UPDATE auth.auth_requests SET request = $2 WHERE id = $1")
+}
+
+func (c *AuthRequestCache) DeleteAuthRequest(_ context.Context, id string) error {
+	_, err := c.client.Exec("DELETE FROM auth.auth_requests WHERE id = $1", id)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "CACHE-32FH9", "unable to marshal auth request")
-	}
-	stmt, err := c.client.Prepare("INSERT INTO auth.auth_requests (id, request) VALUES($1, $2)")
-	if err != nil {
-		return caos_errs.ThrowInternal(err, "CACHE-dswfF", "sql prepare failed")
-	}
-	_, err = stmt.Exec(request.ID, b)
-	if err != nil {
-		return caos_errs.ThrowInternal(err, "CACHE-sw4af", "unable to save auth request")
+		return caos_errs.ThrowInternal(err, "CACHE-dsHw3", "unable to delete auth request")
 	}
 	return nil
 }
 
-func (c *AuthRequestCache) UpdateAuthRequest(_ context.Context, request *model.AuthRequest) error {
+func (c *AuthRequestCache) saveAuthRequest(request *model.AuthRequest, query string) error {
 	b, err := json.Marshal(request)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-os0GH", "unable to marshal auth request")
 	}
-	stmt, err := c.client.Prepare("UPDATE auth.auth_requests SET request = $2 WHERE id = $1")
+	stmt, err := c.client.Prepare(query)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-su3GK", "sql prepare failed")
 	}

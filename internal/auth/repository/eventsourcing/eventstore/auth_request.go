@@ -8,7 +8,7 @@ import (
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/auth_request/repository/cache"
+	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/id"
@@ -20,7 +20,7 @@ import (
 
 type AuthRequestRepo struct {
 	UserEvents   *user_event.UserEventstore
-	AuthRequests *cache.AuthRequestCache
+	AuthRequests cache.AuthRequestCache
 	View         *view.View
 
 	UserSessionViewProvider userSessionViewProvider
@@ -78,6 +78,10 @@ func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*m
 	}
 	request.PossibleSteps = steps
 	return request, nil
+}
+
+func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id string) error {
+	return repo.AuthRequests.DeleteAuthRequest(ctx, id)
 }
 
 func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username string) error {
