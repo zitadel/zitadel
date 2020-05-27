@@ -29,7 +29,7 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 }
 
 func Start(ctx context.Context, config Config) error {
-	statikFS, err := fs.New()
+	statikFS, err := fs.NewWithNamespace("console")
 	if err != nil {
 		return err
 	}

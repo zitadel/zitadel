@@ -45,7 +45,7 @@ func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRe
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
 	}
-	statikFS, err := fs.New()
+	statikFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return err
 	}
