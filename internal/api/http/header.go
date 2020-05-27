@@ -2,8 +2,11 @@ package http
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"strings"
+
+	"github.com/caos/zitadel/internal/api"
 )
 
 type key int
@@ -32,14 +35,34 @@ func RemoteIPFromCtx(ctx context.Context) string {
 	if !ok {
 		return RemoteAddrFromCtx(ctx)
 	}
-	forwarded, ok := ctxHeaders["X-Forwarded-For"]
+	forwarded, ok := ForwardedFor(ctxHeaders)
+	if ok {
+		return forwarded
+	}
+	return RemoteAddrFromCtx(ctx)
+}
+
+func RemoteIPFromRequest(r *http.Request) net.IP {
+	return net.ParseIP(RemoteIPStringFromRequest(r))
+}
+
+func RemoteIPStringFromRequest(r *http.Request) string {
+	ip, ok := ForwardedFor(r.Header)
+	if ok {
+		return ip
+	}
+	return r.RemoteAddr
+}
+
+func ForwardedFor(headers http.Header) (string, bool) {
+	forwarded, ok := headers[api.ForwardedFor]
 	if ok {
 		ip := strings.Split(forwarded[0], ", ")[0]
 		if ip != "" {
-			return ip
+			return ip, true
 		}
 	}
-	return RemoteAddrFromCtx(ctx)
+	return "", false
 }
 
 func RemoteAddrFromCtx(ctx context.Context) string {

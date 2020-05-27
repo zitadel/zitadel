@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/auth_request/model"
-	"net"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -22,9 +22,8 @@ func (l *Login) handleMfaVerify(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	browserInfo := &model.BrowserInfo{RemoteIP: net.IP{}} //TODO: impl
 	if data.MfaType == model.MfaTypeOTP {
-		err = l.authRepo.VerifyMfaOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Code, browserInfo)
+		err = l.authRepo.VerifyMfaOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, data.Code, model.BrowserInfoFromRequest(r))
 	}
 	if err != nil {
 		l.renderError(w, r, authReq, err)
