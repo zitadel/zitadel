@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,30 +14,52 @@ import (
 
 type OrgEventstore struct {
 	eventstore.Eventstore
+	IAMDomain string
 }
 
 type OrgConfig struct {
 	eventstore.Eventstore
+	IAMDomain string
 }
 
 func StartOrg(conf OrgConfig) *OrgEventstore {
-	return &OrgEventstore{Eventstore: conf.Eventstore}
+	return &OrgEventstore{Eventstore: conf.Eventstore, IAMDomain: conf.IAMDomain}
 }
 
 func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org) (*Org, []*es_models.Aggregate, error) {
 	if orgModel == nil || !orgModel.IsValid() {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-OeLSk", "org not valid")
 	}
+	//TODO: validate domain
+	err := es.setZitadelDomain(orgModel)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	id, err := idGenerator.NextID()
 	if err != nil {
 		return nil, nil, errors.ThrowInternal(err, "EVENT-OwciI", "id gen failed")
 	}
 	orgModel.AggregateID = strconv.FormatUint(id, 10)
+
 	org := OrgFromModel(orgModel)
 
 	aggregates, err := orgCreatedAggregates(ctx, es.AggregateCreator(), org)
 
 	return org, aggregates, err
+}
+
+// TODO: implement domain validation
+// we don't validate domains in alpha state.
+// To be sure that only valid domains are registered
+// we set every domain as subdomain of the iam-domain.
+// in the future it maybe makes sense to add the subdomain as additional domain to an org
+func (es *OrgEventstore) setZitadelDomain(org *org_model.Org) error {
+	if strings.HasSuffix(org.Domain, es.IAMDomain) {
+		return nil
+	}
+	org.Domain += "." + es.IAMDomain
+	return nil
 }
 
 func (es *OrgEventstore) CreateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {

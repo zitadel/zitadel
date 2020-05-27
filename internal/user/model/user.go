@@ -1,6 +1,7 @@
 package model
 
 import (
+	"strings"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -51,10 +52,12 @@ const (
 	GENDER_DIVERSE
 )
 
-func (u *User) SetEmailAsUsername() {
+func (u *User) SetEmailAsUsername(orgDomain string) {
 	if u.Profile != nil && u.UserName == "" && u.Email != nil {
-		u.UserName = u.EmailAddress
+		u.UserName = strings.Split(u.EmailAddress, "@")[0]
 	}
+
+	u.UserName += "@" + orgDomain
 }
 
 func (u *User) IsValid() bool {

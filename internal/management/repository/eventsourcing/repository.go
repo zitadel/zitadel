@@ -20,9 +20,11 @@ import (
 
 type Config struct {
 	SearchLimit uint64
-	Eventstore  es_int.Config
-	View        types.SQL
-	Spooler     spooler.SpoolerConfig
+	//TODO: should this be located in system-defaults?
+	Domain     string
+	Eventstore es_int.Config
+	View       types.SQL
+	Spooler    spooler.SpoolerConfig
 }
 
 type EsRepository struct {
@@ -77,7 +79,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain})
 
 	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, UserEvents: user, OrgEvents: org}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)

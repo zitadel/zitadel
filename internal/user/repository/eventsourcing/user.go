@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"

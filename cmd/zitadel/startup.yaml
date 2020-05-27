@@ -19,6 +19,7 @@ Mgmt:
         - x-zitadel-
   Repository:
     SearchLimit: 100
+    Domain: zitadel.ch
     Eventstore:
       ServiceName: 'ManagementAPI'
       Repository:
