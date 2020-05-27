@@ -126,7 +126,6 @@ Auth:
 Login:
   Handler:
     Port: 50031
-    StaticDir: '../../internal/login/static'
     OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
     ZitadelURL: '/zitadel'
     LanguageCookieName: 'ch.caos.zitadel.login.lang'
@@ -156,7 +155,6 @@ Admin:
 
 Console:
   Port: 50050
-  StaticDir: /app/console/dist
 
 
 Notification:
