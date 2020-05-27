@@ -1095,14 +1095,14 @@ func TestChangeEmailAggregate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			aggregates, err := EmailChangeAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.email, tt.args.code)
 
-			if tt.res.errFunc == nil && len(aggregates[1].Events) != tt.res.eventLen {
+			if tt.res.errFunc == nil && len(aggregates[2].Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[1].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if tt.res.errFunc == nil && aggregates[1].Events[i].Type != tt.res.eventTypes[i] {
+				if tt.res.errFunc == nil && aggregates[2].Events[i].Type != tt.res.eventTypes[i] {
 					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[1].Events[i].Type.String())
 				}
-				if tt.res.errFunc == nil && aggregates[1].Events[i].Data == nil {
+				if tt.res.errFunc == nil && aggregates[2].Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
 			}
