@@ -7,14 +7,16 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 
+	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/auth/repository"
+	"github.com/caos/zitadel/internal/id"
 )
 
 type OPHandlerConfig struct {
-	OPConfig      *op.Config
-	StorageConfig StorageConfig
-	//UserAgentCookieConfig *auth.UserAgentCookieConfig
-	Endpoints *EndpointConfig
+	OPConfig              *op.Config
+	StorageConfig         StorageConfig
+	UserAgentCookieConfig *http_utils.UserAgentCookieConfig
+	Endpoints             *EndpointConfig
 }
 
 type StorageConfig struct {
@@ -43,10 +45,18 @@ type OPStorage struct {
 }
 
 func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository) op.OpenIDProvider {
+	cookieHandler, err := http_utils.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator)
+	logging.Log("OIDC-sd4fd").OnError(err).Panic("cannot user agent handler")
 	provider, err := op.NewDefaultOP(
 		ctx,
 		config.OPConfig,
 		newStorage(config.StorageConfig, repo),
+		op.WithHttpInterceptor(
+			UserAgentCookieHandler(
+				cookieHandler,
+				http_utils.CopyHeadersToContext,
+			),
+		),
 		op.WithCustomAuthEndpoint(op.NewEndpointWithURL(config.Endpoints.Auth.Path, config.Endpoints.Auth.URL)),
 		op.WithCustomTokenEndpoint(op.NewEndpointWithURL(config.Endpoints.Token.Path, config.Endpoints.Token.URL)),
 		op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(config.Endpoints.Userinfo.Path, config.Endpoints.Userinfo.URL)),

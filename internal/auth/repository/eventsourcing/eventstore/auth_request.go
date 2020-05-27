@@ -260,7 +260,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		}
 		session = &view_model.UserSessionView{}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, user.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
 		logging.Log("EVENT-Hse6s").WithError(err).Debug("error retrieving new events")
 		return view_model.UserSessionToModel(session), nil

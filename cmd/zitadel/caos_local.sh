@@ -21,6 +21,7 @@ export ZITADEL_KEY_PATH="$BASEDIR/local_keys.yaml"
 export ZITADEL_USER_VERIFICATION_KEY=UserVerificationKey_1
 export ZITADEL_OTP_VERIFICATION_KEY=OTPVerificationKey_1
 export ZITADEL_OIDC_KEYS_ID=OIDCKey_1
+export ZITADEL_COOKIE_KEY=CookieKey_1
 
 # Notifications
 export DEBUG_MODE=TRUE
@@ -42,3 +43,4 @@ export ZITADEL_AUTHORIZE=http://localhost:50022
 export ZITADEL_OAUTH=http://localhost:50022
 export ZITADEL_CONSOLE=http://localhost:4200
 export CAOS_OIDC_DEV=true
+export ZITADEL_COOKIE_DOMAIN=localhost

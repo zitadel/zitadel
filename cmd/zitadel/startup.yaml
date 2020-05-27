@@ -57,6 +57,11 @@ Auth:
         Port: 50022
       StorageConfig:
         DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+      UserAgentCookieConfig:
+        Name: caos.zitadel.useragent
+        Domain: $ZITADEL_COOKIE_DOMAIN
+        Key:
+          EncryptionKeyID: $ZITADEL_COOKIE_KEY
       Endpoints:
         Auth:
           Path: 'authorize'

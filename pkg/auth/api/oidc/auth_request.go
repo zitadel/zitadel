@@ -13,23 +13,10 @@ import (
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (op.AuthRequest, error) {
-	//userAgentCtx := ctx.Value(UserAgentContext)
 	userAgentID, ok := UserAgentIDFromCtx(ctx)
 	if !ok {
-		userAgentID = "ua"
-		//TODO: return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	//var err error
-	//if userAgentCtx != nil {
-	//	userAgent, err = o.processor.GetUserAgent(ctx, userAgentCtx.(string))
-	//}
-	//if userAgentCtx == nil || err != nil {
-	//	agent := CreateAgentFromContext(ctx)
-	//	userAgent, err = o.processor.CreateUserAgent(ctx, agent)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
