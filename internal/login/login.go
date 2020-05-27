@@ -1,3 +1,5 @@
+//go:generate statik -src=./static
+
 package login
 
 import (

@@ -1,10 +1,13 @@
 package renderer
 
 import (
-	"github.com/caos/zitadel/internal/i18n"
+	"io/ioutil"
 	"net/http"
-	"path"
+	"os"
 	"text/template"
+
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/i18n"
 
 	"github.com/caos/logging"
 	"golang.org/x/text/language"
@@ -12,6 +15,8 @@ import (
 
 const (
 	TranslateFn = "t"
+
+	templatesPath = "/templates"
 )
 
 type Renderer struct {
@@ -19,14 +24,14 @@ type Renderer struct {
 	i18n      *i18n.Translator
 }
 
-func NewRenderer(templatesDir string, tmplMapping map[string]string, funcs map[string]interface{}, translatorConfig i18n.TranslatorConfig) (*Renderer, error) {
+func NewRenderer(dir http.FileSystem, tmplMapping map[string]string, funcs map[string]interface{}, translatorConfig i18n.TranslatorConfig) (*Renderer, error) {
 	var err error
 	r := new(Renderer)
-	r.i18n, err = i18n.NewTranslator(translatorConfig)
+	r.i18n, err = i18n.NewTranslator(dir, translatorConfig)
 	if err != nil {
 		return nil, err
 	}
-	r.loadTemplates(templatesDir, tmplMapping, funcs)
+	r.loadTemplates(dir, tmplMapping, funcs)
 	return r, nil
 }
 
@@ -48,16 +53,48 @@ func (r *Renderer) Lang(req *http.Request) language.Tag {
 	return r.i18n.Lang(req)
 }
 
-func (r *Renderer) loadTemplates(templatesDir string, tmplMapping map[string]string, funcs map[string]interface{}) {
+func (r *Renderer) loadTemplates(dir http.FileSystem, tmplMapping map[string]string, funcs map[string]interface{}) error {
 	funcs = r.registerTranslateFn(nil, funcs)
 	funcs[TranslateFn] = func(id string, args ...interface{}) string {
 		return id
 	}
-	tmpls := template.Must(template.New("").Funcs(funcs).ParseGlob(path.Join(templatesDir, "*.html")))
+	templatesDir, err := dir.Open(templatesPath)
+	if err != nil {
+		return errors.ThrowNotFound(err, "RENDE-G3aea", "path not found")
+	}
+	defer templatesDir.Close()
+	files, err := templatesDir.Readdir(0)
+	if err != nil {
+		return errors.ThrowNotFound(err, "RENDE-dfR33", "cannot read dir")
+	}
+	tmpl := template.New("")
+	for _, file := range files {
+		if err := r.addFileToTemplate(dir, tmpl, tmplMapping, funcs, file); err != nil {
+			return errors.ThrowNotFound(err, "RENDE-dfTe1", "cannot append file to templates")
+		}
+	}
 	r.Templates = make(map[string]*template.Template, len(tmplMapping))
 	for name, file := range tmplMapping {
-		r.Templates[name] = tmpls.Lookup(file)
+		r.Templates[name] = tmpl.Lookup(file)
 	}
+	return nil
+}
+
+func (r *Renderer) addFileToTemplate(dir http.FileSystem, tmpl *template.Template, tmplMapping map[string]string, funcs map[string]interface{}, file os.FileInfo) error {
+	f, err := dir.Open(templatesPath + "/" + file.Name())
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	content, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	tmpl, err = tmpl.New(file.Name()).Funcs(funcs).Parse(string(content))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *Renderer) registerTranslateFn(req *http.Request, funcs map[string]interface{}) map[string]interface{} {

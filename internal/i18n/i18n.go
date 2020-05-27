@@ -2,15 +2,20 @@ package i18n
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/errors"
 	"io/ioutil"
 	"net/http"
-	"path"
+	"os"
+
+	"github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
 	"github.com/ghodss/yaml"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
+)
+
+const (
+	i18nPath = "/i18n"
 )
 
 type Translator struct {
@@ -21,15 +26,14 @@ type Translator struct {
 }
 
 type TranslatorConfig struct {
-	Path            string
 	DefaultLanguage language.Tag
 	CookieName      string
 }
 
-func NewTranslator(config TranslatorConfig) (*Translator, error) {
+func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, error) {
 	t := new(Translator)
 	var err error
-	t.bundle, err = newBundle(config.Path, config.DefaultLanguage)
+	t.bundle, err = newBundle(dir, config.DefaultLanguage)
 	if err != nil {
 		return nil, err
 	}
@@ -38,18 +42,39 @@ func NewTranslator(config TranslatorConfig) (*Translator, error) {
 	return t, nil
 }
 
-func newBundle(i18nDir string, defaultLanguage language.Tag) (*i18n.Bundle, error) {
+func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle, error) {
 	bundle := i18n.NewBundle(defaultLanguage)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
-	files, err := ioutil.ReadDir(i18nDir)
+	i18nDir, err := dir.Open(i18nPath)
 	if err != nil {
 		return nil, errors.ThrowNotFound(err, "I18N-MnXRie", "path not found")
 	}
+	defer i18nDir.Close()
+	files, err := i18nDir.Readdir(0)
+	if err != nil {
+		return nil, errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
+	}
 	for _, file := range files {
-		bundle.MustLoadMessageFile(path.Join(i18nDir, file.Name()))
+		if err := addFileToBundle(dir, bundle, file); err != nil {
+			return nil, errors.ThrowNotFound(err, "I18N-ZS2AW", "cannot append file to bundle")
+		}
 	}
 	return bundle, nil
+}
+
+func addFileToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo) error {
+	f, err := dir.Open("/i18n/" + file.Name())
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	content, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	bundle.MustParseMessageFileBytes(content, file.Name())
+	return nil
 }
 
 func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[string]interface{}) string {

@@ -2,14 +2,19 @@ package handler
 
 import (
 	"context"
+	"net"
+	"net/http"
+
 	"github.com/caos/logging"
+	"github.com/gorilla/mux"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/form"
-	"github.com/gorilla/mux"
-	"golang.org/x/text/language"
-	"net"
-	"net/http"
+
+	_ "github.com/caos/zitadel/internal/login/statik"
 )
 
 type Login struct {
@@ -25,7 +30,6 @@ type Login struct {
 
 type Config struct {
 	Port                string
-	StaticDir           string
 	OidcAuthCallbackURL string
 	ZitadelURL          string
 	LanguageCookieName  string
@@ -41,26 +45,30 @@ func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRe
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
 	}
-	login.router = CreateRouter(login, config.StaticDir)
-	login.renderer = CreateRenderer(config.StaticDir, config.LanguageCookieName, config.DefaultLanguage)
+	statikFS, err := fs.New()
+	if err != nil {
+		return err
+	}
+	login.router = CreateRouter(login, statikFS)
+	login.renderer = CreateRenderer(statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	login.Listen(ctx)
 	return err
 }
 
-func (login *Login) Listen(ctx context.Context) {
-	if login.endpoint == "" {
-		login.endpoint = ":80"
+func (l *Login) Listen(ctx context.Context) {
+	if l.endpoint == "" {
+		l.endpoint = ":80"
 	} else {
-		login.endpoint = ":" + login.endpoint
+		l.endpoint = ":" + l.endpoint
 	}
 
-	defer logging.LogWithFields("APP-xUZof", "port", login.endpoint).Info("html is listening")
-	httpListener, err := net.Listen("tcp", login.endpoint)
+	defer logging.LogWithFields("APP-xUZof", "port", l.endpoint).Info("html is listening")
+	httpListener, err := net.Listen("tcp", l.endpoint)
 	logging.Log("CONFI-W5q2O").OnError(err).Panic("unable to start listener")
 
 	httpServer := &http.Server{
-		Handler: login.router,
+		Handler: l.router,
 	}
 
 	go func() {

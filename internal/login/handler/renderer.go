@@ -14,9 +14,6 @@ import (
 )
 
 const (
-	templatesDir = "templates"
-	i18nDir      = "i18n"
-
 	tmplError = "error"
 )
 
@@ -24,7 +21,7 @@ type Renderer struct {
 	*renderer.Renderer
 }
 
-func CreateRenderer(staticDir, cookieName string, defaultLanguage language.Tag) *Renderer {
+func CreateRenderer(staticDir http.FileSystem, cookieName string, defaultLanguage language.Tag) *Renderer {
 	r := new(Renderer)
 	tmplMapping := map[string]string{
 		tmplError:              "error.html",
@@ -105,8 +102,9 @@ func CreateRenderer(staticDir, cookieName string, defaultLanguage language.Tag) 
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
-		path.Join(staticDir, templatesDir), tmplMapping, funcs,
-		i18n.TranslatorConfig{Path: path.Join(staticDir, i18nDir), DefaultLanguage: defaultLanguage, CookieName: cookieName},
+		staticDir,
+		tmplMapping, funcs,
+		i18n.TranslatorConfig{DefaultLanguage: defaultLanguage, CookieName: cookieName},
 	)
 	logging.Log("APP-40tSoJ").OnError(err).WithError(err).Panic("error creating renderer")
 	return r
