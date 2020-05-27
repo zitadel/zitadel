@@ -1,9 +1,8 @@
-//go:generate statik -src=./static
-
 package login
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/login/handler"

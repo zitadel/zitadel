@@ -1,5 +1,3 @@
-//go:generate statik -src=../../console/dist/app
-
 package console
 
 import (
