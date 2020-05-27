@@ -11,5 +11,5 @@ COPY --from=prepare /etc/passwd /etc/passwd
 COPY --from=prepare / /
 USER zitadel
 HEALTHCHECK NONE
-ENTRYPOINT ["/zitadel", "-login=false", "-console=false"]
+ENTRYPOINT ["/zitadel"]
 ## TODO enable CMD
