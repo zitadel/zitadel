@@ -11,5 +11,5 @@ type OrgRepository interface {
 	SetUpOrg(context.Context, *admin_model.SetupOrg) (*admin_model.SetupOrg, error)
 	IsOrgUnique(ctx context.Context, name, domain string) (bool, error)
 	OrgByID(ctx context.Context, id string) (*org_model.Org, error)
-	SearchOrgs(ctx context.Context) ([]*org_model.Org, error)
+	SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error)
 }

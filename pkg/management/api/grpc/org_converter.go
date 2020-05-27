@@ -31,6 +31,23 @@ func orgFromModel(org *org_model.Org) *Org {
 	}
 }
 
+func orgFromView(org *org_model.OrgView) *Org {
+	creationDate, err := ptypes.TimestampProto(org.CreationDate)
+	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
+
+	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
+	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
+
+	return &Org{
+		Domain:       org.Domain,
+		ChangeDate:   changeDate,
+		CreationDate: creationDate,
+		Id:           org.ID,
+		Name:         org.Name,
+		State:        orgStateFromModel(org.State),
+	}
+}
+
 func orgStateFromModel(state org_model.OrgState) OrgState {
 	switch state {
 	case org_model.ORGSTATE_ACTIVE:
