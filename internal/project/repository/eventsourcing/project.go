@@ -42,8 +42,12 @@ func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *mod
 		if err != nil {
 			return nil, err
 		}
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(model.ProjectAggregate).
+			EventTypesFilter(model.ProjectAdded, model.ProjectChanged, model.ProjectRemoved)
 
-		return agg.AppendEvent(model.ProjectAdded, project)
+		validation := addProjectValidation(project.Name)
+		return agg.SetPrecondition(validationQuery, validation).AppendEvent(model.ProjectAdded, project)
 	}
 }
 
@@ -57,6 +61,17 @@ func ProjectUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *mo
 			return nil, err
 		}
 		changes := existing.Changes(new)
+		if len(changes) == 0 {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9soPE", "no changes found")
+		}
+		if existing.Name != new.Name {
+			validationQuery := es_models.NewSearchQuery().
+				AggregateTypeFilter(model.ProjectAggregate).
+				EventTypesFilter(model.ProjectAdded, model.ProjectChanged, model.ProjectRemoved)
+
+			validation := addProjectValidation(new.Name)
+			agg.SetPrecondition(validationQuery, validation)
+		}
 		return agg.AppendEvent(model.ProjectChanged, changes)
 	}
 }
@@ -415,6 +430,37 @@ func ProjectGrantMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, 
 			return nil, err
 		}
 		return agg.AppendEvent(model.ProjectGrantMemberRemoved, member)
+	}
+}
+
+func addProjectValidation(projectName string) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		projects := make([]*model.Project, 0)
+		for _, event := range events {
+			switch event.Type {
+			case model.ProjectAdded:
+				project := &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: event.AggregateID}}
+				project.AppendAddProjectEvent(event)
+				projects = append(projects, project)
+			case model.ProjectChanged:
+				_, project := model.GetProject(projects, event.AggregateID)
+				project.AppendAddProjectEvent(event)
+			case model.ProjectRoleRemoved:
+				for i, project := range projects {
+					if project.AggregateID == event.AggregateID {
+						projects[i] = projects[len(projects)-1]
+						projects[len(projects)-1] = nil
+						projects = projects[:len(projects)-1]
+					}
+				}
+			}
+		}
+		for _, p := range projects {
+			if p.Name == projectName {
+				return errors.ThrowPreconditionFailed(nil, "EVENT-s9oPw", "conditions not met")
+			}
+		}
+		return nil
 	}
 }
 
