@@ -5,6 +5,10 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	proj_model "github.com/caos/zitadel/internal/project/model"
+	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 )
 
@@ -43,10 +47,16 @@ func UserGrantAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.UserGrantAdded, grant)
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(usr_model.UserAggregate, org_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateIDsFilter(grant.UserID, auth.GetCtxData(ctx).OrgID, grant.ProjectID)
+
+	validation := addUserGrantValidation(auth.GetCtxData(ctx).OrgID, grant)
+	agg, err = agg.SetPrecondition(validationQuery, validation).AppendEvent(model.UserGrantAdded, grant)
 	if err != nil {
 		return nil, err
 	}
+
 	uniqueAggregate, err := reservedUniqueUserGrantAggregate(ctx, aggCreator, grant)
 	if err != nil {
 		return nil, err
@@ -159,4 +169,75 @@ func isEventValidation(aggregate *es_models.Aggregate, eventType es_models.Event
 		aggregate.PreviousSequence = events[0].Sequence
 		return nil
 	}
+}
+
+func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		existsOrg := false
+		existsUser := false
+		project := new(proj_es_model.Project)
+		for _, event := range events {
+			switch event.AggregateType {
+			case usr_model.UserAggregate:
+				switch event.Type {
+				case usr_model.UserAdded, usr_model.UserRegistered:
+					existsUser = true
+				case usr_model.UserRemoved:
+					existsUser = false
+				}
+			case org_model.OrgAggregate:
+				switch event.Type {
+				case org_model.OrgAdded:
+					existsOrg = true
+				case org_model.OrgRemoved:
+					existsOrg = false
+				}
+			case proj_es_model.ProjectAggregate:
+				project.AppendEvent(event)
+			}
+		}
+		if existsOrg && existsUser && checkProjectConditions(resourceOwner, grant, project) {
+			return nil
+		}
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "conditions not met")
+	}
+}
+
+func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) bool {
+	if project.State == int32(proj_model.PROJECTSTATE_REMOVED) {
+		return false
+	}
+	if resourceOwner == project.ResourceOwner {
+		return checkIfProjectHasRoles(grant.RoleKeys, project.Roles)
+	}
+
+	if _, projectGrant := proj_es_model.GetProjectGrantByResourceOwner(project.Grants, resourceOwner); projectGrant != nil {
+		return checkIfProjectGrantHasRoles(grant.RoleKeys, projectGrant.RoleKeys)
+	}
+	return false
+}
+
+func checkIfProjectHasRoles(roles []string, existing []*proj_es_model.ProjectRole) bool {
+	for _, roleKey := range roles {
+		if _, role := proj_es_model.GetProjectRole(existing, roleKey); role == nil {
+			return false
+		}
+	}
+	return true
+}
+
+func checkIfProjectGrantHasRoles(roles []string, existing []string) bool {
+	roleExists := false
+	for _, roleKey := range roles {
+		for _, existingRoleKey := range existing {
+			if roleKey == existingRoleKey {
+				roleExists = true
+				continue
+			}
+		}
+		if !roleExists {
+			return false
+		}
+	}
+	return true
 }

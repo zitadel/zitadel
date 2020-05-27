@@ -31,6 +31,15 @@ func GetProjectGrant(grants []*ProjectGrant, id string) (int, *ProjectGrant) {
 	return -1, nil
 }
 
+func GetProjectGrantByResourceOwner(grants []*ProjectGrant, resourceOwner string) (int, *ProjectGrant) {
+	for i, g := range grants {
+		if g.ResourceOwner == resourceOwner {
+			return i, g
+		}
+	}
+	return -1, nil
+}
+
 func (g *ProjectGrant) Changes(changed *ProjectGrant) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	changes["grantId"] = g.GrantID

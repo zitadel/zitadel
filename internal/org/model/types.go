@@ -11,6 +11,7 @@ const (
 	OrgChanged     models.EventType = "org.changed"
 	OrgDeactivated models.EventType = "org.deactivated"
 	OrgReactivated models.EventType = "org.reactivated"
+	OrgRemoved     models.EventType = "org.removed"
 
 	OrgNameReserved models.EventType = "org.name.reserved"
 	OrgNameReleased models.EventType = "org.name.released"
