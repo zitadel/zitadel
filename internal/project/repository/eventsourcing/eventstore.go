@@ -113,8 +113,10 @@ func (es *ProjectEventstore) DeactivateProject(ctx context.Context, id string) (
 
 	repoExisting := model.ProjectFromModel(existing)
 	aggregate := ProjectDeactivateAggregate(es.AggregateCreator(), repoExisting)
-	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
-
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoExisting)
 	return model.ProjectToModel(repoExisting), nil
 }
@@ -130,8 +132,10 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, id string) (
 
 	repoExisting := model.ProjectFromModel(existing)
 	aggregate := ProjectReactivateAggregate(es.AggregateCreator(), repoExisting)
-	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
-
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoExisting)
 	return model.ProjectToModel(repoExisting), nil
 }
@@ -194,6 +198,9 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 
 	projectAggregate := ProjectMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, m := model.GetProjectMember(repoProject.Members, member.UserID); m != nil {
@@ -218,6 +225,9 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 
 	projectAggregate := ProjectMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
 	es.projectCache.cacheProject(repoProject)
 	return err
 }
@@ -347,6 +357,9 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 
 	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		converted := model.AppToModel(a)
@@ -372,6 +385,9 @@ func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_mo
 
 	projectAggregate := ApplicationChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.AppToModel(a), nil
@@ -418,6 +434,9 @@ func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectI
 
 	projectAggregate := ApplicationDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.AppToModel(a), nil
@@ -442,6 +461,9 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 
 	projectAggregate := ApplicationReactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.AppToModel(a), nil
@@ -469,6 +491,9 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 
 	projectAggregate := OIDCConfigChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoConfig)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.OIDCConfigToModel(a.OIDCConfig), nil
@@ -500,6 +525,9 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 
 	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, crypto)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
@@ -550,7 +578,9 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 
 	addAggregate := ProjectGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
-
+	if err != nil {
+		return nil, err
+	}
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
 		return model.GrantToModel(g), nil
 	}
@@ -576,6 +606,9 @@ func (es *ProjectEventstore) ChangeProjectGrant(ctx context.Context, grant *proj
 
 	projectAggregate := ProjectGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
@@ -623,6 +656,9 @@ func (es *ProjectEventstore) DeactivateProjectGrant(ctx context.Context, project
 
 	projectAggregate := ProjectGrantDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
 		return model.GrantToModel(g), nil
@@ -647,6 +683,9 @@ func (es *ProjectEventstore) ReactivateProjectGrant(ctx context.Context, project
 
 	projectAggregate := ProjectGrantReactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
@@ -687,6 +726,9 @@ func (es *ProjectEventstore) AddProjectGrantMember(ctx context.Context, member *
 
 	addAggregate := ProjectGrantMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, g := model.GetProjectGrant(repoProject.Grants, member.GrantID); g != nil {
 		if _, m := model.GetProjectGrantMember(g.Members, member.UserID); m != nil {
@@ -712,6 +754,9 @@ func (es *ProjectEventstore) ChangeProjectGrantMember(ctx context.Context, membe
 
 	projectAggregate := ProjectGrantMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, g := model.GetProjectGrant(repoProject.Grants, member.GrantID); g != nil {
 		if _, m := model.GetProjectGrantMember(g.Members, member.UserID); m != nil {
@@ -737,6 +782,9 @@ func (es *ProjectEventstore) RemoveProjectGrantMember(ctx context.Context, membe
 
 	projectAggregate := ProjectGrantMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
 	es.projectCache.cacheProject(repoProject)
 	return err
 }
