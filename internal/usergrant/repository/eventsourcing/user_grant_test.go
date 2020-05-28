@@ -51,15 +51,15 @@ func TestUserGrantAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserGrantAddedAggregate(tt.args.aggCreator, tt.args.grant)(tt.args.ctx)
+			aggregates, err := UserGrantAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.grant)
 
-			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))
 			}
-			if tt.res.errFunc == nil && agg.Events[0].Type != tt.res.eventType {
-				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			if tt.res.errFunc == nil && aggregates[0].Events[0].Type != tt.res.eventType {
+				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, aggregates[0].Events[0].Type.String())
 			}
-			if tt.res.errFunc == nil && agg.Events[0].Data == nil {
+			if tt.res.errFunc == nil && aggregates[0].Events[0].Data == nil {
 				t.Errorf("should have data in event")
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
@@ -230,14 +230,14 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserGrantRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			aggregates, err := UserGrantRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
 
-			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if tt.res.errFunc == nil && agg.Events[i].Type != tt.res.eventTypes[i] {
-					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				if tt.res.errFunc == nil && aggregates[0].Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[0].Events[i].Type.String())
 				}
 			}
 

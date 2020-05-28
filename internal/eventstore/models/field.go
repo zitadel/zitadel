@@ -9,4 +9,5 @@ const (
 	Field_ResourceOwner
 	Field_EditorService
 	Field_EditorUser
+	Field_EventType
 )

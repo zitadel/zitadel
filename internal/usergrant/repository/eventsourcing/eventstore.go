@@ -66,8 +66,11 @@ func (es *UserGrantEventStore) AddUserGrant(ctx context.Context, grant *grant_mo
 
 	repoGrant := model.UserGrantFromModel(grant)
 
-	addAggregate := UserGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoGrant)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoGrant.AppendEvents, addAggregate)
+	addAggregates, err := UserGrantAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoGrant)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoGrant.AppendEvents, addAggregates...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +104,11 @@ func (es *UserGrantEventStore) RemoveUserGrant(ctx context.Context, grantID stri
 	}
 	repoExisting := model.UserGrantFromModel(existing)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
-	projectAggregate := UserGrantRemovedAggregate(es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, projectAggregate)
+	projectAggregates, err := UserGrantRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, projectAggregates...)
 	if err != nil {
 		return err
 	}

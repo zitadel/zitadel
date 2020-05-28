@@ -29,12 +29,12 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 		return nil, err
 	}
 
-	user, userAggregate, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
 
-	aggregates = append(aggregates, userAggregate)
+	aggregates = append(aggregates, userAggregates...)
 	setupModel := &Setup{Org: org, User: user}
 
 	member := org_model.NewOrgMemberWithRoles(org.AggregateID, user.AggregateID, "ORG_ADMIN") //TODO: role as const
