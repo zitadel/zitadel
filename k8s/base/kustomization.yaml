@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: zitadel
+
+resources:
+-  deployment.yaml
+-  service-accounts.yaml
+-  service-api-admin.yaml
+-  service-api-auth.yaml
+-  service-api-mangagement.yaml
+-  service-console.yaml

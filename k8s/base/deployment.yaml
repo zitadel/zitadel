@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zitadel
+  labels:
+    app: zitadel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: zitadel
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: zitadel
+        version: v1
+    spec:
+      containers:
+      - name: zitadel
+        image: docker.pkg.github.com/caos/zitadel/zitadel:latest
+        imagePullPolicy: Always
+        args: ["-login=false", "-console=false"]
+        ports:
+        - name: management-rest
+          containerPort: 60021
+        - name: management-grpc
+          containerPort: 60020
+        - name: auth-rest
+          containerPort: 60051
+        - name: issuer-rest
+          containerPort: 60052
+        - name: auth-grpc
+          containerPort: 60050
+        - name: admin-rest
+          containerPort: 60091
+        - name: admin-grpc
+          containerPort: 60090
+        - name: console-http
+          containerPort: 9090
+        - name: accounts-http
+          containerPort: 61121
+        env: 
+        - name: ZITADEL_GOOGLE_CHAT_URL
+          valueFrom:
+            secretKeyRef:
+              name: zitadel-secrets-vars
+              key: ZITADEL_GOOGLE_CHAT_URL
+        - name: ZITADEL_TWILIO_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: zitadel-secrets-vars
+              key: ZITADEL_TWILIO_AUTH_TOKEN
+        - name: ZITADEL_TWILIO_SID
+          valueFrom:
+            secretKeyRef:
+              name: zitadel-secrets-vars
+              key: ZITADEL_TWILIO_SID
+        - name: ZITADEL_EMAILAPPKEY
+          valueFrom:
+            secretKeyRef:
+              name: zitadel-secrets-vars
+              key: ZITADEL_EMAILAPPKEY
+        envFrom:
+          - configMapRef:
+              name: zitadel-vars
+        volumeMounts:
+          - name: zitadel-secret
+            mountPath: /secret
+          - name: console-config
+            mountPath: /app/console/dist/assets/environment.json
+            subPath: environment.json
+      imagePullSecrets:
+      - name: githubsecret
+      volumes:
+        - name: zitadel-secret
+          secret:
+            secretName: zitadel-secret
+        - name: console-config
+          configMap:
+            name: console-config
