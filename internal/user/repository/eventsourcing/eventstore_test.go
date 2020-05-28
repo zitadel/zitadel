@@ -1508,13 +1508,13 @@ func TestChangePassword(t *testing.T) {
 		{
 			name: "no policy",
 			args: args{
-				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+				es: GetMockManipulateUserWithPasswordAndEmailCodeGen(ctrl,
 					repo_model.User{
 						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
 						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
 							CryptoType: crypto.TypeHash,
 							Algorithm:  "hash",
-							Crypted:    []byte("older"),
+							Crypted:    []byte("old"),
 						}},
 					},
 				),

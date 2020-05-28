@@ -419,12 +419,14 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_mod
 
 func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, password string, onetime bool) (*usr_model.Password, error) {
 	pw := &usr_model.Password{SecretString: password}
-	pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
-
+	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
+	if err != nil {
+		return nil, err
+	}
 	repoPassword := model.PasswordFromModel(pw)
 	repoUser := model.UserFromModel(user)
 	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
-	err := es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return nil, err
 	}
