@@ -2,8 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
-
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
@@ -39,11 +37,11 @@ func (es *PolicyEventstore) CreatePasswordLockoutPolicy(ctx context.Context, pol
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
 	}
 
-	id, err := idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	policy.AggregateID = strconv.FormatUint(id, 10)
+	policy.AggregateID = id
 
 	repoPolicy := PasswordLockoutPolicyFromModel(policy)
 

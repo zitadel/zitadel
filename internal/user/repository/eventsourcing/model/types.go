@@ -11,7 +11,6 @@ const (
 	UserRegistered           models.EventType = "user.selfregistered"
 	InitializedUserCodeAdded models.EventType = "user.initialization.code.added"
 	InitializedUserCodeSent  models.EventType = "user.initialization.code.sent"
-	UserRemoved              models.EventType = "user.removed"
 
 	UserUserNameReserved models.EventType = "user.username.reserved"
 	UserUserNameReleased models.EventType = "user.username.released"

@@ -5,14 +5,14 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/project/model"
-	"github.com/sony/sonyflake"
 	"strings"
 )
 
 //ClientID random_number@projectname (eg. 495894098234@zitadel)
-func generateNewClientID(idGenerator *sonyflake.Sonyflake, project *model.Project) (string, error) {
-	rndID, err := idGenerator.NextID()
+func generateNewClientID(idGenerator id.Generator, project *model.Project) (string, error) {
+	rndID, err := idGenerator.Next()
 	if err != nil {
 		return "", err
 	}
