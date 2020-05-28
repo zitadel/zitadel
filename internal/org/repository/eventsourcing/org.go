@@ -2,14 +2,10 @@ package eventsourcing
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/sony/sonyflake"
 )
-
-var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
 func OrgByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {

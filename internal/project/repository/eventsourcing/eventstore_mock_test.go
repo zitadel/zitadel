@@ -6,10 +6,10 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
-	"github.com/sony/sonyflake"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *ProjectEventstore {
@@ -35,8 +35,8 @@ func GetMockCache(ctrl *gomock.Controller) *ProjectCache {
 	return &ProjectCache{projectCache: mockCache}
 }
 
-func GetSonyFlacke() *sonyflake.Sonyflake {
-	return sonyflake.NewSonyflake(sonyflake.Settings{})
+func GetSonyFlacke() id.Generator {
+	return id.SonyFlakeGenerator
 }
 
 func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {

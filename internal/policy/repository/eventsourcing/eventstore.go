@@ -4,15 +4,14 @@ import (
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/policy"
-	"github.com/sony/sonyflake"
 )
-
-var idGenerator = sonyflake.NewSonyflake(sonyflake.Settings{})
 
 type PolicyEventstore struct {
 	es_int.Eventstore
 	policyCache                     *PolicyCache
+	idGenerator                     id.Generator
 	passwordAgePolicyDefault        policy.PasswordAgePolicyDefault
 	passwordComplexityPolicyDefault policy.PasswordComplexityPolicyDefault
 	passwordLockoutPolicyDefault    policy.PasswordLockoutPolicyDefault
@@ -31,6 +30,7 @@ func StartPolicy(conf PolicyConfig, systemDefaults sd.SystemDefaults) (*PolicyEv
 	return &PolicyEventstore{
 		Eventstore:                      conf.Eventstore,
 		policyCache:                     policyCache,
+		idGenerator:                     id.SonyFlakeGenerator,
 		passwordAgePolicyDefault:        systemDefaults.DefaultPolicies.Age,
 		passwordComplexityPolicyDefault: systemDefaults.DefaultPolicies.Complexity,
 		passwordLockoutPolicyDefault:    systemDefaults.DefaultPolicies.Lockout,

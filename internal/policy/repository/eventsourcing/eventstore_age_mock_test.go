@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/id"
 
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/eventstore/mock"
@@ -14,6 +15,7 @@ func GetMockedEventstoreAge(ctrl *gomock.Controller, mockEs *mock.MockEventstore
 	return &PolicyEventstore{
 		Eventstore:  mockEs,
 		policyCache: GetMockCacheAge(ctrl),
+		idGenerator: GetSonyFlacke(),
 	}
 }
 
@@ -22,6 +24,10 @@ func GetMockCacheAge(ctrl *gomock.Controller) *PolicyCache {
 	mockCache.EXPECT().Get(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	mockCache.EXPECT().Set(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	return &PolicyCache{policyCache: mockCache}
+}
+
+func GetSonyFlacke() id.Generator {
+	return id.SonyFlakeGenerator
 }
 
 func GetMockGetPasswordAgePolicyOK(ctrl *gomock.Controller) *PolicyEventstore {
