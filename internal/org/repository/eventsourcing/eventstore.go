@@ -2,17 +2,17 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
 type OrgEventstore struct {
 	eventstore.Eventstore
+	idGenerator id.Generator
 }
 
 type OrgConfig struct {
@@ -20,18 +20,21 @@ type OrgConfig struct {
 }
 
 func StartOrg(conf OrgConfig) *OrgEventstore {
-	return &OrgEventstore{Eventstore: conf.Eventstore}
+	return &OrgEventstore{
+		Eventstore:  conf.Eventstore,
+		idGenerator: id.SonyFlakeGenerator,
+	}
 }
 
 func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org) (*Org, []*es_models.Aggregate, error) {
 	if orgModel == nil || !orgModel.IsValid() {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-OeLSk", "org not valid")
 	}
-	id, err := idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, errors.ThrowInternal(err, "EVENT-OwciI", "id gen failed")
 	}
-	orgModel.AggregateID = strconv.FormatUint(id, 10)
+	orgModel.AggregateID = id
 	org := OrgFromModel(orgModel)
 
 	aggregates, err := orgCreatedAggregates(ctx, es.AggregateCreator(), org)

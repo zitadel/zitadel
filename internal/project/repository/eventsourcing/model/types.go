@@ -9,6 +9,7 @@ const (
 	ProjectChanged     models.EventType = "project.changed"
 	ProjectDeactivated models.EventType = "project.deactivated"
 	ProjectReactivated models.EventType = "project.reactivated"
+	ProjectRemoved     models.EventType = "project.removed"
 
 	ProjectMemberAdded   models.EventType = "project.member.added"
 	ProjectMemberChanged models.EventType = "project.member.changed"

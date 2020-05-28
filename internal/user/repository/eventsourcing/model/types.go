@@ -23,7 +23,7 @@ const (
 	UserUnlocked    models.EventType = "user.unlocked"
 	UserDeactivated models.EventType = "user.deactivated"
 	UserReactivated models.EventType = "user.reactivated"
-	UserDeleted     models.EventType = "user.deleted"
+	UserRemoved     models.EventType = "user.removed"
 
 	UserPasswordChanged        models.EventType = "user.password.changed"
 	UserPasswordCodeAdded      models.EventType = "user.password.code.added"

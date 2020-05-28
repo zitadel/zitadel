@@ -2,10 +2,8 @@ package eventsourcing
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/id"
 	"time"
-
-	"github.com/golang/mock/gomock"
-	"github.com/sony/sonyflake"
 
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/crypto"
@@ -13,6 +11,7 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/golang/mock/gomock"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *UserEventstore {
@@ -52,8 +51,8 @@ func GetMockCache(ctrl *gomock.Controller) *UserCache {
 	return &UserCache{userCache: mockCache}
 }
 
-func GetSonyFlacke() *sonyflake.Sonyflake {
-	return sonyflake.NewSonyflake(sonyflake.Settings{})
+func GetSonyFlacke() id.Generator {
+	return id.SonyFlakeGenerator
 }
 
 func GetMockPwGenerator(ctrl *gomock.Controller) crypto.Generator {

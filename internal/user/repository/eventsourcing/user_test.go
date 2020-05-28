@@ -108,11 +108,12 @@ func TestUserCreateAggregate(t *testing.T) {
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
-		eventLen   int
-		eventTypes []models.EventType
-		checkData  []bool
-		wantErr    bool
-		errFunc    func(err error) bool
+		eventLen      int
+		eventTypes    []models.EventType
+		aggregatesLen int
+		checkData     []bool
+		wantErr       bool
+		errFunc       func(err error) bool
 	}
 	tests := []struct {
 		name string
@@ -125,13 +126,15 @@ func TestUserCreateAggregate(t *testing.T) {
 				ctx: auth.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   1,
-				eventTypes: []models.EventType{model.UserAdded},
-				checkData:  []bool{true},
+				eventLen:      1,
+				eventTypes:    []models.EventType{model.UserAdded},
+				checkData:     []bool{true},
+				aggregatesLen: 3,
 			},
 		},
 		{
@@ -152,14 +155,16 @@ func TestUserCreateAggregate(t *testing.T) {
 				ctx: auth.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
 				initCode:   &model.InitUserCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   2,
-				eventTypes: []models.EventType{model.UserAdded, model.InitializedUserCodeAdded},
-				checkData:  []bool{true, true},
+				eventLen:      2,
+				eventTypes:    []models.EventType{model.UserAdded, model.InitializedUserCodeAdded},
+				checkData:     []bool{true, true},
+				aggregatesLen: 3,
 			},
 		},
 		{
@@ -168,14 +173,16 @@ func TestUserCreateAggregate(t *testing.T) {
 				ctx: auth.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
 				phoneCode:  &model.PhoneCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   2,
-				eventTypes: []models.EventType{model.UserAdded, model.UserPhoneCodeAdded},
-				checkData:  []bool{true, true},
+				eventLen:      2,
+				eventTypes:    []models.EventType{model.UserAdded, model.UserPhoneCodeAdded},
+				checkData:     []bool{true, true},
+				aggregatesLen: 3,
 			},
 		},
 		{
@@ -189,9 +196,10 @@ func TestUserCreateAggregate(t *testing.T) {
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   2,
-				eventTypes: []models.EventType{model.UserAdded, model.UserEmailVerified},
-				checkData:  []bool{true, false},
+				eventLen:      2,
+				eventTypes:    []models.EventType{model.UserAdded, model.UserEmailVerified},
+				checkData:     []bool{true, false},
+				aggregatesLen: 3,
 			},
 		},
 		{
@@ -200,32 +208,38 @@ func TestUserCreateAggregate(t *testing.T) {
 				ctx: auth.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 					Phone:   &model.Phone{PhoneNumber: "PhoneNumber", IsPhoneVerified: true},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   2,
-				eventTypes: []models.EventType{model.UserAdded, model.UserPhoneVerified},
-				checkData:  []bool{true, false},
+				eventLen:      2,
+				eventTypes:    []models.EventType{model.UserAdded, model.UserPhoneVerified},
+				checkData:     []bool{true, false},
+				aggregatesLen: 3,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.initCode, tt.args.phoneCode, "")
+			aggregates, err := UserCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.initCode, tt.args.phoneCode, "")
 
-			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			if !tt.res.wantErr && len(aggregates) != tt.res.aggregatesLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.aggregatesLen, len(aggregates))
+			}
+
+			if !tt.res.wantErr && len(aggregates[0].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
-					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				if !tt.res.wantErr && aggregates[0].Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[0].Events[i].Type.String())
 				}
-				if !tt.res.wantErr && tt.res.checkData[i] && agg.Events[i].Data == nil {
+				if !tt.res.wantErr && tt.res.checkData[i] && aggregates[0].Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
-				if !tt.res.wantErr && !tt.res.checkData[i] && agg.Events[i].Data != nil {
+				if !tt.res.wantErr && !tt.res.checkData[i] && aggregates[0].Events[i].Data != nil {
 					t.Errorf("should not have data in event")
 				}
 			}
@@ -257,9 +271,10 @@ func TestUserRegisterAggregate(t *testing.T) {
 		{
 			name: "user register aggregate ok",
 			args: args{
-				ctx: auth.NewMockContext("", ""),
+				ctx: auth.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
 				emailCode:     &model.EmailCode{},
 				resourceOwner: "newResourceowner",
@@ -290,6 +305,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 				resourceOwner: "newResourceowner",
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -303,6 +319,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 				ctx: auth.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
 				resourceOwner: "newResourceowner",
 				emailCode:     &model.EmailCode{},
@@ -319,6 +336,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 				ctx: auth.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Profile: &model.Profile{UserName: "UserName"},
+					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
 				emailCode:  &model.EmailCode{},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -330,16 +348,16 @@ func TestUserRegisterAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.emailCode)
+			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.emailCode)
 
-			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if tt.res.errFunc == nil && agg.Events[i].Type != tt.res.eventTypes[i] {
-					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				if tt.res.errFunc == nil && aggregates[0].Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[0].Events[i].Type.String())
 				}
-				if tt.res.errFunc == nil && agg.Events[i].Data == nil {
+				if tt.res.errFunc == nil && aggregates[0].Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
 			}
@@ -1207,16 +1225,16 @@ func TestChangeEmailAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := EmailChangeAggregate(tt.args.aggCreator, tt.args.existing, tt.args.email, tt.args.code)(tt.args.ctx)
+			aggregates, err := EmailChangeAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.email, tt.args.code)
 
-			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
-				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			if tt.res.errFunc == nil && len(aggregates[2].Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[1].Events))
 			}
 			for i := 0; i < tt.res.eventLen; i++ {
-				if tt.res.errFunc == nil && agg.Events[i].Type != tt.res.eventTypes[i] {
-					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				if tt.res.errFunc == nil && aggregates[2].Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], aggregates[1].Events[i].Type.String())
 				}
-				if tt.res.errFunc == nil && agg.Events[i].Data == nil {
+				if tt.res.errFunc == nil && aggregates[2].Events[i].Data == nil {
 					t.Errorf("should have data in event")
 				}
 			}

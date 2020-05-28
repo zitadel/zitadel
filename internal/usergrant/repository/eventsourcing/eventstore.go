@@ -7,16 +7,15 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/id"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
-	"github.com/sony/sonyflake"
-	"strconv"
 )
 
 type UserGrantEventStore struct {
 	es_int.Eventstore
 	userGrantCache *UserGrantCache
-	idGenerator    *sonyflake.Sonyflake
+	idGenerator    id.Generator
 }
 
 type UserGrantConfig struct {
@@ -29,11 +28,10 @@ func StartUserGrant(conf UserGrantConfig) (*UserGrantEventStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &UserGrantEventStore{
 		Eventstore:     conf.Eventstore,
 		userGrantCache: userGrantCache,
-		idGenerator:    idGenerator,
+		idGenerator:    id.SonyFlakeGenerator,
 	}, nil
 }
 
@@ -60,16 +58,19 @@ func (es *UserGrantEventStore) AddUserGrant(ctx context.Context, grant *grant_mo
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
 	}
 	//TODO: Check Uniqueness
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	grant.AggregateID = strconv.FormatUint(id, 10)
+	grant.AggregateID = id
 
 	repoGrant := model.UserGrantFromModel(grant)
 
-	addAggregate := UserGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoGrant)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoGrant.AppendEvents, addAggregate)
+	addAggregates, err := UserGrantAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoGrant)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoGrant.AppendEvents, addAggregates...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,8 +104,11 @@ func (es *UserGrantEventStore) RemoveUserGrant(ctx context.Context, grantID stri
 	}
 	repoExisting := model.UserGrantFromModel(existing)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
-	projectAggregate := UserGrantRemovedAggregate(es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, projectAggregate)
+	projectAggregates, err := UserGrantRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, projectAggregates...)
 	if err != nil {
 		return err
 	}

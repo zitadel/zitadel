@@ -20,7 +20,7 @@ func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 	}
 
 	validationQuery := es_models.NewSearchQuery().
-		AggregateTypeFilter("org", "user").
+		AggregateTypeFilter(org_model.OrgAggregate, usr_model.UserAggregate).
 		AggregateIDsFilter(member.AggregateID, member.UserID)
 
 	validation := addMemberValidation(aggregate, member)

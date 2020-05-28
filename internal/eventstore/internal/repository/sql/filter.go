@@ -126,7 +126,7 @@ func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []i
 	for i, filter := range searchQuery.Filters {
 		value := filter.GetValue()
 		switch value.(type) {
-		case []bool, []float64, []int64, []string, []models.AggregateType, *[]bool, *[]float64, *[]int64, *[]string, *[]models.AggregateType:
+		case []bool, []float64, []int64, []string, []models.AggregateType, []models.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]models.AggregateType, *[]models.EventType:
 			value = pq.Array(value)
 		}
 
@@ -165,6 +165,8 @@ func getField(field es_models.Field) string {
 		return "editor_service"
 	case es_models.Field_EditorUser:
 		return "editor_user"
+	case es_models.Field_EventType:
+		return "event_type"
 	}
 	return ""
 }

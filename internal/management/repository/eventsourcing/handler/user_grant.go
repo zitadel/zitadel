@@ -2,7 +2,11 @@ package handler
 
 import (
 	"context"
+	"time"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -10,7 +14,6 @@ import (
 	usr_events "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	grant_es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -25,6 +28,7 @@ type UserGrant struct {
 	eventstore    eventstore.Eventstore
 	projectEvents *proj_event.ProjectEventstore
 	userEvents    *usr_events.UserEventstore
+	orgEvents     *org_events.OrgEventstore
 }
 
 const (
@@ -67,7 +71,7 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		err = u.fillData(grant)
+		err = u.fillData(grant, event.ResourceOwner)
 	case grant_es_model.UserGrantChanged,
 		grant_es_model.UserGrantDeactivated,
 		grant_es_model.UserGrantReactivated:
@@ -133,7 +137,7 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	return nil
 }
 
-func (u *UserGrant) fillData(grant *view_model.UserGrantView) (err error) {
+func (u *UserGrant) fillData(grant *view_model.UserGrantView, resourceOwner string) (err error) {
 	user, err := u.userEvents.UserByID(context.Background(), grant.UserID)
 	if err != nil {
 		return err
@@ -144,7 +148,12 @@ func (u *UserGrant) fillData(grant *view_model.UserGrantView) (err error) {
 		return err
 	}
 	u.fillProjectData(grant, project)
-	u.fillOrgData(grant)
+
+	org, err := u.orgEvents.OrgByID(context.TODO(), org_model.NewOrg(resourceOwner))
+	if err != nil {
+		return err
+	}
+	u.fillOrgData(grant, org)
 	return nil
 }
 
@@ -159,8 +168,9 @@ func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *pr
 	grant.ProjectName = project.Name
 }
 
-func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView) {
-	//TODO: get ORG
+func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.Org) {
+	grant.OrgDomain = org.Domain
+	grant.OrgName = org.Name
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {

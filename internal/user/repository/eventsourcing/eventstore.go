@@ -2,10 +2,8 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
-
+	"github.com/caos/zitadel/internal/id"
 	"github.com/pquerna/otp/totp"
-	"github.com/sony/sonyflake"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/cache/config"
@@ -23,7 +21,7 @@ import (
 type UserEventstore struct {
 	es_int.Eventstore
 	userCache                *UserCache
-	idGenerator              *sonyflake.Sonyflake
+	idGenerator              id.Generator
 	PasswordAlg              crypto.HashAlgorithm
 	InitializeUserCode       crypto.Generator
 	EmailVerificationCode    crypto.Generator
@@ -44,7 +42,6 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	if err != nil {
 		return nil, err
 	}
-	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	if err != nil {
 		return nil, err
@@ -55,26 +52,23 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	passwordVerificationCode := crypto.NewEncryptionGenerator(systemDefaults.SecretGenerators.PasswordVerificationCode, aesCrypto)
 	aesOtpCrypto, err := crypto.NewAESCrypto(systemDefaults.Multifactors.OTP.VerificationKey)
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
-	if err != nil {
-		return nil, err
-	}
-	mfa := global_model.Multifactors{
-		OTP: global_model.OTP{
-			CryptoMFA: aesOtpCrypto,
-			Issuer:    systemDefaults.Multifactors.OTP.Issuer,
-		},
-	}
+
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
-		idGenerator:              idGenerator,
+		idGenerator:              id.SonyFlakeGenerator,
 		InitializeUserCode:       initCodeGen,
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
 		PasswordVerificationCode: passwordVerificationCode,
-		Multifactors:             mfa,
-		PasswordAlg:              passwordAlg,
-		validateTOTP:             totp.Validate,
+		Multifactors: global_model.Multifactors{
+			OTP: global_model.OTP{
+				CryptoMFA: aesOtpCrypto,
+				Issuer:    systemDefaults.Multifactors.OTP.Issuer,
+			},
+		},
+		PasswordAlg:  passwordAlg,
+		validateTOTP: totp.Validate,
 	}, nil
 }
 
@@ -106,12 +100,12 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
-	//TODO: Check Uniqueness
-	id, err := es.idGenerator.NextID()
+
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	user.AggregateID = strconv.FormatUint(id, 10)
+	user.AggregateID = id
 
 	err = user.HashPasswordIfExisting(es.PasswordAlg, true)
 	if err != nil {
@@ -130,18 +124,18 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 	repoPhoneCode := model.PhoneCodeFromModel(user.PhoneCode)
 
-	createAggregate, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner)
+	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner)
 
-	return repoUser, createAggregate, err
+	return repoUser, createAggregates, err
 }
 
 func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	repoUser, aggregate, err := es.PrepareCreateUser(ctx, user, "")
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, "")
 	if err != nil {
 		return nil, err
 	}
 
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregate)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
 	if err != nil {
 		return nil, err
 	}
@@ -150,17 +144,16 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, *es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
 	}
-	//TODO: Check Uniqueness
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	user.AggregateID = strconv.FormatUint(id, 10)
+	user.AggregateID = id
 
 	err = user.HashPasswordIfExisting(es.PasswordAlg, false)
 	if err != nil {
@@ -174,17 +167,17 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	repoUser := model.UserFromModel(user)
 	repoEmailCode := model.EmailCodeFromModel(user.EmailCode)
 
-	aggregate, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode)
-	return repoUser, aggregate, err
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode)
+	return repoUser, aggregates, err
 }
 
 func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregate, err := es.PrepareRegisterUser(ctx, user, resourceOwner)
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, createAggregate)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, createAggregates...)
 	if err != nil {
 		return nil, err
 	}
@@ -594,8 +587,11 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	repoNew := model.EmailFromModel(email)
 	repoEmailCode := model.EmailCodeFromModel(emailCode)
 
-	updateAggregate := EmailChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	updateAggregates, err := EmailChangeAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregates...)
 	if err != nil {
 		return nil, err
 	}

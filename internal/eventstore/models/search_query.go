@@ -43,6 +43,10 @@ func (q *SearchQuery) AggregateTypeFilter(types ...AggregateType) *SearchQuery {
 	return q.setFilter(NewFilter(Field_AggregateType, types, Operation_In))
 }
 
+func (q *SearchQuery) EventTypesFilter(types ...EventType) *SearchQuery {
+	return q.setFilter(NewFilter(Field_EventType, types, Operation_In))
+}
+
 func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
 	sortOrder := Operation_Greater
 	if q.Desc {
