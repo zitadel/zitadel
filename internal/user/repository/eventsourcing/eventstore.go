@@ -90,12 +90,11 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 	return model.UserToModel(user), nil
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, *es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
-	//TODO: Check Uniqueness
 	id, err := es.idGenerator.NextID()
 	if err != nil {
 		return nil, nil, err
@@ -119,18 +118,18 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 	repoPhoneCode := model.PhoneCodeFromModel(user.PhoneCode)
 
-	createAggregate, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner)
+	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner)
 
-	return repoUser, createAggregate, err
+	return repoUser, createAggregates, err
 }
 
 func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	repoUser, aggregate, err := es.PrepareCreateUser(ctx, user, "")
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, "")
 	if err != nil {
 		return nil, err
 	}
 
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregate)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, aggregates...)
 	if err != nil {
 		return nil, err
 	}
@@ -139,12 +138,11 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, *es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
 	}
-	//TODO: Check Uniqueness
 	id, err := es.idGenerator.NextID()
 	if err != nil {
 		return nil, nil, err
@@ -163,17 +161,17 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	repoUser := model.UserFromModel(user)
 	repoEmailCode := model.EmailCodeFromModel(user.EmailCode)
 
-	aggregate, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode)
-	return repoUser, aggregate, err
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode)
+	return repoUser, aggregates, err
 }
 
 func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregate, err := es.PrepareRegisterUser(ctx, user, resourceOwner)
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, createAggregate)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoUser.AppendEvents, createAggregates...)
 	if err != nil {
 		return nil, err
 	}
@@ -550,8 +548,11 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	repoNew := model.EmailFromModel(email)
 	repoEmailCode := model.EmailCodeFromModel(emailCode)
 
-	updateAggregate := EmailChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	updateAggregates, err := EmailChangeAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregates...)
 	if err != nil {
 		return nil, err
 	}

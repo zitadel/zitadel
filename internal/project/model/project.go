@@ -20,6 +20,7 @@ type ProjectState int32
 const (
 	PROJECTSTATE_ACTIVE ProjectState = iota
 	PROJECTSTATE_INACTIVE
+	PROJECTSTATE_REMOVED
 )
 
 func NewProject(id string) *Project {

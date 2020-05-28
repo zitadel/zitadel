@@ -2,8 +2,13 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	proj_model "github.com/caos/zitadel/internal/project/model"
+	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 )
 
@@ -21,6 +26,15 @@ func UserGrantQuery(latestSequence uint64) *es_models.SearchQuery {
 		LatestSequenceFilter(latestSequence)
 }
 
+func UserGrantUniqueQuery(resourceOwner, projectID, userID string) *es_models.SearchQuery {
+	grantID := resourceOwner + projectID + userID
+	return es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserGrantUniqueAggregate).
+		AggregateIDFilter(grantID).
+		OrderDesc().
+		SetLimit(1)
+}
+
 func UserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) (*es_models.Aggregate, error) {
 	if grant == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing grant should not be nil")
@@ -28,14 +42,57 @@ func UserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCrea
 	return aggCreator.NewAggregate(ctx, grant.AggregateID, model.UserGrantAggregate, model.UserGrantVersion, grant.Sequence)
 }
 
-func UserGrantAddedAggregate(aggCreator *es_models.AggregateCreator, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserGrantAggregate(ctx, aggCreator, grant)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.UserGrantAdded, grant)
+func UserGrantAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) ([]*es_models.Aggregate, error) {
+	agg, err := UserGrantAggregate(ctx, aggCreator, grant)
+	if err != nil {
+		return nil, err
 	}
+	validationQuery := es_models.NewSearchQuery().
+		AggregateTypeFilter(usr_model.UserAggregate, org_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateIDsFilter(grant.UserID, auth.GetCtxData(ctx).OrgID, grant.ProjectID)
+
+	validation := addUserGrantValidation(auth.GetCtxData(ctx).OrgID, grant)
+	agg, err = agg.SetPrecondition(validationQuery, validation).AppendEvent(model.UserGrantAdded, grant)
+	if err != nil {
+		return nil, err
+	}
+
+	uniqueAggregate, err := reservedUniqueUserGrantAggregate(ctx, aggCreator, grant)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		uniqueAggregate,
+	}, nil
+}
+
+func reservedUniqueUserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) (*es_models.Aggregate, error) {
+	grantID := auth.GetCtxData(ctx).OrgID + grant.ProjectID + grant.UserID
+	aggregate, err := aggCreator.NewAggregate(ctx, grantID, model.UserGrantUniqueAggregate, model.UserGrantVersion, 0)
+	if err != nil {
+		return nil, err
+	}
+	aggregate, err = aggregate.AppendEvent(model.UserGrantReserved, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aggregate.SetPrecondition(UserGrantUniqueQuery(auth.GetCtxData(ctx).OrgID, grant.ProjectID, grant.UserID), isEventValidation(aggregate, model.UserGrantReserved)), nil
+}
+
+func releasedUniqueUserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) (aggregate *es_models.Aggregate, err error) {
+	grantID := grant.ResourceOwner + grant.ProjectID + grant.UserID
+	aggregate, err = aggCreator.NewAggregate(ctx, grantID, model.UserGrantUniqueAggregate, model.UserGrantVersion, 0)
+	if err != nil {
+		return nil, err
+	}
+	aggregate, err = aggregate.AppendEvent(model.UserGrantReleased, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return aggregate.SetPrecondition(UserGrantUniqueQuery(grant.ResourceOwner, grant.ProjectID, grant.UserID), isEventValidation(aggregate, model.UserGrantReleased)), nil
 }
 
 func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
@@ -78,15 +135,109 @@ func UserGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func UserGrantRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if grant == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo21s", "grant should not be nil")
-		}
-		agg, err := UserGrantAggregate(ctx, aggCreator, existing)
-		if err != nil {
-			return nil, err
-		}
-		return agg.AppendEvent(model.UserGrantRemoved, nil)
+func UserGrantRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant) ([]*es_models.Aggregate, error) {
+	if grant == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo21s", "grant should not be nil")
 	}
+	agg, err := UserGrantAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.UserGrantRemoved, nil)
+	if err != nil {
+		return nil, err
+	}
+	uniqueAggregate, err := releasedUniqueUserGrantAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	return []*es_models.Aggregate{
+		agg,
+		uniqueAggregate,
+	}, nil
+}
+
+func isEventValidation(aggregate *es_models.Aggregate, eventType es_models.EventType) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		if len(events) == 0 {
+			aggregate.PreviousSequence = 0
+			return nil
+		}
+		if events[0].Type == eventType {
+			return errors.ThrowPreconditionFailedf(nil, "EVENT-eJQqe", "user_grant is already %v", eventType)
+		}
+		aggregate.PreviousSequence = events[0].Sequence
+		return nil
+	}
+}
+
+func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		existsOrg := false
+		existsUser := false
+		project := new(proj_es_model.Project)
+		for _, event := range events {
+			switch event.AggregateType {
+			case usr_model.UserAggregate:
+				switch event.Type {
+				case usr_model.UserAdded, usr_model.UserRegistered:
+					existsUser = true
+				case usr_model.UserRemoved:
+					existsUser = false
+				}
+			case org_model.OrgAggregate:
+				switch event.Type {
+				case org_model.OrgAdded:
+					existsOrg = true
+				case org_model.OrgRemoved:
+					existsOrg = false
+				}
+			case proj_es_model.ProjectAggregate:
+				project.AppendEvent(event)
+			}
+		}
+		if existsOrg && existsUser && checkProjectConditions(resourceOwner, grant, project) {
+			return nil
+		}
+		return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "conditions not met")
+	}
+}
+
+func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) bool {
+	if project.State == int32(proj_model.PROJECTSTATE_REMOVED) {
+		return false
+	}
+	if resourceOwner == project.ResourceOwner {
+		return checkIfProjectHasRoles(grant.RoleKeys, project.Roles)
+	}
+
+	if _, projectGrant := proj_es_model.GetProjectGrantByResourceOwner(project.Grants, resourceOwner); projectGrant != nil {
+		return checkIfProjectGrantHasRoles(grant.RoleKeys, projectGrant.RoleKeys)
+	}
+	return false
+}
+
+func checkIfProjectHasRoles(roles []string, existing []*proj_es_model.ProjectRole) bool {
+	for _, roleKey := range roles {
+		if _, role := proj_es_model.GetProjectRole(existing, roleKey); role == nil {
+			return false
+		}
+	}
+	return true
+}
+
+func checkIfProjectGrantHasRoles(roles []string, existing []string) bool {
+	roleExists := false
+	for _, roleKey := range roles {
+		for _, existingRoleKey := range existing {
+			if roleKey == existingRoleKey {
+				roleExists = true
+				continue
+			}
+		}
+		if !roleExists {
+			return false
+		}
+	}
+	return true
 }

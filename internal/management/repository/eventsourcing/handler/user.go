@@ -60,7 +60,7 @@ func (p *User) Process(event *models.Event) (err error) {
 			return err
 		}
 		err = user.AppendEvent(event)
-	case es_model.UserDeleted:
+	case es_model.UserRemoved:
 		err = p.view.DeleteUser(event.AggregateID, event.Sequence)
 	default:
 		return p.view.ProcessedUserSequence(event.Sequence)

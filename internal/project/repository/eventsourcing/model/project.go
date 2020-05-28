@@ -88,6 +88,8 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendDeactivatedEvent()
 	case ProjectReactivated:
 		return p.appendReactivatedEvent()
+	case ProjectRemoved:
+		return p.appendRemovedEvent()
 	case ProjectMemberAdded:
 		return p.appendAddMemberEvent(event)
 	case ProjectMemberChanged:
@@ -147,6 +149,11 @@ func (p *Project) appendDeactivatedEvent() error {
 
 func (p *Project) appendReactivatedEvent() error {
 	p.State = int32(model.PROJECTSTATE_ACTIVE)
+	return nil
+}
+
+func (p *Project) appendRemovedEvent() error {
+	p.State = int32(model.PROJECTSTATE_REMOVED)
 	return nil
 }
 
