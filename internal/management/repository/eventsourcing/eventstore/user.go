@@ -88,7 +88,11 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
-	return repo.UserEvents.SetOneTimePassword(ctx, password)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.SetOneTimePassword(ctx, policy, password)
 }
 
 func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {

@@ -1073,6 +1073,7 @@ func TestSetOneTimePassword(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
+		policy   *policy_model.PasswordComplexityPolicy
 		password *model.Password
 	}
 	type res struct {
@@ -1089,6 +1090,7 @@ func TestSetOneTimePassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
 			},
 			res: res{
@@ -1100,6 +1102,7 @@ func TestSetOneTimePassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: ""}, SecretString: "Password"},
 			},
 			res: res{
@@ -1111,6 +1114,7 @@ func TestSetOneTimePassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, SecretString: "Password"},
 			},
 			res: res{
@@ -1120,7 +1124,7 @@ func TestSetOneTimePassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.SetOneTimePassword(tt.args.ctx, tt.args.password)
+			result, err := tt.args.es.SetOneTimePassword(tt.args.ctx, tt.args.policy, tt.args.password)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -1270,6 +1274,7 @@ func TestSetPassword(t *testing.T) {
 	type args struct {
 		es       *UserEventstore
 		ctx      context.Context
+		policy   *policy_model.PasswordComplexityPolicy
 		userID   string
 		code     string
 		password string
@@ -1297,6 +1302,7 @@ func TestSetPassword(t *testing.T) {
 					},
 				),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1308,6 +1314,7 @@ func TestSetPassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUser(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				userID:   "",
 				code:     "code",
 				password: "password",
@@ -1321,6 +1328,7 @@ func TestSetPassword(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateUserNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1338,6 +1346,7 @@ func TestSetPassword(t *testing.T) {
 					},
 				),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1361,6 +1370,7 @@ func TestSetPassword(t *testing.T) {
 					},
 				),
 				ctx:      auth.NewMockContext("orgID", "userID"),
+				policy:   &policy_model.PasswordComplexityPolicy{},
 				userID:   "userID",
 				code:     "code",
 				password: "password",
@@ -1372,7 +1382,7 @@ func TestSetPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.SetPassword(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.password)
+			err := tt.args.es.SetPassword(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.code, tt.args.password)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("result has error: %v", err)
@@ -1389,6 +1399,7 @@ func TestChangePassword(t *testing.T) {
 	type args struct {
 		es     *UserEventstore
 		ctx    context.Context
+		policy *policy_model.PasswordComplexityPolicy
 		userID string
 		old    string
 		new    string
@@ -1416,6 +1427,7 @@ func TestChangePassword(t *testing.T) {
 					},
 				),
 				ctx:    auth.NewMockContext("orgID", "userID"),
+				policy: &policy_model.PasswordComplexityPolicy{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",
@@ -1429,6 +1441,7 @@ func TestChangePassword(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateUser(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
+				policy: &policy_model.PasswordComplexityPolicy{},
 				userID: "",
 				old:    "old",
 				new:    "new",
@@ -1442,6 +1455,7 @@ func TestChangePassword(t *testing.T) {
 			args: args{
 				es:     GetMockManipulateUserNoEvents(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
+				policy: &policy_model.PasswordComplexityPolicy{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",
@@ -1459,6 +1473,7 @@ func TestChangePassword(t *testing.T) {
 					},
 				),
 				ctx:    auth.NewMockContext("orgID", "userID"),
+				policy: &policy_model.PasswordComplexityPolicy{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",
@@ -1481,6 +1496,7 @@ func TestChangePassword(t *testing.T) {
 					},
 				),
 				ctx:    auth.NewMockContext("orgID", "userID"),
+				policy: &policy_model.PasswordComplexityPolicy{},
 				userID: "userID",
 				old:    "old",
 				new:    "new",
@@ -1489,10 +1505,32 @@ func TestChangePassword(t *testing.T) {
 				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
+		{
+			name: "no policy",
+			args: args{
+				es: GetMockManipulateUserWithPasswordCodeGen(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Password: &repo_model.Password{Secret: &crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							Crypted:    []byte("older"),
+						}},
+					},
+				),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "userID",
+				old:    "old",
+				new:    "new",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ChangePassword(tt.args.ctx, tt.args.userID, tt.args.old, tt.args.new)
+			result, err := tt.args.es.ChangePassword(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.old, tt.args.new)
 
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")

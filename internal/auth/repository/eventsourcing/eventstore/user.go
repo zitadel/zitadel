@@ -95,7 +95,11 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 }
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
-	_, err := repo.UserEvents.ChangePassword(ctx, auth.GetCtxData(ctx).UserID, old, new)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	_, err = repo.UserEvents.ChangePassword(ctx, policy, auth.GetCtxData(ctx).UserID, old, new)
 	return err
 }
 
@@ -124,7 +128,11 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string)
 }
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
-	return repo.UserEvents.SetPassword(ctx, userID, code, password)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.SetPassword(ctx, policy, userID, code, password)
 }
 
 func (repo *UserRepo) SignOut(ctx context.Context, agentID, userID string) error {

@@ -383,15 +383,15 @@ func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_
 	return nil
 }
 
-func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, password *usr_model.Password) (*usr_model.Password, error) {
 	user, err := es.UserByID(ctx, password.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	return es.changedPassword(ctx, user, password.SecretString, true)
+	return es.changedPassword(ctx, user, policy, password.SecretString, true)
 }
 
-func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, password string) error {
+func (es *UserEventstore) SetPassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, code, password string) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -402,11 +402,11 @@ func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, passwor
 	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "EVENT-sd6DF", "code invalid")
 	}
-	_, err = es.changedPassword(ctx, user, password, false)
+	_, err = es.changedPassword(ctx, user, policy, password, false)
 	return err
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new string) (*usr_model.Password, error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, old, new string) (*usr_model.Password, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -417,19 +417,17 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new s
 	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "invalid password")
 	}
-	return es.changedPassword(ctx, user, new, false)
+	return es.changedPassword(ctx, user, policy, new, false)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, password string, onetime bool) (*usr_model.Password, error) {
-	//TODO: check password policy
-	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
-	if err != nil {
-		return nil, err
-	}
-	repoPassword := &model.Password{Secret: secret, ChangeRequired: onetime}
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, password string, onetime bool) (*usr_model.Password, error) {
+	pw := &usr_model.Password{SecretString: password}
+	pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
+
+	repoPassword := model.PasswordFromModel(pw)
 	repoUser := model.UserFromModel(user)
 	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return nil, err
 	}
