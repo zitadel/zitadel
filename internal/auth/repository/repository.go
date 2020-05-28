@@ -11,4 +11,5 @@ type Repository interface {
 	TokenRepository
 	ApplicationRepository
 	KeyRepository
+	UserSessionRepository
 }
