@@ -7,13 +7,15 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type UserRepo struct {
-	UserEvents *user_event.UserEventstore
-	View       *view.View
+	UserEvents   *user_event.UserEventstore
+	PolicyEvents *policy_event.PolicyEventstore
+	View         *view.View
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
@@ -21,7 +23,15 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 }
 
 func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error) {
-	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
+	policyResourceOwner := auth.GetCtxData(ctx).OrgID
+	if resourceOwner != "" {
+		policyResourceOwner = resourceOwner
+	}
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {

@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
 	"strconv"
 
 	"github.com/pquerna/otp/totp"
@@ -31,6 +32,7 @@ type UserEventstore struct {
 	PasswordVerificationCode crypto.Generator
 	Multifactors             global_model.Multifactors
 	validateTOTP             func(string, string) bool
+	SystemDefaults           sd.SystemDefaults
 }
 
 type UserConfig struct {
@@ -70,8 +72,9 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 				Issuer:    systemDefaults.Multifactors.OTP.Issuer,
 			},
 		},
-		PasswordAlg:  passwordAlg,
-		validateTOTP: totp.Validate,
+		PasswordAlg:    passwordAlg,
+		validateTOTP:   totp.Validate,
+		SystemDefaults: systemDefaults,
 	}, nil
 }
 
@@ -90,7 +93,7 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 	return model.UserToModel(user), nil
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
@@ -101,7 +104,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	}
 	user.AggregateID = strconv.FormatUint(id, 10)
 
-	err = user.HashPasswordIfExisting(es.PasswordAlg, true)
+	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -123,8 +126,8 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, "")
+func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy) (*usr_model.User, error) {
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, policy, "")
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +141,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
@@ -149,7 +152,7 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	}
 	user.AggregateID = strconv.FormatUint(id, 10)
 
-	err = user.HashPasswordIfExisting(es.PasswordAlg, false)
+	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -165,8 +168,8 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	return repoUser, aggregates, err
 }
 
-func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, resourceOwner)
+func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*usr_model.User, error) {
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, policy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

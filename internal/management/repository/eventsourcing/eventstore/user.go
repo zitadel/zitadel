@@ -2,16 +2,19 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type UserRepo struct {
-	SearchLimit uint64
-	UserEvents  *usr_event.UserEventstore
-	View        *view.View
+	SearchLimit  uint64
+	UserEvents   *usr_event.UserEventstore
+	PolicyEvents *policy_event.PolicyEventstore
+	View         *view.View
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.User, err error) {
@@ -19,11 +22,23 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_mod
 }
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	return repo.UserEvents.CreateUser(ctx, user)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.CreateUser(ctx, user, policy)
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
+	policyResourceOwner := auth.GetCtxData(ctx).OrgID
+	if resourceOwner != "" {
+		policyResourceOwner = resourceOwner
+	}
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
 }
 
 func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {

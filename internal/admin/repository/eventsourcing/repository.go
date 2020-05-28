@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
@@ -61,7 +62,13 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 	if err != nil {
 		return nil, err
 	}
-
+	policy, err := es_policy.StartPolicy(es_policy.PolicyConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
 	sqlClient, err := conf.View.Start()
 	if err != nil {
 		return nil, err
@@ -71,7 +78,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 
-	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user, ProjectEvents: project, IamEvents: iam}
+	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user, ProjectEvents: project, IamEvents: iam, PolicyEvents: policy}
 	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute(ctx)
 	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to execute setup")
 
