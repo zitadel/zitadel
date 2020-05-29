@@ -56,7 +56,7 @@ func IamMemberToModel(member *IamMember) *model.IamMember {
 
 func (iam *Iam) appendAddMemberEvent(event *es_models.Event) error {
 	member := &IamMember{}
-	err := member.setData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (iam *Iam) appendAddMemberEvent(event *es_models.Event) error {
 
 func (iam *Iam) appendChangeMemberEvent(event *es_models.Event) error {
 	member := &IamMember{}
-	err := member.setData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (iam *Iam) appendChangeMemberEvent(event *es_models.Event) error {
 
 func (iam *Iam) appendRemoveMemberEvent(event *es_models.Event) error {
 	member := &IamMember{}
-	err := member.setData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (iam *Iam) appendRemoveMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (m *IamMember) setData(event *es_models.Event) error {
+func (m *IamMember) SetData(event *es_models.Event) error {
 	m.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, m); err != nil {
 		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")

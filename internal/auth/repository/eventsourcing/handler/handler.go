@@ -1,6 +1,7 @@
 package handler
 
 import (
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
@@ -31,14 +32,20 @@ type EventstoreRepos struct {
 	OrgEvents     *org_events.OrgEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []spooler.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []spooler.Handler {
 	return []spooler.Handler{
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
 		&UserSession{handler: handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount}, userEvents: repos.UserEvents},
 		&Token{handler: handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount}},
 		&Key{handler: handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount}},
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
-		&UserGrant{handler: handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount}, eventstore: eventstore},
+		&UserGrant{
+			handler:       handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount},
+			eventstore:    eventstore,
+			userEvents:    repos.UserEvents,
+			orgEvents:     repos.OrgEvents,
+			projectEvents: repos.ProjectEvents,
+			iamID:         systemDefaults.IamID},
 	}
 }
 

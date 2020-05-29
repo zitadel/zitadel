@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -10,6 +11,7 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -28,6 +30,7 @@ type UserGrant struct {
 	projectEvents *proj_event.ProjectEventstore
 	userEvents    *usr_events.UserEventstore
 	orgEvents     *org_events.OrgEventstore
+	iamID         string
 	iamProjectID  string
 }
 
@@ -50,7 +53,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(grant_es_model.UserGrantAggregate, iam_es_model.IamAggregate, org_es_model.OrgAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
 		LatestSequenceFilter(sequence), nil
 }
 
@@ -62,6 +65,10 @@ func (u *UserGrant) Process(event *models.Event) (err error) {
 		err = u.processUser(event)
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
+	case iam_es_model.IamAggregate:
+		err = u.processIamMember(event, "IAM", false)
+	case org_es_model.OrgAggregate:
+		return u.processOrg(event)
 	}
 	return err
 }
@@ -134,117 +141,127 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 			u.fillProjectData(grant, project)
 			return u.view.PutUserGrant(grant, event.Sequence)
 		}
+	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectMemberRemoved:
+		member := new(proj_es_model.ProjectMember)
+		member.SetData(event)
+		return u.processMember(event, "PROJECT", true, member.UserID, member.Roles)
+	case proj_es_model.ProjectGrantMemberAdded, proj_es_model.ProjectGrantMemberChanged, proj_es_model.ProjectGrantMemberRemoved:
+		member := new(proj_es_model.ProjectGrantMember)
+		member.SetData(event)
+		return u.processMember(event, "PROJECT_GRANT", true, member.UserID, member.Roles)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
 	return nil
 }
 
-//
-//func (u *UserGrant) processMember(rolePrefix string, event *models.Event, suffix bool) error {
-//	member := &model.Member{}
-//
-//	switch event.Type {
-//	case org_es_model.OrgMemberAdded, proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded,
-//		org_pkg.ChangeMember, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectGrantMemberChanged:
-//
-//		if err := proto.FromPBStruct(member, event.Data); err != nil {
-//			logging.Log("VIEW-Nt7QE").WithError(err).Debug("unable to map data into user")
-//			return err
-//		}
-//
-//		grant, err := u.cache.LatestGrant(event.ResourceOwner, u.iamProjectID, member.UserID)
-//		if err != nil && !errors.IsNotFound(err) {
-//			return err
-//		}
-//		if suffix {
-//			member.Roles = suffixRoles(event.GetAggregateId(), member.Roles)
-//		}
-//		if errors.IsNotFound(err) {
-//			grant = &model.Grant{
-//				OrgID:     event.ResourceOwner,
-//				ProjectID: g.iamProjectID,
-//				UserID:    member.UserID,
-//				Roles:     member.Roles,
-//			}
-//			g.fillOrg(grant)
-//		} else {
-//			newRoles := member.Roles
-//			if grant.Roles != nil {
-//				grant.Roles = mergeExistingRoles(rolePrefix, grant.Roles, newRoles)
-//			} else {
-//				grant.Roles = newRoles
-//			}
-//		}
-//		grant.CurrentSequence = event.Sequence
-//		return g.cache.PutGrant(grant)
-//	case org_pkg.RemoveMember,
-//		pro_pkg.RemovedMember,
-//		pro_pkg.RemovedGrantMember:
-//
-//		if err := proto.FromPBStruct(member, event.Data); err != nil {
-//			logging.Log("VIEW-Nt7QE").WithError(err).Debug("unable to map data into user")
-//			return err
-//		}
-//		grant, err := g.cache.LatestGrant(event.ResourceOwner, g.iamProjectID, member.UserID)
-//		if err != nil {
-//			return err
-//		}
-//		return g.cache.RemoveGrant(grant, event.Sequence)
-//	default:
-//		return g.cache.ProcessedGrantSequence(event.Sequence)
-//	}
-//}
-//
-//func (u *UserGrant) processIamMember(rolePrefix string, event *models.Event, suffix bool) error {
-//	member := &model.Member{}
-//
-//	switch event.EventType() {
-//	case iam_pkg.AddedIamMember, iam_pkg.ChangedIamMember:
-//		if err := proto.FromPBStruct(member, event.Data); err != nil {
-//			logging.Log("VIEW-UeJ58").WithError(err).Debug("unable to map data into member")
-//			return err
-//		}
-//		grant, err := g.cache.LatestGrant(iamResourceOwner, g.iamProjectID, member.UserID)
-//		if err != nil && !errors.IsNotFound(err) {
-//			return err
-//		}
-//		if errors.IsNotFound(err) {
-//			grant = &model.Grant{
-//				OrgID:     iamResourceOwner,
-//				OrgName:   iamResourceOwner,
-//				ProjectID: g.iamProjectID,
-//				UserID:    member.UserID,
-//				Roles:     member.Roles,
-//			}
-//			if suffix {
-//				grant.Roles = suffixRoles(event.GetAggregateId(), grant.Roles)
-//			}
-//		} else {
-//			newRoles := member.Roles
-//			if grant.Roles != nil {
-//				grant.Roles = mergeExistingRoles(rolePrefix, grant.Roles, newRoles)
-//			} else {
-//				grant.Roles = newRoles
-//			}
-//
-//		}
-//		grant.CurrentSequence = event.Sequence
-//		return g.cache.PutGrant(grant)
-//	case iam_pkg.RemovedIamMember:
-//		if err := proto.FromPBStruct(member, event.Data); err != nil {
-//			logging.Log("VIEW-Mi7Er").WithError(err).Debug("unable to map data into user")
-//			return err
-//		}
-//		grant, err := g.cache.LatestGrant(iamResourceOwner, g.iamProjectID, member.UserID)
-//		if err != nil {
-//			return err
-//		}
-//		return g.cache.RemoveGrant(grant, event.Sequence)
-//	default:
-//		return g.cache.ProcessedGrantSequence(event.Sequence)
-//	}
-//}
+func (u *UserGrant) processOrg(event *models.Event) (err error) {
+	switch event.Type {
+	case org_es_model.OrgMemberAdded, org_es_model.OrgMemberChanged, org_es_model.OrgMemberRemoved:
+		member := new(org_es_model.OrgMember)
+		member.SetData(event)
+		return u.processMember(event, "ORG", false, member.UserID, member.Roles)
+	default:
+		return u.view.ProcessedUserGrantSequence(event.Sequence)
+	}
+	return nil
+}
+
+func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {
+	member := new(iam_es_model.IamMember)
+
+	switch event.Type {
+	case iam_es_model.IamMemberAdded, iam_es_model.IamMemberChanged:
+		member.SetData(event)
+
+		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
+		if err != nil && !errors.IsNotFound(err) {
+			return err
+		}
+		if errors.IsNotFound(err) {
+			grant = &view_model.UserGrantView{
+				ID:            u.iamProjectID + member.UserID,
+				ResourceOwner: u.iamID,
+				OrgName:       u.iamID,
+				OrgDomain:     u.iamID,
+				ProjectID:     u.iamProjectID,
+				UserID:        member.UserID,
+				RoleKeys:      member.Roles,
+				CreationDate:  event.CreationDate,
+			}
+			if suffix {
+				grant.RoleKeys = suffixRoles(event.AggregateID, grant.RoleKeys)
+			}
+		} else {
+			newRoles := member.Roles
+			if grant.RoleKeys != nil {
+				grant.RoleKeys = mergeExistingRoles(rolePrefix, grant.RoleKeys, newRoles)
+			} else {
+				grant.RoleKeys = newRoles
+			}
+
+		}
+		grant.Sequence = event.Sequence
+		grant.ChangeDate = event.CreationDate
+		return u.view.PutUserGrant(grant, grant.Sequence)
+	case iam_es_model.IamMemberRemoved:
+		member.SetData(event)
+		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
+		if err != nil {
+			return err
+		}
+		return u.view.DeleteUserGrant(grant.ID, event.Sequence)
+	default:
+		return u.view.ProcessedUserGrantSequence(event.Sequence)
+	}
+}
+
+func (u *UserGrant) processMember(event *models.Event, rolePrefix string, suffix bool, userID string, roleKeys []string) error {
+	switch event.Type {
+	case org_es_model.OrgMemberAdded, proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded,
+		org_es_model.OrgMemberChanged, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectGrantMemberChanged:
+
+		grant, err := u.view.UserGrantByIDs(event.ResourceOwner, u.iamProjectID, userID)
+		if err != nil && !errors.IsNotFound(err) {
+			return err
+		}
+		if suffix {
+			roleKeys = suffixRoles(event.AggregateID, roleKeys)
+		}
+		if errors.IsNotFound(err) {
+			grant = &view_model.UserGrantView{
+				ID:            u.iamProjectID + event.ResourceOwner + userID,
+				ResourceOwner: event.ResourceOwner,
+				ProjectID:     u.iamProjectID,
+				UserID:        userID,
+				RoleKeys:      roleKeys,
+				CreationDate:  event.CreationDate,
+			}
+			u.fillData(grant, event.ResourceOwner)
+		} else {
+			newRoles := roleKeys
+			if grant.RoleKeys != nil {
+				grant.RoleKeys = mergeExistingRoles(rolePrefix, grant.RoleKeys, newRoles)
+			} else {
+				grant.RoleKeys = newRoles
+			}
+		}
+		grant.Sequence = event.Sequence
+		grant.ChangeDate = event.CreationDate
+		return u.view.PutUserGrant(grant, event.Sequence)
+	case org_es_model.OrgMemberRemoved,
+		proj_es_model.ProjectMemberRemoved,
+		proj_es_model.ProjectGrantMemberRemoved:
+
+		grant, err := u.view.UserGrantByIDs(event.ResourceOwner, u.iamProjectID, userID)
+		if err != nil {
+			return err
+		}
+		return u.view.DeleteUserGrant(grant.ID, event.Sequence)
+	default:
+		return u.view.ProcessedUserGrantSequence(event.Sequence)
+	}
+}
 
 func suffixRoles(suffix string, roles []string) []string {
 	suffixedRoles := make([]string, len(roles))

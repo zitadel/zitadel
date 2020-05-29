@@ -15,6 +15,10 @@ func (v *View) UserGrantByID(grantID string) (*model.UserGrantView, error) {
 	return view.UserGrantByID(v.Db, userGrantTable, grantID)
 }
 
+func (v *View) UserGrantByIDs(resourceOwnerID, projectID, userID string) (*model.UserGrantView, error) {
+	return view.UserGrantByIDs(v.Db, userGrantTable, resourceOwnerID, projectID, userID)
+}
+
 func (v *View) UserGrantsByUserID(userID string) ([]*model.UserGrantView, error) {
 	return view.UserGrantsByUserID(v.Db, userGrantTable, userID)
 }
