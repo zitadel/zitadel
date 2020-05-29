@@ -58,6 +58,56 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	return grantRespToOrgResp(grants), nil
 }
 
+func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
+	ctxData := auth.GetCtxData(ctx)
+
+	orgGrants, err := repo.View.UserGrantByIDs(ctxData.OrgID, repo.IamProjectID, ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	iamAdminGrants, err := repo.View.UserGrantByIDs(ctx, repo.IamID, repo.IamProjectID, ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	//grants := make([]*auth.Grant, 0)
+	//if len(orgGrants) > 0 {
+	//	for _, grant := range orgGrants.Result {
+	//		roles := grant.Roles
+	//		if iamAdminGrants.TotalResult == 1 {
+	//			roles = addIamAdminRoles(roles, iamAdminGrants.Result[0].Roles)
+	//		}
+	//		grants = append(grants, &auth.Grant{OrgID: grant.OrgID, Roles: roles})
+	//	}
+	//} else if iamAdminGrants.TotalResult == 1 {
+	//	grants = append(grants, &auth.Grant{
+	//		OrgID: orgID,
+	//		Roles: iamAdminGrants.Result[0].Roles,
+	//	})
+	//}
+	//
+	//grants, err := s.processor.ResolveGrants(ctx, ctxData.UserID, ctxData.OrgID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//permissions := &MyPermissions{Permissions: []string{}}
+	//
+	//for _, grant := range grants {
+	//	for _, role := range grant.Roles {
+	//		roleName, ctxID := auth.SplitPermission(role)
+	//		for _, mapping := range s.authConf.RolePermissionMappings {
+	//			if mapping.Role == roleName {
+	//				permissions.appendPermissions(ctxID, mapping.Permissions...)
+	//			}
+	//		}
+	//	}
+	//}
+	//
+	//return permissions, nil
+	return nil, nil
+}
+
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	searchRequest := &org_model.OrgSearchRequest{}
 	if len(request.Queries) > 0 {
