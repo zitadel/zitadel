@@ -500,10 +500,10 @@ message UserGrantSearchResponse {
   uint64 offset = 1;
   uint64 limit = 2;
   uint64 total_result = 3;
-  repeated UserGrant result = 4;
+  repeated UserGrantView result = 4;
 }
 
-message UserGrant {
+message UserGrantView {
   string OrgId = 1;
   string ProjectId = 2;
   string UserId = 3;
@@ -549,4 +549,7 @@ enum SearchMethod {
   SEARCHMETHOD_EQUALS = 0;
   SEARCHMETHOD_STARTS_WITH = 1;
   SEARCHMETHOD_CONTAINS = 2;
+  SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
+  SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
+  SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
 }

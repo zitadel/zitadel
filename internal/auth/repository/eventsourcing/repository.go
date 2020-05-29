@@ -20,7 +20,13 @@ import (
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
+const (
+	//TODO: How do we get this
+	iamProjectID = "57485314557478002@zitadel"
+)
+
 type Config struct {
+	SearchLimit uint64
 	Eventstore  es_int.Config
 	AuthRequest cache.Config
 	View        types.SQL
@@ -37,6 +43,7 @@ type EsRepository struct {
 	eventstore.ApplicationRepo
 	eventstore.UserSessionRepo
 	eventstore.UserGrantRepo
+	eventstore.OrgRepository
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -129,7 +136,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 			View: view,
 		},
 		eventstore.UserGrantRepo{
-			View: view,
+			SearchLimit:  conf.SearchLimit,
+			View:         view,
+			IamProjectID: iamProjectID,
+			IamID:        systemDefaults.IamID,
+		},
+		eventstore.OrgRepository{
+			SearchLimit: conf.SearchLimit,
+			View:        view,
 		},
 	}, nil
 }

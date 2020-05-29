@@ -771,7 +771,10 @@
       "enum": [
         "SEARCHMETHOD_EQUALS",
         "SEARCHMETHOD_STARTS_WITH",
-        "SEARCHMETHOD_CONTAINS"
+        "SEARCHMETHOD_CONTAINS",
+        "SEARCHMETHOD_EQUALS_IGNORE_CASE",
+        "SEARCHMETHOD_STARTS_WITH_IGNORE_CASE",
+        "SEARCHMETHOD_CONTAINS_IGNORE_CASE"
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },
@@ -896,29 +899,6 @@
         }
       }
     },
-    "v1UserGrant": {
-      "type": "object",
-      "properties": {
-        "OrgId": {
-          "type": "string"
-        },
-        "ProjectId": {
-          "type": "string"
-        },
-        "UserId": {
-          "type": "string"
-        },
-        "Roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "OrgName": {
-          "type": "string"
-        }
-      }
-    },
     "v1UserGrantSearchKey": {
       "type": "string",
       "enum": [
@@ -987,8 +967,31 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1UserGrant"
+            "$ref": "#/definitions/v1UserGrantView"
           }
+        }
+      }
+    },
+    "v1UserGrantView": {
+      "type": "object",
+      "properties": {
+        "OrgId": {
+          "type": "string"
+        },
+        "ProjectId": {
+          "type": "string"
+        },
+        "UserId": {
+          "type": "string"
+        },
+        "Roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "OrgName": {
+          "type": "string"
         }
       }
     },
