@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/caos/zitadel/internal/errors"
 )
 
 type AuthRequest struct {
@@ -65,6 +67,14 @@ func NewAuthRequest(id, agentID string, info *BrowserInfo, applicationID, callba
 		MaxAuthAge:        maxAuthAge,
 		Request:           request,
 	}
+}
+
+func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
+	request, ok := authRequestTypeMapping[requestType]
+	if !ok {
+		return nil, errors.ThrowInvalidArgument(nil, "MODEL-ds2kl", "invalid request type")
+	}
+	return &AuthRequest{Request: request}, nil
 }
 
 func (a *AuthRequest) IsValid() bool {
