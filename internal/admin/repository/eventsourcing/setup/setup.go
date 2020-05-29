@@ -99,7 +99,7 @@ func (s *Setup) Execute(ctx context.Context) error {
 
 	pwComplexityPolicy, err := s.repos.PolicyEvents.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
 	if err != nil {
-		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity polica")
+		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity policy")
 		return err
 	}
 	setUp.pwComplexityPolicy = pwComplexityPolicy
