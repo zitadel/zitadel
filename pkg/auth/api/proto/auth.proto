@@ -243,9 +243,9 @@ service AuthService {
     };
   }
 
-  rpc SearchGrant(GrantSearchRequest) returns (GrantSearchResponse) {
+  rpc SearchUserGrant(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
     option (google.api.http) = {
-      post: "/grants/_search"
+      post: "/usergrants/_search"
       body: "*"
     };
   }
@@ -254,16 +254,6 @@ service AuthService {
     option (google.api.http) = {
       post: "/global/projectorgs/_search"
       body: "*"
-    };
-
-    option (caos.zitadel.utils.v1.auth_option) = {
-      permission: "authenticated"
-    };
-  }
-
-  rpc IsIamAdmin(google.protobuf.Empty) returns (IsAdminResponse) {
-    option (google.api.http) = {
-      get: "/global/_isiamadmin"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -485,35 +475,35 @@ message OIDCClientAuth {
   string client_secret = 2;
 }
 
-message GrantSearchRequest {
+message UserGrantSearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;
-  GrantSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];;
+  UserGrantSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];;
   bool asc = 4;
-  repeated GrantSearchQuery queries = 5;
+  repeated UserGrantSearchQuery queries = 5;
 }
 
-message GrantSearchQuery {
-  GrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];;
+message UserGrantSearchQuery {
+  UserGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];;
   SearchMethod method = 2;
   string value = 3;
 }
 
-enum GrantSearchKey {
-  GrantSearchKey_UNKNOWN = 0;
-  GrantSearchKey_ORG_ID = 1;
-  GrantSearchKey_PROJECT_ID = 2;
-  GrantSearchKey_USER_ID = 3;
+enum UserGrantSearchKey {
+  UserGrantSearchKey_UNKNOWN = 0;
+  UserGrantSearchKey_ORG_ID = 1;
+  UserGrantSearchKey_PROJECT_ID = 2;
+  UserGrantSearchKey_USER_ID = 3;
 }
 
-message GrantSearchResponse {
+message UserGrantSearchResponse {
   uint64 offset = 1;
   uint64 limit = 2;
   uint64 total_result = 3;
-  repeated Grant result = 4;
+  repeated UserGrant result = 4;
 }
 
-message Grant {
+message UserGrant {
   string OrgId = 1;
   string ProjectId = 2;
   string UserId = 3;
@@ -544,10 +534,6 @@ message MyProjectOrgSearchResponse {
   uint64 limit = 2;
   uint64 total_result = 3;
   repeated Org result = 4;
-}
-
-message IsAdminResponse {
-  bool is_admin = 1;
 }
 
 message Org {

@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	org_model "github.com/caos/zitadel/internal/org/model"
+	model2 "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -341,7 +341,7 @@ func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existing
 			return nil, err
 		}
 		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter(org_model.OrgAggregate).
+			AggregateTypeFilter(model2.OrgAggregate).
 			AggregateIDFilter(grant.GrantedOrgID)
 
 		validation := addProjectGrantValidation()
@@ -506,11 +506,11 @@ func addProjectGrantValidation() func(...*es_models.Event) error {
 		existsOrg := false
 		for _, event := range events {
 			switch event.AggregateType {
-			case org_model.OrgAggregate:
+			case model2.OrgAggregate:
 				switch event.Type {
-				case org_model.OrgAdded:
+				case model2.OrgAdded:
 					existsOrg = true
-				case org_model.OrgRemoved:
+				case model2.OrgRemoved:
 					existsOrg = false
 				}
 			}

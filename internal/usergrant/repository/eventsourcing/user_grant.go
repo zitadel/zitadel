@@ -5,7 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
+	model2 "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -48,7 +48,7 @@ func UserGrantAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 		return nil, err
 	}
 	validationQuery := es_models.NewSearchQuery().
-		AggregateTypeFilter(usr_model.UserAggregate, org_model.OrgAggregate, proj_es_model.ProjectAggregate).
+		AggregateTypeFilter(usr_model.UserAggregate, model2.OrgAggregate, proj_es_model.ProjectAggregate).
 		AggregateIDsFilter(grant.UserID, auth.GetCtxData(ctx).OrgID, grant.ProjectID)
 
 	validation := addUserGrantValidation(auth.GetCtxData(ctx).OrgID, grant)
@@ -185,11 +185,11 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 				case usr_model.UserRemoved:
 					existsUser = false
 				}
-			case org_model.OrgAggregate:
+			case model2.OrgAggregate:
 				switch event.Type {
-				case org_model.OrgAdded:
+				case model2.OrgAdded:
 					existsOrg = true
-				case org_model.OrgRemoved:
+				case model2.OrgRemoved:
 					existsOrg = false
 				}
 			case proj_es_model.ProjectAggregate:

@@ -5,7 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-func (s *Server) SearchGrant(ctx context.Context, grantSearch *GrantSearchRequest) (*GrantSearchResponse, error) {
+func (s *Server) SearchUserGrant(ctx context.Context, grantSearch *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-s8iSf", "Not implemented")
 }
 

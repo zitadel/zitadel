@@ -12,4 +12,5 @@ type Repository interface {
 	ApplicationRepository
 	KeyRepository
 	UserSessionRepository
+	UserGrantRepository
 }

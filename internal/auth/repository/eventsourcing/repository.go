@@ -34,6 +34,8 @@ type EsRepository struct {
 	eventstore.TokenRepo
 	eventstore.KeyRepository
 	eventstore.ApplicationRepo
+	eventstore.UserSessionRepo
+	eventstore.UserGrantRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
@@ -88,7 +90,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
-
 	repos := handler.EventstoreRepos{UserEvents: user}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos)
 
@@ -120,6 +121,12 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		eventstore.ApplicationRepo{
 			View:          view,
 			ProjectEvents: project,
+		},
+		eventstore.UserSessionRepo{
+			View: view,
+		},
+		eventstore.UserGrantRepo{
+			View: view,
 		},
 	}, nil
 }

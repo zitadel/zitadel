@@ -2,6 +2,7 @@ package view
 
 import (
 	"encoding/json"
+	model2 "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
 
 	"github.com/caos/logging"
@@ -76,11 +77,11 @@ func (r *OrgMemberView) AppendEvent(event *models.Event) (err error) {
 	r.Sequence = event.Sequence
 	r.ChangeDate = event.CreationDate
 	switch event.Type {
-	case model.OrgMemberAdded:
+	case model2.OrgMemberAdded:
 		r.setRootData(event)
 		r.CreationDate = event.CreationDate
 		err = r.SetData(event)
-	case model.OrgMemberChanged:
+	case model2.OrgMemberChanged:
 		err = r.SetData(event)
 	}
 	return err

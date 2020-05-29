@@ -19,22 +19,6 @@
     "application/grpc"
   ],
   "paths": {
-    "/global/_isiamadmin": {
-      "get": {
-        "operationId": "IsIamAdmin",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1IsAdminResponse"
-            }
-          }
-        },
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
     "/global/projectorgs/_search": {
       "post": {
         "operationId": "SearchMyProjectOrgs",
@@ -53,32 +37,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1MyProjectOrgSearchRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AuthService"
-        ]
-      }
-    },
-    "/grants/_search": {
-      "post": {
-        "operationId": "SearchGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GrantSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1GrantSearchRequest"
             }
           }
         ],
@@ -149,6 +107,32 @@
             }
           }
         },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/usergrants/_search": {
+      "post": {
+        "operationId": "SearchUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantSearchRequest"
+            }
+          }
+        ],
         "tags": [
           "AuthService"
         ]
@@ -623,111 +607,6 @@
       ],
       "default": "GENDER_UNSPECIFIED"
     },
-    "v1Grant": {
-      "type": "object",
-      "properties": {
-        "OrgId": {
-          "type": "string"
-        },
-        "ProjectId": {
-          "type": "string"
-        },
-        "UserId": {
-          "type": "string"
-        },
-        "Roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "OrgName": {
-          "type": "string"
-        }
-      }
-    },
-    "v1GrantSearchKey": {
-      "type": "string",
-      "enum": [
-        "GrantSearchKey_UNKNOWN",
-        "GrantSearchKey_ORG_ID",
-        "GrantSearchKey_PROJECT_ID",
-        "GrantSearchKey_USER_ID"
-      ],
-      "default": "GrantSearchKey_UNKNOWN"
-    },
-    "v1GrantSearchQuery": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "$ref": "#/definitions/v1GrantSearchKey"
-        },
-        "method": {
-          "$ref": "#/definitions/v1SearchMethod"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
-    "v1GrantSearchRequest": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "sorting_column": {
-          "$ref": "#/definitions/v1GrantSearchKey"
-        },
-        "asc": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1GrantSearchQuery"
-          }
-        }
-      }
-    },
-    "v1GrantSearchResponse": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "total_result": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1Grant"
-          }
-        }
-      }
-    },
-    "v1IsAdminResponse": {
-      "type": "object",
-      "properties": {
-        "is_admin": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
     "v1MFAState": {
       "type": "string",
       "enum": [
@@ -1014,6 +893,102 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1UserGrant": {
+      "type": "object",
+      "properties": {
+        "OrgId": {
+          "type": "string"
+        },
+        "ProjectId": {
+          "type": "string"
+        },
+        "UserId": {
+          "type": "string"
+        },
+        "Roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "OrgName": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserGrantSearchKey": {
+      "type": "string",
+      "enum": [
+        "UserGrantSearchKey_UNKNOWN",
+        "UserGrantSearchKey_ORG_ID",
+        "UserGrantSearchKey_PROJECT_ID",
+        "UserGrantSearchKey_USER_ID"
+      ],
+      "default": "UserGrantSearchKey_UNKNOWN"
+    },
+    "v1UserGrantSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1UserGrantSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserGrantSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "sorting_column": {
+          "$ref": "#/definitions/v1UserGrantSearchKey"
+        },
+        "asc": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrantSearchQuery"
+          }
+        }
+      }
+    },
+    "v1UserGrantSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrant"
+          }
         }
       }
     },

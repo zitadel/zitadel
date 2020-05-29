@@ -1,4 +1,4 @@
-package eventsourcing
+package model
 
 import (
 	"encoding/json"

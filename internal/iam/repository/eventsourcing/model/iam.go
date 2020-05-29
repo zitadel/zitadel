@@ -65,7 +65,7 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 		i.SetUpDone = true
 	case IamProjectSet,
 		GlobalOrgSet:
-		err = i.setData(event)
+		err = i.SetData(event)
 	case IamMemberAdded:
 		err = i.appendAddMemberEvent(event)
 	case IamMemberChanged:
@@ -76,7 +76,7 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 	return err
 }
 
-func (i *Iam) setData(event *es_models.Event) error {
+func (i *Iam) SetData(event *es_models.Event) error {
 	i.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, i); err != nil {
 		logging.Log("EVEN-9sie4").WithError(err).Error("could not unmarshal event data")
