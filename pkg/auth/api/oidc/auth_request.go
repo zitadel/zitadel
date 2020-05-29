@@ -78,5 +78,5 @@ func (o *OPStorage) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, error) 
 }
 
 func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
-	return o.repo.GenerateSigningKeyPair(ctx)
+	return o.repo.GenerateSigningKeyPair(ctx, o.signingKeyAlgorithm)
 }

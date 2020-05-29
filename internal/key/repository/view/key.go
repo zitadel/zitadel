@@ -43,7 +43,7 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 			},
 		},
 	)
-	_, err := query(db, keys)
+	_, err := query(db, &keys)
 	return keys, err
 }
 

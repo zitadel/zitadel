@@ -57,6 +57,7 @@ Auth:
         Port: 50022
       StorageConfig:
         DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+        SigningKeyAlgorithm: RS256
       UserAgentCookieConfig:
         Name: caos.zitadel.useragent
         Domain: $ZITADEL_COOKIE_DOMAIN

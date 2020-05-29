@@ -20,7 +20,8 @@ type OPHandlerConfig struct {
 }
 
 type StorageConfig struct {
-	DefaultLoginURL string
+	DefaultLoginURL     string
+	SigningKeyAlgorithm string
 	//TokenLifetime         string
 }
 
@@ -40,8 +41,9 @@ type Endpoint struct {
 type OPStorage struct {
 	repo repository.Repository
 	//config          *op.Config
-	defaultLoginURL string
-	tokenLifetime   time.Duration
+	defaultLoginURL     string
+	tokenLifetime       time.Duration
+	signingKeyAlgorithm string
 }
 
 func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository) op.OpenIDProvider {
@@ -71,7 +73,8 @@ func newStorage(config StorageConfig, repo repository.Repository) *OPStorage {
 	return &OPStorage{
 		repo: repo,
 		//config:          config.OPConfig,
-		defaultLoginURL: config.DefaultLoginURL,
+		defaultLoginURL:     config.DefaultLoginURL,
+		signingKeyAlgorithm: config.SigningKeyAlgorithm,
 		//op.tokenLifetime, _ = time.ParseDuration(c.TokenLifetime)
 	}
 }
