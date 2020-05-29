@@ -3,6 +3,8 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/id"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
+
 	"github.com/pquerna/otp/totp"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
@@ -87,20 +89,19 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 	return model.UserToModel(user), nil
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
 
-	//TODO: Check Uniqueness
 	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
 	user.AggregateID = id
 
-	err = user.HashPasswordIfExisting(es.PasswordAlg, true)
+	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -122,8 +123,8 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, "")
+func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy) (*usr_model.User, error) {
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, policy, "")
 	if err != nil {
 		return nil, err
 	}
@@ -137,19 +138,18 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
 	}
-	//TODO: Check Uniqueness
 	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
 	user.AggregateID = id
 
-	err = user.HashPasswordIfExisting(es.PasswordAlg, false)
+	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -165,8 +165,8 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	return repoUser, aggregates, err
 }
 
-func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, resourceOwner)
+func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*usr_model.User, error) {
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, policy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -380,15 +380,15 @@ func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_
 	return nil
 }
 
-func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, password *usr_model.Password) (*usr_model.Password, error) {
 	user, err := es.UserByID(ctx, password.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	return es.changedPassword(ctx, user, password.SecretString, true)
+	return es.changedPassword(ctx, user, policy, password.SecretString, true)
 }
 
-func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, password string) error {
+func (es *UserEventstore) SetPassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, code, password string) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -399,11 +399,11 @@ func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, passwor
 	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "EVENT-sd6DF", "code invalid")
 	}
-	_, err = es.changedPassword(ctx, user, password, false)
+	_, err = es.changedPassword(ctx, user, policy, password, false)
 	return err
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new string) (*usr_model.Password, error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, old, new string) (*usr_model.Password, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -414,16 +414,16 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new s
 	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "invalid password")
 	}
-	return es.changedPassword(ctx, user, new, false)
+	return es.changedPassword(ctx, user, policy, new, false)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, password string, onetime bool) (*usr_model.Password, error) {
-	//TODO: check password policy
-	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, password string, onetime bool) (*usr_model.Password, error) {
+	pw := &usr_model.Password{SecretString: password}
+	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
 	if err != nil {
 		return nil, err
 	}
-	repoPassword := &model.Password{Secret: secret, ChangeRequired: onetime}
+	repoPassword := model.PasswordFromModel(pw)
 	repoUser := model.UserFromModel(user)
 	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
