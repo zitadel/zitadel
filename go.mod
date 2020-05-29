@@ -14,14 +14,13 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/aws/aws-sdk-go v1.30.25 // indirect
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.6.0
+	github.com/caos/oidc v0.6.2
 	github.com/cockroachdb/cockroach-go v0.0.0-20200504194139-73ffeee90b62
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.4.1
-	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/securecookie v1.1.1
@@ -43,7 +42,6 @@ require (
 	github.com/pquerna/otp v1.2.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
-	github.com/sirupsen/logrus v1.6.0 // indirect
 	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
 	github.com/sony/sonyflake v1.0.0
 	github.com/stretchr/testify v1.5.1
@@ -59,6 +57,6 @@ require (
 	google.golang.org/genproto v0.0.0-20200511104702-f5ebc3bea380
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.22.0
-	gopkg.in/square/go-jose.v2 v2.5.0
+	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

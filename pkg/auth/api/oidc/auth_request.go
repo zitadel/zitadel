@@ -33,6 +33,18 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequ
 	return AuthRequestFromBusiness(resp)
 }
 
+func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (op.AuthRequest, error) {
+	resp, err := o.repo.AuthRequestByCode(ctx, code)
+	if err != nil {
+		return nil, err
+	}
+	return AuthRequestFromBusiness(resp)
+}
+
+func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) error {
+	return o.repo.SaveAuthCode(ctx, id, code)
+}
+
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
 	return o.repo.DeleteAuthRequest(ctx, id)
 }

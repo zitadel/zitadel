@@ -80,6 +80,28 @@ func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*m
 	return request, nil
 }
 
+func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code string) error {
+	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	request.Code = code
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
+func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string) (*model.AuthRequest, error) {
+	request, err := repo.AuthRequests.GetAuthRequestByCode(ctx, code)
+	if err != nil {
+		return nil, err
+	}
+	steps, err := repo.nextSteps(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	request.PossibleSteps = steps
+	return request, nil
+}
+
 func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id string) error {
 	return repo.AuthRequests.DeleteAuthRequest(ctx, id)
 }

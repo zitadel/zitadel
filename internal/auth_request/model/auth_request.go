@@ -29,6 +29,7 @@ type AuthRequest struct {
 	PossibleSteps         []NextStep
 	PasswordVerified      bool
 	MfasVerified          []MfaType
+	Code                  string
 }
 
 type Prompt int32
