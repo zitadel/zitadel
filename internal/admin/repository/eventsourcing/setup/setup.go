@@ -59,6 +59,7 @@ const (
 	OIDCAuthMethodType_NONE          = "NONE"
 	OIDCAuthMethodType_BASIC         = "BASIC"
 	OIDCAuthMethodType_POST          = "POST"
+	DEFAULT_POLICY                   = "0"
 )
 
 func StartSetup(sd systemdefaults.SystemDefaults, repos EventstoreRepos) *Setup {
@@ -96,7 +97,7 @@ func (s *Setup) Execute(ctx context.Context) error {
 		createdProjects: make(map[string]*proj_model.Project),
 	}
 
-	pwComplexityPolicy, err := s.repos.PolicyEvents.GetPasswordComplexityPolicy(ctx, "0")
+	pwComplexityPolicy, err := s.repos.PolicyEvents.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
 	if err != nil {
 		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity polica")
 		return err

@@ -14,6 +14,10 @@ import (
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
+const (
+	DEFAULT_POLICY = "0"
+)
+
 type OrgRepo struct {
 	Eventstore       eventstore.Eventstore
 	OrgEventstore    *org_es.OrgEventstore
@@ -26,7 +30,7 @@ type OrgRepo struct {
 }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
-	policy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, "0")
+	policy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
 	if err != nil {
 		return nil, err
 	}
