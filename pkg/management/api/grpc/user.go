@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
@@ -36,7 +37,11 @@ func (s *Server) SearchUsers(ctx context.Context, in *UserSearchRequest) (*UserS
 }
 
 func (s *Server) UserChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-pl6Zu", "Not implemented")
+	response, err := s.user.UserChanges(ctx, changesRequest.Id, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return changesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, request *UniqueUserRequest) (*UniqueUserResponse, error) {

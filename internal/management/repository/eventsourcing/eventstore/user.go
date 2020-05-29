@@ -2,6 +2,9 @@ package eventstore
 
 import (
 	"context"
+
+	chg_model "github.com/caos/zitadel/internal/changes/model"
+	chg_event "github.com/caos/zitadel/internal/changes/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -9,9 +12,10 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit uint64
-	UserEvents  *usr_event.UserEventstore
-	View        *view.View
+	SearchLimit   uint64
+	UserEvents    *usr_event.UserEventstore
+	View          *view.View
+	ChangesEvents *chg_event.ChangesEventstore
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.User, err error) {
@@ -54,6 +58,14 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		TotalResult: uint64(count),
 		Result:      model.UsersToModel(projects),
 	}, nil
+}
+
+func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
+	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.User, id, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return changes, nil
 }
 
 func (repo *UserRepo) GetGlobalUserByEmail(ctx context.Context, email string) (*usr_model.UserView, error) {

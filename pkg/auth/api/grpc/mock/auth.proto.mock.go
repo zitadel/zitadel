@@ -397,26 +397,6 @@ func (mr *MockAuthServiceClientMockRecorder) SearchMyProjectOrgs(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyProjectOrgs", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyProjectOrgs), varargs...)
 }
 
-// SetMyPassword mocks base method
-func (m *MockAuthServiceClient) SetMyPassword(arg0 context.Context, arg1 *grpc.PasswordRequest, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SetMyPassword", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SetMyPassword indicates an expected call of SetMyPassword
-func (mr *MockAuthServiceClientMockRecorder) SetMyPassword(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMyPassword", reflect.TypeOf((*MockAuthServiceClient)(nil).SetMyPassword), varargs...)
-}
-
 // UpdateMyUserAddress mocks base method
 func (m *MockAuthServiceClient) UpdateMyUserAddress(arg0 context.Context, arg1 *grpc.UpdateUserAddressRequest, arg2 ...grpc0.CallOption) (*grpc.UserAddress, error) {
 	m.ctrl.T.Helper()
@@ -478,14 +458,14 @@ func (mr *MockAuthServiceClientMockRecorder) Validate(arg0, arg1 interface{}, ar
 }
 
 // VerifyMfaOTP mocks base method
-func (m *MockAuthServiceClient) VerifyMfaOTP(arg0 context.Context, arg1 *grpc.VerifyMfaOtp, arg2 ...grpc0.CallOption) (*grpc.MfaOtpResponse, error) {
+func (m *MockAuthServiceClient) VerifyMfaOTP(arg0 context.Context, arg1 *grpc.VerifyMfaOtp, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "VerifyMfaOTP", varargs...)
-	ret0, _ := ret[0].(*grpc.MfaOtpResponse)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

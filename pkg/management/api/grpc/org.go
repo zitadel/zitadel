@@ -2,8 +2,6 @@ package grpc
 
 import (
 	"context"
-
-	"github.com/caos/zitadel/internal/errors"
 )
 
 func (s *Server) GetOrgByID(ctx context.Context, orgID *OrgID) (*Org, error) {
@@ -39,5 +37,9 @@ func (s *Server) ReactivateOrg(ctx context.Context, in *OrgID) (*Org, error) {
 }
 
 func (s *Server) OrgChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-DNiIq", "unimplemented")
+	response, err := s.org.OrgChanges(ctx, changesRequest.Id, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return changesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }

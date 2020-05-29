@@ -2,9 +2,9 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -96,5 +96,9 @@ func (s *Server) SearchProjectRoles(ctx context.Context, in *ProjectRoleSearchRe
 }
 
 func (s *Server) ProjectChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mci3f", "Not implemented")
+	response, err := s.project.ProjectChanges(ctx, changesRequest.Id, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return changesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }

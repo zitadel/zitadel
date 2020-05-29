@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	chg_model "github.com/caos/zitadel/internal/changes/model"
 	"github.com/caos/zitadel/internal/project/model"
 )
 
@@ -25,6 +26,7 @@ type ProjectRepository interface {
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
 	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
+	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error)
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.Application, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
@@ -35,6 +37,7 @@ type ProjectRepository interface {
 	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
+	ApplicationChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error)
 
 	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)

@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 
+	chg_model "github.com/caos/zitadel/internal/changes/model"
+	chg_event "github.com/caos/zitadel/internal/changes/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/errors"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -14,8 +16,9 @@ import (
 type OrgRepository struct {
 	SearchLimit uint64
 	*org_es.OrgEventstore
-	View  *mgmt_view.View
-	Roles []string
+	View          *mgmt_view.View
+	Roles         []string
+	ChangesEvents *chg_event.ChangesEventstore
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
@@ -41,6 +44,14 @@ func (repo *OrgRepository) DeactivateOrg(ctx context.Context, id string) (*org_m
 
 func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_model.Org, error) {
 	return repo.OrgEventstore.ReactivateOrg(ctx, id)
+}
+
+func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
+	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Org, id, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return changes, nil
 }
 
 func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (member *org_model.OrgMember, err error) {

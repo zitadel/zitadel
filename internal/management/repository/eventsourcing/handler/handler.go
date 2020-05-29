@@ -3,6 +3,7 @@ package handler
 import (
 	"time"
 
+	chg_event "github.com/caos/zitadel/internal/changes/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -29,6 +30,7 @@ type EventstoreRepos struct {
 	ProjectEvents *proj_event.ProjectEventstore
 	UserEvents    *usr_event.UserEventstore
 	OrgEvents     *org_event.OrgEventstore
+	ChangesEvents *chg_event.ChangesEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []spooler.Handler {
