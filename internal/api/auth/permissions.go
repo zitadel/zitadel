@@ -11,21 +11,20 @@ func getUserMethodPermissions(ctx context.Context, t TokenVerifier, requiredPerm
 	if ctxData.IsZero() {
 		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")
 	}
-	grants, err := t.ResolveGrants(ctx, ctxData.UserID, ctxData.OrgID)
+	grant, err := t.ResolveGrant(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
-	permissions := mapGrantsToPermissions(requiredPerm, grants, authConfig)
+	permissions := mapGrantsToPermissions(requiredPerm, grant, authConfig)
 	return context.WithValue(ctx, permissionsKey, permissions), permissions, nil
 }
 
-func mapGrantsToPermissions(requiredPerm string, grants []*Grant, authConfig *Config) []string {
+func mapGrantsToPermissions(requiredPerm string, grant *Grant, authConfig *Config) []string {
 	resolvedPermissions := make([]string, 0)
-	for _, grant := range grants {
-		for _, role := range grant.Roles {
-			resolvedPermissions = mapRoleToPerm(requiredPerm, role, authConfig, resolvedPermissions)
-		}
+	for _, role := range grant.Roles {
+		resolvedPermissions = mapRoleToPerm(requiredPerm, role, authConfig, resolvedPermissions)
 	}
+
 	return resolvedPermissions
 }
 

@@ -3,6 +3,7 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
@@ -47,7 +48,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -137,11 +138,11 @@ func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults) (*E
 			View: view,
 		},
 		eventstore.UserGrantRepo{
-			SearchLimit:  conf.SearchLimit,
-			View:         view,
-			IamProjectID: iamProjectID,
-			IamID:        systemDefaults.IamID,
-			Auth:         authZ,
+			SearchLimit: conf.SearchLimit,
+			View:        view,
+			IamID:       systemDefaults.IamID,
+			Auth:        authZ,
+			AuthZRepo:   authZRepo,
 		},
 		eventstore.OrgRepository{
 			SearchLimit: conf.SearchLimit,

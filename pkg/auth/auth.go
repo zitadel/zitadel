@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
@@ -14,6 +15,6 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func Start(ctx context.Context, config Config, authZ auth.Config, systemDefaults sd.SystemDefaults, authRepo *eventsourcing.EsRepository) {
-	api.Start(ctx, config.API, authZ, authRepo)
+func Start(ctx context.Context, config Config, authZRepo *authz_repo.EsRepository, authZ auth.Config, systemDefaults sd.SystemDefaults, authRepo *eventsourcing.EsRepository) {
+	api.Start(ctx, config.API, authZRepo, authZ, authRepo)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -13,11 +14,11 @@ import (
 )
 
 type UserGrantRepo struct {
-	SearchLimit  uint64
-	View         *view.View
-	IamID        string
-	IamProjectID string
-	Auth         auth.Config
+	SearchLimit uint64
+	View        *view.View
+	IamID       string
+	Auth        auth.Config
+	AuthZRepo   *authz_repo.EsRepository
 }
 
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
@@ -40,7 +41,7 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	if ctxData.ProjectID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "APP-7lqva", "Could not get ProjectID")
 	}
-	if ctxData.ProjectID == repo.IamProjectID {
+	if ctxData.ProjectID == repo.AuthZRepo.IamProjectID {
 		isAdmin, err := repo.IsIamAdmin(ctx)
 		if err != nil {
 			return nil, err
@@ -60,19 +61,10 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
-	ctxData := auth.GetCtxData(ctx)
-
-	orgGrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, repo.IamProjectID, ctxData.UserID)
-	if err != nil && !caos_errs.IsNotFound(err) {
+	grant, err := repo.AuthZRepo.ResolveGrants(ctx)
+	if err != nil {
 		return nil, err
 	}
-	iamAdminGrant, err := repo.View.UserGrantByIDs(repo.IamID, repo.IamProjectID, ctxData.UserID)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return nil, err
-	}
-
-	grant := mergeOrgAndAdminGrant(ctxData, orgGrant, iamAdminGrant)
-
 	permissions := &grant_model.Permissions{Permissions: []string{}}
 	for _, role := range grant.Roles {
 		roleName, ctxID := auth.SplitPermission(role)

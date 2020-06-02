@@ -3,21 +3,32 @@ package auth
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+)
+
+const (
+	adminName = "Admin-API"
 )
 
 type TokenVerifier struct {
+	adminID   string
+	authZRepo *authz_repo.EsRepository
 }
 
-func Start() (v *TokenVerifier) {
-	return new(TokenVerifier)
+func Start(authZRepo *authz_repo.EsRepository) (v *TokenVerifier) {
+	return &TokenVerifier{authZRepo: authZRepo}
 }
 
 func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string) (string, string, string, error) {
-	return "", "", "", nil
+	userID, clientID, agentID, err := v.authZRepo.VerifyAccessToken(ctx, token, adminName, v.adminID)
+	if clientID != "" {
+		v.adminID = clientID
+	}
+	return userID, clientID, agentID, err
 }
 
-func (v *TokenVerifier) ResolveGrants(ctx context.Context, userID, orgID string) ([]*auth.Grant, error) {
-	return nil, nil
+func (v *TokenVerifier) ResolveGrant(ctx context.Context) (*auth.Grant, error) {
+	return v.authZRepo.ResolveGrants(ctx)
 }
 
 func (v *TokenVerifier) GetProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
