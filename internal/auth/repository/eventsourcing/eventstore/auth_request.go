@@ -60,7 +60,11 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.ID = reqID
-	request.Audience = []string{request.ApplicationID} //TODO: add whole project
+	ids, err := repo.View.AppIDsFromProjectByClientID(ctx, request.ApplicationID)
+	if err != nil {
+		return nil, err
+	}
+	request.Audience = ids
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
 		return nil, err
