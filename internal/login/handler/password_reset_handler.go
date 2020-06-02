@@ -15,7 +15,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.RequestPasswordReset(r.Context(), authReq.UserName)
+	err = l.authRepo.RequestPasswordReset(setContext(r.Context(), authReq.UserOrgID), authReq.UserName)
 	l.renderPasswordResetDone(w, r, authReq, err)
 }
 

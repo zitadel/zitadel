@@ -79,6 +79,7 @@ html {
 }
 
 h1 {
+  color: #FFFFFF;
   font-family: Aileron;
   text-transform: uppercase;
   text-align: center;
@@ -93,13 +94,20 @@ header .logo {
   background-repeat: no-repeat;
   background-size: contain;
   height: 80px;
+  margin: 30px;
 }
 
 .content {
   margin: auto;
   padding: 20px;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
+}
+
+a {
+  color: #760038;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 button {
@@ -110,7 +118,7 @@ button {
   border-radius: 5px;
   width: 100%;
   max-width: 600px;
-  height: 40px;
+  height: 50px;
   transition: all 0.3s ease 0s;
   cursor: pointer;
   outline: none;
@@ -121,7 +129,7 @@ button:hover {
 }
 button.primary {
   background-color: #760038;
-  color: white;
+  color: #FFFFFF;
   border: none;
 }
 button.primary:hover {
@@ -131,10 +139,13 @@ button > .sessionstate {
   text-transform: lowercase;
 }
 
-input {
-  background-color: #282828;
+input, select {
+  background-color: #252525;
   color: white;
-  height: 40px;
+  height: 50px;
+  border: 2px solid #595959;
+  border-radius: 5px;
+  padding-left: 15px;
 }
 
 form .field {
@@ -144,8 +155,9 @@ form .field {
 form .field.radio-button {
   display: inherit;
 }
-form .label {
+form label {
   text-transform: uppercase;
+  font-size: 0.9rem;
 }
 form .actions {
   padding: 20px 0;
@@ -153,7 +165,7 @@ form .actions {
 form .actions .right {
   float: right;
 }
-form .actions button {
+form .actions button, form .actions a {
   margin: 10px 0;
 }
 

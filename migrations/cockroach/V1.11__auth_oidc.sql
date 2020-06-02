@@ -42,8 +42,15 @@ CREATE TABLE auth.applications (
 );
 
 ALTER TABLE auth.tokens ADD COLUMN scopes TEXT ARRAY;
+ALTER TABLE auth.tokens ADD COLUMN audience TEXT ARRAY;
 
 ALTER TABLE auth.users ADD COLUMN init_required BOOLEAN;
 ALTER TABLE management.users ADD COLUMN init_required BOOLEAN;
+
+ALTER TABLE auth.auth_requests ADD COLUMN code TEXT;
+ALTER TABLE auth.auth_requests ADD COLUMN request_type smallint;
+
+ALTER TABLE auth.user_sessions ADD COLUMN mfa_software_verification_type smallint;
+ALTER TABLE auth.user_sessions ADD COLUMN mfa_hardware_verification_type smallint;
 
 COMMIT;

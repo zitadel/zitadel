@@ -111,7 +111,7 @@ func PublicKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*Public
 	if err != nil {
 		return nil, err
 	}
-	publicKey, err := crypto.BytesToPrivateKey(keyData)
+	publicKey, err := crypto.BytesToPublicKey(keyData)
 	if err != nil {
 		return nil, err
 	}

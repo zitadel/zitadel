@@ -43,23 +43,7 @@ func StartKey(eventstore es_int.Eventstore, config KeyConfig, keyAlgorithm crypt
 	}, nil
 }
 
-//
-//func (es *KeyEventstore) KeyByID(ctx context.Context, id string) (*key_model.Key, error) {
-//	project := es.projectCache.getKey(id)
-//
-//	query, err := KeyByIDQuery(project.AggregateID, project.Sequence)
-//	if err != nil {
-//		return nil, err
-//	}
-//	err = es_sdk.Filter(ctx, es.FilterEvents, project.AppendEvents, query)
-//	if err != nil && !(caos_errs.IsNotFound(err) && project.Sequence != 0) {
-//		return nil, err
-//	}
-//	es.projectCache.cacheKey(project)
-//	return model.KeyToModel(project), nil
-//}
-
-func (es *KeyEventstore) GenerateKeyPair(ctx context.Context, usage key_model.KeyUsage) (*key_model.KeyPair, error) {
+func (es *KeyEventstore) GenerateKeyPair(ctx context.Context, usage key_model.KeyUsage, algorithm string) (*key_model.KeyPair, error) {
 	privateKey, publicKey, err := crypto.GenerateEncryptedKeyPair(es.keySize, es.keyAlgorithm)
 	if err != nil {
 		return nil, err
@@ -69,7 +53,7 @@ func (es *KeyEventstore) GenerateKeyPair(ctx context.Context, usage key_model.Ke
 	return es.CreateKeyPair(ctx, &key_model.KeyPair{
 		ObjectRoot: models.ObjectRoot{},
 		Usage:      usage,
-		Algorithm:  "RS256", //TODO: ?
+		Algorithm:  algorithm,
 		PrivateKey: &key_model.Key{
 			Key:    privateKey,
 			Expiry: privateKeyExp,

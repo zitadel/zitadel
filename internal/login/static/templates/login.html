@@ -18,7 +18,7 @@
 
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
-        <button class="default right" name="register" value="true" type="submit" formnovalidate >{{t "Actions.Register"}}</button>
+        <a class="default right" href="{{ registerUrl .AuthReqID }}" >{{t "Actions.Register"}}</a>
     </div>
 </form>
 

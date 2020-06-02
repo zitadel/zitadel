@@ -70,6 +70,10 @@ PasswordChangeDone:
   Title: Change Password
   Description: Your password was changed successfully.
 
+PasswordResetDone:
+  Title: Reset link set
+  Description: Check your email to to reset your password.
+
 PasswordSetDone:
   Title: Password set
   Description: Your password was set successfully.
@@ -89,13 +93,13 @@ Registration:
   Email: E-Mail
   Firstname: Firstname
   Lastname: Lastname
-  Nickname: Nickname
   Language: Language
   German: Deutsch
   English: English
   Gender: Gender
   Female: Female
   Male: Male
+  Diverse: diverse / X
   Password: Password
   Password2: Password confirmation
 

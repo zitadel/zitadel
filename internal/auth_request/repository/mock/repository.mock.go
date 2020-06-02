@@ -48,6 +48,21 @@ func (mr *MockAuthRequestCacheMockRecorder) DeleteAuthRequest(arg0, arg1 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAuthRequest", reflect.TypeOf((*MockAuthRequestCache)(nil).DeleteAuthRequest), arg0, arg1)
 }
 
+// GetAuthRequestByCode mocks base method
+func (m *MockAuthRequestCache) GetAuthRequestByCode(arg0 context.Context, arg1 string) (*model.AuthRequest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAuthRequestByCode", arg0, arg1)
+	ret0, _ := ret[0].(*model.AuthRequest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAuthRequestByCode indicates an expected call of GetAuthRequestByCode
+func (mr *MockAuthRequestCacheMockRecorder) GetAuthRequestByCode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthRequestByCode", reflect.TypeOf((*MockAuthRequestCache)(nil).GetAuthRequestByCode), arg0, arg1)
+}
+
 // GetAuthRequestByID mocks base method
 func (m *MockAuthRequestCache) GetAuthRequestByID(arg0 context.Context, arg1 string) (*model.AuthRequest, error) {
 	m.ctrl.T.Helper()

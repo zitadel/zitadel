@@ -26,11 +26,23 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 }
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequest, error) {
-	resp, err := o.repo.AuthRequestByID(ctx, id)
+	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	return AuthRequestFromBusiness(resp)
+}
+
+func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (op.AuthRequest, error) {
+	resp, err := o.repo.AuthRequestByCode(ctx, code)
+	if err != nil {
+		return nil, err
+	}
+	return AuthRequestFromBusiness(resp)
+}
+
+func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) error {
+	return o.repo.SaveAuthCode(ctx, id, code)
 }
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) error {
@@ -42,7 +54,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (st
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Request.(*model.AuthRequestOIDC).Scopes, 5*time.Minute) //TODO: lifetime
+	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Audience, req.Request.(*model.AuthRequestOIDC).Scopes, o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -66,5 +78,5 @@ func (o *OPStorage) GetKeySet(ctx context.Context) (*jose.JSONWebKeySet, error) 
 }
 
 func (o *OPStorage) SaveNewKeyPair(ctx context.Context) error {
-	return o.repo.GenerateSigningKeyPair(ctx)
+	return o.repo.GenerateSigningKeyPair(ctx, o.signingKeyAlgorithm)
 }

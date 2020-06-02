@@ -13,8 +13,8 @@ type TokenRepo struct {
 	View *view.View
 }
 
-func (repo *TokenRepo) CreateToken(ctx context.Context, agentID, applicationID, userID string, scopes []string, lifetime time.Duration) (*token_model.Token, error) {
-	token, err := repo.View.CreateToken(agentID, applicationID, userID, scopes, lifetime)
+func (repo *TokenRepo) CreateToken(ctx context.Context, agentID, applicationID, userID string, audience, scopes []string, lifetime time.Duration) (*token_model.Token, error) {
+	token, err := repo.View.CreateToken(agentID, applicationID, userID, audience, scopes, lifetime)
 	if err != nil {
 		return nil, err
 	}

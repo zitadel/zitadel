@@ -22,7 +22,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	if err != nil {
 		return nil, err
 	}
-	return ClientFromBusiness(client, o.defaultLoginURL, o.tokenLifetime)
+	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {

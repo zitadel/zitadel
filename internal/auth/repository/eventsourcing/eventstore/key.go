@@ -23,9 +23,9 @@ type KeyRepository struct {
 	SigningKeyRotation time.Duration
 }
 
-func (k *KeyRepository) GenerateSigningKeyPair(ctx context.Context) error {
+func (k *KeyRepository) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {
 	ctx = setOIDCCtx(ctx)
-	_, err := k.KeyEvents.GenerateKeyPair(ctx, model.KeyUsageSigning)
+	_, err := k.KeyEvents.GenerateKeyPair(ctx, model.KeyUsageSigning, algorithm)
 	return err
 }
 

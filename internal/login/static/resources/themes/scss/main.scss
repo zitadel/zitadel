@@ -17,6 +17,7 @@ html {
 }
 
 h1 {
+    color: $headerColor;
     font-family: $headerFont;
     text-transform: uppercase;
     text-align: center;
@@ -31,6 +32,7 @@ header {
         background-repeat: no-repeat;
         background-size: contain;
         height: 80px;
+        margin: 30px;
     }
 }
 
@@ -38,7 +40,13 @@ header {
     margin: auto;
     padding: 20px;
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
+}
+
+a {
+    color: $primaryColor;
+    text-decoration: none;
+    text-transform: uppercase;
 }
 
 button {
@@ -49,7 +57,7 @@ button {
     border-radius: 5px;
     width: 100%;
     max-width: 600px;
-    height: 40px; 
+    height: $inputHeight;
     transition: all 0.3s ease 0s;
     cursor: pointer;
     outline: none;
@@ -60,7 +68,7 @@ button {
 
     &.primary {
         background-color: $primaryColor;
-        color: $fontColor;
+        color: $headerColor;
         border: none;
         &:hover {
             background-color: $primaryColorHover;
@@ -72,10 +80,13 @@ button {
     }
 }
 
-input {
-    background-color: $backgroundColor;
+input, select {
+    background-color: $inputBackgroundColor;
     color: $fontColor;
-    height: 40px;;
+    height: $inputHeight;
+    border: 2px solid $inputBorderColor;
+    border-radius: 5px;
+    padding-left: 15px;
 }
 
 form {
@@ -88,8 +99,9 @@ form {
         display: inherit;
     }
 
-    .label {
+    label {
         text-transform: uppercase;
+        font-size: 0.9rem;
     }
 
     .actions {
@@ -99,7 +111,7 @@ form {
             float: right;
         }
 
-        button {
+        button, a {
             margin: 10px 0;
         }
     }

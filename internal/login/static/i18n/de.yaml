@@ -70,6 +70,10 @@ PasswordChangeDone:
   Title: Passwort ändern
   Description: Das Passwort wurde erfolgreich geändert.
 
+PasswordResetDone:
+  Title: Resetlink versendet
+  Description: Prüfe dein E-Mail Postfach, um ein neues Passwort zu setzen.
+
 PasswordSetDone:
   Title: Passwort gesetzt
   Description: Das Passwort wurde erfolgreich gesetzt.
@@ -89,13 +93,13 @@ Registration:
   Email: E-Mail
   Firstname: Vorname
   Lastname: Nachname
-  Nickname: Spitzname
   Language: Sprache
   German: Deutsch
   English: English
   Gender: Geschlecht
   Female: weiblich
   Male: männlich
+  Diverse: diverse
   Password: Passwort
   Password2: Passwort wiederholen
 
