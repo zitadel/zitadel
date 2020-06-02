@@ -54,7 +54,7 @@ func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (st
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Request.(*model.AuthRequestOIDC).Scopes, 5*time.Minute) //TODO: lifetime
+	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Audience, req.Request.(*model.AuthRequestOIDC).Scopes, o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
