@@ -4,7 +4,7 @@ type Permissions struct {
 	Permissions []string
 }
 
-func (p *Permissions) appendPermissions(ctxID string, permissions ...string) {
+func (p *Permissions) AppendPermissions(ctxID string, permissions ...string) {
 	for _, permission := range permissions {
 		p.appendPermission(ctxID, permission)
 	}

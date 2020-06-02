@@ -17,6 +17,7 @@ type UserGrantRepo struct {
 	View         *view.View
 	IamID        string
 	IamProjectID string
+	Auth         auth.Config
 }
 
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
@@ -61,51 +62,27 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
 	ctxData := auth.GetCtxData(ctx)
 
-	orgGrants, err := repo.View.UserGrantByIDs(ctxData.OrgID, repo.IamProjectID, ctxData.UserID)
-	if err != nil {
+	orgGrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, repo.IamProjectID, ctxData.UserID)
+	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
-	iamAdminGrants, err := repo.View.UserGrantByIDs(ctx, repo.IamID, repo.IamProjectID, ctxData.UserID)
-	if err != nil {
+	iamAdminGrant, err := repo.View.UserGrantByIDs(repo.IamID, repo.IamProjectID, ctxData.UserID)
+	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 
-	//grants := make([]*auth.Grant, 0)
-	//if len(orgGrants) > 0 {
-	//	for _, grant := range orgGrants.Result {
-	//		roles := grant.Roles
-	//		if iamAdminGrants.TotalResult == 1 {
-	//			roles = addIamAdminRoles(roles, iamAdminGrants.Result[0].Roles)
-	//		}
-	//		grants = append(grants, &auth.Grant{OrgID: grant.OrgID, Roles: roles})
-	//	}
-	//} else if iamAdminGrants.TotalResult == 1 {
-	//	grants = append(grants, &auth.Grant{
-	//		OrgID: orgID,
-	//		Roles: iamAdminGrants.Result[0].Roles,
-	//	})
-	//}
-	//
-	//grants, err := s.processor.ResolveGrants(ctx, ctxData.UserID, ctxData.OrgID)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//permissions := &MyPermissions{Permissions: []string{}}
-	//
-	//for _, grant := range grants {
-	//	for _, role := range grant.Roles {
-	//		roleName, ctxID := auth.SplitPermission(role)
-	//		for _, mapping := range s.authConf.RolePermissionMappings {
-	//			if mapping.Role == roleName {
-	//				permissions.appendPermissions(ctxID, mapping.Permissions...)
-	//			}
-	//		}
-	//	}
-	//}
-	//
-	//return permissions, nil
-	return nil, nil
+	grant := mergeOrgAndAdminGrant(ctxData, orgGrant, iamAdminGrant)
+
+	permissions := &grant_model.Permissions{Permissions: []string{}}
+	for _, role := range grant.Roles {
+		roleName, ctxID := auth.SplitPermission(role)
+		for _, mapping := range repo.Auth.RolePermissionMappings {
+			if mapping.Role == roleName {
+				permissions.AppendPermissions(ctxID, mapping.Permissions...)
+			}
+		}
+	}
+	return permissions.Permissions, nil
 }
 
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
@@ -161,4 +138,31 @@ func orgRespToOrgResp(orgs []*org_view.OrgView, count int) *grant_model.ProjectO
 		resp.Result[i] = &grant_model.Org{OrgID: o.ID, OrgName: o.Name}
 	}
 	return resp
+}
+
+func mergeOrgAndAdminGrant(ctxData auth.CtxData, orgGrant, iamAdminGrant *model.UserGrantView) (grant *auth.Grant) {
+	if orgGrant != nil {
+		roles := orgGrant.RoleKeys
+		if iamAdminGrant != nil {
+			roles = addIamAdminRoles(roles, iamAdminGrant.RoleKeys)
+		}
+		grant = &auth.Grant{OrgID: orgGrant.ResourceOwner, Roles: roles}
+	} else if iamAdminGrant != nil {
+		grant = &auth.Grant{
+			OrgID: ctxData.OrgID,
+			Roles: iamAdminGrant.RoleKeys,
+		}
+	}
+	return grant
+}
+
+func addIamAdminRoles(orgRoles, iamAdminRoles []string) []string {
+	result := make([]string, 0)
+	result = append(result, iamAdminRoles...)
+	for _, role := range orgRoles {
+		if !auth.ExistsPerm(result, role) {
+			result = append(result, role)
+		}
+	}
+	return result
 }

@@ -419,7 +419,7 @@ func Test_ExistisPerm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := existsPerm(tt.args.existing, tt.args.perm)
+			result := ExistsPerm(tt.args.existing, tt.args.perm)
 			if result != tt.result {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}

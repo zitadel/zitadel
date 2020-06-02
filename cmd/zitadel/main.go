@@ -57,7 +57,7 @@ func main() {
 	}
 	var authRepo *eventsourcing.EsRepository
 	if *authEnabled || *loginEnabled {
-		authRepo, err = eventsourcing.Start(conf.Auth.Repository, conf.SystemDefaults)
+		authRepo, err = eventsourcing.Start(conf.Auth.Repository, conf.AuthZ, conf.SystemDefaults)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 	if *authEnabled {

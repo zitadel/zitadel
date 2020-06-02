@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
@@ -22,7 +23,7 @@ import (
 
 const (
 	//TODO: How do we get this
-	iamProjectID = "57485314557478002@zitadel"
+	iamProjectID = "57485300129072242"
 )
 
 type Config struct {
@@ -46,7 +47,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -140,6 +141,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 			View:         view,
 			IamProjectID: iamProjectID,
 			IamID:        systemDefaults.IamID,
+			Auth:         authZ,
 		},
 		eventstore.OrgRepository{
 			SearchLimit: conf.SearchLimit,

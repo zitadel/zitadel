@@ -36,7 +36,7 @@ func mapRoleToPerm(requiredPerm, actualRole string, authConfig *Config, resolved
 	for _, p := range perms {
 		if p == requiredPerm {
 			p = addRoleContextIDToPerm(p, roleContextID)
-			if !existsPerm(resolvedPermissions, p) {
+			if !ExistsPerm(resolvedPermissions, p) {
 				resolvedPermissions = append(resolvedPermissions, p)
 			}
 		}
@@ -51,7 +51,7 @@ func addRoleContextIDToPerm(perm, roleContextID string) string {
 	return perm
 }
 
-func existsPerm(existing []string, perm string) bool {
+func ExistsPerm(existing []string, perm string) bool {
 	for _, e := range existing {
 		if e == perm {
 			return true
