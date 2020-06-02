@@ -15,6 +15,14 @@ func (v *View) ApplicationByID(appID string) (*model.ApplicationView, error) {
 	return view.ApplicationByID(v.Db, applicationTable, appID)
 }
 
+func (v *View) ApplicationByOIDCClientID(clientID string) (*model.ApplicationView, error) {
+	return view.ApplicationByOIDCClientID(v.Db, applicationTable, clientID)
+}
+
+func (v *View) ApplicationByProjecIDAndAppName(projectID, appName string) (*model.ApplicationView, error) {
+	return view.ApplicationByProjectIDAndAppName(v.Db, applicationTable, projectID, appName)
+}
+
 func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, int, error) {
 	return view.SearchApplications(v.Db, applicationTable, request)
 }

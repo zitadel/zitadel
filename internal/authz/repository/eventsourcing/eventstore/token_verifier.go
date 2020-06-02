@@ -6,8 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	global_model "github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	"time"
 )
@@ -44,6 +42,14 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	return "", "", "", caos_errs.ThrowPermissionDenied(nil, "APP-Zxfako", "invalid audience")
 }
 
+func (repo *TokenVerifierRepo) ProjectIDByClientID(ctx context.Context, clientID string) (projectID string, err error) {
+	app, err := repo.View.ApplicationByOIDCClientID(clientID)
+	if err != nil {
+		return "", err
+	}
+	return app.ID, nil
+}
+
 func (repo *TokenVerifierRepo) verifierClientID(ctx context.Context, appName, appClientID string) (string, error) {
 	if appClientID != "" {
 		return appClientID, nil
@@ -52,19 +58,9 @@ func (repo *TokenVerifierRepo) verifierClientID(ctx context.Context, appName, ap
 	if err != nil {
 		return "", err
 	}
-	apps, _, err := repo.View.SearchApplications(&model.ApplicationSearchRequest{
-		Queries: []*model.ApplicationSearchQuery{
-			&model.ApplicationSearchQuery{Key: model.APPLICATIONSEARCHKEY_PROJECT_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: iam.IamProjectID},
-			&model.ApplicationSearchQuery{Key: model.APPLICATIONSEARCHKEY_NAME, Method: global_model.SEARCHMETHOD_EQUALS, Value: appName},
-		},
-		Limit: 1,
-	},
-	)
+	app, err := repo.View.ApplicationByProjecIDAndAppName(iam.IamProjectID, appName)
 	if err != nil {
 		return "", err
 	}
-	if len(apps) != 1 {
-		return "", caos_errs.ThrowNotFound(nil, "APP-ZAQlLQ", "client not found")
-	}
-	return apps[0].OIDCClientID, nil
+	return app.OIDCClientID, nil
 }
