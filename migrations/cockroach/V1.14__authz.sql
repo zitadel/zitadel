@@ -88,7 +88,7 @@ CREATE TABLE authz.applications (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE auth.tokens (
+CREATE TABLE authz.tokens (
     id TEXT,
 
     creation_date TIMESTAMPTZ,
@@ -101,6 +101,7 @@ CREATE TABLE auth.tokens (
     expiration TIMESTAMPTZ,
     sequence BIGINT,
     scopes TEXT ARRAY,
+    audience TEXT ARRAY,
 
     PRIMARY KEY (id)
 );

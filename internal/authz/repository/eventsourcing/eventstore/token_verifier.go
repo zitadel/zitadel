@@ -34,7 +34,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if token.Expiration.Before(time.Now().UTC()) {
 		return "", "", "", caos_errs.ThrowPermissionDenied(err, "APP-BJEyZ1", "token expired")
 	}
-	for _, aud := range token.Scopes {
+	for _, aud := range token.Audience {
 		if clientID == aud {
 			return token.UserID, clientID, token.UserAgentID, nil
 		}

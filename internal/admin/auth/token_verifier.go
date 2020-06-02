@@ -32,5 +32,5 @@ func (v *TokenVerifier) ResolveGrant(ctx context.Context) (*auth.Grant, error) {
 }
 
 func (v *TokenVerifier) GetProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
-	return "", nil
+	return v.authZRepo.ProjectIDByClientID(ctx, clientID)
 }
