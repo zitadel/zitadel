@@ -9,7 +9,7 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-func generateEmail(user *view_model.NotifyUser, content string, config systemdefaults.Notifications, lastEmail bool) error {
+func generateEmail(user *view_model.NotifyUser, subject, content string, config systemdefaults.Notifications, lastEmail bool) error {
 	provider, err := email.InitEmailProvider(config.Providers.Email)
 	if err != nil {
 		return err
@@ -17,7 +17,7 @@ func generateEmail(user *view_model.NotifyUser, content string, config systemdef
 	message := &email.EmailMessage{
 		SenderEmail: config.Providers.Email.From,
 		Recipients:  []string{user.VerifiedEmail},
-		Subject:     config.TemplateData.InitCode.Subject,
+		Subject:     subject,
 		Content:     content,
 	}
 	if lastEmail {
