@@ -60,6 +60,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.ID = reqID
+	request.Audience = []string{request.ApplicationID} //TODO: add whole project
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
 		return nil, err
@@ -68,16 +69,11 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 }
 
 func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id string) (*model.AuthRequest, error) {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	steps, err := repo.nextSteps(ctx, request)
-	if err != nil {
-		return nil, err
-	}
-	request.PossibleSteps = steps
-	return request, nil
+	return repo.getAuthRequest(ctx, id, false)
+}
+
+func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id string) (*model.AuthRequest, error) {
+	return repo.getAuthRequest(ctx, id, true)
 }
 
 func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code string) error {
@@ -94,7 +90,7 @@ func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string)
 	if err != nil {
 		return nil, err
 	}
-	steps, err := repo.nextSteps(ctx, request)
+	steps, err := repo.nextSteps(ctx, request, true)
 	if err != nil {
 		return nil, err
 	}
@@ -154,15 +150,29 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest) ([]model.NextStep, error) {
+func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id string, checkLoggedIn bool) (*model.AuthRequest, error) {
+	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	steps, err := repo.nextSteps(ctx, request, checkLoggedIn)
+	if err != nil {
+		return nil, err
+	}
+	request.PossibleSteps = steps
+	return request, nil
+}
+
+func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest, checkLoggedIn bool) ([]model.NextStep, error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "request must not be nil")
 	}
 	steps := make([]model.NextStep, 0)
+	if !checkLoggedIn && request.Prompt == model.PromptNone {
+		return append(steps, &model.RedirectToCallbackStep{}), nil
+	}
 	if request.UserID == "" {
-		if request.Prompt != model.PromptNone {
-			steps = append(steps, &model.LoginStep{})
-		}
+		steps = append(steps, &model.LoginStep{})
 		if request.Prompt == model.PromptSelectAccount {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
@@ -191,6 +201,8 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	if !checkVerificationTime(userSession.PasswordVerification, repo.PasswordCheckLifeTime) {
 		return append(steps, &model.PasswordStep{}), nil
 	}
+	request.PasswordVerified = true
+	request.AuthTime = userSession.PasswordVerification
 
 	if step, ok := repo.mfaChecked(userSession, request, user); !ok {
 		return append(steps, step), nil
@@ -246,11 +258,15 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		fallthrough
 	case model.MfaLevelSoftware:
 		if checkVerificationTime(userSession.MfaSoftwareVerification, repo.MfaSoftwareCheckLifeTime) {
+			request.MfasVerified = append(request.MfasVerified, userSession.MfaSoftwareVerificationType)
+			request.AuthTime = userSession.MfaSoftwareVerification
 			return nil, true
 		}
 		fallthrough
 	case model.MfaLevelHardware:
 		if checkVerificationTime(userSession.MfaHardwareVerification, repo.MfaHardwareCheckLifeTime) {
+			request.MfasVerified = append(request.MfasVerified, userSession.MfaHardwareVerificationType)
+			request.AuthTime = userSession.MfaHardwareVerification
 			return nil, true
 		}
 	}

@@ -7,31 +7,31 @@ import (
 )
 
 type AuthRequest struct {
-	ID                string
-	AgentID           string
-	CreationDate      time.Time
-	ChangeDate        time.Time
-	BrowserInfo       *BrowserInfo
-	ApplicationID     string
-	CallbackURI       string
-	TransferState     string
-	Prompt            Prompt
-	PossibleLOAs      []LevelOfAssurance
-	UiLocales         []string
-	LoginHint         string
-	PreselectedUserID string
-	MaxAuthAge        uint32
-	Request           Request
+	ID            string
+	AgentID       string
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	BrowserInfo   *BrowserInfo
+	ApplicationID string
+	CallbackURI   string
+	TransferState string
+	Prompt        Prompt
+	PossibleLOAs  []LevelOfAssurance
+	UiLocales     []string
+	LoginHint     string
+	MaxAuthAge    uint32
+	Request       Request
 
-	levelOfAssurance      LevelOfAssurance
-	projectApplicationIDs []string
-	UserID                string
-	UserName              string
-	UserOrgID             string
-	PossibleSteps         []NextStep
-	PasswordVerified      bool
-	MfasVerified          []MfaType
-	Code                  string
+	levelOfAssurance LevelOfAssurance
+	UserID           string
+	UserName         string
+	UserOrgID        string
+	PossibleSteps    []NextStep
+	PasswordVerified bool
+	MfasVerified     []MfaType
+	Audience         []string
+	AuthTime         time.Time
+	Code             string
 }
 
 type Prompt int32
@@ -53,19 +53,19 @@ const (
 func NewAuthRequest(id, agentID string, info *BrowserInfo, applicationID, callbackURI, transferState string,
 	prompt Prompt, possibleLOAs []LevelOfAssurance, uiLocales []string, loginHint, preselectedUserID string, maxAuthAge uint32, request Request) *AuthRequest {
 	return &AuthRequest{
-		ID:                id,
-		AgentID:           agentID,
-		BrowserInfo:       info,
-		ApplicationID:     applicationID,
-		CallbackURI:       callbackURI,
-		TransferState:     transferState,
-		Prompt:            prompt,
-		PossibleLOAs:      possibleLOAs,
-		UiLocales:         uiLocales,
-		LoginHint:         loginHint,
-		PreselectedUserID: preselectedUserID,
-		MaxAuthAge:        maxAuthAge,
-		Request:           request,
+		ID:            id,
+		AgentID:       agentID,
+		BrowserInfo:   info,
+		ApplicationID: applicationID,
+		CallbackURI:   callbackURI,
+		TransferState: transferState,
+		Prompt:        prompt,
+		PossibleLOAs:  possibleLOAs,
+		UiLocales:     uiLocales,
+		LoginHint:     loginHint,
+		UserID:        preselectedUserID,
+		MaxAuthAge:    maxAuthAge,
+		Request:       request,
 	}
 }
 

@@ -57,6 +57,8 @@ Auth:
         Port: 50022
       StorageConfig:
         DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+        DefaultAccessTokenLifetime: 12h
+        DefaultIdTokenLifetime: 12h
         SigningKeyAlgorithm: RS256
       UserAgentCookieConfig:
         Name: caos.zitadel.useragent

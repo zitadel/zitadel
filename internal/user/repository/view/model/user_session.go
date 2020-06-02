@@ -21,17 +21,19 @@ const (
 )
 
 type UserSessionView struct {
-	CreationDate            time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate              time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner           string    `json:"-" gorm:"column:resource_owner"`
-	State                   int32     `json:"-" gorm:"column:state"`
-	UserAgentID             string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
-	UserID                  string    `json:"userID" gorm:"column:user_id;primary_key"`
-	UserName                string    `json:"userName" gorm:"column:user_name"`
-	PasswordVerification    time.Time `json:"-" gorm:"column:password_verification"`
-	MfaSoftwareVerification time.Time `json:"-" gorm:"column:mfa_software_verification"`
-	MfaHardwareVerification time.Time `json:"-" gorm:"column:mfa_hardware_verification"`
-	Sequence                uint64    `json:"-" gorm:"column:sequence"`
+	CreationDate                time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate                  time.Time `json:"-" gorm:"column:change_date"`
+	ResourceOwner               string    `json:"-" gorm:"column:resource_owner"`
+	State                       int32     `json:"-" gorm:"column:state"`
+	UserAgentID                 string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
+	UserID                      string    `json:"userID" gorm:"column:user_id;primary_key"`
+	UserName                    string    `json:"userName" gorm:"column:user_name"`
+	PasswordVerification        time.Time `json:"-" gorm:"column:password_verification"`
+	MfaSoftwareVerification     time.Time `json:"-" gorm:"column:mfa_software_verification"`
+	MfaSoftwareVerificationType int32     `json:"-" gorm:"column:mfa_software_verification_type"`
+	MfaHardwareVerification     time.Time `json:"-" gorm:"column:mfa_hardware_verification"`
+	MfaHardwareVerificationType int32     `json:"-" gorm:"column:mfa_hardware_verification_type"`
+	Sequence                    uint64    `json:"-" gorm:"column:sequence"`
 }
 
 func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
@@ -45,17 +47,19 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
-		ChangeDate:              userSession.ChangeDate,
-		CreationDate:            userSession.CreationDate,
-		ResourceOwner:           userSession.ResourceOwner,
-		State:                   req_model.UserSessionState(userSession.State),
-		UserAgentID:             userSession.UserAgentID,
-		UserID:                  userSession.UserID,
-		UserName:                userSession.UserName,
-		PasswordVerification:    userSession.PasswordVerification,
-		MfaSoftwareVerification: userSession.MfaSoftwareVerification,
-		MfaHardwareVerification: userSession.MfaHardwareVerification,
-		Sequence:                userSession.Sequence,
+		ChangeDate:                  userSession.ChangeDate,
+		CreationDate:                userSession.CreationDate,
+		ResourceOwner:               userSession.ResourceOwner,
+		State:                       req_model.UserSessionState(userSession.State),
+		UserAgentID:                 userSession.UserAgentID,
+		UserID:                      userSession.UserID,
+		UserName:                    userSession.UserName,
+		PasswordVerification:        userSession.PasswordVerification,
+		MfaSoftwareVerification:     userSession.MfaSoftwareVerification,
+		MfaSoftwareVerificationType: req_model.MfaType(userSession.MfaSoftwareVerificationType),
+		MfaHardwareVerification:     userSession.MfaHardwareVerification,
+		MfaHardwareVerificationType: req_model.MfaType(userSession.MfaHardwareVerificationType),
+		Sequence:                    userSession.Sequence,
 	}
 }
 
@@ -77,6 +81,7 @@ func (v *UserSessionView) AppendEvent(event *models.Event) {
 		v.PasswordVerification = time.Time{}
 	case es_model.MfaOtpCheckSucceeded:
 		v.MfaSoftwareVerification = event.CreationDate
+		v.MfaSoftwareVerificationType = int32(req_model.MfaTypeOTP)
 	case es_model.MfaOtpCheckFailed,
 		es_model.MfaOtpRemoved:
 		v.MfaSoftwareVerification = time.Time{}

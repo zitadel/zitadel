@@ -26,7 +26,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 }
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequest, error) {
-	resp, err := o.repo.AuthRequestByID(ctx, id)
+	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id)
 	if err != nil {
 		return nil, err
 	}

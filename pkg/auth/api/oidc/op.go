@@ -9,6 +9,7 @@ import (
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/auth/repository"
+	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/id"
 )
 
@@ -20,9 +21,10 @@ type OPHandlerConfig struct {
 }
 
 type StorageConfig struct {
-	DefaultLoginURL     string
-	SigningKeyAlgorithm string
-	//TokenLifetime         string
+	DefaultLoginURL            string
+	SigningKeyAlgorithm        string
+	DefaultAccessTokenLifetime types.Duration
+	DefaultIdTokenLifetime     types.Duration
 }
 
 type EndpointConfig struct {
@@ -39,11 +41,11 @@ type Endpoint struct {
 }
 
 type OPStorage struct {
-	repo repository.Repository
-	//config          *op.Config
-	defaultLoginURL     string
-	tokenLifetime       time.Duration
-	signingKeyAlgorithm string
+	repo                       repository.Repository
+	defaultLoginURL            string
+	defaultAccessTokenLifetime time.Duration
+	defaultIdTokenLifetime     time.Duration
+	signingKeyAlgorithm        string
 }
 
 func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository) op.OpenIDProvider {
@@ -71,11 +73,11 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 
 func newStorage(config StorageConfig, repo repository.Repository) *OPStorage {
 	return &OPStorage{
-		repo: repo,
-		//config:          config.OPConfig,
-		defaultLoginURL:     config.DefaultLoginURL,
-		signingKeyAlgorithm: config.SigningKeyAlgorithm,
-		//op.tokenLifetime, _ = time.ParseDuration(c.TokenLifetime)
+		repo:                       repo,
+		defaultLoginURL:            config.DefaultLoginURL,
+		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
+		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime.Duration,
+		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime.Duration,
 	}
 }
 

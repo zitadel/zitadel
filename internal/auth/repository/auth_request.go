@@ -9,6 +9,7 @@ import (
 type AuthRequestRepository interface {
 	CreateAuthRequest(ctx context.Context, request *model.AuthRequest) (*model.AuthRequest, error)
 	AuthRequestByID(ctx context.Context, id string) (*model.AuthRequest, error)
+	AuthRequestByIDCheckLoggedIn(ctx context.Context, id string) (*model.AuthRequest, error)
 	AuthRequestByCode(ctx context.Context, code string) (*model.AuthRequest, error)
 	SaveAuthCode(ctx context.Context, id, code string) error
 	DeleteAuthRequest(ctx context.Context, id string) error

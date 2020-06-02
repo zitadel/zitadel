@@ -15,6 +15,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
+const (
+	amrPassword = "password"
+	amrMFA      = "mfa"
+	amrOTP      = "otp"
+)
+
 type AuthRequest struct {
 	*model.AuthRequest
 }
@@ -31,22 +37,25 @@ func (a *AuthRequest) GetACR() string {
 func (a *AuthRequest) GetAMR() []string {
 	amr := make([]string, 0)
 	if a.PasswordVerified {
-		amr = append(amr, "password")
+		amr = append(amr, amrPassword)
 	}
 	if len(a.MfasVerified) > 0 {
-		amr = append(amr, "mfa") //PLANNED: add types
-	} //PLANNED: impl
+		amr = append(amr, amrMFA)
+		for _, mfa := range a.MfasVerified {
+			if amrMfa := AMRFromMFAType(mfa); amrMfa != "" {
+				amr = append(amr, amrMfa)
+			}
+		}
+	}
 	return amr
 }
 
 func (a *AuthRequest) GetAudience() []string {
-	//return a.ProjectClientIDs
-	return []string{a.ApplicationID}
+	return a.Audience
 }
 
 func (a *AuthRequest) GetAuthTime() time.Time {
-	return time.Now().UTC()
-	//TODO: return a.AuthTime
+	return a.AuthTime
 }
 
 func (a *AuthRequest) GetClientID() string {
@@ -103,17 +112,17 @@ func AuthRequestFromBusiness(authReq *model.AuthRequest) (_ op.AuthRequest, err 
 
 func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *model.AuthRequest {
 	return &model.AuthRequest{
-		AgentID:           userAgentID,
-		BrowserInfo:       ParseBrowserInfoFromContext(ctx),
-		ApplicationID:     authReq.ClientID,
-		CallbackURI:       authReq.RedirectURI,
-		TransferState:     authReq.State,
-		Prompt:            PromptToBusiness(authReq.Prompt),
-		PossibleLOAs:      ACRValuesToBusiness(authReq.ACRValues),
-		UiLocales:         UILocalesToBusiness(authReq.UILocales),
-		LoginHint:         authReq.LoginHint,
-		MaxAuthAge:        authReq.MaxAge,
-		PreselectedUserID: userID,
+		AgentID:       userAgentID,
+		BrowserInfo:   ParseBrowserInfoFromContext(ctx),
+		ApplicationID: authReq.ClientID,
+		CallbackURI:   authReq.RedirectURI,
+		TransferState: authReq.State,
+		Prompt:        PromptToBusiness(authReq.Prompt),
+		PossibleLOAs:  ACRValuesToBusiness(authReq.ACRValues),
+		UiLocales:     UILocalesToBusiness(authReq.UILocales),
+		LoginHint:     authReq.LoginHint,
+		MaxAuthAge:    authReq.MaxAge,
+		UserID:        userID,
 		Request: &model.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
@@ -128,12 +137,6 @@ func ParseBrowserInfoFromContext(ctx context.Context) *model.BrowserInfo {
 	ip := IpFromContext(ctx)
 	return &model.BrowserInfo{RemoteIP: ip, UserAgent: userAgent, AcceptLanguage: acceptLang}
 }
-
-//func CreateAgentFromContext(ctx context.Context) *model.CreateAgent {
-//	userAgent, acceptLang := HttpHeadersFromContext(ctx)
-//	ip := IpFromContext(ctx)
-//	return &model.CreateAgent{RemoteIP: ip, UserAgent: userAgent, AcceptLanguage: acceptLang}
-//}
 
 func HttpHeadersFromContext(ctx context.Context) (userAgent, acceptLang string) {
 	userAgent = "not set" //TODO: necessary?
@@ -241,5 +244,14 @@ func CodeChallengeToOIDC(challenge *model.OIDCCodeChallenge) *oidc.CodeChallenge
 	return &oidc.CodeChallenge{
 		Challenge: challenge.Challenge,
 		Method:    challengeMethod,
+	}
+}
+
+func AMRFromMFAType(mfaType model.MfaType) string {
+	switch mfaType {
+	case model.MfaTypeOTP:
+		return amrOTP
+	default:
+		return ""
 	}
 }
