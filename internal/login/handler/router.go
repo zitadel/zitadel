@@ -50,7 +50,8 @@ func CreateRouter(login *Login, staticDir http.FileSystem) *mux.Router {
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerification).Methods(http.MethodGet)
 	router.HandleFunc(EndpointMailVerification, login.handleMailVerificationCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointChangePassword, login.handleChangePassword).Methods(http.MethodPost)
-	router.HandleFunc(EndpointRegister, login.handleRegister).Methods(http.MethodPost)
+	router.HandleFunc(EndpointRegister, login.handleRegister).Methods(http.MethodGet)
+	router.HandleFunc(EndpointRegister, login.handleRegisterCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLogoutDone, login.handleLogoutDone).Methods(http.MethodGet)
 	router.PathPrefix(EndpointResources).Handler(login.handleResources(staticDir)).Methods(http.MethodGet)
 	return router

@@ -75,10 +75,11 @@ body {
 
 html {
   background-color: #282828;
-  color: white;
+  color: #898989;
 }
 
 h1 {
+  color: #FFFFFF;
   font-family: Aileron;
   text-transform: uppercase;
   text-align: center;
@@ -93,48 +94,58 @@ header .logo {
   background-repeat: no-repeat;
   background-size: contain;
   height: 80px;
+  margin: 30px;
 }
 
 .content {
   margin: auto;
   padding: 20px;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
+}
+
+a {
+  color: #364DF6;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 button {
   text-transform: uppercase;
   background-color: #282828;
-  color: #1e00ff;
-  border: 2px solid #1e00ff;
+  color: #364DF6;
+  border: 2px solid #364DF6;
   border-radius: 5px;
   width: 100%;
   max-width: 600px;
-  height: 40px;
+  height: 50px;
   transition: all 0.3s ease 0s;
   cursor: pointer;
   outline: none;
 }
 button:hover {
-  background-color: #4b33ff;
-  border: 2px solid #4b33ff;
+  background-color: #6778f8;
+  border: 2px solid #6778f8;
 }
 button.primary {
-  background-color: #1e00ff;
-  color: white;
+  background-color: #364DF6;
+  color: #FFFFFF;
   border: none;
 }
 button.primary:hover {
-  background-color: #4b33ff;
+  background-color: #6778f8;
 }
 button > .sessionstate {
   text-transform: lowercase;
 }
 
-input {
-  background-color: #282828;
-  color: white;
-  height: 40px;
+input, select {
+  background-color: #252525;
+  color: #898989;
+  height: 50px;
+  border: 2px solid #595959;
+  border-radius: 5px;
+  padding-left: 15px;
 }
 
 form .field {
@@ -144,8 +155,9 @@ form .field {
 form .field.radio-button {
   display: inherit;
 }
-form .label {
+form label {
   text-transform: uppercase;
+  font-size: 0.9rem;
 }
 form .actions {
   padding: 20px 0;
@@ -153,7 +165,7 @@ form .actions {
 form .actions .right {
   float: right;
 }
-form .actions button {
+form .actions button, form .actions a {
   margin: 10px 0;
 }
 
@@ -168,32 +180,32 @@ footer {
 }
 
 html {
-  background-color: white;
+  background-color: #FFFFFF;
   color: #282828;
 }
 html header .logo {
   background-image: url("../logo-light.png");
 }
 html button {
-  background-color: white;
-  color: #1e00ff;
-  border: 2px solid #1e00ff;
+  background-color: #FFFFFF;
+  color: #364DF6;
+  border: 2px solid #364DF6;
 }
 html button:hover {
-  background-color: #4b33ff;
-  border: 2px solid #4b33ff;
+  background-color: #6778f8;
+  border: 2px solid #6778f8;
 }
 html button.primary {
-  background-color: #1e00ff;
-  color: white;
+  background-color: #364DF6;
+  color: #898989;
   border: none;
-  box-shadow: 0px 10px 30px #1e00ff;
+  box-shadow: 0px 10px 30px #364DF6;
 }
 html button.primary:hover {
-  background-color: #4b33ff;
+  background-color: #6778f8;
 }
 html input {
-  background-color: white;
+  background-color: #FFFFFF;
   color: #282828;
 }
 html footer {

@@ -54,6 +54,9 @@ func CreateRenderer(staticDir http.FileSystem, cookieName string, defaultLanguag
 		"loginUrl": func() string {
 			return EndpointLogin
 		},
+		"registerUrl": func(id string) string {
+			return fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id)
+		},
 		"usernameUrl": func() string {
 			return EndpointUsername
 		},

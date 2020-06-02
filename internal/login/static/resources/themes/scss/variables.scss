@@ -2,17 +2,23 @@
 $standardFont: Lato;
 $headerFont: Aileron;
 
-// ----- COLORS ------------
+// ----- LAYOUT ------------
+$inputHeight: 50px;
 
-// ------ DARK-THEME -------
+
+// ----- DARK-THEME --------
 $backgroundColor: #282828;
-$fontColor: white;
-$primaryColor: #1e00ff;
+$headerColor: #FFFFFF;
+$fontColor: #898989;
+$primaryColor: #364DF6;
 $primaryColorHover: lighten($primaryColor, 10%);
+$inputBorderColor: #595959;
+$inputBackgroundColor: #252525;
 
 
-// ------ LIGHT-THEME -------
-$backgroundColorLight: $fontColor;
+// ----- LIGHT-THEME --------
+$backgroundColorLight: $headerColor;
+$headerColorLight: $backgroundColor;
 $fontColorLight: $backgroundColor;
 $primaryColorLight: $primaryColor;
 $primaryColorHoverLight: lighten($primaryColorLight, 10%);

@@ -10,13 +10,14 @@ import (
 
 const (
 	tmplRegister = "register"
+
+	globalRO = "GlobalResourceOwner"
 )
 
 type registerFormData struct {
 	Email     string `schema:"email"`
 	Firstname string `schema:"firstname"`
 	Lastname  string `schema:"lastname"`
-	Nickname  string `schema:"nickname"`
 	Language  string `schema:"language"`
 	Gender    int32  `schema:"gender"`
 	Password  string `schema:"password"`
@@ -30,27 +31,41 @@ type registerData struct {
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 	data := new(registerFormData)
-	authSession, err := l.getAuthRequestAndParseData(r, data)
+	authRequest, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authRequest, err)
+		return
+	}
+	l.renderRegister(w, r, authRequest, data, nil)
+}
+
+func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
+	data := new(registerFormData)
+	authRequest, err := l.getAuthRequestAndParseData(r, data)
+	if err != nil {
+		l.renderError(w, r, authRequest, err)
 		return
 	}
 	if data.Password != data.Password2 {
 		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "passwords dont match")
-		l.renderRegister(w, r, authSession, data, err)
+		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
 	//TODO: How to get ResourceOwner?
-	user, err := l.authRepo.Register(r.Context(), data.toUserModel(), "GlobalResourceOwner")
+	user, err := l.authRepo.Register(setContext(r.Context(), globalRO), data.toUserModel(), globalRO)
 	if err != nil {
-		l.renderRegister(w, r, authSession, data, err)
+		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	authSession.UserName = user.UserName
-	l.renderNextStep(w, r, authSession)
+	if authRequest == nil {
+		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		return
+	}
+	authRequest.UserName = user.UserName
+	l.renderNextStep(w, r, authRequest)
 }
 
-func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, formData *registerFormData, err error) {
+func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *model.AuthRequest, formData *registerFormData, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = err.Error()
@@ -58,8 +73,11 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authSessi
 	if formData == nil {
 		formData = new(registerFormData)
 	}
+	if formData.Language == "" {
+		formData.Language = l.renderer.Lang(r).String()
+	}
 	data := registerData{
-		baseData:         l.getBaseData(r, authSession, "Register", errType, errMessage),
+		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,
 	}
 	funcs := map[string]interface{}{
@@ -84,7 +102,6 @@ func (d registerFormData) toUserModel() *usr_model.User {
 		Profile: &usr_model.Profile{
 			FirstName:         d.Firstname,
 			LastName:          d.Lastname,
-			NickName:          d.Nickname,
 			PreferredLanguage: language.Make(d.Language),
 			Gender:            usr_model.Gender(d.Gender),
 		},

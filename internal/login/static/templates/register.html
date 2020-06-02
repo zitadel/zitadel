@@ -21,10 +21,6 @@
             <input class="input" type="text" id="lastname" name="lastname" placeholder="{{t "Registration.Lastname"}}" autocomplete="family-name" value="{{ .Lastname }}" required>
         </div>
         <div class="field">
-            <label class="label" for="nickname">{{t "Registration.Nickname"}}</label>
-            <input class="input" type="text" id="nickname" name="nickname" placeholder="{{t "Registration.Nickname"}}" autocomplete="nickname" value="{{ .Nickname }}">
-        </div>
-        <div class="field">
             <label class="label" for="languages">{{t "Registration.Language"}}</label>
             <select id="languages" name="language">
                 <option value=""></option>
@@ -38,6 +34,7 @@
                 <option value=""></option>
                 <option value="1" id="female" {{if (selectedGender 1)}} selected {{end}}>{{t "Registration.Female"}}</option>
                 <option value="2" id="male" {{if (selectedGender 2)}} selected {{end}}>{{t "Registration.Male"}}</option>
+                <option value="3" id="diverse" {{if (selectedGender 3)}} selected {{end}}>{{t "Registration.Diverse"}}</option>
             </select>
         </div>
         <div class="field">
