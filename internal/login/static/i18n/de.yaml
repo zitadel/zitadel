@@ -70,6 +70,10 @@ PasswordChangeDone:
   Title: Passwort ändern
   Description: Das Passwort wurde erfolgreich geändert.
 
+PasswordResetDone:
+  Title: Resetlink versendet
+  Description: Prüfe dein E-Mail Postfach, um ein neues Passwort zu setzen.
+
 PasswordSetDone:
   Title: Passwort gesetzt
   Description: Das Passwort wurde erfolgreich gesetzt.

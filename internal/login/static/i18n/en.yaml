@@ -70,6 +70,10 @@ PasswordChangeDone:
   Title: Change Password
   Description: Your password was changed successfully.
 
+PasswordResetDone:
+  Title: Reset link set
+  Description: Check your email to to reset your password.
+
 PasswordSetDone:
   Title: Password set
   Description: Your password was set successfully.

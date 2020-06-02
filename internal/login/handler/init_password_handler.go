@@ -55,7 +55,11 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *mod
 		l.renderInitPassword(w, r, authReq, data.UserID, data.Code, err)
 		return
 	}
-	err = l.authRepo.SetPassword(r.Context(), data.UserID, data.Code, data.Password)
+	userOrg := "LOGIN"
+	if authReq != nil {
+		userOrg = authReq.UserOrgID
+	}
+	err = l.authRepo.SetPassword(setContext(r.Context(), userOrg), data.UserID, data.Code, data.Password)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
