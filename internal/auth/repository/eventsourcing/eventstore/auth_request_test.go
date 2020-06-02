@@ -93,6 +93,7 @@ func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequen
 }
 
 type mockViewUser struct {
+	InitRequired           bool
 	PasswordSet            bool
 	PasswordChangeRequired bool
 	IsEmailVerified        bool
@@ -103,6 +104,7 @@ type mockViewUser struct {
 
 func (m *mockViewUser) UserByID(string) (*view_model.UserView, error) {
 	return &view_model.UserView{
+		InitRequired:           m.InitRequired,
 		PasswordSet:            m.PasswordSet,
 		PasswordChangeRequired: m.PasswordChangeRequired,
 		IsEmailVerified:        m.IsEmailVerified,
@@ -126,7 +128,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		MfaHardwareCheckLifeTime time.Duration
 	}
 	type args struct {
-		request *model.AuthRequest
+		request       *model.AuthRequest
+		checkLoggedIn bool
 	}
 	tests := []struct {
 		name    string
@@ -138,22 +141,22 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		{
 			"request nil, error",
 			fields{},
-			args{nil},
+			args{nil, false},
 			nil,
 			errors.IsErrorInvalidArgument,
 		},
 		{
-			"user not set, login step",
+			"prompt none and checkLoggedIn false, callback step",
 			fields{},
-			args{&model.AuthRequest{}},
-			[]model.NextStep{&model.LoginStep{}},
+			args{&model.AuthRequest{Prompt: model.PromptNone}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
-			"user not set and prompt none, no step",
+			"user not set, login step",
 			fields{},
-			args{&model.AuthRequest{Prompt: model.PromptNone}},
-			[]model.NextStep{},
+			args{&model.AuthRequest{}, false},
+			[]model.NextStep{&model.LoginStep{}},
 			nil,
 		},
 		{
@@ -161,7 +164,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewNoUserSession{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
 			nil,
 			errors.IsInternal,
 		},
@@ -182,7 +185,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
 			[]model.NextStep{
 				&model.LoginStep{},
 				&model.SelectUserStep{
@@ -205,7 +208,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider:  &mockViewNoUser{},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsNotFound,
 		},
@@ -218,7 +221,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.PasswordStep{}},
 			nil,
 		},
@@ -229,9 +232,25 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider:        &mockViewUser{},
 				userEventProvider:       &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsInternal,
+		},
+		{
+			"user not initialized, init user step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					InitRequired: true,
+					PasswordSet:  true,
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
+			[]model.NextStep{&model.InitUserStep{
+				PasswordSet: true,
+			}},
+			nil,
 		},
 		{
 			"password not set, init password step",
@@ -240,7 +259,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider:        &mockViewUser{},
 				userEventProvider:       &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.InitPasswordStep{}},
 			nil,
 		},
@@ -254,7 +273,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider:     &mockEventUser{},
 				PasswordCheckLifeTime: 10 * 24 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.PasswordStep{}},
 			nil,
 		},
@@ -273,7 +292,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
 				MfaProviders: []model.MfaType{model.MfaTypeOTP},
 			}},
@@ -296,7 +315,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.ChangePasswordStep{}},
 			nil,
 		},
@@ -315,7 +334,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.VerifyEMailStep{}},
 			nil,
 		},
@@ -335,7 +354,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.ChangePasswordStep{}, &model.VerifyEMailStep{}},
 			nil,
 		},
@@ -355,7 +374,27 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true and authenticated, redirect to callback step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone}, true},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -374,7 +413,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				MfaSoftwareCheckLifeTime: tt.fields.MfaSoftwareCheckLifeTime,
 				MfaHardwareCheckLifeTime: tt.fields.MfaHardwareCheckLifeTime,
 			}
-			got, err := repo.nextSteps(context.Background(), tt.args.request)
+			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return
