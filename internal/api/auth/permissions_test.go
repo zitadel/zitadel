@@ -12,15 +12,15 @@ func getTestCtx(userID, orgID string) context.Context {
 }
 
 type testVerifier struct {
-	grants []*Grant
+	grant *Grant
 }
 
 func (v *testVerifier) VerifyAccessToken(ctx context.Context, token string) (string, string, string, error) {
 	return "userID", "clientID", "agentID", nil
 }
 
-func (v *testVerifier) ResolveGrants(ctx context.Context, sub, orgID string) ([]*Grant, error) {
-	return v.grants, nil
+func (v *testVerifier) ResolveGrant(ctx context.Context) (*Grant, error) {
+	return v.grant, nil
 }
 
 func (v *testVerifier) GetProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
@@ -57,8 +57,8 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "Empty Context",
 			args: args{
 				ctx: getTestCtx("", ""),
-				verifier: &testVerifier{grants: []*Grant{&Grant{
-					Roles: []string{"ORG_OWNER"}}}},
+				verifier: &testVerifier{grant: &Grant{
+					Roles: []string{"ORG_OWNER"}}},
 				requiredPerm: "project.read",
 				authConfig: &Config{
 					RolePermissionMappings: []RoleMapping{
@@ -81,7 +81,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "No Grants",
 			args: args{
 				ctx:          getTestCtx("", ""),
-				verifier:     &testVerifier{grants: []*Grant{}},
+				verifier:     &testVerifier{grant: &Grant{}},
 				requiredPerm: "project.read",
 				authConfig: &Config{
 					RolePermissionMappings: []RoleMapping{
@@ -102,8 +102,8 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "Get Permissions",
 			args: args{
 				ctx: getTestCtx("userID", "orgID"),
-				verifier: &testVerifier{grants: []*Grant{&Grant{
-					Roles: []string{"ORG_OWNER"}}}},
+				verifier: &testVerifier{grant: &Grant{
+					Roles: []string{"ORG_OWNER"}}},
 				requiredPerm: "project.read",
 				authConfig: &Config{
 					RolePermissionMappings: []RoleMapping{
@@ -143,7 +143,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 func Test_MapGrantsToPermissions(t *testing.T) {
 	type args struct {
 		requiredPerm string
-		grants       []*Grant
+		grant        *Grant
 		authConfig   *Config
 	}
 	tests := []struct {
@@ -155,8 +155,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "One Role existing perm",
 			args: args{
 				requiredPerm: "project.read",
-				grants: []*Grant{&Grant{
-					Roles: []string{"ORG_OWNER"}}},
+				grant:        &Grant{Roles: []string{"ORG_OWNER"}},
 				authConfig: &Config{
 					RolePermissionMappings: []RoleMapping{
 						RoleMapping{
@@ -176,8 +175,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "One Role not existing perm",
 			args: args{
 				requiredPerm: "project.write",
-				grants: []*Grant{&Grant{
-					Roles: []string{"ORG_OWNER"}}},
+				grant:        &Grant{Roles: []string{"ORG_OWNER"}},
 				authConfig: &Config{
 					RolePermissionMappings: []RoleMapping{
 						RoleMapping{
@@ -197,8 +195,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "Multiple Roles one existing",
 			args: args{
 				requiredPerm: "project.read",
-				grants: []*Grant{&Grant{
-					Roles: []string{"ORG_OWNER", "IAM_OWNER"}}},
+				grant:        &Grant{Roles: []string{"ORG_OWNER", "IAM_OWNER"}},
 				authConfig: &Config{
 					RolePermissionMappings: []RoleMapping{
 						RoleMapping{
@@ -218,8 +215,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			name: "Multiple Roles, global and specific",
 			args: args{
 				requiredPerm: "project.read",
-				grants: []*Grant{&Grant{
-					Roles: []string{"ORG_OWNER", "PROJECT_OWNER:1"}}},
+				grant:        &Grant{Roles: []string{"ORG_OWNER", "PROJECT_OWNER:1"}},
 				authConfig: &Config{
 					RolePermissionMappings: []RoleMapping{
 						RoleMapping{
@@ -238,7 +234,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := mapGrantsToPermissions(tt.args.requiredPerm, tt.args.grants, tt.args.authConfig)
+			result := mapGrantsToPermissions(tt.args.requiredPerm, tt.args.grant, tt.args.authConfig)
 			if !equalStringArray(result, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}
