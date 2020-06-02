@@ -68,6 +68,9 @@ func (repo *UserGrantRepo) fillIamProjectID(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	if !iam.SetUpDone {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-skiwS", "Setup not done")
+	}
 	repo.IamProjectID = iam.IamProjectID
 	return nil
 }

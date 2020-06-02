@@ -4,10 +4,12 @@ import (
 	"context"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
@@ -19,6 +21,7 @@ import (
 type UserGrant struct {
 	handler
 	eventstore   eventstore.Eventstore
+	iamEvents    *iam_events.IamEventstore
 	iamID        string
 	iamProjectID string
 }
@@ -35,7 +38,10 @@ func (u *UserGrant) ViewModel() string {
 
 func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 	if u.iamProjectID == "" {
-		u.setIamProjectID()
+		err := u.setIamProjectID()
+		if err != nil {
+			return nil, err
+		}
 	}
 	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
@@ -199,25 +205,19 @@ func mergeExistingRoles(rolePrefix string, existingRoles, newRoles []string) []s
 	return append(mergedRoles, newRoles...)
 }
 
-func (u *UserGrant) setIamProjectID() {
-	filter := es_models.NewSearchQuery().
-		AggregateTypeFilter(iam_es_model.IamAggregate).
-		LatestSequenceFilter(0)
-
-	events, err := u.eventstore.FilterEvents(context.Background(), filter)
+func (u *UserGrant) setIamProjectID() error {
+	if u.iamProjectID != "" {
+		return nil
+	}
+	iam, err := u.iamEvents.IamByID(context.Background(), u.iamID)
 	if err != nil {
-		return
+		return err
 	}
-	if len(events) == 0 {
-		return
+	if !iam.SetUpDone {
+		return caos_errs.ThrowPreconditionFailed(nil, "HANDL-s5DTs", "Setup not done")
 	}
-	for _, e := range events {
-		if e.Type == iam_es_model.IamProjectSet {
-			iam := &iam_es_model.Iam{}
-			iam.SetData(e)
-			u.iamProjectID = iam.IamProjectID
-		}
-	}
+	u.iamProjectID = iam.IamProjectID
+	return nil
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {
