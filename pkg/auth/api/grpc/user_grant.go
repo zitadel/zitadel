@@ -28,21 +28,3 @@ func (s *Server) GetMyZitadelPermissions(ctx context.Context, _ *empty.Empty) (*
 	}
 	return &MyPermissions{Permissions: perms}, nil
 }
-
-func (p *MyPermissions) appendPermissions(ctxID string, permissions ...string) {
-	for _, permission := range permissions {
-		p.appendPermission(ctxID, permission)
-	}
-}
-
-func (p *MyPermissions) appendPermission(ctxID, permission string) {
-	if ctxID != "" {
-		permission = permission + ":" + ctxID
-	}
-	for _, existingPermission := range p.Permissions {
-		if existingPermission == permission {
-			return
-		}
-	}
-	p.Permissions = append(p.Permissions, permission)
-}
