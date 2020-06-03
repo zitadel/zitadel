@@ -113,7 +113,7 @@ func (s *Setup) Execute(ctx context.Context) error {
 
 	err = setUp.setIamProject(ctx)
 	if err != nil {
-		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set citadel project")
+		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set zitadel project")
 		return err
 	}
 
