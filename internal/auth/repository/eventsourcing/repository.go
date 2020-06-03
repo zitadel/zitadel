@@ -23,11 +23,6 @@ import (
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
-const (
-	//TODO: How do we get this
-	iamProjectID = "57485300129072242"
-)
-
 type Config struct {
 	SearchLimit uint64
 	Eventstore  es_int.Config
