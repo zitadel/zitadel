@@ -7,7 +7,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	"time"
 )
 
 type TokenVerifierRepo struct {
@@ -31,9 +30,14 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if err != nil {
 		return "", "", "", caos_errs.ThrowPermissionDenied(err, "APP-BxUSiL", "invalid token")
 	}
-	if token.Expiration.Before(time.Now().UTC()) {
-		return "", "", "", caos_errs.ThrowPermissionDenied(err, "APP-BJEyZ1", "token expired")
+	valid, err := repo.View.IsTokenValid(tokenID)
+	if err != nil {
+		return "", "", "", err
 	}
+	if !valid {
+		return "", "", "", caos_errs.ThrowPermissionDenied(err, "APP-k9KS0", "invalid token")
+	}
+
 	for _, aud := range token.Audience {
 		if clientID == aud {
 			return token.UserID, clientID, token.UserAgentID, nil

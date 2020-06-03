@@ -11,9 +11,9 @@ import (
 
 type key int
 
-var (
-	permissionsKey key
-	dataKey        key
+const (
+	permissionsKey key = 1
+	dataKey        key = 2
 )
 
 type CtxData struct {
