@@ -38,7 +38,7 @@ type Config struct {
 
 }
 
-func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRepository) (err error) {
+func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRepository) {
 	login := &Login{
 		endpoint:            config.Port,
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
@@ -46,14 +46,12 @@ func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRe
 		authRepo:            authRepo,
 	}
 	statikFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return err
-	}
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start listener")
+
 	login.router = CreateRouter(login, statikFS)
 	login.renderer = CreateRenderer(statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	login.Listen(ctx)
-	return err
 }
 
 func (l *Login) Listen(ctx context.Context) {
