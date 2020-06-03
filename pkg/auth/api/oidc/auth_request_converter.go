@@ -139,9 +139,6 @@ func ParseBrowserInfoFromContext(ctx context.Context) *model.BrowserInfo {
 }
 
 func HttpHeadersFromContext(ctx context.Context) (userAgent, acceptLang string) {
-	userAgent = "not set" //TODO: necessary?
-	acceptLang = "not set"
-
 	ctxHeaders, ok := http_utils.HeadersFromCtx(ctx)
 	if !ok {
 		return
