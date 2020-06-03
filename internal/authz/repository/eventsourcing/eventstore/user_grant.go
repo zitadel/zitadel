@@ -11,7 +11,6 @@ import (
 )
 
 type UserGrantRepo struct {
-	SearchLimit  uint64
 	View         *view.View
 	IamID        string
 	IamProjectID string

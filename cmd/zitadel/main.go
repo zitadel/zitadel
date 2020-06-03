@@ -24,14 +24,14 @@ type Config struct {
 	Mgmt         management.Config
 	Auth         auth.Config
 	Login        login.Config
+	AuthZ        authz.Config
 	Admin        admin.Config
 	Console      console.Config
 	Notification notification.Config
-	AuthZ        authz.Config
 
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
-	IntAuthZ       internal_authz.Config
+	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 }
 
@@ -51,22 +51,22 @@ func main() {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
-	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.IntAuthZ, conf.SystemDefaults)
+	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 
 	if *adminEnabled {
-		admin.Start(ctx, conf.Admin, authZRepo, conf.IntAuthZ, conf.SystemDefaults)
+		admin.Start(ctx, conf.Admin, authZRepo, conf.InternalAuthZ, conf.SystemDefaults)
 	}
 	if *managementEnabled {
-		management.Start(ctx, conf.Mgmt, authZRepo, conf.IntAuthZ, conf.SystemDefaults)
+		management.Start(ctx, conf.Mgmt, authZRepo, conf.InternalAuthZ, conf.SystemDefaults)
 	}
 	var authRepo *eventsourcing.EsRepository
 	if *authEnabled || *loginEnabled {
-		authRepo, err = eventsourcing.Start(conf.Auth.Repository, conf.IntAuthZ, conf.SystemDefaults, authZRepo)
+		authRepo, err = eventsourcing.Start(conf.Auth.Repository, conf.InternalAuthZ, conf.SystemDefaults, authZRepo)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 	if *authEnabled {
-		auth.Start(ctx, conf.Auth, authZRepo, conf.IntAuthZ, conf.SystemDefaults, authRepo)
+		auth.Start(ctx, conf.Auth, authZRepo, conf.InternalAuthZ, conf.SystemDefaults, authRepo)
 	}
 	if *loginEnabled {
 		login.Start(ctx, conf.Login, conf.SystemDefaults, authRepo)

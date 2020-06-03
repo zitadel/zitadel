@@ -20,7 +20,6 @@ import (
 )
 
 type Config struct {
-	SearchLimit uint64
 	Eventstore  es_int.Config
 	AuthRequest cache.Config
 	View        types.SQL
@@ -72,11 +71,10 @@ func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults) (*E
 	return &EsRepository{
 		spool,
 		eventstore.UserGrantRepo{
-			SearchLimit: conf.SearchLimit,
-			View:        view,
-			IamID:       systemDefaults.IamID,
-			Auth:        authZ,
-			IamEvents:   iam,
+			View:      view,
+			IamID:     systemDefaults.IamID,
+			Auth:      authZ,
+			IamEvents: iam,
 		},
 		eventstore.IamRepo{
 			IamID:     systemDefaults.IamID,

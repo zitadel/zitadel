@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
@@ -100,9 +101,19 @@ func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, aut
 	if err != nil {
 		return nil, err
 	}
+	iam, err := es_iam.StartIam(
+		es_iam.IamConfig{
+			Eventstore: es,
+			Cache:      conf.Eventstore.Cache,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
 
-	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org}
+	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	return &EsRepository{

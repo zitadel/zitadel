@@ -135,7 +135,7 @@ Login:
     DefaultLanguage: 'de'
 
 
-Authz:
+AuthZ:
   Repository:
     Eventstore:
       ServiceName: 'AuthZ'
