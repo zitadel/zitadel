@@ -62,6 +62,14 @@
   font-style: italic;
   font-weight: 800;
 }
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
+  /* For IE6-8 */
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
+}
 *, *::before, *::after {
   box-sizing: border-box;
   font-family: Lato;
@@ -75,7 +83,7 @@ body {
 
 html {
   background-color: #282828;
-  color: #898989;
+  color: #FFFFFF;
 }
 
 h1 {
@@ -84,6 +92,10 @@ h1 {
   text-transform: uppercase;
   text-align: center;
   font-size: 40px;
+}
+
+p {
+  font-width: 300;
 }
 
 header {
@@ -108,6 +120,10 @@ a {
   color: #364DF6;
   text-decoration: none;
   text-transform: uppercase;
+  font-weight: 600;
+}
+a:hover {
+  color: #6778f8;
 }
 
 button {
@@ -139,9 +155,9 @@ button > .sessionstate {
   text-transform: lowercase;
 }
 
-input, select {
+input:not([type=radio]), select {
   background-color: #252525;
-  color: #898989;
+  color: #FFFFFF;
   height: 50px;
   border: 2px solid #595959;
   border-radius: 5px;
@@ -153,11 +169,27 @@ form .field {
   padding: 10px 0;
 }
 form .field.radio-button {
-  display: inherit;
+  display: flex;
+}
+form .field.radio-button input[type=radio] {
+  height: 20px;
+  vertical-align: middle;
+}
+form .field.radio-button label {
+  height: 20px;
+  display: inline-block;
+  padding: 3px 0 0 15px;
+  width: 100%;
 }
 form label {
+  color: #898989;
   text-transform: uppercase;
   font-size: 0.9rem;
+  margin-bottom: 3px;
+}
+form label span.optional {
+  font-style: italic;
+  text-transform: none;
 }
 form .actions {
   padding: 20px 0;
@@ -169,6 +201,26 @@ form .actions button, form .actions a {
   margin: 10px 0;
 }
 
+#copy-secret {
+  visibility: hidden;
+  position: absolute;
+}
+
+#qrcode {
+  text-align: center;
+}
+#qrcode svg rect[style*="fill:white"] {
+  fill: #282828 !important;
+}
+#qrcode svg rect[style*="fill:black"] {
+  fill: #FFFFFF !important;
+}
+
+#secret .copy {
+  float: right;
+  cursor: pointer;
+}
+
 footer {
   background-image: url("../gradientdeco-full.svg");
   width: 100%;
@@ -177,6 +229,29 @@ footer {
   position: absolute;
   bottom: 0;
   z-index: -1;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: "liga";
 }
 
 /*# sourceMappingURL=dark.css.map */

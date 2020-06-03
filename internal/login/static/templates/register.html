@@ -29,7 +29,10 @@
             </select>
         </div>
         <div class="field">
-            <label class="label" for="genders">{{t "Registration.Gender"}}</label>
+            <label class="label" for="genders">
+                {{t "Registration.Gender"}}
+                <span class="optional">{{t "optional"}}</span>
+            </label>
             <select id="genders" name="gender">
                 <option value=""></option>
                 <option value="1" id="female" {{if (selectedGender 1)}} selected {{end}}>{{t "Registration.Female"}}</option>

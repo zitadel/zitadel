@@ -17,11 +17,15 @@ html {
 }
 
 h1 {
-    color: $headerColor;
+    color: $fontColor;
     font-family: $headerFont;
     text-transform: uppercase;
     text-align: center;
     font-size: 40px;
+}
+
+p {
+    font-width: 300;
 }
 
 header {
@@ -47,6 +51,11 @@ a {
     color: $primaryColor;
     text-decoration: none;
     text-transform: uppercase;
+    font-weight: 600;
+
+    &:hover {
+        color: $primaryColorHover;
+    }
 }
 
 button {
@@ -68,7 +77,7 @@ button {
 
     &.primary {
         background-color: $primaryColor;
-        color: $headerColor;
+        color: $fontColor;
         border: none;
         &:hover {
             background-color: $primaryColorHover;
@@ -80,7 +89,7 @@ button {
     }
 }
 
-input, select {
+input:not([type='radio']), select {
     background-color: $inputBackgroundColor;
     color: $fontColor;
     height: $inputHeight;
@@ -96,12 +105,31 @@ form {
     }
 
     .field.radio-button {
-        display: inherit;
+        display: flex;
+
+        input[type='radio'] {
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        & label {
+            height: 20px;
+            display: inline-block;
+            padding: 3px 0 0 15px;
+            width: 100%;
+        }
     }
 
     label {
+        color: $labelColor;
         text-transform: uppercase;
         font-size: 0.9rem;
+        margin-bottom: 3px;
+
+        span.optional {
+            font-style: italic;
+            text-transform: none;
+        }
     }
 
     .actions {
@@ -117,6 +145,30 @@ form {
     }
 }
 
+#copy-secret {
+    visibility: hidden;
+    position: absolute;
+}
+
+#qrcode {
+    text-align: center;
+
+    svg rect[style*="fill:white"] {
+        fill: $backgroundColor !important;
+    }
+
+    svg rect[style*="fill:black"] {
+        fill: $fontColor !important;
+    }
+}
+
+#secret {
+    .copy {
+        float: right;
+        cursor: pointer;
+    }
+}
+
 footer {
     background-image: url($footerimgDark);
     width: 100%;
@@ -125,4 +177,29 @@ footer {
     position: absolute;
     bottom: 0;
     z-index: -1;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: 'liga';
 }

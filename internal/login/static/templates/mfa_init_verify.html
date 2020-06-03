@@ -10,15 +10,20 @@
     <input type="hidden" name="mfaType" value="{{ .MfaType }}" />
     <input type="hidden" name="url" value="{{ .Url }}" />
     <input type="hidden" name="secret" value="{{ .Secret }}" />
-
+    <textarea id="copy-secret">{{ .Secret }}</textarea>
 
     {{if (eq .MfaType 0) }}
         <p>{{t "MfaInitVerify.OtpDescription"}}</p>
-        <img src="data:image/png;base64,{{.QrCode}}">
+        <div id="qrcode">
+            {{.QrCode}}
+        </div>
         <div class="fields">
             <div class="field">
-                <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</label>
-                <span class="input" id="secret">{{.Secret}}</span>
+                <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
+                <span class="input" id="secret">
+                    {{.Secret}}
+                    <span class="copy material-icons" onclick="copySecret()">content_copy</span>
+                </span>
             </div>
             <div class="field">
                <label class="label" for="code">{{t "MfaInitVerify.Code"}}</label>
@@ -26,11 +31,18 @@
             </div>
         </div>
     {{end}}
-   
+
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
+
+<script>
+    function copySecret() {
+        document.getElementById('copy-secret').select();
+        document.execCommand('copy');
+    }
+</script>
 
 
 {{template "main-bottom" .}}
