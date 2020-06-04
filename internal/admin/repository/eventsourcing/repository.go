@@ -23,6 +23,8 @@ type Config struct {
 	Eventstore  es_int.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
+	//TODO: should this be located in system-defaults?
+	Domain string
 }
 
 type EsRepository struct {
@@ -44,7 +46,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain})
 
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
 		Eventstore: es,
