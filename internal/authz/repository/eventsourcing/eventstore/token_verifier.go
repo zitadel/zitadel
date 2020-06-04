@@ -10,7 +10,7 @@ import (
 )
 
 type TokenVerifierRepo struct {
-	TokenVerificationKey string
+	TokenVerificationKey [32]byte
 	IamID                string
 	IamEvents            *iam_event.IamEventstore
 	ProjectEvents        *proj_event.ProjectEventstore
@@ -22,7 +22,8 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if err != nil {
 		return "", "", "", caos_errs.ThrowPermissionDenied(nil, "APP-ptTIF2", "invalid token")
 	}
-	tokenID, err := crypto.DecryptAESString(tokenString, repo.TokenVerificationKey)
+	//TODO: use real key
+	tokenID, err := crypto.DecryptAESString(tokenString, string(repo.TokenVerificationKey[:32]))
 	if err != nil {
 		return "", "", "", caos_errs.ThrowPermissionDenied(nil, "APP-8EF0zZ", "invalid token")
 	}
