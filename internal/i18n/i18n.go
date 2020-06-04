@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
@@ -19,10 +20,9 @@ const (
 )
 
 type Translator struct {
-	bundle     *i18n.Bundle
-	cookieName string
-	//TODO: Add Cookie Handler
-	//cookieHandler *http_util.CookieHandler
+	bundle        *i18n.Bundle
+	cookieName    string
+	cookieHandler *http_util.CookieHandler
 }
 
 type TranslatorConfig struct {
@@ -37,8 +37,8 @@ func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, e
 	if err != nil {
 		return nil, err
 	}
-	//t.cookieHandler = http_util.NewCookieHandler()
-	//t.cookieName = config.CookieName
+	t.cookieHandler = http_util.NewCookieHandler()
+	t.cookieName = config.CookieName
 	return t, nil
 }
 
@@ -104,7 +104,7 @@ func (t *Translator) Lang(r *http.Request) language.Tag {
 }
 
 func (t *Translator) SetLangCookie(w http.ResponseWriter, lang language.Tag) {
-	//t.cookieHandler.SetCookie(w, t.cookieName, lang.String())
+	t.cookieHandler.SetCookie(w, t.cookieName, lang.String())
 }
 
 func (t *Translator) localizerFromRequest(r *http.Request) *i18n.Localizer {
@@ -118,10 +118,10 @@ func (t *Translator) localizer(langs ...string) *i18n.Localizer {
 func (t *Translator) langsFromRequest(r *http.Request) []string {
 	langs := make([]string, 0)
 	if r != nil {
-		//lang, err := t.cookieHandler.GetCookieValue(r, t.cookieName)
-		//if err == nil {
-		//	langs = append(langs, lang)
-		//}
+		lang, err := t.cookieHandler.GetCookieValue(r, t.cookieName)
+		if err == nil {
+			langs = append(langs, lang)
+		}
 		langs = append(langs, r.Header.Get("Accept-Language"))
 	}
 	return langs

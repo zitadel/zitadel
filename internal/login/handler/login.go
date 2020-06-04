@@ -25,7 +25,6 @@ type Login struct {
 	authRepo            *eventsourcing.EsRepository
 	zitadelURL          string
 	oidcAuthCallbackURL string
-	//userAgentHandler    *auth.UserAgentHandler
 }
 
 type Config struct {
@@ -34,8 +33,6 @@ type Config struct {
 	ZitadelURL          string
 	LanguageCookieName  string
 	DefaultLanguage     language.Tag
-	//UserAgentCookieConfig *auth.UserAgentCookieConfig
-
 }
 
 func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRepository) (err error) {

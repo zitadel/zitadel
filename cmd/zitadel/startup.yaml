@@ -131,7 +131,7 @@ Login:
     Port: 50031
     OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
     ZitadelURL: '$CITADEL_CONSOLE'
-    LanguageCookieName: 'ch.caos.zitadel.login.lang'
+    LanguageCookieName: 'caos.zitadel.login.lang'
     DefaultLanguage: 'de'
 
 Admin:
