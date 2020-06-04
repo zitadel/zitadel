@@ -146,7 +146,11 @@ func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID str
 }
 
 func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
-	return repo.UserEvents.VerifyInitCode(ctx, userID, code, password)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.VerifyInitCode(ctx, policy, userID, code, password)
 }
 
 func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {

@@ -45,7 +45,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
 	}
-	userOrg := "LOGIN"
+	userOrg := login
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
@@ -54,8 +54,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 }
 
 func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string) {
-	//TODO: Where do we get org id, if its not in login flow
-	userOrg := "LOGIN"
+	userOrg := login
 	if authReq != nil {
 		userID = authReq.UserID
 		userOrg = authReq.UserOrgID

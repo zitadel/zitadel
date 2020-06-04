@@ -325,12 +325,12 @@ func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error
 	return nil
 }
 
-func (es *UserEventstore) VerifyInitCode(ctx context.Context, userID, verificationCode, password string) error {
+func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, verificationCode, password string) error {
 	if userID == "" || verificationCode == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "userId or Code empty")
 	}
-	//TODO: Check PW Policy
-	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
+	pw := &usr_model.Password{SecretString: password}
+	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, false)
 	if err != nil {
 		return err
 	}
@@ -341,7 +341,7 @@ func (es *UserEventstore) VerifyInitCode(ctx context.Context, userID, verificati
 	if existing.InitCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-spo9W", "code not found")
 	}
-	repoPassword := &model.Password{Secret: secret, ChangeRequired: false}
+	repoPassword := model.PasswordFromModel(pw)
 	repoExisting := model.UserFromModel(existing)
 	var updateAggregate func(ctx context.Context) (*es_models.Aggregate, error)
 	if err := crypto.VerifyCode(existing.InitCode.CreationDate, existing.InitCode.Expiry, existing.InitCode.Code, verificationCode, es.InitializeUserCode); err != nil {

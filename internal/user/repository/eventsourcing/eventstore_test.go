@@ -940,6 +940,7 @@ func TestInitCodeVerify(t *testing.T) {
 	type args struct {
 		es         *UserEventstore
 		ctx        context.Context
+		policy     *policy_model.PasswordComplexityPolicy
 		userID     string
 		verifyCode string
 		password   string
@@ -964,6 +965,7 @@ func TestInitCodeVerify(t *testing.T) {
 					},
 				),
 				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
 				verifyCode: "code",
 				userID:     "userID",
 			},
@@ -981,6 +983,7 @@ func TestInitCodeVerify(t *testing.T) {
 					},
 				),
 				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
 				userID:     "userID",
 				verifyCode: "code",
 				password:   "password",
@@ -998,6 +1001,7 @@ func TestInitCodeVerify(t *testing.T) {
 					},
 				),
 				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
 				userID:     "userID",
 				verifyCode: "code",
 				password:   "password",
@@ -1008,6 +1012,7 @@ func TestInitCodeVerify(t *testing.T) {
 			args: args{
 				es:         GetMockManipulateUser(ctrl),
 				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
 				userID:     "",
 				verifyCode: "code",
 				password:   "password",
@@ -1017,10 +1022,25 @@ func TestInitCodeVerify(t *testing.T) {
 			},
 		},
 		{
+			name: "password policy not matched",
+			args: args{
+				es:         GetMockManipulateUser(ctrl),
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{HasNumber: true},
+				userID:     "userID",
+				verifyCode: "code",
+				password:   "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "existing user not found",
 			args: args{
 				es:         GetMockManipulateUserNoEventsWithPw(ctrl),
 				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
 				userID:     "userID",
 				password:   "password",
 				verifyCode: "code",
@@ -1032,7 +1052,7 @@ func TestInitCodeVerify(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.args.es.VerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.verifyCode, tt.args.password)
+			err := tt.args.es.VerifyInitCode(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.verifyCode, tt.args.password)
 
 			if tt.res.errFunc == nil && err != nil {
 				t.Errorf("should not have err: %v", err)

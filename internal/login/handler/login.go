@@ -35,6 +35,10 @@ type Config struct {
 	DefaultLanguage     language.Tag
 }
 
+const (
+	login = "LOGIN"
+)
+
 func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRepository) (err error) {
 	login := &Login{
 		endpoint:            config.Port,
@@ -83,7 +87,7 @@ func (l *Login) Listen(ctx context.Context) {
 
 func setContext(ctx context.Context, resourceOwner string) context.Context {
 	data := auth.CtxData{
-		UserID: "LOGIN",
+		UserID: login,
 		OrgID:  resourceOwner,
 	}
 	return auth.SetCtxData(ctx, data)

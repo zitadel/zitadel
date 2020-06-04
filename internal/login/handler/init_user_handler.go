@@ -55,7 +55,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitUser(w, r, nil, data.UserID, data.Code, err)
 		return
 	}
-	userOrgID := "LOGIN"
+	userOrgID := login
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
@@ -68,7 +68,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string) {
-	userOrgID := "LOGIN"
+	userOrgID := login
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
