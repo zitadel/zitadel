@@ -113,15 +113,10 @@ Auth:
       ConcurrentTasks: 4
       BulkLimit: 100
       FailureCountUntilSkip: 5
-      Handlers:
-        UserSession:
-          MinimumCycleDuration: 1ms
-        User:
-          MinimumCycleDuration: 1ms
     KeyConfig:
       Size: 2048
-      PrivateKeyLifetime: 10m
-      PublicKeyLifetime: 30m
+      PrivateKeyLifetime: 6h
+      PublicKeyLifetime: 30h
       EncryptionConfig:
         EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
       SigningKeyRotation: 10s
