@@ -44,7 +44,7 @@ InitUserDone:
   Description: EMail verifiziert und Passwort erfolgreich gesetzt
 
 MfaPrompt:
-  Title: Multifacktor hinzufügen
+  Title: Multifaktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
   Provider0: OTP
   Provider1: SMS
