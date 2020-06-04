@@ -13,9 +13,14 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func (es *ChangesEventstore) Changes(ctx context.Context, objectType es_model.AggregateType, objectID string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-
-	query := ChangesQuery(objectID, lastSequence, objectType)
+func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model.AggregateType, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
+	aggregateTypeQuery := aggregateType
+	idQuery := id
+	if aggregateType == chg_model.Application {
+		aggregateTypeQuery = chg_model.Project
+		idQuery = ""
+	}
+	query := ChangesQuery(idQuery, lastSequence, aggregateTypeQuery)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -34,10 +39,7 @@ func (es *ChangesEventstore) Changes(ctx context.Context, objectType es_model.Ag
 			Modifier:   u.EditorUser,
 			Sequence:   u.Sequence,
 		}
-		result = append(result, change)
-		if lastSequence < u.Sequence {
-			lastSequence = u.Sequence
-		}
+		appendChanges := true
 
 		switch u.AggregateType {
 		case chg_model.User:
@@ -55,36 +57,49 @@ func (es *ChangesEventstore) Changes(ctx context.Context, objectType es_model.Ag
 			}
 			change.Data = userDummy
 		case chg_model.Project:
-			logging.Log("Project").Debugln("Project")
-			type project struct {
-				Name string `json:"name,omitempty"`
-			}
-			projectDummy := project{}
-			if u.Data != nil {
-				if err := json.Unmarshal(u.Data, &projectDummy); err != nil {
-					log.Println("Error getting data!", err.Error())
+			if aggregateType == chg_model.Project {
+				logging.Log("Project").Debugln("Project")
+				type project struct {
+					Name string `json:"name,omitempty"`
+				}
+				projectDummy := project{}
+				if u.Data != nil {
+					if err := json.Unmarshal(u.Data, &projectDummy); err != nil {
+						log.Println("Error getting data!", err.Error())
+					}
+				}
+				change.Data = projectDummy
+			} else if aggregateType == chg_model.Application {
+				if change.EventType == "project.application.added" ||
+					change.EventType == "project.application.changed" ||
+					change.EventType == "project.application.config.oidc.added" ||
+					change.EventType == "project.application.config.oidc.changed" {
+					type omitempty struct {
+						ClientId string `json:"clientId,omitempty"`
+					}
+					type app struct {
+						ClientId  string    `json:"clientId,omitempty"`
+						Name      string    `json:"name,omitempty"`
+						Omitempty omitempty `json:"omitempty,omitempty"`
+						AppId     string    `json:"AppId,omitempty"`
+						AppType   int       `json:"AppType,omitempty"`
+					}
+					appDummy := app{}
+					omitemptyDummy := omitempty{}
+					appDummy.Omitempty = omitemptyDummy
+					if u.Data != nil {
+						if err := json.Unmarshal(u.Data, &appDummy); err != nil {
+							log.Println("Error getting data!", err.Error())
+						}
+					}
+					change.Data = appDummy
+					if appDummy.AppId != id {
+						appendChanges = false
+					}
+				} else {
+					appendChanges = false
 				}
 			}
-			change.Data = projectDummy
-		case chg_model.Application:
-			type omitempty struct {
-				ClientId string `json:"clientId,omitempty"`
-			}
-			type app struct {
-				ClientId  string    `json:"clientId,omitempty"`
-				Name      string    `json:"name,omitempty"`
-				Omitempty omitempty `json:"omitempty,omitempty"`
-				ProjectId string    `json:"projectId,omitempty"`
-			}
-			appDummy := app{}
-			omitemptyDummy := omitempty{}
-			appDummy.Omitempty = omitemptyDummy
-			if u.Data != nil {
-				if err := json.Unmarshal(u.Data, &appDummy); err != nil {
-					log.Println("Error getting data!", err.Error())
-				}
-			}
-			change.Data = appDummy
 		case chg_model.Org:
 			type org struct {
 				Domain string   `json:"domain,omitempty"`
@@ -100,6 +115,12 @@ func (es *ChangesEventstore) Changes(ctx context.Context, objectType es_model.Ag
 			}
 			change.Data = orgDummy
 		}
+		if appendChanges {
+			result = append(result, change)
+			if lastSequence < u.Sequence {
+				lastSequence = u.Sequence
+			}
+		}
 	}
 
 	changes := &model.Changes{
@@ -110,9 +131,12 @@ func (es *ChangesEventstore) Changes(ctx context.Context, objectType es_model.Ag
 	return changes, nil
 }
 
-func ChangesQuery(recourceOwner string, latestSequence uint64, aggregateType es_model.AggregateType) *es_model.SearchQuery {
-	return es_model.NewSearchQuery().
+func ChangesQuery(objectID string, latestSequence uint64, aggregateType es_model.AggregateType) *es_model.SearchQuery {
+	query := es_model.NewSearchQuery().
 		AggregateTypeFilter(aggregateType).
-		LatestSequenceFilter(latestSequence).
-		AggregateIDFilter(recourceOwner)
+		LatestSequenceFilter(latestSequence)
+	if objectID != "" {
+		query = query.AggregateIDFilter(objectID)
+	}
+	return query
 }
