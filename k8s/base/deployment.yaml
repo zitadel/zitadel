@@ -20,7 +20,7 @@ spec:
       - name: zitadel
         image: docker.pkg.github.com/caos/zitadel/zitadel:latest
         imagePullPolicy: IfNotPresent
-        args: ["-login=false", "-console=false"]
+        args: ["-console=false"]
         ports:
         - name: management-rest
           containerPort: 60021
