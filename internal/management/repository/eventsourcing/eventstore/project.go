@@ -3,7 +3,7 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
-	model2 "github.com/caos/zitadel/internal/model"
+	global_model "github.com/caos/zitadel/internal/model"
 	"strings"
 
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -47,7 +47,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 	permissions := auth.GetPermissionsFromCtx(ctx)
 	if !auth.HasGlobalPermission(permissions) {
 		ids := auth.GetPermissionCtxIDs(permissions)
-		request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Method: model2.SEARCHMETHOD_IN, Value: ids})
+		request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IN, Value: ids})
 	}
 
 	projects, count, err := repo.View.SearchGrantedProjects(request)
