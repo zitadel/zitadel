@@ -15,7 +15,7 @@ func getUserMethodPermissions(ctx context.Context, t TokenVerifier, requiredPerm
 	if err != nil {
 		return nil, nil, err
 	}
-	permissions := mapGrantsToPermissions(requiredPerm, grant, authConfig)
+	permissions := mapGrantToPermissions(requiredPerm, grant, authConfig)
 	return context.WithValue(ctx, permissionsKey, permissions), permissions, nil
 }
 
