@@ -11,26 +11,36 @@
     <input type="hidden" name="url" value="{{ .Url }}" />
     <input type="hidden" name="secret" value="{{ .Secret }}" />
 
-
     {{if (eq .MfaType 0) }}
         <p>{{t "MfaInitVerify.OtpDescription"}}</p>
-        <img src="data:image/png;base64,{{.QrCode}}">
+        <div id="qrcode">
+            {{.QrCode}}
+        </div>
         <div class="fields">
             <div class="field">
-                <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</label>
-                <span class="input" id="secret">{{.Secret}}</span>
+                <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
+                <span class="input" id="secret">
+                    {{.Secret}}
+                    <span class="copy material-icons" onclick="copyToClipboard('{{ .Secret }}')">content_copy</span>
+                </span>
             </div>
             <div class="field">
                <label class="label" for="code">{{t "MfaInitVerify.Code"}}</label>
-                <input class="input" type="text" id="code" name="code" placeholder="{{t "MfaInitVerify.Code"}}" autocomplete="off" autofocus required>
+                <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
             </div>
         </div>
     {{end}}
-   
+
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
+
+<script>
+    const copyToClipboard = str => {
+        navigator.clipboard.writeText(str);
+    }
+</script>
 
 
 {{template "main-bottom" .}}

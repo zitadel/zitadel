@@ -12,8 +12,8 @@ UserSelection:
   Title: Account auswählen
   Description: Wähle deinen Account aus.
   OtherUser: Anderer Benutzer
-  SessionState1: aktiv
-  SessionState2: inaktiv
+  SessionState0: aktiv
+  SessionState1: inaktiv
 
 MfaVerify:
   Title: Multifaktor verifizieren
@@ -44,7 +44,7 @@ InitUserDone:
   Description: EMail verifiziert und Passwort erfolgreich gesetzt
 
 MfaPrompt:
-  Title: Multifacktor hinzufügen
+  Title: Multifaktor hinzufügen
   Description: Möchtest du einen Mulitfaktor hinzufügen?
   Provider0: OTP
   Provider1: SMS
@@ -52,7 +52,7 @@ MfaPrompt:
 MfaInitVerify:
   Title: Multifaktor Verifizierung
   Description: Verifiziere deinen Multifaktor
-  OtpDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authentificator) und gib den Code ein.
+  OtpDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authentificator) oder kopiere das Secret und gib anschliessend den Code ein.
   Secret: Secret
   Code: Code
 
@@ -114,4 +114,6 @@ Actions:
   Resend: erneut senden
   Skip: überspringen
   Register: registrieren
-  ForgotPassword: Password vergessen
+  ForgotPassword: Password zurücksetzen
+
+optional: (optional)

@@ -11,8 +11,11 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/VictoriaMetrics/fastcache v1.5.7
+	github.com/aaronarduino/goqrsvg v0.0.0-20170617203649-603647895681
+	github.com/ajstarks/svgo v0.0.0-20200320125537-f189e35d30ca
 	github.com/allegro/bigcache v1.2.1
 	github.com/aws/aws-sdk-go v1.30.25 // indirect
+	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.6.2
 	github.com/cockroachdb/cockroach-go v0.0.0-20200504194139-73ffeee90b62
@@ -42,7 +45,6 @@ require (
 	github.com/pquerna/otp v1.2.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
-	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
 	github.com/sony/sonyflake v1.0.0
 	github.com/stretchr/testify v1.5.1
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect

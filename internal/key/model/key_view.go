@@ -19,13 +19,9 @@ type KeyView struct {
 }
 
 type SigningKey struct {
-	ID string
-	//Private         bool
-	//Expiry          time.Time
+	ID        string
 	Algorithm string
-	//Usage           string
-	Key interface{}
-	//CurrentSequence uint64
+	Key       interface{}
 }
 
 type PublicKey struct {

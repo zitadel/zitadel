@@ -7,6 +7,10 @@ html {
         background-image: url($logoImgLight);
     }
 
+    h1 {
+        color: $fontColorLight;
+    }
+
     button {
         background-color: $backgroundColorLight;
         color: $primaryColorLight;
@@ -33,6 +37,15 @@ html {
         color: $fontColorLight;
     }
 
+    #qrcode {
+        svg rect[style*="fill:white"] {
+            fill: $backgroundColorLight !important;
+        }
+
+        svg rect[style*="fill:black"] {
+            fill: $fontColorLight !important;
+        }
+    }
 
     footer {
         background-image: url($footerimgLight);

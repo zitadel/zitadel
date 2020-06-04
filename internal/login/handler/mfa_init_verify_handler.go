@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"encoding/base64"
-	//"encoding/base64"
-	"github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/skip2/go-qrcode"
+	"bytes"
 	"net/http"
-	//qrcode "github.com/skip2/go-qrcode"
+
+	"github.com/aaronarduino/goqrsvg"
+	svg "github.com/ajstarks/svgo"
+	"github.com/boombuler/barcode/qr"
+	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 const (
@@ -68,11 +69,27 @@ func (l *Login) renderMfaInitVerify(w http.ResponseWriter, r *http.Request, auth
 	data.baseData = l.getBaseData(r, authReq, "Mfa Init Verify", errType, errMessage)
 	data.UserName = authReq.UserName
 	if data.MfaType == model.MfaTypeOTP {
-		qrCode, err := qrcode.Encode(data.otpData.Url, qrcode.Medium, 256)
+		code, err := generateQrCode(data.otpData.Url)
 		if err == nil {
-			data.otpData.QrCode = base64.StdEncoding.EncodeToString(qrCode)
+			data.otpData.QrCode = code
 		}
 	}
 
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaInitVerify], data, nil)
+}
+
+func generateQrCode(url string) (string, error) {
+	var b bytes.Buffer
+	s := svg.New(&b)
+
+	qrCode, err := qr.Encode(url, qr.M, qr.Auto)
+	if err != nil {
+		return "", err
+	}
+	qs := goqrsvg.NewQrSVG(qrCode, 5)
+	qs.StartQrSVG(s)
+	qs.WriteQrSVG(s)
+
+	s.End()
+	return string(b.Bytes()), nil
 }

@@ -62,6 +62,14 @@
   font-style: italic;
   font-weight: 800;
 }
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
+  /* For IE6-8 */
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
+}
 *, *::before, *::after {
   box-sizing: border-box;
   font-family: Lato;
@@ -79,11 +87,15 @@ html {
 }
 
 h1 {
-  color: #FFFFFF;
+  color: white;
   font-family: Aileron;
   text-transform: uppercase;
   text-align: center;
   font-size: 40px;
+}
+
+p {
+  font-width: 300;
 }
 
 header {
@@ -108,6 +120,10 @@ a {
   color: #760038;
   text-decoration: none;
   text-transform: uppercase;
+  font-weight: 600;
+}
+a:hover {
+  color: #f60075;
 }
 
 button {
@@ -129,7 +145,7 @@ button:hover {
 }
 button.primary {
   background-color: #760038;
-  color: #FFFFFF;
+  color: white;
   border: none;
 }
 button.primary:hover {
@@ -139,7 +155,7 @@ button > .sessionstate {
   text-transform: lowercase;
 }
 
-input, select {
+input:not([type=radio]), select {
   background-color: #252525;
   color: white;
   height: 50px;
@@ -153,11 +169,27 @@ form .field {
   padding: 10px 0;
 }
 form .field.radio-button {
-  display: inherit;
+  display: flex;
+}
+form .field.radio-button input[type=radio] {
+  height: 20px;
+  vertical-align: middle;
+}
+form .field.radio-button label {
+  height: 20px;
+  display: inline-block;
+  padding: 3px 0 0 15px;
+  width: 100%;
 }
 form label {
+  color: #898989;
   text-transform: uppercase;
   font-size: 0.9rem;
+  margin-bottom: 3px;
+}
+form label span.optional {
+  font-style: italic;
+  text-transform: none;
 }
 form .actions {
   padding: 20px 0;
@@ -169,14 +201,57 @@ form .actions button, form .actions a {
   margin: 10px 0;
 }
 
+#copy-secret {
+  visibility: hidden;
+  position: absolute;
+}
+
+#qrcode {
+  text-align: center;
+}
+#qrcode svg rect[style*="fill:white"] {
+  fill: #282828 !important;
+}
+#qrcode svg rect[style*="fill:black"] {
+  fill: white !important;
+}
+
+#secret .copy {
+  float: right;
+  cursor: pointer;
+}
+
 footer {
   background-image: url("../gradientdeco-full.svg");
   width: 100%;
   background-size: cover;
   height: 44vw;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   z-index: -1;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: "liga";
 }
 
 html {
@@ -185,6 +260,9 @@ html {
 }
 html header .logo {
   background-image: url("../logo-light.png");
+}
+html h1 {
+  color: #282828;
 }
 html button {
   background-color: white;
@@ -207,6 +285,12 @@ html button.primary:hover {
 html input {
   background-color: white;
   color: #282828;
+}
+html #qrcode svg rect[style*="fill:white"] {
+  fill: white !important;
+}
+html #qrcode svg rect[style*="fill:black"] {
+  fill: #282828 !important;
 }
 html footer {
   background-image: url("../gradientdeco-full.svg");

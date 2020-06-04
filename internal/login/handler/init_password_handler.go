@@ -55,7 +55,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *mod
 		l.renderInitPassword(w, r, authReq, data.UserID, data.Code, err)
 		return
 	}
-	userOrg := "LOGIN"
+	userOrg := login
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}

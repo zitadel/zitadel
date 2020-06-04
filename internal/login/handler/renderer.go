@@ -164,9 +164,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *model.InitUserStep:
 		l.renderInitUser(w, r, authReq, "", "", nil)
 	default:
-		//TODO: err
+		l.renderInternalError(w, r, authReq, errors.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
-	// NEXT_STEP_MFA_VERIFY_ASYNC
 }
 
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {

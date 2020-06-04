@@ -7,8 +7,8 @@ UserSelection:
   Title: Select account
   Description: Select your account.
   OtherUser: Other User
-  SessionState1: active
-  SessionState2: inactive
+  SessionState0: active
+  SessionState1: inactive
 
 Password:
   Title: Password
@@ -52,7 +52,7 @@ MfaPrompt:
 MfaInitVerify:
   Title: Multifactor Verification
   Description: Verify your multifactor.
-  OtpDescription: Scan the code (e.g Google-Authentificator) and insert your code
+  OtpDescription: Scan the code with your authenticator app (e.g Google-Authenticator) or copy the secret and insert the generated code below.
   Secret: Secret
   Code: Code
 
@@ -114,4 +114,6 @@ Actions:
   Resend: resend
   Skip: skip
   Register: register
-  ForgotPassword: Forgot password
+  ForgotPassword: Reset password
+
+optional: (optional)
