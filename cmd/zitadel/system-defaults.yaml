@@ -76,7 +76,7 @@ SystemDefaults:
             LastName: 'Administrator'
             UserName: 'zitadel-global-org-admin@caos.ch'
             Email: 'zitadel-global-org-admin@caos.ch'
-            Password: 'Password'
+            Password: 'Password1!'
         Owners:
           - 'zitadel-global-org-admin@caos.ch'
       - Name: 'CAOS AG'
@@ -86,7 +86,7 @@ SystemDefaults:
             LastName: 'Administrator'
             UserName: 'zitadel-admin@caos.ch'
             Email: 'zitadel-admin@caos.ch'
-            Password: 'Password'
+            Password: 'Password1!'
         Owners:
           - 'zitadel-admin@caos.ch'
         Projects:
