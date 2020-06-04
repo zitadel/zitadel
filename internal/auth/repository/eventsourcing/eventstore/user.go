@@ -7,13 +7,15 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type UserRepo struct {
-	UserEvents *user_event.UserEventstore
-	View       *view.View
+	UserEvents   *user_event.UserEventstore
+	PolicyEvents *policy_event.PolicyEventstore
+	View         *view.View
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {
@@ -21,7 +23,15 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 }
 
 func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error) {
-	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
+	policyResourceOwner := auth.GetCtxData(ctx).OrgID
+	if resourceOwner != "" {
+		policyResourceOwner = resourceOwner
+	}
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
@@ -93,7 +103,11 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 }
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
-	_, err := repo.UserEvents.ChangePassword(ctx, auth.GetCtxData(ctx).UserID, old, new)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	_, err = repo.UserEvents.ChangePassword(ctx, policy, auth.GetCtxData(ctx).UserID, old, new)
 	return err
 }
 
@@ -144,7 +158,11 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string)
 }
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
-	return repo.UserEvents.SetPassword(ctx, userID, code, password)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return err
+	}
+	return repo.UserEvents.SetPassword(ctx, policy, userID, code, password)
 }
 
 func (repo *UserRepo) SignOut(ctx context.Context, agentID, userID string) error {

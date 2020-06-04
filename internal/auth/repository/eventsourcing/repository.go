@@ -16,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -57,7 +58,16 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
-
+	policy, err := es_policy.StartPolicy(
+		es_policy.PolicyConfig{
+			Eventstore: es,
+			Cache:      conf.Eventstore.Cache,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
 	user, err := es_user.StartUser(
 		es_user.UserConfig{
 			Eventstore: es,
@@ -95,8 +105,9 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	return &EsRepository{
 		spool,
 		eventstore.UserRepo{
-			UserEvents: user,
-			View:       view,
+			UserEvents:   user,
+			PolicyEvents: policy,
+			View:         view,
 		},
 		eventstore.AuthRequestRepo{
 			UserEvents:               user,
