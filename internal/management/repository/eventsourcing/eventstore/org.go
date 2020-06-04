@@ -47,7 +47,7 @@ func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_m
 }
 
 func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Org, id, 0, 0)
+	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Org, id, "", 0, 0)
 	if err != nil {
 		return nil, err
 	}

@@ -116,7 +116,7 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_m
 }
 
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Project, id, 0, 0)
+	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Project, id, "", 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -162,8 +162,8 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	}, nil
 }
 
-func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Application, id, 0, 0)
+func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
+	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Application, id, appId, 0, 0)
 	if err != nil {
 		return nil, err
 	}

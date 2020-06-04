@@ -13,14 +13,12 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model.AggregateType, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
+func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model.AggregateType, id string, secId string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
 	aggregateTypeQuery := aggregateType
-	idQuery := id
 	if aggregateType == chg_model.Application {
 		aggregateTypeQuery = chg_model.Project
-		idQuery = ""
 	}
-	query := ChangesQuery(idQuery, lastSequence, aggregateTypeQuery)
+	query := ChangesQuery(id, lastSequence, aggregateTypeQuery)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -48,6 +46,8 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 				LastName     string `json:"lastName,omitempty"`
 				EMailAddress string `json:"email,omitempty"`
 				Phone        string `json:"phone,omitempty"`
+				Language     string `json:"preferredLanguage,omitempty"`
+				UserName     string `json:"userName,omitempty"`
 			}
 			userDummy := user{}
 			if u.Data != nil {
@@ -78,22 +78,20 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 						ClientId string `json:"clientId,omitempty"`
 					}
 					type app struct {
-						ClientId  string    `json:"clientId,omitempty"`
-						Name      string    `json:"name,omitempty"`
-						Omitempty omitempty `json:"omitempty,omitempty"`
-						AppId     string    `json:"AppId,omitempty"`
-						AppType   int       `json:"AppType,omitempty"`
+						AppId          string `json:"AppId,omitempty"`
+						AppType        int    `json:"AppType,omitempty"`
+						AuthMethodType int    `json:"authMethodType,omitempty"`
+						ClientId       string `json:"clientId,omitempty"`
+						Name           string `json:"name,omitempty"`
 					}
 					appDummy := app{}
-					omitemptyDummy := omitempty{}
-					appDummy.Omitempty = omitemptyDummy
 					if u.Data != nil {
 						if err := json.Unmarshal(u.Data, &appDummy); err != nil {
 							log.Println("Error getting data!", err.Error())
 						}
 					}
 					change.Data = appDummy
-					if appDummy.AppId != id {
+					if appDummy.AppId != secId {
 						appendChanges = false
 					}
 				} else {
@@ -134,9 +132,7 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 func ChangesQuery(objectID string, latestSequence uint64, aggregateType es_model.AggregateType) *es_model.SearchQuery {
 	query := es_model.NewSearchQuery().
 		AggregateTypeFilter(aggregateType).
-		LatestSequenceFilter(latestSequence)
-	if objectID != "" {
-		query = query.AggregateIDFilter(objectID)
-	}
+		LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(objectID)
 	return query
 }

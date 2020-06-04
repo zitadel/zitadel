@@ -370,7 +370,7 @@ func request_ManagementService_UserChanges_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_ManagementService_ApplicationChanges_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_ManagementService_ApplicationChanges_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "sec_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_ManagementService_ApplicationChanges_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -393,6 +393,17 @@ func request_ManagementService_ApplicationChanges_0(ctx context.Context, marshal
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	val, ok = pathParams["sec_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "sec_id")
+	}
+
+	protoReq.SecId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "sec_id", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -5877,7 +5888,7 @@ var (
 
 	pattern_ManagementService_UserChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ManagementService_ApplicationChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ApplicationChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "id", "applications", "sec_id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ManagementService_OrgChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
 

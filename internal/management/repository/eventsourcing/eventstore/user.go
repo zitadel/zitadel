@@ -61,7 +61,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.User, id, 0, 0)
+	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.User, id, "", 0, 0)
 	if err != nil {
 		return nil, err
 	}

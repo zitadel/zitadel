@@ -37,7 +37,7 @@ type ProjectRepository interface {
 	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
-	ApplicationChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error)
+	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*chg_model.Changes, error)
 
 	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)

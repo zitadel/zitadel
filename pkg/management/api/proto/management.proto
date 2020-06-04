@@ -170,7 +170,7 @@ service ManagementService {
 
     rpc ApplicationChanges(ChangeRequest) returns (Changes) {
         option (google.api.http) = {
-            get: "/applications/{id}/changes"
+            get: "/projects/{id}/applications/{sec_id}/changes"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1223,8 +1223,9 @@ service ManagementService {
 
 message ChangeRequest {
     string id = 1;
-    uint64 limit= 2;
-    uint64 sequence_offset = 3;
+    string sec_id = 2;
+    uint64 limit= 3;
+    uint64 sequence_offset = 4;
 }
 
 message Changes {
