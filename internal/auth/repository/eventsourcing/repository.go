@@ -19,8 +19,8 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
-	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -43,6 +43,7 @@ type EsRepository struct {
 	eventstore.UserSessionRepo
 	eventstore.UserGrantRepo
 	eventstore.OrgRepository
+	eventstore.IamRepository
 }
 
 func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
@@ -164,6 +165,10 @@ func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, aut
 		eventstore.OrgRepository{
 			SearchLimit: conf.SearchLimit,
 			View:        view,
+		},
+		eventstore.IamRepository{
+			IamEvents: iam,
+			IamID:     systemDefaults.IamID,
 		},
 	}, nil
 }
