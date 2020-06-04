@@ -17,7 +17,7 @@ type Application struct {
 }
 
 const (
-	applicationTable = "management.applications"
+	applicationTable = "auth.applications"
 )
 
 func (p *Application) MinimumCycleDuration() time.Duration { return p.cycleDuration }
