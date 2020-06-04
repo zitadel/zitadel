@@ -21,8 +21,9 @@ type UserGrantRepo struct {
 	AuthZRepo   *authz_repo.EsRepository
 }
 
-func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
+func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_USER_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).UserID})
 	grants, count, err := repo.View.SearchUserGrants(request)
 	if err != nil {
 		return nil, err
@@ -51,9 +52,8 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 		}
 	}
 	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: ctxData.ProjectID})
-	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_USER_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: ctxData.UserID})
 
-	grants, err := repo.SearchUserGrants(ctx, request)
+	grants, err := repo.SearchMyUserGrants(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -94,13 +94,11 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 }
 
 func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
-	ctxData := auth.GetCtxData(ctx)
 	grantSearch := &grant_model.UserGrantSearchRequest{
 		Queries: []*grant_model.UserGrantSearchQuery{
-			&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_USER_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: ctxData.UserID},
 			&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER, Method: global_model.SEARCHMETHOD_EQUALS, Value: repo.IamID},
 		}}
-	result, err := repo.SearchUserGrants(ctx, grantSearch)
+	result, err := repo.SearchMyUserGrants(ctx, grantSearch)
 	if err != nil {
 		return false, err
 	}

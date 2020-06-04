@@ -243,10 +243,13 @@ service AuthService {
     };
   }
 
-  rpc SearchUserGrant(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
+  rpc SearchMyUserGrant(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
     option (google.api.http) = {
-      post: "/usergrants/_search"
+      post: "/usergrants/me/_search"
       body: "*"
+    };
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
     };
   }
 
@@ -493,7 +496,6 @@ enum UserGrantSearchKey {
   UserGrantSearchKey_UNKNOWN = 0;
   UserGrantSearchKey_ORG_ID = 1;
   UserGrantSearchKey_PROJECT_ID = 2;
-  UserGrantSearchKey_USER_ID = 3;
 }
 
 message UserGrantSearchResponse {

@@ -105,6 +105,11 @@ var AuthService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/zitadel.auth.api.v1.AuthService/SearchMyUserGrant": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/zitadel.auth.api.v1.AuthService/SearchMyProjectOrgs": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",

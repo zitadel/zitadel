@@ -5,8 +5,8 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) SearchUserGrant(ctx context.Context, in *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
-	response, err := s.repo.SearchUserGrants(ctx, userGrantSearchRequestsToModel(in))
+func (s *Server) SearchMyUserGrant(ctx context.Context, in *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
+	response, err := s.repo.SearchMyUserGrants(ctx, userGrantSearchRequestsToModel(in))
 	if err != nil {
 		return nil, err
 	}

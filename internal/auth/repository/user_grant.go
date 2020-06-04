@@ -6,7 +6,7 @@ import (
 )
 
 type UserGrantRepository interface {
-	SearchUserGrants(ctx context.Context, request *model.UserGrantSearchRequest) (*model.UserGrantSearchResponse, error)
+	SearchMyUserGrants(ctx context.Context, request *model.UserGrantSearchRequest) (*model.UserGrantSearchResponse, error)
 	SearchMyProjectOrgs(ctx context.Context, request *model.UserGrantSearchRequest) (*model.ProjectOrgSearchResponse, error)
 	SearchMyZitadelPermissions(ctx context.Context) ([]string, error)
 }

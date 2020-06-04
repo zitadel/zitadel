@@ -112,9 +112,9 @@
         ]
       }
     },
-    "/usergrants/_search": {
+    "/usergrants/me/_search": {
       "post": {
-        "operationId": "SearchUserGrant",
+        "operationId": "SearchMyUserGrant",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -904,8 +904,7 @@
       "enum": [
         "UserGrantSearchKey_UNKNOWN",
         "UserGrantSearchKey_ORG_ID",
-        "UserGrantSearchKey_PROJECT_ID",
-        "UserGrantSearchKey_USER_ID"
+        "UserGrantSearchKey_PROJECT_ID"
       ],
       "default": "UserGrantSearchKey_UNKNOWN"
     },
