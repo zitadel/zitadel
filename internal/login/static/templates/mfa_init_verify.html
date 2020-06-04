@@ -10,7 +10,6 @@
     <input type="hidden" name="mfaType" value="{{ .MfaType }}" />
     <input type="hidden" name="url" value="{{ .Url }}" />
     <input type="hidden" name="secret" value="{{ .Secret }}" />
-    <textarea id="copy-secret">{{ .Secret }}</textarea>
 
     {{if (eq .MfaType 0) }}
         <p>{{t "MfaInitVerify.OtpDescription"}}</p>
@@ -22,7 +21,7 @@
                 <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
                 <span class="input" id="secret">
                     {{.Secret}}
-                    <span class="copy material-icons" onclick="copySecret()">content_copy</span>
+                    <span class="copy material-icons" onclick="copyToClipboard('{{ .Secret }}')">content_copy</span>
                 </span>
             </div>
             <div class="field">
@@ -38,9 +37,8 @@
 </form>
 
 <script>
-    function copySecret() {
-        document.getElementById('copy-secret').select();
-        document.execCommand('copy');
+    const copyToClipboard = str => {
+        navigator.clipboard.writeText(str);
     }
 </script>
 
