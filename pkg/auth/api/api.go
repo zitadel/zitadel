@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 
 	"github.com/caos/oidc/pkg/op"
 
@@ -18,10 +19,10 @@ type Config struct {
 	OIDC oidc.OPHandlerConfig
 }
 
-func Start(ctx context.Context, conf Config, authZ auth_util.Config, repo repository.Repository) {
-	grpcServer := grpc.StartServer(conf.GRPC.ToServerConfig(), authZ, repo)
+func Start(ctx context.Context, conf Config, authZRepo *authz_repo.EsRepository, authZ auth_util.Config, authRepo repository.Repository) {
+	grpcServer := grpc.StartServer(conf.GRPC.ToServerConfig(), authZRepo, authZ, authRepo)
 	grpcGateway := grpc.StartGateway(conf.GRPC.ToGatewayConfig())
-	oidcHandler := oidc.NewProvider(ctx, conf.OIDC, repo)
+	oidcHandler := oidc.NewProvider(ctx, conf.OIDC, authRepo)
 
 	server.StartServer(ctx, grpcServer)
 	server.StartGateway(ctx, grpcGateway)

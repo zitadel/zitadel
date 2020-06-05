@@ -66,6 +66,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 		op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(config.Endpoints.Userinfo.Path, config.Endpoints.Userinfo.URL)),
 		op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(config.Endpoints.EndSession.Path, config.Endpoints.EndSession.URL)),
 		op.WithCustomKeysEndpoint(op.NewEndpointWithURL(config.Endpoints.Keys.Path, config.Endpoints.Keys.URL)),
+		op.WithRetry(3, time.Duration(30*time.Second)),
 	)
 	logging.Log("OIDC-asf13").OnError(err).Panic("cannot create provider")
 	return provider

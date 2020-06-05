@@ -16,7 +16,7 @@ const (
 	ApplicationKeyProjectID     = "project_id"
 	ApplicationKeyResourceOwner = "resource_owner"
 	ApplicationKeyOIDCClientID  = "oidc_client_id"
-	ApplicationKeyName          = "name"
+	ApplicationKeyName          = "app_name"
 )
 
 type ApplicationView struct {

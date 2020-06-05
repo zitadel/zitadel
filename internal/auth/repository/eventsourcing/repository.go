@@ -2,6 +2,10 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/handler"
@@ -15,12 +19,13 @@ import (
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
-	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
+	SearchLimit uint64
 	Eventstore  es_int.Config
 	AuthRequest cache.Config
 	View        types.SQL
@@ -35,9 +40,13 @@ type EsRepository struct {
 	eventstore.TokenRepo
 	eventstore.KeyRepository
 	eventstore.ApplicationRepo
+	eventstore.UserSessionRepo
+	eventstore.UserGrantRepo
+	eventstore.OrgRepository
+	eventstore.IamRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -98,9 +107,20 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
+	iam, err := es_iam.StartIam(
+		es_iam.IamConfig{
+			Eventstore: es,
+			Cache:      conf.Eventstore.Cache,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
 
-	repos := handler.EventstoreRepos{UserEvents: user}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos)
+	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	return &EsRepository{
 		spool,
@@ -131,6 +151,24 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		eventstore.ApplicationRepo{
 			View:          view,
 			ProjectEvents: project,
+		},
+		eventstore.UserSessionRepo{
+			View: view,
+		},
+		eventstore.UserGrantRepo{
+			SearchLimit: conf.SearchLimit,
+			View:        view,
+			IamID:       systemDefaults.IamID,
+			Auth:        authZ,
+			AuthZRepo:   authZRepo,
+		},
+		eventstore.OrgRepository{
+			SearchLimit: conf.SearchLimit,
+			View:        view,
+		},
+		eventstore.IamRepository{
+			IamEvents: iam,
+			IamID:     systemDefaults.IamID,
 		},
 	}, nil
 }

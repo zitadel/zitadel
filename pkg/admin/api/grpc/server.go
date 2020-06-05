@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
@@ -20,13 +21,13 @@ type Server struct {
 	repo     repository.Repository
 }
 
-func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository.Repository) *Server {
+func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository, authZ auth.Config, repo repository.Repository) *Server {
 	return &Server{
 		port:     conf.Port,
 		org:      repo,
 		repo:     repo,
 		authZ:    authZ,
-		verifier: admin_auth.Start(),
+		verifier: admin_auth.Start(authZRepo),
 	}
 }
 

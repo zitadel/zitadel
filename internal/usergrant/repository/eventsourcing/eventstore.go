@@ -57,7 +57,6 @@ func (es *UserGrantEventStore) AddUserGrant(ctx context.Context, grant *grant_mo
 	if grant == nil || !grant.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
 	}
-	//TODO: Check Uniqueness
 	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err

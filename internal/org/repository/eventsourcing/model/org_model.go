@@ -1,15 +1,14 @@
-package eventsourcing
+package model
 
 import (
 	"encoding/json"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
 const (
-	orgVersion = "v1"
+	OrgVersion = "v1"
 )
 
 type Org struct {
@@ -64,22 +63,22 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 
 func (o *Org) AppendEvent(event *es_models.Event) error {
 	switch event.Type {
-	case org_model.OrgAdded:
+	case OrgAdded:
 		*o = Org{}
 		err := o.setData(event)
 		if err != nil {
 			return err
 		}
-	case org_model.OrgChanged:
+	case OrgChanged:
 		err := o.setData(event)
 		if err != nil {
 			return err
 		}
-	case org_model.OrgDeactivated:
+	case OrgDeactivated:
 		o.State = int32(org_model.ORGSTATE_INACTIVE)
-	case org_model.OrgReactivated:
+	case OrgReactivated:
 		o.State = int32(org_model.ORGSTATE_ACTIVE)
-	case org_model.OrgMemberAdded:
+	case OrgMemberAdded:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
 			return err
@@ -87,7 +86,7 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		member.CreationDate = event.CreationDate
 
 		o.setMember(member)
-	case org_model.OrgMemberChanged:
+	case OrgMemberChanged:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
 			return err
@@ -96,7 +95,7 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		member.CreationDate = existingMember.CreationDate
 
 		o.setMember(member)
-	case org_model.OrgMemberRemoved:
+	case OrgMemberRemoved:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {
 			return err

@@ -51,8 +51,12 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	//TODO: replace globalRO
-	user, err := l.authRepo.Register(setContext(r.Context(), globalRO), data.toUserModel(), globalRO)
+	iam, err := l.authRepo.GetIam(r.Context())
+	if err != nil {
+		l.renderRegister(w, r, authRequest, data, err)
+		return
+	}
+	user, err := l.authRepo.Register(setContext(r.Context(), iam.GlobalOrgID), data.toUserModel(), iam.GlobalOrgID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return

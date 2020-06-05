@@ -1,4 +1,4 @@
-package eventsourcing
+package model
 
 import (
 	"encoding/json"
@@ -29,10 +29,10 @@ func (m *OrgMember) AppendEvents(events ...*es_models.Event) error {
 func (m *OrgMember) AppendEvent(event *es_models.Event) error {
 	m.ObjectRoot.AppendEvent(event)
 
-	return m.setData(event)
+	return m.SetData(event)
 }
 
-func (m *OrgMember) setData(event *es_models.Event) error {
+func (m *OrgMember) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, m)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-Hz7Mb", "unable to unmarshal data")

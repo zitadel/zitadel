@@ -277,26 +277,6 @@ func (mr *MockAuthServiceClientMockRecorder) Healthz(arg0, arg1 interface{}, arg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Healthz", reflect.TypeOf((*MockAuthServiceClient)(nil).Healthz), varargs...)
 }
 
-// IsIamAdmin mocks base method
-func (m *MockAuthServiceClient) IsIamAdmin(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.IsAdminResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "IsIamAdmin", varargs...)
-	ret0, _ := ret[0].(*grpc.IsAdminResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// IsIamAdmin indicates an expected call of IsIamAdmin
-func (mr *MockAuthServiceClientMockRecorder) IsIamAdmin(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsIamAdmin", reflect.TypeOf((*MockAuthServiceClient)(nil).IsIamAdmin), varargs...)
-}
-
 // Ready mocks base method
 func (m *MockAuthServiceClient) Ready(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -397,24 +377,24 @@ func (mr *MockAuthServiceClientMockRecorder) SearchMyProjectOrgs(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyProjectOrgs", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyProjectOrgs), varargs...)
 }
 
-// SetMyPassword mocks base method
-func (m *MockAuthServiceClient) SetMyPassword(arg0 context.Context, arg1 *grpc.PasswordRequest, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+// SearchUserGrant mocks base method
+func (m *MockAuthServiceClient) SearchUserGrant(arg0 context.Context, arg1 *grpc.UserGrantSearchRequest, arg2 ...grpc0.CallOption) (*grpc.UserGrantSearchResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "SetMyPassword", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
+	ret := m.ctrl.Call(m, "SearchUserGrant", varargs...)
+	ret0, _ := ret[0].(*grpc.UserGrantSearchResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SetMyPassword indicates an expected call of SetMyPassword
-func (mr *MockAuthServiceClientMockRecorder) SetMyPassword(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// SearchUserGrant indicates an expected call of SearchUserGrant
+func (mr *MockAuthServiceClientMockRecorder) SearchUserGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMyPassword", reflect.TypeOf((*MockAuthServiceClient)(nil).SetMyPassword), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserGrant", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchUserGrant), varargs...)
 }
 
 // UpdateMyUserAddress mocks base method
@@ -478,14 +458,14 @@ func (mr *MockAuthServiceClientMockRecorder) Validate(arg0, arg1 interface{}, ar
 }
 
 // VerifyMfaOTP mocks base method
-func (m *MockAuthServiceClient) VerifyMfaOTP(arg0 context.Context, arg1 *grpc.VerifyMfaOtp, arg2 ...grpc0.CallOption) (*grpc.MfaOtpResponse, error) {
+func (m *MockAuthServiceClient) VerifyMfaOTP(arg0 context.Context, arg1 *grpc.VerifyMfaOtp, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "VerifyMfaOTP", varargs...)
-	ret0, _ := ret[0].(*grpc.MfaOtpResponse)
+	ret0, _ := ret[0].(*emptypb.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

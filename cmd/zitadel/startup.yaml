@@ -125,9 +125,36 @@ Login:
   Handler:
     Port: 50031
     OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
-    ZitadelURL: '$CITADEL_CONSOLE'
+    ZitadelURL: '$ZITADEL_CONSOLE'
     LanguageCookieName: 'caos.zitadel.login.lang'
     DefaultLanguage: 'de'
+
+
+AuthZ:
+  Repository:
+    Eventstore:
+      ServiceName: 'AuthZ'
+      Repository:
+        SQL:
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'authz'
+          Database: 'eventstore'
+          SSLmode: disable
+      Cache:
+        Type: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
+    View:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'authz'
+      Database: 'authz'
+      SSLmode: disable
+    Spooler:
+      ConcurrentTasks: 1
+      BulkLimit: 100
+      FailureCountUntilSkip: 5
 
 Admin:
   API:

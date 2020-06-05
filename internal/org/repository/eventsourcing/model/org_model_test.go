@@ -1,4 +1,4 @@
-package eventsourcing
+package model
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ func TestOrgFromEvents(t *testing.T) {
 			name: "org from events, ok",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "ID", Sequence: 1, Type: model.OrgAdded},
+					{AggregateID: "ID", Sequence: 1, Type: OrgAdded},
 				},
 				org: &Org{Name: "OrgName"},
 			},
@@ -32,7 +32,7 @@ func TestOrgFromEvents(t *testing.T) {
 			name: "org from events, nil org",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "ID", Sequence: 1, Type: model.OrgAdded},
+					{AggregateID: "ID", Sequence: 1, Type: OrgAdded},
 				},
 				org: nil,
 			},
@@ -66,7 +66,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append added event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OrgAdded},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgAdded},
 				org:   &Org{Name: "OrgName"},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgName"},
@@ -74,7 +74,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OrgChanged, Data: []byte(`{"domain": "OrgDomain"}`)},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgChanged, Data: []byte(`{"domain": "OrgDomain"}`)},
 				org:   &Org{Name: "OrgName", Domain: "asdf"},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgName", Domain: "OrgDomain"},
@@ -82,14 +82,14 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OrgDeactivated},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgDeactivated},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_INACTIVE)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: model.OrgReactivated},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgReactivated},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE)},
 		},
