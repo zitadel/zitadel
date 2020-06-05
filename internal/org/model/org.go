@@ -53,7 +53,7 @@ func (o *Org) ContainsMember(userID string) bool {
 }
 
 func (o *Org) nameForDomain(iamDomain string) string {
-	return strings.ReplaceAll(o.Name, " ", "-") + "." + iamDomain
+	return strings.ToLower(strings.ReplaceAll(o.Name, " ", "-") + "." + iamDomain)
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {
