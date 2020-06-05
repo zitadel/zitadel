@@ -56,9 +56,9 @@ require (
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200512001501-aaeff5de670a
 	google.golang.org/api v0.24.0 // indirect
-	google.golang.org/genproto v0.0.0-20200511104702-f5ebc3bea380
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/grpc v1.29.1
-	google.golang.org/protobuf v1.22.0
+	google.golang.org/protobuf v1.24.0
 	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
