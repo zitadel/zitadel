@@ -41,6 +41,11 @@ spec:
         - name: accounts-http
           containerPort: 50031
         env: 
+    - env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         - name: ZITADEL_GOOGLE_CHAT_URL
           valueFrom:
             secretKeyRef:
