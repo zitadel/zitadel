@@ -90,23 +90,5 @@ CREATE TABLE authz.applications (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE authz.tokens (
-    id TEXT,
-
-    creation_date TIMESTAMPTZ,
-    change_date TIMESTAMPTZ,
-
-    resource_owner TEXT,
-    application_id TEXT,
-    user_agent_id TEXT,
-    user_id TEXT,
-    expiration TIMESTAMPTZ,
-    sequence BIGINT,
-    scopes TEXT ARRAY,
-    audience TEXT ARRAY,
-
-    PRIMARY KEY (id)
-);
-
 COMMIT;
 
