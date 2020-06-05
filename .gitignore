@@ -32,4 +32,4 @@ cockroach-data/*
 
 #binaries
 cmd/zitadel/zitadel
-zitadel
+**/statik/statik.go

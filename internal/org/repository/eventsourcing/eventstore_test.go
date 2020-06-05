@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"testing"
 	"time"
 
@@ -428,7 +429,7 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 		{
 			name: "new events found and added success",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
-				{Sequence: 6, Data: []byte("{\"userId\": \"banana\", \"roles\": [\"bananaa\"]}"), Type: org_model.OrgMemberChanged},
+				{Sequence: 6, Data: []byte("{\"userId\": \"banana\", \"roles\": [\"bananaa\"]}"), Type: model.OrgMemberChanged},
 			}, nil)},
 			args: args{
 				ctx:    auth.NewMockContext("user", "org"),
@@ -442,8 +443,8 @@ func TestOrgEventstore_OrgMemberByIDs(t *testing.T) {
 		{
 			name: "not member of org error",
 			fields: fields{Eventstore: newTestEventstore(t).expectFilterEvents([]*es_models.Event{
-				{Sequence: 6, Data: []byte("{\"userId\": \"banana\", \"roles\": [\"bananaa\"]}"), Type: org_model.OrgMemberAdded},
-				{Sequence: 7, Data: []byte("{\"userId\": \"apple\"}"), Type: org_model.OrgMemberRemoved},
+				{Sequence: 6, Data: []byte("{\"userId\": \"banana\", \"roles\": [\"bananaa\"]}"), Type: model.OrgMemberAdded},
+				{Sequence: 7, Data: []byte("{\"userId\": \"apple\"}"), Type: model.OrgMemberRemoved},
 			}, nil)},
 			args: args{
 				ctx:    auth.NewMockContext("user", "org"),
@@ -511,7 +512,7 @@ func TestOrgEventstore_AddOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
@@ -541,7 +542,7 @@ func TestOrgEventstore_AddOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
@@ -570,7 +571,7 @@ func TestOrgEventstore_AddOrgMember(t *testing.T) {
 				expectAggregateCreator().
 				expectFilterEvents([]*es_models.Event{
 					{
-						Type:     org_model.OrgMemberAdded,
+						Type:     model.OrgMemberAdded,
 						Data:     []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence: 6,
 					},
@@ -600,12 +601,12 @@ func TestOrgEventstore_AddOrgMember(t *testing.T) {
 				expectPushEvents(10, nil).
 				expectFilterEvents([]*es_models.Event{
 					{
-						Type:     org_model.OrgMemberAdded,
+						Type:     model.OrgMemberAdded,
 						Data:     []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence: 6,
 					},
 					{
-						Type:     org_model.OrgMemberRemoved,
+						Type:     model.OrgMemberRemoved,
 						Data:     []byte(`{"userId": "hodor"}`),
 						Sequence: 10,
 					},
@@ -708,13 +709,13 @@ func TestOrgEventstore_ChangeOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgMemberAdded,
+						Type:        model.OrgMemberAdded,
 						Data:        []byte(`{"userId": "brudi", "roles": ["master of desaster"]}`),
 						Sequence:    6,
 					},
@@ -740,13 +741,13 @@ func TestOrgEventstore_ChangeOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgMemberAdded,
+						Type:        model.OrgMemberAdded,
 						Data:        []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence:    6,
 					},
@@ -772,13 +773,13 @@ func TestOrgEventstore_ChangeOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgMemberAdded,
+						Type:        model.OrgMemberAdded,
 						Data:        []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence:    6,
 					},
@@ -805,13 +806,13 @@ func TestOrgEventstore_ChangeOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgMemberAdded,
+						Type:        model.OrgMemberAdded,
 						Data:        []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence:    6,
 					},
@@ -890,13 +891,13 @@ func TestOrgEventstore_RemoveOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgMemberAdded,
+						Type:        model.OrgMemberAdded,
 						Data:        []byte(`{"userId": "brudi", "roles": ["master of desaster"]}`),
 						Sequence:    6,
 					},
@@ -921,13 +922,13 @@ func TestOrgEventstore_RemoveOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgMemberAdded,
+						Type:        model.OrgMemberAdded,
 						Data:        []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence:    6,
 					},
@@ -952,13 +953,13 @@ func TestOrgEventstore_RemoveOrgMember(t *testing.T) {
 				expectFilterEvents([]*es_models.Event{
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgAdded,
+						Type:        model.OrgAdded,
 						Sequence:    4,
 						Data:        []byte("{}"),
 					},
 					{
 						AggregateID: "hodor-org",
-						Type:        org_model.OrgMemberAdded,
+						Type:        model.OrgMemberAdded,
 						Data:        []byte(`{"userId": "hodor", "roles": ["master"]}`),
 						Sequence:    6,
 					},
@@ -996,7 +997,7 @@ func TestOrgEventstore_RemoveOrgMember(t *testing.T) {
 func orgCreatedEvent() *es_models.Event {
 	return &es_models.Event{
 		AggregateID:      "hodor-org",
-		AggregateType:    org_model.OrgAggregate,
+		AggregateType:    model.OrgAggregate,
 		AggregateVersion: "v1",
 		CreationDate:     time.Now().Add(-1 * time.Minute),
 		Data:             []byte(`{"name": "hodor-org", "domain":"hodor.org"}`),
@@ -1005,14 +1006,14 @@ func orgCreatedEvent() *es_models.Event {
 		ID:               "sdlfö4t23kj",
 		ResourceOwner:    "hodor-org",
 		Sequence:         32,
-		Type:             org_model.OrgAdded,
+		Type:             model.OrgAdded,
 	}
 }
 
 func orgInactiveEvent() *es_models.Event {
 	return &es_models.Event{
 		AggregateID:      "hodor-org",
-		AggregateType:    org_model.OrgAggregate,
+		AggregateType:    model.OrgAggregate,
 		AggregateVersion: "v1",
 		CreationDate:     time.Now().Add(-1 * time.Minute),
 		Data:             nil,
@@ -1021,6 +1022,6 @@ func orgInactiveEvent() *es_models.Event {
 		ID:               "sdlfö4t23kj",
 		ResourceOwner:    "hodor-org",
 		Sequence:         52,
-		Type:             org_model.OrgDeactivated,
+		Type:             model.OrgDeactivated,
 	}
 }

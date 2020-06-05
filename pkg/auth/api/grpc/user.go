@@ -110,7 +110,7 @@ func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpRespon
 }
 
 func (s *Server) VerifyMfaOTP(ctx context.Context, request *VerifyMfaOtp) (*empty.Empty, error) {
-	err := s.repo.VerifyMyMfaOTP(ctx, request.Code)
+	err := s.repo.VerifyMyMfaOTPSetup(ctx, request.Code)
 	return &empty.Empty{}, err
 }
 

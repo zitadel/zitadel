@@ -516,6 +516,39 @@ service ManagementService {
         };
     }
 
+
+    rpc SearchMyOrgDomains(OrgDomainSearchRequest) returns (OrgDomainSearchResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.read"
+        };
+    }
+
+    rpc AddMyOrgDomain(AddOrgDomainRequest) returns (OrgDomain) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc RemoveMyOrgDomain(RemoveOrgDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/orgs/me/domains/{domain}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
     //ORG_MEMBERS
     rpc GetOrgMemberRoles(google.protobuf.Empty) returns (OrgMemberRoles) {
         option (google.api.http) = {
@@ -1624,24 +1657,75 @@ message OrgID {
     string id = 1;
 }
 
-message OrgDomain {
-    string domain = 1;
-}
-
 message Org {
     string id = 1;
     OrgState state = 2;
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
-    string domain = 6;
-    uint64 sequence = 7;
+    uint64 sequence = 6;
 }
 
 enum OrgState {
     ORGSTATE_UNSPECIFIED = 0;
     ORGSTATE_ACTIVE = 1;
     ORGSTATE_INACTIVE = 2;
+}
+
+message OrgDomains {
+    repeated OrgDomain domains = 1;
+}
+
+message OrgDomain {
+    string org_id = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp change_date = 3;
+    string domain = 4;
+    bool verified = 5;
+    bool primary = 6;
+    uint64 sequence = 7;
+}
+
+message OrgDomainView {
+    string org_id = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp change_date = 3;
+    string domain = 4;
+    bool verified = 5;
+    bool primary = 6;
+    uint64 sequence = 7;
+}
+
+message AddOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message OrgDomainSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated OrgDomainView result = 4;
+}
+
+message OrgDomainSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated OrgDomainSearchQuery queries = 3;
+}
+
+message OrgDomainSearchQuery {
+    OrgDomainSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum OrgDomainSearchKey {
+    ORGDOMAINSEARCHKEY_UNSPECIFIED = 0;
+    ORGDOMAINSEARCHKEY_DOMAIN = 1;
 }
 
 message OrgMemberRoles {

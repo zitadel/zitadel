@@ -1,0 +1,98 @@
+package eventsourcing
+
+import (
+	"context"
+	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/handler"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/id"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+
+	"github.com/caos/zitadel/internal/auth_request/repository/cache"
+	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/spooler"
+	authz_view "github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
+	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
+)
+
+type Config struct {
+	Eventstore  es_int.Config
+	AuthRequest cache.Config
+	View        types.SQL
+	Spooler     spooler.SpoolerConfig
+	KeyConfig   es_key.KeyConfig
+}
+
+type EsRepository struct {
+	spooler *es_spol.Spooler
+	eventstore.UserGrantRepo
+	eventstore.IamRepo
+	eventstore.TokenVerifierRepo
+}
+
+func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+	es, err := es_int.Start(conf.Eventstore)
+	if err != nil {
+		return nil, err
+	}
+
+	sqlClient, err := conf.View.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	idGenerator := id.SonyFlakeGenerator
+	view, err := authz_view.StartView(sqlClient, idGenerator)
+	if err != nil {
+		return nil, err
+	}
+
+	iam, err := es_iam.StartIam(es_iam.IamConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+	project, err := es_proj.StartProject(es_proj.ProjectConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
+	repos := handler.EventstoreRepos{IamEvents: iam}
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
+
+	return &EsRepository{
+		spool,
+		eventstore.UserGrantRepo{
+			View:      view,
+			IamID:     systemDefaults.IamID,
+			Auth:      authZ,
+			IamEvents: iam,
+		},
+		eventstore.IamRepo{
+			IamID:     systemDefaults.IamID,
+			IamEvents: iam,
+		},
+		eventstore.TokenVerifierRepo{
+			//TODO: Add Token Verification Key
+			IamID:         systemDefaults.IamID,
+			IamEvents:     iam,
+			ProjectEvents: project,
+			View:          view,
+		},
+	}, nil
+}
+
+func (repo *EsRepository) Health(ctx context.Context) error {
+	if err := repo.UserGrantRepo.Health(); err != nil {
+		return err
+	}
+	return nil
+}

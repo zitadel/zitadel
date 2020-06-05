@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/auth"
@@ -141,7 +142,7 @@ func Test_uniqueNameAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := uniqueNameAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgName)
+			got, err := reservedUniqueNameAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgName)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
@@ -217,7 +218,7 @@ func TestOrgReactivateAggregate(t *testing.T) {
 	}
 	type args struct {
 		aggCreator *es_models.AggregateCreator
-		org        *Org
+		org        *model.Org
 		ctx        context.Context
 	}
 	tests := []struct {
@@ -230,7 +231,7 @@ func TestOrgReactivateAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				org: &Org{
+				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
 						Sequence:    2,
@@ -244,7 +245,7 @@ func TestOrgReactivateAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				org: &Org{
+				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
 						Sequence:    2,
@@ -291,7 +292,7 @@ func TestOrgDeactivateAggregate(t *testing.T) {
 	}
 	type args struct {
 		aggCreator *es_models.AggregateCreator
-		org        *Org
+		org        *model.Org
 		ctx        context.Context
 	}
 	tests := []struct {
@@ -304,7 +305,7 @@ func TestOrgDeactivateAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				org: &Org{
+				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
 						Sequence:    2,
@@ -318,7 +319,7 @@ func TestOrgDeactivateAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				org: &Org{
+				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
 						Sequence:    2,
@@ -367,8 +368,8 @@ func TestOrgUpdateAggregates(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		aggCreator *es_models.AggregateCreator
-		existing   *Org
-		updated    *Org
+		existing   *model.Org
+		updated    *model.Org
 	}
 	tests := []struct {
 		name string
@@ -381,7 +382,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				existing:   nil,
-				updated:    &Org{},
+				updated:    &model.Org{},
 			},
 			res: res{
 				aggregateCount: 0,
@@ -393,7 +394,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				existing:   &Org{},
+				existing:   &model.Org{},
 				updated:    nil,
 			},
 			res: res{
@@ -406,8 +407,8 @@ func TestOrgUpdateAggregates(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				existing:   &Org{},
-				updated:    &Org{},
+				existing:   &model.Org{},
+				updated:    &model.Org{},
 			},
 			res: res{
 				aggregateCount: 0,
@@ -419,7 +420,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				existing: &Org{
+				existing: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
@@ -427,7 +428,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 					Domain: "caos.ch",
 					Name:   "coas",
 				},
-				updated: &Org{
+				updated: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
@@ -446,7 +447,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				existing: &Org{
+				existing: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
@@ -454,7 +455,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 					Domain: "caos.swiss",
 					Name:   "caos",
 				},
-				updated: &Org{
+				updated: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
@@ -493,7 +494,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		aggCreator *es_models.AggregateCreator
-		org        *Org
+		org        *model.Org
 	}
 	tests := []struct {
 		name string
@@ -517,7 +518,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				org: &Org{
+				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
@@ -536,7 +537,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				org: &Org{
+				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
@@ -554,7 +555,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
-				org: &Org{
+				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,

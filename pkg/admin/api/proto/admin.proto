@@ -235,5 +235,5 @@ enum Gender {
 
 message CreateOrgRequest {
     string name = 1 [(validate.rules).string.min_len = 1];
-    string domain = 2 [(validate.rules).string.min_len = 1];
+    string domain = 2;
 }

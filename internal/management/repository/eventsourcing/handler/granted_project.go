@@ -107,7 +107,6 @@ func (p *GrantedProject) Process(event *models.Event) (err error) {
 }
 
 func (p *GrantedProject) fillOrgData(grantedProject *view_model.GrantedProjectView, org *org_model.Org) {
-	grantedProject.OrgDomain = org.Domain
 	grantedProject.OrgName = org.Name
 }
 

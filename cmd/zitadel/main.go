@@ -3,18 +3,20 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/login"
 
 	"github.com/caos/logging"
 
-	authz "github.com/caos/zitadel/internal/api/auth"
+	internal_authz "github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/config"
 	"github.com/caos/zitadel/internal/notification"
 	tracing "github.com/caos/zitadel/internal/tracing/config"
 	"github.com/caos/zitadel/pkg/admin"
 	"github.com/caos/zitadel/pkg/auth"
 	"github.com/caos/zitadel/pkg/console"
-	"github.com/caos/zitadel/pkg/login"
 	"github.com/caos/zitadel/pkg/management"
 )
 
@@ -22,13 +24,14 @@ type Config struct {
 	Mgmt         management.Config
 	Auth         auth.Config
 	Login        login.Config
+	AuthZ        authz.Config
 	Admin        admin.Config
 	Console      console.Config
 	Notification notification.Config
 
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
-	AuthZ          authz.Config
+	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
 }
 
@@ -48,18 +51,25 @@ func main() {
 	logging.Log("MAIN-FaF2r").OnError(err).Fatal("cannot read config")
 
 	ctx := context.Background()
+	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults)
+	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
+
 	if *adminEnabled {
-		admin.Start(ctx, conf.Admin, conf.AuthZ, conf.SystemDefaults)
+		admin.Start(ctx, conf.Admin, authZRepo, conf.InternalAuthZ, conf.SystemDefaults)
 	}
 	if *managementEnabled {
-		management.Start(ctx, conf.Mgmt, conf.AuthZ, conf.SystemDefaults)
+		management.Start(ctx, conf.Mgmt, authZRepo, conf.InternalAuthZ, conf.SystemDefaults)
+	}
+	var authRepo *eventsourcing.EsRepository
+	if *authEnabled || *loginEnabled {
+		authRepo, err = eventsourcing.Start(conf.Auth.Repository, conf.InternalAuthZ, conf.SystemDefaults, authZRepo)
+		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 	if *authEnabled {
-		auth.Start(ctx, conf.Auth, conf.AuthZ, conf.SystemDefaults)
+		auth.Start(ctx, conf.Auth, authZRepo, conf.InternalAuthZ, conf.SystemDefaults, authRepo)
 	}
 	if *loginEnabled {
-		err = login.Start(ctx, conf.Login)
-		logging.Log("MAIN-53RF2").OnError(err).Fatal("error starting login ui")
+		login.Start(ctx, conf.Login, conf.SystemDefaults, authRepo)
 	}
 	if *notificationEnabled {
 		notification.Start(ctx, conf.Notification, conf.SystemDefaults)

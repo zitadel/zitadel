@@ -2,7 +2,6 @@ package eventsourcing
 
 import (
 	"context"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
@@ -249,6 +248,38 @@ func UserInitCodeSentAggregate(aggCreator *es_models.AggregateCreator, existing 
 	}
 }
 
+func InitCodeVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, password *model.Password) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		if existing.Email != nil && !existing.Email.IsEmailVerified {
+			agg, err = agg.AppendEvent(model.UserEmailVerified, nil)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if password != nil {
+			agg, err = agg.AppendEvent(model.UserPasswordChanged, password)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return agg.AppendEvent(model.InitializedUserCheckSucceeded, nil)
+	}
+}
+
+func InitCodeCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.InitializedUserCheckFailed, nil)
+	}
+}
+
 func SkipMfaAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)
@@ -379,13 +410,23 @@ func EmailChangeAggregate(ctx context.Context, aggCreator *es_models.AggregateCr
 	return append(aggregates, agg), nil
 }
 
-func EmailVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+func EmailVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)
 		if err != nil {
 			return nil, err
 		}
 		return agg.AppendEvent(model.UserEmailVerified, nil)
+	}
+}
+
+func EmailVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserEmailVerificationFailed, nil)
 	}
 }
 
@@ -444,13 +485,24 @@ func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 		return agg, nil
 	}
 }
-func PhoneVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) func(ctx context.Context) (*es_models.Aggregate, error) {
+
+func PhoneVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)
 		if err != nil {
 			return nil, err
 		}
 		return agg.AppendEvent(model.UserPhoneVerified, nil)
+	}
+}
+
+func PhoneVerificationFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserPhoneVerificationFailed, nil)
 	}
 }
 

@@ -59,7 +59,7 @@ func GrantMemberToModel(member *ProjectGrantMember) *model.ProjectGrantMember {
 
 func (p *Project) appendAddGrantMemberEvent(event *es_models.Event) error {
 	member := &ProjectGrantMember{}
-	err := member.getData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -73,13 +73,13 @@ func (p *Project) appendAddGrantMemberEvent(event *es_models.Event) error {
 
 func (p *Project) appendChangeGrantMemberEvent(event *es_models.Event) error {
 	member := &ProjectGrantMember{}
-	err := member.getData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
 	if _, g := GetProjectGrant(p.Grants, member.GrantID); g != nil {
 		if i, m := GetProjectGrantMember(g.Members, member.UserID); m != nil {
-			g.Members[i].getData(event)
+			g.Members[i].SetData(event)
 		}
 	}
 	return nil
@@ -87,7 +87,7 @@ func (p *Project) appendChangeGrantMemberEvent(event *es_models.Event) error {
 
 func (p *Project) appendRemoveGrantMemberEvent(event *es_models.Event) error {
 	member := &ProjectGrantMember{}
-	err := member.getData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -102,7 +102,7 @@ func (p *Project) appendRemoveGrantMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (m *ProjectGrantMember) getData(event *es_models.Event) error {
+func (m *ProjectGrantMember) SetData(event *es_models.Event) error {
 	m.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, m); err != nil {
 		logging.Log("EVEN-8die2").WithError(err).Error("could not unmarshal event data")

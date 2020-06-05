@@ -230,6 +230,21 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgDomains": utils_auth.Option{
+		Permission: "org.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgDomain": utils_auth.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgDomain": utils_auth.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetOrgMemberRoles": utils_auth.Option{
 		Permission: "org.member.read",
 		CheckParam: "",

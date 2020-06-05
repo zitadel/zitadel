@@ -3,10 +3,9 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	"strconv"
-
+	"github.com/caos/zitadel/internal/id"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
 	"github.com/pquerna/otp/totp"
-	"github.com/sony/sonyflake"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/auth"
@@ -19,16 +18,16 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	global_model "github.com/caos/zitadel/internal/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	org_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 type UserEventstore struct {
 	es_int.Eventstore
 	userCache                *UserCache
-	idGenerator              *sonyflake.Sonyflake
+	idGenerator              id.Generator
 	PasswordAlg              crypto.HashAlgorithm
 	InitializeUserCode       crypto.Generator
 	EmailVerificationCode    crypto.Generator
@@ -49,7 +48,6 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	if err != nil {
 		return nil, err
 	}
-	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	if err != nil {
 		return nil, err
@@ -64,7 +62,7 @@ func StartUser(conf UserConfig, systemDefaults sd.SystemDefaults) (*UserEventsto
 	return &UserEventstore{
 		Eventstore:               conf.Eventstore,
 		userCache:                userCache,
-		idGenerator:              idGenerator,
+		idGenerator:              id.SonyFlakeGenerator,
 		InitializeUserCode:       initCodeGen,
 		EmailVerificationCode:    emailVerificationCode,
 		PhoneVerificationCode:    phoneVerificationCode,
@@ -92,7 +90,15 @@ func (es *UserEventstore) UserByID(ctx context.Context, id string) (*usr_model.U
 		return nil, err
 	}
 	es.userCache.cacheUser(user)
-	return org_es_model.UserToModel(user), nil
+	return model.UserToModel(user), nil
+}
+
+func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+	query, err := UserByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return es.FilterEvents(ctx, query)
 }
 
 type domain struct {
@@ -109,7 +115,7 @@ func (es *UserEventstore) getUserNameSuffix(ctx context.Context, orgID string) s
 	setUserNameSuffix := func(events ...*es_models.Event) error {
 		for _, event := range events {
 			switch event.Type {
-			case org_model.OrgAdded, org_model.OrgChanged:
+			case org_es_model.OrgAdded, org_es_model.OrgChanged:
 				s := new(domain)
 				err := json.Unmarshal(event.Data, s)
 				logging.Log("EVENT-xr1mV").OnError(err).Debug("get domain failed")
@@ -134,18 +140,19 @@ func getOrgID(ctx context.Context, resourceOwner string) string {
 	return auth.GetCtxData(ctx).OrgID
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*org_es_model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername(es.getUserNameSuffix(ctx, getOrgID(ctx, resourceOwner)))
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
-	id, err := es.idGenerator.NextID()
+
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	user.AggregateID = strconv.FormatUint(id, 10)
+	user.AggregateID = id
 
-	err = user.HashPasswordIfExisting(es.PasswordAlg, true)
+	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -158,17 +165,17 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 		return nil, nil, err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
-	repoInitCode := org_es_model.InitCodeFromModel(user.InitCode)
-	repoPhoneCode := org_es_model.PhoneCodeFromModel(user.PhoneCode)
+	repoUser := model.UserFromModel(user)
+	repoInitCode := model.InitCodeFromModel(user.InitCode)
+	repoPhoneCode := model.PhoneCodeFromModel(user.PhoneCode)
 
 	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner)
 
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, "")
+func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy) (*usr_model.User, error) {
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, policy, "")
 	if err != nil {
 		return nil, err
 	}
@@ -179,21 +186,21 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User) 
 	}
 
 	es.userCache.cacheUser(repoUser)
-	return org_es_model.UserToModel(repoUser), nil
+	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*org_es_model.User, []*es_models.Aggregate, error) {
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername(es.getUserNameSuffix(ctx, getOrgID(ctx, resourceOwner)))
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	user.AggregateID = strconv.FormatUint(id, 10)
+	user.AggregateID = id
 
-	err = user.HashPasswordIfExisting(es.PasswordAlg, false)
+	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -202,15 +209,15 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 		return nil, nil, err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
-	repoEmailCode := org_es_model.EmailCodeFromModel(user.EmailCode)
+	repoUser := model.UserFromModel(user)
+	repoEmailCode := model.EmailCodeFromModel(user.EmailCode)
 
 	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode)
 	return repoUser, aggregates, err
 }
 
-func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, resourceOwner)
+func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*usr_model.User, error) {
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, policy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +228,7 @@ func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User
 	}
 
 	es.userCache.cacheUser(repoUser)
-	return org_es_model.UserToModel(repoUser), nil
+	return model.UserToModel(repoUser), nil
 }
 
 func (es *UserEventstore) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -233,14 +240,14 @@ func (es *UserEventstore) DeactivateUser(ctx context.Context, id string) (*usr_m
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "cant deactivate inactive user")
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
+	repoExisting := model.UserFromModel(existing)
 	aggregate := UserDeactivateAggregate(es.AggregateCreator(), repoExisting)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 	}
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.UserToModel(repoExisting), nil
+	return model.UserToModel(repoExisting), nil
 }
 
 func (es *UserEventstore) ReactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -252,14 +259,14 @@ func (es *UserEventstore) ReactivateUser(ctx context.Context, id string) (*usr_m
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do94s", "user must be inactive")
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
+	repoExisting := model.UserFromModel(existing)
 	aggregate := UserReactivateAggregate(es.AggregateCreator(), repoExisting)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 	}
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.UserToModel(repoExisting), nil
+	return model.UserToModel(repoExisting), nil
 }
 
 func (es *UserEventstore) LockUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -271,14 +278,14 @@ func (es *UserEventstore) LockUser(ctx context.Context, id string) (*usr_model.U
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "user must be active or initial")
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
+	repoExisting := model.UserFromModel(existing)
 	aggregate := UserLockAggregate(es.AggregateCreator(), repoExisting)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 	}
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.UserToModel(repoExisting), nil
+	return model.UserToModel(repoExisting), nil
 }
 
 func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -290,14 +297,14 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dks83", "user must be locked")
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
+	repoExisting := model.UserFromModel(existing)
 	aggregate := UserUnlockAggregate(es.AggregateCreator(), repoExisting)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 	}
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.UserToModel(repoExisting), nil
+	return model.UserToModel(repoExisting), nil
 }
 
 func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
@@ -330,8 +337,8 @@ func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, user
 		return nil, err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
-	repoInitCode := org_es_model.InitCodeFromModel(initCode)
+	repoUser := model.UserFromModel(user)
+	repoInitCode := model.InitCodeFromModel(initCode)
 
 	agg := UserInitCodeAggregate(es.AggregateCreator(), repoUser, repoInitCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
@@ -339,7 +346,7 @@ func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, user
 		return nil, err
 	}
 	es.userCache.cacheUser(repoUser)
-	return org_es_model.InitCodeToModel(repoUser.InitCode), nil
+	return model.InitCodeToModel(repoUser.InitCode), nil
 }
 
 func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error {
@@ -351,13 +358,46 @@ func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error
 		return err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	agg := UserInitCodeSentAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
 		return err
 	}
 	es.userCache.cacheUser(repoUser)
+	return nil
+}
+
+func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, verificationCode, password string) error {
+	if userID == "" || verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "userId or Code empty")
+	}
+	pw := &usr_model.Password{SecretString: password}
+	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, false)
+	if err != nil {
+		return err
+	}
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if existing.InitCode == nil {
+		return caos_errs.ThrowNotFound(nil, "EVENT-spo9W", "code not found")
+	}
+	repoPassword := model.PasswordFromModel(pw)
+	repoExisting := model.UserFromModel(existing)
+	var updateAggregate func(ctx context.Context) (*es_models.Aggregate, error)
+	if err := crypto.VerifyCode(existing.InitCode.CreationDate, existing.InitCode.Expiry, existing.InitCode.Code, verificationCode, es.InitializeUserCode); err != nil {
+		updateAggregate = InitCodeCheckFailedAggregate(es.AggregateCreator(), repoExisting)
+	} else {
+		updateAggregate = InitCodeVerifiedAggregate(es.AggregateCreator(), repoExisting, repoPassword)
+	}
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
 	return nil
 }
 
@@ -370,7 +410,7 @@ func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error 
 		return err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	agg := SkipMfaAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
@@ -412,9 +452,9 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "invalid password")
 }
 
-func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *org_es_model.User, *org_es_model.AuthRequest) es_sdk.AggregateFunc) error {
-	repoUser := org_es_model.UserFromModel(user)
-	repoAuthRequest := org_es_model.AuthRequestFromModel(authRequest)
+func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc) error {
+	repoUser := model.UserFromModel(user)
+	repoAuthRequest := model.AuthRequestFromModel(authRequest)
 	agg := check(es.AggregateCreator(), repoUser, repoAuthRequest)
 	err := es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
@@ -424,15 +464,15 @@ func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_
 	return nil
 }
 
-func (es *UserEventstore) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
+func (es *UserEventstore) SetOneTimePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, password *usr_model.Password) (*usr_model.Password, error) {
 	user, err := es.UserByID(ctx, password.AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	return es.changedPassword(ctx, user, password.SecretString, true)
+	return es.changedPassword(ctx, user, policy, password.SecretString, true)
 }
 
-func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, password string) error {
+func (es *UserEventstore) SetPassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, code, password string) error {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
@@ -443,11 +483,11 @@ func (es *UserEventstore) SetPassword(ctx context.Context, userID, code, passwor
 	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "EVENT-sd6DF", "code invalid")
 	}
-	_, err = es.changedPassword(ctx, user, password, false)
+	_, err = es.changedPassword(ctx, user, policy, password, false)
 	return err
 }
 
-func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new string) (*usr_model.Password, error) {
+func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, old, new string) (*usr_model.Password, error) {
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -458,17 +498,17 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, userID, old, new s
 	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "invalid password")
 	}
-	return es.changedPassword(ctx, user, new, false)
+	return es.changedPassword(ctx, user, policy, new, false)
 }
 
-func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, password string, onetime bool) (*usr_model.Password, error) {
-	//TODO: check password policy
-	secret, err := crypto.Hash([]byte(password), es.PasswordAlg)
+func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, password string, onetime bool) (*usr_model.Password, error) {
+	pw := &usr_model.Password{SecretString: password}
+	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, onetime)
 	if err != nil {
 		return nil, err
 	}
-	repoPassword := &org_es_model.Password{Secret: secret, ChangeRequired: onetime}
-	repoUser := org_es_model.UserFromModel(user)
+	repoPassword := model.PasswordFromModel(pw)
+	repoUser := model.UserFromModel(user)
 	agg := PasswordChangeAggregate(es.AggregateCreator(), repoUser, repoPassword)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
@@ -476,7 +516,7 @@ func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.U
 	}
 	es.userCache.cacheUser(repoUser)
 
-	return org_es_model.PasswordToModel(repoUser.Password), nil
+	return model.PasswordToModel(repoUser.Password), nil
 }
 
 func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string, notifyType usr_model.NotificationType) error {
@@ -488,13 +528,13 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 		return err
 	}
 
-	passwordCode := new(org_es_model.PasswordCode)
+	passwordCode := new(model.PasswordCode)
 	err = es.generatePasswordCode(passwordCode, notifyType)
 	if err != nil {
 		return err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	agg := RequestSetPassword(es.AggregateCreator(), repoUser, passwordCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
@@ -513,7 +553,7 @@ func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) e
 		return err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	agg := PasswordCodeSentAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
@@ -546,8 +586,8 @@ func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.
 	if err != nil {
 		return nil, err
 	}
-	repoExisting := org_es_model.UserFromModel(existing)
-	repoNew := org_es_model.ProfileFromModel(profile)
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.ProfileFromModel(profile)
 
 	updateAggregate := ProfileChangeAggregate(es.AggregateCreator(), repoExisting, repoNew)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
@@ -556,7 +596,7 @@ func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.
 	}
 
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.ProfileToModel(repoExisting.Profile), nil
+	return model.ProfileToModel(repoExisting.Profile), nil
 }
 
 func (es *UserEventstore) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
@@ -588,9 +628,9 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 		return nil, err
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
-	repoNew := org_es_model.EmailFromModel(email)
-	repoEmailCode := org_es_model.EmailCodeFromModel(emailCode)
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.EmailFromModel(email)
+	repoEmailCode := model.EmailCodeFromModel(emailCode)
 
 	updateAggregates, err := EmailChangeAggregate(ctx, es.AggregateCreator(), repoExisting, repoNew, repoEmailCode)
 	if err != nil {
@@ -602,7 +642,7 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 	}
 
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.EmailToModel(repoExisting.Email), nil
+	return model.EmailToModel(repoExisting.Email), nil
 }
 
 func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationCode string) error {
@@ -616,17 +656,23 @@ func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationC
 	if existing.EmailCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "code not found")
 	}
-	if err := crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, verificationCode, es.EmailVerificationCode); err != nil {
+
+	err = crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, verificationCode, es.EmailVerificationCode)
+	if err == nil {
+		return es.setEmailVerifyResult(ctx, existing, EmailVerifiedAggregate)
+	}
+	if err := es.setEmailVerifyResult(ctx, existing, EmailVerificationFailedAggregate); err != nil {
 		return err
 	}
+	return caos_errs.ThrowInvalidArgument(err, "EVENT-dtGaa", "invalid code")
+}
 
-	repoExisting := org_es_model.UserFromModel(existing)
-	updateAggregate := EmailVerifiedAggregate(es.AggregateCreator(), repoExisting)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+func (es *UserEventstore) setEmailVerifyResult(ctx context.Context, existing *usr_model.User, check func(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc) error {
+	repoExisting := model.UserFromModel(existing)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, check(es.AggregateCreator(), repoExisting))
 	if err != nil {
 		return err
 	}
-
 	es.userCache.cacheUser(repoExisting)
 	return nil
 }
@@ -652,8 +698,8 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 		return err
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
-	repoEmailCode := org_es_model.EmailCodeFromModel(emailCode)
+	repoExisting := model.UserFromModel(existing)
+	repoEmailCode := model.EmailCodeFromModel(emailCode)
 	updateAggregate := EmailVerificationCodeAggregate(es.AggregateCreator(), repoExisting, repoEmailCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -673,7 +719,7 @@ func (es *UserEventstore) EmailVerificationCodeSent(ctx context.Context, userID 
 		return err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	agg := EmailCodeSentAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
@@ -712,9 +758,9 @@ func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phon
 		return nil, err
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
-	repoNew := org_es_model.PhoneFromModel(phone)
-	repoPhoneCode := org_es_model.PhoneCodeFromModel(phoneCode)
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.PhoneFromModel(phone)
+	repoPhoneCode := model.PhoneCodeFromModel(phoneCode)
 
 	updateAggregate := PhoneChangeAggregate(es.AggregateCreator(), repoExisting, repoNew, repoPhoneCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
@@ -723,7 +769,7 @@ func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phon
 	}
 
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.PhoneToModel(repoExisting.Phone), nil
+	return model.PhoneToModel(repoExisting.Phone), nil
 }
 
 func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationCode string) error {
@@ -737,17 +783,23 @@ func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationC
 	if existing.PhoneCode == nil {
 		return caos_errs.ThrowNotFound(nil, "EVENT-slp0s", "code not found")
 	}
-	if err := crypto.VerifyCode(existing.PhoneCode.CreationDate, existing.PhoneCode.Expiry, existing.PhoneCode.Code, verificationCode, es.PhoneVerificationCode); err != nil {
+
+	err = crypto.VerifyCode(existing.PhoneCode.CreationDate, existing.PhoneCode.Expiry, existing.PhoneCode.Code, verificationCode, es.PhoneVerificationCode)
+	if err == nil {
+		return es.setPhoneVerifyResult(ctx, existing, PhoneVerifiedAggregate)
+	}
+	if err := es.setPhoneVerifyResult(ctx, existing, PhoneVerificationFailedAggregate); err != nil {
 		return err
 	}
+	return caos_errs.ThrowInvalidArgument(err, "EVENT-dsf4G", "invalid code")
+}
 
-	repoExisting := org_es_model.UserFromModel(existing)
-	updateAggregate := PhoneVerifiedAggregate(es.AggregateCreator(), repoExisting)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+func (es *UserEventstore) setPhoneVerifyResult(ctx context.Context, existing *usr_model.User, check func(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc) error {
+	repoExisting := model.UserFromModel(existing)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, check(es.AggregateCreator(), repoExisting))
 	if err != nil {
 		return err
 	}
-
 	es.userCache.cacheUser(repoExisting)
 	return nil
 }
@@ -773,8 +825,8 @@ func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userI
 		return err
 	}
 
-	repoExisting := org_es_model.UserFromModel(existing)
-	repoPhoneCode := org_es_model.PhoneCodeFromModel(phoneCode)
+	repoExisting := model.UserFromModel(existing)
+	repoPhoneCode := model.PhoneCodeFromModel(phoneCode)
 	updateAggregate := PhoneVerificationCodeAggregate(es.AggregateCreator(), repoExisting, repoPhoneCode)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -794,7 +846,7 @@ func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID 
 		return err
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	agg := PhoneCodeSentAggregate(es.AggregateCreator(), repoUser)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, agg)
 	if err != nil {
@@ -824,8 +876,8 @@ func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.
 	if err != nil {
 		return nil, err
 	}
-	repoExisting := org_es_model.UserFromModel(existing)
-	repoNew := org_es_model.AddressFromModel(address)
+	repoExisting := model.UserFromModel(existing)
+	repoNew := model.AddressFromModel(address)
 
 	updateAggregate := AddressChangeAggregate(es.AggregateCreator(), repoExisting, repoNew)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
@@ -834,7 +886,7 @@ func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.
 	}
 
 	es.userCache.cacheUser(repoExisting)
-	return org_es_model.AddressToModel(repoExisting.Address), nil
+	return model.AddressToModel(repoExisting.Address), nil
 }
 
 func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model.OTP, error) {
@@ -853,8 +905,8 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model
 	if err != nil {
 		return nil, err
 	}
-	repoOtp := &org_es_model.OTP{Secret: encryptedSecret}
-	repoExisting := org_es_model.UserFromModel(existing)
+	repoOtp := &model.OTP{Secret: encryptedSecret}
+	repoExisting := model.UserFromModel(existing)
 	updateAggregate := MfaOTPAddAggregate(es.AggregateCreator(), repoExisting, repoOtp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -862,7 +914,7 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model
 	}
 
 	es.userCache.cacheUser(repoExisting)
-	otp := org_es_model.OTPToModel(repoExisting.OTP)
+	otp := model.OTPToModel(repoExisting.OTP)
 	otp.Url = key.URL()
 	otp.SecretString = key.Secret()
 	return otp, nil
@@ -876,7 +928,7 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 	if existing.OTP == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "no otp existing")
 	}
-	repoExisting := org_es_model.UserFromModel(existing)
+	repoExisting := model.UserFromModel(existing)
 	updateAggregate := MfaOTPRemoveAggregate(es.AggregateCreator(), repoExisting)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
 	if err != nil {
@@ -898,7 +950,7 @@ func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code str
 	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
 		return err
 	}
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, MfaOTPVerifyAggregate(es.AggregateCreator(), repoUser))
 	if err != nil {
 		return err
@@ -917,9 +969,9 @@ func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, 
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "opt not ready")
 	}
 
-	repoUser := org_es_model.UserFromModel(user)
-	repoAuthReq := org_es_model.AuthRequestFromModel(authRequest)
-	var aggregate func(*es_models.AggregateCreator, *org_es_model.User, *org_es_model.AuthRequest) es_sdk.AggregateFunc
+	repoUser := model.UserFromModel(user)
+	repoAuthReq := model.AuthRequestFromModel(authRequest)
+	var aggregate func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc
 	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
 		aggregate = MfaOTPCheckFailedAggregate
 	} else {
@@ -952,7 +1004,7 @@ func (es *UserEventstore) SignOut(ctx context.Context, agentID, userID string) e
 	if err != nil {
 		return err
 	}
-	repoUser := org_es_model.UserFromModel(user)
+	repoUser := model.UserFromModel(user)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, SignOutAggregate(es.AggregateCreator(), repoUser, agentID))
 	if err != nil {
 		return err

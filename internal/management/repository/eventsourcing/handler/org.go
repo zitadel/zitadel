@@ -1,14 +1,14 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"time"
 
 	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/org/repository/view"
 )
 
 type Org struct {
@@ -34,12 +34,12 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 }
 
 func (o *Org) Process(event *es_models.Event) error {
-	org := new(view.OrgView)
+	org := new(org_model.OrgView)
 
 	switch event.Type {
-	case org_model.OrgAdded:
+	case model.OrgAdded:
 		org.AppendEvent(event)
-	case org_model.OrgChanged:
+	case model.OrgChanged:
 		err := org.SetData(event)
 		if err != nil {
 			return err

@@ -2,19 +2,19 @@ package eventsourcing
 
 import (
 	"context"
-	"strconv"
-	"strings"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
 type OrgEventstore struct {
 	eventstore.Eventstore
-	IAMDomain string
+	IAMDomain   string
+	idGenerator id.Generator
 }
 
 type OrgConfig struct {
@@ -23,43 +23,29 @@ type OrgConfig struct {
 }
 
 func StartOrg(conf OrgConfig) *OrgEventstore {
-	return &OrgEventstore{Eventstore: conf.Eventstore, IAMDomain: conf.IAMDomain}
+	return &OrgEventstore{
+		Eventstore:  conf.Eventstore,
+		idGenerator: id.SonyFlakeGenerator,
+		IAMDomain:   conf.IAMDomain,
+	}
 }
 
-func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org) (*Org, []*es_models.Aggregate, error) {
+func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org) (*model.Org, []*es_models.Aggregate, error) {
 	if orgModel == nil || !orgModel.IsValid() {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-OeLSk", "org not valid")
 	}
-	//TODO: validate domain
-	err := es.setZitadelDomain(orgModel)
-	if err != nil {
-		return nil, nil, err
-	}
+	orgModel.AddIAMDomain(es.IAMDomain)
 
-	id, err := idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, nil, errors.ThrowInternal(err, "EVENT-OwciI", "id gen failed")
 	}
-	orgModel.AggregateID = strconv.FormatUint(id, 10)
-
-	org := OrgFromModel(orgModel)
+	orgModel.AggregateID = id
+	org := model.OrgFromModel(orgModel)
 
 	aggregates, err := orgCreatedAggregates(ctx, es.AggregateCreator(), org)
 
 	return org, aggregates, err
-}
-
-// TODO: implement domain validation
-// we don't validate domains in alpha state.
-// To be sure that only valid domains are registered
-// we set every domain as subdomain of the iam-domain.
-// in the future it maybe makes sense to add the subdomain as additional domain to an org
-func (es *OrgEventstore) setZitadelDomain(org *org_model.Org) error {
-	if strings.HasSuffix(org.Domain, es.IAMDomain) {
-		return nil
-	}
-	org.Domain += "." + es.IAMDomain
-	return nil
 }
 
 func (es *OrgEventstore) CreateOrg(ctx context.Context, orgModel *org_model.Org) (*org_model.Org, error) {
@@ -69,7 +55,7 @@ func (es *OrgEventstore) CreateOrg(ctx context.Context, orgModel *org_model.Org)
 		return nil, err
 	}
 
-	return OrgToModel(org), nil
+	return model.OrgToModel(org), nil
 }
 
 func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
@@ -81,7 +67,7 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 		return nil, err
 	}
 
-	esOrg := OrgFromModel(org)
+	esOrg := model.OrgFromModel(org)
 	err = es_sdk.Filter(ctx, es.FilterEvents, esOrg.AppendEvents, query)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
@@ -90,7 +76,7 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 		return nil, errors.ThrowNotFound(nil, "EVENT-kVLb2", "org not found")
 	}
 
-	return OrgToModel(esOrg), nil
+	return model.OrgToModel(esOrg), nil
 }
 
 func (es *OrgEventstore) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
@@ -113,7 +99,7 @@ func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
 		if len(events) == 0 {
 			return nil
 		}
-		*unique = *unique || events[0].Type == org_model.OrgDomainReserved || events[0].Type == org_model.OrgNameReserved
+		*unique = *unique || events[0].Type == model.OrgDomainReserved || events[0].Type == model.OrgNameReserved
 
 		return nil
 	}
@@ -124,7 +110,7 @@ func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgID string) (*org_
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not found")
 	}
-	org := OrgFromModel(existingOrg)
+	org := model.OrgFromModel(existingOrg)
 
 	aggregate := orgDeactivateAggregate(es.AggregateCreator(), org)
 	err = es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
@@ -132,7 +118,7 @@ func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgID string) (*org_
 		return nil, err
 	}
 
-	return OrgToModel(org), nil
+	return model.OrgToModel(org), nil
 }
 
 func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_model.Org, error) {
@@ -140,7 +126,7 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not set")
 	}
-	org := OrgFromModel(existingOrg)
+	org := model.OrgFromModel(existingOrg)
 
 	aggregate := orgReactivateAggregate(es.AggregateCreator(), org)
 	err = es_sdk.Push(ctx, es.PushAggregates, org.AppendEvents, aggregate)
@@ -148,7 +134,56 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_
 		return nil, err
 
 	}
-	return OrgToModel(org), nil
+	return model.OrgToModel(org), nil
+}
+
+func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
+	if !domain.IsValid() {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8sFJW", "domain is invalid")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoDomain := model.OrgDomainFromModel(domain)
+	orgAggregates, err := OrgDomainAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregates...)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, d := model.GetDomain(repoOrg.Domains, domain.Domain); d != nil {
+		return model.OrgDomainToModel(d), nil
+	}
+	return nil, errors.ThrowInternal(nil, "EVENT-ISOP0", "Could not find org in list")
+}
+
+func (es *OrgEventstore) RemoveOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	if domain.Domain == "" {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-SJsK3", "Domain is required")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	if err != nil {
+		return err
+	}
+	if !existing.ContainsDomain(domain) {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Domain doesn't exist on project")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoDomain := model.OrgDomainFromModel(domain)
+	orgAggregates, err := OrgDomainRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregates...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
@@ -170,12 +205,12 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 	return nil, errors.ThrowNotFound(nil, "EVENT-SXji6", "member not found")
 }
 
-func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember) (*OrgMember, *es_models.Aggregate, error) {
+func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember) (*model.OrgMember, *es_models.Aggregate, error) {
 	if member == nil || !member.IsValid() {
 		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
-	repoMember := OrgMemberFromModel(member)
+	repoMember := model.OrgMemberFromModel(member)
 	addAggregate, err := orgMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoMember)
 
 	return repoMember, addAggregate, err
@@ -191,7 +226,7 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 		return nil, err
 	}
 
-	return OrgMemberToModel(repoMember), nil
+	return model.OrgMemberToModel(repoMember), nil
 }
 
 func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
@@ -205,8 +240,8 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 	}
 
 	member.ObjectRoot = existingMember.ObjectRoot
-	repoMember := OrgMemberFromModel(member)
-	repoExistingMember := OrgMemberFromModel(existingMember)
+	repoMember := model.OrgMemberFromModel(member)
+	repoExistingMember := model.OrgMemberFromModel(existingMember)
 
 	orgAggregate := orgMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoExistingMember, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
@@ -214,7 +249,7 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 		return nil, err
 	}
 
-	return OrgMemberToModel(repoMember), nil
+	return model.OrgMemberToModel(repoMember), nil
 }
 
 func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.OrgMember) error {
@@ -231,7 +266,7 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 	}
 
 	member.ObjectRoot = existingMember.ObjectRoot
-	repoMember := OrgMemberFromModel(member)
+	repoMember := model.OrgMemberFromModel(member)
 
 	orgAggregate := orgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)

@@ -2,13 +2,15 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
+	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/org/repository/view"
 )
 
 type OrgRepository struct {
@@ -28,7 +30,7 @@ func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string)
 	if err != nil {
 		return nil, err
 	}
-	return view.OrgToModel(org), nil
+	return model.OrgToModel(org), nil
 }
 
 func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
@@ -41,6 +43,31 @@ func (repo *OrgRepository) DeactivateOrg(ctx context.Context, id string) (*org_m
 
 func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_model.Org, error) {
 	return repo.OrgEventstore.ReactivateOrg(ctx, id)
+}
+
+func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_ORG_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID})
+	domains, count, err := repo.View.SearchOrgDomains(request)
+	if err != nil {
+		return nil, err
+	}
+	return &org_model.OrgDomainSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.OrgDomainsToModel(domains),
+	}, nil
+}
+
+func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
+	domain.AggregateID = auth.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string) error {
+	d := org_model.NewOrgDomain(auth.GetCtxData(ctx).OrgID, domain)
+	return repo.OrgEventstore.RemoveOrgDomain(ctx, d)
 }
 
 func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (member *org_model.OrgMember, err error) {
@@ -71,7 +98,7 @@ func (repo *OrgRepository) SearchOrgMembers(ctx context.Context, request *org_mo
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      view.OrgMembersToModel(members),
+		Result:      model.OrgMembersToModel(members),
 	}, nil
 }
 

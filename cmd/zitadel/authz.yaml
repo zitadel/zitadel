@@ -1,4 +1,4 @@
-AuthZ:
+InternalAuthZ:
   RolePermissionMappings:
     - Role: 'IAM_OWNER'
       Permissions:

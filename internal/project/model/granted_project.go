@@ -50,7 +50,7 @@ const (
 type GrantedProjectSearchQuery struct {
 	Key    GrantedProjectSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type GrantedProjectSearchResponse struct {

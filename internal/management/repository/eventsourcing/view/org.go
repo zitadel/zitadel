@@ -2,6 +2,7 @@ package view
 
 import (
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
 )
 
@@ -9,15 +10,15 @@ const (
 	orgTable = "management.orgs"
 )
 
-func (v *View) OrgByID(orgID string) (*org_view.OrgView, error) {
+func (v *View) OrgByID(orgID string) (*model.OrgView, error) {
 	return org_view.OrgByID(v.Db, orgTable, orgID)
 }
 
-func (v *View) OrgByDomain(domain string) (*org_view.OrgView, error) {
+func (v *View) OrgByDomain(domain string) (*model.OrgView, error) {
 	return org_view.GetGlobalOrgByDomain(v.Db, orgTable, domain)
 }
 
-func (v *View) PutOrg(org *org_view.OrgView) error {
+func (v *View) PutOrg(org *model.OrgView) error {
 	err := org_view.PutOrg(v.Db, orgTable, org)
 	if err != nil {
 		return err

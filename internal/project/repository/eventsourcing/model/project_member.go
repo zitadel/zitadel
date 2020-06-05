@@ -56,7 +56,7 @@ func ProjectMemberToModel(member *ProjectMember) *model.ProjectMember {
 
 func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 	member := &ProjectMember{}
-	err := member.setData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (p *Project) appendAddMemberEvent(event *es_models.Event) error {
 
 func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 	member := &ProjectMember{}
-	err := member.setData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (p *Project) appendChangeMemberEvent(event *es_models.Event) error {
 
 func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	member := &ProjectMember{}
-	err := member.setData(event)
+	err := member.SetData(event)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (p *Project) appendRemoveMemberEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (m *ProjectMember) setData(event *es_models.Event) error {
+func (m *ProjectMember) SetData(event *es_models.Event) error {
 	m.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, m); err != nil {
 		logging.Log("EVEN-e4dkp").WithError(err).Error("could not unmarshal event data")

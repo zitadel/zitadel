@@ -2,14 +2,14 @@ package handler
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	view_model "github.com/caos/zitadel/internal/org/repository/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -36,13 +36,13 @@ func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(org_model.OrgAggregate, usr_es_model.UserAggregate).
+		AggregateTypeFilter(model.OrgAggregate, usr_es_model.UserAggregate).
 		LatestSequenceFilter(sequence), nil
 }
 
 func (m *OrgMember) Process(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case org_model.OrgAggregate:
+	case model.OrgAggregate:
 		err = m.processOrgMember(event)
 	case usr_es_model.UserAggregate:
 		err = m.processUser(event)
@@ -51,12 +51,12 @@ func (m *OrgMember) Process(event *models.Event) (err error) {
 }
 
 func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
-	member := new(view_model.OrgMemberView)
+	member := new(org_model.OrgMemberView)
 	switch event.Type {
-	case org_model.OrgMemberAdded:
+	case model.OrgMemberAdded:
 		member.AppendEvent(event)
 		m.fillData(member)
-	case org_model.OrgMemberChanged:
+	case model.OrgMemberChanged:
 		err := member.SetData(event)
 		if err != nil {
 			return err
@@ -66,7 +66,7 @@ func (m *OrgMember) processOrgMember(event *models.Event) (err error) {
 			return err
 		}
 		member.AppendEvent(event)
-	case org_model.OrgMemberRemoved:
+	case model.OrgMemberRemoved:
 		err := member.SetData(event)
 		if err != nil {
 			return err
@@ -106,7 +106,7 @@ func (m *OrgMember) processUser(event *models.Event) (err error) {
 	return nil
 }
 
-func (m *OrgMember) fillData(member *view_model.OrgMemberView) (err error) {
+func (m *OrgMember) fillData(member *org_model.OrgMemberView) (err error) {
 	user, err := m.userEvents.UserByID(context.Background(), member.UserID)
 	if err != nil {
 		return err
@@ -115,7 +115,7 @@ func (m *OrgMember) fillData(member *view_model.OrgMemberView) (err error) {
 	return nil
 }
 
-func (m *OrgMember) fillUserData(member *view_model.OrgMemberView, user *usr_model.User) {
+func (m *OrgMember) fillUserData(member *org_model.OrgMemberView, user *usr_model.User) {
 	member.UserName = user.UserName
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName

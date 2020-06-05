@@ -29,7 +29,6 @@ type GrantedProjectView struct {
 	Type            int32          `json:"-" gorm:"column:project_type"`
 	ResourceOwner   string         `json:"-" gorm:"column:resource_owner"`
 	OrgName         string         `json:"-" gorm:"column:org_name"`
-	OrgDomain       string         `json:"-" gorm:"column:org_domain"`
 	Sequence        uint64         `json:"-" gorm:"column:sequence"`
 	GrantID         string         `json:"-" gorm:"column:grant_id"`
 	GrantedRoleKeys pq.StringArray `json:"-" gorm:"column:granted_role_keys"`

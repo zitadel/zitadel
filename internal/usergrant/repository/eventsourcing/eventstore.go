@@ -7,16 +7,15 @@ import (
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/id"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
-	"github.com/sony/sonyflake"
-	"strconv"
 )
 
 type UserGrantEventStore struct {
 	es_int.Eventstore
 	userGrantCache *UserGrantCache
-	idGenerator    *sonyflake.Sonyflake
+	idGenerator    id.Generator
 }
 
 type UserGrantConfig struct {
@@ -29,11 +28,10 @@ func StartUserGrant(conf UserGrantConfig) (*UserGrantEventStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &UserGrantEventStore{
 		Eventstore:     conf.Eventstore,
 		userGrantCache: userGrantCache,
-		idGenerator:    idGenerator,
+		idGenerator:    id.SonyFlakeGenerator,
 	}, nil
 }
 
@@ -59,11 +57,11 @@ func (es *UserGrantEventStore) AddUserGrant(ctx context.Context, grant *grant_mo
 	if grant == nil || !grant.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	grant.AggregateID = strconv.FormatUint(id, 10)
+	grant.AggregateID = id
 
 	repoGrant := model.UserGrantFromModel(grant)
 

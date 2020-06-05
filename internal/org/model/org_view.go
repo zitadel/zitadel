@@ -15,8 +15,7 @@ type OrgView struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	Name   string
-	Domain string
+	Name string
 }
 
 type OrgSearchRequest struct {
@@ -66,8 +65,8 @@ func OrgViewToOrg(o *OrgView) *Org {
 			ResourceOwner: o.ResourceOwner,
 			Sequence:      o.Sequence,
 		},
-		Domain: o.Domain,
-		Name:   o.Name,
-		State:  o.State,
+		//Domain: o.Domain,
+		Name:  o.Name,
+		State: o.State,
 	}
 }

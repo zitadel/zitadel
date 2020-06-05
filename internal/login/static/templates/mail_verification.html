@@ -1,0 +1,31 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "EmailVerification.Title"}}</h1>
+<p>{{t "EmailVerification.Description"}}</p>
+
+<form action="{{ mailVerificationUrl }}" method="POST">
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="userID" value="{{ .UserID }}" />
+
+    <div class="fields">
+        <div class="field">
+            <label class="label" for="code">{{t "EmailVerification.Code"}}</label>
+            <input class="input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+        </div>
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="actions">
+        <button type="submit" name="resend" value="false" class="primary right" >{{t "Actions.Next"}}</buttontype="submit">
+        {{ if .UserID }}
+        <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend"}}</button>
+        {{ end }}
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

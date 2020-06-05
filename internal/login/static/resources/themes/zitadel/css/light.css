@@ -1,0 +1,299 @@
+@font-face {
+  font-family: Aileron;
+  src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Thin.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-ThinItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Light.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-LightItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Regular.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Italic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Bold.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Black.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 800;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BlackItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 800;
+}
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
+  /* For IE6-8 */
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: Lato;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+}
+
+html {
+  background-color: #282828;
+  color: #FFFFFF;
+}
+
+h1 {
+  color: #FFFFFF;
+  font-family: Aileron;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 40px;
+}
+
+p {
+  font-width: 300;
+}
+
+header {
+  padding: 8px;
+}
+header .logo {
+  background-image: url("../logo-dark.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 80px;
+  margin: 30px;
+}
+
+.content {
+  margin: auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+}
+
+a {
+  color: #364DF6;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+a:hover {
+  color: #6778f8;
+}
+
+button {
+  text-transform: uppercase;
+  background-color: #282828;
+  color: #364DF6;
+  border: 2px solid #364DF6;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 600px;
+  height: 50px;
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+button:hover {
+  background-color: #6778f8;
+  border: 2px solid #6778f8;
+}
+button.primary {
+  background-color: #364DF6;
+  color: #FFFFFF;
+  border: none;
+}
+button.primary:hover {
+  background-color: #6778f8;
+}
+button > .sessionstate {
+  text-transform: lowercase;
+}
+
+input:not([type=radio]), select {
+  background-color: #252525;
+  color: #FFFFFF;
+  height: 50px;
+  border: 2px solid #595959;
+  border-radius: 5px;
+  padding-left: 15px;
+}
+
+form .field {
+  display: grid;
+  padding: 10px 0;
+}
+form .field.radio-button {
+  display: flex;
+}
+form .field.radio-button input[type=radio] {
+  height: 20px;
+  vertical-align: middle;
+}
+form .field.radio-button label {
+  height: 20px;
+  display: inline-block;
+  padding: 3px 0 0 15px;
+  width: 100%;
+}
+form label {
+  color: #898989;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  margin-bottom: 3px;
+}
+form label span.optional {
+  font-style: italic;
+  text-transform: none;
+}
+form .actions {
+  padding: 20px 0;
+}
+form .actions .right {
+  float: right;
+}
+form .actions button, form .actions a {
+  margin: 10px 0;
+}
+
+#copy-secret {
+  visibility: hidden;
+  position: absolute;
+}
+
+#qrcode {
+  text-align: center;
+}
+#qrcode svg rect[style*="fill:white"] {
+  fill: #282828 !important;
+}
+#qrcode svg rect[style*="fill:black"] {
+  fill: #FFFFFF !important;
+}
+
+#secret .copy {
+  float: right;
+  cursor: pointer;
+}
+
+footer {
+  background-image: url("../gradientdeco-full.svg");
+  width: 100%;
+  background-size: cover;
+  height: 44vw;
+  position: fixed;
+  bottom: 0;
+  z-index: -1;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+html {
+  background-color: #FFFFFF;
+  color: #282828;
+}
+html header .logo {
+  background-image: url("../logo-light.png");
+}
+html h1 {
+  color: #282828;
+}
+html button {
+  background-color: #FFFFFF;
+  color: #364DF6;
+  border: 2px solid #364DF6;
+}
+html button:hover {
+  background-color: #6778f8;
+  border: 2px solid #6778f8;
+}
+html button.primary {
+  background-color: #364DF6;
+  color: #FFFFFF;
+  border: none;
+  box-shadow: 0px 10px 30px #364DF6;
+}
+html button.primary:hover {
+  background-color: #6778f8;
+}
+html input {
+  background-color: #FFFFFF;
+  color: #282828;
+}
+html #qrcode svg rect[style*="fill:white"] {
+  fill: #FFFFFF !important;
+}
+html #qrcode svg rect[style*="fill:black"] {
+  fill: #282828 !important;
+}
+html footer {
+  background-image: url("../gradientdeco-full.svg");
+}
+
+/*# sourceMappingURL=light.css.map */

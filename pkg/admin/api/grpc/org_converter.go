@@ -18,8 +18,8 @@ func setUpRequestToModel(setUp *OrgSetUpRequest) *admin_model.SetupOrg {
 
 func orgCreateRequestToModel(org *CreateOrgRequest) *org_model.Org {
 	return &org_model.Org{
-		Domain: org.Domain,
-		Name:   org.Name,
+		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
+		Name:    org.Name,
 	}
 }
 
@@ -82,7 +82,6 @@ func orgFromModel(org *org_model.Org) *Org {
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
 	return &Org{
-		Domain:       org.Domain,
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.AggregateID,
@@ -99,7 +98,6 @@ func orgViewFromModel(org *org_model.OrgView) *Org {
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
 	return &Org{
-		Domain:       org.Domain,
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.ID,

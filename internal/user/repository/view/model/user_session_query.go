@@ -51,8 +51,6 @@ func (req UserSessionSearchQuery) GetValue() interface{} {
 
 func (key UserSessionSearchKey) ToColumnName() string {
 	switch usr_model.UserSessionSearchKey(key) {
-	case usr_model.USERSESSIONSEARCHKEY_SESSION_ID:
-		return UserSessionKeySessionID
 	case usr_model.USERSESSIONSEARCHKEY_USER_AGENT_ID:
 		return UserSessionKeyUserAgentID
 	case usr_model.USERSESSIONSEARCHKEY_USER_ID:

@@ -2,12 +2,12 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -18,7 +18,7 @@ func TestOrgMemberAddedAggregate(t *testing.T) {
 	}
 	type args struct {
 		aggCreator *es_models.AggregateCreator
-		member     *OrgMember
+		member     *model.OrgMember
 		ctx        context.Context
 	}
 	tests := []struct {
@@ -42,7 +42,7 @@ func TestOrgMemberAddedAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				member: &OrgMember{
+				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
 			},
@@ -78,8 +78,8 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 	}
 	type args struct {
 		aggCreator     *es_models.AggregateCreator
-		existingMember *OrgMember
-		member         *OrgMember
+		existingMember *model.OrgMember
+		member         *model.OrgMember
 		ctx            context.Context
 	}
 	tests := []struct {
@@ -93,7 +93,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 				aggCreator:     es_models.NewAggregateCreator("test"),
 				ctx:            auth.NewMockContext("org", "user"),
 				member:         nil,
-				existingMember: &OrgMember{},
+				existingMember: &model.OrgMember{},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
@@ -105,7 +105,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 				aggCreator:     es_models.NewAggregateCreator("test"),
 				ctx:            auth.NewMockContext("org", "user"),
 				existingMember: nil,
-				member:         &OrgMember{},
+				member:         &model.OrgMember{},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
@@ -116,10 +116,10 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				member: &OrgMember{
+				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
-				existingMember: &OrgMember{
+				existingMember: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
 			},
@@ -132,11 +132,11 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				member: &OrgMember{
+				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 					Roles:      []string{"asdf"},
 				},
-				existingMember: &OrgMember{
+				existingMember: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 					Roles:      []string{"asdf", "woeri"},
 				},
@@ -174,7 +174,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 	}
 	type args struct {
 		aggCreator *es_models.AggregateCreator
-		member     *OrgMember
+		member     *model.OrgMember
 		ctx        context.Context
 	}
 	tests := []struct {
@@ -198,7 +198,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
 				ctx:        auth.NewMockContext("org", "user"),
-				member: &OrgMember{
+				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
 			},
@@ -236,7 +236,7 @@ func Test_addMemberValidation(t *testing.T) {
 	type args struct {
 		aggregate *es_models.Aggregate
 		events    []*es_models.Event
-		member    *OrgMember
+		member    *model.OrgMember
 	}
 	tests := []struct {
 		name string
@@ -258,21 +258,21 @@ func Test_addMemberValidation(t *testing.T) {
 				aggregate: &es_models.Aggregate{},
 				events: []*es_models.Event{
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      13,
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      142,
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      1234,
-						Type:          org_model.OrgMemberAdded,
+						Type:          model.OrgMemberAdded,
 						Data:          []byte(`{"userId":"hodor"}`),
 					},
 				},
-				member: &OrgMember{UserID: "hodor"},
+				member: &model.OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
@@ -292,7 +292,7 @@ func Test_addMemberValidation(t *testing.T) {
 						Sequence:      142,
 					},
 				},
-				member: &OrgMember{UserID: "hodor"},
+				member: &model.OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
@@ -308,11 +308,11 @@ func Test_addMemberValidation(t *testing.T) {
 						Sequence:      13,
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      142,
 					},
 				},
-				member: &OrgMember{UserID: "hodor"},
+				member: &model.OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr:            nil,
@@ -329,23 +329,23 @@ func Test_addMemberValidation(t *testing.T) {
 						Sequence:      13,
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      142,
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      1234,
-						Type:          org_model.OrgMemberAdded,
+						Type:          model.OrgMemberAdded,
 						Data:          []byte(`{"userId":"hodor"}`),
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      1236,
-						Type:          org_model.OrgMemberRemoved,
+						Type:          model.OrgMemberRemoved,
 						Data:          []byte(`{"userId":"hodor"}`),
 					},
 				},
-				member: &OrgMember{UserID: "hodor"},
+				member: &model.OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr:            nil,
@@ -362,17 +362,17 @@ func Test_addMemberValidation(t *testing.T) {
 						Sequence:      13,
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      142,
 					},
 					{
-						AggregateType: org_model.OrgAggregate,
+						AggregateType: model.OrgAggregate,
 						Sequence:      1234,
-						Type:          org_model.OrgMemberAdded,
+						Type:          model.OrgMemberAdded,
 						Data:          []byte(`{"userId":"hodor"}`),
 					},
 				},
-				member: &OrgMember{UserID: "hodor"},
+				member: &model.OrgMember{UserID: "hodor"},
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
