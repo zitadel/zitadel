@@ -3,6 +3,15 @@
 # How to contribute to Zitadel's documentation
 Before you start your editing process please take some time to familiarise yourself with the rules for contributing to the documentation of Zitadel.
 
+## File format
+Zitadel's static site generator uses a Markdown file format. The flavour of the Markdown is specified in the [Caos Static Site Generator](cssg.md) document.
+
+## Using headings
+Make use of headings to structure and organise the document. The static site generator will make sure that the headings are rendered as a means of navigation for the site's content.
+
+## Headings capitalisaion conventions
+In order to keep consistency across the documentation we urge you to only write the very first word of a heading with a capital letter. The styling of the static site generator will then guarantee the consistent rendering of first caps, all caps, word caps or whatever style is chosen for the output.
+
 ## Using captions
 We urge you to always add captions to listings, code snippets, tables, graphics and images, *unless* the image is a logo or icon of any type. Also, inline graphics and images don't require captions due to readability.
 
@@ -15,7 +24,7 @@ If the description consists of **one term** only you must omit any trailing punc
 
 Examples:
 
-* Snippet 3. Example of a protobuf interface deriving ZITADEL's OIDC connector.
+* Snippet 3. Example of a protobuf interface deriving Zitadel's OIDC connector.
 * Figure 1. Inside the ESO Atacama Large Millimeter/submillimeter Array.
 * Table 21. Representation of all supported quantum-singularity proximation algorithms.
 * Image 13. Higgs Boson
@@ -25,3 +34,26 @@ Use sparsely. You should always make sure that inline images do not exceed 48 by
 
 ## Keyboard shortcuts
 When documenting the usage of UI components don't forget to include the keyboard shortcuts available. Use the `kbd:` macro or `<kbd>` HTML tag to style the keys accordingly. To ensure platform-independent documentation always include the modifier-keys for **all** supported platforms, i.e. [kbd:]Ctrl or [kbd:]Opt [kbd:]C, which renders <kbd>Ctrl</kbd> or <kbd>Opt</kbd> <kbd>C</kbd>.
+
+# File name conventions
+## File name
+If and when the filname of a Markdown file consist of more than **one** contiguous word you must use a hyphen `-` to separate the word elements.
+
+Examples:
+
+* content.md
+* distribution-guide.md
+* programming-examples.md
+* explaining-the-code-snippets.md
+
+## File extension
+For reasons of consistency the static site generator only accepts Markdown files with the `.md` file extension.
+
+## Internationalisation (I18N)
+Writing documentation in country specific languages is highly endorsed. The static site generator makes use of a simple naming confention for Markdown files which are available in different languages:
+
+`{filename}[.{language-id}].md`
+
+Where `filename` represents the name of the file (see section [File name](#File_names)), `language-id` is an *optional* language identifier (see the list of [ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)), and the mandatory file extension `.md`.
+
+**Note:** If a filename does not specify a language identifier we consider the file name to implicitely be written in English language (defaulting to `.en`).
