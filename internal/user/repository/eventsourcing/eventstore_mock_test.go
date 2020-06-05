@@ -246,13 +246,13 @@ func GetMockManipulateLockedUser(ctrl *gomock.Controller) *UserEventstore {
 	return GetMockedEventstore(ctrl, mockEs)
 }
 
-func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller) *UserEventstore {
-	user := model.User{
-		Profile: &model.Profile{
-			UserName: "UserName",
-		},
-	}
-	code := model.InitUserCode{Expiry: time.Hour * 30}
+func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller, user model.User) *UserEventstore {
+	code := model.InitUserCode{Code: &crypto.CryptoValue{
+		CryptoType: crypto.TypeEncryption,
+		Algorithm:  "enc",
+		KeyID:      "id",
+		Crypted:    []byte("code"),
+	}}
 	dataUser, _ := json.Marshal(user)
 	dataCode, _ := json.Marshal(code)
 	events := []*es_models.Event{
@@ -263,7 +263,7 @@ func GetMockManipulateUserWithInitCode(ctrl *gomock.Controller) *UserEventstore 
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
-	return GetMockedEventstore(ctrl, mockEs)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, true, false, false, true)
 }
 
 func GetMockManipulateUserWithEmailCode(ctrl *gomock.Controller) *UserEventstore {
@@ -362,6 +362,7 @@ func GetMockManipulateUserVerifiedPhone(ctrl *gomock.Controller) *UserEventstore
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
 }
+
 func GetMockManipulateUserFull(ctrl *gomock.Controller) *UserEventstore {
 	user := model.User{
 		Profile: &model.Profile{
@@ -445,4 +446,13 @@ func GetMockManipulateUserNoEvents(ctrl *gomock.Controller) *UserEventstore {
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockManipulateUserNoEventsWithPw(ctrl *gomock.Controller) *UserEventstore {
+	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
+	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
+	return GetMockedEventstoreWithPw(ctrl, mockEs, false, false, false, true)
 }

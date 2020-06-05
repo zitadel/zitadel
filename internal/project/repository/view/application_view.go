@@ -1,6 +1,7 @@
 package view
 
 import (
+	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
@@ -10,6 +11,23 @@ import (
 func ApplicationByID(db *gorm.DB, table, appID string) (*model.ApplicationView, error) {
 	app := new(model.ApplicationView)
 	query := view.PrepareGetByKey(table, model.ApplicationSearchKey(proj_model.APPLICATIONSEARCHKEY_APP_ID), appID)
+	err := query(db, app)
+	return app, err
+}
+
+func ApplicationByOIDCClientID(db *gorm.DB, table, clientID string) (*model.ApplicationView, error) {
+	app := new(model.ApplicationView)
+	clientIDQuery := model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_OIDC_CLIENT_ID, Value: clientID, Method: global_model.SEARCHMETHOD_EQUALS}
+	query := view.PrepareGetByQuery(table, clientIDQuery)
+	err := query(db, app)
+	return app, err
+}
+
+func ApplicationByProjectIDAndAppName(db *gorm.DB, table, projectID, appName string) (*model.ApplicationView, error) {
+	app := new(model.ApplicationView)
+	projectIDQuery := model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
+	appNameQuery := model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_NAME, Value: appName, Method: global_model.SEARCHMETHOD_EQUALS}
+	query := view.PrepareGetByQuery(table, projectIDQuery, appNameQuery)
 	err := query(db, app)
 	return app, err
 }

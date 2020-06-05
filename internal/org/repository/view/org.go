@@ -2,12 +2,12 @@ package view
 
 import (
 	"encoding/json"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	org_es_model "github.com/caos/zitadel/internal/org/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 )
 
@@ -69,17 +69,17 @@ func OrgsToModel(orgs []*OrgView) []*org_model.OrgView {
 
 func (o *OrgView) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
-	case org_es_model.OrgAdded:
+	case model.OrgAdded:
 		o.CreationDate = event.CreationDate
 		o.State = int32(org_model.ORGSTATE_ACTIVE)
 		o.setRootData(event)
 		err = o.SetData(event)
-	case org_es_model.OrgChanged:
+	case model.OrgChanged:
 		o.setRootData(event)
 		err = o.SetData(event)
-	case org_es_model.OrgDeactivated:
+	case model.OrgDeactivated:
 		o.State = int32(org_model.ORGSTATE_INACTIVE)
-	case org_es_model.OrgReactivated:
+	case model.OrgReactivated:
 		o.State = int32(org_model.ORGSTATE_ACTIVE)
 	}
 	return err

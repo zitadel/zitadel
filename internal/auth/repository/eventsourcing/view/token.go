@@ -20,17 +20,23 @@ func (v *View) IsTokenValid(tokenID string) (bool, error) {
 	return view.IsTokenValid(v.Db, tokenTable, tokenID)
 }
 
-func (v *View) CreateToken(agentID, applicationID, userID string, lifetime time.Duration) (*model.Token, error) {
+func (v *View) CreateToken(agentID, applicationID, userID string, audience, scopes []string, lifetime time.Duration) (*model.Token, error) {
+	id, err := v.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
 	now := time.Now().UTC()
 	token := &model.Token{
+		ID:            id,
 		CreationDate:  now,
 		UserID:        userID,
 		ApplicationID: applicationID,
 		UserAgentID:   agentID,
+		Scopes:        scopes,
+		Audience:      audience,
 		Expiration:    now.Add(lifetime),
 	}
-	err := view.PutToken(v.Db, tokenTable, token)
-	if err != nil {
+	if err := view.PutToken(v.Db, tokenTable, token); err != nil {
 		return nil, err
 	}
 	return token, nil

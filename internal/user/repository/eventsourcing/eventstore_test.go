@@ -753,7 +753,13 @@ func TestGetInitCodeByID(t *testing.T) {
 		{
 			name: "get by id, ok",
 			args: args{
-				es:       GetMockManipulateUserWithInitCode(ctrl),
+				es: GetMockManipulateUserWithInitCode(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Profile: &repo_model.Profile{
+							UserName: "UserName",
+						},
+					}),
 				ctx:      auth.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
@@ -791,8 +797,8 @@ func TestGetInitCodeByID(t *testing.T) {
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.Expiry != tt.res.code.Expiry {
-				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.code.Expiry, result.Expiry)
+			if tt.res.errFunc == nil && result == nil {
+				t.Error("got wrong result code should not be nil", result)
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -858,8 +864,8 @@ func TestCreateInitCode(t *testing.T) {
 			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if tt.res.errFunc == nil && result.Expiry != tt.res.code.Expiry {
-				t.Errorf("got wrong result expiry: expected: %v, actual: %v ", tt.res.code.Expiry, result.Expiry)
+			if tt.res.errFunc == nil && result == nil {
+				t.Errorf("got wrong result code is nil")
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -924,6 +930,135 @@ func TestInitCodeSent(t *testing.T) {
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestInitCodeVerify(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es         *UserEventstore
+		ctx        context.Context
+		policy     *policy_model.PasswordComplexityPolicy
+		userID     string
+		verifyCode string
+		password   string
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "verify init code, no pw",
+			args: args{
+				es: GetMockManipulateUserWithInitCode(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Email: &repo_model.Email{
+							EmailAddress: "EmailAddress",
+						},
+					},
+				),
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
+				verifyCode: "code",
+				userID:     "userID",
+			},
+		},
+		{
+			name: "verify init code, pw",
+			args: args{
+				es: GetMockManipulateUserWithInitCode(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Email: &repo_model.Email{
+							EmailAddress:    "EmailAddress",
+							IsEmailVerified: true,
+						},
+					},
+				),
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
+				userID:     "userID",
+				verifyCode: "code",
+				password:   "password",
+			},
+		},
+		{
+			name: "verify init code, email and pw",
+			args: args{
+				es: GetMockManipulateUserWithInitCode(ctrl,
+					repo_model.User{
+						ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+						Email: &repo_model.Email{
+							EmailAddress: "EmailAddress",
+						},
+					},
+				),
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
+				userID:     "userID",
+				verifyCode: "code",
+				password:   "password",
+			},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:         GetMockManipulateUser(ctrl),
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
+				userID:     "",
+				verifyCode: "code",
+				password:   "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "password policy not matched",
+			args: args{
+				es:         GetMockManipulateUser(ctrl),
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{HasNumber: true},
+				userID:     "userID",
+				verifyCode: "code",
+				password:   "password",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:         GetMockManipulateUserNoEventsWithPw(ctrl),
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				policy:     &policy_model.PasswordComplexityPolicy{},
+				userID:     "userID",
+				password:   "password",
+				verifyCode: "code",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.VerifyInitCode(tt.args.ctx, tt.args.policy, tt.args.userID, tt.args.verifyCode, tt.args.password)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("should not have err: %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v", err)
 			}
 		})
 	}
@@ -1981,11 +2116,23 @@ func TestVerifyEmail(t *testing.T) {
 			res: res{},
 		},
 		{
+			name: "verify email code wrong",
+			args: args{
+				es:     GetMockManipulateUserWithEmailCode(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "wrong",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "empty userid",
 			args: args{
 				es:   GetMockManipulateUser(ctrl),
 				ctx:  auth.NewMockContext("orgID", "userID"),
-				code: "Code",
+				code: "code",
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -2008,7 +2155,7 @@ func TestVerifyEmail(t *testing.T) {
 				es:     GetMockManipulateUserNoEvents(ctrl),
 				ctx:    auth.NewMockContext("orgID", "userID"),
 				userID: "AggregateID",
-				code:   "Code",
+				code:   "code",
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,
@@ -2345,6 +2492,18 @@ func TestVerifyPhone(t *testing.T) {
 				code:   "code",
 			},
 			res: res{},
+		},
+		{
+			name: "verify code wrong",
+			args: args{
+				es:     GetMockManipulateUserWithPhoneCode(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "wrong",
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
 		},
 		{
 			name: "empty userid",

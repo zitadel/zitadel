@@ -6,7 +6,8 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -290,11 +291,41 @@ func OIDCConfigSecretChangedAggregate(aggCreator *es_models.AggregateCreator, ex
 		if err != nil {
 			return nil, err
 		}
-		changes := make(map[string]interface{}, 1)
+		changes := make(map[string]interface{}, 2)
 		changes["appId"] = appID
 		changes["clientSecret"] = secret
 
 		agg.AppendEvent(model.OIDCConfigSecretChanged, changes)
+
+		return agg, nil
+	}
+}
+
+func OIDCClientSecretCheckSucceededAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, appID string) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := make(map[string]interface{}, 1)
+		changes["appId"] = appID
+
+		agg.AppendEvent(model.OIDCClientSecretCheckSucceeded, changes)
+
+		return agg, nil
+	}
+}
+
+func OIDCClientSecretCheckFailedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, appID string) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := ProjectAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		changes := make(map[string]interface{}, 1)
+		changes["appId"] = appID
+
+		agg.AppendEvent(model.OIDCClientSecretCheckFailed, changes)
 
 		return agg, nil
 	}
@@ -310,7 +341,7 @@ func ProjectGrantAddedAggregate(aggCreator *es_models.AggregateCreator, existing
 			return nil, err
 		}
 		validationQuery := es_models.NewSearchQuery().
-			AggregateTypeFilter(org_model.OrgAggregate).
+			AggregateTypeFilter(org_es_model.OrgAggregate).
 			AggregateIDFilter(grant.GrantedOrgID)
 
 		validation := addProjectGrantValidation()
@@ -475,11 +506,11 @@ func addProjectGrantValidation() func(...*es_models.Event) error {
 		existsOrg := false
 		for _, event := range events {
 			switch event.AggregateType {
-			case org_model.OrgAggregate:
+			case org_es_model.OrgAggregate:
 				switch event.Type {
-				case org_model.OrgAdded:
+				case org_es_model.OrgAdded:
 					existsOrg = true
-				case org_model.OrgRemoved:
+				case org_es_model.OrgRemoved:
 					existsOrg = false
 				}
 			}

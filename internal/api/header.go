@@ -7,6 +7,8 @@ const (
 	ContentType    = "content-type"
 	Location       = "location"
 	Origin         = "origin"
+	UserAgent      = "user-agent"
+	ForwardedFor   = "x-forwarded-for"
 
 	ZitadelOrgID = "x-zitadel-orgid"
 	//TODO: Remove as soon an authentification is implemented

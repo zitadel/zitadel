@@ -98,6 +98,12 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText+"%")
 	case model.SEARCHMETHOD_NOT_EQUALS:
 		query = query.Where(""+column+" <> ?", value)
+	case model.SEARCHMETHOD_GREATER_THAN:
+		query = query.Where(column+" > ?", value)
+	case model.SEARCHMETHOD_LESS_THAN:
+		query = query.Where(column+" < ?", value)
+	case model.SEARCHMETHOD_IN:
+		query = query.Where(column+" IN (?)", value)
 	default:
 		return nil, nil
 	}

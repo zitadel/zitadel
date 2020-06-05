@@ -4,18 +4,21 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 type ProjectEventstore struct {
 	es_int.Eventstore
 	projectCache *ProjectCache
+	passwordAlg  crypto.HashAlgorithm
 	pwGenerator  crypto.Generator
 	idGenerator  id.Generator
 }
@@ -35,6 +38,7 @@ func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*Projec
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
 		projectCache: projectCache,
+		passwordAlg:  passwordAlg,
 		pwGenerator:  pwGenerator,
 		idGenerator:  id.SonyFlakeGenerator,
 	}, nil
@@ -533,6 +537,42 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	}
 
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Could not find app in list")
+}
+
+func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, projectID, appID string, secret string) error {
+	if appID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-H3RT2", "some required fields missing")
+	}
+	existing, err := es.ProjectByID(ctx, projectID)
+	if err != nil {
+		return err
+	}
+	var app *proj_model.Application
+	if _, app = existing.GetApp(appID); app == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D6hba", "App is not in this project")
+	}
+	if app.Type != proj_model.APPTYPE_OIDC {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-huywq", "App is not an oidc application")
+	}
+
+	if err := crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg); err == nil {
+		return es.setOIDCClientSecretCheckResult(ctx, existing, app.AppID, OIDCClientSecretCheckSucceededAggregate)
+	}
+	if err := es.setOIDCClientSecretCheckResult(ctx, existing, app.AppID, OIDCClientSecretCheckFailedAggregate); err != nil {
+		return err
+	}
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-wg24q", "invalid client secret")
+}
+
+func (es *ProjectEventstore) setOIDCClientSecretCheckResult(ctx context.Context, project *proj_model.Project, appID string, check func(*es_models.AggregateCreator, *model.Project, string) es_sdk.AggregateFunc) error {
+	repoProject := model.ProjectFromModel(project)
+	agg := check(es.AggregateCreator(), repoProject, appID)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.projectCache.cacheProject(repoProject)
+	return nil
 }
 
 func (es *ProjectEventstore) ProjectGrantByIDs(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {

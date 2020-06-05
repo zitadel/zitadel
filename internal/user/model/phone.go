@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	//TODO: How do we get region?
 	defaultRegion = "CH"
 )
 

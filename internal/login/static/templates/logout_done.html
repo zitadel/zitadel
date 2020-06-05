@@ -1,0 +1,15 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "LogoutDone.Title"}}</h1>
+<p>{{t "LogoutDone.Description"}}</p>
+<form action="{{ loginUrl }}" method="POST">
+
+    <div class="actions">
+        <button class="primary right" type="submit">{{t "Actions.Login"}}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

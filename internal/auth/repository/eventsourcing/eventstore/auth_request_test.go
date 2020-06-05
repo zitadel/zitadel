@@ -1,6 +1,8 @@
 package eventstore
 
 import (
+	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -10,8 +12,10 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/errors"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -22,6 +26,16 @@ func (m *mockViewNoUserSession) UserSessionByIDs(string, string) (*view_model.Us
 }
 
 func (m *mockViewNoUserSession) UserSessionsByAgentID(string) ([]*view_model.UserSessionView, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+type mockViewErrUserSession struct{}
+
+func (m *mockViewErrUserSession) UserSessionByIDs(string, string) (*view_model.UserSessionView, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockViewErrUserSession) UserSessionsByAgentID(string) ([]*view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -60,7 +74,26 @@ func (m *mockViewNoUser) UserByID(string) (*view_model.UserView, error) {
 	return nil, errors.ThrowNotFound(nil, "id", "user not found")
 }
 
+type mockEventUser struct {
+	Event *es_models.Event
+}
+
+func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+	events := make([]*es_models.Event, 0)
+	if m.Event != nil {
+		events = append(events, m.Event)
+	}
+	return events, nil
+}
+
+type mockEventErrUser struct{}
+
+func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+	return nil, errors.ThrowInternal(nil, "id", "internal error")
+}
+
 type mockViewUser struct {
+	InitRequired           bool
 	PasswordSet            bool
 	PasswordChangeRequired bool
 	IsEmailVerified        bool
@@ -71,6 +104,7 @@ type mockViewUser struct {
 
 func (m *mockViewUser) UserByID(string) (*view_model.UserView, error) {
 	return &view_model.UserView{
+		InitRequired:           m.InitRequired,
 		PasswordSet:            m.PasswordSet,
 		PasswordChangeRequired: m.PasswordChangeRequired,
 		IsEmailVerified:        m.IsEmailVerified,
@@ -87,13 +121,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		View                     *view.View
 		userSessionViewProvider  userSessionViewProvider
 		userViewProvider         userViewProvider
+		userEventProvider        userEventProvider
 		PasswordCheckLifeTime    time.Duration
 		MfaInitSkippedLifeTime   time.Duration
 		MfaSoftwareCheckLifeTime time.Duration
 		MfaHardwareCheckLifeTime time.Duration
 	}
 	type args struct {
-		request *model.AuthRequest
+		request       *model.AuthRequest
+		checkLoggedIn bool
 	}
 	tests := []struct {
 		name    string
@@ -105,22 +141,22 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		{
 			"request nil, error",
 			fields{},
-			args{nil},
+			args{nil, false},
 			nil,
 			errors.IsErrorInvalidArgument,
 		},
 		{
-			"user not set, login step",
+			"prompt none and checkLoggedIn false, callback step",
 			fields{},
-			args{&model.AuthRequest{}},
-			[]model.NextStep{&model.LoginStep{}},
+			args{&model.AuthRequest{Prompt: model.PromptNone}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
-			"user not set and prompt none, no step",
+			"user not set, login step",
 			fields{},
-			args{&model.AuthRequest{Prompt: model.PromptNone}},
-			[]model.NextStep{},
+			args{&model.AuthRequest{}, false},
+			[]model.NextStep{&model.LoginStep{}},
 			nil,
 		},
 		{
@@ -128,7 +164,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userSessionViewProvider: &mockViewNoUserSession{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
 			nil,
 			errors.IsInternal,
 		},
@@ -147,8 +183,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						},
 					},
 				},
+				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
 			[]model.NextStep{
 				&model.LoginStep{},
 				&model.SelectUserStep{
@@ -166,31 +203,63 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"usersession not found, not found error",
+			"user not not found, not found error",
 			fields{
-				userSessionViewProvider: &mockViewNoUserSession{},
+				userViewProvider:  &mockViewNoUser{},
+				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			nil,
 			errors.IsNotFound,
 		},
 		{
-			"user not not found, not found error",
+			"usersession not found, new user session, password step",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordSet: true,
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
+			[]model.NextStep{&model.PasswordStep{}},
+			nil,
+		},
+		{
+			"usersession error, internal error",
+			fields{
+				userSessionViewProvider: &mockViewErrUserSession{},
+				userViewProvider:        &mockViewUser{},
+				userEventProvider:       &mockEventUser{},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
+			nil,
+			errors.IsInternal,
+		},
+		{
+			"user not initialized, init user step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
-				userViewProvider:        &mockViewNoUser{},
+				userViewProvider: &mockViewUser{
+					InitRequired: true,
+					PasswordSet:  true,
+				},
+				userEventProvider: &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
+			[]model.NextStep{&model.InitUserStep{
+				PasswordSet: true,
+			}},
 			nil,
-			errors.IsNotFound,
 		},
 		{
 			"password not set, init password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
 				userViewProvider:        &mockViewUser{},
+				userEventProvider:       &mockEventUser{},
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.InitPasswordStep{}},
 			nil,
 		},
@@ -201,9 +270,10 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
 				},
+				userEventProvider:     &mockEventUser{},
 				PasswordCheckLifeTime: 10 * 24 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.PasswordStep{}},
 			nil,
 		},
@@ -218,10 +288,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					OTPState:    int32(user_model.MFASTATE_READY),
 					MfaMaxSetUp: int32(model.MfaLevelSoftware),
 				},
+				userEventProvider:        &mockEventUser{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.MfaVerificationStep{
 				MfaProviders: []model.MfaType{model.MfaTypeOTP},
 			}},
@@ -238,11 +309,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
 					IsEmailVerified:        true,
+					MfaMaxSetUp:            int32(model.MfaLevelSoftware),
 				},
+				userEventProvider:        &mockEventUser{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.ChangePasswordStep{}},
 			nil,
 		},
@@ -255,11 +328,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
+					MfaMaxSetUp: int32(model.MfaLevelSoftware),
 				},
+				userEventProvider:        &mockEventUser{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.VerifyEMailStep{}},
 			nil,
 		},
@@ -273,11 +348,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
+					MfaMaxSetUp:            int32(model.MfaLevelSoftware),
 				},
+				userEventProvider:        &mockEventUser{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
 			[]model.NextStep{&model.ChangePasswordStep{}, &model.VerifyEMailStep{}},
 			nil,
 		},
@@ -291,11 +368,33 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
 				},
+				userEventProvider:        &mockEventUser{},
 				PasswordCheckLifeTime:    10 * 24 * time.Hour,
 				MfaSoftwareCheckLifeTime: 18 * time.Hour,
 			},
-			args{&model.AuthRequest{UserID: "UserID"}},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
+			[]model.NextStep{&model.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true and authenticated, redirect to callback step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:    time.Now().UTC().Add(-5 * time.Minute),
+					MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MfaMaxSetUp:     int32(model.MfaLevelSoftware),
+				},
+				userEventProvider:        &mockEventUser{},
+				PasswordCheckLifeTime:    10 * 24 * time.Hour,
+				MfaSoftwareCheckLifeTime: 18 * time.Hour,
+			},
+			args{&model.AuthRequest{UserID: "UserID", Prompt: model.PromptNone}, true},
 			[]model.NextStep{&model.RedirectToCallbackStep{}},
 			nil,
 		},
@@ -308,12 +407,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				View:                     tt.fields.View,
 				UserSessionViewProvider:  tt.fields.userSessionViewProvider,
 				UserViewProvider:         tt.fields.userViewProvider,
+				UserEventProvider:        tt.fields.userEventProvider,
 				PasswordCheckLifeTime:    tt.fields.PasswordCheckLifeTime,
 				MfaInitSkippedLifeTime:   tt.fields.MfaInitSkippedLifeTime,
 				MfaSoftwareCheckLifeTime: tt.fields.MfaSoftwareCheckLifeTime,
 				MfaHardwareCheckLifeTime: tt.fields.MfaHardwareCheckLifeTime,
 			}
-			got, err := repo.nextSteps(tt.args.request)
+			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return
@@ -360,13 +460,30 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					MfaMaxSetUp: -1,
+					MfaMaxSetUp: model.MfaLevelNotSetUp,
 				},
 			},
 			&model.MfaPromptStep{
-				MfaProviders: []model.MfaType{},
+				MfaProviders: []model.MfaType{
+					model.MfaTypeOTP,
+				},
 			},
 			false,
+		},
+		{
+			"not set up and skipped, true",
+			fields{
+				MfaInitSkippedLifeTime: 30 * 24 * time.Hour,
+			},
+			args{
+				request: &model.AuthRequest{},
+				user: &user_model.UserView{
+					MfaMaxSetUp:    model.MfaLevelNotSetUp,
+					MfaInitSkipped: time.Now().UTC(),
+				},
+			},
+			nil,
+			true,
 		},
 		{
 			"checked mfa software, true",
@@ -376,7 +493,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					OTPState: user_model.MFASTATE_READY,
+					MfaMaxSetUp: model.MfaLevelSoftware,
+					OTPState:    user_model.MFASTATE_READY,
 				},
 				userSession: &user_model.UserSessionView{MfaSoftwareVerification: time.Now().UTC().Add(-5 * time.Hour)},
 			},
@@ -391,7 +509,8 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			args{
 				request: &model.AuthRequest{},
 				user: &user_model.UserView{
-					OTPState: user_model.MFASTATE_READY,
+					MfaMaxSetUp: model.MfaLevelSoftware,
+					OTPState:    user_model.MFASTATE_READY,
 				},
 				userSession: &user_model.UserSessionView{},
 			},
@@ -470,6 +589,238 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			if got := repo.mfaSkippedOrSetUp(tt.args.user); got != tt.want {
 				t.Errorf("mfaSkippedOrSetUp() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func Test_userSessionByIDs(t *testing.T) {
+	type args struct {
+		userProvider  userSessionViewProvider
+		eventProvider userEventProvider
+		agentID       string
+		user          *user_model.UserView
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user_model.UserSessionView
+		wantErr func(error) bool
+	}{
+		{
+			"not found, new session",
+			args{
+				userProvider:  &mockViewNoUserSession{},
+				eventProvider: &mockEventErrUser{},
+				user:          &user_model.UserView{ID: "id"},
+			},
+			&user_model.UserSessionView{},
+			nil,
+		},
+		{
+			"internal error, internal error",
+			args{
+				userProvider: &mockViewErrUserSession{},
+				user:         &user_model.UserView{ID: "id"},
+			},
+			nil,
+			errors.IsInternal,
+		},
+		{
+			"error user events, old view model state",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+				},
+				user:          &user_model.UserView{ID: "id"},
+				eventProvider: &mockEventErrUser{},
+			},
+			&user_model.UserSessionView{
+				PasswordVerification:    time.Now().UTC().Round(1 * time.Second),
+				MfaSoftwareVerification: time.Time{},
+				MfaHardwareVerification: time.Time{},
+			},
+			nil,
+		},
+		{
+			"new user events but error, old view model state",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+				},
+				agentID: "agentID",
+				user:    &user_model.UserView{ID: "id"},
+				eventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.MfaOtpCheckSucceeded,
+						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+					},
+				},
+			},
+			&user_model.UserSessionView{
+				PasswordVerification:    time.Now().UTC().Round(1 * time.Second),
+				MfaSoftwareVerification: time.Time{},
+				MfaHardwareVerification: time.Time{},
+			},
+			nil,
+		},
+		{
+			"new user events but other agentID, old view model state",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+				},
+				agentID: "agentID",
+				user:    &user_model.UserView{ID: "id"},
+				eventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.MfaOtpCheckSucceeded,
+						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						Data: func() []byte {
+							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+							return data
+						}(),
+					},
+				},
+			},
+			&user_model.UserSessionView{
+				PasswordVerification:    time.Now().UTC().Round(1 * time.Second),
+				MfaSoftwareVerification: time.Time{},
+				MfaHardwareVerification: time.Time{},
+			},
+			nil,
+		},
+		{
+			"new user events, new view model state",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+				},
+				agentID: "agentID",
+				user:    &user_model.UserView{ID: "id"},
+				eventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.MfaOtpCheckSucceeded,
+						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						Data: func() []byte {
+							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+							return data
+						}(),
+					},
+				},
+			},
+			&user_model.UserSessionView{
+				PasswordVerification:    time.Now().UTC().Round(1 * time.Second),
+				MfaSoftwareVerification: time.Now().UTC().Round(1 * time.Second),
+				ChangeDate:              time.Now().UTC().Round(1 * time.Second),
+			},
+			nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := userSessionByIDs(context.Background(), tt.args.userProvider, tt.args.eventProvider, tt.args.agentID, tt.args.user)
+			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
+				t.Errorf("nextSteps() wrong error = %v", err)
+				return
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_userByID(t *testing.T) {
+	type args struct {
+		ctx           context.Context
+		viewProvider  userViewProvider
+		eventProvider userEventProvider
+		userID        string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user_model.UserView
+		wantErr func(error) bool
+	}{
+
+		{
+			"not found, not found error",
+			args{
+				viewProvider: &mockViewNoUser{},
+			},
+			nil,
+			errors.IsNotFound,
+		},
+		{
+			"error user events, old view model state",
+			args{
+				viewProvider: &mockViewUser{
+					PasswordChangeRequired: true,
+				},
+				eventProvider: &mockEventErrUser{},
+			},
+			&user_model.UserView{
+				PasswordChangeRequired: true,
+			},
+			nil,
+		},
+		{
+			"new user events but error, old view model state",
+			args{
+				viewProvider: &mockViewUser{
+					PasswordChangeRequired: true,
+				},
+				eventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.UserPasswordChanged,
+						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						Data:          nil,
+					},
+				},
+			},
+			&user_model.UserView{
+				PasswordChangeRequired: true,
+			},
+			nil,
+		},
+		{
+			"new user events, new view model state",
+			args{
+				viewProvider: &mockViewUser{
+					PasswordChangeRequired: true,
+				},
+				eventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.UserPasswordChanged,
+						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						Data: func() []byte {
+							data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false})
+							return data
+						}(),
+					},
+				},
+			},
+			&user_model.UserView{
+				PasswordChangeRequired: false,
+				ChangeDate:             time.Now().UTC().Round(1 * time.Second),
+				State:                  user_model.USERSTATE_INITIAL,
+				PasswordChanged:        time.Now().UTC().Round(1 * time.Second),
+			},
+			nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := userByID(tt.args.ctx, tt.args.viewProvider, tt.args.eventProvider, tt.args.userID)
+			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
+				t.Errorf("nextSteps() wrong error = %v", err)
+				return
+			}
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

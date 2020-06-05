@@ -30,5 +30,5 @@ func SendPasswordCode(user *view_model.NotifyUser, code *es_model.PasswordCode, 
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, template, systemDefaults.Notifications, false)
+	return generateEmail(user, systemDefaults.Notifications.TemplateData.PasswordReset.Subject, template, systemDefaults.Notifications, false)
 }

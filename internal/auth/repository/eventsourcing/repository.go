@@ -2,6 +2,10 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/handler"
@@ -10,18 +14,23 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/crypto"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/id"
+	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
 	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type Config struct {
+	SearchLimit uint64
 	Eventstore  es_int.Config
 	AuthRequest cache.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
+	KeyConfig   es_key.KeyConfig
 }
 
 type EsRepository struct {
@@ -29,9 +38,15 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
+	eventstore.KeyRepository
+	eventstore.ApplicationRepo
+	eventstore.UserSessionRepo
+	eventstore.UserGrantRepo
+	eventstore.OrgRepository
+	eventstore.IamRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -41,7 +56,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 	if err != nil {
 		return nil, err
 	}
-	view, err := auth_view.StartView(sqlClient)
+
+	keyAlgorithm, err := crypto.NewAESCrypto(conf.KeyConfig.EncryptionConfig)
+	if err != nil {
+		return nil, err
+	}
+	idGenerator := id.SonyFlakeGenerator
+
+	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -70,8 +92,35 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 		return nil, err
 	}
 
-	repos := handler.EventstoreRepos{UserEvents: user}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos)
+	key, err := es_key.StartKey(es, conf.KeyConfig, keyAlgorithm, idGenerator)
+	if err != nil {
+		return nil, err
+	}
+
+	project, err := es_proj.StartProject(
+		es_proj.ProjectConfig{
+			Cache:      conf.Eventstore.Cache,
+			Eventstore: es,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
+	iam, err := es_iam.StartIam(
+		es_iam.IamConfig{
+			Eventstore: es,
+			Cache:      conf.Eventstore.Cache,
+		},
+		systemDefaults,
+	)
+	if err != nil {
+		return nil, err
+	}
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
+
+	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
 
 	return &EsRepository{
 		spool,
@@ -86,13 +135,41 @@ func Start(conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error)
 			View:                     view,
 			UserSessionViewProvider:  view,
 			UserViewProvider:         view,
-			IdGenerator:              id.SonyFlakeGenerator,
+			UserEventProvider:        user,
+			IdGenerator:              idGenerator,
 			PasswordCheckLifeTime:    systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			MfaInitSkippedLifeTime:   systemDefaults.VerificationLifetimes.MfaInitSkip.Duration,
 			MfaSoftwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaSoftwareCheck.Duration,
 			MfaHardwareCheckLifeTime: systemDefaults.VerificationLifetimes.MfaHardwareCheck.Duration,
 		},
 		eventstore.TokenRepo{View: view},
+		eventstore.KeyRepository{
+			KeyEvents:          key,
+			View:               view,
+			SigningKeyRotation: conf.KeyConfig.SigningKeyRotation.Duration,
+		},
+		eventstore.ApplicationRepo{
+			View:          view,
+			ProjectEvents: project,
+		},
+		eventstore.UserSessionRepo{
+			View: view,
+		},
+		eventstore.UserGrantRepo{
+			SearchLimit: conf.SearchLimit,
+			View:        view,
+			IamID:       systemDefaults.IamID,
+			Auth:        authZ,
+			AuthZRepo:   authZRepo,
+		},
+		eventstore.OrgRepository{
+			SearchLimit: conf.SearchLimit,
+			View:        view,
+		},
+		eventstore.IamRepository{
+			IamEvents: iam,
+			IamID:     systemDefaults.IamID,
+		},
 	}, nil
 }
 

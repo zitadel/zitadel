@@ -8,18 +8,19 @@ import (
 )
 
 type UserSessionView struct {
-	ID                      string
-	CreationDate            time.Time
-	ChangeDate              time.Time
-	State                   req_model.UserSessionState
-	ResourceOwner           string
-	UserAgentID             string
-	UserID                  string
-	UserName                string
-	PasswordVerification    time.Time
-	MfaSoftwareVerification time.Time
-	MfaHardwareVerification time.Time
-	Sequence                uint64
+	CreationDate                time.Time
+	ChangeDate                  time.Time
+	State                       req_model.UserSessionState
+	ResourceOwner               string
+	UserAgentID                 string
+	UserID                      string
+	UserName                    string
+	PasswordVerification        time.Time
+	MfaSoftwareVerification     time.Time
+	MfaSoftwareVerificationType req_model.MfaType
+	MfaHardwareVerification     time.Time
+	MfaHardwareVerificationType req_model.MfaType
+	Sequence                    uint64
 }
 
 type UserSessionSearchRequest struct {
@@ -34,7 +35,6 @@ type UserSessionSearchKey int32
 
 const (
 	USERSESSIONSEARCHKEY_UNSPECIFIED UserSessionSearchKey = iota
-	USERSESSIONSEARCHKEY_SESSION_ID
 	USERSESSIONSEARCHKEY_USER_AGENT_ID
 	USERSESSIONSEARCHKEY_USER_ID
 	USERSESSIONSEARCHKEY_STATE

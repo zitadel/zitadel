@@ -11,9 +11,9 @@ import (
 
 type key int
 
-var (
-	permissionsKey key
-	dataKey        key
+const (
+	permissionsKey key = 1
+	dataKey        key = 2
 )
 
 type CtxData struct {
@@ -36,7 +36,7 @@ type Grant struct {
 
 type TokenVerifier interface {
 	VerifyAccessToken(ctx context.Context, token string) (string, string, string, error)
-	ResolveGrants(ctx context.Context, sub, orgID string) ([]*Grant, error)
+	ResolveGrant(ctx context.Context) (*Grant, error)
 	GetProjectIDByClientID(ctx context.Context, clientID string) (string, error)
 }
 
