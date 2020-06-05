@@ -19,7 +19,7 @@ type OrgDomainView struct {
 	Domain   string `json:"-" gorm:"column:domain;primary_key"`
 	OrgID    string `json:"-" gorm:"column:org_id"`
 	Verified bool   `json:"-" gorm:"column:verified"`
-	Primary  bool   `json:"-" gorm:"column:primary"`
+	Primary  bool   `json:"-" gorm:"column:primary_domain"`
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
