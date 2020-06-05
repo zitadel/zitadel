@@ -24,4 +24,4 @@ Examples:
 Use sparsely. You should always make sure that inline images do not exceed 48 by 48 pixels (or the equivalent scale for HDPI displays).
 
 ## Keyboard shortcuts
-When documenting the usage of UI components don't forget to include the keyboard shortcuts available. Use the `kbd:` macro to style the keys accordingly. To ensure platform-independent documentation always include the modifier-keys for **all** supported platforms, i.e. [kbd:]Ctrl or [kbd:]Opt [kbd:]C.
+When documenting the usage of UI components don't forget to include the keyboard shortcuts available. Use the `kbd:` macro or `<kbd>` HTML tag to style the keys accordingly. To ensure platform-independent documentation always include the modifier-keys for **all** supported platforms, i.e. [kbd:]Ctrl or [kbd:]Opt [kbd:]C, which renders <kbd>Ctrl</kbd> or <kbd>Opt</kbd> <kbd>C</kbd>.
