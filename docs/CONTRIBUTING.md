@@ -4,7 +4,7 @@
 Before you start your editing process please take some time to familiarise yourself with the rules for contributing to the documentation of Zitadel.
 
 ## File format
-Zitadel's static site generator uses a Markdown file format. The flavour of the Markdown is specified in the [Caos Static Site Generator](cssg.md) document.
+Zitadel's static site generator uses a Markdown file format. The flavour of the Markdown is specified in the [Caos Static Site Generator](/docs/cssg.md) document.
 
 ## Using headings
 Make use of headings to structure and organise the document. The static site generator will make sure that the headings are rendered as a means of navigation for the site's content.
@@ -54,6 +54,6 @@ Writing documentation in country specific languages is highly endorsed. The stat
 
 `{filename}[.{language-id}].md`
 
-Where `filename` represents the name of the file (see section [File name](#File_names)), `language-id` is an *optional* language identifier (see the list of [ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)), and the mandatory file extension `.md`.
+Where `filename` represents the name of the file (see section [File name](#file-name)), `language-id` is an *optional* language identifier (see the list of [ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)), and the mandatory file extension `.md`.
 
-**Note:** If a filename does not specify a language identifier we consider the file name to implicitely be written in English language (defaulting to `.en`).
+**Note:** If a filename does not specify a language identifier we consider the file name to be implicitely written in English language (defaulting to `.en`).
