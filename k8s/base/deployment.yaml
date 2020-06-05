@@ -20,26 +20,26 @@ spec:
       - name: zitadel
         image: docker.pkg.github.com/caos/zitadel/zitadel:latest
         imagePullPolicy: IfNotPresent
-        args: ["-console=false"]
+        args: []
         ports:
         - name: management-rest
-          containerPort: 60021
+          containerPort: 50011
         - name: management-grpc
-          containerPort: 60020
+          containerPort: 50010
         - name: auth-rest
-          containerPort: 60051
+          containerPort: 50021
         - name: issuer-rest
-          containerPort: 60052
+          containerPort: 50022
         - name: auth-grpc
-          containerPort: 60050
+          containerPort: 50020
         - name: admin-rest
-          containerPort: 60091
+          containerPort: 50041
         - name: admin-grpc
-          containerPort: 60090
+          containerPort: 50040
         - name: console-http
-          containerPort: 9090
+          containerPort: 50050
         - name: accounts-http
-          containerPort: 61121
+          containerPort: 50031
         env: 
         - name: ZITADEL_GOOGLE_CHAT_URL
           valueFrom:
