@@ -234,7 +234,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := mapGrantsToPermissions(tt.args.requiredPerm, tt.args.grant, tt.args.authConfig)
+			result := mapGrantToPermissions(tt.args.requiredPerm, tt.args.grant, tt.args.authConfig)
 			if !equalStringArray(result, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}
