@@ -37,7 +37,7 @@ When documenting the usage of UI components don't forget to include the keyboard
 
 # File name conventions
 ## File name
-If and when the filname of a Markdown file consist of more than **one** contiguous word you must use a hyphen `-` to separate the word elements.
+If and when the file name of a Markdown file consist of more than **one** contiguous word you must use a hyphen `-` to separate the word elements.
 
 Examples:
 
@@ -50,10 +50,10 @@ Examples:
 For reasons of consistency the static site generator only accepts Markdown files with the `.md` file extension.
 
 ## Internationalisation (I18N)
-Writing documentation in country specific languages is highly endorsed. The static site generator makes use of a simple naming confention for Markdown files which are available in different languages:
+Writing documentation in country specific languages is highly endorsed. The static site generator makes use of a simple naming convention for Markdown files which are available in different languages:
 
 `{filename}[.{language-id}].md`
 
 Where `filename` represents the name of the file (see section [File name](#file-name)), `language-id` is an *optional* language identifier (see the list of [ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)), and the mandatory file extension `.md`.
 
-**Note:** If a filename does not specify a language identifier we consider the file name to be implicitely written in English language (defaulting to `.en`).
+**Note:** If a file name does not specify a language identifier we consider the file name to be implicitely written in English language (defaulting to `.en`).
