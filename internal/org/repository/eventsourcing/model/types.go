@@ -26,4 +26,8 @@ const (
 	OrgMemberAdded   models.EventType = "org.member.added"
 	OrgMemberChanged models.EventType = "org.member.changed"
 	OrgMemberRemoved models.EventType = "org.member.removed"
+
+	OrgIamPolicyAdded   models.EventType = "org.iam.policy.added"
+	OrgIamPolicyChanged models.EventType = "org.iam.policy.changed"
+	OrgIamPolicyRemoved models.EventType = "org.iam.policy.removed"
 )

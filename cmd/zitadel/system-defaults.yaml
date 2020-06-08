@@ -63,6 +63,9 @@ SystemDefaults:
       Description: Standard lockout policy
       MaxAttempts: 5
       ShowLockOutFailures: true
+    OrgIam:
+      Description: Standard org policy
+      UserLoginMustBeDomain: true
   IamID: 'IAM'
   SetUp:
     GlobalOrg: 'Global'

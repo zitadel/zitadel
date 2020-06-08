@@ -17,8 +17,9 @@ type Org struct {
 	Name  string `json:"name,omitempty"`
 	State int32  `json:"-"`
 
-	Domains []*OrgDomain `json:"-"`
-	Members []*OrgMember `json:"-"`
+	Domains      []*OrgDomain  `json:"-"`
+	Members      []*OrgMember  `json:"-"`
+	OrgIamPolicy *OrgIamPolicy `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
@@ -110,6 +111,12 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 		o.appendPrimaryDomainEvent(event)
 	case OrgDomainRemoved:
 		o.appendRemoveDomainEvent(event)
+	case OrgIamPolicyAdded:
+		o.appendAddOrgIamPolicyEvent(event)
+	case OrgIamPolicyChanged:
+		o.appendChangeOrgIamPolicyEvent(event)
+	case OrgIamPolicyRemoved:
+		o.appendRemoveOrgIamPolicyEvent()
 	}
 
 	o.ObjectRoot.AppendEvent(event)

@@ -141,7 +141,8 @@ func getOrgID(ctx context.Context, resourceOwner string) string {
 }
 
 func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	user.SetEmailAsUsername(es.getUserNameSuffix(ctx, getOrgID(ctx, resourceOwner)))
+	//user.SetEmailAsUsername(es.getUserNameSuffix(ctx, getOrgID(ctx, resourceOwner)))
+	user.SetEmailAsUsername(user.UserName)
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}

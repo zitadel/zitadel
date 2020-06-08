@@ -79,7 +79,7 @@ func Test_isReservedValidation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validate := isReservedValidation(tt.args.aggregate, tt.args.eventType)
+			validate := isEventValidation(tt.args.aggregate, tt.args.eventType)
 
 			err := validate(tt.args.Events...)
 
@@ -198,7 +198,7 @@ func Test_uniqueDomainAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := uniqueDomainAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgDomain)
+			got, err := reservedUniqueDomainAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgDomain)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
@@ -425,47 +425,18 @@ func TestOrgUpdateAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
-					Name:   "coas",
+					Name: "coas",
 				},
 				updated: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
-					Name:   "caos",
+					Name: "caos",
 				},
 			},
 			res: res{
-				aggregateCount: 2,
-				isErr:          nil,
-			},
-		},
-		{
-			name: "domain changed",
-			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
-				aggCreator: es_models.NewAggregateCreator("test"),
-				existing: &model.Org{
-					ObjectRoot: es_models.ObjectRoot{
-						AggregateID: "sdaf",
-						Sequence:    5,
-					},
-					Domain: "caos.swiss",
-					Name:   "caos",
-				},
-				updated: &model.Org{
-					ObjectRoot: es_models.ObjectRoot{
-						AggregateID: "sdaf",
-						Sequence:    5,
-					},
-					Domain: "caos.ch",
-					Name:   "caos",
-				},
-			},
-			res: res{
-				aggregateCount: 2,
+				aggregateCount: 3,
 				isErr:          nil,
 			},
 		},
@@ -523,31 +494,12 @@ func TestOrgCreatedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
-					Name:   "caos",
-				},
-			},
-			res: res{
-				aggregateCount: 3,
-				isErr:          nil,
-			},
-		},
-		{
-			name: "no domain error",
-			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
-				aggCreator: es_models.NewAggregateCreator("test"),
-				org: &model.Org{
-					ObjectRoot: es_models.ObjectRoot{
-						AggregateID: "sdaf",
-						Sequence:    5,
-					},
 					Name: "caos",
 				},
 			},
 			res: res{
 				aggregateCount: 2,
-				isErr:          errors.IsPreconditionFailed,
+				isErr:          nil,
 			},
 		},
 		{
@@ -560,7 +512,6 @@ func TestOrgCreatedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
 				},
 			},
 			res: res{
