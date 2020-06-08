@@ -18,6 +18,7 @@ type UserView struct {
 	PasswordChanged        time.Time
 	LastLogin              time.Time
 	UserName               string
+	LoginNames             []string
 	FirstName              string
 	LastName               string
 	NickName               string

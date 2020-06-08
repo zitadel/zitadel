@@ -78,7 +78,7 @@ SystemDefaults:
         Users:
           - FirstName: 'Global Org'
             LastName: 'Administrator'
-            UserName: 'zitadel-global-org-admin'
+            UserName: 'zitadel-global-org-admin@caos.ch'
             Email: 'zitadel-global-org-admin@caos.ch'
             Password: 'Password1!'
         Owners:

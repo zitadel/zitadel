@@ -2,6 +2,7 @@ package view
 
 import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
@@ -20,6 +21,20 @@ func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error
 	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_NAME), userName)
 	err := query(db, user)
 	return user, err
+}
+
+func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
+	users := make([]*model.UserView, 0)
+	orgIDQuery := &usr_model.UserSearchQuery{
+		Key:    usr_model.USERSEARCHKEY_RESOURCEOWNER,
+		Method: global_model.SEARCHMETHOD_EQUALS,
+		Value:  orgID,
+	}
+	query := view.PrepareSearchQuery(table, model.UserSearchRequest{
+		Queries: []*usr_model.UserSearchQuery{orgIDQuery},
+	})
+	_, err := query(db, &users)
+	return users, err
 }
 
 func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([]*model.UserView, int, error) {
