@@ -74,6 +74,7 @@ SystemDefaults:
       - Name: 'Global'
         Domain: 'global.caos.ch'
         Default: true
+        OrgIamPolicy: true
         Users:
           - FirstName: 'Global Org'
             LastName: 'Administrator'

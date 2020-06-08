@@ -167,6 +167,14 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 		}
 		setUp.createdOrgs[iamOrg.Name] = org
 
+		if iamOrg.OrgIamPolicy {
+			_, err := setUp.iamorgpolicy(ctx, org)
+			if err != nil {
+				logging.LogWithFields("SETUP-IlLif", "Org Iam Policy", iamOrg.Name).WithError(err).Error("unable to create iam org policy")
+				return err
+			}
+		}
+
 		ctx = setSetUpContextData(ctx, org.AggregateID)
 		err = setUp.users(ctx, iamOrg.Users)
 		if err != nil {
@@ -197,6 +205,15 @@ func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Or
 		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
 	}
 	return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
+}
+
+func (setUp *initializer) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIamPolicy, error) {
+	ctx = setSetUpContextData(ctx, org.AggregateID)
+	policy := &org_model.OrgIamPolicy{
+		ObjectRoot:            models.ObjectRoot{AggregateID: org.AggregateID},
+		UserLoginMustBeDomain: false,
+	}
+	return setUp.repos.OrgEvents.AddOrgIamPolicy(ctx, policy)
 }
 
 func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error {

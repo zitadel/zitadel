@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -13,8 +14,9 @@ import (
 
 type OrgEventstore struct {
 	eventstore.Eventstore
-	IAMDomain   string
-	idGenerator id.Generator
+	IAMDomain           string
+	idGenerator         id.Generator
+	defaultOrgIamPolicy *org_model.OrgIamPolicy
 }
 
 type OrgConfig struct {
@@ -22,11 +24,14 @@ type OrgConfig struct {
 	IAMDomain string
 }
 
-func StartOrg(conf OrgConfig) *OrgEventstore {
+func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEventstore {
+	policy := defaults.DefaultPolicies.OrgIam
+	policy.Default = true
 	return &OrgEventstore{
-		Eventstore:  conf.Eventstore,
-		idGenerator: id.SonyFlakeGenerator,
-		IAMDomain:   conf.IAMDomain,
+		Eventstore:          conf.Eventstore,
+		idGenerator:         id.SonyFlakeGenerator,
+		IAMDomain:           conf.IAMDomain,
+		defaultOrgIamPolicy: &policy,
 	}
 }
 
@@ -270,4 +275,75 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 
 	orgAggregate := orgMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoMember)
 	return es_sdk.Push(ctx, es.PushAggregates, repoMember.AppendEvents, orgAggregate)
+}
+
+func (es *OrgEventstore) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIamPolicy, error) {
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	if err != nil {
+		return nil, err
+	}
+	if existing.OrgIamPolicy != nil {
+		return existing.OrgIamPolicy, nil
+	}
+	return es.defaultOrgIamPolicy, nil
+}
+
+func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	if existing.OrgIamPolicy != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Usj3", "Policy already exists")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoPolicy := model.OrgIamPolicyFromModel(policy)
+	orgAggregate := OrgIamPolicyAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	return model.OrgIamPolicyToModel(repoOrg.OrgIamPolicy), nil
+}
+
+func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(policy.AggregateID))
+	if err != nil {
+		return nil, err
+	}
+	if existing.OrgIamPolicy == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8juSd", "Policy doesnt exist")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoPolicy := model.OrgIamPolicyFromModel(policy)
+	orgAggregate := OrgIamPolicyChangedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoPolicy)
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
+	if err != nil {
+		return nil, err
+	}
+
+	return model.OrgIamPolicyToModel(repoOrg.OrgIamPolicy), nil
+}
+
+func (es *OrgEventstore) RemoveOrgIamPolicy(ctx context.Context, orgID string) error {
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
+	if err != nil {
+		return err
+	}
+	if existing.OrgIamPolicy == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-z6Dse", "Policy doesnt exist")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	orgAggregate := OrgIamPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)
+	if err != nil {
+		return err
+	}
+	return es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregate)
 }

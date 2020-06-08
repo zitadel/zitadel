@@ -56,7 +56,7 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 		return nil, err
 	}
 	aggregates := make([]*es_models.Aggregate, 0)
-	err = addDomainAggregateAndEvents(ctx, aggCreator, agg, aggregates, org)
+	aggregates, err = addDomainAggregateAndEvents(ctx, aggCreator, agg, aggregates, org)
 	if err != nil {
 		return nil, err
 	}
@@ -68,31 +68,31 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 	return append(aggregates, agg), nil
 }
 
-func addDomainAggregateAndEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, orgAggregate *es_models.Aggregate, aggregates []*es_models.Aggregate, org *model.Org) error {
+func addDomainAggregateAndEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, orgAggregate *es_models.Aggregate, aggregates []*es_models.Aggregate, org *model.Org) ([]*es_models.Aggregate, error) {
 	for _, domain := range org.Domains {
-		domainAgregate, err := reservedUniqueDomainAggregate(ctx, aggCreator, org.AggregateID, domain.Domain)
+		domainAggregate, err := reservedUniqueDomainAggregate(ctx, aggCreator, org.AggregateID, domain.Domain)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		aggregates = append(aggregates, domainAgregate)
+		aggregates = append(aggregates, domainAggregate)
 		orgAggregate, err = orgAggregate.AppendEvent(model.OrgDomainAdded, domain)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if domain.Verified {
 			orgAggregate, err = orgAggregate.AppendEvent(model.OrgDomainVerified, domain)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 		if domain.Primary {
 			orgAggregate, err = orgAggregate.AppendEvent(model.OrgDomainPrimarySet, domain)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
-	return nil
+	return aggregates, nil
 }
 
 func OrgUpdateAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, updated *model.Org) ([]*es_models.Aggregate, error) {

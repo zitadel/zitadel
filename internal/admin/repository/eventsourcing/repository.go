@@ -47,7 +47,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain})
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
 		Eventstore: es,

@@ -12,7 +12,8 @@ type Org struct {
 	Name    string
 	Domains []*OrgDomain
 
-	Members []*OrgMember
+	Members      []*OrgMember
+	OrgIamPolicy *OrgIamPolicy
 }
 
 type OrgState int32

@@ -83,3 +83,19 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	return repo.OrgEventstore.IsOrgUnique(ctx, name, domain)
 }
+
+func (repo *OrgRepo) GetOrgIamPolicyByID(ctx context.Context, id string) (*org_model.OrgIamPolicy, error) {
+	return repo.OrgEventstore.GetOrgIamPolicy(ctx, id)
+}
+
+func (repo *OrgRepo) CreateOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+	return repo.OrgEventstore.AddOrgIamPolicy(ctx, policy)
+}
+
+func (repo *OrgRepo) ChangeOrgIamPolicy(ctx context.Context, policy *org_model.OrgIamPolicy) (*org_model.OrgIamPolicy, error) {
+	return repo.OrgEventstore.ChangeOrgIamPolicy(ctx, policy)
+}
+
+func (repo *OrgRepo) RemoveOrgIamPolicy(ctx context.Context, id string) error {
+	return repo.OrgEventstore.RemoveOrgIamPolicy(ctx, id)
+}

@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
-func OrgIamPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgIamPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-i9sJS", "policy should not be nil")
@@ -20,7 +20,7 @@ func OrgIamPolicyAddedAggregate(ctx context.Context, aggCreator *es_models.Aggre
 	}
 }
 
-func OrgIamPolicyChangedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgIamPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9Ksie", "policy should not be nil")
@@ -37,11 +37,8 @@ func OrgIamPolicyChangedAggregate(ctx context.Context, aggCreator *es_models.Agg
 	}
 }
 
-func OrgIamPolicyRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgIamPolicyRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9Ksie", "policy should not be nil")
-		}
 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
 			return nil, err

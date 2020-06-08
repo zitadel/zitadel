@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/notification/providers/email"
 	"github.com/caos/zitadel/internal/notification/providers/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	pol "github.com/caos/zitadel/internal/policy"
 )
 
@@ -51,7 +51,7 @@ type DefaultPolicies struct {
 	Age        pol.PasswordAgePolicyDefault
 	Complexity pol.PasswordComplexityPolicyDefault
 	Lockout    pol.PasswordLockoutPolicyDefault
-	OrgIam     model.OrgIamPolicy
+	OrgIam     org_model.OrgIamPolicy
 }
 
 type Notifications struct {

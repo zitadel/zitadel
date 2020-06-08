@@ -25,24 +25,31 @@ type Org struct {
 func OrgFromModel(org *org_model.Org) *Org {
 	members := OrgMembersFromModel(org.Members)
 	domains := OrgDomainsFromModel(org.Domains)
-
-	return &Org{
+	converted := &Org{
 		ObjectRoot: org.ObjectRoot,
 		Name:       org.Name,
 		State:      int32(org.State),
 		Domains:    domains,
 		Members:    members,
 	}
+	if org.OrgIamPolicy != nil {
+		converted.OrgIamPolicy = OrgIamPolicyFromModel(org.OrgIamPolicy)
+	}
+	return converted
 }
 
 func OrgToModel(org *Org) *org_model.Org {
-	return &org_model.Org{
+	converted := &org_model.Org{
 		ObjectRoot: org.ObjectRoot,
 		Name:       org.Name,
 		State:      org_model.OrgState(org.State),
 		Domains:    OrgDomainsToModel(org.Domains),
 		Members:    OrgMembersToModel(org.Members),
 	}
+	if org.OrgIamPolicy != nil {
+		converted.OrgIamPolicy = OrgIamPolicyToModel(org.OrgIamPolicy)
+	}
+	return converted
 }
 
 func OrgFromEvents(org *Org, events ...*es_models.Event) (*Org, error) {
