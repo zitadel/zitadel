@@ -16,7 +16,7 @@ const (
 )
 
 type OrgDomainView struct {
-	Domain   string `json:"-" gorm:"column:domain;primary_key"`
+	Domain   string `json:"domain" gorm:"column:domain;primary_key"`
 	OrgID    string `json:"-" gorm:"column:org_id"`
 	Verified bool   `json:"-" gorm:"column:verified"`
 	Primary  bool   `json:"-" gorm:"column:primary_domain"`
