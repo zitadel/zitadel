@@ -279,10 +279,10 @@ func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.
 
 func (es *OrgEventstore) GetOrgIamPolicy(ctx context.Context, orgID string) (*org_model.OrgIamPolicy, error) {
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
-	if existing.OrgIamPolicy != nil {
+	if existing != nil && existing.OrgIamPolicy != nil {
 		return existing.OrgIamPolicy, nil
 	}
 	return es.defaultOrgIamPolicy, nil

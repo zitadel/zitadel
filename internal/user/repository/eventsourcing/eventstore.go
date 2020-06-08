@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/caos/zitadel/internal/id"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
 	"github.com/pquerna/otp/totp"
 
@@ -105,11 +106,9 @@ type domain struct {
 	Domain string `json:"domain"`
 }
 
-//TODO: policy for global or.
-// if you create a user in global-org we shouldn't add a suffix
-func (es *UserEventstore) getUserNameSuffix(ctx context.Context, orgID string) string {
+func (es *UserEventstore) checkIamOrgPolicy(ctx context.Context, orgID string, user *usr_model.User) string {
 	orgDomainQuery, err := org_events.OrgByIDQuery(orgID, 0)
-	logging.Log("EVENT-6duS5").OnError(err).Fatal("create query failed")
+	logging.Log("EVENT-6duS5").OnError(err).Error("create query failed")
 
 	suffix := ""
 	setUserNameSuffix := func(events ...*es_models.Event) error {
@@ -140,9 +139,11 @@ func getOrgID(ctx context.Context, resourceOwner string) string {
 	return auth.GetCtxData(ctx).OrgID
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	//user.SetEmailAsUsername(es.getUserNameSuffix(ctx, getOrgID(ctx, resourceOwner)))
-	user.SetEmailAsUsername(user.UserName)
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+	err := user.CheckOrgIamPolicy(orgIamPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
@@ -153,7 +154,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	}
 	user.AggregateID = id
 
-	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, true)
+	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -170,13 +171,13 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 	repoPhoneCode := model.PhoneCodeFromModel(user.PhoneCode)
 
-	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner)
+	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner, orgIamPolicy.UserLoginMustBeDomain)
 
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy) (*usr_model.User, error) {
-	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, policy, "")
+func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIamPolicy, "")
 	if err != nil {
 		return nil, err
 	}
@@ -190,8 +191,11 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	user.SetEmailAsUsername(es.getUserNameSuffix(ctx, getOrgID(ctx, resourceOwner)))
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+	err := user.CheckOrgIamPolicy(orgIamPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
 	}
@@ -213,12 +217,12 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	repoUser := model.UserFromModel(user)
 	repoEmailCode := model.EmailCodeFromModel(user.EmailCode)
 
-	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode)
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode, orgIamPolicy.UserLoginMustBeDomain)
 	return repoUser, aggregates, err
 }
 
-func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, policy, resourceOwner)
+func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*usr_model.User, error) {
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, pwPolicy, orgIamPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

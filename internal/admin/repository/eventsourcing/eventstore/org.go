@@ -30,7 +30,11 @@ type OrgRepo struct {
 }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
-	policy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
+	pwPolicy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
+	if err != nil {
+		return nil, err
+	}
+	orgPolicy, err := repo.OrgEventstore.GetOrgIamPolicy(ctx, DEFAULT_POLICY)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +42,7 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	if err != nil {
 		return nil, err
 	}
-
-	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, policy, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, pwPolicy, orgPolicy, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}

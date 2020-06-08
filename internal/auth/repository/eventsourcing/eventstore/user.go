@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -15,6 +16,7 @@ import (
 type UserRepo struct {
 	UserEvents   *user_event.UserEventstore
 	PolicyEvents *policy_event.PolicyEventstore
+	OrgEvents    *org_event.OrgEventstore
 	View         *view.View
 }
 
@@ -27,11 +29,15 @@ func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOw
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.RegisterUser(ctx, user, pwPolicy, orgPolicy, resourceOwner)
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {

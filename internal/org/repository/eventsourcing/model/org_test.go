@@ -74,8 +74,8 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgChanged, Data: []byte(`{"name": "OrgNameChanged"}`)},
-				org:   &Org{Name: "OrgName"},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgChanged, Data: []byte(`{"name": "OrgName}`)},
+				org:   &Org{Name: "OrgNameChanged"},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgNameChanged"},
 		},
