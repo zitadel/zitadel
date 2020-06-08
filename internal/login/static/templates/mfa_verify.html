@@ -6,6 +6,8 @@
 
 <form action="{{ mfaVerifyUrl }}" method="POST">
 
+    {{ .CSRF }}
+
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
     <input type="hidden" name="mfaType" value="{{ .SelectedMfaProvider }}" />
 

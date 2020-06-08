@@ -128,6 +128,11 @@ Login:
     ZitadelURL: '$ZITADEL_CONSOLE'
     LanguageCookieName: 'caos.zitadel.login.lang'
     DefaultLanguage: 'de'
+    CSRF:
+      CookieName: 'caos.zitadel.login.csrf'
+      Key:
+        EncryptionKeyID: $ZITADEL_CSRF_KEY
+      Development: $ZITADEL_CSRF_DEV
 
 
 AuthZ:

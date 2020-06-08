@@ -6,6 +6,8 @@
 
 <form action="{{ userSelectionUrl }}" method="POST">
 
+    {{ .CSRF }}
+
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="actions">

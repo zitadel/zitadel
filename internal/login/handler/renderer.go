@@ -2,6 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"html/template"
+
+	"github.com/gorilla/csrf"
+
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
@@ -188,6 +192,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		Theme:     l.getTheme(r),
 		ThemeMode: l.getThemeMode(r),
 		AuthReqID: getRequestID(authReq, r),
+		CSRF:      csrf.TemplateField(r),
 	}
 }
 
@@ -206,6 +211,13 @@ func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
 	return r.FormValue(queryAuthRequestID)
 }
 
+func (l *Login) csrfErrorHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := csrf.FailureReason(r)
+		l.renderInternalError(w, r, nil, err)
+	})
+}
+
 type baseData struct {
 	errorData
 	Lang      string
@@ -213,6 +225,7 @@ type baseData struct {
 	Theme     string
 	ThemeMode string
 	AuthReqID string
+	CSRF      template.HTML
 }
 
 type errorData struct {
