@@ -40,8 +40,7 @@ spec:
           containerPort: 50050
         - name: accounts-http
           containerPort: 50031
-        env: 
-    - env:
+        env:
         - name: POD_IP
           valueFrom:
             fieldRef:
