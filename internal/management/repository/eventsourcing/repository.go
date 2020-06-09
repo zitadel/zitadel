@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -32,6 +33,7 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
 	eventstore.PolicyRepo
+	eventstore.IamRepository
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -78,6 +80,13 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		return nil, err
 	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
+	iam, err := es_iam.StartIam(es_iam.IamConfig{
+		Eventstore: es,
+		Cache:      conf.Eventstore.Cache,
+	}, systemDefaults)
+	if err != nil {
+		return nil, err
+	}
 
 	eventstoreRepos := handler.EventstoreRepos{ProjectEvents: project, UserEvents: user, OrgEvents: org}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
@@ -89,6 +98,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, policy, view},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
 		PolicyRepo:    eventstore.PolicyRepo{policy},
+		IamRepository: eventstore.IamRepository{iam},
 	}, nil
 }
 
