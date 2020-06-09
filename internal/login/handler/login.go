@@ -7,11 +7,11 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
-	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
@@ -58,24 +58,26 @@ func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRe
 	statikFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-Ga21f").OnError(err).Panic("unable to create filesystem")
 
-	login.router, err = csrfInterceptor(config.CSRF, login.csrfErrorHandler(), CreateRouter(login, statikFS))
-	logging.Log("CONFI-BHq2a").OnError(err).Panic("unable to create router")
+	csrf, err := csrfInterceptor(config.CSRF, login.csrfErrorHandler())
+	logging.Log("CONFI-dHR2a").OnError(err).Panic("unable to create csrfInterceptor")
+	cache, err := middleware.DefaultCacheInterceptor(EndpointResources)
+	logging.Log("CONFI-BHq2a").OnError(err).Panic("unable to create cacheInterceptor")
+	login.router = CreateRouter(login, statikFS, csrf, cache)
 	login.renderer = CreateRenderer(statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	login.Listen(ctx)
 }
 
-func csrfInterceptor(config CSRF, errorHandler http.Handler, router *mux.Router) (http.Handler, error) {
+func csrfInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
 	csrfKey, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
 	if err != nil {
 		return nil, err
 	}
 	return csrf.Protect([]byte(csrfKey),
-			csrf.Secure(!config.Development),
-			csrf.CookieName(config.CookieName),
-			csrf.ErrorHandler(errorHandler),
-		)(router),
-		nil
+		csrf.Secure(!config.Development),
+		csrf.CookieName(config.CookieName),
+		csrf.ErrorHandler(errorHandler),
+	), nil
 }
 
 func (l *Login) Listen(ctx context.Context) {

@@ -29,8 +29,9 @@ const (
 	EndpointResources = "/resources"
 )
 
-func CreateRouter(login *Login, staticDir http.FileSystem) *mux.Router {
+func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.MiddlewareFunc) *mux.Router {
 	router := mux.NewRouter()
+	router.Use(interceptors...)
 	router.HandleFunc(EndpointRoot, login.handleLogin).Methods(http.MethodGet)
 	router.HandleFunc(EndpointHealthz, login.handleHealthz).Methods(http.MethodGet)
 	router.HandleFunc(EndpointReadiness, login.handleReadiness).Methods(http.MethodGet)

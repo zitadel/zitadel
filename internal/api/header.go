@@ -4,9 +4,12 @@ const (
 	Authorization  = "authorization"
 	Accept         = "accept"
 	AcceptLanguage = "accept-language"
+	CacheControl   = "cache-control"
 	ContentType    = "content-type"
+	Expires        = "expires"
 	Location       = "location"
 	Origin         = "origin"
+	Pragma         = "pragma"
 	UserAgent      = "user-agent"
 	ForwardedFor   = "x-forwarded-for"
 
