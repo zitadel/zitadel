@@ -8,12 +8,12 @@ const routes: Routes = [
     {
         path: '',
         loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule),
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
     },
     {
         path: 'projects',
         loadChildren: () => import('./pages/projects/projects.module').then(m => m.ProjectsModule),
-        canActivate: [AuthGuard, RoleGuard],
+        // canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['project.read'],
         },
