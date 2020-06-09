@@ -19,9 +19,12 @@ export class GrpcOrgInterceptor implements GrpcInterceptor {
     ): Promise<any> {
         const org: Org.AsObject | null = (this.storageService.getItem('organization'));
         if (!metadata[orgKey] && org) {
-            metadata[orgKey] = org.id ?? '';
+            metadata[orgKey] = org.id ?? '58922556878487833';
         }
 
+        // metadata['x-zitadel-login'] = 'true';
+        // metadata['x-zitadel-userid'] = '58922557365027097';
+        // metadata['x-zitadel-clientid'] = '58933678545305881@zitadel';
         return await next.handle(req, metadata);
     }
 }

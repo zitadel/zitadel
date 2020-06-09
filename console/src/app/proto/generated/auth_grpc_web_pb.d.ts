@@ -9,20 +9,20 @@ import * as protoc$gen$swagger_options_annotations_pb from './protoc-gen-swagger
 import * as authoption_options_pb from './authoption/options_pb';
 
 import {
-  IsAdminResponse,
   MfaOtpResponse,
   MultiFactors,
   MyPermissions,
   MyProjectOrgSearchRequest,
   MyProjectOrgSearchResponse,
   PasswordChange,
-  PasswordRequest,
   UpdateUserAddressRequest,
   UpdateUserEmailRequest,
   UpdateUserPhoneRequest,
   UpdateUserProfileRequest,
   UserAddress,
   UserEmail,
+  UserGrantSearchRequest,
+  UserGrantSearchResponse,
   UserPhone,
   UserProfile,
   UserSessionViews,
@@ -154,13 +154,6 @@ export class AuthServiceClient {
                response: MultiFactors) => void
   ): grpcWeb.ClientReadableStream<MultiFactors>;
 
-  setMyPassword(
-    request: PasswordRequest,
-    metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
-               response: google_protobuf_empty_pb.Empty) => void
-  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
-
   changeMyPassword(
     request: PasswordChange,
     metadata: grpcWeb.Metadata | undefined,
@@ -179,8 +172,8 @@ export class AuthServiceClient {
     request: VerifyMfaOtp,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: MfaOtpResponse) => void
-  ): grpcWeb.ClientReadableStream<MfaOtpResponse>;
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
   removeMfaOTP(
     request: google_protobuf_empty_pb.Empty,
@@ -189,19 +182,19 @@ export class AuthServiceClient {
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
+  searchMyUserGrant(
+    request: UserGrantSearchRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: UserGrantSearchResponse) => void
+  ): grpcWeb.ClientReadableStream<UserGrantSearchResponse>;
+
   searchMyProjectOrgs(
     request: MyProjectOrgSearchRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
                response: MyProjectOrgSearchResponse) => void
   ): grpcWeb.ClientReadableStream<MyProjectOrgSearchResponse>;
-
-  isIamAdmin(
-    request: google_protobuf_empty_pb.Empty,
-    metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
-               response: IsAdminResponse) => void
-  ): grpcWeb.ClientReadableStream<IsAdminResponse>;
 
   getMyZitadelPermissions(
     request: google_protobuf_empty_pb.Empty,
@@ -302,11 +295,6 @@ export class AuthServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<MultiFactors>;
 
-  setMyPassword(
-    request: PasswordRequest,
-    metadata?: grpcWeb.Metadata
-  ): Promise<google_protobuf_empty_pb.Empty>;
-
   changeMyPassword(
     request: PasswordChange,
     metadata?: grpcWeb.Metadata
@@ -320,22 +308,22 @@ export class AuthServicePromiseClient {
   verifyMfaOTP(
     request: VerifyMfaOtp,
     metadata?: grpcWeb.Metadata
-  ): Promise<MfaOtpResponse>;
+  ): Promise<google_protobuf_empty_pb.Empty>;
 
   removeMfaOTP(
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
 
+  searchMyUserGrant(
+    request: UserGrantSearchRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<UserGrantSearchResponse>;
+
   searchMyProjectOrgs(
     request: MyProjectOrgSearchRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<MyProjectOrgSearchResponse>;
-
-  isIamAdmin(
-    request: google_protobuf_empty_pb.Empty,
-    metadata?: grpcWeb.Metadata
-  ): Promise<IsAdminResponse>;
 
   getMyZitadelPermissions(
     request: google_protobuf_empty_pb.Empty,

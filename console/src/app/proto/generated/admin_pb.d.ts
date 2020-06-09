@@ -208,8 +208,8 @@ export class OrgSetUpRequest extends jspb.Message {
   hasOrg(): boolean;
   clearOrg(): void;
 
-  getUser(): RegisterUserRequest | undefined;
-  setUser(value?: RegisterUserRequest): void;
+  getUser(): CreateUserRequest | undefined;
+  setUser(value?: CreateUserRequest): void;
   hasUser(): boolean;
   clearUser(): void;
 
@@ -224,7 +224,7 @@ export class OrgSetUpRequest extends jspb.Message {
 export namespace OrgSetUpRequest {
   export type AsObject = {
     org?: CreateOrgRequest.AsObject,
-    user?: RegisterUserRequest.AsObject,
+    user?: CreateUserRequest.AsObject,
   }
 }
 
@@ -254,9 +254,9 @@ export namespace OrgSetUpResponse {
   }
 }
 
-export class RegisterUserRequest extends jspb.Message {
-  getEmail(): string;
-  setEmail(value: string): void;
+export class CreateUserRequest extends jspb.Message {
+  getUserName(): string;
+  setUserName(value: string): void;
 
   getFirstName(): string;
   setFirstName(value: string): void;
@@ -276,31 +276,63 @@ export class RegisterUserRequest extends jspb.Message {
   getGender(): Gender;
   setGender(value: Gender): void;
 
+  getEmail(): string;
+  setEmail(value: string): void;
+
+  getIsEmailVerified(): boolean;
+  setIsEmailVerified(value: boolean): void;
+
+  getPhone(): string;
+  setPhone(value: string): void;
+
+  getIsPhoneVerified(): boolean;
+  setIsPhoneVerified(value: boolean): void;
+
+  getCountry(): string;
+  setCountry(value: string): void;
+
+  getLocality(): string;
+  setLocality(value: string): void;
+
+  getPostalCode(): string;
+  setPostalCode(value: string): void;
+
+  getRegion(): string;
+  setRegion(value: string): void;
+
+  getStreetAddress(): string;
+  setStreetAddress(value: string): void;
+
   getPassword(): string;
   setPassword(value: string): void;
 
-  getOrgId(): string;
-  setOrgId(value: string): void;
-
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): RegisterUserRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: RegisterUserRequest): RegisterUserRequest.AsObject;
-  static serializeBinaryToWriter(message: RegisterUserRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): RegisterUserRequest;
-  static deserializeBinaryFromReader(message: RegisterUserRequest, reader: jspb.BinaryReader): RegisterUserRequest;
+  toObject(includeInstance?: boolean): CreateUserRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateUserRequest): CreateUserRequest.AsObject;
+  static serializeBinaryToWriter(message: CreateUserRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateUserRequest;
+  static deserializeBinaryFromReader(message: CreateUserRequest, reader: jspb.BinaryReader): CreateUserRequest;
 }
 
-export namespace RegisterUserRequest {
+export namespace CreateUserRequest {
   export type AsObject = {
-    email: string,
+    userName: string,
     firstName: string,
     lastName: string,
     nickName: string,
     displayName: string,
     preferredLanguage: string,
     gender: Gender,
+    email: string,
+    isEmailVerified: boolean,
+    phone: string,
+    isPhoneVerified: boolean,
+    country: string,
+    locality: string,
+    postalCode: string,
+    region: string,
+    streetAddress: string,
     password: string,
-    orgId: string,
   }
 }
 
@@ -369,6 +401,9 @@ export class User extends jspb.Message {
   getStreetAddress(): string;
   setStreetAddress(value: string): void;
 
+  getSequence(): number;
+  setSequence(value: number): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): User.AsObject;
   static toObject(includeInstance: boolean, msg: User): User.AsObject;
@@ -399,6 +434,7 @@ export namespace User {
     postalCode: string,
     region: string,
     streetAddress: string,
+    sequence: number,
   }
 }
 
