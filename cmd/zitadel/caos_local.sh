@@ -48,4 +48,4 @@ export CAOS_OIDC_DEV=true
 export ZITADEL_COOKIE_DOMAIN=localhost
 
 #Console
-export ZITADEL_CONSOLE_ENV_PATH=../../console/src/
+export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/

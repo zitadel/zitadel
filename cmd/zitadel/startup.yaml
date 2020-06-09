@@ -191,7 +191,7 @@ Admin:
 
 Console:
   Port: 50050
-  EnvOverwritePath: $ZITADEL_CONSOLE_ENV_PATH
+  EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
 
 
 Notification:
