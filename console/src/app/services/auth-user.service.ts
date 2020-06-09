@@ -12,7 +12,6 @@ import {
     MyProjectOrgSearchRequest,
     MyProjectOrgSearchResponse,
     PasswordChange,
-    PasswordRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
@@ -196,17 +195,6 @@ export class AuthUserService {
         );
     }
 
-    public async SetMyPassword(id: string): Promise<Empty> {
-        const req = new PasswordRequest();
-        req.setPassword(id);
-
-        return await this.request(
-            c => c.setMyPassword,
-            req,
-            f => f,
-        );
-    }
-
     public async ChangeMyPassword(oldPassword: string, newPassword: string): Promise<Empty> {
         const req = new PasswordChange();
         req.setOldPassword(oldPassword);
@@ -234,7 +222,7 @@ export class AuthUserService {
         );
     }
 
-    public async VerifyMfaOTP(code: string): Promise<MfaOtpResponse> {
+    public async VerifyMfaOTP(code: string): Promise<Empty> {
         const req = new VerifyMfaOtp();
         req.setCode(code);
         return await this.request(

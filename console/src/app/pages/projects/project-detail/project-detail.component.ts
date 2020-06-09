@@ -29,7 +29,9 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class ProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: Project.AsObject;
+    public grantId: string = '';
+    public project!: Project.AsObject; // ProjectGrant.AsObject;
+    public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -75,25 +77,39 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.subscription?.unsubscribe();
     }
 
-    private async getData({ id }: Params): Promise<void> {
+    private async getData({ id, grantId }: Params): Promise<void> {
         this.projectId = id;
-        this.projectService.GetProjectById(id).then(proj => {
-            this.project = proj.toObject();
-            if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||
-                this.project.state === ProjectState.PROJECTSTATE_INACTIVE ||
-                this.project.state === ProjectState.PROJECTSTATE_UNSPECIFIED) {
-            }
+        this.grantId = grantId;
 
-            this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
-                const ret = appsResp.toObject().resultList
-                    .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
-                return ret;
-            })); // TODO: replace with prettier thing
-        }).catch(error => {
-            this.toast.showError(error.message);
-        });
+        if (grantId) {
+            // this.projectService.GetGrantedProjectGrantByID(id, this.grantId).then(proj => {
+            //     this.projectGrant = proj.toObject();
+            //     this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
+            //         const ret = appsResp.toObject().resultList
+            //             .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
+            //         return ret;
+            //     })); // TODO: replace with prettier thing
+            // }).catch(error => {
+            //     this.toast.showError(error.message);
+            // });
+        } else {
+            this.projectService.GetProjectById(id).then(proj => {
+                this.project = proj.toObject();
+                // if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||
+                //     this.project.state === ProjectState.PROJECTSTATE_INACTIVE ||
+                //     this.project.state === ProjectState.PROJECTSTATE_UNSPECIFIED) {
+                // }
+
+                this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
+                    const ret = appsResp.toObject().resultList
+                        .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
+                    return ret;
+                })); // TODO: replace with prettier thing
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        }
     }
-
 
     public changeState(newState: ProjectState): void {
         if (newState === ProjectState.PROJECTSTATE_ACTIVE) {

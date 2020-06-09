@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { Project, ProjectMember } from 'src/app/proto/generated/management_pb';
+import { GrantedProject, ProjectMember } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 
 /**
@@ -19,7 +19,7 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
         super();
     }
 
-    public loadMembers(project: Project.AsObject, pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadMembers(project: GrantedProject.AsObject, pageIndex: number, pageSize: number, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);

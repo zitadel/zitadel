@@ -15,6 +15,11 @@ const routes: Routes = [
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
     },
     {
+        path: ':id/grant/:grantId',
+        component: ProjectDetailComponent,
+        data: { animation: 'HomePage' },
+    },
+    {
         path: ':id',
         component: ProjectDetailComponent,
         data: { animation: 'HomePage' },

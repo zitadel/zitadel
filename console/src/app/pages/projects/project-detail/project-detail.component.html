@@ -6,11 +6,11 @@
             </a>
             <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.name}}</h1>
             <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
-                <button *ngIf="project?.type == ProjectType.PROJECTTYPE_SELF" mat-icon-button
+                <!-- <button *ngIf="project?.type == ProjectType.PROJECTTYPE_OWNED" mat-icon-button
                     (click)="editstate = !editstate" aria-label="Edit project name">
                     <mat-icon *ngIf="!editstate">edit</mat-icon>
                     <mat-icon *ngIf="editstate">close</mat-icon>
-                </button>
+                </button> -->
             </ng-template>
 
             <div class="full-width">
@@ -35,7 +35,7 @@
         </div>
 
         <!-- show only on owned projects-->
-        <ng-container *ngIf="project?.type === ProjectType.PROJECTTYPE_SELF; else granteddetail">
+        <ng-container *ngIf="project && projectType == ProjectType.PROJECTTYPE_OWNED; else granteddetail">
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
                 <app-project-application-grid *ngIf="grid"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" (changeView)="grid = false"
@@ -65,7 +65,7 @@
                     <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
                         <app-project-roles [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                            [actionsVisible]="project?.type == ProjectType.PROJECTTYPE_SELF" [projectId]="projectId">
+                            [actionsVisible]="true" [projectId]="projectId">
                         </app-project-roles>
                     </app-card>
                 </ng-template>
@@ -85,7 +85,7 @@
         <div class="details">
             <div class="row">
                 <span class="first">{{'PROJECT.TYPE.TITLE' | translate}}:</span>
-                <span class="second" *ngIf="project?.type">{{'PROJECT.TYPE.'+ project.type | translate}}</span>
+                <span class="second" *ngIf="projectType">{{'PROJECT.TYPE.'+ projectType | translate}}</span>
             </div>
             <div class="row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <ng-container *ngIf="project?.type === ProjectType.PROJECTTYPE_SELF; else grantedmeta">
+        <ng-container *ngIf="projectType === ProjectType.PROJECTTYPE_OWNED; else grantedmeta">
             <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
                 <mat-tab label="Details">
                     <app-project-contributors *ngIf="project"

@@ -5,14 +5,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { Project, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { Project, ProjectMember } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    CreationType,
-    ProjectMemberCreateDialogComponent,
-} from '../../../modules/add-member-dialog/project-member-create-dialog.component';
 import { ProjectMembersDataSource } from './project-members-datasource';
 
 @Component({
@@ -92,31 +88,33 @@ export class ProjectMembersComponent implements AfterViewInit {
     }
 
     public openAddMember(): void {
-        const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
-            data: {
-                creationType: this.project.type ===
-                    ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-                    ProjectType.PROJECTTYPE_SELF ? CreationType.PROJECT_OWNED : undefined,
-                projectId: this.project.id,
-            },
-            width: '400px',
-        });
 
-        dialogRef.afterClosed().subscribe(resp => {
-            if (resp) {
-                const users: User.AsObject[] = resp.users;
-                const roles: string[] = resp.roles;
+        // TODO
+        // const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
+        //     data: {
+        //         creationType: this.project.type ===
+        //             ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
+        //             ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
+        //         projectId: this.project.id,
+        //     },
+        //     width: '400px',
+        // });
 
-                if (users && users.length && roles && roles.length) {
-                    Promise.all(users.map(user => {
-                        return this.projectService.AddProjectMember(this.project.id, user.id, roles);
-                    })).then(() => {
-                        this.toast.showError('members added');
-                    }).catch(error => {
-                        this.toast.showError(error.message);
-                    });
-                }
-            }
-        });
+        // dialogRef.afterClosed().subscribe(resp => {
+        //     if (resp) {
+        //         const users: User.AsObject[] = resp.users;
+        //         const roles: string[] = resp.roles;
+
+        //         if (users && users.length && roles && roles.length) {
+        //             Promise.all(users.map(user => {
+        //                 return this.projectService.AddProjectMember(this.project.id, user.id, roles);
+        //             })).then(() => {
+        //                 this.toast.showError('members added');
+        //             }).catch(error => {
+        //                 this.toast.showError(error.message);
+        //             });
+        //         }
+        //     }
+        // });
     }
 }

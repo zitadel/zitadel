@@ -1,7 +1,6 @@
 import { DataSource } from '@angular/cdk/collections';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
-import { Project, ProjectMember, ProjectMemberSearchResponse, ProjectType } from 'src/app/proto/generated/management_pb';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Project, ProjectMember } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 
 /**
@@ -23,24 +22,25 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-
-        const promise: Promise<ProjectMemberSearchResponse> | undefined =
-            project.type === ProjectType.PROJECTTYPE_SELF ?
-                this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
-                project.type === ProjectType.PROJECTTYPE_GRANTED ?
-                    this.projectService.SearchProjectGrantMembers(project.id, project.grantId, pageSize, offset) : undefined;
-        if (promise) {
-            from(promise).pipe(
-                map(resp => {
-                    this.totalResult = resp.toObject().totalResult;
-                    return resp.toObject().resultList;
-                }),
-                catchError(() => of([])),
-                finalize(() => this.loadingSubject.next(false)),
-            ).subscribe(members => {
-                this.membersSubject.next(members);
-            });
-        }
+        // TODO
+        // const promise: Promise<ProjectMemberSearchResponse> | undefined =
+        //     project.type === ProjectType.PROJECTTYPE_OWNED ?
+        //         this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
+        //         project.type === ProjectType.PROJECTTYPE_GRANTED ?
+        //             this.projectService.SearchProjectGrantMembers(project.id,
+        // project.grantId, pageSize, offset) : undefined;
+        // if (promise) {
+        //     from(promise).pipe(
+        //         map(resp => {
+        //             this.totalResult = resp.toObject().totalResult;
+        //             return resp.toObject().resultList;
+        //         }),
+        //         catchError(() => of([])),
+        //         finalize(() => this.loadingSubject.next(false)),
+        //     ).subscribe(members => {
+        //         this.membersSubject.next(members);
+        //     });
+        // }
     }
 
 

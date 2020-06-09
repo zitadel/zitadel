@@ -125,9 +125,11 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public setPassword(): void {
-        if (this.passwordForm.valid && this.newPassword && this.newPassword.value && this.newPassword.valid) {
+        if (this.passwordForm.valid && this.currentPassword &&
+            this.currentPassword.value &&
+            this.newPassword && this.newPassword.value && this.newPassword.valid) {
             this.userService
-                .SetMyPassword(this.newPassword.value).then((data: any) => {
+                .ChangeMyPassword(this.currentPassword.value, this.newPassword.value).then((data: any) => {
                     this.toast.showInfo('Password Set');
                     this.email = data.toObject();
                 }).catch(data => {
