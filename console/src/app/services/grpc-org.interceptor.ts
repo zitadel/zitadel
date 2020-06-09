@@ -22,9 +22,9 @@ export class GrpcOrgInterceptor implements GrpcInterceptor {
             metadata[orgKey] = org.id ?? '58922556878487833';
         }
 
-        // metadata['x-zitadel-login'] = 'true';
-        // metadata['x-zitadel-userid'] = '58922557365027097';
-        // metadata['x-zitadel-clientid'] = '58933678545305881@zitadel';
+        metadata['x-zitadel-login'] = 'true';
+        metadata['x-zitadel-userid'] = '58922557365027097';
+        metadata['x-zitadel-clientid'] = '58933678545305881@zitadel';
         return await next.handle(req, metadata);
     }
 }
