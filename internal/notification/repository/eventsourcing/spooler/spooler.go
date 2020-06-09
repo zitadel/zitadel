@@ -5,6 +5,7 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -21,12 +22,12 @@ type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
 }
 
-func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sql *sql.DB, eventstoreRepos handler.EventstoreRepos, systemDefaults sd.SystemDefaults) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sql *sql.DB, eventstoreRepos handler.EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:      es,
 		Locker:          &locker{dbClient: sql},
 		ConcurrentTasks: c.ConcurrentTasks,
-		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, eventstoreRepos, systemDefaults),
+		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, eventstoreRepos, systemDefaults, i18n),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

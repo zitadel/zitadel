@@ -37,6 +37,9 @@ func (s *Server) UpdateApplication(ctx context.Context, in *ApplicationUpdate) (
 	return appFromModel(app), nil
 }
 func (s *Server) DeactivateApplication(ctx context.Context, in *ApplicationID) (*Application, error) {
+	if s.IsZitadel(ctx, in.ProjectId) {
+		return nil, errors.ThrowInvalidArgument(nil, "GRPC-LSped", "Zitadel Project Applications should not be deactivated")
+	}
 	app, err := s.project.DeactivateApplication(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
@@ -52,11 +55,17 @@ func (s *Server) ReactivateApplication(ctx context.Context, in *ApplicationID) (
 }
 
 func (s *Server) RemoveApplication(ctx context.Context, in *ApplicationID) (*empty.Empty, error) {
+	if s.IsZitadel(ctx, in.ProjectId) {
+		return nil, errors.ThrowInvalidArgument(nil, "GRPC-LSpee", "Zitadel Project Applications should not be removed")
+	}
 	err := s.project.RemoveApplication(ctx, in.ProjectId, in.Id)
 	return &empty.Empty{}, err
 }
 
 func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *OIDCConfigUpdate) (*OIDCConfig, error) {
+	if s.IsZitadel(ctx, in.ProjectId) {
+		return nil, errors.ThrowInvalidArgument(nil, "GRPC-LSpee", "Zitadel Project Applications OIdc Config should not be changed")
+	}
 	config, err := s.project.ChangeOIDCConfig(ctx, oidcConfigUpdateToModel(in))
 	if err != nil {
 		return nil, err
@@ -65,6 +74,9 @@ func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *OIDCConfig
 }
 
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *ApplicationID) (*ClientSecret, error) {
+	if s.IsZitadel(ctx, in.ProjectId) {
+		return nil, errors.ThrowInvalidArgument(nil, "GRPC-Lps4d", "Zitadel Project Applications OIdc Config should not be changed")
+	}
 	config, err := s.project.ChangeOIDConfigSecret(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
