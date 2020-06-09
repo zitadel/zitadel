@@ -1,0 +1,19 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "EmailVerificationDone.Title"}}</h1>
+<p>{{t "EmailVerificationDone.Description"}}</p>
+
+<form action="{{ loginUrl }}" method="POST">
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+
+
+    <div class="actions">
+        <button class="primary right" type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

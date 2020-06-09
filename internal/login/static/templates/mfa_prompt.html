@@ -1,0 +1,30 @@
+{{template "main-top" .}}
+
+
+<h1>{{t "MfaPrompt.Title"}}</h1>
+
+<form action="{{ mfaPromptUrl }}" method="POST">
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    
+    <div class="fields">
+        {{ range $provider := .MfaProviders}}
+        {{ $providerName := (t (printf "MfaPrompt.Provider%v" $provider)) }}
+            <div class="field radio-button">
+                <input id="{{ $provider }}" type="radio" name="provider" value="{{ $provider }}">
+                <label for="{{ $provider }}">{{ $providerName }}</label>
+            </div>
+        {{ end }}
+    </div>
+
+    <div class="actions">
+        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+        {{if not .MfaRequired}}
+        <button class="default right" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
+        {{end}}
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

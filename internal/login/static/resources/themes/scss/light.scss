@@ -1,0 +1,53 @@
+// ---- LIGHT-THEME-------
+html {
+    background-color: $backgroundColorLight;
+    color: $fontColorLight;
+    
+    header .logo {
+        background-image: url($logoImgLight);
+    }
+
+    h1 {
+        color: $fontColorLight;
+    }
+
+    button {
+        background-color: $backgroundColorLight;
+        color: $primaryColorLight;
+        border: 2px solid $primaryColorLight;
+
+        &:hover {
+            background-color: $primaryColorHoverLight;
+            border: 2px solid $primaryColorHoverLight;
+        }
+
+        &.primary {
+            background-color: $primaryColor;
+            color: $fontColor;
+            border: none;
+            box-shadow: 0px 10px 30px $primaryColor;
+            &:hover {
+                background-color: $primaryColorHover;
+            }
+        }
+    }
+
+    input {
+        background-color: $backgroundColorLight;
+        color: $fontColorLight;
+    }
+
+    #qrcode {
+        svg rect[style*="fill:white"] {
+            fill: $backgroundColorLight !important;
+        }
+
+        svg rect[style*="fill:black"] {
+            fill: $fontColorLight !important;
+        }
+    }
+
+    footer {
+        background-image: url($footerimgLight);
+    }
+}

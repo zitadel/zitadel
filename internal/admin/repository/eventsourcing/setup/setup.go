@@ -2,6 +2,8 @@ package setup
 
 import (
 	"context"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/logging"
@@ -31,13 +33,15 @@ type EventstoreRepos struct {
 	OrgEvents     *org_event.OrgEventstore
 	UserEvents    *usr_event.UserEventstore
 	ProjectEvents *proj_event.ProjectEventstore
+	PolicyEvents  *policy_event.PolicyEventstore
 }
 
 type initializer struct {
 	*Setup
-	createdUsers    map[string]*usr_model.User
-	createdOrgs     map[string]*org_model.Org
-	createdProjects map[string]*proj_model.Project
+	createdUsers       map[string]*usr_model.User
+	createdOrgs        map[string]*org_model.Org
+	createdProjects    map[string]*proj_model.Project
+	pwComplexityPolicy *policy_model.PasswordComplexityPolicy
 }
 
 const (
@@ -55,6 +59,7 @@ const (
 	OIDCAuthMethodType_NONE          = "NONE"
 	OIDCAuthMethodType_BASIC         = "BASIC"
 	OIDCAuthMethodType_POST          = "POST"
+	DEFAULT_POLICY                   = "0"
 )
 
 func StartSetup(sd systemdefaults.SystemDefaults, repos EventstoreRepos) *Setup {
@@ -92,6 +97,13 @@ func (s *Setup) Execute(ctx context.Context) error {
 		createdProjects: make(map[string]*proj_model.Project),
 	}
 
+	pwComplexityPolicy, err := s.repos.PolicyEvents.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
+	if err != nil {
+		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity policy")
+		return err
+	}
+	setUp.pwComplexityPolicy = pwComplexityPolicy
+
 	err = setUp.orgs(ctx, s.setUpConfig.Orgs)
 	if err != nil {
 		logging.Log("SETUP-p4oWq").WithError(err).Error("unable to set up orgs")
@@ -113,7 +125,7 @@ func (s *Setup) Execute(ctx context.Context) error {
 
 	err = setUp.setIamProject(ctx)
 	if err != nil {
-		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set citadel project")
+		logging.Log("SETUP-kaWjq").WithError(err).Error("unable to set zitadel project")
 		return err
 	}
 
@@ -264,7 +276,7 @@ func (setUp *initializer) user(ctx context.Context, user types.User) (*usr_model
 			SecretString: user.Password,
 		},
 	}
-	return setUp.repos.UserEvents.CreateUser(ctx, createUser)
+	return setUp.repos.UserEvents.CreateUser(ctx, createUser, setUp.pwComplexityPolicy)
 }
 
 func (setUp *initializer) orgOwners(ctx context.Context, org *org_model.Org, owners []string) error {

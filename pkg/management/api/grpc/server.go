@@ -4,6 +4,8 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	mgmt_auth "github.com/caos/zitadel/internal/management/auth"
 	"github.com/caos/zitadel/internal/management/repository"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -13,26 +15,30 @@ import (
 var _ ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
-	port      string
-	project   repository.ProjectRepository
-	policy    repository.PolicyRepository
-	org       repository.OrgRepository
-	user      repository.UserRepository
-	usergrant repository.UserGrantRepository
-	verifier  *mgmt_auth.TokenVerifier
-	authZ     auth.Config
+	port           string
+	project        repository.ProjectRepository
+	policy         repository.PolicyRepository
+	org            repository.OrgRepository
+	user           repository.UserRepository
+	usergrant      repository.UserGrantRepository
+	iam            repository.IamRepository
+	verifier       *mgmt_auth.TokenVerifier
+	authZ          auth.Config
+	systemDefaults systemdefaults.SystemDefaults
 }
 
-func StartServer(conf grpc_util.ServerConfig, authZ auth.Config, repo repository.Repository) *Server {
+func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository, authZ auth.Config, sd systemdefaults.SystemDefaults, repo repository.Repository) *Server {
 	return &Server{
-		port:      conf.Port,
-		project:   repo,
-		policy:    repo,
-		org:       repo,
-		user:      repo,
-		usergrant: repo,
-		authZ:     authZ,
-		verifier:  mgmt_auth.Start(),
+		port:           conf.Port,
+		project:        repo,
+		policy:         repo,
+		org:            repo,
+		user:           repo,
+		usergrant:      repo,
+		iam:            repo,
+		authZ:          authZ,
+		verifier:       mgmt_auth.Start(authZRepo),
+		systemDefaults: sd,
 	}
 }
 

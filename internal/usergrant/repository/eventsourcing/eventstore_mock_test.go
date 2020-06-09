@@ -5,9 +5,9 @@ import (
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
-	"github.com/sony/sonyflake"
 )
 
 func GetMockedEventstore(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *UserGrantEventStore {
@@ -25,8 +25,8 @@ func GetMockCache(ctrl *gomock.Controller) *UserGrantCache {
 	return &UserGrantCache{userGrantCache: mockCache}
 }
 
-func GetSonyFlacke() *sonyflake.Sonyflake {
-	return sonyflake.NewSonyflake(sonyflake.Settings{})
+func GetSonyFlacke() id.Generator {
+	return id.SonyFlakeGenerator
 }
 
 func GetMockUserGrantByIDOK(ctrl *gomock.Controller) *UserGrantEventStore {

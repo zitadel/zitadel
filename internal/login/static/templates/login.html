@@ -1,0 +1,27 @@
+{{template "main-top" .}}
+
+<h1>{{t "Login.Title"}}</h1>
+<p>{{t "Login.Description"}}</p>
+
+<form action="{{ usernameUrl }}" method="POST">
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+
+    <div class="fields">
+        <div class="field">
+            <label class="label" for="username">{{t "Login.Username"}}</label>
+            <input class="input" type="text" id="username" name="username"  value="{{ .UserName }}" autocomplete="username" autofocus required>
+        </div>
+    </div>
+
+    {{template "error-message" .}}
+
+    <div class="actions">
+        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+        <a class="default right" href="{{ registerUrl .AuthReqID }}" >{{t "Actions.Register"}}</a>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}
+ 

@@ -74,9 +74,10 @@ func (pw *Password) setData(event *es_models.Event) error {
 	return nil
 }
 
-func (a *PasswordCode) SetData(event *es_models.Event) error {
-	a.ObjectRoot.AppendEvent(event)
-	if err := json.Unmarshal(event.Data, a); err != nil {
+func (c *PasswordCode) SetData(event *es_models.Event) error {
+	c.ObjectRoot.AppendEvent(event)
+	c.CreationDate = event.CreationDate
+	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-q21dr", "could not unmarshal event")
 	}

@@ -15,6 +15,17 @@ func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, er
 	return user, err
 }
 
+func UserGrantByIDs(db *gorm.DB, table, resourceOwnerID, projectID, userID string) (*model.UserGrantView, error) {
+	user := new(model.UserGrantView)
+
+	resourceOwnerIDQuery := model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER, Value: resourceOwnerID, Method: global_model.SEARCHMETHOD_EQUALS}
+	projectIDQuery := model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
+	userIDQuery := model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS}
+	query := view.PrepareGetByQuery(table, resourceOwnerIDQuery, projectIDQuery, userIDQuery)
+	err := query(db, user)
+	return user, err
+}
+
 func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearchRequest) ([]*model.UserGrantView, int, error) {
 	users := make([]*model.UserGrantView, 0)
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})

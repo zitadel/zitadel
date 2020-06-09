@@ -9,13 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/view"
 )
 
-func UserSessionByID(db *gorm.DB, table, sessionID string) (*model.UserSessionView, error) {
-	userSession := new(model.UserSessionView)
-	query := view.PrepareGetByKey(table, model.UserSessionSearchKey(usr_model.USERSESSIONSEARCHKEY_SESSION_ID), sessionID)
-	err := query(db, userSession)
-	return userSession, err
-}
-
 func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSessionView, error) {
 	userSession := new(model.UserSessionView)
 	userAgentQuery := model.UserSessionSearchQuery{
@@ -33,6 +26,20 @@ func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSe
 	return userSession, err
 }
 
+func UserSessionsByUserID(db *gorm.DB, table, userID string) ([]*model.UserSessionView, error) {
+	userSessions := make([]*model.UserSessionView, 0)
+	userAgentQuery := &usr_model.UserSessionSearchQuery{
+		Key:    usr_model.USERSESSIONSEARCHKEY_USER_ID,
+		Method: global_model.SEARCHMETHOD_EQUALS,
+		Value:  userID,
+	}
+	query := view.PrepareSearchQuery(table, model.UserSessionSearchRequest{
+		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
+	})
+	_, err := query(db, &userSessions)
+	return userSessions, err
+}
+
 func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSessionView, error) {
 	userSessions := make([]*model.UserSessionView, 0)
 	userAgentQuery := &usr_model.UserSessionSearchQuery{
@@ -43,7 +50,7 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSes
 	query := view.PrepareSearchQuery(table, model.UserSessionSearchRequest{
 		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
 	})
-	_, err := query(db, userSessions)
+	_, err := query(db, &userSessions)
 	return userSessions, err
 }
 

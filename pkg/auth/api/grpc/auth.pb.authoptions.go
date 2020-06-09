@@ -15,107 +15,107 @@ import (
 
 var AuthService_AuthMethods = utils_auth.MethodMapping{
 
-	"/zitadel.auth.api.v1.AuthService/GetMyUserSessions": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserSessions": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/GetMyUserProfile": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserProfile": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/UpdateMyUserProfile": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/UpdateMyUserProfile": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/GetMyUserEmail": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserEmail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/ChangeMyUserEmail": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyUserEmail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/VerifyMyUserEmail": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyUserEmail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/ResendMyEmailVerificationMail": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ResendMyEmailVerificationMail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/GetMyUserPhone": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/ChangeMyUserPhone": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/VerifyMyUserPhone": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/ResendMyPhoneVerificationCode": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ResendMyPhoneVerificationCode": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/GetMyUserAddress": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserAddress": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/UpdateMyUserAddress": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/UpdateMyUserAddress": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/GetMyMfas": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyMfas": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/ChangeMyPassword": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyPassword": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/AddMfaOTP": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/AddMfaOTP": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/VerifyMfaOTP": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMfaOTP": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/RemoveMfaOTP": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/RemoveMfaOTP": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/SearchMyProjectOrgs": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/SearchMyUserGrant": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/IsIamAdmin": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/SearchMyProjectOrgs": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/zitadel.auth.api.v1.AuthService/GetMyZitadelPermissions": utils_auth.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyZitadelPermissions": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},

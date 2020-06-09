@@ -10,13 +10,19 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	policy_es "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
+const (
+	DEFAULT_POLICY = "0"
+)
+
 type OrgRepo struct {
-	Eventstore     eventstore.Eventstore
-	OrgEventstore  *org_es.OrgEventstore
-	UserEventstore *usr_es.UserEventstore
+	Eventstore       eventstore.Eventstore
+	OrgEventstore    *org_es.OrgEventstore
+	UserEventstore   *usr_es.UserEventstore
+	PolicyEventstore *policy_es.PolicyEventstore
 
 	View *admin_view.View
 
@@ -24,17 +30,21 @@ type OrgRepo struct {
 }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
+	policy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
+	if err != nil {
+		return nil, err
+	}
 	org, aggregates, err := repo.OrgEventstore.PrepareCreateOrg(ctx, setUp.Org)
 	if err != nil {
 		return nil, err
 	}
 
-	user, userAggregate, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, org.AggregateID)
+	user, userAggregates, err := repo.UserEventstore.PrepareCreateUser(ctx, setUp.User, policy, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}
 
-	aggregates = append(aggregates, userAggregate)
+	aggregates = append(aggregates, userAggregates...)
 	setupModel := &Setup{Org: org, User: user}
 
 	member := org_model.NewOrgMemberWithRoles(org.AggregateID, user.AggregateID, "ORG_ADMIN") //TODO: role as const

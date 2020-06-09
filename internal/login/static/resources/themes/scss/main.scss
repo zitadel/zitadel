@@ -1,0 +1,205 @@
+@import "fonts";
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    font-family: $standardFont;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+body {
+    margin: 0;
+}
+
+html {
+    background-color: $backgroundColor;
+    color: $fontColor;
+}
+
+h1 {
+    color: $fontColor;
+    font-family: $headerFont;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 40px;
+}
+
+p {
+    font-width: 300;
+}
+
+header {
+    padding: 8px;
+
+    .logo {
+        background-image: url($logoImgDark);
+        background-repeat: no-repeat;
+        background-size: contain;
+        height: 80px;
+        margin: 30px;
+    }
+}
+
+.content {
+    margin: auto;
+    padding: 20px;
+    width: 100%;
+    max-width: 500px;
+}
+
+a {
+    color: $primaryColor;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 600;
+
+    &:hover {
+        color: $primaryColorHover;
+    }
+}
+
+button {
+    text-transform: uppercase;
+    background-color: $backgroundColor;
+    color: $primaryColor;
+    border: 2px solid $primaryColor;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 600px;
+    height: $inputHeight;
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+    outline: none;
+    &:hover {
+        background-color: $primaryColorHover;
+        border: 2px solid $primaryColorHover;
+    }
+
+    &.primary {
+        background-color: $primaryColor;
+        color: $fontColor;
+        border: none;
+        &:hover {
+            background-color: $primaryColorHover;
+        }
+    }
+
+    & > .sessionstate {
+        text-transform: lowercase;
+    }
+}
+
+input:not([type='radio']), select {
+    background-color: $inputBackgroundColor;
+    color: $fontColor;
+    height: $inputHeight;
+    border: 2px solid $inputBorderColor;
+    border-radius: 5px;
+    padding-left: 15px;
+}
+
+form {
+    .field {
+        display: grid;
+        padding: 10px 0;
+    }
+
+    .field.radio-button {
+        display: flex;
+
+        input[type='radio'] {
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        & label {
+            height: 20px;
+            display: inline-block;
+            padding: 3px 0 0 15px;
+            width: 100%;
+        }
+    }
+
+    label {
+        color: $labelColor;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        margin-bottom: 3px;
+
+        span.optional {
+            font-style: italic;
+            text-transform: none;
+        }
+    }
+
+    .actions {
+        padding: 20px 0;
+
+        .right {
+            float: right;
+        }
+
+        button, a {
+            margin: 10px 0;
+        }
+    }
+}
+
+#copy-secret {
+    visibility: hidden;
+    position: absolute;
+}
+
+#qrcode {
+    text-align: center;
+
+    svg rect[style*="fill:white"] {
+        fill: $backgroundColor !important;
+    }
+
+    svg rect[style*="fill:black"] {
+        fill: $fontColor !important;
+    }
+}
+
+#secret {
+    .copy {
+        float: right;
+        cursor: pointer;
+    }
+}
+
+footer {
+    background-image: url($footerimgDark);
+    width: 100%;
+    background-size: cover;
+    height: 44vw;
+    position: fixed;
+    bottom: 0;
+    z-index: -1;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+}

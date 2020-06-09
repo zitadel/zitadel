@@ -54,13 +54,15 @@ func (p *User) Process(event *models.Event) (err error) {
 		es_model.UserUnlocked,
 		es_model.MfaOtpAdded,
 		es_model.MfaOtpVerified,
-		es_model.MfaOtpRemoved:
+		es_model.MfaOtpRemoved,
+		es_model.MfaInitSkipped,
+		es_model.UserPasswordChanged:
 		user, err = p.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = user.AppendEvent(event)
-	case es_model.UserDeleted:
+	case es_model.UserRemoved:
 		err = p.view.DeleteUser(event.AggregateID, event.Sequence)
 	default:
 		return p.view.ProcessedUserSequence(event.Sequence)

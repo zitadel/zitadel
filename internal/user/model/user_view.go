@@ -36,6 +36,7 @@ type UserView struct {
 	OTPState               MfaState
 	MfaMaxSetUp            req_model.MfaLevel
 	MfaInitSkipped         time.Time
+	InitRequired           bool
 	Sequence               uint64
 }
 
@@ -88,6 +89,8 @@ func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
 func (u *UserView) MfaTypesSetupPossible(level req_model.MfaLevel) []req_model.MfaType {
 	types := make([]req_model.MfaType, 0)
 	switch level {
+	default:
+		fallthrough
 	case req_model.MfaLevelSoftware:
 		if u.OTPState != MFASTATE_READY {
 			types = append(types, req_model.MfaTypeOTP)

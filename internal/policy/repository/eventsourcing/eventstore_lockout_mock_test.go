@@ -14,6 +14,7 @@ func GetMockedEventstoreLockout(ctrl *gomock.Controller, mockEs *mock.MockEvents
 	return &PolicyEventstore{
 		Eventstore:  mockEs,
 		policyCache: GetMockCacheLockout(ctrl),
+		idGenerator: GetSonyFlacke(),
 	}
 }
 

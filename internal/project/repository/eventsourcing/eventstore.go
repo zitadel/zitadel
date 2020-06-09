@@ -2,25 +2,25 @@ package eventsourcing
 
 import (
 	"context"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"strconv"
-
-	"github.com/sony/sonyflake"
-
 	"github.com/caos/zitadel/internal/cache/config"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 )
 
 type ProjectEventstore struct {
 	es_int.Eventstore
 	projectCache *ProjectCache
+	passwordAlg  crypto.HashAlgorithm
 	pwGenerator  crypto.Generator
-	idGenerator  *sonyflake.Sonyflake
+	idGenerator  id.Generator
 }
 
 type ProjectConfig struct {
@@ -35,12 +35,12 @@ func StartProject(conf ProjectConfig, systemDefaults sd.SystemDefaults) (*Projec
 	}
 	passwordAlg := crypto.NewBCrypt(systemDefaults.SecretGenerators.PasswordSaltCost)
 	pwGenerator := crypto.NewHashGenerator(systemDefaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
-	idGenerator := sonyflake.NewSonyflake(sonyflake.Settings{})
 	return &ProjectEventstore{
 		Eventstore:   conf.Eventstore,
 		projectCache: projectCache,
+		passwordAlg:  passwordAlg,
 		pwGenerator:  pwGenerator,
-		idGenerator:  idGenerator,
+		idGenerator:  id.SonyFlakeGenerator,
 	}, nil
 }
 
@@ -63,11 +63,11 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Name is required")
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	project.AggregateID = strconv.FormatUint(id, 10)
+	project.AggregateID = id
 	project.State = proj_model.PROJECTSTATE_ACTIVE
 	repoProject := model.ProjectFromModel(project)
 
@@ -113,8 +113,10 @@ func (es *ProjectEventstore) DeactivateProject(ctx context.Context, id string) (
 
 	repoExisting := model.ProjectFromModel(existing)
 	aggregate := ProjectDeactivateAggregate(es.AggregateCreator(), repoExisting)
-	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
-
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoExisting)
 	return model.ProjectToModel(repoExisting), nil
 }
@@ -130,8 +132,10 @@ func (es *ProjectEventstore) ReactivateProject(ctx context.Context, id string) (
 
 	repoExisting := model.ProjectFromModel(existing)
 	aggregate := ProjectReactivateAggregate(es.AggregateCreator(), repoExisting)
-	es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
-
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, aggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoExisting)
 	return model.ProjectToModel(repoExisting), nil
 }
@@ -194,6 +198,9 @@ func (es *ProjectEventstore) ChangeProjectMember(ctx context.Context, member *pr
 
 	projectAggregate := ProjectMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, m := model.GetProjectMember(repoProject.Members, member.UserID); m != nil {
@@ -218,6 +225,9 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 
 	projectAggregate := ProjectMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
 	es.projectCache.cacheProject(repoProject)
 	return err
 }
@@ -321,16 +331,16 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 	if err != nil {
 		return nil, err
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	app.AppID = strconv.FormatUint(id, 10)
+	app.AppID = id
 
 	var stringPw string
 	var cryptoPw *crypto.CryptoValue
 	if app.OIDCConfig != nil {
-		app.OIDCConfig.AppID = strconv.FormatUint(id, 10)
+		app.OIDCConfig.AppID = id
 		stringPw, cryptoPw, err = generateNewClientSecret(es.pwGenerator)
 		if err != nil {
 			return nil, err
@@ -347,6 +357,9 @@ func (es *ProjectEventstore) AddApplication(ctx context.Context, app *proj_model
 
 	addAggregate := ApplicationAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		converted := model.AppToModel(a)
@@ -372,6 +385,9 @@ func (es *ProjectEventstore) ChangeApplication(ctx context.Context, app *proj_mo
 
 	projectAggregate := ApplicationChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.AppToModel(a), nil
@@ -418,6 +434,9 @@ func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectI
 
 	projectAggregate := ApplicationDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.AppToModel(a), nil
@@ -442,6 +461,9 @@ func (es *ProjectEventstore) ReactivateApplication(ctx context.Context, projectI
 
 	projectAggregate := ApplicationReactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoApp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.AppToModel(a), nil
@@ -469,6 +491,9 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 
 	projectAggregate := OIDCConfigChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoConfig)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
 		return model.OIDCConfigToModel(a.OIDCConfig), nil
@@ -500,6 +525,9 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 
 	projectAggregate := OIDCConfigSecretChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, appID, crypto)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, a := model.GetApplication(repoProject.Applications, app.AppID); a != nil {
@@ -509,6 +537,42 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	}
 
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-dk87s", "Could not find app in list")
+}
+
+func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, projectID, appID string, secret string) error {
+	if appID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-H3RT2", "some required fields missing")
+	}
+	existing, err := es.ProjectByID(ctx, projectID)
+	if err != nil {
+		return err
+	}
+	var app *proj_model.Application
+	if _, app = existing.GetApp(appID); app == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D6hba", "App is not in this project")
+	}
+	if app.Type != proj_model.APPTYPE_OIDC {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-huywq", "App is not an oidc application")
+	}
+
+	if err := crypto.CompareHash(app.OIDCConfig.ClientSecret, []byte(secret), es.passwordAlg); err == nil {
+		return es.setOIDCClientSecretCheckResult(ctx, existing, app.AppID, OIDCClientSecretCheckSucceededAggregate)
+	}
+	if err := es.setOIDCClientSecretCheckResult(ctx, existing, app.AppID, OIDCClientSecretCheckFailedAggregate); err != nil {
+		return err
+	}
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-wg24q", "invalid client secret")
+}
+
+func (es *ProjectEventstore) setOIDCClientSecretCheckResult(ctx context.Context, project *proj_model.Project, appID string, check func(*es_models.AggregateCreator, *model.Project, string) es_sdk.AggregateFunc) error {
+	repoProject := model.ProjectFromModel(project)
+	agg := check(es.AggregateCreator(), repoProject, appID)
+	err := es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, agg)
+	if err != nil {
+		return err
+	}
+	es.projectCache.cacheProject(repoProject)
+	return nil
 }
 
 func (es *ProjectEventstore) ProjectGrantByIDs(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {
@@ -539,18 +603,20 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	if !existing.ContainsRoles(grant.RoleKeys) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
 	}
-	id, err := es.idGenerator.NextID()
+	id, err := es.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	grant.GrantID = strconv.FormatUint(id, 10)
+	grant.GrantID = id
 
 	repoProject := model.ProjectFromModel(existing)
 	repoGrant := model.GrantFromModel(grant)
 
 	addAggregate := ProjectGrantAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
-
+	if err != nil {
+		return nil, err
+	}
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
 		return model.GrantToModel(g), nil
 	}
@@ -576,6 +642,9 @@ func (es *ProjectEventstore) ChangeProjectGrant(ctx context.Context, grant *proj
 
 	projectAggregate := ProjectGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
@@ -623,6 +692,9 @@ func (es *ProjectEventstore) DeactivateProjectGrant(ctx context.Context, project
 
 	projectAggregate := ProjectGrantDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
 		return model.GrantToModel(g), nil
@@ -647,6 +719,9 @@ func (es *ProjectEventstore) ReactivateProjectGrant(ctx context.Context, project
 
 	projectAggregate := ProjectGrantReactivatedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 
 	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
@@ -687,6 +762,9 @@ func (es *ProjectEventstore) AddProjectGrantMember(ctx context.Context, member *
 
 	addAggregate := ProjectGrantMemberAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, g := model.GetProjectGrant(repoProject.Grants, member.GrantID); g != nil {
 		if _, m := model.GetProjectGrantMember(g.Members, member.UserID); m != nil {
@@ -712,6 +790,9 @@ func (es *ProjectEventstore) ChangeProjectGrantMember(ctx context.Context, membe
 
 	projectAggregate := ProjectGrantMemberChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return nil, err
+	}
 	es.projectCache.cacheProject(repoProject)
 	if _, g := model.GetProjectGrant(repoProject.Grants, member.GrantID); g != nil {
 		if _, m := model.GetProjectGrantMember(g.Members, member.UserID); m != nil {
@@ -737,6 +818,9 @@ func (es *ProjectEventstore) RemoveProjectGrantMember(ctx context.Context, membe
 
 	projectAggregate := ProjectGrantMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
 	es.projectCache.cacheProject(repoProject)
 	return err
 }

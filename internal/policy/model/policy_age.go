@@ -1,6 +1,8 @@
 package model
 
-import "github.com/caos/zitadel/internal/eventstore/models"
+import (
+	"github.com/caos/zitadel/internal/eventstore/models"
+)
 
 type PasswordAgePolicy struct {
 	models.ObjectRoot

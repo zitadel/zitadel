@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
+	global_model "github.com/caos/zitadel/internal/model"
 	"strings"
 
 	chg_model "github.com/caos/zitadel/internal/changes/model"
@@ -44,6 +46,13 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 
 func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+
+	permissions := auth.GetPermissionsFromCtx(ctx)
+	if !auth.HasGlobalPermission(permissions) {
+		ids := auth.GetPermissionCtxIDs(permissions)
+		request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IN, Value: ids})
+	}
+
 	projects, count, err := repo.View.SearchGrantedProjects(request)
 	if err != nil {
 		return nil, err

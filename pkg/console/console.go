@@ -1,5 +1,3 @@
-//go:generate statik -src=../../console/dist/app
-
 package console
 
 import (
@@ -14,12 +12,18 @@ import (
 )
 
 type Config struct {
-	Port string
+	Port            string
+	EnvOverwriteDir string
 }
 
 type spaHandler struct {
 	fileSystem http.FileSystem
 }
+
+const (
+	envRequestPath = "/assets/environment.json"
+	envDefaultDir  = "/console/"
+)
 
 func (i *spaHandler) Open(name string) (http.File, error) {
 	ret, err := i.fileSystem.Open(name)
@@ -31,10 +35,15 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 }
 
 func Start(ctx context.Context, config Config) error {
-	statikFS, err := fs.New()
+	statikFS, err := fs.NewWithNamespace("console")
 	if err != nil {
 		return err
 	}
+	envDir := envDefaultDir
+	if config.EnvOverwriteDir != "" {
+		envDir = config.EnvOverwriteDir
+	}
 	http.Handle("/", http.FileServer(&spaHandler{statikFS}))
+	http.Handle(envRequestPath, http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))
 	return http.ListenAndServe(":"+config.Port, nil)
 }

@@ -6,6 +6,7 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/types"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -24,6 +25,7 @@ type Notification struct {
 	userEvents     *usr_event.UserEventstore
 	systemDefaults sd.SystemDefaults
 	AesCrypto      crypto.EncryptionAlgorithm
+	i18n           *i18n.Translator
 }
 
 const (
@@ -75,7 +77,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendUserInitCode(user, initCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendUserInitCode(n.i18n, user, initCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
@@ -93,7 +95,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(user, pwCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendPasswordCode(n.i18n, user, pwCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
@@ -111,7 +113,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendEmailVerificationCode(user, emailCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendEmailVerificationCode(n.i18n, user, emailCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}
@@ -129,7 +131,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(user, phoneCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendPhoneVerificationCode(n.i18n, user, phoneCode, n.systemDefaults, n.AesCrypto)
 	if err != nil {
 		return err
 	}

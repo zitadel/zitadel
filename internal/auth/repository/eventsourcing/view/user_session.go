@@ -10,12 +10,12 @@ const (
 	userSessionTable = "auth.user_sessions"
 )
 
-func (v *View) UserSessionByID(sessionID string) (*model.UserSessionView, error) {
-	return view.UserSessionByID(v.Db, userSessionTable, sessionID)
-}
-
 func (v *View) UserSessionByIDs(agentID, userID string) (*model.UserSessionView, error) {
 	return view.UserSessionByIDs(v.Db, userSessionTable, agentID, userID)
+}
+
+func (v *View) UserSessionsByUserID(userID string) ([]*model.UserSessionView, error) {
+	return view.UserSessionsByUserID(v.Db, userSessionTable, userID)
 }
 
 func (v *View) UserSessionsByAgentID(agentID string) ([]*model.UserSessionView, error) {

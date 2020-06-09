@@ -3,9 +3,11 @@ package eventstore
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/auth"
 	chg_model "github.com/caos/zitadel/internal/changes/model"
 	chg_event "github.com/caos/zitadel/internal/changes/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
@@ -14,6 +16,7 @@ import (
 type UserRepo struct {
 	SearchLimit   uint64
 	UserEvents    *usr_event.UserEventstore
+	PolicyEvents  *policy_event.PolicyEventstore
 	View          *view.View
 	ChangesEvents *chg_event.ChangesEventstore
 }
@@ -23,11 +26,23 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_mod
 }
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	return repo.UserEvents.CreateUser(ctx, user)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.CreateUser(ctx, user, policy)
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	return repo.UserEvents.RegisterUser(ctx, user, resourceOwner)
+	policyResourceOwner := auth.GetCtxData(ctx).OrgID
+	if resourceOwner != "" {
+		policyResourceOwner = resourceOwner
+	}
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
 }
 
 func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -85,7 +100,11 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
-	return repo.UserEvents.SetOneTimePassword(ctx, password)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.SetOneTimePassword(ctx, policy, password)
 }
 
 func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyType usr_model.NotificationType) error {

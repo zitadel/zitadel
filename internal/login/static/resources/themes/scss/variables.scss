@@ -1,0 +1,23 @@
+// ----- FONTS ------------
+$standardFont: Lato;
+$headerFont: Aileron;
+
+// ----- LAYOUT ------------
+$inputHeight: 50px;
+
+
+// ----- DARK-THEME --------
+$backgroundColor: #282828;
+$fontColor: #FFFFFF;
+$primaryColor: #364DF6;
+$primaryColorHover: lighten($primaryColor, 10%);
+$labelColor: #898989;
+$inputBorderColor: #595959;
+$inputBackgroundColor: #252525;
+
+
+// ----- LIGHT-THEME --------
+$backgroundColorLight: $fontColor;
+$fontColorLight: $backgroundColor;
+$primaryColorLight: $primaryColor;
+$primaryColorHoverLight: lighten($primaryColorLight, 10%);

@@ -8,7 +8,7 @@ import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
 
-package zitadel.auth.api.v1;
+package caos.zitadel.auth.api.v1;
 
 option go_package = "github.com/caos/zitadel/pkg/auth/api/grpc";
 
@@ -243,20 +243,20 @@ service AuthService {
     };
   }
 
-  rpc SearchMyProjectOrgs(MyProjectOrgSearchRequest) returns (MyProjectOrgSearchResponse) {
+  rpc SearchMyUserGrant(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
     option (google.api.http) = {
-      post: "/global/projectorgs/_search"
+      post: "/usergrants/me/_search"
       body: "*"
     };
-
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "authenticated"
     };
   }
 
-  rpc IsIamAdmin(google.protobuf.Empty) returns (IsAdminResponse) {
+  rpc SearchMyProjectOrgs(MyProjectOrgSearchRequest) returns (MyProjectOrgSearchResponse) {
     option (google.api.http) = {
-      get: "/global/_isiamadmin"
+      post: "/global/projectorgs/_search"
+      body: "*"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -478,6 +478,41 @@ message OIDCClientAuth {
   string client_secret = 2;
 }
 
+message UserGrantSearchRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  UserGrantSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];;
+  bool asc = 4;
+  repeated UserGrantSearchQuery queries = 5;
+}
+
+message UserGrantSearchQuery {
+  UserGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];;
+  SearchMethod method = 2;
+  string value = 3;
+}
+
+enum UserGrantSearchKey {
+  UserGrantSearchKey_UNKNOWN = 0;
+  UserGrantSearchKey_ORG_ID = 1;
+  UserGrantSearchKey_PROJECT_ID = 2;
+}
+
+message UserGrantSearchResponse {
+  uint64 offset = 1;
+  uint64 limit = 2;
+  uint64 total_result = 3;
+  repeated UserGrantView result = 4;
+}
+
+message UserGrantView {
+  string OrgId = 1;
+  string ProjectId = 2;
+  string UserId = 3;
+  repeated string Roles = 4;
+  string OrgName = 5;
+}
+
 message MyProjectOrgSearchRequest {
   uint64 offset = 1;
   uint64 limit = 2;
@@ -503,10 +538,6 @@ message MyProjectOrgSearchResponse {
   repeated Org result = 4;
 }
 
-message IsAdminResponse {
-  bool is_admin = 1;
-}
-
 message Org {
   string id = 1;
   string name = 2;
@@ -520,4 +551,7 @@ enum SearchMethod {
   SEARCHMETHOD_EQUALS = 0;
   SEARCHMETHOD_STARTS_WITH = 1;
   SEARCHMETHOD_CONTAINS = 2;
+  SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
+  SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
+  SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
 }
