@@ -30,7 +30,8 @@ import { ToastService } from 'src/app/services/toast.service';
 export class ProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public grantId: string = '';
-    public project!: Project.AsObject; //| ProjectGrant.AsObject;
+    public project!: Project.AsObject; // ProjectGrant.AsObject;
+    public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -82,7 +83,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
 
         if (grantId) {
             // this.projectService.GetGrantedProjectGrantByID(id, this.grantId).then(proj => {
-            //     this.project = proj.toObject();
+            //     this.projectGrant = proj.toObject();
             //     this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
             //         const ret = appsResp.toObject().resultList
             //             .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
@@ -109,7 +110,6 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
             });
         }
     }
-
 
     public changeState(newState: ProjectState): void {
         if (newState === ProjectState.PROJECTSTATE_ACTIVE) {
