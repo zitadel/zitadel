@@ -8,7 +8,7 @@ import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
 
-package zitadel.auth.api.v1;
+package caos.zitadel.auth.api.v1;
 
 option go_package = "github.com/caos/zitadel/pkg/auth/api/grpc";
 

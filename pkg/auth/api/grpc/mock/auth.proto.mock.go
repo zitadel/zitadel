@@ -377,24 +377,24 @@ func (mr *MockAuthServiceClientMockRecorder) SearchMyProjectOrgs(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyProjectOrgs", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyProjectOrgs), varargs...)
 }
 
-// SearchUserGrant mocks base method
-func (m *MockAuthServiceClient) SearchUserGrant(arg0 context.Context, arg1 *grpc.UserGrantSearchRequest, arg2 ...grpc0.CallOption) (*grpc.UserGrantSearchResponse, error) {
+// SearchMyUserGrant mocks base method
+func (m *MockAuthServiceClient) SearchMyUserGrant(arg0 context.Context, arg1 *grpc.UserGrantSearchRequest, arg2 ...grpc0.CallOption) (*grpc.UserGrantSearchResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "SearchUserGrant", varargs...)
+	ret := m.ctrl.Call(m, "SearchMyUserGrant", varargs...)
 	ret0, _ := ret[0].(*grpc.UserGrantSearchResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SearchUserGrant indicates an expected call of SearchUserGrant
-func (mr *MockAuthServiceClientMockRecorder) SearchUserGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// SearchMyUserGrant indicates an expected call of SearchMyUserGrant
+func (mr *MockAuthServiceClientMockRecorder) SearchMyUserGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserGrant", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchUserGrant), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMyUserGrant", reflect.TypeOf((*MockAuthServiceClient)(nil).SearchMyUserGrant), varargs...)
 }
 
 // UpdateMyUserAddress mocks base method
