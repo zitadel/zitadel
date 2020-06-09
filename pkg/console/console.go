@@ -12,8 +12,8 @@ import (
 )
 
 type Config struct {
-	Port             string
-	EnvOverwritePath string
+	Port            string
+	EnvOverwriteDir string
 }
 
 type spaHandler struct {
@@ -22,6 +22,7 @@ type spaHandler struct {
 
 const (
 	envRequestPath = "/assets/environment.json"
+	envDefaultDir  = "/console"
 )
 
 func (i *spaHandler) Open(name string) (http.File, error) {
@@ -38,11 +39,11 @@ func Start(ctx context.Context, config Config) error {
 	if err != nil {
 		return err
 	}
-	envPath := envRequestPath
-	if config.EnvOverwritePath != "" {
-		envPath = config.EnvOverwritePath
+	envDir := envDefaultDir
+	if config.EnvOverwriteDir != "" {
+		envDir = config.EnvOverwriteDir
 	}
 	http.Handle("/", http.FileServer(&spaHandler{statikFS}))
-	http.Handle(envRequestPath, http.FileServer(http.Dir(envPath)))
+	http.Handle(envRequestPath, http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))
 	return http.ListenAndServe(":"+config.Port, nil)
 }
