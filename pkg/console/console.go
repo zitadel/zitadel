@@ -19,6 +19,10 @@ type spaHandler struct {
 	fileSystem http.FileSystem
 }
 
+const (
+	environmentPath = "/assets/environment.json"
+)
+
 func (i *spaHandler) Open(name string) (http.File, error) {
 	ret, err := i.fileSystem.Open(name)
 	if !os.IsNotExist(err) || path.Ext(name) != "" {
@@ -34,5 +38,6 @@ func Start(ctx context.Context, config Config) error {
 		return err
 	}
 	http.Handle("/", http.FileServer(&spaHandler{statikFS}))
+	http.Handle(environmentPath, http.FileServer(http.Dir(environmentPath)))
 	return http.ListenAndServe(":"+config.Port, nil)
 }
