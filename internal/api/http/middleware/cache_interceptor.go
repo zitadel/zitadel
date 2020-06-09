@@ -11,32 +11,39 @@ import (
 )
 
 type Cache struct {
+	Cacheability Cacheability
+	NoCache      bool
+	NoStore      bool
 	MaxAge       time.Duration
 	SharedMaxAge time.Duration
-	//Cacheability Cacheability
-	//Revalidation CacheRevalidation
-	Public       bool
-	Cacheability Cacheability
-	NoStore      bool
 	NoTransform  bool
-
-	serialized map[string][]string
+	Revalidation Revalidation
 }
+
 type Cacheability string
 
 const (
 	CacheabilityNotSet  Cacheability = ""
-	CacheabilityNoCache              = "no-cache"
-	CacheabilityNoStore              = "no-store"
+	CacheabilityPublic               = "public"
+	CacheabilityPrivate              = "private"
+)
+
+type Revalidation string
+
+const (
+	RevalidationNotSet Revalidation = ""
+	RevalidationMust                = "must-revalidate"
+	RevalidationProxy               = "proxy-revalidate"
 )
 
 var (
 	NeverCacheOptions = &Cache{
-		Cacheability: CacheabilityNoStore,
+		NoStore: true,
 	}
 	AssetOptions = &Cache{
-		MaxAge: 365 * 24 * time.Hour,
-		Public: true,
+		Cacheability: CacheabilityPublic,
+		MaxAge:       365 * 24 * time.Hour,
+		SharedMaxAge: 365 * 24 * time.Hour,
 	}
 )
 
@@ -72,26 +79,37 @@ func CacheInterceptorOpts(h http.Handler, cache *Cache) http.Handler {
 }
 
 func (c *Cache) serializeHeaders(w http.ResponseWriter) {
-	control := make([]string, 2, 6)
+	control := make([]string, 0, 6)
 	pragma := false
-	maxAge := c.MaxAge
 
-	control[0] = "private"
-	if c.Public {
-		control[0] = "public"
+	if c.Cacheability != CacheabilityNotSet {
+		control = append(control, string(c.Cacheability))
+		control = append(control, fmt.Sprintf("max-age=%v", c.MaxAge.Seconds()))
+		control = append(control, fmt.Sprintf("s-maxage=%v", c.SharedMaxAge.Seconds()))
 	}
-	control[1] = fmt.Sprintf("max-age=%v", maxAge.Seconds())
+	maxAge := c.MaxAge
 	if maxAge == 0 {
 		maxAge = -time.Hour
 	}
 	expires := time.Now().UTC().Add(maxAge).Format(http.TimeFormat)
 
-	if c.Cacheability != CacheabilityNotSet {
-		control = append(control, string(c.Cacheability))
+	if c.NoCache {
+		control = append(control, fmt.Sprintf("no-cache"))
 		pragma = true
 	}
 
-	w.Header().Set(api.CacheControl, strings.Join(control, ","))
+	if c.NoStore {
+		control = append(control, fmt.Sprintf("no-store"))
+	}
+	if c.NoTransform {
+		control = append(control, fmt.Sprintf("no-transform"))
+	}
+
+	if c.Revalidation != RevalidationNotSet {
+		control = append(control, string(c.Revalidation))
+	}
+
+	w.Header().Set(api.CacheControl, strings.Join(control, ", "))
 	w.Header().Set(api.Expires, expires)
 	if pragma {
 		w.Header().Set(api.Pragma, "no-cache")
