@@ -3,6 +3,7 @@ package types
 import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -10,12 +11,10 @@ import (
 
 type EmailVerificationCodeData struct {
 	templates.TemplateData
-	FirstName string
-	LastName  string
-	URL       string
+	URL string
 }
 
-func SendEmailVerificationCode(user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
+func SendEmailVerificationCode(i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -24,7 +23,13 @@ func SendEmailVerificationCode(user *view_model.NotifyUser, code *es_model.Email
 	if err != nil {
 		return err
 	}
-	emailCodeData := &EmailVerificationCodeData{TemplateData: systemDefaults.Notifications.TemplateData.VerifyEmail, FirstName: user.FirstName, LastName: user.LastName, URL: url}
+	var args = map[string]interface{}{
+		"FirstName": user.FirstName,
+		"LastName":  user.LastName,
+		"Code":      codeString,
+	}
+	systemDefaults.Notifications.TemplateData.VerifyEmail.Translate(i18n, args)
+	emailCodeData := &EmailVerificationCodeData{TemplateData: systemDefaults.Notifications.TemplateData.VerifyEmail, URL: url}
 
 	template, err := templates.GetParsedTemplate(emailCodeData)
 	if err != nil {

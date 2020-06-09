@@ -1,0 +1,29 @@
+InitCode:
+  Title: Zitadel - User initialisieren
+  PreHeader: User initialisieren
+  Subject: User initialisieren
+  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Du kannst den Button unten verwenden, um die Initialisierung abzuschliesen. (Code {{.Code}}) Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
+  ButtonText: Initialisierung abschliessen
+PasswordReset:
+  Title: Zitadel - Passwort zurücksetzen
+  PreHeader: Passwort zurücksetzen
+  Subject: Passwort zurücksetzen
+  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen. Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
+  ButtonText: Passwort zurücksetzen
+VerifyEmail:
+  Title: Zitadel - Email verifizieren
+  PreHeader: Email verifizieren
+  Subject: Email verifizieren
+  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren. Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
+  ButtonText: Email verifizieren
+VerifyPhone:
+  Title: Zitadel - Telefonnummer verifizieren
+  PreHeader: Telefonnummer verifizieren
+  Subject: Telefonnummer verifizieren
+  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst {{.Code}}
+  ButtonText: Telefon verifizieren
+

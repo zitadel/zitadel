@@ -196,6 +196,7 @@ Console:
 
 Notification:
   Repository:
+    DefaultLanguage: 'de'
     Eventstore:
       ServiceName: 'Notification'
       Repository:

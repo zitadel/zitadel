@@ -1,0 +1,29 @@
+InitCode:
+  Title: Zitadel - Initialize User
+  PreHeader: Initialize User
+  Subject: Initialize User
+  Greeting: Hello {{.FirstName}} {{.LastName}},
+  Text: This user was created in Zitadel. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
+  ButtonText: Finish initialization
+PasswordReset:
+  Title: Zitadel - Reset password
+  PreHeader: Reset password
+  Subject: Reset password
+  Greeting: Hello {{.FirstName}} {{.LastName}},
+  Text: We received a password reset request. Please use the button below to reset your password. If you didn't ask for this mail, please ignore it.
+  ButtonText: Reset password
+VerifyEmail:
+  Title: Zitadel - Verify email
+  PreHeader: Verify email
+  Subject: Verify email
+  Greeting: Hello {{.FirstName}} {{.LastName}},
+  Text: A new email has been added. Please use the button below to verify your mail. If you din't add a new email, please ignore this email.
+  ButtonText: Verify email
+VerifyPhone:
+  Title: Zitadel - Verify phone
+  PreHeader: Verify phone
+  Subject: Verify phone
+  Greeting: Hello {{.FirstName}} {{.LastName}},
+  Text: A new phonenumber has been added. Please use the following code to verify it {{.Code}}
+  ButtonText: Verify phone
+
