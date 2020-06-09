@@ -60,6 +60,13 @@ func GetMockChangesProjectOK(ctrl *gomock.Controller) *ChangesEventstore {
 	return GetMockedEventstoreComplexity(ctrl, mockEs)
 }
 
+func GetMockChangesProjectNoEvents(ctrl *gomock.Controller) *ChangesEventstore {
+	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
+}
+
 func GetMockChangesApplicationOK(ctrl *gomock.Controller) *ChangesEventstore {
 	app := chg_type.App{
 		Name:     "MusterApp",
@@ -79,6 +86,13 @@ func GetMockChangesApplicationOK(ctrl *gomock.Controller) *ChangesEventstore {
 	return GetMockedEventstoreComplexity(ctrl, mockEs)
 }
 
+func GetMockChangesApplicationNoEvents(ctrl *gomock.Controller) *ChangesEventstore {
+	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
+}
+
 func GetMockChangesOrgOK(ctrl *gomock.Controller) *ChangesEventstore {
 	org := chg_type.Org{
 		Name:   "MusterOrg",
@@ -92,6 +106,13 @@ func GetMockChangesOrgOK(ctrl *gomock.Controller) *ChangesEventstore {
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateIDApp", Sequence: 1, AggregateType: model.User, Data: data},
 	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
+}
+
+func GetMockChangesOrgNoEvents(ctrl *gomock.Controller) *ChangesEventstore {
+	events := []*es_models.Event{}
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	return GetMockedEventstoreComplexity(ctrl, mockEs)

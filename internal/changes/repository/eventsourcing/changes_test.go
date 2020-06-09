@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/changes/model"
 	chg_model "github.com/caos/zitadel/internal/changes/model"
 	chg_type "github.com/caos/zitadel/internal/changes/types"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_model "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/golang/mock/gomock"
 )
@@ -47,21 +48,21 @@ func TestChangesUser(t *testing.T) {
 				user:    &chg_type.User{FirstName: "Hans", LastName: "Muster", EMailAddress: "a@b.ch", Phone: "+41 12 345 67 89", Language: "D", UserName: "HansMuster"},
 			},
 		},
-		// {
-		// 	name: "policy from events, no events",
-		// 	args: args{
-		// 		es:            GetMockChangesUserNoEvents(ctrl),
-		// 		aggregateType: chg_model.User,
-		// 		id:            "2",
-		// 		secId:         "",
-		// 		lastSequence:  0,
-		// 		limit:         0,
-		// 	},
-		// 	res: res{
-		// 		wantErr: true,
-		// 		errFunc: caos_errs.IsNotFound,
-		// 	},
-		// },
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:            GetMockChangesUserNoEvents(ctrl),
+				aggregateType: chg_model.User,
+				id:            "2",
+				secId:         "",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -118,6 +119,21 @@ func TestChangesProject(t *testing.T) {
 			res: res{
 				changes: &model.Changes{Changes: []*model.Change{&chg_model.Change{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
 				project: &chg_type.Project{Name: "MusterProject"},
+			},
+		},
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:            GetMockChangesProjectNoEvents(ctrl),
+				aggregateType: chg_model.Project,
+				id:            "2",
+				secId:         "",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
 			},
 		},
 	}
@@ -178,6 +194,21 @@ func TestChangesApplication(t *testing.T) {
 				app:     &chg_type.App{Name: "MusterApp", AppId: "AppId", AppType: 3, ClientId: "MyClient"},
 			},
 		},
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:            GetMockChangesApplicationNoEvents(ctrl),
+				aggregateType: chg_model.User,
+				id:            "2",
+				secId:         "",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -234,6 +265,21 @@ func TestChangesOrg(t *testing.T) {
 			res: res{
 				changes: &model.Changes{Changes: []*model.Change{&chg_model.Change{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
 				org:     &chg_type.Org{Name: "MusterOrg", Domain: "myDomain", UserId: "myUserId"},
+			},
+		},
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:            GetMockChangesOrgNoEvents(ctrl),
+				aggregateType: chg_model.User,
+				id:            "2",
+				secId:         "",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
 			},
 		},
 	}
