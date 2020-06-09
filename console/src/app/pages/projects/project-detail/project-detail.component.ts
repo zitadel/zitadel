@@ -79,10 +79,10 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.projectId = id;
         this.projectService.GetProjectById(id).then(proj => {
             this.project = proj.toObject();
-            if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||
-                this.project.state === ProjectState.PROJECTSTATE_INACTIVE ||
-                this.project.state === ProjectState.PROJECTSTATE_UNSPECIFIED) {
-            }
+            // if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||
+            //     this.project.state === ProjectState.PROJECTSTATE_INACTIVE ||
+            //     this.project.state === ProjectState.PROJECTSTATE_UNSPECIFIED) {
+            // }
 
             this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
                 const ret = appsResp.toObject().resultList

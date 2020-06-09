@@ -5,7 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { Project, ProjectMember, User } from 'src/app/proto/generated/management_pb';
+import { GrantedProject, ProjectMember, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -21,7 +21,7 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
     styleUrls: ['./project-grant-members.component.scss'],
 })
 export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
-    @Input() public project!: Project.AsObject;
+    @Input() public project!: GrantedProject.AsObject;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;

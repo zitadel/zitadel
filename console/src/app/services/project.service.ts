@@ -10,7 +10,9 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
-    GrantedGrantID,
+    GrantedProjectSearchQuery,
+    GrantedProjectSearchRequest,
+    GrantedProjectSearchResponse,
     OIDCApplicationCreate,
     OIDCConfig,
     OIDCConfigUpdate,
@@ -38,9 +40,6 @@ import {
     ProjectRoleSearchQuery,
     ProjectRoleSearchRequest,
     ProjectRoleSearchResponse,
-    ProjectSearchQuery,
-    ProjectSearchRequest,
-    ProjectSearchResponse,
     ProjectUpdateRequest,
     ProjectUserGrantSearchRequest,
     UserGrant,
@@ -72,16 +71,16 @@ export class ProjectService {
         return responseMapper(response);
     }
 
-    public async SearchProjects(
-        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
-        const req = new ProjectSearchRequest();
+    public async SearchGrantedProjects(
+        limit: number, offset: number, queryList?: GrantedProjectSearchQuery[]): Promise<GrantedProjectSearchResponse> {
+        const req = new GrantedProjectSearchRequest();
         req.setLimit(limit);
         req.setOffset(offset);
         if (queryList) {
             req.setQueriesList(queryList);
         }
         return await this.request(
-            c => c.searchProjects,
+            c => c.searchGrantedProjects,
             req,
             f => f,
         );
@@ -370,7 +369,7 @@ export class ProjectService {
 
     // NEW
     public async GetGrantedProjectGrantByID(id: string): Promise<ProjectGrant> {
-        const req = new GrantedGrantID();
+        const req = new ProjectGrantID();
         req.setId(id);
         return await this.request(
             c => c.getGrantedProjectGrantByID,

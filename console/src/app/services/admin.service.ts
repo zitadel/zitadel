@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Metadata } from 'grpc-web';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
-import { CreateOrgRequest, OrgSetUpRequest, OrgSetUpResponse, RegisterUserRequest } from '../proto/generated/admin_pb';
+import { CreateOrgRequest, CreateUserRequest, OrgSetUpRequest, OrgSetUpResponse } from '../proto/generated/admin_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
 
@@ -29,7 +29,7 @@ export class AdminService {
 
     public async SetUpOrg(
         createOrgRequest: CreateOrgRequest,
-        registerUserRequest: RegisterUserRequest,
+        registerUserRequest: CreateUserRequest,
     ): Promise<OrgSetUpResponse> {
         const req: OrgSetUpRequest = new OrgSetUpRequest();
 

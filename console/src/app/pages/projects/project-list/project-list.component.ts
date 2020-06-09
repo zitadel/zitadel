@@ -80,7 +80,7 @@ export class ProjectListComponent implements OnInit {
 
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
-        this.projectService.SearchProjects(limit, offset).then(res => {
+        this.projectService.SearchGrantedProjects(limit, offset).then(res => {
             this.projectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
             this.dataSource.data = this.projectList;
