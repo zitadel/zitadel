@@ -46,3 +46,6 @@ export ZITADEL_OAUTH=http://localhost:50022
 export ZITADEL_CONSOLE=http://localhost:4200
 export CAOS_OIDC_DEV=true
 export ZITADEL_COOKIE_DOMAIN=localhost
+
+#Console
+export ZITADEL_CONSOLE_ENV_PATH=../../console/src/

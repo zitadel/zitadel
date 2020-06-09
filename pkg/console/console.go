@@ -12,7 +12,8 @@ import (
 )
 
 type Config struct {
-	Port string
+	Port            string
+	EnvironmentPath string
 }
 
 type spaHandler struct {
@@ -20,7 +21,7 @@ type spaHandler struct {
 }
 
 const (
-	environmentPath = "/assets/environment.json"
+	envRequestPath = "/assets/environment.json"
 )
 
 func (i *spaHandler) Open(name string) (http.File, error) {
@@ -37,7 +38,11 @@ func Start(ctx context.Context, config Config) error {
 	if err != nil {
 		return err
 	}
+	envPath := envRequestPath
+	if config.EnvironmentPath != "" {
+		envPath = config.EnvironmentPath
+	}
 	http.Handle("/", http.FileServer(&spaHandler{statikFS}))
-	http.Handle(environmentPath, http.FileServer(http.Dir(environmentPath)))
+	http.Handle(envRequestPath, http.FileServer(http.Dir(envPath)))
 	return http.ListenAndServe(":"+config.Port, nil)
 }

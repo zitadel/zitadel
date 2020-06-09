@@ -191,6 +191,7 @@ Admin:
 
 Console:
   Port: 50050
+  EnvironmentPath: $ZITADEL_CONSOLE_ENV_PATH
 
 
 Notification:
