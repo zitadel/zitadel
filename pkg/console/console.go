@@ -22,7 +22,7 @@ type spaHandler struct {
 
 const (
 	envRequestPath = "/assets/environment.json"
-	envDefaultDir  = "/console"
+	envDefaultDir  = "/console/"
 )
 
 func (i *spaHandler) Open(name string) (http.File, error) {
