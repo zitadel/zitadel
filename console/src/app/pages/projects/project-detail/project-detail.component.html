@@ -35,7 +35,7 @@
         </div>
 
         <!-- show only on owned projects-->
-        <ng-container *ngIf="projectType == ProjectType.PROJECTTYPE_OWNED; else granteddetail">
+        <ng-container *ngIf="project && projectType == ProjectType.PROJECTTYPE_OWNED; else granteddetail">
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
                 <app-project-application-grid *ngIf="grid"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" (changeView)="grid = false"
