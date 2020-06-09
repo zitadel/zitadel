@@ -24,12 +24,12 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 	query := ChangesQuery(id, lastSequence, aggregateTypeQuery)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
-	if len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "no objects found")
-	}
 	if err != nil {
 		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
 		return nil, errors.ThrowInternal(err, "EVENT-328b1", "unable to get current user")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "no objects found")
 	}
 
 	result := make([]*model.Change, 0)
