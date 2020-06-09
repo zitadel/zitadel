@@ -45,7 +45,8 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t Toke
 	//TODO: Remove as soon an authentification is implemented
 	if CheckInternal(ctx) {
 		userID = grpc_util.GetHeader(ctx, api.ZitadelUserID)
-		projectID = grpc_util.GetHeader(ctx, api.ZitadelClientID)
+		clientID = grpc_util.GetHeader(ctx, api.ZitadelClientID)
+		projectID, err = t.GetProjectIDByClientID(ctx, clientID)
 		agentID = grpc_util.GetHeader(ctx, api.ZitadelAgentID)
 	} else {
 		userID, clientID, agentID, err = verifyAccessToken(ctx, token, t)
