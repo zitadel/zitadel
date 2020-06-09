@@ -12,8 +12,8 @@ import (
 )
 
 type Config struct {
-	Port            string
-	EnvironmentPath string
+	Port             string
+	EnvOverwritePath string
 }
 
 type spaHandler struct {
@@ -39,8 +39,8 @@ func Start(ctx context.Context, config Config) error {
 		return err
 	}
 	envPath := envRequestPath
-	if config.EnvironmentPath != "" {
-		envPath = config.EnvironmentPath
+	if config.EnvOverwritePath != "" {
+		envPath = config.EnvOverwritePath
 	}
 	http.Handle("/", http.FileServer(&spaHandler{statikFS}))
 	http.Handle(envRequestPath, http.FileServer(http.Dir(envPath)))
