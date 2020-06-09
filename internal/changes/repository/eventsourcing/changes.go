@@ -8,6 +8,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/changes/model"
 	chg_model "github.com/caos/zitadel/internal/changes/model"
+	chg_type "github.com/caos/zitadel/internal/changes/types"
 	"github.com/caos/zitadel/internal/errors"
 	es_model "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/golang/protobuf/ptypes"
@@ -22,15 +23,15 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
-		logging.Log("EVENT-SUOQ8z").WithError(err).Warn("eventstore unavailable")
-		return nil, errors.ThrowInternal(err, "EVENT-Uw6zSS", "unable to get current user")
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-328b1", "unable to get current user")
 	}
 
 	result := make([]*model.Change, 0)
 
 	for _, u := range events {
 		creationDate, err := ptypes.TimestampProto(u.CreationDate)
-		logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
+		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
 		change := &model.Change{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
@@ -41,15 +42,7 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 
 		switch u.AggregateType {
 		case chg_model.User:
-			type user struct {
-				FirstName    string `json:"firstName,omitempty"`
-				LastName     string `json:"lastName,omitempty"`
-				EMailAddress string `json:"email,omitempty"`
-				Phone        string `json:"phone,omitempty"`
-				Language     string `json:"preferredLanguage,omitempty"`
-				UserName     string `json:"userName,omitempty"`
-			}
-			userDummy := user{}
+			userDummy := chg_type.User{}
 			if u.Data != nil {
 				if err := json.Unmarshal(u.Data, &userDummy); err != nil {
 					log.Println("Error getting data!", err.Error())
@@ -59,10 +52,7 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 		case chg_model.Project:
 			if aggregateType == chg_model.Project {
 				logging.Log("Project").Debugln("Project")
-				type project struct {
-					Name string `json:"name,omitempty"`
-				}
-				projectDummy := project{}
+				projectDummy := chg_type.Project{}
 				if u.Data != nil {
 					if err := json.Unmarshal(u.Data, &projectDummy); err != nil {
 						log.Println("Error getting data!", err.Error())
@@ -74,17 +64,7 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 					change.EventType == "project.application.changed" ||
 					change.EventType == "project.application.config.oidc.added" ||
 					change.EventType == "project.application.config.oidc.changed" {
-					type omitempty struct {
-						ClientId string `json:"clientId,omitempty"`
-					}
-					type app struct {
-						AppId          string `json:"AppId,omitempty"`
-						AppType        int    `json:"AppType,omitempty"`
-						AuthMethodType int    `json:"authMethodType,omitempty"`
-						ClientId       string `json:"clientId,omitempty"`
-						Name           string `json:"name,omitempty"`
-					}
-					appDummy := app{}
+					appDummy := chg_type.App{}
 					if u.Data != nil {
 						if err := json.Unmarshal(u.Data, &appDummy); err != nil {
 							log.Println("Error getting data!", err.Error())
@@ -99,13 +79,7 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 				}
 			}
 		case chg_model.Org:
-			type org struct {
-				Domain string   `json:"domain,omitempty"`
-				Name   string   `json:"name,omitempty"`
-				Roles  []string `json:"roles,omitempty"`
-				UserId string   `json:"userId,omitempty"`
-			}
-			orgDummy := org{}
+			orgDummy := chg_type.Org{}
 			if u.Data != nil {
 				if err := json.Unmarshal(u.Data, &orgDummy); err != nil {
 					log.Println("Error getting data!", err.Error())
