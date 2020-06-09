@@ -72,7 +72,7 @@ spec:
           - name: zitadel-secret
             mountPath: /secret
           - name: console-config
-            mountPath: /app/console/dist/assets/environment.json
+            mountPath: /assets/environment.json
             subPath: environment.json
       imagePullSecrets:
       - name: githubsecret

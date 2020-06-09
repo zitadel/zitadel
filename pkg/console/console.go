@@ -12,12 +12,17 @@ import (
 )
 
 type Config struct {
-	Port string
+	Port             string
+	EnvOverwritePath string
 }
 
 type spaHandler struct {
 	fileSystem http.FileSystem
 }
+
+const (
+	envRequestPath = "/assets/environment.json"
+)
 
 func (i *spaHandler) Open(name string) (http.File, error) {
 	ret, err := i.fileSystem.Open(name)
@@ -33,6 +38,11 @@ func Start(ctx context.Context, config Config) error {
 	if err != nil {
 		return err
 	}
+	envPath := envRequestPath
+	if config.EnvOverwritePath != "" {
+		envPath = config.EnvOverwritePath
+	}
 	http.Handle("/", http.FileServer(&spaHandler{statikFS}))
+	http.Handle(envRequestPath, http.FileServer(http.Dir(envPath)))
 	return http.ListenAndServe(":"+config.Port, nil)
 }
