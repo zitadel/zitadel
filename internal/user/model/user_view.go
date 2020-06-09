@@ -62,12 +62,13 @@ const (
 	USERSEARCHKEY_EMAIL
 	USERSEARCHKEY_STATE
 	USERSEARCHKEY_RESOURCEOWNER
+	USERSEARCHKEY_LOGIN_NAMES
 )
 
 type UserSearchQuery struct {
 	Key    UserSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type UserSearchResponse struct {

@@ -111,7 +111,7 @@ func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username str
 	if err != nil {
 		return err
 	}
-	user, err := repo.View.UserByUsername(username)
+	user, err := repo.View.UserByLoginName(username)
 	if err != nil {
 		return err
 	}

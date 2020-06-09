@@ -19,6 +19,10 @@ func (v *View) UserByUsername(userName string) (*model.UserView, error) {
 	return view.UserByUserName(v.Db, userTable, userName)
 }
 
+func (v *View) UserByLoginName(loginName string) (*model.UserView, error) {
+	return view.UserByLoginName(v.Db, userTable, loginName)
+}
+
 func (v *View) UsersByOrgID(orgID string) ([]*model.UserView, error) {
 	return view.UsersByOrgID(v.Db, userTable, orgID)
 }

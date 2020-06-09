@@ -24,6 +24,7 @@ const (
 	UserKeyEmail         = "email"
 	UserKeyState         = "user_state"
 	UserKeyResourceOwner = "resource_owner"
+	UserKeyLoginNames    = "login_names"
 )
 
 type UserView struct {
