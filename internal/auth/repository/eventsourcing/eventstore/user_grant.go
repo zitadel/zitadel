@@ -42,7 +42,11 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	if ctxData.ProjectID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "APP-7lqva", "Could not get ProjectID")
 	}
-	if ctxData.ProjectID == repo.AuthZRepo.IamProjectID {
+	err := repo.AuthZRepo.FillIamProjectID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if ctxData.ProjectID == repo.AuthZRepo.UserGrantRepo.IamProjectID {
 		isAdmin, err := repo.IsIamAdmin(ctx)
 		if err != nil {
 			return nil, err
