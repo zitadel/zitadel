@@ -1,12 +1,13 @@
 package types
 
 type User struct {
-	FirstName    string `json:"firstName,omitempty"`
-	LastName     string `json:"lastName,omitempty"`
-	EMailAddress string `json:"email,omitempty"`
-	Phone        string `json:"phone,omitempty"`
-	Language     string `json:"preferredLanguage,omitempty"`
-	UserName     string `json:"userName,omitempty"`
+	FirstName      string `json:"firstName,omitempty"`
+	LastName       string `json:"lastName,omitempty"`
+	EMailAddress   string `json:"email,omitempty"`
+	Phone          string `json:"phone,omitempty"`
+	Language       string `json:"preferredLanguage,omitempty"`
+	UserName       string `json:"userName,omitempty"`
+	ChangeRequired bool   `json:"changeRequired"`
 }
 
 type Project struct {
@@ -18,11 +19,15 @@ type omitempty struct {
 }
 
 type App struct {
-	AppId          string `json:"AppId,omitempty"`
-	AppType        int    `json:"AppType,omitempty"`
-	AuthMethodType int    `json:"authMethodType,omitempty"`
-	ClientId       string `json:"clientId,omitempty"`
-	Name           string `json:"name,omitempty"`
+	AppId                  string   `json:"AppId,omitempty"`
+	AppType                int      `json:"AppType,omitempty"`
+	AuthMethodType         int      `json:"authMethodType,omitempty"`
+	ClientId               string   `json:"clientId,omitempty"`
+	Name                   string   `json:"name,omitempty"`
+	GrantTypes             []int    `json:"grantTypes,omitempty"`
+	PostLogoutRedirectUris []string `json:"postLogoutRedirectUris,omitempty"`
+	RedirectUris           []string `json:"redirectUris,omitempty"`
+	ResponseTypes          []int    `json:"responseTypes,omitempty"`
 }
 
 type Org struct {

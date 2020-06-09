@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/changes/model"
@@ -57,12 +58,21 @@ func (es *ChangesEventstore) Changes(ctx context.Context, aggregateType es_model
 			if aggregateType == chg_model.Project {
 				logging.Log("Project").Debugln("Project")
 				projectDummy := chg_type.Project{}
+				appDummy := chg_type.App{}
+				change.Data = projectDummy
 				if u.Data != nil {
-					if err := json.Unmarshal(u.Data, &projectDummy); err != nil {
-						log.Println("Error getting data!", err.Error())
+					if strings.Contains(change.EventType, "application") {
+						if err := json.Unmarshal(u.Data, &appDummy); err != nil {
+							log.Println("Error getting data!", err.Error())
+						}
+						change.Data = appDummy
+					} else {
+						if err := json.Unmarshal(u.Data, &projectDummy); err != nil {
+							log.Println("Error getting data!", err.Error())
+						}
+						change.Data = projectDummy
 					}
 				}
-				change.Data = projectDummy
 			} else if aggregateType == chg_model.Application {
 				if change.EventType == "project.application.added" ||
 					change.EventType == "project.application.changed" ||
