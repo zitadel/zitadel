@@ -22,12 +22,13 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        // TODO 
+        // TODO
         // const promise: Promise<ProjectMemberSearchResponse> | undefined =
         //     project.type === ProjectType.PROJECTTYPE_OWNED ?
         //         this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
         //         project.type === ProjectType.PROJECTTYPE_GRANTED ?
-        //             this.projectService.SearchProjectGrantMembers(project.id, project.grantId, pageSize, offset) : undefined;
+        //             this.projectService.SearchProjectGrantMembers(project.id,
+        // project.grantId, pageSize, offset) : undefined;
         // if (promise) {
         //     from(promise).pipe(
         //         map(resp => {
