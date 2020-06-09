@@ -33,7 +33,7 @@ func SendUserInitCode(i18n *i18n.Translator, user *view_model.NotifyUser, code *
 		"LastName":  user.LastName,
 		"Code":      codeString,
 	}
-	systemDefaults.Notifications.TemplateData.InitCode.Translate(i18n, args)
+	systemDefaults.Notifications.TemplateData.InitCode.Translate(i18n, args, user.PreferredLanguage)
 	initCodeData := &InitCodeEmailData{TemplateData: systemDefaults.Notifications.TemplateData.InitCode, URL: url}
 
 	template, err := templates.GetParsedTemplate(initCodeData)

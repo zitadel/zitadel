@@ -23,7 +23,7 @@ func SendPhoneVerificationCode(i18n *i18n.Translator, user *view_model.NotifyUse
 		"LastName":  user.LastName,
 		"Code":      codeString,
 	}
-	systemDefaults.Notifications.TemplateData.VerifyPhone.Translate(i18n, args)
+	systemDefaults.Notifications.TemplateData.VerifyPhone.Translate(i18n, args, user.PreferredLanguage)
 	codeData := &PhoneVerificationCodeData{UserID: user.ID}
 	template, err := templates.ParseTemplateText(systemDefaults.Notifications.TemplateData.VerifyPhone.Text, codeData)
 	if err != nil {

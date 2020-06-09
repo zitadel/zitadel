@@ -30,7 +30,7 @@ func SendPasswordCode(i18n *i18n.Translator, user *view_model.NotifyUser, code *
 		"LastName":  user.LastName,
 		"Code":      codeString,
 	}
-	systemDefaults.Notifications.TemplateData.PasswordReset.Translate(i18n, args)
+	systemDefaults.Notifications.TemplateData.PasswordReset.Translate(i18n, args, user.PreferredLanguage)
 	passwordCodeData := &PasswordCodeData{TemplateData: systemDefaults.Notifications.TemplateData.PasswordReset, FirstName: user.FirstName, LastName: user.LastName, URL: url}
 
 	template, err := templates.GetParsedTemplate(passwordCodeData)

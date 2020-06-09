@@ -28,7 +28,7 @@ func SendEmailVerificationCode(i18n *i18n.Translator, user *view_model.NotifyUse
 		"LastName":  user.LastName,
 		"Code":      codeString,
 	}
-	systemDefaults.Notifications.TemplateData.VerifyEmail.Translate(i18n, args)
+	systemDefaults.Notifications.TemplateData.VerifyEmail.Translate(i18n, args, user.PreferredLanguage)
 	emailCodeData := &EmailVerificationCodeData{TemplateData: systemDefaults.Notifications.TemplateData.VerifyEmail, URL: url}
 
 	template, err := templates.GetParsedTemplate(emailCodeData)
