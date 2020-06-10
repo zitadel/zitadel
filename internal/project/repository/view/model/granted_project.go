@@ -89,6 +89,7 @@ func (p *GrantedProjectView) AppendEvent(event *models.Event) (err error) {
 	case es_model.ProjectAdded:
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		p.CreationDate = event.CreationDate
+		p.Type = int32(model.PROJECTTYPE_OWNED)
 		p.setRootData(event)
 		err = p.setData(event)
 	case es_model.ProjectChanged:
@@ -100,6 +101,7 @@ func (p *GrantedProjectView) AppendEvent(event *models.Event) (err error) {
 	case es_model.ProjectGrantAdded:
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		p.CreationDate = event.CreationDate
+		p.Type = int32(model.PROJECTTYPE_GRANTED)
 		p.setRootData(event)
 		err = p.setProjectGrantData(event)
 	case es_model.ProjectGrantChanged:
