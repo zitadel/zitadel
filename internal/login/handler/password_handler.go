@@ -1,7 +1,6 @@
 package handler
 
 import (
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -18,11 +17,7 @@ type passwordData struct {
 func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
-		if caos_errs.IsErrorInvalidArgument(err) {
-			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.InvalidPassword", nil)
-		} else {
-			errMessage = l.getErrorMessage(r, err)
-		}
+		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Password", errType, errMessage),

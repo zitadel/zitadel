@@ -117,10 +117,27 @@ Actions:
   ForgotPassword: Password zurücksetzen
 
 Errors:
+  AuthRequest:
+    NotFound: AuthRequest konnte nicht gefunden werden
   User:
     NotFound: Benutzer konnte nicht gefunden werden
-    InvalidPassword: Passwort ungültig
-    InvalidPasswordInit: Code, Passwortbestätigung oder Passwort ungültig
-    CodeExpired: Code ist abgelaufen
+    NotMatchingUserID: User stimm nicht mit User in Auth Request überein
+    Password:
+      ConfirmationWrong: Passowort Bestätigung stimmt nicht überein
+      Empty: Passwort ist leer
+      Invalid: Passwort ungültig
+    PasswordComplexityPolicy:
+      NotFound: Passwort Policy konnte nicht gefunden werden
+      MinLength: Passwort ist zu kurz
+      HasLower: Passwort beinhaltet keinen klein Buchstaben
+      HasUpper: Passwort beinhaltet keinen gross Buchstaben
+      HasNumber: Passwort beinhaltet keine Nummer
+      HasSymbol: Passwort beinhaltet kein Symbol
+    Code:
+      Expired: Code ist abgelaufen
+      Invalid: Code ist ungültig
+      CryptoCodeNil: Crypto Code ist nil
+      NotFound: Code konnte nicht gefunden werden
+      GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
 
 optional: (optional)

@@ -51,7 +51,7 @@ func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *initUserFormData, err error) {
 	if data.Password != data.PasswordConfirm {
-		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "passwords dont match")
+		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
 		l.renderInitUser(w, r, nil, data.UserID, data.Code, err)
 		return
 	}

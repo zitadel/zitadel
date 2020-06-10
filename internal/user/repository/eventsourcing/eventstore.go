@@ -400,7 +400,7 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 		return err
 	}
 	if existing.Password == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "no password set")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s35Fa", "Errors.User.Password.Empty")
 	}
 	if err := crypto.CompareHash(existing.Password.SecretCrypto, []byte(password), es.PasswordAlg); err == nil {
 		return es.setPasswordCheckResult(ctx, existing, authRequest, PasswordCheckSucceededAggregate)
@@ -408,7 +408,7 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	if err := es.setPasswordCheckResult(ctx, existing, authRequest, PasswordCheckFailedAggregate); err != nil {
 		return err
 	}
-	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "invalid password")
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "Errors.User.InvalidPassword")
 }
 
 func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc) error {
@@ -437,10 +437,10 @@ func (es *UserEventstore) SetPassword(ctx context.Context, policy *policy_model.
 		return err
 	}
 	if user.PasswordCode == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-65sdr", "reset code not found")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-65sdr", "Errors.User.Code.NotFound")
 	}
 	if err := crypto.VerifyCode(user.PasswordCode.CreationDate, user.PasswordCode.Expiry, user.PasswordCode.Code, code, es.PasswordVerificationCode); err != nil {
-		return caos_errs.ThrowPreconditionFailed(err, "EVENT-sd6DF", "code invalid")
+		return err
 	}
 	_, err = es.changedPassword(ctx, user, policy, password, false)
 	return err
@@ -452,10 +452,10 @@ func (es *UserEventstore) ChangePassword(ctx context.Context, policy *policy_mod
 		return nil, err
 	}
 	if user.Password == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fds3s", "user has no password")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fds3s", "Errors.User.Password.Empty")
 	}
 	if err := crypto.CompareHash(user.Password.SecretCrypto, []byte(old), es.PasswordAlg); err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "invalid password")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-s56a3", "Errors.User.Password.Invalid")
 	}
 	return es.changedPassword(ctx, user, policy, new, false)
 }

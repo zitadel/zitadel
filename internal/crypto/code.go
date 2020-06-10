@@ -123,7 +123,7 @@ func IsCodeExpired(creationDate time.Time, expiry time.Duration) bool {
 
 func VerifyCode(creationDate time.Time, expiry time.Duration, cryptoCode *CryptoValue, verificationCode string, g Generator) error {
 	if IsCodeExpired(creationDate, expiry) {
-		return errors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "verification code is expired")
+		return errors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired")
 	}
 	switch alg := g.Alg().(type) {
 	case EncryptionAlgorithm:
@@ -131,7 +131,7 @@ func VerifyCode(creationDate time.Time, expiry time.Duration, cryptoCode *Crypto
 	case HashAlgorithm:
 		return verifyHashedCode(cryptoCode, verificationCode, alg)
 	}
-	return errors.ThrowInvalidArgument(nil, "CODE-fW2gNa", "generator alg is not supported")
+	return errors.ThrowInvalidArgument(nil, "CODE-fW2gNa", "Errors.User.Code.GeneratorAlgNotSupported")
 }
 
 func generateRandomString(length uint, chars []rune) (string, error) {
@@ -158,7 +158,7 @@ func generateRandomString(length uint, chars []rune) (string, error) {
 
 func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg EncryptionAlgorithm) error {
 	if cryptoCode == nil {
-		return errors.ThrowInvalidArgument(nil, "CRYPT-aqrFV", "cryptoCode must not be nil")
+		return errors.ThrowInvalidArgument(nil, "CRYPT-aqrFV", "Errors.User.Code.CryptoCodeNil")
 	}
 	code, err := DecryptString(cryptoCode, alg)
 	if err != nil {
@@ -166,7 +166,7 @@ func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg E
 	}
 
 	if code != verificationCode {
-		return errors.ThrowInvalidArgument(nil, "CODE-woT0xc", "verification code is invalid")
+		return errors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid")
 	}
 	return nil
 }

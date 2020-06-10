@@ -65,7 +65,7 @@ func (c *AuthRequestCache) getAuthRequest(key, value string) (*model.AuthRequest
 	err := c.client.QueryRow(query, value).Scan(&b, &requestType)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, caos_errs.ThrowNotFound(err, "CACHE-d24aD", "auth request not found")
+			return nil, caos_errs.ThrowNotFound(err, "CACHE-d24aD", "Errors.AuthRequest.NotFound")
 		}
 		return nil, caos_errs.ThrowInternal(err, "CACHE-as3kj", "unable to get auth request from database")
 	}
