@@ -223,3 +223,4 @@ jobs:
         checkout_project
         change_image_version
         upload_files
+      if: env.CAOS_NEXT_VERSION !=  ''
