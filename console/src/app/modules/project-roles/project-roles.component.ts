@@ -2,6 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { tap } from 'rxjs/operators';
 import { ProjectRole } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -26,7 +27,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     @Output() public changedSelection: EventEmitter<Array<ProjectRole.AsObject>> = new EventEmitter();
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'name', 'displayname', 'group'];
+    public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
 
     constructor(private projectService: ProjectService, private toast: ToastService) { }
 
@@ -106,5 +107,10 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             .catch(data => {
                 this.toast.showError(data.message);
             });
+    }
+
+    public dateFromTimestamp(date: Timestamp.AsObject): any {
+        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
+        return ts;
     }
 }

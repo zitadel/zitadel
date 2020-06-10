@@ -325,6 +325,7 @@
             "NAME": "Name"
         },
         "ROLE": {
+            "KEY":"Key",
             "TITLE": "Roles",
             "DESCRIPTION":"Definieren Sie Rollen, die Sie bei der Erstellung eines Projekt-Grants vergeben können",
             "NAME": "Name",
@@ -333,7 +334,8 @@
             "ACTIONS": "Aktion",
             "ADDTITLE": "Rolle erstellen",
             "ADDDESCRIPTION": "Geben Sie die Daten für die zu erstellende Rolle ein!",
-            "DELETE":"Rolle löschen"
+            "DELETE":"Rolle löschen",
+            "CREATIONDATE":"Erstelldatum"
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt:",

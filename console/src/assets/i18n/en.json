@@ -325,6 +325,7 @@
             "NAME": "Name"
         },
         "ROLE": {
+            "KEY":"Key",
             "TITLE": "Roles",
             "DESCRIPTION":"Define some roles which can be used to create project-grants",
             "NAME": "Name",
@@ -333,7 +334,8 @@
             "ACTIONS": "Actions",
             "ADDTITLE": "Create role",
             "ADDDESCRIPTION": "Enter the data for the new role!",
-            "DELETE":"Delete Role"
+            "DELETE":"Delete Role",
+            "CREATIONDATE":"Created"
         },
         "TABLE": {
             "TOTAL": "Entries total:",

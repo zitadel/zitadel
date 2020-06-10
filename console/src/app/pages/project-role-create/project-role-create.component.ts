@@ -50,6 +50,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
     ) {
         this.formGroup = new FormGroup({
+            key: new FormControl(''),
             name: new FormControl(''),
             displayName: new FormControl(''),
             group: new FormControl('', [Validators.required]),
