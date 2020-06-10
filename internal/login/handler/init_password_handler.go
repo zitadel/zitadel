@@ -78,9 +78,9 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 		if errors.IsErrorInvalidArgument(err) {
 			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.InvalidPasswordInit", nil)
 		} else if errors.IsPreconditionFailed(err) {
-			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.InvalidPasswordInit", nil)
+			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.CodeExpired", nil)
 		} else {
-			errMessage = l.getErrorMessage(err)
+			errMessage = l.getErrorMessage(r, err)
 		}
 		errMessage = err.Error()
 	}

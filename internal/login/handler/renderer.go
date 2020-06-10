@@ -192,9 +192,9 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 	}
 }
 
-func (l *Login) getErrorMessage(err error) (errMsg string) {
+func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
 	if caosErr, ok := err.(*caos_errs.CaosError); ok {
-		return caosErr.Message
+		return l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
 	}
 	return err.Error()
 }

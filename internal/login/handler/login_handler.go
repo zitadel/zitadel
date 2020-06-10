@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/caos/zitadel/internal/auth_request/model"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"net/http"
 )
 
@@ -54,11 +53,7 @@ func (l *Login) handleUsernameCheck(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
-		if caos_errs.IsNotFound(err) {
-			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.UserNotFound", nil)
-		} else {
-			errMessage = l.getErrorMessage(err)
-		}
+		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Login", errType, errMessage),

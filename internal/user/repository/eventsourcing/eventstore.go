@@ -346,6 +346,8 @@ func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *policy_mod
 	var updateAggregate func(ctx context.Context) (*es_models.Aggregate, error)
 	if err := crypto.VerifyCode(existing.InitCode.CreationDate, existing.InitCode.Expiry, existing.InitCode.Code, verificationCode, es.InitializeUserCode); err != nil {
 		updateAggregate = InitCodeCheckFailedAggregate(es.AggregateCreator(), repoExisting)
+		es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, updateAggregate)
+		return err
 	} else {
 		updateAggregate = InitCodeVerifiedAggregate(es.AggregateCreator(), repoExisting, repoPassword)
 	}

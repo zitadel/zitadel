@@ -21,7 +21,7 @@ func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *
 		if caos_errs.IsErrorInvalidArgument(err) {
 			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.InvalidPassword", nil)
 		} else {
-			errMessage = l.getErrorMessage(err)
+			errMessage = l.getErrorMessage(r, err)
 		}
 	}
 	data := userData{
