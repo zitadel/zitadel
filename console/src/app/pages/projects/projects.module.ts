@@ -42,6 +42,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
 import { ProjectGridComponent } from './project-grid/project-grid.component';
 import { ProjectListComponent } from './project-list/project-list.component';
 import { ProjectsRoutingModule } from './projects-routing.module';
+import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 
 @NgModule({
     declarations: [
@@ -54,6 +55,7 @@ import { ProjectsRoutingModule } from './projects-routing.module';
         ProjectGrantMembersComponent,
         ProjectGrantMembersCreateDialogComponent,
         ProjectContributorsComponent,
+        GrantedProjectDetailComponent,
     ],
     imports: [
         ProjectsRoutingModule,

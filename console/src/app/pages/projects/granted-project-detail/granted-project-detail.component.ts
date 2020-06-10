@@ -10,7 +10,6 @@ import {
     Application,
     ApplicationSearchResponse,
     GrantedProject,
-    Project,
     ProjectMember,
     ProjectMemberSearchResponse,
     ProjectRole,
@@ -23,14 +22,14 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-detail',
-    templateUrl: './project-detail.component.html',
-    styleUrls: ['./project-detail.component.scss'],
-
+    selector: 'app-granted-project-detail',
+    templateUrl: './granted-project-detail.component.html',
+    styleUrls: ['./granted-project-detail.component.scss'],
 })
-export class ProjectDetailComponent implements OnInit, OnDestroy {
+export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: Project.AsObject | GrantedProject.AsObject;
+    public grantId: string = '';
+    public project!: GrantedProject.AsObject;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -78,12 +77,14 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.zitadelsub.unsubscribe();
     }
 
-    private async getData({ id }: Params): Promise<void> {
+    private async getData({ id, grantId }: Params): Promise<void> {
         this.projectId = id;
+        this.grantId = grantId;
 
-        if (this.projectId) {
-            this.projectService.GetProjectById(id).then(proj => {
+        if (this.projectId && this.grantId) {
+            this.projectService.GetGrantedProjectGrantByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
+                console.log(this.project);
                 this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
                     const ret = appsResp.toObject().resultList
                         .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
@@ -97,32 +98,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.zitadelsub = this.isZitadel$.subscribe(isZita => console.log(`zitade: ${isZita}`));
     }
 
-    public changeState(newState: ProjectState): void {
-        if (newState === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.projectService.ReactivateProject(this.projectId).then(() => {
-                this.toast.showInfo('Reactivated Project');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
-        } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
-            this.toast.showInfo('You cant update this project.');
-        }
-    }
-
-    public saveProject(): void {
-        this.projectService.UpdateProject(this.project as Project.AsObject).then(() => {
-            this.toast.showInfo('Project updated');
-        }).catch(error => {
-            this.toast.showInfo(error.message);
-        });
-    }
-
     public navigateBack(): void {
         this._location.back();
-    }
-
-    public updateName(): void {
-        this.saveProject();
-        this.editstate = false;
     }
 }
