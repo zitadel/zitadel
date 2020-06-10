@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <ng-template appHasRole [appHasRole]="['project.app.read:' + project?.id, 'project.app.read']">
+        <!-- <ng-template appHasRole [appHasRole]="['project.app.read:' + project?.id, 'project.app.read']">
             <app-project-application-grid *ngIf="grid" [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
                 (changeView)="grid = false" [projectId]="projectId"></app-project-application-grid>
             <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
@@ -23,7 +23,7 @@
                 <app-project-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
                     [projectId]="projectId"></app-project-applications>
             </app-card>
-        </ng-template>
+        </ng-template> -->
 
         <app-card>
             <app-project-grant-members *ngIf="project && project.id && project.grantId"
