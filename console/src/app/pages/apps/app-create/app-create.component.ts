@@ -107,6 +107,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 this.showSavedDialog(data.toObject());
             })
             .catch(data => {
+                console.error(data);
                 this.toast.showError(data.message);
             });
     }

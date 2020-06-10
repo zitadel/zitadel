@@ -1,11 +1,10 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { Project, ProjectMember } from 'src/app/proto/generated/management_pb';
+import { Project, ProjectMember, ProjectType } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -18,6 +17,7 @@ import { ProjectMembersDataSource } from './project-members-datasource';
 })
 export class ProjectMembersComponent implements AfterViewInit {
     public project!: Project.AsObject;
+    public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
@@ -28,14 +28,14 @@ export class ProjectMembersComponent implements AfterViewInit {
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
     constructor(private projectService: ProjectService,
-        private dialog: MatDialog,
         private toast: ToastService,
         private route: ActivatedRoute) {
         this.route.params.subscribe(params => {
             this.projectService.GetProjectById(params.projectid).then(project => {
                 this.project = project.toObject();
+                console.log(this.project);
                 this.dataSource = new ProjectMembersDataSource(this.projectService);
-                this.dataSource.loadMembers(this.project, 0, 25, 'asc');
+                this.dataSource.loadMembers(this.project, this.projectType, 0, 25, 'asc');
             });
         });
     }
@@ -52,6 +52,7 @@ export class ProjectMembersComponent implements AfterViewInit {
     private loadMembersPage(): void {
         this.dataSource.loadMembers(
             this.project,
+            this.projectType,
             this.paginator.pageIndex,
             this.paginator.pageSize,
         );

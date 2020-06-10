@@ -87,6 +87,7 @@
         },
         "DATA": {
             "STATE": "Status",
+            "STATE0": "unknown",
             "STATE1": "active",
             "STATE2": "inactive",
             "STATE3": "deleted",
@@ -325,6 +326,7 @@
             "NAME": "Name"
         },
         "ROLE": {
+            "KEY":"Key",
             "TITLE": "Roles",
             "DESCRIPTION":"Define some roles which can be used to create project-grants",
             "NAME": "Name",
@@ -333,7 +335,8 @@
             "ACTIONS": "Actions",
             "ADDTITLE": "Create role",
             "ADDDESCRIPTION": "Enter the data for the new role!",
-            "DELETE":"Delete Role"
+            "DELETE":"Delete Role",
+            "CREATIONDATE":"Created"
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -344,7 +347,7 @@
             "ORGNAME":"Org Name",
             "ORGDOMAIN":"Org Domain",
             "STATE":"Status",
-            "Type":"Type",
+            "TYPE":"Type",
             "CREATIONDATE":"Created At",
             "CHANGEDATE":"Last Modified"
         }

@@ -32,12 +32,12 @@ import { ToastService } from 'src/app/services/toast.service';
     ],
 })
 export class ProjectGridComponent {
-    @Input() items: Array<Project.AsObject> = [];
+    @Input() items: Array<GrantedProject.AsObject> = [];
     @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
     @Output() changedView: EventEmitter<boolean> = new EventEmitter();
     @Input() loading: boolean = false;
 
-    public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
+    public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
     public selectedIndex: number = -1;
 
     public showNewProject: boolean = false;
@@ -48,39 +48,23 @@ export class ProjectGridComponent {
     public selectItem(item: GrantedProject.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
             if (item.grantId) {
-                this.router.navigate(['/project-grant', `${item.id}:${item.grantId}`]);
+                this.router.navigate([item.id, '/grant', `${item.grantId}`]);
             } else {
                 this.router.navigate(['/projects', item.id]);
             }
         } else if (!event) {
-            this.router.navigate(['/projects', item.id]);
+            if (item.grantId) {
+                this.router.navigate([item.id, '/grant', `${item.grantId}`]);
+            } else {
+                this.router.navigate(['/projects', item.id]);
+            }
         }
+
+
     }
 
     public addItem(): void {
         this.newClicked.emit(true);
-    }
-
-    public deleteProjects(selected: Project.AsObject[]): void {
-        // TODO: implement service
-
-        // Promise.all([selected.map(proj => {
-        //     return this.projectService.DeleteProject(proj.id);
-        // })]).then(() => {
-        //     this.toast.showInfo('Successful deleted all projects');
-        // }).catch(error => {
-        //     this.toast.showError(error.message);
-        // });
-    }
-
-    public deleteProject(proj: Project.AsObject): void {
-        // TODO: implement service
-
-        // this.projectService.DeleteProject(proj.id).then(() => {
-        //     this.toast.showInfo('Successful deleted Project');
-        // }).catch(error => {
-        //     this.toast.showError(error.message);
-        // });
     }
 
     public dateFromTimestamp(date: Timestamp.AsObject): any {

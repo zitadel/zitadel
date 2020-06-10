@@ -52,6 +52,10 @@ h1 {
             box-sizing: border-box;
         }
 
+        &.active {
+            border-color: #db4c69;
+        }
+
         .selection-icon {
             opacity: 0;
             position: absolute;
@@ -88,6 +92,7 @@ h1 {
 
             .description {
                 font-size: 0.8rem;
+                margin-top: .5rem;
             }
 
             .created {
@@ -120,6 +125,7 @@ h1 {
 
                 .current {
                     height: 10px;
+                    font-size: 14px;
                     width: 10px;
                     border-radius: 50%;
                     background-color:  rgb(144,212,210);

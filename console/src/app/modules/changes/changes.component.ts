@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, Observable } from 'rxjs';
-import { scan, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { catchError, scan, take, tap } from 'rxjs/operators';
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
@@ -19,6 +19,7 @@ export enum ChangeType {
 export class ChangesComponent implements OnInit {
     @Input() public changeType: ChangeType = ChangeType.USER;
     @Input() public id: string = '';
+    public errorMessage: string = '';
 
     // Source data
     private _done: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -50,7 +51,6 @@ export class ChangesComponent implements OnInit {
                 break;
             case ChangeType.ORG: first = this.mgmtUserService.OrgChanges(this.id, 10, 0);
                 break;
-
         }
 
         this.mapAndUpdate(first);
@@ -100,6 +100,7 @@ export class ChangesComponent implements OnInit {
         // Map snapshot with doc ref (needed for cursor)
         return from(col).pipe(
             tap((res: Changes) => {
+                console.log('more cahnge');
                 let values = res.toObject().changesList;
                 // If prepending, reverse the batch order
                 values = false ? values.reverse() : values;
@@ -114,7 +115,14 @@ export class ChangesComponent implements OnInit {
                     this._done.next(true);
                 }
             }),
-            take(1)).subscribe();
+            catchError(err => {
+                console.error(err);
+                this._loading.next(false);
+                this.errorMessage = err.message;
+                return of([]);
+            }),
+            take(1),
+        ).subscribe();
     }
 
     public dateFromTimestamp(date: Timestamp.AsObject): any {

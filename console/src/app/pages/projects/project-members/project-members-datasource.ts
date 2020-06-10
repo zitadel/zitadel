@@ -1,6 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Project, ProjectMember } from 'src/app/proto/generated/management_pb';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
+import { Project, ProjectMember, ProjectMemberSearchResponse, ProjectType } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 
 /**
@@ -18,29 +19,32 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         super();
     }
 
-    public loadMembers(project: Project.AsObject, pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadMembers(project: Project.AsObject,
+        projectType: ProjectType,
+        pageIndex: number, pageSize: number, grantId?: string, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
         // TODO
-        // const promise: Promise<ProjectMemberSearchResponse> | undefined =
-        //     project.type === ProjectType.PROJECTTYPE_OWNED ?
-        //         this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
-        //         project.type === ProjectType.PROJECTTYPE_GRANTED ?
-        //             this.projectService.SearchProjectGrantMembers(project.id,
-        // project.grantId, pageSize, offset) : undefined;
-        // if (promise) {
-        //     from(promise).pipe(
-        //         map(resp => {
-        //             this.totalResult = resp.toObject().totalResult;
-        //             return resp.toObject().resultList;
-        //         }),
-        //         catchError(() => of([])),
-        //         finalize(() => this.loadingSubject.next(false)),
-        //     ).subscribe(members => {
-        //         this.membersSubject.next(members);
-        //     });
-        // }
+        const promise: Promise<ProjectMemberSearchResponse> | undefined =
+            projectType === ProjectType.PROJECTTYPE_OWNED ?
+                this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
+                projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
+                    this.projectService.SearchProjectGrantMembers(project.id,
+                        grantId, pageSize, offset) : undefined;
+        if (promise) {
+            from(promise).pipe(
+                map(resp => {
+                    this.totalResult = resp.toObject().totalResult;
+                    console.log(this.totalResult);
+                    return resp.toObject().resultList;
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false)),
+            ).subscribe(members => {
+                this.membersSubject.next(members);
+            });
+        }
     }
 
 

@@ -82,6 +82,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.grantId = grantId;
 
         if (grantId) {
+            this.projectType = ProjectType.PROJECTTYPE_GRANTED;
             // this.projectService.GetGrantedProjectGrantByID(id, this.grantId).then(proj => {
             //     this.projectGrant = proj.toObject();
             //     this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
@@ -93,6 +94,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
             //     this.toast.showError(error.message);
             // });
         } else {
+            this.projectType = ProjectType.PROJECTTYPE_OWNED;
             this.projectService.GetProjectById(id).then(proj => {
                 this.project = proj.toObject();
                 // if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||
@@ -105,6 +107,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
                         .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
                     return ret;
                 })); // TODO: replace with prettier thing
+                this.isZitadel$.subscribe(isZita => console.log(`zitade: ${isZita}`));
             }).catch(error => {
                 this.toast.showError(error.message);
             });

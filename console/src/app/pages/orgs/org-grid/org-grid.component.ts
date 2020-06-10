@@ -42,8 +42,12 @@ export class OrgGridComponent {
     public selectOrg(item: Org.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
             this.authService.setActiveOrg(item);
-            this.router.navigate(['/orgs', item.id]);
+            this.routeToOrg(item);
         }
+    }
+
+    public routeToOrg(item: Org.AsObject): void {
+        this.router.navigate(['/orgs', item.id]);
     }
 
     public dateFromTimestamp(date: Timestamp.AsObject): any {

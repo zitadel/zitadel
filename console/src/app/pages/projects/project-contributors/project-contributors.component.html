@@ -5,15 +5,15 @@
         <div class="img-list">
             <ng-container *ngIf="totalResult < 10; else compact">
                 <ng-container *ngFor="let member of membersSubject | async">
-                    <img (click)="showDetail()" *ngIf="member.imageURL; else render" class="avatar-img"
+                    <!-- <img (click)="showDetail()" *ngIf="member.imageURL; else render" class="avatar-img"
                         [src]="member.imageURL" matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}"
                         alt="editor avatar" />
-                    <ng-template #render>
-                        <div (click)="showDetail()" class="avatar-circle"
-                            matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
-                            <mat-icon>face</mat-icon>
-                        </div>
-                    </ng-template>
+                    <ng-template #render> -->
+                    <div (click)="showDetail()" class="avatar-circle"
+                        matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
+                        <mat-icon>face</mat-icon>
+                    </div>
+                    <!-- </ng-template> -->
                 </ng-container>
             </ng-container>
             <ng-template #compact>
@@ -22,7 +22,7 @@
                 </div>
             </ng-template>
             <button class="add-img" (click)="openAddMember()"
-                [disabled]="project?.state !== ProjectState.ACTIVE_PROJECT" mat-icon-button
+                [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" mat-icon-button
                 aria-label="Edit contributors">
                 <mat-icon>add</mat-icon>
             </button>
