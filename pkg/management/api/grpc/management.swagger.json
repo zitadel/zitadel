@@ -167,7 +167,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrant"
+              "$ref": "#/definitions/v1GrantedProject"
             }
           }
         },

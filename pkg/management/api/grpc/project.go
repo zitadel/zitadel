@@ -65,12 +65,12 @@ func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, erro
 	return projectFromModel(project), nil
 }
 
-func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrant, error) {
-	project, err := s.project.ProjectGrantByID(ctx, in.ProjectId, in.Id)
+func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*GrantedProject, error) {
+	project, err := s.project.GetGrantedProjectGrantByIDs(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return projectGrantFromModel(project), nil
+	return grantedProjectFromModel(project), nil
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*ProjectRole, error) {
