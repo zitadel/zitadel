@@ -191,6 +191,10 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 	}
 }
 
+func (l *Login) getErrorMessage(err error) (errType string, errMsg string) {
+	return "", ""
+}
+
 func (l *Login) getTheme(r *http.Request) string {
 	return "zitadel" //TODO: impl
 }
