@@ -60,6 +60,7 @@ func grantedProjectFromModel(project *proj_model.GrantedProjectView) *GrantedPro
 		OrgName:       project.OrgName,
 		OrgDomain:     project.OrgDomain,
 		GrantId:       project.GrantID,
+		Type:          projectTypeFromModel(project.Type),
 	}
 }
 
