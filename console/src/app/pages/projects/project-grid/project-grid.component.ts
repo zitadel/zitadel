@@ -61,28 +61,6 @@ export class ProjectGridComponent {
         this.newClicked.emit(true);
     }
 
-    public deleteProjects(selected: Project.AsObject[]): void {
-        // TODO: implement service
-
-        // Promise.all([selected.map(proj => {
-        //     return this.projectService.DeleteProject(proj.id);
-        // })]).then(() => {
-        //     this.toast.showInfo('Successful deleted all projects');
-        // }).catch(error => {
-        //     this.toast.showError(error.message);
-        // });
-    }
-
-    public deleteProject(proj: Project.AsObject): void {
-        // TODO: implement service
-
-        // this.projectService.DeleteProject(proj.id).then(() => {
-        //     this.toast.showInfo('Successful deleted Project');
-        // }).catch(error => {
-        //     this.toast.showError(error.message);
-        // });
-    }
-
     public dateFromTimestamp(date: Timestamp.AsObject): any {
         const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
         return ts;

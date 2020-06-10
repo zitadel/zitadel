@@ -12,7 +12,6 @@ import {
     SearchMethod,
 } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
     selector: 'app-search-project-autocomplete',
@@ -33,7 +32,7 @@ export class SearchProjectAutocompleteComponent {
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Input() public singleOutput: boolean = false;
     @Output() public selectionChanged: EventEmitter<Project.AsObject[] | Project.AsObject> = new EventEmitter();
-    constructor(private projectService: ProjectService, private toast: ToastService) {
+    constructor(private projectService: ProjectService) {
         this.myControl.valueChanges
             .pipe(
                 debounceTime(200),

@@ -19,7 +19,7 @@
 <div class="container">
     <mat-progress-bar *ngIf="loading" class="spinner" color="accent" mode="indeterminate"></mat-progress-bar>
     <div class="item card" *ngFor="let item of items; index as i" (click)="selectItem(item, $event)"
-        [ngClass]="{ selected: selection.isSelected(item), inactive: item.state !== ProjectState.ACTIVE_PROJECT}">
+        [ngClass]="{ selected: selection.isSelected(item), inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
         <mat-icon matTooltip="select item" (click)="selection.toggle(item)" class="selection-icon">
             check_circle</mat-icon>
         <div class="text-part">
@@ -52,8 +52,6 @@
                 <button (click)="selection.toggle(item)" mat-menu-item>
                     {{'ACTIONS.INFO' | translate}}
                 </button>
-
-                <button (click)="deleteProject(item)" mat-menu-item> {{'ACTIONS.DELETE' | translate}}</button>
             </ng-template>
         </mat-menu>
     </div>
