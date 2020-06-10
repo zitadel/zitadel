@@ -116,4 +116,10 @@ Actions:
   Register: register
   ForgotPassword: Reset password
 
+Errors:
+  UserNotFound: User not found
+  InvalidPassword: Invalid password
+  InvalidPasswordInit: Invalid code, password confirmation or password
+  CodeExpired: Code is expired
+
 optional: (optional)

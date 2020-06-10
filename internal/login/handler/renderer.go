@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
 	"net/http"
@@ -191,8 +192,11 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 	}
 }
 
-func (l *Login) getErrorMessage(err error) (errType string, errMsg string) {
-	return "", ""
+func (l *Login) getErrorMessage(err error) (errMsg string) {
+	if caosErr, ok := err.(*caos_errs.CaosError); ok {
+		return caosErr.Message
+	}
+	return err.Error()
 }
 
 func (l *Login) getTheme(r *http.Request) string {

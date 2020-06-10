@@ -75,6 +75,13 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string, err error) {
 	var errType, errMessage string
 	if err != nil {
+		if errors.IsErrorInvalidArgument(err) {
+			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.InvalidPasswordInit", nil)
+		} else if errors.IsPreconditionFailed(err) {
+			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.InvalidPasswordInit", nil)
+		} else {
+			errMessage = l.getErrorMessage(err)
+		}
 		errMessage = err.Error()
 	}
 	if userID == "" && authReq != nil {

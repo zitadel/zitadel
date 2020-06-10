@@ -55,10 +55,10 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 	var errType, errMessage string
 	if err != nil {
 		if caos_errs.IsNotFound(err) {
-			errMessage = "User not found"
+			errMessage = l.renderer.LocalizeFromRequest(r, "Errors.UserNotFound", nil)
+		} else {
+			errMessage = l.getErrorMessage(err)
 		}
-
-		errMessage = err.Error()
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Login", errType, errMessage),

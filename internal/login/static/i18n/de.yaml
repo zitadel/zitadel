@@ -116,4 +116,10 @@ Actions:
   Register: registrieren
   ForgotPassword: Password zurücksetzen
 
+Errors:
+  UserNotFound: Benutzer konnte nicht gefunden werden
+  InvalidPassword: Passwort ungültig
+  InvalidPasswordInit: Code, Passwortbestätigung oder Passwort ungültig
+  CodeExpired: Code ist abgelaufen
+
 optional: (optional)
