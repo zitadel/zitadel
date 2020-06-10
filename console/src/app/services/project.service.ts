@@ -10,6 +10,7 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
+    GrantedProject,
     GrantedProjectSearchQuery,
     GrantedProjectSearchRequest,
     GrantedProjectSearchResponse,
@@ -112,6 +113,17 @@ export class ProjectService {
         );
     }
 
+    public async GetGrantedProjectGrantByIDs(projectId: string, grantId: string): Promise<GrantedProject> {
+        const req = new ProjectID();
+        req.setId(projectId);
+        req.set;
+        return await this.request(
+            c => c.getGrantedProjectGrantByIDs,
+            req,
+            f => f,
+        );
+    }
+
     public async GetGrantedProjectGrantByID(projectId: string, id: string): Promise<ProjectGrant> {
         const req = new ProjectGrantID();
         req.setId(id);
@@ -204,6 +216,18 @@ export class ProjectService {
         const req = new Empty();
         return await this.request(
             c => c.getProjectGrantMemberRoles,
+            req,
+            f => f,
+        );
+    }
+
+    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
+        const req = new ProjectMemberAdd();
+        req.setId(projectId);
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.addProjectMember,
             req,
             f => f,
         );
@@ -508,18 +532,6 @@ export class ProjectService {
         req.setApplicationType(oidcConfig.applicationType);
         return await this.request(
             c => c.updateApplicationOIDCConfig,
-            req,
-            f => f,
-        );
-    }
-
-    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
-        const req = new ProjectMemberAdd();
-        req.setId(projectId);
-        req.setUserId(userId);
-        req.setRolesList(rolesList);
-        return await this.request(
-            c => c.addProjectMember,
             req,
             f => f,
         );

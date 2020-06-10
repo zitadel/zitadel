@@ -19,22 +19,29 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
         super();
     }
 
-    public loadMembers(project: GrantedProject.AsObject, pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadMembers(grantedProject: GrantedProject.AsObject, pageIndex: number,
+        pageSize: number, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
 
-        from(this.projectService.SearchProjectGrantMembers(project.id, project.grantId, pageSize, offset)).pipe(
-            map(resp => {
-                this.totalResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
-            }),
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false)),
-        ).subscribe(members => {
-            this.membersSubject.next(members);
-        });
+        console.log(grantedProject);
+        const prom = this.projectService.SearchProjectGrantMembers(grantedProject.id,
+            grantedProject.grantId, pageSize, offset);
 
+        if (prom) {
+            from(prom).pipe(
+                map(resp => {
+                    this.totalResult = resp.toObject().totalResult;
+                    return resp.toObject().resultList;
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false)),
+            ).subscribe(members => {
+                console.log(members);
+                this.membersSubject.next(members);
+            });
+        }
     }
 
 

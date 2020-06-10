@@ -20,7 +20,7 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
     styleUrls: ['./project-grant-members.component.scss'],
 })
 export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
-    @Input() public project!: GrantedProject.AsObject;
+    @Input() public grantedProject!: GrantedProject.AsObject;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
@@ -38,7 +38,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public ngOnInit(): void {
         this.dataSource = new ProjectGrantMembersDataSource(this.projectService);
-        this.dataSource.loadMembers(this.project, 0, 25, 'asc');
+        this.dataSource.loadMembers(this.grantedProject, 0, 25, 'asc');
     }
 
     public ngAfterViewInit(): void {
@@ -47,12 +47,11 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
                 tap(() => this.loadMembersPage()),
             )
             .subscribe();
-
     }
 
     private loadMembersPage(): void {
         this.dataSource.loadMembers(
-            this.project,
+            this.grantedProject,
             this.paginator.pageIndex,
             this.paginator.pageSize,
         );
@@ -60,7 +59,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.projectService.RemoveProjectMember(this.project.id, member.userId).then(() => {
+            return this.projectService.RemoveProjectMember(this.grantedProject.id, member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
                 this.toast.showError(error.message);
@@ -69,7 +68,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     }
 
     public removeMember(member: ProjectMember.AsObject): void {
-        this.projectService.RemoveProjectMember(this.project.id, member.userId).then(() => {
+        this.projectService.RemoveProjectMember(this.grantedProject.id, member.userId).then(() => {
             this.toast.showInfo('Member removed successfully');
         }).catch(error => {
             this.toast.showError(error.message);
@@ -92,19 +91,21 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
         const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.PROJECT_GRANTED,
-                projectId: this.project.id,
+                projectId: this.grantedProject.id,
             },
             width: '400px',
         });
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
+                console.log(resp);
                 const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.projectService.AddProjectMember(this.project.id, user.id, roles);
+                        return this.projectService.AddProjectGrantMember(this.grantedProject.id,
+                            this.grantedProject.grantId, user.id, roles);
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
