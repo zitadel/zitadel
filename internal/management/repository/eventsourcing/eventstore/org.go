@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/model"
 	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -48,21 +50,24 @@ func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID stri
 	return repo.OrgEventstore.OrgMemberByIDs(ctx, member)
 }
 
-func (repo *OrgRepository) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+func (repo *OrgRepository) AddMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	member.AggregateID = auth.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.AddOrgMember(ctx, member)
 }
 
-func (repo *OrgRepository) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+func (repo *OrgRepository) ChangeMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
+	member.AggregateID = auth.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.ChangeOrgMember(ctx, member)
 }
 
-func (repo *OrgRepository) RemoveOrgMember(ctx context.Context, orgID, userID string) error {
-	member := org_model.NewOrgMember(orgID, userID)
+func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string) error {
+	member := org_model.NewOrgMember(auth.GetCtxData(ctx).OrgID, userID)
 	return repo.OrgEventstore.RemoveOrgMember(ctx, member)
 }
 
-func (repo *OrgRepository) SearchOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
+func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.ORGMEMBERSEARCHKEY_ORG_ID, Method: model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID}
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
 		return nil, err
