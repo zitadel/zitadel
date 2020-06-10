@@ -82,6 +82,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.grantId = grantId;
 
         if (grantId) {
+            this.projectType = ProjectType.PROJECTTYPE_GRANTED;
             // this.projectService.GetGrantedProjectGrantByID(id, this.grantId).then(proj => {
             //     this.projectGrant = proj.toObject();
             //     this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
@@ -93,6 +94,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
             //     this.toast.showError(error.message);
             // });
         } else {
+            this.projectType = ProjectType.PROJECTTYPE_OWNED;
             this.projectService.GetProjectById(id).then(proj => {
                 this.project = proj.toObject();
                 // if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||

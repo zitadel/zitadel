@@ -8,6 +8,8 @@
         <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
     </div>
 
+    <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
+
     <app-card title="{{ 'APP.PAGES.DETAIL.TITLE' | translate }}" *ngIf="app">
         <form [formGroup]="appNameForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">

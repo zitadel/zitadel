@@ -31,6 +31,7 @@ export class OrgMembersDataSource extends DataSource<OrgMember.AsObject> {
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(members => {
+            console.log(members);
             this.membersSubject.next(members);
         });
     }
@@ -43,7 +44,7 @@ export class OrgMembersDataSource extends DataSource<OrgMember.AsObject> {
      */
     public connect(): Observable<OrgMember.AsObject[]> {
         return this.membersSubject.asObservable();
-    }
+    };
 
     /**
      *  Called when the table is being destroyed. Use this function, to clean up

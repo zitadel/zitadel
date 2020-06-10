@@ -344,7 +344,7 @@
             "ORGNAME":"Org Name",
             "ORGDOMAIN":"Org Domain",
             "STATE":"Status",
-            "Type":"Type",
+            "TYPE":"Type",
             "CREATIONDATE":"Created At",
             "CHANGEDATE":"Last Modified"
         }

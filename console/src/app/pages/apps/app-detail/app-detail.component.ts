@@ -33,6 +33,7 @@ enum RedirectType {
     styleUrls: ['./app-detail.component.scss'],
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
+    public errorMessage: string = '';
     public selectable: boolean = false;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
@@ -103,25 +104,31 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     private async getData({ projectid, id }: Params): Promise<void> {
         this.projectId = projectid;
-        this.app = (await this.projectService.GetApplicationById(projectid, id)).toObject();
-        this.appNameForm.patchValue(this.app);
-        if (this.app.state !== AppState.APPSTATE_ACTIVE) {
-            this.appNameForm.controls['name'].disable();
-            this.appForm.disable();
-        } else {
-            this.appNameForm.controls['name'].enable();
-            this.appForm.enable();
-            this.clientId?.disable();
-        }
-        if (this.app.oidcConfig?.redirectUrisList) {
-            this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
-        }
-        if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
-            this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
-        }
-        if (this.app.oidcConfig) {
-            this.appForm.patchValue(this.app.oidcConfig);
-        }
+        this.projectService.GetApplicationById(projectid, id).then(app => {
+            this.app = app.toObject();
+            this.appNameForm.patchValue(this.app);
+            if (this.app.state !== AppState.APPSTATE_ACTIVE) {
+                this.appNameForm.controls['name'].disable();
+                this.appForm.disable();
+            } else {
+                this.appNameForm.controls['name'].enable();
+                this.appForm.enable();
+                this.clientId?.disable();
+            }
+            if (this.app.oidcConfig?.redirectUrisList) {
+                this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
+            }
+            if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
+                this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
+            }
+            if (this.app.oidcConfig) {
+                this.appForm.patchValue(this.app.oidcConfig);
+            }
+        }).catch(error => {
+            console.error(error);
+            this.toast.showError(error.message);
+            this.errorMessage = error.message;
+        });
     }
 
     public changeState(event: MatButtonToggleChange): void {

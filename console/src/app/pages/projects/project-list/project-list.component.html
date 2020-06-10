@@ -83,7 +83,7 @@
                 <ng-container matColumnDef="type">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.TYPE' | translate }} </th>
                     <td mat-cell *matCellDef="let project">
-                        <span *ngIf="project.type">{{'PROJECT.TYPE.'+project.type | translate}}</span>
+                        <span *ngIf="project.type !== undefined">{{'PROJECT.TYPE.'+project.type | translate}}</span>
                     </td>
                 </ng-container>
 
