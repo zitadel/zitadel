@@ -13,6 +13,14 @@ const (
 	UserAgent      = "user-agent"
 	ForwardedFor   = "x-forwarded-for"
 
+	ContentSecurityPolicy   = "content-security-policy"
+	XXSSProtection          = "x-xss-protection"
+	StrictTransportSecurity = "strict-transport-security"
+	XFrameOptions           = "x-frame-options"
+	XContentTypeOptions     = "x-content-type-options"
+	ReferrerPolicy          = "referrer-policy"
+	FeaturePolicy           = "feature-policy"
+
 	ZitadelOrgID = "x-zitadel-orgid"
 	//TODO: Remove as soon an authentification is implemented
 	ZitadelUserID   = "x-zitadel-userid"

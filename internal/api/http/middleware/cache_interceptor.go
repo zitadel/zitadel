@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/api"
+	"github.com/caos/zitadel/internal/config/types"
 )
 
 type Cache struct {
@@ -36,17 +37,25 @@ const (
 	RevalidationProxy               = "proxy-revalidate"
 )
 
+type CacheConfig struct {
+	MaxAge       types.Duration
+	SharedMaxAge types.Duration
+}
+
 var (
 	NeverCacheOptions = &Cache{
 		NoStore: true,
 	}
-	AssetOptions = &Cache{
-		Cacheability: CacheabilityPublic,
-		MaxAge:       7 * 24 * time.Hour,
+	AssetOptions = func(maxAge, SharedMaxAge time.Duration) *Cache {
+		return &Cache{
+			Cacheability: CacheabilityPublic,
+			MaxAge:       maxAge,
+			SharedMaxAge: SharedMaxAge,
+		}
 	}
 )
 
-func DefaultCacheInterceptor(pattern string) (func(http.Handler) http.Handler, error) {
+func DefaultCacheInterceptor(pattern string, maxAge, sharedMaxAge time.Duration) (func(http.Handler) http.Handler, error) {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
 		return nil, err
@@ -54,7 +63,7 @@ func DefaultCacheInterceptor(pattern string) (func(http.Handler) http.Handler, e
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if regex.MatchString(r.URL.Path) {
-				AssetsCacheInterceptor(handler).ServeHTTP(w, r)
+				AssetsCacheInterceptor(maxAge, sharedMaxAge, handler).ServeHTTP(w, r)
 				return
 			}
 			NoCacheInterceptor(handler).ServeHTTP(w, r)
@@ -66,8 +75,8 @@ func NoCacheInterceptor(h http.Handler) http.Handler {
 	return CacheInterceptorOpts(h, NeverCacheOptions)
 }
 
-func AssetsCacheInterceptor(h http.Handler) http.Handler {
-	return CacheInterceptorOpts(h, AssetOptions)
+func AssetsCacheInterceptor(maxAge, sharedMaxAge time.Duration, h http.Handler) http.Handler {
+	return CacheInterceptorOpts(h, AssetOptions(maxAge, sharedMaxAge))
 }
 
 func CacheInterceptorOpts(h http.Handler, cache *Cache) http.Handler {
@@ -101,6 +110,7 @@ func (c *Cache) serializeHeaders(w http.ResponseWriter) {
 
 	if c.NoStore {
 		control = append(control, fmt.Sprintf("no-store"))
+		pragma = true
 	}
 	if c.NoTransform {
 		control = append(control, fmt.Sprintf("no-transform"))

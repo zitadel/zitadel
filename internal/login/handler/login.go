@@ -36,6 +36,7 @@ type Config struct {
 	LanguageCookieName  string
 	DefaultLanguage     language.Tag
 	CSRF                CSRF
+	Cache               middleware.CacheConfig
 }
 
 type CSRF struct {
@@ -60,9 +61,10 @@ func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRe
 
 	csrf, err := csrfInterceptor(config.CSRF, login.csrfErrorHandler())
 	logging.Log("CONFI-dHR2a").OnError(err).Panic("unable to create csrfInterceptor")
-	cache, err := middleware.DefaultCacheInterceptor(EndpointResources)
+	cache, err := middleware.DefaultCacheInterceptor(EndpointResources, config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
 	logging.Log("CONFI-BHq2a").OnError(err).Panic("unable to create cacheInterceptor")
-	login.router = CreateRouter(login, statikFS, csrf, cache)
+	security := middleware.SecurityHeaders(nil)
+	login.router = CreateRouter(login, statikFS, csrf, cache, security)
 	login.renderer = CreateRenderer(statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	login.Listen(ctx)

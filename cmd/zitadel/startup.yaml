@@ -65,6 +65,9 @@ Auth:
         Domain: $ZITADEL_COOKIE_DOMAIN
         Key:
           EncryptionKeyID: $ZITADEL_COOKIE_KEY
+      Cache:
+        MaxAge: $ZITADEL_CACHE_MAXAGE
+        SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
       Endpoints:
         Auth:
           Path: 'authorize'
@@ -133,6 +136,9 @@ Login:
       Key:
         EncryptionKeyID: $ZITADEL_CSRF_KEY
       Development: $ZITADEL_CSRF_DEV
+    Cache:
+      MaxAge: $ZITADEL_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
 
 
 AuthZ:

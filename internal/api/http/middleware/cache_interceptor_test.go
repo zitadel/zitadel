@@ -33,7 +33,7 @@ func TestCache_serializeHeaders(t *testing.T) {
 			},
 			"no-store",
 			time.Now().UTC().Add(-1 * time.Hour).Format(http.TimeFormat),
-			"",
+			"no-cache",
 		},
 		{
 			"private and max-age",
