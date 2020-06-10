@@ -16,7 +16,7 @@ const (
 	GrantedProjectKeyGrantID       = "grant_id"
 	GrantedProjectKeyOrgID         = "org_id"
 	GrantedProjectKeyResourceOwner = "resource_owner"
-	GrantedProjectKeyName          = "name"
+	GrantedProjectKeyName          = "project_name"
 )
 
 type GrantedProjectView struct {
