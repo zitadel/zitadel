@@ -213,3 +213,13 @@ jobs:
     - name: Docker Push Latest
       run: docker push $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest
       if: env.CAOS_NEXT_VERSION !=  ''
+    - name: Deploy DEV environment
+      env:
+        TARGET_ENVIRONMENT: "dev"
+        GIT_OPSREPO_DEPLOYTOKEN: ${{secrets.GIT_OPSREPO_DEPLOYTOKEN}}
+      run: |
+        source ./.github/scripts/githelper.sh
+        setup_git
+        checkout_project
+        change_image_version
+        upload_files
