@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
@@ -19,9 +20,11 @@ func TestCache_serializeHeaders(t *testing.T) {
 		Revalidation Revalidation
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   string
+		name        string
+		fields      fields
+		wantControl string
+		wantExpires string
+		wantPragma  string
 	}{
 		{
 			"no-store",
@@ -29,6 +32,8 @@ func TestCache_serializeHeaders(t *testing.T) {
 				NoStore: true,
 			},
 			"no-store",
+			time.Now().UTC().Add(-1 * time.Hour).Format(http.TimeFormat),
+			"",
 		},
 		{
 			"private and max-age",
@@ -38,15 +43,19 @@ func TestCache_serializeHeaders(t *testing.T) {
 				SharedMaxAge: 1 * time.Hour,
 			},
 			"private, max-age=3600",
+			time.Now().UTC().Add(1 * time.Hour).Format(http.TimeFormat),
+			"",
 		},
 		{
-			"public, no-cache, proy-revalidate",
+			"public, no-cache, proxy-revalidate",
 			fields{
 				Cacheability: CacheabilityPublic,
 				NoCache:      true,
 				Revalidation: RevalidationProxy,
 			},
-			"public, no-cache, proxy-revalidate",
+			"public, max-age=0, no-cache, proxy-revalidate",
+			time.Now().UTC().Add(-1 * time.Hour).Format(http.TimeFormat),
+			"no-cache",
 		},
 	}
 	for _, tt := range tests {
@@ -62,8 +71,12 @@ func TestCache_serializeHeaders(t *testing.T) {
 				Revalidation: tt.fields.Revalidation,
 			}
 			c.serializeHeaders(recorder)
-			got := recorder.Result().Header.Get("cache-control")
-			assert.Equal(t, tt.want, got)
+			cc := recorder.Result().Header.Get("cache-control")
+			assert.Equal(t, tt.wantControl, cc)
+			exp := recorder.Result().Header.Get("expires")
+			assert.Equal(t, tt.wantExpires, exp)
+			pragma := recorder.Result().Header.Get("pragma")
+			assert.Equal(t, tt.wantPragma, pragma)
 		})
 	}
 }

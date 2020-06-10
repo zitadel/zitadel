@@ -42,8 +42,7 @@ var (
 	}
 	AssetOptions = &Cache{
 		Cacheability: CacheabilityPublic,
-		MaxAge:       365 * 24 * time.Hour,
-		SharedMaxAge: 365 * 24 * time.Hour,
+		MaxAge:       7 * 24 * time.Hour,
 	}
 )
 
@@ -85,7 +84,9 @@ func (c *Cache) serializeHeaders(w http.ResponseWriter) {
 	if c.Cacheability != CacheabilityNotSet {
 		control = append(control, string(c.Cacheability))
 		control = append(control, fmt.Sprintf("max-age=%v", c.MaxAge.Seconds()))
-		control = append(control, fmt.Sprintf("s-maxage=%v", c.SharedMaxAge.Seconds()))
+		if c.SharedMaxAge != c.MaxAge {
+			control = append(control, fmt.Sprintf("s-maxage=%v", c.SharedMaxAge.Seconds()))
+		}
 	}
 	maxAge := c.MaxAge
 	if maxAge == 0 {
