@@ -114,7 +114,7 @@ export class ProjectService {
     }
 
     public async GetGrantedProjectGrantByIDs(projectId: string, grantId: string): Promise<GrantedProject> {
-        const req = new ProjectID();
+        const req = new ProjectGrantID();
         req.setId(projectId);
         req.set;
         return await this.request(
