@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { Project } from 'src/app/proto/generated/management_pb';
+import { GrantedProject, Project } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -37,8 +37,8 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class ProjectListComponent implements OnInit {
     public totalResult: number = 0;
-    public dataSource: MatTableDataSource<Project.AsObject> = new MatTableDataSource<Project.AsObject>();
-    public projectList: Project.AsObject[] = [];
+    public dataSource: MatTableDataSource<GrantedProject.AsObject> = new MatTableDataSource<GrantedProject.AsObject>();
+    public projectList: GrantedProject.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'type', 'state', 'creationDate', 'changeDate'];
     public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -79,13 +79,16 @@ export class ProjectListComponent implements OnInit {
     }
 
     private async getData(limit: number, offset: number): Promise<void> {
+        console.log('getprojects');
         this.loadingSubject.next(true);
-        this.projectService.SearchProjects(limit, offset).then(res => {
+        this.projectService.SearchGrantedProjects(limit, offset).then(res => {
             this.projectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
             this.dataSource.data = this.projectList;
             this.loadingSubject.next(false);
+            console.log(this.projectList);
         }).catch(error => {
+            console.error(error);
             this.toast.showError(error.message);
             this.loadingSubject.next(false);
         });

@@ -3,7 +3,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { Project, ProjectState } from 'src/app/proto/generated/management_pb';
+import { GrantedProject, Project, ProjectState } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -45,9 +45,13 @@ export class ProjectGridComponent {
 
     constructor(private router: Router, private projectService: ProjectService, private toast: ToastService) { }
 
-    public selectItem(item: Project.AsObject, event?: any): void {
+    public selectItem(item: GrantedProject.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
-            this.router.navigate(['/projects', item.id]);
+            if (item.grantId) {
+                this.router.navigate(['/project-grant', `${item.id}:${item.grantId}`]);
+            } else {
+                this.router.navigate(['/projects', item.id]);
+            }
         } else if (!event) {
             this.router.navigate(['/projects', item.id]);
         }

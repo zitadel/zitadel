@@ -5,7 +5,7 @@ import { BehaviorSubject, from, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { User } from 'src/app/proto/generated/auth_pb';
 import {
-    Project,
+    GrantedProject,
     ProjectMember,
     ProjectMemberSearchResponse,
     ProjectState,
@@ -25,7 +25,7 @@ import {
     styleUrls: ['./project-contributors.component.scss'],
 })
 export class ProjectContributorsComponent implements OnInit {
-    @Input() public project!: Project.AsObject;
+    @Input() public project!: GrantedProject.AsObject;
     @Input() public disabled: boolean = false;
 
     public totalResult: number = 0;
@@ -40,7 +40,7 @@ export class ProjectContributorsComponent implements OnInit {
 
     public ngOnInit(): void {
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
-            this.project.type === ProjectType.PROJECTTYPE_SELF ?
+            this.project.type === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(this.project.id, 100, 0) :
                 this.project.type === ProjectType.PROJECTTYPE_GRANTED ?
                     this.projectService.SearchProjectGrantMembers(this.project.id, this.project.grantId, 100, 0) : undefined;
@@ -64,7 +64,7 @@ export class ProjectContributorsComponent implements OnInit {
             data: {
                 creationType: this.project.type ===
                     ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-                    ProjectType.PROJECTTYPE_SELF ? CreationType.PROJECT_OWNED : undefined,
+                    ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
                 projectId: this.project.id,
             },
             width: '400px',

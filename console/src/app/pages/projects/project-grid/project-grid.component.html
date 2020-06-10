@@ -23,16 +23,14 @@
         <mat-icon matTooltip="select item" (click)="selection.toggle(item)" class="selection-icon">
             check_circle</mat-icon>
         <div class="text-part">
-            <!-- <span *ngIf="item?.creationDate"
-                class="top">{{item?.creationDate?.toDate() | date: 'dd. MMM, HH:mm'}}</span> -->
             <span *ngIf="item.changeDate" class="top">last modified on
                 {{
                         dateFromTimestamp(item.changeDate) | date: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
             <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span>
-            <span class="description" *ngIf="item.type">{{'PROJECT.TYPE.TITLE' | translate}}:
-                {{'PROJECT.TYPE.'+item.type | translate}}</span>
+            <!-- <span class="description" *ngIf="item.type">{{'PROJECT.TYPE.TITLE' | translate}}:
+                {{'PROJECT.TYPE.'+item.type | translate}}</span> -->
             <span *ngIf="item.changeDate" class="created">created on
                 {{
                         dateFromTimestamp(item.creationDate) | date: 'EEE dd. MMM, HH:mm'
