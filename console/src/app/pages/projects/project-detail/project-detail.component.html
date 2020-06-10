@@ -73,6 +73,21 @@
         </ng-container>
 
         <ng-template #granteddetail>
+            <ng-template appHasRole [appHasRole]="['project.app.read:' + project?.id, 'project.app.read']">
+                <app-project-application-grid *ngIf="grid"
+                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" (changeView)="grid = false"
+                    [projectId]="projectId"></app-project-application-grid>
+                <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
+                    <card-actions class="card-actions">
+                        <button mat-icon-button (click)="grid = true">
+                            <i matTooltip="show grid view" class="las la-th-large"></i>
+                        </button>
+                    </card-actions>
+                    <app-project-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
+                        [projectId]="projectId"></app-project-applications>
+                </app-card>
+            </ng-template>
+
             <app-card>
                 <app-project-grant-members *ngIf="project"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" [project]="project">

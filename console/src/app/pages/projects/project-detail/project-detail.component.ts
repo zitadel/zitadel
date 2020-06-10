@@ -9,7 +9,9 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     ApplicationSearchResponse,
+    GrantedProject,
     Project,
+    ProjectGrant,
     ProjectMember,
     ProjectMemberSearchResponse,
     ProjectRole,
@@ -30,7 +32,7 @@ import { ToastService } from 'src/app/services/toast.service';
 export class ProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public grantId: string = '';
-    public project!: Project.AsObject; // ProjectGrant.AsObject;
+    public project!: Project.AsObject | ProjectGrant.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
 
     public pageSizeRoles: number = 10;
@@ -83,16 +85,16 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
 
         if (grantId) {
             this.projectType = ProjectType.PROJECTTYPE_GRANTED;
-            // this.projectService.GetGrantedProjectGrantByID(id, this.grantId).then(proj => {
-            //     this.projectGrant = proj.toObject();
-            //     this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
-            //         const ret = appsResp.toObject().resultList
-            //             .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
-            //         return ret;
-            //     })); // TODO: replace with prettier thing
-            // }).catch(error => {
-            //     this.toast.showError(error.message);
-            // });
+            this.projectService.GetGrantedProjectGrantByID(id, this.grantId).then(proj => {
+                this.project = proj.toObject();
+                this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
+                    const ret = appsResp.toObject().resultList
+                        .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
+                    return ret;
+                })); // TODO: replace with prettier thing
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
         } else {
             this.projectType = ProjectType.PROJECTTYPE_OWNED;
             this.projectService.GetProjectById(id).then(proj => {
@@ -122,20 +124,24 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error.message);
             });
         } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
-            this.projectService.DeactivateProject(this.projectId).then(() => {
-                this.toast.showInfo('Deactivated Project');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
+            this.toast.showInfo('You cant update this project.');
         }
     }
 
     public saveProject(): void {
-        this.projectService.UpdateProject(this.project).then(() => {
-            this.toast.showInfo('Project updated');
-        }).catch(error => {
-            this.toast.showInfo(error.message);
-        });
+        if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+            this.projectService.UpdateProject(this.project as Project.AsObject).then(() => {
+                this.toast.showInfo('Project updated');
+            }).catch(error => {
+                this.toast.showInfo(error.message);
+            });
+        } else {
+            this.projectService.U(this.project as GrantedProject.AsObject).then(() => {
+                this.toast.showInfo('Project updated');
+            }).catch(error => {
+                this.toast.showInfo(error.message);
+            });
+        }
     }
 
     public navigateBack(): void {

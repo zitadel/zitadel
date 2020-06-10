@@ -28,6 +28,7 @@ import {
     ProjectGrantMemberSearchRequest,
     ProjectGrantSearchRequest,
     ProjectGrantSearchResponse,
+    ProjectGrantUpdate,
     ProjectID,
     ProjectMemberAdd,
     ProjectMemberChange,
@@ -138,6 +139,18 @@ export class ProjectService {
         req.setId(project.id);
         return await this.request(
             c => c.updateProject,
+            req,
+            f => f,
+        );
+    }
+
+    public async UpdateProjectGrant(id: string, projectId: string, rolesList: string[]): Promise<ProjectGrant> {
+        const req = new ProjectGrantUpdate();
+        req.setRoleKeysList(rolesList);
+        req.setId(id);
+        req.setProjectId(projectId);
+        return await this.request(
+            c => c.updateProjectGrant,
             req,
             f => f,
         );

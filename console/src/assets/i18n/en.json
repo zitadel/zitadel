@@ -286,7 +286,7 @@
         "TYPE": {
             "TITLE": "Type",
             "0": "unknown type",
-            "1": "self created",
+            "1": "owned",
             "2": "granted"
         },
         "NAME": "Name",

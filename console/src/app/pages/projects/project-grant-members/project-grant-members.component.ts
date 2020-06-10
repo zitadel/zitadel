@@ -3,7 +3,6 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { GrantedProject, ProjectMember, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -34,7 +33,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     constructor(private projectService: ProjectService,
         private dialog: MatDialog,
         private toast: ToastService,
-        private route: ActivatedRoute) {
+    ) {
     }
 
     public ngOnInit(): void {
