@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { GrantedProject, ProjectMember } from 'src/app/proto/generated/management_pb';
+import { ProjectMember } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 
 /**
@@ -19,21 +19,24 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
         super();
     }
 
-    public loadMembers(project: GrantedProject.AsObject, pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadMembers(projectId: string, grantId: string, pageIndex: number,
+        pageSize: number, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
 
-        from(this.projectService.SearchProjectGrantMembers(project.id, project.grantId, pageSize, offset)).pipe(
-            map(resp => {
-                this.totalResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
-            }),
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false)),
-        ).subscribe(members => {
-            this.membersSubject.next(members);
-        });
+        from(this.projectService.SearchProjectGrantMembers(projectId,
+            grantId, pageSize, offset)).pipe(
+                map(resp => {
+                    this.totalResult = resp.toObject().totalResult;
+                    return resp.toObject().resultList;
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false)),
+            ).subscribe(members => {
+                console.log(members);
+                this.membersSubject.next(members);
+            });
 
     }
 

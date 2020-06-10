@@ -42,7 +42,7 @@ export class ProjectContributorsComponent implements OnInit {
         private router: Router) { }
 
     public ngOnInit(): void {
-        console.log(this.project);
+        console.log('project grant members');
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
             this.projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(this.project.id, 100, 0) :

@@ -1630,9 +1630,6 @@ export namespace OrgMember {
 }
 
 export class AddOrgMemberRequest extends jspb.Message {
-  getOrgId(): string;
-  setOrgId(value: string): void;
-
   getUserId(): string;
   setUserId(value: string): void;
 
@@ -1651,16 +1648,12 @@ export class AddOrgMemberRequest extends jspb.Message {
 
 export namespace AddOrgMemberRequest {
   export type AsObject = {
-    orgId: string,
     userId: string,
     rolesList: Array<string>,
   }
 }
 
 export class ChangeOrgMemberRequest extends jspb.Message {
-  getOrgId(): string;
-  setOrgId(value: string): void;
-
   getUserId(): string;
   setUserId(value: string): void;
 
@@ -1679,16 +1672,12 @@ export class ChangeOrgMemberRequest extends jspb.Message {
 
 export namespace ChangeOrgMemberRequest {
   export type AsObject = {
-    orgId: string,
     userId: string,
     rolesList: Array<string>,
   }
 }
 
 export class RemoveOrgMemberRequest extends jspb.Message {
-  getOrgId(): string;
-  setOrgId(value: string): void;
-
   getUserId(): string;
   setUserId(value: string): void;
 
@@ -1702,7 +1691,6 @@ export class RemoveOrgMemberRequest extends jspb.Message {
 
 export namespace RemoveOrgMemberRequest {
   export type AsObject = {
-    orgId: string,
     userId: string,
   }
 }
@@ -1717,10 +1705,10 @@ export class OrgMemberSearchResponse extends jspb.Message {
   getTotalResult(): number;
   setTotalResult(value: number): void;
 
-  getResultList(): Array<OrgMember>;
-  setResultList(value: Array<OrgMember>): void;
+  getResultList(): Array<OrgMemberView>;
+  setResultList(value: Array<OrgMemberView>): void;
   clearResultList(): void;
-  addResult(value?: OrgMember, index?: number): OrgMember;
+  addResult(value?: OrgMemberView, index?: number): OrgMemberView;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): OrgMemberSearchResponse.AsObject;
@@ -1735,14 +1723,67 @@ export namespace OrgMemberSearchResponse {
     offset: number,
     limit: number,
     totalResult: number,
-    resultList: Array<OrgMember.AsObject>,
+    resultList: Array<OrgMemberView.AsObject>,
+  }
+}
+
+export class OrgMemberView extends jspb.Message {
+  getUserId(): string;
+  setUserId(value: string): void;
+
+  getRolesList(): Array<string>;
+  setRolesList(value: Array<string>): void;
+  clearRolesList(): void;
+  addRoles(value: string, index?: number): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getUserName(): string;
+  setUserName(value: string): void;
+
+  getEmail(): string;
+  setEmail(value: string): void;
+
+  getFirstName(): string;
+  setFirstName(value: string): void;
+
+  getLastName(): string;
+  setLastName(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgMemberView.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgMemberView): OrgMemberView.AsObject;
+  static serializeBinaryToWriter(message: OrgMemberView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgMemberView;
+  static deserializeBinaryFromReader(message: OrgMemberView, reader: jspb.BinaryReader): OrgMemberView;
+}
+
+export namespace OrgMemberView {
+  export type AsObject = {
+    userId: string,
+    rolesList: Array<string>,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    sequence: number,
+    userName: string,
+    email: string,
+    firstName: string,
+    lastName: string,
   }
 }
 
 export class OrgMemberSearchRequest extends jspb.Message {
-  getOrgId(): string;
-  setOrgId(value: string): void;
-
   getOffset(): number;
   setOffset(value: number): void;
 
@@ -1764,7 +1805,6 @@ export class OrgMemberSearchRequest extends jspb.Message {
 
 export namespace OrgMemberSearchRequest {
   export type AsObject = {
-    orgId: string,
     offset: number,
     limit: number,
     queriesList: Array<OrgMemberSearchQuery.AsObject>,

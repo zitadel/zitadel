@@ -19,11 +19,11 @@ export class OrgMembersDataSource extends DataSource<OrgMember.AsObject> {
         super();
     }
 
-    public loadMembers(orgId: string, pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadMembers(pageIndex: number, pageSize: number, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.orgService.SearchOrgMembers(orgId, pageSize, offset)).pipe(
+        from(this.orgService.SearchMyOrgMembers(pageSize, offset)).pipe(
             map(resp => {
                 this.totalResult = resp.toObject().totalResult;
                 return resp.toObject().resultList;
