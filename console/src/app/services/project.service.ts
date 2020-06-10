@@ -113,18 +113,7 @@ export class ProjectService {
         );
     }
 
-    public async GetGrantedProjectGrantByIDs(projectId: string, grantId: string): Promise<GrantedProject> {
-        const req = new ProjectGrantID();
-        req.setId(projectId);
-        req.set;
-        return await this.request(
-            c => c.getGrantedProjectGrantByIDs,
-            req,
-            f => f,
-        );
-    }
-
-    public async GetGrantedProjectGrantByID(projectId: string, id: string): Promise<ProjectGrant> {
+    public async GetGrantedProjectGrantByID(projectId: string, id: string): Promise<GrantedProject> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);

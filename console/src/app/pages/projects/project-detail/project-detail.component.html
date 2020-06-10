@@ -89,9 +89,8 @@
             </ng-template>
 
             <app-card>
-                <app-project-grant-members *ngIf="project"
-                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" [project]="project"
-                    [projectType]="ProjectType.PROJECTTYPE_GRANTED">
+                <app-project-grant-members *ngIf="project && project.id && project.grantId"
+                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" [project]="project">
                 </app-project-grant-members>
             </app-card>
         </ng-template>

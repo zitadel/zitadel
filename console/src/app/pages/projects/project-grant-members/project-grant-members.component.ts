@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { GrantedProject, ProjectMember, User } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -20,7 +20,9 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
     styleUrls: ['./project-grant-members.component.scss'],
 })
 export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
-    @Input() public grantedProject!: GrantedProject.AsObject;
+    @Input() public projectId!: string;
+    @Input() public grantId!: string;
+
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
@@ -38,7 +40,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public ngOnInit(): void {
         this.dataSource = new ProjectGrantMembersDataSource(this.projectService);
-        this.dataSource.loadMembers(this.grantedProject, 0, 25, 'asc');
+        this.dataSource.loadMembers(this.projectId, this.grantId, 0, 25, 'asc');
     }
 
     public ngAfterViewInit(): void {
@@ -51,28 +53,29 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     private loadMembersPage(): void {
         this.dataSource.loadMembers(
-            this.grantedProject,
+            this.projectId,
+            this.grantId,
             this.paginator.pageIndex,
             this.paginator.pageSize,
         );
     }
 
     public removeProjectMemberSelection(): void {
-        Promise.all(this.selection.selected.map(member => {
-            return this.projectService.RemoveProjectMember(this.grantedProject.id, member.userId).then(() => {
-                this.toast.showInfo('Removed successfully');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
-        }));
+        // Promise.all(this.selection.selected.map(member => {
+        //     return this.projectService.RemoveProjectMember(this.projectId, this.grantId, member.userId).then(() => {
+        //         this.toast.showInfo('Removed successfully');
+        //     }).catch(error => {
+        //         this.toast.showError(error.message);
+        //     });
+        // }));
     }
 
     public removeMember(member: ProjectMember.AsObject): void {
-        this.projectService.RemoveProjectMember(this.grantedProject.id, member.userId).then(() => {
-            this.toast.showInfo('Member removed successfully');
-        }).catch(error => {
-            this.toast.showError(error.message);
-        });
+        // this.projectService.RemoveProjectMember(this.grantedProject.id, member.userId).then(() => {
+        //     this.toast.showInfo('Member removed successfully');
+        // }).catch(error => {
+        //     this.toast.showError(error.message);
+        // });
     }
 
     public isAllSelected(): boolean {
@@ -91,7 +94,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
         const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.PROJECT_GRANTED,
-                projectId: this.grantedProject.id,
+                projectId: this.projectId,
             },
             width: '400px',
         });
@@ -104,8 +107,8 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.projectService.AddProjectGrantMember(this.grantedProject.id,
-                            this.grantedProject.grantId, user.id, roles);
+                        return this.projectService.AddProjectGrantMember(this.projectId,
+                            this.grantId, user.id, roles);
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {

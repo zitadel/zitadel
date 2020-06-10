@@ -84,10 +84,9 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.projectId = id;
         this.grantId = grantId;
 
-        if (grantId) {
+        if (this.projectId && this.grantId) {
             this.projectType = ProjectType.PROJECTTYPE_GRANTED;
-            // get grantedproject instead of projectgrant
-            this.projectService.GetGrantedProjectGrantByID(id, this.grantId).then(proj => {
+            this.projectService.GetGrantedProjectGrantByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
                 console.log(this.project);
                 this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {

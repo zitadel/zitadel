@@ -34,7 +34,7 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
 
     public ngOnInit(): void {
         this.dataSource = new OrgMembersDataSource(this.orgService);
-        this.dataSource.loadMembers(this.orgId, 0, 25, 'asc');
+        this.dataSource.loadMembers(0, 25, 'asc');
 
         this.selection.changed.subscribe(change => {
             console.log(change);
@@ -52,7 +52,6 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
 
     private loadMembersPage(): void {
         this.dataSource.loadMembers(
-            this.orgId,
             this.paginator.pageIndex,
             this.paginator.pageSize,
         );
@@ -85,7 +84,7 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.orgService.AddOrgMember(this.orgId, user.id, roles);
+                        return this.orgService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
@@ -98,7 +97,7 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
 
     public removeSelectedOrgMembers(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.orgService.RemoveOrgMember(this.orgId, member.userId).then(() => {
+            return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
                 this.toast.showError(error.message);

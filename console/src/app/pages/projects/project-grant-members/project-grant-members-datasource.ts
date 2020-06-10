@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { GrantedProject, ProjectMember } from 'src/app/proto/generated/management_pb';
+import { ProjectMember } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 
 /**
@@ -19,18 +19,14 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
         super();
     }
 
-    public loadMembers(grantedProject: GrantedProject.AsObject, pageIndex: number,
+    public loadMembers(projectId: string, grantId: string, pageIndex: number,
         pageSize: number, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
 
-        console.log(grantedProject);
-        const prom = this.projectService.SearchProjectGrantMembers(grantedProject.id,
-            grantedProject.grantId, pageSize, offset);
-
-        if (prom) {
-            from(prom).pipe(
+        from(this.projectService.SearchProjectGrantMembers(projectId,
+            grantId, pageSize, offset)).pipe(
                 map(resp => {
                     this.totalResult = resp.toObject().totalResult;
                     return resp.toObject().resultList;
@@ -41,7 +37,7 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
                 console.log(members);
                 this.membersSubject.next(members);
             });
-        }
+
     }
 
 
