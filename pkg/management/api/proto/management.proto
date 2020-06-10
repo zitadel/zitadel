@@ -641,7 +641,7 @@ service ManagementService {
     }
 
     //GRANTED_PROJECT_GRANTS
-    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (ProjectGrant) {
+    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (GrantedProject) {
         option (google.api.http) = {
             get: "/grantedprojects/{project_id}/grants/{id}"
         };

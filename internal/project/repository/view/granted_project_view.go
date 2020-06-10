@@ -12,12 +12,21 @@ func GrantedProjectByIDs(db *gorm.DB, table, projectID, orgID string) (*model.Gr
 	project := new(model.GrantedProjectView)
 
 	projectIDQuery := model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
-	grantIDQuery := model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_ORGID, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
-	query := view.PrepareGetByQuery(table, projectIDQuery, grantIDQuery)
+	orgIDQuery := model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_ORGID, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
+	query := view.PrepareGetByQuery(table, projectIDQuery, orgIDQuery)
 	err := query(db, project)
 	return project, err
 }
 
+func GrantedProjectGrantByIDs(db *gorm.DB, table, projectID, grantID string) (*model.GrantedProjectView, error) {
+	project := new(model.GrantedProjectView)
+
+	projectIDQuery := model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
+	grantIDQuery := model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_GRANTID, Value: grantID, Method: global_model.SEARCHMETHOD_EQUALS}
+	query := view.PrepareGetByQuery(table, projectIDQuery, grantIDQuery)
+	err := query(db, project)
+	return project, err
+}
 func GrantedProjectsByID(db *gorm.DB, table, projectID string) ([]*model.GrantedProjectView, error) {
 	projects := make([]*model.GrantedProjectView, 0)
 	queries := []*proj_model.GrantedProjectSearchQuery{
