@@ -23,6 +23,7 @@ func projectGrantFromModel(grant *proj_model.ProjectGrant) *ProjectGrant {
 		GrantedOrgId: grant.GrantedOrgID,
 		RoleKeys:     grant.RoleKeys,
 		Sequence:     grant.Sequence,
+		ProjectId:    grant.AggregateID,
 	}
 }
 
