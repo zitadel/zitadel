@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"net/http"
 )
 
 type EmailVerificationCodeData struct {
@@ -14,7 +15,7 @@ type EmailVerificationCodeData struct {
 	URL string
 }
 
-func SendEmailVerificationCode(i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
+func SendEmailVerificationCode(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -31,7 +32,7 @@ func SendEmailVerificationCode(i18n *i18n.Translator, user *view_model.NotifyUse
 	systemDefaults.Notifications.TemplateData.VerifyEmail.Translate(i18n, args, user.PreferredLanguage)
 	emailCodeData := &EmailVerificationCodeData{TemplateData: systemDefaults.Notifications.TemplateData.VerifyEmail, URL: url}
 
-	template, err := templates.GetParsedTemplate(emailCodeData)
+	template, err := templates.GetParsedTemplate(dir, emailCodeData)
 	if err != nil {
 		return err
 	}

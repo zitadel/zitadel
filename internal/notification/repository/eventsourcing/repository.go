@@ -52,7 +52,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 	eventstoreRepos := handler.EventstoreRepos{UserEvents: user}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults, i18n)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults, i18n, dir)
 
 	return &EsRepository{
 		spool,
