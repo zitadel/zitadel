@@ -57,9 +57,6 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 		if caos_errs.IsNotFound(err) {
 			errMessage = "User not found"
 		}
-		if caosErr, ok := err.(*caos_errs.CaosError) {
-
-		}
 
 		errMessage = err.Error()
 	}
