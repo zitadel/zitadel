@@ -7,7 +7,7 @@
     </app-search-user-autocomplete>
 
     <mat-form-field class="full-width">
-        <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
+        <mat-label>{{ 'PROJECT.MEMBER.ROLES' | translate }}</mat-label>
         <mat-select [(ngModel)]="roleKeyList" multiple>
             <mat-option *ngFor="let key of data.roleKeysList" [value]="key">
                 {{ key }}

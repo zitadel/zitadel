@@ -87,6 +87,7 @@
         },
         "DATA": {
             "STATE": "Status",
+            "STATE0": "unbekannt",
             "STATE1": "aktiv",
             "STATE2": "inaktiv",
             "STATE3": "gelöscht",

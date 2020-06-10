@@ -107,6 +107,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
                         .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
                     return ret;
                 })); // TODO: replace with prettier thing
+                this.isZitadel$.subscribe(isZita => console.log(`zitade: ${isZita}`));
             }).catch(error => {
                 this.toast.showError(error.message);
             });
