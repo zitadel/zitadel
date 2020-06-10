@@ -44,7 +44,7 @@ export class OrgMembersDataSource extends DataSource<OrgMember.AsObject> {
      */
     public connect(): Observable<OrgMember.AsObject[]> {
         return this.membersSubject.asObservable();
-    };
+    }
 
     /**
      *  Called when the table is being destroyed. Use this function, to clean up
