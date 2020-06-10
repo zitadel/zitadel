@@ -13,10 +13,10 @@ type OrgRepository interface {
 	DeactivateOrg(ctx context.Context, id string) (*org_model.Org, error)
 	ReactivateOrg(ctx context.Context, id string) (*org_model.Org, error)
 
-	SearchOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error)
-	AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
-	ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
-	RemoveOrgMember(ctx context.Context, orgID, userID string) error
+	SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error)
+	AddMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
+	ChangeMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
+	RemoveMyOrgMember(ctx context.Context, userID string) error
 
 	GetOrgMemberRoles() []string
 }

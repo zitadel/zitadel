@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/notification/templates"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"net/http"
 )
 
 type PasswordCodeData struct {
@@ -16,7 +17,7 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
+func SendPasswordCode(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -33,7 +34,7 @@ func SendPasswordCode(i18n *i18n.Translator, user *view_model.NotifyUser, code *
 	systemDefaults.Notifications.TemplateData.PasswordReset.Translate(i18n, args, user.PreferredLanguage)
 	passwordCodeData := &PasswordCodeData{TemplateData: systemDefaults.Notifications.TemplateData.PasswordReset, FirstName: user.FirstName, LastName: user.LastName, URL: url}
 
-	template, err := templates.GetParsedTemplate(passwordCodeData)
+	template, err := templates.GetParsedTemplate(dir, passwordCodeData)
 	if err != nil {
 		return err
 	}

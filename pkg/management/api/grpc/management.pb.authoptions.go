@@ -235,22 +235,22 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/AddOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgMember": utils_auth.Option{
 		Permission: "org.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeMyOrgMember": utils_auth.Option{
 		Permission: "org.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgMember": utils_auth.Option{
 		Permission: "org.member.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchOrgMembers": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgMembers": utils_auth.Option{
 		Permission: "org.member.read",
 		CheckParam: "",
 	},

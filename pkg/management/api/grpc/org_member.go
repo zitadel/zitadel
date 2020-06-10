@@ -10,18 +10,16 @@ func (s *Server) GetOrgMemberRoles(ctx context.Context, _ *empty.Empty) (*OrgMem
 	return &OrgMemberRoles{Roles: s.org.GetOrgMemberRoles()}, nil
 }
 
-func (s *Server) SearchOrgMembers(ctx context.Context, in *OrgMemberSearchRequest) (*OrgMemberSearchResponse, error) {
-	members, err := s.org.SearchOrgMembers(ctx, orgMemberSearchRequestToModel(in))
+func (s *Server) SearchMyOrgMembers(ctx context.Context, in *OrgMemberSearchRequest) (*OrgMemberSearchResponse, error) {
+	members, err := s.org.SearchMyOrgMembers(ctx, orgMemberSearchRequestToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return orgMemberSearchResponseFromModel(members), nil
 }
 
-func (s *Server) AddOrgMember(ctx context.Context, member *AddOrgMemberRequest) (*OrgMember, error) {
-	repositoryMember := addOrgMemberToModel(member)
-
-	addedMember, err := s.org.AddOrgMember(ctx, repositoryMember)
+func (s *Server) AddMyOrgMember(ctx context.Context, member *AddOrgMemberRequest) (*OrgMember, error) {
+	addedMember, err := s.org.AddMyOrgMember(ctx, addOrgMemberToModel(member))
 	if err != nil {
 		return nil, err
 	}
@@ -29,16 +27,15 @@ func (s *Server) AddOrgMember(ctx context.Context, member *AddOrgMemberRequest) 
 	return orgMemberFromModel(addedMember), nil
 }
 
-func (s *Server) ChangeOrgMember(ctx context.Context, member *ChangeOrgMemberRequest) (*OrgMember, error) {
-	repositoryMember := changeOrgMemberToModel(member)
-	changedMember, err := s.org.ChangeOrgMember(ctx, repositoryMember)
+func (s *Server) ChangeMyOrgMember(ctx context.Context, member *ChangeOrgMemberRequest) (*OrgMember, error) {
+	changedMember, err := s.org.ChangeMyOrgMember(ctx, changeOrgMemberToModel(member))
 	if err != nil {
 		return nil, err
 	}
 	return orgMemberFromModel(changedMember), nil
 }
 
-func (s *Server) RemoveOrgMember(ctx context.Context, member *RemoveOrgMemberRequest) (*empty.Empty, error) {
-	err := s.org.RemoveOrgMember(ctx, member.OrgId, member.UserId)
+func (s *Server) RemoveMyOrgMember(ctx context.Context, member *RemoveOrgMemberRequest) (*empty.Empty, error) {
+	err := s.org.RemoveMyOrgMember(ctx, member.UserId)
 	return &empty.Empty{}, err
 }
