@@ -24,7 +24,7 @@
   }
 
   .err-container {
-      color: tomato;
+      color: rgb(201,51,71);
         font-size: 14px;
   }
 
@@ -62,6 +62,10 @@
       margin-bottom: 1rem;
       margin-right: 1rem;
       border-radius: .5rem;
+
+      i {
+          margin-right: 1rem;
+      }
     }
     
   }

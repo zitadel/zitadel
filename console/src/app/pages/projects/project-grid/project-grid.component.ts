@@ -46,21 +46,21 @@ export class ProjectGridComponent {
     constructor(private router: Router, private projectService: ProjectService, private toast: ToastService) { }
 
     public selectItem(item: GrantedProject.AsObject, event?: any): void {
-        // if (event && !event.target.classList.contains('mat-icon')) {
-        //     if (item.grantId) {
-        //         this.router.navigate([item.id, '/grant', `${item.grantId}`]);
-        //     } else {
-        //         this.router.navigate(['/projects', item.id]);
-        //     }
-        // } else if (!event) {
-        //     this.router.navigate(['/projects', item.id]);
-        // }
-
-        if (item.id && item.grantId) {
-            this.router.navigate([item.id, '/grant', `${item.grantId}`]);
-        } else if (item.id) {
-            this.router.navigate(['/projects', item.id]);
+        if (event && !event.target.classList.contains('mat-icon')) {
+            if (item.grantId) {
+                this.router.navigate([item.id, '/grant', `${item.grantId}`]);
+            } else {
+                this.router.navigate(['/projects', item.id]);
+            }
+        } else if (!event) {
+            if (item.grantId) {
+                this.router.navigate([item.id, '/grant', `${item.grantId}`]);
+            } else {
+                this.router.navigate(['/projects', item.id]);
+            }
         }
+
+
     }
 
     public addItem(): void {

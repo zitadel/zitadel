@@ -3,16 +3,16 @@
         <ng-template appHasRole [appHasRole]="['project.write']">
             <button (click)="deactivateProjects(selection.selected)" @animate
                 matTooltip="{{'PROJECT.TABLE.DEACTIVATE' | translate}}" class="left-button" mat-icon-button>
-                <mat-icon svgIcon="mdi_light_off"></mat-icon>
+                <i class="las la-toggle-off"></i>
             </button>
             <button @animate (click)="reactivateProjects(selection.selected)" class="left-button"
                 matTooltip="{{'PROJECT.TABLE.ACTIVATE' | translate}}" mat-icon-button>
-                <mat-icon svgIcon="mdi_light_on"></mat-icon>
+                <i class="las la-toggle-on"></i>
             </button>
         </ng-template>
     </div>
     <button [disabled]="selection.selected.length > 0" (click)="changedView.emit(true)" mat-icon-button>
-        <mat-icon matTooltip="show list view">list</mat-icon>
+        <i class="show list view las la-th-list"></i>
     </button>
 </div>
 

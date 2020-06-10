@@ -43,7 +43,7 @@
                 <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
                     <card-actions class="card-actions">
                         <button mat-icon-button (click)="grid = true">
-                            <mat-icon matTooltip="show grid view">grid_on</mat-icon>
+                            <i matTooltip="show grid view" class="las la-th-large"></i>
                         </button>
                     </card-actions>
                     <app-project-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"

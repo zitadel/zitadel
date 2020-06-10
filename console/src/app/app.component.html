@@ -39,10 +39,11 @@
     <div (clickOutside)="closeAccountCard()" class="icon-container">
         <div class="avatar-wrapper dontcloseonclick" (click)="showAccount = !showAccount">
             <div class="avatar-circle dontcloseonclick" [ngClass]="{'active': showAccount}">
-                <img class="avatar dontcloseonclick" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
-                    src="../assets/images/account-circle-outline.png" />
+                <i *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
+                    class="avatar dontcloseonclick las la-user-circle"></i>
+
                 <ng-template #lighttheme>
-                    <img class="avatar dontcloseonclick" src="../assets/images/account-circle-outline-dark.png" />
+                    <i class="avatar las la-user-circle"></i>
                 </ng-template>
             </div>
         </div>
@@ -58,31 +59,31 @@
             <div class="list">
                 <a *ngIf="authService.authenticationChanged | async" class="nav-item" [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/user/me']">
-                    <mat-icon class="icon" svgIcon="mdi_account_circle_outline"></mat-icon>
+                    <i class="icon las la-user-circle"></i>
                     <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                 </a>
 
                 <a *ngIf="showOrgSection && org?.id" class="nav-item" [routerLinkActive]="['active']"
                     [routerLink]="[ '/orgs', org.id]">
-                    <mat-icon class="icon">business</mat-icon>
+                    <i class="icon las la-archway"></i>
                     <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
                 </a>
 
                 <a *ngIf="showProjectSection" class="nav-item" [routerLinkActive]="['active']"
                     [routerLink]="[ '/projects']">
-                    <mat-icon class="icon">folder_open</mat-icon>
+                    <i class="icon las la-layer-group"></i>
                     <span class="label">{{ 'MENU.PROJECT' | translate }}</span>
                 </a>
 
                 <a *ngIf="showUserSection" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/users']"
                     [routerLinkActiveOptions]="{ exact: true }">
-                    <mat-icon class="icon">people_outline</mat-icon>
+                    <i class="icon las la-users"></i>
                     <span class="label">{{ 'MENU.USER' | translate }}</span>
                 </a>
 
                 <span class="fill-space"></span>
                 <a class="nav-item" (click)="authService.signout()">
-                    <mat-icon class="icon" svgIcon="mdi_logout"></mat-icon>
+                    <i class="icon las la-sign-out-alt"></i>
                     <span class="label">{{ 'MENU.LOGOUT' | translate }}</span>
                 </a>
 

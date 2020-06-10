@@ -171,11 +171,6 @@ export class AppComponent implements OnDestroy {
         );
 
         this.matIconRegistry.addSvgIcon(
-            'mdi_logout',
-            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/logout.svg'),
-        );
-
-        this.matIconRegistry.addSvgIcon(
             'mdi_light_on',
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lightbulb-on-outline.svg'),
         );
