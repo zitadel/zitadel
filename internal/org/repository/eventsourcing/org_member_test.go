@@ -54,7 +54,7 @@ func TestOrgMemberAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregate, err := orgMemberAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.member)
+			aggregate, err := orgMemberAddedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.member, "")
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
