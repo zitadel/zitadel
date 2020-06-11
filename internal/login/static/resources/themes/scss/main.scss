@@ -153,12 +153,12 @@ form {
 #qrcode {
     text-align: center;
 
-    svg rect[style*="fill:white"] {
-        fill: $backgroundColor !important;
+    svg rect.color {
+        fill: $fontColor;
     }
 
-    svg rect[style*="fill:black"] {
-        fill: $fontColor !important;
+    svg rect.bg-color {
+        fill: $backgroundColor;
     }
 }
 

@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"net/http"
 
-	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
+
 	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/qrcode"
 )
 
 const (
@@ -86,7 +87,7 @@ func generateQrCode(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	qs := goqrsvg.NewQrSVG(qrCode, 5)
+	qs := qrcode.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
 

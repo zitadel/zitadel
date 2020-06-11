@@ -63,11 +63,19 @@ func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRe
 	logging.Log("CONFI-dHR2a").OnError(err).Panic("unable to create csrfInterceptor")
 	cache, err := middleware.DefaultCacheInterceptor(EndpointResources, config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
 	logging.Log("CONFI-BHq2a").OnError(err).Panic("unable to create cacheInterceptor")
-	security := middleware.SecurityHeaders(nil)
+	security := middleware.SecurityHeaders(csp(config.OidcAuthCallbackURL))
 	login.router = CreateRouter(login, statikFS, csrf, cache, security)
 	login.renderer = CreateRenderer(statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
 	login.Listen(ctx)
+}
+
+func csp(callback string) *middleware.CSP {
+	csp := middleware.DefaultSCP
+	csp.StyleSrc.AddNonce()
+	csp.ScriptSrc.AddNonce()
+	csp.FormAction.AddHost(callback)
+	return &csp
 }
 
 func csrfInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {

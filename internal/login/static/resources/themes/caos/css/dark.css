@@ -209,11 +209,11 @@ form .actions button, form .actions a {
 #qrcode {
   text-align: center;
 }
-#qrcode svg rect[style*="fill:white"] {
-  fill: #282828 !important;
+#qrcode svg rect.color {
+  fill: white;
 }
-#qrcode svg rect[style*="fill:black"] {
-  fill: white !important;
+#qrcode svg rect.bg-color {
+  fill: #282828;
 }
 
 #secret .copy {

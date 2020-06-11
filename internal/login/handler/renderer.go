@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/csrf"
 
+	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
@@ -193,6 +194,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		ThemeMode: l.getThemeMode(r),
 		AuthReqID: getRequestID(authReq, r),
 		CSRF:      csrf.TemplateField(r),
+		Nonce:     middleware.GetNonce(r),
 	}
 }
 
@@ -226,6 +228,7 @@ type baseData struct {
 	ThemeMode string
 	AuthReqID string
 	CSRF      template.HTML
+	Nonce     string
 }
 
 type errorData struct {

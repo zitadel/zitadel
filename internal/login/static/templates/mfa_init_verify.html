@@ -23,7 +23,7 @@
                 <span class="label" for="secret">{{t "MfaInitVerify.Secret"}}</span>
                 <span class="input" id="secret">
                     {{.Secret}}
-                    <span class="copy material-icons" onclick="copyToClipboard('{{ .Secret }}')">content_copy</span>
+                    <span class="copy material-icons" data-copy="{{ .Secret }}" >content_copy</span>
                 </span>
             </div>
             <div class="field">
@@ -38,12 +38,7 @@
     </div>
 </form>
 
-<script>
-    const copyToClipboard = str => {
-        navigator.clipboard.writeText(str);
-    }
-</script>
-
+<script src="{{ resourceUrl "scripts/copy_to_clipboard.js" }}"></script>
 
 {{template "main-bottom" .}}
  
