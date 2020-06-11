@@ -117,6 +117,7 @@ Actions:
   ForgotPassword: Password zurücksetzen
 
 Errors:
+  Internal: Es ist ein interner Fehler aufgetreten
   AuthRequest:
     NotFound: AuthRequest konnte nicht gefunden werden
   User:
@@ -145,6 +146,7 @@ Errors:
     EmailVerify:
       UserIDEmpty: UserID ist leer
     Mfa:
+      NoProviders: Es stehen keine Multifaktorprovider zur Verfügung
       Otp:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht

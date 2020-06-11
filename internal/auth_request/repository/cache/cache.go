@@ -67,14 +67,14 @@ func (c *AuthRequestCache) getAuthRequest(key, value string) (*model.AuthRequest
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, caos_errs.ThrowNotFound(err, "CACHE-d24aD", "Errors.AuthRequest.NotFound")
 		}
-		return nil, caos_errs.ThrowInternal(err, "CACHE-as3kj", "unable to get auth request from database")
+		return nil, caos_errs.ThrowInternal(err, "CACHE-as3kj", "Errors.Internal")
 	}
 	request, err := model.NewAuthRequestFromType(requestType)
 	if err == nil {
 		err = json.Unmarshal(b, request)
 	}
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "CACHE-2wshg", "unable to unmarshal auth request")
+		return nil, caos_errs.ThrowInternal(err, "CACHE-2wshg", "Errors.Internal")
 	}
 	return request, nil
 }
@@ -82,15 +82,15 @@ func (c *AuthRequestCache) getAuthRequest(key, value string) (*model.AuthRequest
 func (c *AuthRequestCache) saveAuthRequest(request *model.AuthRequest, query string, param interface{}) error {
 	b, err := json.Marshal(request)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "CACHE-os0GH", "unable to marshal auth request")
+		return caos_errs.ThrowInternal(err, "CACHE-os0GH", "Errors.Internal")
 	}
 	stmt, err := c.client.Prepare(query)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "CACHE-su3GK", "sql prepare failed")
+		return caos_errs.ThrowInternal(err, "CACHE-su3GK", "Errors.Internal")
 	}
 	_, err = stmt.Exec(request.ID, b, param)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "CACHE-sj8iS", "unable to save auth request")
+		return caos_errs.ThrowInternal(err, "CACHE-sj8iS", "Errors.Internal")
 	}
 	return nil
 }

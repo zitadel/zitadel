@@ -47,7 +47,7 @@ func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSess
 	}
 
 	if mfaPromptData == nil {
-		l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-XU0tj", "No available mfa providers"))
+		l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-XU0tj", "Errors.User.Mfa.NoProviders"))
 		return
 	}
 
@@ -70,7 +70,7 @@ func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authSe
 		l.handleOtpCreation(w, r, authSession, data)
 		return
 	}
-	l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "No available mfa providers"))
+	l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "Errors.User.Mfa.NoProviders"))
 }
 
 func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {

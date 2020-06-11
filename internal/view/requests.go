@@ -23,7 +23,7 @@ func PrepareGetByKey(table string, key ColumnKey, id string) func(db *gorm.DB, r
 			return caos_errs.ThrowNotFound(err, "VIEW-XRI9c", "object not found")
 		}
 		logging.LogWithFields("VIEW-xVShS", "AggregateID", id).WithError(err).Warn("get from view error")
-		return caos_errs.ThrowInternal(err, "VIEW-J92Td", "view error")
+		return caos_errs.ThrowInternal(err, "VIEW-J92Td", "Errors.Internal")
 	}
 }
 

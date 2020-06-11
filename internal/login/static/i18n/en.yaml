@@ -118,6 +118,7 @@ Actions:
 
 
 Errors:
+  Internal: An internal error occured
   AuthRequest:
     NotFound: Could not find authrequest
   User:
@@ -146,6 +147,7 @@ Errors:
     EmailVerify:
       UserIDEmpty: UserID is empty
     Mfa:
+      NoProviders: No available multifactor providers
       Otp:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already setup
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist

@@ -195,7 +195,9 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
-		return l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
+		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
+		return localized + " (" + caosErr.ID + ")"
+
 	}
 	return err.Error()
 }

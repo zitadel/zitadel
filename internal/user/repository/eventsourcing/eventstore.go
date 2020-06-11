@@ -326,8 +326,11 @@ func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error
 }
 
 func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *policy_model.PasswordComplexityPolicy, userID, verificationCode, password string) error {
-	if userID == "" || verificationCode == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "userId or Code empty")
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.UserIDMissing")
+	}
+	if verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.Code.Empty")
 	}
 	pw := &usr_model.Password{SecretString: password}
 	err := pw.HashPasswordIfExisting(policy, es.PasswordAlg, false)
@@ -339,7 +342,7 @@ func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *policy_mod
 		return err
 	}
 	if existing.InitCode == nil {
-		return caos_errs.ThrowNotFound(nil, "EVENT-spo9W", "code not found")
+		return caos_errs.ThrowNotFound(nil, "EVENT-spo9W", "Errors.User.Code.NotFound")
 	}
 	repoPassword := model.PasswordFromModel(pw)
 	repoExisting := model.UserFromModel(existing)
@@ -362,7 +365,7 @@ func (es *UserEventstore) VerifyInitCode(ctx context.Context, policy *policy_mod
 
 func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -606,7 +609,7 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 
 func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationCode string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.EmailVerify.UserIDEmpty")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.UserIDMissing")
 	}
 	if verificationCode == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-skDws", "Errors.User.Code.Empty")
@@ -857,7 +860,7 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model
 		return nil, err
 	}
 	if existing.IsOTPReady() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "user has already configured otp")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
 	}
 	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: userID})
 	if err != nil {
