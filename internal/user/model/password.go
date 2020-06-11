@@ -40,7 +40,7 @@ func (p *Password) HashPasswordIfExisting(policy *policy_model.PasswordComplexit
 		return nil
 	}
 	if policy == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "MODEL-s8ifS", "Policy should not be nil")
+		return caos_errs.ThrowPreconditionFailed(nil, "MODEL-s8ifS", "Errors.User.PasswordComplexityPolicy.NotFound")
 	}
 	if err := policy.Check(p.SecretString); err != nil {
 		return err

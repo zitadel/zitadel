@@ -22,7 +22,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderPasswordResetDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Password Reset Done", errType, errMessage),

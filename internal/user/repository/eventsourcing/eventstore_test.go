@@ -1487,7 +1487,7 @@ func TestSetPassword(t *testing.T) {
 				password: "password",
 			},
 			res: res{
-				errFunc: caos_errs.IsPreconditionFailed,
+				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1511,7 +1511,7 @@ func TestSetPassword(t *testing.T) {
 				password: "password",
 			},
 			res: res{
-				errFunc: caos_errs.IsPreconditionFailed,
+				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -3076,7 +3076,9 @@ func TestCheckMfaOTP(t *testing.T) {
 					},
 				},
 			},
-			res: res{},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
+			},
 		},
 		{
 			name: "empty userid",
