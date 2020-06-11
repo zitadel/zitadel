@@ -39,7 +39,7 @@ func (l *Login) handleMfaPrompt(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, mfaPromptData *model.MfaPromptStep, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	data := mfaData{
 		baseData: l.getBaseData(r, authSession, "Mfa Prompt", errType, errMessage),

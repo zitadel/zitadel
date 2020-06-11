@@ -149,7 +149,7 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 		return err
 	}
 	if request.UserID != userID {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "user id does not match request id")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }

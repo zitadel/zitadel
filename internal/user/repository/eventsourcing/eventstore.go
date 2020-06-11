@@ -149,7 +149,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.InvalidData")
 	}
 	id, err := es.idGenerator.Next()
 	if err != nil {
@@ -480,7 +480,7 @@ func (es *UserEventstore) changedPassword(ctx context.Context, user *usr_model.U
 
 func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string, notifyType usr_model.NotificationType) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -505,7 +505,7 @@ func (es *UserEventstore) RequestSetPassword(ctx context.Context, userID string,
 
 func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s09ow", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-s09ow", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -605,15 +605,18 @@ func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Emai
 }
 
 func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationCode string) error {
-	if userID == "" || verificationCode == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "userId or Code empty")
+	if userID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9fd", "Errors.User.EmailVerify.UserIDEmpty")
+	}
+	if verificationCode == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-skDws", "Errors.User.Code.Empty")
 	}
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	if existing.EmailCode == nil {
-		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "code not found")
+		return caos_errs.ThrowNotFound(nil, "EVENT-lso9w", "Errors.User.Code.NotFound")
 	}
 
 	err = crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, verificationCode, es.EmailVerificationCode)
@@ -623,7 +626,7 @@ func (es *UserEventstore) VerifyEmail(ctx context.Context, userID, verificationC
 	if err := es.setEmailVerifyResult(ctx, existing, EmailVerificationFailedAggregate); err != nil {
 		return err
 	}
-	return caos_errs.ThrowInvalidArgument(err, "EVENT-dtGaa", "invalid code")
+	return caos_errs.ThrowInvalidArgument(err, "EVENT-dtGaa", "Errors.User.Code.Invalid")
 }
 
 func (es *UserEventstore) setEmailVerifyResult(ctx context.Context, existing *usr_model.User, check func(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc) error {
@@ -903,8 +906,11 @@ func (es *UserEventstore) CheckMfaOTPSetup(ctx context.Context, userID, code str
 	if err != nil {
 		return err
 	}
-	if user.OTP == nil || user.IsOTPReady() {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "otp not existing or already set up")
+	if user.OTP == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.Users.Mfa.Otp.NotExisting")
+	}
+	if user.IsOTPReady() {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.Users.Mfa.Otp.AlreadyReady")
 	}
 	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
 		return err
@@ -925,7 +931,7 @@ func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, 
 		return err
 	}
 	if !user.IsOTPReady() {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "opt not ready")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sd5NJ", "Errors.User.Mfa.Otp.NotReady")
 	}
 
 	repoUser := model.UserFromModel(user)
@@ -953,7 +959,7 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 
 	valid := es.validateTOTP(code, decrypt)
 	if !valid {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Invalid code")
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.Mfa.Otp.InvalidCode")
 	}
 	return nil
 }

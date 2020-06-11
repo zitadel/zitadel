@@ -79,7 +79,7 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	if authReq != nil {
 		userID = authReq.UserID
@@ -93,12 +93,12 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	var errType, errMessage, userName string
+	var userName string
 	if authReq != nil {
 		userName = authReq.UserName
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authReq, "User Init Done", errType, errMessage),
+		baseData: l.getBaseData(r, authReq, "User Init Done", "", ""),
 		UserName: userName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUserDone], data, nil)
