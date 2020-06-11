@@ -37,6 +37,7 @@ func (p *User) EventQuery() (*models.SearchQuery, error) {
 }
 
 func (p *User) Process(event *models.Event) (err error) {
+	//return caos_errs.ThrowInternal(nil, "TEST", "gugus")
 	user := new(view_model.UserView)
 	switch event.Type {
 	case es_model.UserAdded,
