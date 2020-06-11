@@ -35,7 +35,7 @@ func (l *Login) handleMfaVerify(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderMfaVerify(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, verificationStep *model.MfaVerificationStep, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Mfa Verify", errType, errMessage),

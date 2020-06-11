@@ -20,7 +20,7 @@ func NewParser() *Parser {
 func (p *Parser) Parse(r *http.Request, data interface{}) error {
 	err := r.ParseForm()
 	if err != nil {
-		return errors.ThrowInternal(err, "FORM-lCC9zI", "error parsing http form")
+		return errors.ThrowInternal(err, "FORM-lCC9zI", "Errors.Internal")
 	}
 
 	return p.decoder.Decode(data, r.Form)
