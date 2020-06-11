@@ -41,7 +41,7 @@ func (s *Server) UserChanges(ctx context.Context, changesRequest *ChangeRequest)
 	if err != nil {
 		return nil, err
 	}
-	return changesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
+	return userChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, request *UniqueUserRequest) (*UniqueUserResponse, error) {

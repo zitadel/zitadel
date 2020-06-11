@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/user/model"
-
-	chg_model "github.com/caos/zitadel/internal/changes/model"
 )
 
 type UserRepository interface {
@@ -17,7 +15,7 @@ type UserRepository interface {
 	LockUser(ctx context.Context, id string) (*model.User, error)
 	UnlockUser(ctx context.Context, id string) (*model.User, error)
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
-	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error)
+	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*model.UserChanges, error)
 	GetGlobalUserByEmail(ctx context.Context, email string) (*model.UserView, error)
 	IsUserUnique(ctx context.Context, userName, email string) (bool, error)
 	UserMfas(ctx context.Context, userID string) ([]*model.MultiFactor, error)

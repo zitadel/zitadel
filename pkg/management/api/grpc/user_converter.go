@@ -1,11 +1,15 @@
 package grpc
 
 import (
+	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func userFromModel(user *usr_model.User) *User {
@@ -392,4 +396,32 @@ func mfaStateFromModel(state usr_model.MfaState) MFAState {
 	default:
 		return MFAState_MFASTATE_UNSPECIFIED
 	}
+}
+
+func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: userChangesToMgtAPI(response),
+	}
+}
+
+func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		b, err := json.Marshal(change.Data)
+		data := &structpb.Struct{}
+		err = protojson.Unmarshal(b, data)
+		if err != nil {
+		}
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+		}
+	}
+
+	return result
 }

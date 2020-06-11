@@ -1,9 +1,13 @@
 package grpc
 
 import (
+	"encoding/json"
+
 	"github.com/caos/logging"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func orgsFromModel(orgs []*org_model.Org) []*Org {
@@ -57,4 +61,32 @@ func orgStateFromModel(state org_model.OrgState) OrgState {
 	default:
 		return OrgState_ORGSTATE_UNSPECIFIED
 	}
+}
+
+func orgChangesToResponse(response *org_model.OrgChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: orgChangesToMgtAPI(response),
+	}
+}
+
+func orgChangesToMgtAPI(changes *org_model.OrgChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		b, err := json.Marshal(change.Data)
+		data := &structpb.Struct{}
+		err = protojson.Unmarshal(b, data)
+		if err != nil {
+		}
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+		}
+	}
+
+	return result
 }

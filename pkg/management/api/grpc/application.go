@@ -90,5 +90,5 @@ func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *ChangeR
 	if err != nil {
 		return nil, err
 	}
-	return changesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
+	return appChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }

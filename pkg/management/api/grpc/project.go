@@ -119,7 +119,7 @@ func (s *Server) ProjectChanges(ctx context.Context, changesRequest *ChangeReque
 	if err != nil {
 		return nil, err
 	}
-	return changesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
+	return projectChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
 
 func (s *Server) IsZitadel(ctx context.Context, projectID string) bool {

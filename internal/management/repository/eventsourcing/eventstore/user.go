@@ -4,21 +4,19 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/auth"
-	chg_model "github.com/caos/zitadel/internal/changes/model"
-	chg_event "github.com/caos/zitadel/internal/changes/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	usr_types "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type UserRepo struct {
-	SearchLimit   uint64
-	UserEvents    *usr_event.UserEventstore
-	PolicyEvents  *policy_event.PolicyEventstore
-	View          *view.View
-	ChangesEvents *chg_event.ChangesEventstore
+	SearchLimit  uint64
+	UserEvents   *usr_event.UserEventstore
+	PolicyEvents *policy_event.PolicyEventstore
+	View         *view.View
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.User, err error) {
@@ -75,8 +73,8 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	}, nil
 }
 
-func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.User, id, "", 0, 0)
+func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*usr_model.UserChanges, error) {
+	changes, err := repo.UserEvents.UserChanges(ctx, usr_types.UserAggregate, id, lastSequence, limit)
 	if err != nil {
 		return nil, err
 	}

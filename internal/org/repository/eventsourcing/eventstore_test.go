@@ -2,15 +2,19 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"encoding/json"
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_mock "github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	repo_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
 )
 
@@ -1023,5 +1027,75 @@ func orgInactiveEvent() *es_models.Event {
 		ResourceOwner:    "hodor-org",
 		Sequence:         52,
 		Type:             model.OrgDeactivated,
+	}
+}
+
+func TestChangesOrg(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es            *OrgEventstore
+		aggregateType es_models.AggregateType
+		id            string
+		lastSequence  uint64
+		limit         uint64
+	}
+	type res struct {
+		changes *org_model.OrgChanges
+		org     *model.Org
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "changes from events, ok",
+			args: args{
+				es:            GetMockChangesOrgOK(ctrl),
+				aggregateType: repo_model.OrgAggregate,
+				id:            "1",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				changes: &org_model.OrgChanges{Changes: []*org_model.OrgChange{&org_model.OrgChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				org:     &model.Org{Name: "MusterOrg", Domain: "myDomain"},
+			},
+		},
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:            GetMockChangesOrgNoEvents(ctrl),
+				aggregateType: repo_model.OrgAggregate,
+				id:            "2",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.OrgChanges(nil, tt.args.aggregateType, tt.args.id, tt.args.lastSequence, tt.args.limit)
+
+			org := &model.Org{}
+			if result != nil && len(result.Changes) > 0 {
+				b, err := json.Marshal(result.Changes[0].Data)
+				json.Unmarshal(b, org)
+				if err != nil {
+				}
+			}
+			if !tt.res.wantErr && result.LastSequence != tt.res.changes.LastSequence && org.Name != tt.res.org.Name {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.changes.LastSequence, result.LastSequence)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
 	}
 }

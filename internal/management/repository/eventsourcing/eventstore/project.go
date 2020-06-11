@@ -2,17 +2,17 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
-	global_model "github.com/caos/zitadel/internal/model"
 	"strings"
 
-	chg_model "github.com/caos/zitadel/internal/changes/model"
-	chg_event "github.com/caos/zitadel/internal/changes/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/api/auth"
+	global_model "github.com/caos/zitadel/internal/model"
+
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	proj_types "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 type ProjectRepo struct {
@@ -20,7 +20,6 @@ type ProjectRepo struct {
 	ProjectEvents *proj_event.ProjectEventstore
 	View          *view.View
 	Roles         []string
-	ChangesEvents *chg_event.ChangesEventstore
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
@@ -124,8 +123,8 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_m
 	}, nil
 }
 
-func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Project, id, "", 0, 0)
+func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
+	changes, err := repo.ProjectEvents.ProjectChanges(ctx, proj_types.ProjectAggregate, id, lastSequence, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +170,8 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	}, nil
 }
 
-func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64) (*chg_model.Changes, error) {
-	changes, err := repo.ChangesEvents.Changes(ctx, chg_model.Application, id, appId, 0, 0)
+func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
+	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, proj_types.ProjectAggregate, id, appId, lastSequence, limit)
 	if err != nil {
 		return nil, err
 	}

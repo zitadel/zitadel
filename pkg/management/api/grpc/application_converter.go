@@ -1,10 +1,14 @@
 package grpc
 
 import (
+	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func appFromModel(app *proj_model.Application) *Application {
@@ -307,4 +311,32 @@ func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) OIDCAut
 	default:
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 	}
+}
+
+func appChangesToResponse(response *proj_model.ApplicationChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: appChangesToMgtAPI(response),
+	}
+}
+
+func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		b, err := json.Marshal(change.Data)
+		data := &structpb.Struct{}
+		err = protojson.Unmarshal(b, data)
+		if err != nil {
+		}
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+		}
+	}
+
+	return result
 }

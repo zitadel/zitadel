@@ -41,5 +41,5 @@ func (s *Server) OrgChanges(ctx context.Context, changesRequest *ChangeRequest) 
 	if err != nil {
 		return nil, err
 	}
-	return changesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
+	return orgChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }

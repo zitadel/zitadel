@@ -1,10 +1,14 @@
 package grpc
 
 import (
+	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func projectFromModel(project *proj_model.Project) *Project {
@@ -230,4 +234,32 @@ func projectRoleSearchKeyToModel(key ProjectRoleSearchKey) proj_model.ProjectRol
 	default:
 		return proj_model.PROJECTROLESEARCHKEY_UNSPECIFIED
 	}
+}
+
+func projectChangesToResponse(response *proj_model.ProjectChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: projectChangesToMgtAPI(response),
+	}
+}
+
+func projectChangesToMgtAPI(changes *proj_model.ProjectChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		b, err := json.Marshal(change.Data)
+		data := &structpb.Struct{}
+		err = protojson.Unmarshal(b, data)
+		if err != nil {
+		}
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+		}
+	}
+
+	return result
 }

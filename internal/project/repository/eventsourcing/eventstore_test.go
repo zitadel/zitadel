@@ -2,13 +2,16 @@ package eventsourcing
 
 import (
 	"context"
+	"encoding/json"
+	"reflect"
+	"testing"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
+	repo_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
-	"reflect"
-	"testing"
 )
 
 func TestProjectByID(t *testing.T) {
@@ -2688,6 +2691,148 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 
 			if !tt.res.wantErr && err != nil {
 				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+func TestChangesProject(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es            *ProjectEventstore
+		aggregateType es_models.AggregateType
+		id            string
+		lastSequence  uint64
+		limit         uint64
+	}
+	type res struct {
+		changes *model.ProjectChanges
+		project *model.Project
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "changes from events, ok",
+			args: args{
+				es:            GetMockChangesProjectOK(ctrl),
+				aggregateType: repo_model.ProjectAggregate,
+				id:            "1",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				changes: &model.ProjectChanges{Changes: []*model.ProjectChange{&model.ProjectChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				project: &model.Project{Name: "MusterProject"},
+			},
+		},
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:            GetMockChangesProjectNoEvents(ctrl),
+				aggregateType: repo_model.ProjectAggregate,
+				id:            "2",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ProjectChanges(nil, tt.args.aggregateType, tt.args.id, tt.args.lastSequence, tt.args.limit)
+
+			project := &model.Project{}
+			if result != nil && len(result.Changes) > 0 {
+				b, err := json.Marshal(result.Changes[0].Data)
+				json.Unmarshal(b, project)
+				if err != nil {
+				}
+			}
+			if !tt.res.wantErr && result.LastSequence != tt.res.changes.LastSequence && project.Name != tt.res.project.Name {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.changes.LastSequence, result.LastSequence)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangesApplication(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es            *ProjectEventstore
+		aggregateType es_models.AggregateType
+		id            string
+		secId         string
+		lastSequence  uint64
+		limit         uint64
+	}
+	type res struct {
+		changes *model.ApplicationChanges
+		app     *model.Application
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "changes from events, ok",
+			args: args{
+				es:            GetMockChangesApplicationOK(ctrl),
+				aggregateType: repo_model.ProjectAggregate,
+				id:            "1",
+				secId:         "AppId",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				changes: &model.ApplicationChanges{Changes: []*model.ApplicationChange{&model.ApplicationChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				app:     &model.Application{Name: "MusterApp", AppID: "AppId", Type: 3},
+			},
+		},
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:            GetMockChangesApplicationNoEvents(ctrl),
+				aggregateType: repo_model.ProjectAggregate,
+				id:            "2",
+				secId:         "2",
+				lastSequence:  0,
+				limit:         0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ApplicationChanges(nil, tt.args.aggregateType, tt.args.id, tt.args.secId, tt.args.lastSequence, tt.args.limit)
+
+			app := &model.Application{}
+			if result != nil && len(result.Changes) > 0 {
+				b, err := json.Marshal(result.Changes[0].Data)
+				json.Unmarshal(b, app)
+				if err != nil {
+				}
+			}
+			if !tt.res.wantErr && result.LastSequence != tt.res.changes.LastSequence && app.Name != tt.res.app.Name {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.changes.LastSequence, result.LastSequence)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
