@@ -610,11 +610,11 @@ func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 
 func SignOutAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, agentID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregate(ctx, aggCreator, existing)
+		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, existing, existing.ResourceOwner, existing.AggregateID)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.SignedOut, map[string]interface{}{"agentID": agentID})
+		return agg.AppendEvent(model.SignedOut, map[string]interface{}{"userAgentID": agentID})
 	}
 }
 

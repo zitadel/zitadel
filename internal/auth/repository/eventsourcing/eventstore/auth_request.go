@@ -317,7 +317,8 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		case es_model.UserPasswordCheckSucceeded,
 			es_model.UserPasswordCheckFailed,
 			es_model.MfaOtpCheckSucceeded,
-			es_model.MfaOtpCheckFailed:
+			es_model.MfaOtpCheckFailed,
+			es_model.SignedOut:
 			eventData, err := view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).Debug("error getting event data")
