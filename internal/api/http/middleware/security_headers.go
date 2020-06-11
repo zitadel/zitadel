@@ -17,7 +17,7 @@ const (
 	DefaultNonceLength = uint(32)
 )
 
-func SecurityHeaders(csp *CSP, nonceLength ...uint) func(http.Handler) http.Handler {
+func SecurityHeaders(csp *CSP, errorHandler func(error) http.Handler, nonceLength ...uint) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		if csp == nil {
 			csp = &DefaultSCP
@@ -27,17 +27,19 @@ func SecurityHeaders(csp *CSP, nonceLength ...uint) func(http.Handler) http.Hand
 			length = nonceLength[0]
 		}
 		return &headers{
-			csp:         csp,
-			handler:     handler,
-			nonceLength: length,
+			csp:          csp,
+			handler:      handler,
+			errorHandler: errorHandler,
+			nonceLength:  length,
 		}
 	}
 }
 
 type headers struct {
-	csp         *CSP
-	handler     http.Handler
-	nonceLength uint
+	csp          *CSP
+	handler      http.Handler
+	errorHandler func(err error) http.Handler
+	nonceLength  uint
 }
 
 func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +48,8 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var err error
 		nonce, err = generateNonce(h.nonceLength)
 		if err != nil {
-
+			h.errorHandler(err).ServeHTTP(w, r)
+			return
 		}
 		r = saveContext(r, nonceKey, nonce)
 	}

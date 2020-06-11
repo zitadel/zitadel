@@ -220,6 +220,12 @@ func (l *Login) csrfErrorHandler() http.Handler {
 	})
 }
 
+func (l *Login) cspErrorHandler(err error) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		l.renderInternalError(w, r, nil, err)
+	})
+}
+
 type baseData struct {
 	errorData
 	Lang      string
