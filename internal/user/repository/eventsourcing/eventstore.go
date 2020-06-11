@@ -408,7 +408,7 @@ func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password st
 	if err := es.setPasswordCheckResult(ctx, existing, authRequest, PasswordCheckFailedAggregate); err != nil {
 		return err
 	}
-	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "Errors.User.InvalidPassword")
+	return caos_errs.ThrowInvalidArgument(nil, "EVENT-452ad", "Errors.User.Password.Invalid")
 }
 
 func (es *UserEventstore) setPasswordCheckResult(ctx context.Context, user *usr_model.User, authRequest *req_model.AuthRequest, check func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc) error {
@@ -937,12 +937,16 @@ func (es *UserEventstore) CheckMfaOTP(ctx context.Context, userID, code string, 
 	repoUser := model.UserFromModel(user)
 	repoAuthReq := model.AuthRequestFromModel(authRequest)
 	var aggregate func(*es_models.AggregateCreator, *model.User, *model.AuthRequest) es_sdk.AggregateFunc
-	if err := es.verifyMfaOTP(user.OTP, code); err != nil {
+	var checkErr error
+	if checkErr = es.verifyMfaOTP(user.OTP, code); checkErr != nil {
 		aggregate = MfaOTPCheckFailedAggregate
 	} else {
 		aggregate = MfaOTPCheckSucceededAggregate
 	}
 	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, aggregate(es.AggregateCreator(), repoUser, repoAuthReq))
+	if checkErr != nil {
+		return checkErr
+	}
 	if err != nil {
 		return err
 	}

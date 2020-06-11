@@ -125,7 +125,7 @@ Errors:
     UserIDMissing: UserID ist leer
     InvalidData: Userdaten sind ungültig
     Password:
-      ConfirmationWrong: Passowort Bestätigung stimmt nicht überein
+      ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
     PasswordComplexityPolicy:

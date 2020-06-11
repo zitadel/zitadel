@@ -116,11 +116,41 @@ Actions:
   Register: register
   ForgotPassword: Reset password
 
+
 Errors:
+  AuthRequest:
+    NotFound: Could not find authrequest
   User:
-    NotFound: User not found
-    InvalidPassword: Invalid password
-    InvalidPasswordInit: Invalid code, password confirmation or password
-    CodeExpired: Code is expired
+    NotFound: User could not be found
+    NotMatchingUserID: User and user in authrequest don't match
+    UserIDMissing: UserID is empty
+    InvalidData: Invalid userdata
+    Password:
+      ConfirmationWrong: Passwordconfirmation is wrong
+      Empty: Password is empty
+      Invalid: Passwort is invalid
+    PasswordComplexityPolicy:
+      NotFound: Password policy not found
+      MinLength: Password is to short
+      HasLower: Password must contain lower letter
+      HasUpper: Password must contain upper letter
+      HasNumber: Password must contain number
+      HasSymbol: Password must contain symbol
+    Code:
+      Expired: Code is expired
+      Invalid: Code is invalid
+      Empty: Code is empty
+      CryptoCodeNil: Crypto code is nil
+      NotFound: Could not find code
+      GeneratorAlgNotSupported: Unsupported generator algorithm
+    EmailVerify:
+      UserIDEmpty: UserID is empty
+    Mfa:
+      Otp:
+        AlreadyReady: Multifactor OTP (OneTimePassword) is already setup
+        NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
+        InvalidCode: Invalid code
+        NotReady: Multifactor OTP (OneTimePassword) isn't ready
+
 
 optional: (optional)
