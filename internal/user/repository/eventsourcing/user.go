@@ -60,7 +60,7 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 
 	var agg *es_models.Aggregate
 	if resourceOwner != "" {
-		agg, err = UserAggregateOverwriteContext(ctx, aggCreator, user, user.AggregateID, resourceOwner)
+		agg, err = UserAggregateOverwriteContext(ctx, aggCreator, user, resourceOwner, user.AggregateID)
 	} else {
 		agg, err = UserAggregate(ctx, aggCreator, user)
 	}
