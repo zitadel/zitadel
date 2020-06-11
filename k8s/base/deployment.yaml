@@ -45,22 +45,22 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        - name: ZITADEL_GOOGLE_CHAT_URL
+        - name: CHAT_URL
           valueFrom:
             secretKeyRef:
               name: zitadel-secrets-vars
               key: ZITADEL_GOOGLE_CHAT_URL
-        - name: ZITADEL_TWILIO_AUTH_TOKEN
+        - name: TWILIO_TOKEN
           valueFrom:
             secretKeyRef:
               name: zitadel-secrets-vars
               key: ZITADEL_TWILIO_AUTH_TOKEN
-        - name: ZITADEL_TWILIO_SID
+        - name: TWILIO_SERVICE_SID
           valueFrom:
             secretKeyRef:
               name: zitadel-secrets-vars
               key: ZITADEL_TWILIO_SID
-        - name: ZITADEL_EMAILAPPKEY
+        - name: SMTP_PASSWORD
           valueFrom:
             secretKeyRef:
               name: zitadel-secrets-vars
