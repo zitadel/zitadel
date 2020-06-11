@@ -87,11 +87,12 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
-			Eventstore:     es,
-			OrgEventstore:  org,
-			UserEventstore: user,
-			View:           view,
-			SearchLimit:    conf.SearchLimit,
+			Eventstore:       es,
+			OrgEventstore:    org,
+			UserEventstore:   user,
+			PolicyEventstore: policy,
+			View:             view,
+			SearchLimit:      conf.SearchLimit,
 		},
 	}, nil
 }
