@@ -68,7 +68,11 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *mod
 }
 
 func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	err := l.authRepo.RequestPasswordReset(r.Context(), authReq.UserName)
+	userOrg := login
+	if authReq != nil {
+		userOrg = authReq.UserOrgID
+	}
+	err := l.authRepo.RequestPasswordReset(setContext(r.Context(), userOrg), authReq.UserName)
 	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 

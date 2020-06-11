@@ -13,9 +13,9 @@ const (
 
 type FailedEvent struct {
 	ViewName       string `gorm:"column:view_name;primary_key"`
-	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key`
-	FailureCount   uint64 `gorm:"column:failure_count`
-	ErrMsg         string `gorm:"column:err_msg`
+	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key"`
+	FailureCount   uint64 `gorm:"column:failure_count"`
+	ErrMsg         string `gorm:"column:err_msg"`
 }
 
 type FailedEventSearchQuery struct {
