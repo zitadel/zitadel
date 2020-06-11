@@ -164,11 +164,12 @@ func TestProjectCreateAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		new        *model.Project
+		member     *model.ProjectMember
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
 		eventLen  int
-		eventType models.EventType
+		eventType []models.EventType
 		wantErr   bool
 		errFunc   func(err error) bool
 	}
@@ -182,11 +183,12 @@ func TestProjectCreateAggregate(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
 				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				member:     &model.ProjectMember{UserID: "UserID"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:  1,
-				eventType: model.ProjectAdded,
+				eventLen:  2,
+				eventType: []models.EventType{model.ProjectAdded, model.ProjectMemberAdded},
 			},
 		},
 		{
@@ -194,29 +196,47 @@ func TestProjectCreateAggregate(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
 				new:        nil,
+				member:     &model.ProjectMember{UserID: "UserID"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:  1,
-				eventType: model.ProjectAdded,
-				wantErr:   true,
-				errFunc:   caos_errs.IsPreconditionFailed,
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "new member nil",
+			args: args{
+				ctx:        auth.NewMockContext("orgID", "userID"),
+				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				member:     nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectCreateAggregate(tt.args.aggCreator, tt.args.new)(tt.args.ctx)
+			agg, err := ProjectCreateAggregate(tt.args.aggCreator, tt.args.new, tt.args.member)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
-			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
-				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+
+			if !tt.res.wantErr {
+				for i, _ := range agg.Events {
+					if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventType[i] {
+						t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[i].Type.String())
+					}
+					if !tt.res.wantErr && agg.Events[i].Data == nil {
+						t.Errorf("should have data in event")
+					}
+				}
 			}
-			if !tt.res.wantErr && agg.Events[0].Data == nil {
-				t.Errorf("should have data in event")
-			}
+
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}

@@ -2,6 +2,8 @@ InternalAuthZ:
   RolePermissionMappings:
     - Role: 'IAM_OWNER'
       Permissions:
+        - "iam.read"
+        - "iam.write"
         - "org.read"
         - "org.write"
         - "org.member.read"

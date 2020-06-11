@@ -56,3 +56,6 @@ func (r *ProjectMemberSearchRequest) EnsureLimit(limit uint64) {
 		r.Limit = limit
 	}
 }
+func (r *ProjectMemberSearchRequest) AppendProjectQuery(projectID string) {
+	r.Queries = append(r.Queries, &ProjectMemberSearchQuery{Key: PROJECTMEMBERSEARCHKEY_PROJECT_ID, Method: model.SEARCHMETHOD_EQUALS, Value: projectID})
+}

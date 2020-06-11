@@ -33,10 +33,10 @@ func ProjectAggregate(ctx context.Context, aggCreator *es_models.AggregateCreato
 	return aggCreator.NewAggregate(ctx, project.AggregateID, model.ProjectAggregate, model.ProjectVersion, project.Sequence)
 }
 
-func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *model.Project) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if project == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project should not be nil")
+		if project == nil || member == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "project and member should not be nil")
 		}
 
 		agg, err := ProjectAggregate(ctx, aggCreator, project)
@@ -48,7 +48,11 @@ func ProjectCreateAggregate(aggCreator *es_models.AggregateCreator, project *mod
 			EventTypesFilter(model.ProjectAdded, model.ProjectChanged, model.ProjectRemoved)
 
 		validation := addProjectValidation(project.Name)
-		return agg.SetPrecondition(validationQuery, validation).AppendEvent(model.ProjectAdded, project)
+		agg, err = agg.SetPrecondition(validationQuery, validation).AppendEvent(model.ProjectAdded, project)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.ProjectMemberAdded, member)
 	}
 }
 
@@ -488,7 +492,7 @@ func addProjectValidation(projectName string) func(...*es_models.Event) error {
 		}
 		for _, p := range projects {
 			if p.Name == projectName {
-				return errors.ThrowPreconditionFailed(nil, "EVENT-s9oPw", "conditions not met")
+				return errors.ThrowPreconditionFailed(nil, "EVENT-s9oPw", "project already exists on resourceowner")
 			}
 		}
 		return nil
