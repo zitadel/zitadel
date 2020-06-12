@@ -10,6 +10,7 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
+    GrantedProject,
     GrantedProjectSearchQuery,
     GrantedProjectSearchRequest,
     GrantedProjectSearchResponse,
@@ -28,6 +29,7 @@ import {
     ProjectGrantMemberSearchRequest,
     ProjectGrantSearchRequest,
     ProjectGrantSearchResponse,
+    ProjectGrantUpdate,
     ProjectID,
     ProjectMemberAdd,
     ProjectMemberChange,
@@ -111,7 +113,7 @@ export class ProjectService {
         );
     }
 
-    public async GetGrantedProjectGrantByID(projectId: string, id: string): Promise<ProjectGrant> {
+    public async GetGrantedProjectGrantByID(projectId: string, id: string): Promise<GrantedProject> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
@@ -138,6 +140,18 @@ export class ProjectService {
         req.setId(project.id);
         return await this.request(
             c => c.updateProject,
+            req,
+            f => f,
+        );
+    }
+
+    public async UpdateProjectGrant(id: string, projectId: string, rolesList: string[]): Promise<ProjectGrant> {
+        const req = new ProjectGrantUpdate();
+        req.setRoleKeysList(rolesList);
+        req.setId(id);
+        req.setProjectId(projectId);
+        return await this.request(
+            c => c.updateProjectGrant,
             req,
             f => f,
         );
@@ -191,6 +205,18 @@ export class ProjectService {
         const req = new Empty();
         return await this.request(
             c => c.getProjectGrantMemberRoles,
+            req,
+            f => f,
+        );
+    }
+
+    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
+        const req = new ProjectMemberAdd();
+        req.setId(projectId);
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.addProjectMember,
             req,
             f => f,
         );
@@ -495,18 +521,6 @@ export class ProjectService {
         req.setApplicationType(oidcConfig.applicationType);
         return await this.request(
             c => c.updateApplicationOIDCConfig,
-            req,
-            f => f,
-        );
-    }
-
-    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
-        const req = new ProjectMemberAdd();
-        req.setId(projectId);
-        req.setUserId(userId);
-        req.setRolesList(rolesList);
-        return await this.request(
-            c => c.addProjectMember,
             req,
             f => f,
         );

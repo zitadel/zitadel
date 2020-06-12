@@ -527,9 +527,9 @@ service ManagementService {
         };
     }
 
-    rpc AddOrgMember(AddOrgMemberRequest) returns (OrgMember) {
+    rpc AddMyOrgMember(AddOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
-            post: "/orgs/{org_id}/members"
+            post: "/orgs/me/members"
             body: "*"
         };
 
@@ -538,9 +538,9 @@ service ManagementService {
         };
     }
 
-    rpc ChangeOrgMember(ChangeOrgMemberRequest) returns (OrgMember) {
+    rpc ChangeMyOrgMember(ChangeOrgMemberRequest) returns (OrgMember) {
         option (google.api.http) = {
-            put: "/orgs/{org_id}/members/{user_id}"
+            put: "/orgs/me/members/{user_id}"
             body: "*"
         };
 
@@ -549,9 +549,9 @@ service ManagementService {
         };
     }
 
-    rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (google.protobuf.Empty) {
+    rpc RemoveMyOrgMember(RemoveOrgMemberRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/orgs/{org_id}/members/{user_id}"
+            delete: "/orgs/me/members/{user_id}"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -559,9 +559,9 @@ service ManagementService {
         };
     }
 
-    rpc SearchOrgMembers(OrgMemberSearchRequest) returns (OrgMemberSearchResponse) {
+    rpc SearchMyOrgMembers(OrgMemberSearchRequest) returns (OrgMemberSearchResponse) {
         option (google.api.http) = {
-            post: "/orgs/{org_id}/members/_search"
+            post: "/orgs/me/members/_search"
             body: "*"
         };
 
@@ -641,7 +641,7 @@ service ManagementService {
     }
 
     //GRANTED_PROJECT_GRANTS
-    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (ProjectGrant) {
+    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (GrantedProject) {
         option (google.api.http) = {
             get: "/grantedprojects/{project_id}/grants/{id}"
         };
@@ -1658,34 +1658,42 @@ message OrgMember {
 }
 
 message AddOrgMemberRequest {
-    string org_id = 1;
-    string user_id = 2;
-    repeated string roles = 3;
+    string user_id = 1;
+    repeated string roles = 2;
 }
 
 message ChangeOrgMemberRequest {
-    string org_id = 1;
-    string user_id = 2;
-    repeated string roles = 3;
+    string user_id = 1;
+    repeated string roles = 2;
 }
 
 message RemoveOrgMemberRequest {
-    string org_id = 1;
-    string user_id = 2;
+    string user_id = 1;
 }
 
 message OrgMemberSearchResponse {
     uint64 offset = 1;
     uint64 limit = 2;
     uint64 total_result = 3;
-    repeated OrgMember result = 4;
+    repeated OrgMemberView result = 4;
+}
+
+message OrgMemberView {
+    string user_id = 1;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
+    string user_name = 6;
+    string email = 7;
+    string first_name = 8;
+    string last_name = 9;
 }
 
 message OrgMemberSearchRequest {
-    string org_id = 1;
-    uint64 offset = 2;
-    uint64 limit = 3;
-    repeated OrgMemberSearchQuery queries = 4;
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated OrgMemberSearchQuery queries = 3;
 }
 
 message OrgMemberSearchQuery {

@@ -345,6 +345,10 @@ func userStateFromModel(state usr_model.UserState) UserState {
 		return UserState_USERSTATE_INACTIVE
 	case usr_model.USERSTATE_LOCKED:
 		return UserState_USERSTATE_LOCKED
+	case usr_model.USERSTATE_INITIAL:
+		return UserState_USERSTATE_INITIAL
+	case usr_model.USERSTATE_SUSPEND:
+		return UserState_USERSTATE_SUSPEND
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
 	}

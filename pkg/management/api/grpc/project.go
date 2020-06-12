@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api"
+	"github.com/caos/zitadel/internal/api/auth"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -66,12 +67,12 @@ func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, erro
 	return projectFromModel(project), nil
 }
 
-func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrant, error) {
-	project, err := s.project.ProjectGrantByID(ctx, in.ProjectId, in.Id)
+func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*GrantedProject, error) {
+	project, err := s.project.GetGrantedProjectGrantByIDs(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return projectGrantFromModel(project), nil
+	return grantedProjectFromModel(project), nil
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*ProjectRole, error) {
@@ -105,8 +106,8 @@ func (s *Server) RemoveProjectRole(ctx context.Context, in *ProjectRoleRemove) (
 
 func (s *Server) SearchProjectRoles(ctx context.Context, in *ProjectRoleSearchRequest) (*ProjectRoleSearchResponse, error) {
 	request := projectRoleSearchRequestsToModel(in)
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
-	request.AppendMyOrgQuery(orgID)
+	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendProjectQuery(in.ProjectId)
 	response, err := s.project.SearchProjectRoles(ctx, request)
 	if err != nil {
 		return nil, err

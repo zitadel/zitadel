@@ -47,7 +47,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.Password != data.Password2 {
-		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "passwords dont match")
+		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
@@ -72,7 +72,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *model.AuthRequest, formData *registerFormData, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	if formData == nil {
 		formData = new(registerFormData)

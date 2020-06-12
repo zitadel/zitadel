@@ -87,6 +87,7 @@
         },
         "DATA": {
             "STATE": "Status",
+            "STATE0": "unbekannt",
             "STATE1": "aktiv",
             "STATE2": "inaktiv",
             "STATE3": "gelöscht",
@@ -285,7 +286,7 @@
         "TYPE": {
             "TITLE": "Typ",
             "0": "unbekannter Typ",
-            "1": "selbsterstellt",
+            "1": "in Besitz",
             "2": "berechtigt"
         },
         "NAME": "Name",
@@ -325,6 +326,7 @@
             "NAME": "Name"
         },
         "ROLE": {
+            "KEY":"Key",
             "TITLE": "Roles",
             "DESCRIPTION":"Definieren Sie Rollen, die Sie bei der Erstellung eines Projekt-Grants vergeben können",
             "NAME": "Name",
@@ -333,7 +335,8 @@
             "ACTIONS": "Aktion",
             "ADDTITLE": "Rolle erstellen",
             "ADDDESCRIPTION": "Geben Sie die Daten für die zu erstellende Rolle ein!",
-            "DELETE":"Rolle löschen"
+            "DELETE":"Rolle löschen",
+            "CREATIONDATE":"Erstelldatum"
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt:",
@@ -344,7 +347,7 @@
             "ORGNAME":"Org Name",
             "ORGDOMAIN":"Org Domain",
             "STATE":"Status",
-            "Type":"Typ",
+            "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
             "CHANGEDATE":"Letzte Änderung"
         }

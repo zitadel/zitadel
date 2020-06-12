@@ -10,4 +10,5 @@
     <div class="sp-wrapper">
         <mat-spinner *ngIf="loading | async" diameter="25"></mat-spinner>
     </div>
+    <span class="err-container" *ngIf="errorMessage">{{errorMessage}}</span>
 </div>

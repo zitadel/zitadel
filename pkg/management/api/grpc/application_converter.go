@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -110,15 +111,17 @@ func applicationSearchRequestsToModel(request *ApplicationSearchRequest) *proj_m
 	return &proj_model.ApplicationSearchRequest{
 		Offset:  request.Offset,
 		Limit:   request.Limit,
-		Queries: applicationSearchQueriesToModel(request.Queries),
+		Queries: applicationSearchQueriesToModel(request.ProjectId, request.Queries),
 	}
 }
 
-func applicationSearchQueriesToModel(queries []*ApplicationSearchQuery) []*proj_model.ApplicationSearchQuery {
-	converted := make([]*proj_model.ApplicationSearchQuery, len(queries))
+func applicationSearchQueriesToModel(projectID string, queries []*ApplicationSearchQuery) []*proj_model.ApplicationSearchQuery {
+	converted := make([]*proj_model.ApplicationSearchQuery, len(queries)+1)
 	for i, q := range queries {
 		converted[i] = applicationSearchQueryToModel(q)
 	}
+	converted[len(queries)] = &proj_model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_PROJECT_ID, Method: model.SEARCHMETHOD_EQUALS, Value: projectID}
+
 	return converted
 }
 

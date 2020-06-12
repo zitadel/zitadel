@@ -35,7 +35,7 @@
         </div>
 
         <!-- show only on owned projects-->
-        <ng-container *ngIf="project && projectType == ProjectType.PROJECTTYPE_OWNED; else granteddetail">
+        <ng-container *ngIf="project">
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
                 <app-project-application-grid *ngIf="grid"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" (changeView)="grid = false"
@@ -43,7 +43,7 @@
                 <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
                     <card-actions class="card-actions">
                         <button mat-icon-button (click)="grid = true">
-                            <mat-icon matTooltip="show grid view">grid_on</mat-icon>
+                            <i matTooltip="show grid view" class="las la-th-large"></i>
                         </button>
                     </card-actions>
                     <app-project-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
@@ -71,21 +71,12 @@
                 </ng-template>
             </ng-container>
         </ng-container>
-
-        <ng-template #granteddetail>
-            <app-card>
-                <app-project-grant-members *ngIf="project"
-                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" [project]="project">
-                </app-project-grant-members>
-            </app-card>
-        </ng-template>
     </div>
     <metainfo class="side">
-
         <div class="details">
             <div class="row">
                 <span class="first">{{'PROJECT.TYPE.TITLE' | translate}}:</span>
-                <span class="second" *ngIf="projectType">{{'PROJECT.TYPE.'+ projectType | translate}}</span>
+                <span class="second">{{'PROJECT.TYPE.'+ ProjectType.PROJECTTYPE_OWNED | translate}}</span>
             </div>
             <div class="row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
@@ -94,21 +85,16 @@
             </div>
         </div>
 
-        <ng-container *ngIf="projectType === ProjectType.PROJECTTYPE_OWNED; else grantedmeta">
-            <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
-                <mat-tab label="Details">
-                    <app-project-contributors *ngIf="project"
-                        [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" [project]="project">
-                    </app-project-contributors>
-                </mat-tab>
-                <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
-                    <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
-                </mat-tab>
-            </mat-tab-group>
-        </ng-container>
-
-        <ng-template #grantedmeta>
-            <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
-        </ng-template>
+        <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+            <mat-tab label="Details">
+                <app-project-contributors *ngIf="project"
+                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
+                    [projectType]="ProjectType.PROJECTTYPE_OWNED" [project]="project">
+                </app-project-contributors>
+            </mat-tab>
+            <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
+                <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
+            </mat-tab>
+        </mat-tab-group>
     </metainfo>
 </app-meta-layout>

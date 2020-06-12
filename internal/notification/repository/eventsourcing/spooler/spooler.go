@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	"net/http"
 )
 
 type SpoolerConfig struct {
@@ -22,12 +23,12 @@ type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
 }
 
-func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sql *sql.DB, eventstoreRepos handler.EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sql *sql.DB, eventstoreRepos handler.EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:      es,
 		Locker:          &locker{dbClient: sql},
 		ConcurrentTasks: c.ConcurrentTasks,
-		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, eventstoreRepos, systemDefaults, i18n),
+		ViewHandlers:    handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, eventstoreRepos, systemDefaults, i18n, dir),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

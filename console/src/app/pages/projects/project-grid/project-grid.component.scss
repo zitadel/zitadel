@@ -53,6 +53,10 @@
             top: -12px;
             left: -12px;
             user-select: none;
+
+            &:hover {
+                color: white;
+            }
         }
 
         img {
@@ -120,6 +124,10 @@
                     height: 1.4rem;
                     color: #81868a;
                 }
+            }
+
+            span {
+                margin: 2px 0;
             }
         }
 

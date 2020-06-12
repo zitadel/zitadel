@@ -54,33 +54,28 @@
 		.avatar-wrapper {
 			display: flex;
             align-items: center;
-            color: white;
 
             .avatar-circle {
-                height: 35px;
-                width: 35px;
+                height: 30px;
+                width: 30px;
+                font-size: 30px;
                 background-color: transparent;
                 border-radius: 50%;
                 animation: background-color .2s ease-in;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                margin-left: .5rem;
 
                 .avatar {
                     display: block;
                     margin: auto auto;
                     height: 30px;
                     width: 30px;
-                    line-height: 35px;
+                    line-height: 30px;
                     font-size: 30px;
                     border-radius: 50%;
                     text-align: center;
-                    fill: white;
-
-                    * {
-                        fill: white;
-                        color: white;
-                    }
                 }
                 
                 &:hover, &.active {

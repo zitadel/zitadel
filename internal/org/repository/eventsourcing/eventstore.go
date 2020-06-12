@@ -211,19 +211,19 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 	return nil, errors.ThrowNotFound(nil, "EVENT-SXji6", "member not found")
 }
 
-func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember) (*model.OrgMember, *es_models.Aggregate, error) {
+func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember, resourceOwner string) (*model.OrgMember, *es_models.Aggregate, error) {
 	if member == nil || !member.IsValid() {
 		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
 	}
 
 	repoMember := model.OrgMemberFromModel(member)
-	addAggregate, err := orgMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoMember)
+	addAggregate, err := orgMemberAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoMember, resourceOwner)
 
 	return repoMember, addAggregate, err
 }
 
 func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
-	repoMember, addAggregate, err := es.PrepareAddOrgMember(ctx, member)
+	repoMember, addAggregate, err := es.PrepareAddOrgMember(ctx, member, "")
 	if err != nil {
 		return nil, err
 	}

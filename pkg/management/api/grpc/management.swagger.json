@@ -129,7 +129,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrant"
+              "$ref": "#/definitions/v1GrantedProject"
             }
           }
         },
@@ -164,6 +164,112 @@
             }
           }
         },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/members": {
+      "post": {
+        "operationId": "AddMyOrgMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgMember"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddOrgMemberRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/members/_search": {
+      "post": {
+        "operationId": "SearchMyOrgMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgMemberSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgMemberSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/members/{user_id}": {
+      "delete": {
+        "operationId": "RemoveMyOrgMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ChangeMyOrgMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgMember"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangeOrgMemberRequest"
+            }
+          }
+        ],
         "tags": [
           "ManagementService"
         ]
@@ -294,12 +400,6 @@
             "type": "string"
           },
           {
-            "name": "sec_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -312,136 +412,6 @@
             "required": false,
             "type": "string",
             "format": "uint64"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{org_id}/members": {
-      "post": {
-        "operationId": "AddOrgMember",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1OrgMember"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1AddOrgMemberRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{org_id}/members/_search": {
-      "post": {
-        "operationId": "SearchOrgMembers",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1OrgMemberSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OrgMemberSearchRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{org_id}/members/{user_id}": {
-      "delete": {
-        "operationId": "RemoveOrgMember",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "operationId": "ChangeOrgMember",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1OrgMember"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ChangeOrgMemberRequest"
-            }
           }
         ],
         "tags": [
@@ -3361,9 +3331,6 @@
     "v1AddOrgMemberRequest": {
       "type": "object",
       "properties": {
-        "org_id": {
-          "type": "string"
-        },
         "user_id": {
           "type": "string"
         },
@@ -3652,9 +3619,6 @@
     "v1ChangeOrgMemberRequest": {
       "type": "object",
       "properties": {
-        "org_id": {
-          "type": "string"
-        },
         "user_id": {
           "type": "string"
         },
@@ -4179,9 +4143,6 @@
     "v1OrgMemberSearchRequest": {
       "type": "object",
       "properties": {
-        "org_id": {
-          "type": "string"
-        },
         "offset": {
           "type": "string",
           "format": "uint64"
@@ -4216,8 +4177,46 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1OrgMember"
+            "$ref": "#/definitions/v1OrgMemberView"
           }
+        }
+      }
+    },
+    "v1OrgMemberView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
         }
       }
     },

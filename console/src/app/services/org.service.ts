@@ -61,13 +61,12 @@ export class OrgService {
         );
     }
 
-    public async SearchOrgMembers(orgId: string, limit: number, offset: number): Promise<OrgMemberSearchResponse> {
+    public async SearchMyOrgMembers(limit: number, offset: number): Promise<OrgMemberSearchResponse> {
         const req = new OrgMemberSearchRequest();
-        req.setOrgId(orgId);
         req.setLimit(limit);
         req.setOffset(offset);
         return await this.request(
-            c => c.searchOrgMembers,
+            c => c.searchMyOrgMembers,
             req,
             f => f,
         );
@@ -83,26 +82,24 @@ export class OrgService {
         );
     }
 
-    public async AddOrgMember(orgId: string, userId: string, rolesList: string[]): Promise<Empty> {
+    public async AddMyOrgMember(userId: string, rolesList: string[]): Promise<Empty> {
         const req = new AddOrgMemberRequest();
-        req.setOrgId(orgId);
         req.setUserId(userId);
         if (rolesList) {
             req.setRolesList(rolesList);
         }
         return await this.request(
-            c => c.addOrgMember,
+            c => c.addMyOrgMember,
             req,
             f => f,
         );
     }
 
-    public async RemoveOrgMember(orgId: string, userId: string): Promise<Empty> {
+    public async RemoveMyOrgMember(userId: string): Promise<Empty> {
         const req = new RemoveOrgMemberRequest();
-        req.setOrgId(orgId);
         req.setUserId(userId);
         return await this.request(
-            c => c.removeOrgMember,
+            c => c.removeMyOrgMember,
             req,
             f => f,
         );

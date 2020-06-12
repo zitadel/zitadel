@@ -138,7 +138,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, pas
 		return err
 	}
 	if request.UserID != userID {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-ds35D", "user id does not match request id")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-ds35D", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.CheckPassword(ctx, userID, password, request.WithCurrentInfo(info))
 }
@@ -149,7 +149,7 @@ func (repo *AuthRequestRepo) VerifyMfaOTP(ctx context.Context, authRequestID, us
 		return err
 	}
 	if request.UserID != userID {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "user id does not match request id")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-ADJ26", "Errors.User.NotMatchingUserID")
 	}
 	return repo.UserEvents.CheckMfaOTP(ctx, userID, code, request.WithCurrentInfo(info))
 }
@@ -317,7 +317,8 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		case es_model.UserPasswordCheckSucceeded,
 			es_model.UserPasswordCheckFailed,
 			es_model.MfaOtpCheckSucceeded,
-			es_model.MfaOtpCheckFailed:
+			es_model.MfaOtpCheckFailed,
+			es_model.SignedOut:
 			eventData, err := view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).Debug("error getting event data")

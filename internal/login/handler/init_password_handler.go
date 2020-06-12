@@ -51,7 +51,7 @@ func (l *Login) handleInitPasswordCheck(w http.ResponseWriter, r *http.Request) 
 
 func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *initPasswordFormData, err error) {
 	if data.Password != data.PasswordConfirm {
-		err := errors.ThrowInvalidArgument(nil, "VIEW-KaGue", "passwords dont match")
+		err := errors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderInitPassword(w, r, authReq, data.UserID, data.Code, err)
 		return
 	}
@@ -68,14 +68,18 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *mod
 }
 
 func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	err := l.authRepo.RequestPasswordReset(r.Context(), authReq.UserName)
+	userOrg := login
+	if authReq != nil {
+		userOrg = authReq.UserOrgID
+	}
+	err := l.authRepo.RequestPasswordReset(setContext(r.Context(), userOrg), authReq.UserName)
 	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 
 func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID, code string, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID

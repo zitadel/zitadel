@@ -64,6 +64,14 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 	}, nil
 }
 
+func (repo *ProjectRepo) GetGrantedProjectGrantByIDs(ctx context.Context, projectID, grantID string) (project *proj_model.GrantedProjectView, err error) {
+	p, err := repo.View.GrantedProjectGrantByIDs(projectID, grantID)
+	if err != nil {
+		return nil, err
+	}
+	return model.GrantedProjectToModel(p), nil
+}
+
 func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
 	member = proj_model.NewProjectMember(projectID, userID)
 	return repo.ProjectEvents.ProjectMemberByIDs(ctx, member)

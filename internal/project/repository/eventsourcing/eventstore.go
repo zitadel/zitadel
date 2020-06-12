@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/errors"
@@ -20,6 +21,10 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+)
+
+const (
+	projectOwnerRole = "PROJECT_OWNER"
 )
 
 type ProjectEventstore struct {
@@ -77,8 +82,12 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	project.AggregateID = id
 	project.State = proj_model.PROJECTSTATE_ACTIVE
 	repoProject := model.ProjectFromModel(project)
+	member := &model.ProjectMember{
+		UserID: auth.GetCtxData(ctx).UserID,
+		Roles:  []string{projectOwnerRole},
+	}
 
-	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject)
+	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject, member)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err

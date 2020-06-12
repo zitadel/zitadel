@@ -1,6 +1,6 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -35,7 +35,7 @@ import { ToastService } from 'src/app/services/toast.service';
         ]),
     ],
 })
-export class ProjectListComponent implements OnInit {
+export class ProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
     public dataSource: MatTableDataSource<GrantedProject.AsObject> = new MatTableDataSource<GrantedProject.AsObject>();
     public projectList: GrantedProject.AsObject[] = [];
@@ -56,6 +56,10 @@ export class ProjectListComponent implements OnInit {
 
     public ngOnInit(): void {
         this.subscription = this.route.params.subscribe(() => this.getData(10, 0));
+    }
+
+    public ngOnDestroy(): void {
+        this.subscription?.unsubscribe();
     }
 
     public isAllSelected(): boolean {

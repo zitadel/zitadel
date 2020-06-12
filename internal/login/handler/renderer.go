@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
 	"net/http"
@@ -116,10 +117,10 @@ func CreateRenderer(staticDir http.FileSystem, cookieName string, defaultLanguag
 func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID)
 	if err != nil {
-		l.renderInternalError(w, r, authReq, errors.ThrowInternal(nil, "APP-sio0W", "could not get authreq"))
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-sio0W", "could not get authreq"))
 	}
 	if len(authReq.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authReq, errors.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
 		return
 	}
 	l.chooseNextStep(w, r, authReq, 0, nil)
@@ -127,7 +128,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 
 func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	if authReq == nil || len(authReq.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authReq, errors.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
 		return
 	}
 	l.chooseNextStep(w, r, authReq, 0, err)
@@ -164,7 +165,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *model.InitUserStep:
 		l.renderInitUser(w, r, authReq, "", "", nil)
 	default:
-		l.renderInternalError(w, r, authReq, errors.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
 }
 
@@ -189,6 +190,16 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		ThemeMode: l.getThemeMode(r),
 		AuthReqID: getRequestID(authReq, r),
 	}
+}
+
+func (l *Login) getErrorMessage(r *http.Request, err error) (errMsg string) {
+	caosErr := new(caos_errs.CaosError)
+	if errors.As(err, &caosErr) {
+		localized := l.renderer.LocalizeFromRequest(r, caosErr.Message, nil)
+		return localized + " (" + caosErr.ID + ")"
+
+	}
+	return err.Error()
 }
 
 func (l *Login) getTheme(r *http.Request) string {

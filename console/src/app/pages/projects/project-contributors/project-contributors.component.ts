@@ -6,8 +6,8 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { User } from 'src/app/proto/generated/auth_pb';
 import {
     GrantedProject,
-    ProjectMember,
     ProjectMemberSearchResponse,
+    ProjectMemberView,
     ProjectState,
     ProjectType,
 } from 'src/app/proto/generated/management_pb';
@@ -26,10 +26,13 @@ import {
 })
 export class ProjectContributorsComponent implements OnInit {
     @Input() public project!: GrantedProject.AsObject;
+    @Input() public projectType!: ProjectType;
+
     @Input() public disabled: boolean = false;
 
     public totalResult: number = 0;
-    public membersSubject: BehaviorSubject<ProjectMember.AsObject[]> = new BehaviorSubject<ProjectMember.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<ProjectMemberView.AsObject[]>
+        = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);
     public ProjectState: any = ProjectState;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -39,10 +42,11 @@ export class ProjectContributorsComponent implements OnInit {
         private router: Router) { }
 
     public ngOnInit(): void {
+        console.log('project grant members');
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
-            this.project.type === ProjectType.PROJECTTYPE_OWNED ?
+            this.projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(this.project.id, 100, 0) :
-                this.project.type === ProjectType.PROJECTTYPE_GRANTED ?
+                this.projectType === ProjectType.PROJECTTYPE_GRANTED ?
                     this.projectService.SearchProjectGrantMembers(this.project.id, this.project.grantId, 100, 0) : undefined;
         if (promise) {
             from(promise).pipe(
