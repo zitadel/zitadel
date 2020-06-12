@@ -400,6 +400,12 @@
             "type": "string"
           },
           {
+            "name": "sec_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
