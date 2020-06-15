@@ -30,6 +30,11 @@ import { ChangesModule } from '../../modules/changes/changes.module';
 import { ProjectRolesModule } from '../../modules/project-roles/project-roles.module';
 import { OrgMembersModule } from '../orgs/org-members/org-members.module';
 import { UserListModule } from '../user-list/user-list.module';
+import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
+import { GrantedProjectGridComponent } from './granted-project-grid/granted-project-grid.component';
+import { GrantedProjectListComponent } from './granted-project-list/granted-project-list.component';
+import { OwnedProjectGridComponent } from './owned-project-grid/owned-project-grid.component';
+import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
 import { ProjectApplicationGridComponent } from './project-application-grid/project-application-grid.component';
 import { ProjectApplicationsComponent } from './project-applications/project-applications.component';
 import { ProjectContributorsComponent } from './project-contributors/project-contributors.component';
@@ -39,23 +44,24 @@ import {
 } from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrantMembersComponent } from './project-grant-members/project-grant-members.component';
 import { ProjectGrantsComponent } from './project-grants/project-grants.component';
-import { ProjectGridComponent } from './project-grid/project-grid.component';
-import { ProjectListComponent } from './project-list/project-list.component';
 import { ProjectsRoutingModule } from './projects-routing.module';
-import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
+import { ProjectsComponent } from './projects.component';
 
 @NgModule({
     declarations: [
-        ProjectListComponent,
+        GrantedProjectListComponent,
+        GrantedProjectGridComponent,
+        OwnedProjectListComponent,
+        OwnedProjectGridComponent,
         ProjectDetailComponent,
         ProjectApplicationsComponent,
-        ProjectGridComponent,
         ProjectApplicationGridComponent,
         ProjectGrantsComponent,
         ProjectGrantMembersComponent,
         ProjectGrantMembersCreateDialogComponent,
         ProjectContributorsComponent,
         GrantedProjectDetailComponent,
+        ProjectsComponent,
     ],
     imports: [
         ProjectsRoutingModule,
@@ -99,7 +105,7 @@ import { GrantedProjectDetailComponent } from './granted-project-detail/granted-
     entryComponents: [
         ProjectGrantMembersCreateDialogComponent,
     ],
-    exports: [ProjectListComponent],
+    exports: [GrantedProjectListComponent, OwnedProjectListComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
 })
 export class ProjectsModule { }

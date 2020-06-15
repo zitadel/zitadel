@@ -9,7 +9,6 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     ApplicationSearchResponse,
-    GrantedProject,
     Project,
     ProjectMember,
     ProjectMemberSearchResponse,
@@ -30,7 +29,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class ProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: Project.AsObject | GrantedProject.AsObject;
+    public project!: Project.AsObject;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();

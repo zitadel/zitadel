@@ -27,6 +27,11 @@
     margin: 0 -1rem;
     box-sizing: border-box;
 
+    h2 {
+        padding: 0 1rem;
+        flex-basis: 100%;
+    }
+
     .item {
         position: relative;
         z-index: 100;

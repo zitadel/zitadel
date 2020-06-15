@@ -5,7 +5,7 @@ import { BehaviorSubject, from, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { User } from 'src/app/proto/generated/auth_pb';
 import {
-    GrantedProject,
+    ProjectGrantView,
     ProjectMemberSearchResponse,
     ProjectMemberView,
     ProjectState,
@@ -15,7 +15,6 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import {
-    CreationType,
     ProjectMemberCreateDialogComponent,
 } from '../../../modules/add-member-dialog/project-member-create-dialog.component';
 
@@ -25,7 +24,7 @@ import {
     styleUrls: ['./project-contributors.component.scss'],
 })
 export class ProjectContributorsComponent implements OnInit {
-    @Input() public project!: GrantedProject.AsObject;
+    @Input() public project!: ProjectGrantView.AsObject;
     @Input() public projectType!: ProjectType;
 
     @Input() public disabled: boolean = false;
@@ -47,7 +46,8 @@ export class ProjectContributorsComponent implements OnInit {
             this.projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(this.project.id, 100, 0) :
                 this.projectType === ProjectType.PROJECTTYPE_GRANTED ?
-                    this.projectService.SearchProjectGrantMembers(this.project.id, this.project.grantId, 100, 0) : undefined;
+                    this.projectService.SearchProjectGrantMembers(this.project.projectId,
+                        this.project.id, 100, 0) : undefined;
         if (promise) {
             from(promise).pipe(
                 map(resp => {
@@ -66,9 +66,9 @@ export class ProjectContributorsComponent implements OnInit {
     public openAddMember(): void {
         const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
             data: {
-                creationType: this.project.type ===
-                    ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-                    ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
+                // creationType: this.project.type ===
+                //     ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
+                //     ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
                 projectId: this.project.id,
             },
             width: '400px',
@@ -92,9 +92,9 @@ export class ProjectContributorsComponent implements OnInit {
         });
     }
 
-    public showDetail(): void {
-        if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.router.navigate(['projects', this.project.id, 'members']);
-        }
-    }
+    // public showDetail(): void {
+    //     if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
+    //         this.router.navigate(['projects', this.project.id, 'members']);
+    //     }
+    // }
 }

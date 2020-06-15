@@ -4,29 +4,15 @@
             <a [routerLink]="[ '/projects' ]" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.name}}</h1>
+            <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.projectName}}</h1>
 
             <div class="full-width">
                 <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
             </div>
         </div>
 
-        <!-- <ng-template appHasRole [appHasRole]="['project.app.read:' + project?.id, 'project.app.read']">
-            <app-project-application-grid *ngIf="grid" [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                (changeView)="grid = false" [projectId]="projectId"></app-project-application-grid>
-            <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
-                <card-actions class="card-actions">
-                    <button mat-icon-button (click)="grid = true">
-                        <i matTooltip="show grid view" class="las la-th-large"></i>
-                    </button>
-                </card-actions>
-                <app-project-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                    [projectId]="projectId"></app-project-applications>
-            </app-card>
-        </ng-template> -->
-
         <app-card>
-            <app-project-grant-members *ngIf="project && project.id && project.grantId"
+            <app-project-grant-members *ngIf="project && project.projectId && project.id"
                 [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" [project]="project">
             </app-project-grant-members>
         </app-card>

@@ -3,12 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { ProjectDetailComponent } from './project-detail/project-detail.component';
-import { ProjectListComponent } from './project-list/project-list.component';
+import { ProjectsComponent } from './projects.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: ProjectListComponent,
+        component: ProjectsComponent,
         data: { animation: 'HomePage' },
     },
     {

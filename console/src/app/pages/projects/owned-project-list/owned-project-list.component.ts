@@ -3,18 +3,18 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { GrantedProject, Project } from 'src/app/proto/generated/management_pb';
+import { ProjectView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-list',
-    templateUrl: './project-list.component.html',
-    styleUrls: ['./project-list.component.scss'],
+    selector: 'app-owned-project-list',
+    templateUrl: './owned-project-list.component.html',
+    styleUrls: ['./owned-project-list.component.scss'],
     animations: [
         trigger('list', [
             transition(':enter', [
@@ -35,15 +35,15 @@ import { ToastService } from 'src/app/services/toast.service';
         ]),
     ],
 })
-export class ProjectListComponent implements OnInit, OnDestroy {
+export class OwnedProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
-    public dataSource: MatTableDataSource<GrantedProject.AsObject> = new MatTableDataSource<GrantedProject.AsObject>();
+    public dataSource: MatTableDataSource<ProjectView.AsObject> =
+        new MatTableDataSource<ProjectView.AsObject>();
 
-    public ownedProjectList: Project.AsObject[] = [];
-    public grantedProjectList: GrantedProject.AsObject[] = [];
-
+    public ownedProjectList: ProjectView.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'type', 'state', 'creationDate', 'changeDate'];
-    public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
+    public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
+
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -52,13 +52,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router,
         public translate: TranslateService,
-        private route: ActivatedRoute,
         private projectService: ProjectService,
         private toast: ToastService,
     ) { }
 
     public ngOnInit(): void {
-        this.subscription = this.route.params.subscribe(() => this.getData(10, 0));
+        console.log('asdf');
+        this.getData(10, 0);
     }
 
     public ngOnDestroy(): void {
@@ -88,29 +88,17 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     private async getData(limit: number, offset: number): Promise<void> {
         console.log('getprojects');
         this.loadingSubject.next(true);
-        this.projectService.SearchGrantedProjects(limit, offset).then(res => {
-            this.grantedProjectList = res.toObject().resultList;
+        this.projectService.SearchProjects(limit, offset).then(res => {
+            this.ownedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
-            this.dataSource.data = this.grantedProjectList;
+            this.dataSource.data = this.ownedProjectList;
             this.loadingSubject.next(false);
-            console.log(this.grantedProjectList);
+            console.log(this.ownedProjectList);
         }).catch(error => {
             console.error(error);
             this.toast.showError(error.message);
             this.loadingSubject.next(false);
         });
-
-        // this.projectService.SearchProjectList(limit, offset).then(res => {
-        //     this.grantedProjectList = res.toObject().resultList;
-        //     this.totalResult = res.toObject().totalResult;
-        //     this.dataSource.data = this.projectList;
-        //     this.loadingSubject.next(false);
-        //     console.log(this.projectList);
-        // }).catch(error => {
-        //     console.error(error);
-        //     this.toast.showError(error.message);
-        //     this.loadingSubject.next(false);
-        // });
     }
 
     public dateFromTimestamp(date: Timestamp.AsObject): any {
@@ -120,7 +108,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
     public reactivateSelectedProjects(): void {
         const promises = this.selection.selected.map(project => {
-            this.projectService.ReactivateProject(project.id);
+            this.projectService.ReactivateProject(project.projectId);
         });
 
         Promise.all(promises).then(() => {
@@ -133,7 +121,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
     public deactivateSelectedProjects(): void {
         const promises = this.selection.selected.map(project => {
-            this.projectService.DeactivateProject(project.id);
+            this.projectService.DeactivateProject(project.projectId);
         });
 
         Promise.all(promises).then(() => {
