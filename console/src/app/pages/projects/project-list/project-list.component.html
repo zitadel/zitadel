@@ -2,8 +2,8 @@
     <h1>{{ 'PROJECT.PAGES.LIST' | translate }}</h1>
     <p class="sub">{{ 'PROJECT.PAGES.LISTDESCRIPTION' | translate }}</p>
 
-    <app-project-grid *ngIf="grid && projectList" [loading]="loading$ | async" (changedView)="grid = false"
-        [items]="projectList" (newClicked)="addProject()">
+    <app-project-grid *ngIf="grid && grantedProjectList" [loading]="loading$ | async" (changedView)="grid = false"
+        [items]="grantedProjectList" (newClicked)="addProject()">
     </app-project-grid>
 
     <div *ngIf="!grid" class="view-toggle">
@@ -11,7 +11,7 @@
             <i matTooltip="show grid view" class="las la-th-large"></i>
         </button>
     </div>
-    <div *ngIf="!grid && projectList">
+    <div *ngIf="!grid && grantedProjectList">
         <div class="table-header-row">
             <div class="col">
                 <ng-container *ngIf="!selection.hasValue()">

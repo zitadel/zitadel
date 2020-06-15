@@ -96,6 +96,7 @@ export class AuthUserService {
         req.setDisplayName(profile.displayName);
         req.setPreferredLanguage(profile.preferredLanguage);
         req.setGender(profile.gender);
+        console.log(req.toObject());
         return await this.request(
             c => c.updateMyUserProfile,
             req,

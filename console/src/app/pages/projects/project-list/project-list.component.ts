@@ -100,17 +100,17 @@ export class ProjectListComponent implements OnInit, OnDestroy {
             this.loadingSubject.next(false);
         });
 
-        this.projectService.SearchProjectList(limit, offset).then(res => {
-            this.grantedProjectList = res.toObject().resultList;
-            this.totalResult = res.toObject().totalResult;
-            this.dataSource.data = this.projectList;
-            this.loadingSubject.next(false);
-            console.log(this.projectList);
-        }).catch(error => {
-            console.error(error);
-            this.toast.showError(error.message);
-            this.loadingSubject.next(false);
-        });
+        // this.projectService.SearchProjectList(limit, offset).then(res => {
+        //     this.grantedProjectList = res.toObject().resultList;
+        //     this.totalResult = res.toObject().totalResult;
+        //     this.dataSource.data = this.projectList;
+        //     this.loadingSubject.next(false);
+        //     console.log(this.projectList);
+        // }).catch(error => {
+        //     console.error(error);
+        //     this.toast.showError(error.message);
+        //     this.loadingSubject.next(false);
+        // });
     }
 
     public dateFromTimestamp(date: Timestamp.AsObject): any {
