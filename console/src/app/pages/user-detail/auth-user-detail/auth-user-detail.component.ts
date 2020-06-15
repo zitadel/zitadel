@@ -171,6 +171,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             data: {
                 number: this.phone.phone,
             },
+            width: '400px',
         });
 
         dialogRef.afterClosed().subscribe(code => {

@@ -7,6 +7,7 @@ import {
     ChangeRequest,
     Changes,
     CreateUserRequest,
+    MultiFactors,
     NotificationType,
     PasswordRequest,
     ProjectGrantMemberSearchQuery,
@@ -87,6 +88,16 @@ export class MgmtUserService {
         req.setId(id);
         return await this.request(
             c => c.getUserProfile,
+            req,
+            f => f,
+        );
+    }
+
+    public async getUserMfas(id: string): Promise<MultiFactors> {
+        const req = new UserID();
+        req.setId(id);
+        return await this.request(
+            c => c.getUserMfas,
             req,
             f => f,
         );
