@@ -138,8 +138,8 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_
 	return model.OrgToModel(org), nil
 }
 
-func (es *OrgEventstore) OrgChanges(ctx context.Context, aggregateType es_models.AggregateType, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
-	query := ChangesQuery(id, lastSequence, aggregateType)
+func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
+	query := ChangesQuery(id, lastSequence)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -184,9 +184,9 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, aggregateType es_models
 	return changes, nil
 }
 
-func ChangesQuery(orgID string, latestSequence uint64, aggregateType es_models.AggregateType) *es_models.SearchQuery {
+func ChangesQuery(orgID string, latestSequence uint64) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
-		AggregateTypeFilter(aggregateType).
+		AggregateTypeFilter(model.OrgAggregate).
 		LatestSequenceFilter(latestSequence).
 		AggregateIDFilter(orgID)
 	return query

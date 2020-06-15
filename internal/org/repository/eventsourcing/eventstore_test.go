@@ -14,7 +14,6 @@ import (
 	es_mock "github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	repo_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
 )
 
@@ -1033,11 +1032,10 @@ func orgInactiveEvent() *es_models.Event {
 func TestChangesOrg(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es            *OrgEventstore
-		aggregateType es_models.AggregateType
-		id            string
-		lastSequence  uint64
-		limit         uint64
+		es           *OrgEventstore
+		id           string
+		lastSequence uint64
+		limit        uint64
 	}
 	type res struct {
 		changes *org_model.OrgChanges
@@ -1053,11 +1051,10 @@ func TestChangesOrg(t *testing.T) {
 		{
 			name: "changes from events, ok",
 			args: args{
-				es:            GetMockChangesOrgOK(ctrl),
-				aggregateType: repo_model.OrgAggregate,
-				id:            "1",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesOrgOK(ctrl),
+				id:           "1",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				changes: &org_model.OrgChanges{Changes: []*org_model.OrgChange{&org_model.OrgChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
@@ -1067,11 +1064,10 @@ func TestChangesOrg(t *testing.T) {
 		{
 			name: "changes from events, no events",
 			args: args{
-				es:            GetMockChangesOrgNoEvents(ctrl),
-				aggregateType: repo_model.OrgAggregate,
-				id:            "2",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesOrgNoEvents(ctrl),
+				id:           "2",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				wantErr: true,
@@ -1081,7 +1077,7 @@ func TestChangesOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.OrgChanges(nil, tt.args.aggregateType, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.OrgChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
 
 			org := &model.Org{}
 			if result != nil && len(result.Changes) > 0 {

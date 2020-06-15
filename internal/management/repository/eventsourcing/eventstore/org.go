@@ -2,15 +2,15 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/model"
-	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	org_types "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
 )
 
@@ -19,7 +19,6 @@ type OrgRepository struct {
 	*org_es.OrgEventstore
 	View  *mgmt_view.View
 	Roles []string
-	//	ChangesEvents *chg_event.ChangesEventstore
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
@@ -48,7 +47,7 @@ func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_m
 }
 
 func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
-	changes, err := repo.OrgEventstore.OrgChanges(ctx, org_types.OrgAggregate, id, lastSequence, limit)
+	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit)
 	if err != nil {
 		return nil, err
 	}

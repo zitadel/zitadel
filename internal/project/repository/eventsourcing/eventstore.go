@@ -324,8 +324,8 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	return nil
 }
 
-func (es *ProjectEventstore) ProjectChanges(ctx context.Context, aggregateType es_models.AggregateType, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
-	query := ChangesQuery(id, lastSequence, aggregateType)
+func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
+	query := ChangesQuery(id, lastSequence)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -380,9 +380,9 @@ func (es *ProjectEventstore) ProjectChanges(ctx context.Context, aggregateType e
 	return changes, nil
 }
 
-func ChangesQuery(projID string, latestSequence uint64, aggregateType es_models.AggregateType) *es_models.SearchQuery {
+func ChangesQuery(projID string, latestSequence uint64) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
-		AggregateTypeFilter(aggregateType).
+		AggregateTypeFilter(model.ProjectAggregate).
 		LatestSequenceFilter(latestSequence).
 		AggregateIDFilter(projID)
 	return query
@@ -497,8 +497,8 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	return nil
 }
 
-func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, aggregateType es_models.AggregateType, id string, secId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
-	query := ChangesQuery(id, lastSequence, aggregateType)
+func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
+	query := ChangesQuery(id, lastSequence)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -521,11 +521,15 @@ func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, aggregateTy
 			Sequence:   u.Sequence,
 		}
 		appendChanges := true
+		// if change.EventType == "project.application.added" ||
+		// 	change.EventType == "project.application.changed" ||
+		// 	change.EventType == "project.application.config.oidc.added" ||
+		// 	change.EventType == "project.application.config.oidc.changed" {
 
-		if change.EventType == "project.application.added" ||
-			change.EventType == "project.application.changed" ||
-			change.EventType == "project.application.config.oidc.added" ||
-			change.EventType == "project.application.config.oidc.changed" {
+		if change.EventType == model.ApplicationAdded.String() ||
+			change.EventType == model.ApplicationChanged.String() ||
+			change.EventType == model.OIDCConfigAdded.String() ||
+			change.EventType == model.OIDCConfigChanged.String() {
 			appDummy := model.Application{}
 			if u.Data != nil {
 				if err := json.Unmarshal(u.Data, &appDummy); err != nil {

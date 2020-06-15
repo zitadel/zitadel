@@ -12,7 +12,6 @@ import (
 
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
-	proj_types "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 type ProjectRepo struct {
@@ -132,7 +131,7 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_m
 }
 
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
-	changes, err := repo.ProjectEvents.ProjectChanges(ctx, proj_types.ProjectAggregate, id, lastSequence, limit)
+	changes, err := repo.ProjectEvents.ProjectChanges(ctx, id, lastSequence, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +178,7 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 }
 
 func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
-	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, proj_types.ProjectAggregate, id, appId, lastSequence, limit)
+	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit)
 	if err != nil {
 		return nil, err
 	}

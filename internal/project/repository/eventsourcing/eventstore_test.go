@@ -10,7 +10,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
-	repo_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
 )
 
@@ -2701,11 +2700,10 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 func TestChangesProject(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es            *ProjectEventstore
-		aggregateType es_models.AggregateType
-		id            string
-		lastSequence  uint64
-		limit         uint64
+		es           *ProjectEventstore
+		id           string
+		lastSequence uint64
+		limit        uint64
 	}
 	type res struct {
 		changes *model.ProjectChanges
@@ -2721,11 +2719,10 @@ func TestChangesProject(t *testing.T) {
 		{
 			name: "changes from events, ok",
 			args: args{
-				es:            GetMockChangesProjectOK(ctrl),
-				aggregateType: repo_model.ProjectAggregate,
-				id:            "1",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesProjectOK(ctrl),
+				id:           "1",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				changes: &model.ProjectChanges{Changes: []*model.ProjectChange{&model.ProjectChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
@@ -2735,11 +2732,10 @@ func TestChangesProject(t *testing.T) {
 		{
 			name: "changes from events, no events",
 			args: args{
-				es:            GetMockChangesProjectNoEvents(ctrl),
-				aggregateType: repo_model.ProjectAggregate,
-				id:            "2",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesProjectNoEvents(ctrl),
+				id:           "2",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				wantErr: true,
@@ -2749,7 +2745,7 @@ func TestChangesProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProjectChanges(nil, tt.args.aggregateType, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.ProjectChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
 
 			project := &model.Project{}
 			if result != nil && len(result.Changes) > 0 {
@@ -2771,12 +2767,11 @@ func TestChangesProject(t *testing.T) {
 func TestChangesApplication(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es            *ProjectEventstore
-		aggregateType es_models.AggregateType
-		id            string
-		secId         string
-		lastSequence  uint64
-		limit         uint64
+		es           *ProjectEventstore
+		id           string
+		secId        string
+		lastSequence uint64
+		limit        uint64
 	}
 	type res struct {
 		changes *model.ApplicationChanges
@@ -2792,12 +2787,11 @@ func TestChangesApplication(t *testing.T) {
 		{
 			name: "changes from events, ok",
 			args: args{
-				es:            GetMockChangesApplicationOK(ctrl),
-				aggregateType: repo_model.ProjectAggregate,
-				id:            "1",
-				secId:         "AppId",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesApplicationOK(ctrl),
+				id:           "1",
+				secId:        "AppId",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				changes: &model.ApplicationChanges{Changes: []*model.ApplicationChange{&model.ApplicationChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
@@ -2807,12 +2801,11 @@ func TestChangesApplication(t *testing.T) {
 		{
 			name: "changes from events, no events",
 			args: args{
-				es:            GetMockChangesApplicationNoEvents(ctrl),
-				aggregateType: repo_model.ProjectAggregate,
-				id:            "2",
-				secId:         "2",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesApplicationNoEvents(ctrl),
+				id:           "2",
+				secId:        "2",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				wantErr: true,
@@ -2822,7 +2815,7 @@ func TestChangesApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ApplicationChanges(nil, tt.args.aggregateType, tt.args.id, tt.args.secId, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.ApplicationChanges(nil, tt.args.id, tt.args.secId, tt.args.lastSequence, tt.args.limit)
 
 			app := &model.Application{}
 			if result != nil && len(result.Changes) > 0 {
