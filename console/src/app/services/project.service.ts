@@ -73,6 +73,21 @@ export class ProjectService {
         return responseMapper(response);
     }
 
+    public async SearchProjects(
+        limit: number, offset: number, queryList?: GrantedProjectSearchQuery[]): Promise<GrantedProjectSearchResponse> {
+        const req = new GrantedProjectSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchPro,
+            req,
+            f => f,
+        );
+    }
+
     public async SearchGrantedProjects(
         limit: number, offset: number, queryList?: GrantedProjectSearchQuery[]): Promise<GrantedProjectSearchResponse> {
         const req = new GrantedProjectSearchRequest();

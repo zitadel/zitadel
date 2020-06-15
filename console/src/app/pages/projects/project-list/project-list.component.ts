@@ -38,7 +38,10 @@ import { ToastService } from 'src/app/services/toast.service';
 export class ProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
     public dataSource: MatTableDataSource<GrantedProject.AsObject> = new MatTableDataSource<GrantedProject.AsObject>();
-    public projectList: GrantedProject.AsObject[] = [];
+
+    public ownedProjectList: Project.AsObject[] = [];
+    public grantedProjectList: GrantedProject.AsObject[] = [];
+
     public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'type', 'state', 'creationDate', 'changeDate'];
     public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -86,7 +89,19 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         console.log('getprojects');
         this.loadingSubject.next(true);
         this.projectService.SearchGrantedProjects(limit, offset).then(res => {
-            this.projectList = res.toObject().resultList;
+            this.grantedProjectList = res.toObject().resultList;
+            this.totalResult = res.toObject().totalResult;
+            this.dataSource.data = this.grantedProjectList;
+            this.loadingSubject.next(false);
+            console.log(this.grantedProjectList);
+        }).catch(error => {
+            console.error(error);
+            this.toast.showError(error.message);
+            this.loadingSubject.next(false);
+        });
+
+        this.projectService.SearchProjectList(limit, offset).then(res => {
+            this.grantedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
             this.dataSource.data = this.projectList;
             this.loadingSubject.next(false);
