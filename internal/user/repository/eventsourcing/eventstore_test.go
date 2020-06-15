@@ -3217,12 +3217,11 @@ func TestRemoveOTP(t *testing.T) {
 func TestChangesUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es            *UserEventstore
-		aggregateType es_models.AggregateType
-		id            string
-		secId         string
-		lastSequence  uint64
-		limit         uint64
+		es           *UserEventstore
+		id           string
+		secId        string
+		lastSequence uint64
+		limit        uint64
 	}
 	type res struct {
 		changes *model.UserChanges
@@ -3238,11 +3237,10 @@ func TestChangesUser(t *testing.T) {
 		{
 			name: "changes from events, ok",
 			args: args{
-				es:            GetMockChangesUserOK(ctrl),
-				aggregateType: repo_model.UserAggregate,
-				id:            "1",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesUserOK(ctrl),
+				id:           "1",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				changes: &model.UserChanges{Changes: []*model.UserChange{&model.UserChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
@@ -3252,11 +3250,10 @@ func TestChangesUser(t *testing.T) {
 		{
 			name: "changes from events, no events",
 			args: args{
-				es:            GetMockChangesUserNoEvents(ctrl),
-				aggregateType: repo_model.UserAggregate,
-				id:            "2",
-				lastSequence:  0,
-				limit:         0,
+				es:           GetMockChangesUserNoEvents(ctrl),
+				id:           "2",
+				lastSequence: 0,
+				limit:        0,
 			},
 			res: res{
 				wantErr: true,
@@ -3266,7 +3263,7 @@ func TestChangesUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.UserChanges(nil, tt.args.aggregateType, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.UserChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
 
 			user := &model.Profile{}
 			if result != nil && len(result.Changes) > 0 {

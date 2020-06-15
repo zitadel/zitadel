@@ -8,7 +8,6 @@ import (
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	usr_types "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -74,7 +73,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*usr_model.UserChanges, error) {
-	changes, err := repo.UserEvents.UserChanges(ctx, usr_types.UserAggregate, id, lastSequence, limit)
+	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit)
 	if err != nil {
 		return nil, err
 	}
