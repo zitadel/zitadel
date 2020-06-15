@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -10,24 +10,6 @@ import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
-
-function lowercaseValidator(c: FormControl) {
-    const regex = /[a-z]/g;
-    if (regex.test(c.value)) {
-        return null;
-    } else {
-        return { lowercase: true };
-    }
-}
-
-function uppercaseValidator(c: FormControl) {
-    const regex = /[A-Z]/g;
-    if (regex.test(c.value)) {
-        return null;
-    } else {
-        return { lowercase: true };
-    }
-}
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
