@@ -19,44 +19,6 @@
     "application/grpc"
   ],
   "paths": {
-    "/applications/{id}/changes": {
-      "get": {
-        "operationId": "ApplicationChanges",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Changes"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "uint64"
-          },
-          {
-            "name": "sequence_offset",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "uint64"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/authgrants/_search": {
       "post": {
         "summary": "Grant",
@@ -434,6 +396,12 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sec_id",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -1159,6 +1127,50 @@
         ]
       }
     },
+    "/projects/{id}/applications/{sec_id}/changes": {
+      "get": {
+        "operationId": "ApplicationChanges",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Changes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sec_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "sequence_offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/projects/{id}/changes": {
       "get": {
         "operationId": "ProjectChanges",
@@ -1175,6 +1187,12 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sec_id",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -2832,6 +2850,12 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sec_id",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {

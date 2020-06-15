@@ -1,8 +1,10 @@
 package model
 
 import (
-	policy_model "github.com/caos/zitadel/internal/policy/model"
 	"time"
+
+	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"github.com/golang/protobuf/ptypes/timestamp"
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -22,6 +24,18 @@ type User struct {
 	PhoneCode    *PhoneCode
 	PasswordCode *PasswordCode
 	OTP          *OTP
+}
+type UserChanges struct {
+	Changes      []*UserChange
+	LastSequence uint64
+}
+
+type UserChange struct {
+	ChangeDate *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType  string               `json:"eventType,omitempty"`
+	Sequence   uint64               `json:"sequence,omitempty"`
+	Modifier   string               `json:"modifierUser,omitempty"`
+	Data       interface{}          `json:"data,omitempty"`
 }
 
 type InitUserCode struct {

@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type Org struct {
@@ -12,6 +13,18 @@ type Org struct {
 	Domain string
 
 	Members []*OrgMember
+}
+type OrgChanges struct {
+	Changes      []*OrgChange
+	LastSequence uint64
+}
+
+type OrgChange struct {
+	ChangeDate *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType  string               `json:"eventType,omitempty"`
+	Sequence   uint64               `json:"sequence,omitempty"`
+	Modifier   string               `json:"modifierUser,omitempty"`
+	Data       interface{}          `json:"data,omitempty"`
 }
 
 type OrgState int32

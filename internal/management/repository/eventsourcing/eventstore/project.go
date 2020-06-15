@@ -2,9 +2,10 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	global_model "github.com/caos/zitadel/internal/model"
-	"strings"
 
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -129,6 +130,14 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_m
 	}, nil
 }
 
+func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
+	changes, err := repo.ProjectEvents.ProjectChanges(ctx, id, lastSequence, limit)
+	if err != nil {
+		return nil, err
+	}
+	return changes, nil
+}
+
 func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (app *proj_model.Application, err error) {
 	return repo.ProjectEvents.ApplicationByIDs(ctx, projectID, appID)
 }
@@ -166,6 +175,14 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 		TotalResult: uint64(count),
 		Result:      model.ApplicationViewsToModel(apps),
 	}, nil
+}
+
+func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
+	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit)
+	if err != nil {
+		return nil, err
+	}
+	return changes, nil
 }
 
 func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {

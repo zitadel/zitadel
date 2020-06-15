@@ -2,8 +2,14 @@ package eventsourcing
 
 import (
 	"context"
+	"encoding/json"
+	"log"
+
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/pquerna/otp/totp"
 
@@ -262,6 +268,60 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	}
 	es.userCache.cacheUser(repoExisting)
 	return model.UserToModel(repoExisting), nil
+}
+
+func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*usr_model.UserChanges, error) {
+	query := ChangesQuery(id, lastSequence)
+
+	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-g9HCv").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "unable to get current user")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6cAxe", "no objects found")
+	}
+
+	result := make([]*usr_model.UserChange, 0)
+
+	for _, u := range events {
+		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+		logging.Log("EVENT-8GTGS").OnError(err).Debug("unable to parse timestamp")
+		change := &usr_model.UserChange{
+			ChangeDate: creationDate,
+			EventType:  u.Type.String(),
+			Modifier:   u.EditorUser,
+			Sequence:   u.Sequence,
+		}
+
+		userDummy := model.Profile{}
+		if u.Data != nil {
+			if err := json.Unmarshal(u.Data, &userDummy); err != nil {
+				log.Println("Error getting data!", err.Error())
+			}
+		}
+		change.Data = userDummy
+
+		result = append(result, change)
+		if lastSequence < u.Sequence {
+			lastSequence = u.Sequence
+		}
+	}
+
+	changes := &usr_model.UserChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}
+
+	return changes, nil
+}
+
+func ChangesQuery(userID string, latestSequence uint64) *es_models.SearchQuery {
+	query := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserAggregate).
+		LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(userID)
+	return query
 }
 
 func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
