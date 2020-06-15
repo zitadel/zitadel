@@ -65,8 +65,8 @@ func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, erro
 	return projectFromModel(project), nil
 }
 
-func (s *Server) SearchGrantedProjects(ctx context.Context, in *ProjectGrantSearchRequest) (*ProjectGrantSearchResponse, error) {
-	request := projectGrantSearchRequestsToModel(in)
+func (s *Server) SearchGrantedProjects(ctx context.Context, in *GrantedProjectSearchRequest) (*ProjectGrantSearchResponse, error) {
+	request := grantedProjectSearchRequestsToModel(in)
 	request.AppendMyOrgQuery(grpc_util.GetHeader(ctx, api.ZitadelOrgID))
 	response, err := s.project.SearchProjectGrants(ctx, request)
 	if err != nil {

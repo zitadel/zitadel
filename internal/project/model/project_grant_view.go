@@ -11,7 +11,6 @@ type ProjectGrantView struct {
 	CreationDate    time.Time
 	ChangeDate      time.Time
 	State           ProjectState
-	Type            ProjectType
 	ResourceOwner   string
 	OrgID           string
 	OrgName         string
@@ -20,13 +19,6 @@ type ProjectGrantView struct {
 	GrantID         string
 	GrantedRoleKeys []string
 }
-
-type ProjectType int32
-
-const (
-	PROJECTTYPE_OWNED ProjectType = iota
-	PROJECTTYPE_GRANTED
-)
 
 type ProjectGrantViewSearchRequest struct {
 	Offset        uint64

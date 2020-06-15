@@ -641,9 +641,9 @@ service ManagementService {
     }
 
     //GRANTED_PROJECT_GRANTS
-    rpc SearchGrantedProjects(ProjectGrantSearchRequest) returns (ProjectGrantSearchResponse) {
+    rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (ProjectGrantSearchResponse) {
         option (google.api.http) = {
-            post: "/grantedprojects/{project_id}/grants/_search"
+            post: "/grantedprojects/_search"
             body: "*"
         };
 
@@ -2105,6 +2105,12 @@ message ProjectGrantSearchRequest {
     string project_id = 1;
     uint64 offset = 2;
     uint64 limit = 3;
+}
+
+message GrantedProjectSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated ProjectSearchQuery queries = 3;
 }
 
 message ProjectGrantMemberRoles {

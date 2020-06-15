@@ -132,7 +132,7 @@
         ]
       }
     },
-    "/grantedprojects/{project_id}/grants/_search": {
+    "/grantedprojects/_search": {
       "post": {
         "summary": "GRANTED_PROJECT_GRANTS",
         "operationId": "SearchGrantedProjects",
@@ -146,17 +146,11 @@
         },
         "parameters": [
           {
-            "name": "project_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrantSearchRequest"
+              "$ref": "#/definitions/v1GrantedProjectSearchRequest"
             }
           }
         ],
@@ -3796,6 +3790,25 @@
         "GENDER_DIVERSE"
       ],
       "default": "GENDER_UNSPECIFIED"
+    },
+    "v1GrantedProjectSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectSearchQuery"
+          }
+        }
+      }
     },
     "v1MFAState": {
       "type": "string",

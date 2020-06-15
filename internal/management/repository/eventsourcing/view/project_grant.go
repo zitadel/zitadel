@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	grantedProjectTable = "management.granted_projects"
+	grantedProjectTable = "management.project_grants"
 )
 
 func (v *View) ProjectGrantByID(grantID string) (*model.ProjectGrantView, error) {

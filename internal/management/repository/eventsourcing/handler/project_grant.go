@@ -25,7 +25,7 @@ type ProjectGrant struct {
 }
 
 const (
-	grantedProjectTable = "management.granted_projects"
+	grantedProjectTable = "management.project_grants"
 )
 
 func (p *ProjectGrant) MinimumCycleDuration() time.Duration { return p.cycleDuration }

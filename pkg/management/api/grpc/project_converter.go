@@ -101,17 +101,6 @@ func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 	}
 }
 
-func projectTypeFromModel(projecttype proj_model.ProjectType) ProjectType {
-	switch projecttype {
-	case proj_model.PROJECTTYPE_OWNED:
-		return ProjectType_PROJECTTYPE_OWNED
-	case proj_model.PROJECTTYPE_GRANTED:
-		return ProjectType_PROJECTTYPE_GRANTED
-	default:
-		return ProjectType_PROJECTTYPE_UNSPECIFIED
-	}
-}
-
 func projectUpdateToModel(project *ProjectUpdateRequest) *proj_model.Project {
 	return &proj_model.Project{
 		ObjectRoot: models.ObjectRoot{
@@ -167,6 +156,13 @@ func projectSearchRequestsToModel(project *ProjectSearchRequest) *proj_model.Pro
 		Queries: projectSearchQueriesToModel(project.Queries),
 	}
 }
+func grantedProjectSearchRequestsToModel(request *GrantedProjectSearchRequest) *proj_model.ProjectGrantViewSearchRequest {
+	return &proj_model.ProjectGrantViewSearchRequest{
+		Offset:  request.Offset,
+		Limit:   request.Limit,
+		Queries: grantedPRojectSearchQueriesToModel(request.Queries),
+	}
+}
 
 func projectSearchQueriesToModel(queries []*ProjectSearchQuery) []*proj_model.ProjectViewSearchQuery {
 	converted := make([]*proj_model.ProjectViewSearchQuery, len(queries))
@@ -190,6 +186,31 @@ func projectSearchKeyToModel(key ProjectSearchKey) proj_model.ProjectViewSearchK
 		return proj_model.PROJECTSEARCHKEY_NAME
 	default:
 		return proj_model.PROJECTSEARCHKEY_UNSPECIFIED
+	}
+}
+
+func grantedPRojectSearchQueriesToModel(queries []*ProjectSearchQuery) []*proj_model.ProjectGrantViewSearchQuery {
+	converted := make([]*proj_model.ProjectGrantViewSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = grantedProjectSearchQueryToModel(q)
+	}
+	return converted
+}
+
+func grantedProjectSearchQueryToModel(query *ProjectSearchQuery) *proj_model.ProjectGrantViewSearchQuery {
+	return &proj_model.ProjectGrantViewSearchQuery{
+		Key:    projectGrantSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func projectGrantSearchKeyToModel(key ProjectSearchKey) proj_model.ProjectGrantViewSearchKey {
+	switch key {
+	case ProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
+		return proj_model.GRANTEDPROJECTSEARCHKEY_NAME
+	default:
+		return proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED
 	}
 }
 
