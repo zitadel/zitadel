@@ -5,9 +5,9 @@ import { BehaviorSubject, from, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { User } from 'src/app/proto/generated/auth_pb';
 import {
-    Project,
-    ProjectMember,
+    GrantedProject,
     ProjectMemberSearchResponse,
+    ProjectMemberView,
     ProjectState,
     ProjectType,
 } from 'src/app/proto/generated/management_pb';
@@ -25,11 +25,14 @@ import {
     styleUrls: ['./project-contributors.component.scss'],
 })
 export class ProjectContributorsComponent implements OnInit {
-    @Input() public project!: Project.AsObject;
+    @Input() public project!: GrantedProject.AsObject;
+    @Input() public projectType!: ProjectType;
+
     @Input() public disabled: boolean = false;
 
     public totalResult: number = 0;
-    public membersSubject: BehaviorSubject<ProjectMember.AsObject[]> = new BehaviorSubject<ProjectMember.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<ProjectMemberView.AsObject[]>
+        = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);
     public ProjectState: any = ProjectState;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -39,10 +42,11 @@ export class ProjectContributorsComponent implements OnInit {
         private router: Router) { }
 
     public ngOnInit(): void {
+        console.log('project grant members');
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
-            this.project.type === ProjectType.PROJECTTYPE_SELF ?
+            this.projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(this.project.id, 100, 0) :
-                this.project.type === ProjectType.PROJECTTYPE_GRANTED ?
+                this.projectType === ProjectType.PROJECTTYPE_GRANTED ?
                     this.projectService.SearchProjectGrantMembers(this.project.id, this.project.grantId, 100, 0) : undefined;
         if (promise) {
             from(promise).pipe(
@@ -64,7 +68,7 @@ export class ProjectContributorsComponent implements OnInit {
             data: {
                 creationType: this.project.type ===
                     ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-                    ProjectType.PROJECTTYPE_SELF ? CreationType.PROJECT_OWNED : undefined,
+                    ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
                 projectId: this.project.id,
             },
             width: '400px',

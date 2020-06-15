@@ -2,7 +2,6 @@
     display: block;
     margin-bottom: 1rem;
     font-weight: 400;
-    color: #81868a;
     margin-top: 1rem;
 }
 
@@ -36,5 +35,10 @@
         padding: .5rem;
         display: flex;
         justify-content: center;
+    }
+
+    .err-container {
+        font-size: 14px;
+        color: rgb(201,51,71);
     }
 }

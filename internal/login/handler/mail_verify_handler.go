@@ -70,7 +70,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *m
 func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	if userID == "" {
 		userID = authReq.UserID

@@ -32,8 +32,8 @@ export class PolicyGridComponent implements OnInit {
     }
 
     private getData(): void {
-        this.orgService.GetPasswordLockoutPolicy().then(data => this.lockoutPolicy = data.toObject()).catch(error => { });
-        this.orgService.GetPasswordAgePolicy().then(data => this.agePolicy = data.toObject()).catch(error => { });
+        // this.orgService.GetPasswordLockoutPolicy().then(data => this.lockoutPolicy = data.toObject()).catch(error => { });
+        // this.orgService.GetPasswordAgePolicy().then(data => this.agePolicy = data.toObject()).catch(error => { });
         this.orgService.GetPasswordComplexityPolicy().then(data => this.complexityPolicy = data.toObject())
             .catch(error => { });
     }

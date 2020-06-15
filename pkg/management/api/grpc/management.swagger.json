@@ -101,47 +101,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "org_id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "creation_date",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "change_date",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "verified",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "primary",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "sequence",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "uint64"
           }
         ],
         "tags": [
@@ -175,13 +134,13 @@
     },
     "/grantedprojects/_search": {
       "post": {
-        "summary": "PROJECTS",
+        "summary": "GRANTED_PROJECT_GRANTS",
         "operationId": "SearchGrantedProjects",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GrantedProjectSearchResponse"
+              "$ref": "#/definitions/v1ProjectGrantSearchResponse"
             }
           }
         },
@@ -202,13 +161,12 @@
     },
     "/grantedprojects/{project_id}/grants/{id}": {
       "get": {
-        "summary": "GRANTED_PROJECT_GRANTS",
-        "operationId": "GetGrantedProjectGrantByID",
+        "operationId": "GetGrantedProjectByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrant"
+              "$ref": "#/definitions/v1ProjectGrantView"
             }
           }
         },
@@ -248,14 +206,14 @@
         ]
       }
     },
-    "/orgs/me/domains": {
+    "/orgs/me/members": {
       "post": {
-        "operationId": "AddMyOrgDomain",
+        "operationId": "AddMyOrgMember",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1OrgDomain"
+              "$ref": "#/definitions/v1OrgMember"
             }
           }
         },
@@ -265,7 +223,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1AddOrgDomainRequest"
+              "$ref": "#/definitions/v1AddOrgMemberRequest"
             }
           }
         ],
@@ -274,14 +232,14 @@
         ]
       }
     },
-    "/orgs/me/domains/_search": {
+    "/orgs/me/members/_search": {
       "post": {
-        "operationId": "SearchMyOrgDomains",
+        "operationId": "SearchMyOrgMembers",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1OrgDomainSearchResponse"
+              "$ref": "#/definitions/v1OrgMemberSearchResponse"
             }
           }
         },
@@ -291,7 +249,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1OrgDomainSearchRequest"
+              "$ref": "#/definitions/v1OrgMemberSearchRequest"
             }
           }
         ],
@@ -300,9 +258,9 @@
         ]
       }
     },
-    "/orgs/me/domains/{domain}": {
+    "/orgs/me/members/{user_id}": {
       "delete": {
-        "operationId": "RemoveMyOrgDomain",
+        "operationId": "RemoveMyOrgMember",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -313,10 +271,40 @@
         },
         "parameters": [
           {
-            "name": "domain",
+            "name": "user_id",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "ChangeMyOrgMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgMember"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangeOrgMemberRequest"
+            }
           }
         ],
         "tags": [
@@ -461,136 +449,6 @@
             "required": false,
             "type": "string",
             "format": "uint64"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{org_id}/members": {
-      "post": {
-        "operationId": "AddOrgMember",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1OrgMember"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1AddOrgMemberRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{org_id}/members/_search": {
-      "post": {
-        "operationId": "SearchOrgMembers",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1OrgMemberSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OrgMemberSearchRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{org_id}/members/{user_id}": {
-      "delete": {
-        "operationId": "RemoveOrgMember",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "operationId": "ChangeOrgMember",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1OrgMember"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1ChangeOrgMemberRequest"
-            }
           }
         ],
         "tags": [
@@ -1114,6 +972,33 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1ProjectCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/projects/_search": {
+      "post": {
+        "summary": "PROJECTS",
+        "operationId": "SearchProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProjectSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectSearchRequest"
             }
           }
         ],
@@ -3509,20 +3394,9 @@
       },
       "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
     },
-    "v1AddOrgDomainRequest": {
-      "type": "object",
-      "properties": {
-        "domain": {
-          "type": "string"
-        }
-      }
-    },
     "v1AddOrgMemberRequest": {
       "type": "object",
       "properties": {
-        "org_id": {
-          "type": "string"
-        },
         "user_id": {
           "type": "string"
         },
@@ -3811,9 +3685,6 @@
     "v1ChangeOrgMemberRequest": {
       "type": "object",
       "properties": {
-        "org_id": {
-          "type": "string"
-        },
         "user_id": {
           "type": "string"
         },
@@ -3920,72 +3791,6 @@
       ],
       "default": "GENDER_UNSPECIFIED"
     },
-    "v1GrantedProject": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "state": {
-          "$ref": "#/definitions/v1ProjectState"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "type": {
-          "$ref": "#/definitions/v1ProjectType"
-        },
-        "resource_owner": {
-          "type": "string"
-        },
-        "org_id": {
-          "type": "string"
-        },
-        "org_name": {
-          "type": "string"
-        },
-        "org_domain": {
-          "type": "string"
-        },
-        "grant_id": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1GrantedProjectSearchKey": {
-      "type": "string",
-      "enum": [
-        "PROJECTSEARCHKEY_UNSPECIFIED",
-        "PROJECTSEARCHKEY_PROJECT_NAME"
-      ],
-      "default": "PROJECTSEARCHKEY_UNSPECIFIED"
-    },
-    "v1GrantedProjectSearchQuery": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "$ref": "#/definitions/v1GrantedProjectSearchKey"
-        },
-        "method": {
-          "$ref": "#/definitions/v1SearchMethod"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
     "v1GrantedProjectSearchRequest": {
       "type": "object",
       "properties": {
@@ -4000,30 +3805,7 @@
         "queries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1GrantedProjectSearchQuery"
-          }
-        }
-      }
-    },
-    "v1GrantedProjectSearchResponse": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "total_result": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1GrantedProject"
+            "$ref": "#/definitions/v1ProjectSearchQuery"
           }
         }
       }
@@ -4256,131 +4038,8 @@
         "name": {
           "type": "string"
         },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1OrgDomain": {
-      "type": "object",
-      "properties": {
-        "org_id": {
-          "type": "string"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        },
         "domain": {
           "type": "string"
-        },
-        "verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "primary": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1OrgDomainSearchKey": {
-      "type": "string",
-      "enum": [
-        "ORGDOMAINSEARCHKEY_UNSPECIFIED",
-        "ORGDOMAINSEARCHKEY_DOMAIN"
-      ],
-      "default": "ORGDOMAINSEARCHKEY_UNSPECIFIED"
-    },
-    "v1OrgDomainSearchQuery": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "$ref": "#/definitions/v1OrgDomainSearchKey"
-        },
-        "method": {
-          "$ref": "#/definitions/v1SearchMethod"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
-    "v1OrgDomainSearchRequest": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1OrgDomainSearchQuery"
-          }
-        }
-      }
-    },
-    "v1OrgDomainSearchResponse": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "total_result": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1OrgDomainView"
-          }
-        }
-      }
-    },
-    "v1OrgDomainView": {
-      "type": "object",
-      "properties": {
-        "org_id": {
-          "type": "string"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "domain": {
-          "type": "string"
-        },
-        "verified": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "primary": {
-          "type": "boolean",
-          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -4461,9 +4120,6 @@
     "v1OrgMemberSearchRequest": {
       "type": "object",
       "properties": {
-        "org_id": {
-          "type": "string"
-        },
         "offset": {
           "type": "string",
           "format": "uint64"
@@ -4498,8 +4154,46 @@
         "result": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1OrgMember"
+            "$ref": "#/definitions/v1OrgMemberView"
           }
+        }
+      }
+    },
+    "v1OrgMemberView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
         }
       }
     },
@@ -5606,6 +5300,70 @@
         }
       }
     },
+    "v1ProjectSearchKey": {
+      "type": "string",
+      "enum": [
+        "PROJECTSEARCHKEY_UNSPECIFIED",
+        "PROJECTSEARCHKEY_PROJECT_NAME"
+      ],
+      "default": "PROJECTSEARCHKEY_UNSPECIFIED"
+    },
+    "v1ProjectSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1ProjectSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProjectSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectSearchQuery"
+          }
+        }
+      }
+    },
+    "v1ProjectSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectView"
+          }
+        }
+      }
+    },
     "v1ProjectState": {
       "type": "string",
       "enum": [
@@ -5614,15 +5372,6 @@
         "PROJECTSTATE_INACTIVE"
       ],
       "default": "PROJECTSTATE_UNSPECIFIED"
-    },
-    "v1ProjectType": {
-      "type": "string",
-      "enum": [
-        "PROJECTTYPE_UNSPECIFIED",
-        "PROJECTTYPE_OWNED",
-        "PROJECTTYPE_GRANTED"
-      ],
-      "default": "PROJECTTYPE_UNSPECIFIED"
     },
     "v1ProjectUpdateRequest": {
       "type": "object",
@@ -5688,6 +5437,35 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "v1ProjectView": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1ProjectState"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },

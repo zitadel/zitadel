@@ -3,15 +3,16 @@ package handler
 import (
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"golang.org/x/text/language"
 	"net/http"
 )
 
 const (
-	tmplRegister = "register"
-
-	globalRO = "GlobalResourceOwner"
+	tmplRegister          = "register"
+	orgProjectCreatorRole = "ORG_PROJECT_CREATOR"
 )
 
 type registerFormData struct {
@@ -47,7 +48,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.Password != data.Password2 {
-		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "passwords dont match")
+		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
@@ -56,7 +57,12 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err := l.authRepo.Register(setContext(r.Context(), iam.GlobalOrgID), data.toUserModel(), iam.GlobalOrgID)
+
+	member := &org_model.OrgMember{
+		ObjectRoot: models.ObjectRoot{AggregateID: iam.GlobalOrgID},
+		Roles:      []string{orgProjectCreatorRole},
+	}
+	user, err := l.authRepo.Register(setContext(r.Context(), iam.GlobalOrgID), data.toUserModel(), member, iam.GlobalOrgID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -72,7 +78,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *model.AuthRequest, formData *registerFormData, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	if formData == nil {
 		formData = new(registerFormData)

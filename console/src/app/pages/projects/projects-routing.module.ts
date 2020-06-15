@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { ProjectDetailComponent } from './project-detail/project-detail.component';
 import { ProjectListComponent } from './project-list/project-list.component';
 
@@ -13,6 +14,11 @@ const routes: Routes = [
     {
         path: 'create',
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
+    },
+    {
+        path: ':id/grant/:grantId',
+        component: GrantedProjectDetailComponent,
+        data: { animation: 'HomePage' },
     },
     {
         path: ':id',

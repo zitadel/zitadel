@@ -14,9 +14,8 @@ type userSelectionFormData struct {
 }
 
 func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, selectionData *model.SelectUserStep) {
-	var errType, errMessage string
 	data := userSelectionData{
-		baseData: l.getBaseData(r, authReq, "Select User", errType, errMessage),
+		baseData: l.getBaseData(r, authReq, "Select User", "", ""),
 		Users:    selectionData.Users,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplUserSelection], data, nil)

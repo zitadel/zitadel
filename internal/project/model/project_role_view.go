@@ -51,6 +51,9 @@ type ProjectRoleSearchResponse struct {
 func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: PROJECTROLESEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
 }
+func (r *ProjectRoleSearchRequest) AppendProjectQuery(projectID string) {
+	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: PROJECTROLESEARCHKEY_PROJECTID, Method: model.SEARCHMETHOD_EQUALS, Value: projectID})
+}
 
 func (r *ProjectRoleSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {

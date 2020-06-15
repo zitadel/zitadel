@@ -89,8 +89,8 @@ func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[st
 	return s
 }
 
-func (t *Translator) Localize(id string, args map[string]interface{}) string {
-	s, _ := t.localizer().Localize(&i18n.LocalizeConfig{
+func (t *Translator) Localize(id string, args map[string]interface{}, langs ...string) string {
+	s, _ := t.localizer(langs...).Localize(&i18n.LocalizeConfig{
 		MessageID:    id,
 		TemplateData: args,
 	})

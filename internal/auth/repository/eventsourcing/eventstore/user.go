@@ -2,7 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -14,9 +18,10 @@ import (
 )
 
 type UserRepo struct {
+	Eventstore   eventstore.Eventstore
 	UserEvents   *user_event.UserEventstore
-	PolicyEvents *policy_event.PolicyEventstore
 	OrgEvents    *org_event.OrgEventstore
+	PolicyEvents *policy_event.PolicyEventstore
 	View         *view.View
 }
 
@@ -24,7 +29,7 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
 }
 
-func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error) {
+func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
 	policyResourceOwner := auth.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
@@ -37,7 +42,24 @@ func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOw
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, pwPolicy, orgPolicy, resourceOwner)
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, pwPolicy, orgPolicy, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if orgMember != nil {
+		orgMember.UserID = user.AggregateID
+		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, memberAggregate)
+	}
+
+	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, user.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+	return usr_model.UserToModel(user), nil
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {

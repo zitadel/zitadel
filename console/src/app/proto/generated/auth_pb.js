@@ -25,42 +25,46 @@ var protoc$gen$swagger_options_annotations_pb = require('./protoc-gen-swagger/op
 goog.object.extend(proto, protoc$gen$swagger_options_annotations_pb);
 var authoption_options_pb = require('./authoption/options_pb.js');
 goog.object.extend(proto, authoption_options_pb);
-goog.exportSymbol('proto.zitadel.auth.api.v1.Gender', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.IsAdminResponse', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MFAState', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MfaOtpResponse', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MfaType', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MultiFactor', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MultiFactors', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MyPermissions', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MyProjectOrgSearchKey', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.OIDCClientAuth', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.OIDCResponseType', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.Org', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.PasswordChange', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.PasswordID', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.PasswordRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.SearchMethod', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UpdateUserAddressRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UpdateUserEmailRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UpdateUserPhoneRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UpdateUserProfileRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.User', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserAddress', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserEmail', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserPhone', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserProfile', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserSessionState', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserSessionView', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserSessionViews', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.UserState', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.VerifyMfaOtp', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.VerifyUserEmailRequest', null, global);
-goog.exportSymbol('proto.zitadel.auth.api.v1.VerifyUserPhoneRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.Gender', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MFAState', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MfaOtpResponse', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MfaType', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MultiFactor', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MultiFactors', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MyPermissions', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchKey', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.OIDCClientAuth', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.OIDCResponseType', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.Org', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.PasswordChange', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.PasswordID', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.PasswordRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.SearchMethod', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.User', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserAddress', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserEmail', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserGrantSearchKey', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserGrantView', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserPhone', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserProfile', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserSessionState', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserSessionView', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserSessionViews', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.UserState', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.VerifyMfaOtp', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest', null, global);
 /**
  * Generated by JsPbCodeGenerator.
  * @param {Array=} opt_data Optional initial data array, typically from a
@@ -71,16 +75,16 @@ goog.exportSymbol('proto.zitadel.auth.api.v1.VerifyUserPhoneRequest', null, glob
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UserSessionViews = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.zitadel.auth.api.v1.UserSessionViews.repeatedFields_, null);
+proto.caos.zitadel.auth.api.v1.UserSessionViews = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.UserSessionViews.repeatedFields_, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UserSessionViews, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserSessionViews, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UserSessionViews.displayName = 'proto.zitadel.auth.api.v1.UserSessionViews';
+  proto.caos.zitadel.auth.api.v1.UserSessionViews.displayName = 'proto.caos.zitadel.auth.api.v1.UserSessionViews';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -92,16 +96,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UserSessionView = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UserSessionView = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UserSessionView, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserSessionView, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UserSessionView.displayName = 'proto.zitadel.auth.api.v1.UserSessionView';
+  proto.caos.zitadel.auth.api.v1.UserSessionView.displayName = 'proto.caos.zitadel.auth.api.v1.UserSessionView';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -113,16 +117,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.User = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.User = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.User, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.User, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.User.displayName = 'proto.zitadel.auth.api.v1.User';
+  proto.caos.zitadel.auth.api.v1.User.displayName = 'proto.caos.zitadel.auth.api.v1.User';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -134,16 +138,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UserProfile = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UserProfile = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UserProfile, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserProfile, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UserProfile.displayName = 'proto.zitadel.auth.api.v1.UserProfile';
+  proto.caos.zitadel.auth.api.v1.UserProfile.displayName = 'proto.caos.zitadel.auth.api.v1.UserProfile';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -155,16 +159,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UpdateUserProfileRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UpdateUserProfileRequest.displayName = 'proto.zitadel.auth.api.v1.UpdateUserProfileRequest';
+  proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.displayName = 'proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -176,16 +180,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UserEmail = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UserEmail = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UserEmail, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserEmail, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UserEmail.displayName = 'proto.zitadel.auth.api.v1.UserEmail';
+  proto.caos.zitadel.auth.api.v1.UserEmail.displayName = 'proto.caos.zitadel.auth.api.v1.UserEmail';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -197,16 +201,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.displayName = 'proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest';
+  proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.displayName = 'proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -218,16 +222,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.VerifyUserEmailRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.VerifyUserEmailRequest.displayName = 'proto.zitadel.auth.api.v1.VerifyUserEmailRequest';
+  proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.displayName = 'proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -239,16 +243,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UpdateUserEmailRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UpdateUserEmailRequest.displayName = 'proto.zitadel.auth.api.v1.UpdateUserEmailRequest';
+  proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.displayName = 'proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -260,16 +264,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UserPhone = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UserPhone = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UserPhone, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserPhone, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UserPhone.displayName = 'proto.zitadel.auth.api.v1.UserPhone';
+  proto.caos.zitadel.auth.api.v1.UserPhone.displayName = 'proto.caos.zitadel.auth.api.v1.UserPhone';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -281,16 +285,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UpdateUserPhoneRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.displayName = 'proto.zitadel.auth.api.v1.UpdateUserPhoneRequest';
+  proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.displayName = 'proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -302,16 +306,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.VerifyUserPhoneRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.displayName = 'proto.zitadel.auth.api.v1.VerifyUserPhoneRequest';
+  proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.displayName = 'proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -323,16 +327,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UserAddress = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UserAddress = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UserAddress, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserAddress, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UserAddress.displayName = 'proto.zitadel.auth.api.v1.UserAddress';
+  proto.caos.zitadel.auth.api.v1.UserAddress.displayName = 'proto.caos.zitadel.auth.api.v1.UserAddress';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -344,16 +348,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.UpdateUserAddressRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.UpdateUserAddressRequest.displayName = 'proto.zitadel.auth.api.v1.UpdateUserAddressRequest';
+  proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.displayName = 'proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -365,16 +369,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.PasswordID = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.PasswordID = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.PasswordID, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.PasswordID, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.PasswordID.displayName = 'proto.zitadel.auth.api.v1.PasswordID';
+  proto.caos.zitadel.auth.api.v1.PasswordID.displayName = 'proto.caos.zitadel.auth.api.v1.PasswordID';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -386,16 +390,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.PasswordRequest = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.PasswordRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.PasswordRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.PasswordRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.PasswordRequest.displayName = 'proto.zitadel.auth.api.v1.PasswordRequest';
+  proto.caos.zitadel.auth.api.v1.PasswordRequest.displayName = 'proto.caos.zitadel.auth.api.v1.PasswordRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -407,16 +411,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.PasswordChange = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.PasswordChange = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.PasswordChange, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.PasswordChange, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.PasswordChange.displayName = 'proto.zitadel.auth.api.v1.PasswordChange';
+  proto.caos.zitadel.auth.api.v1.PasswordChange.displayName = 'proto.caos.zitadel.auth.api.v1.PasswordChange';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -428,16 +432,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.VerifyMfaOtp, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.VerifyMfaOtp, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.VerifyMfaOtp.displayName = 'proto.zitadel.auth.api.v1.VerifyMfaOtp';
+  proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.displayName = 'proto.caos.zitadel.auth.api.v1.VerifyMfaOtp';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -449,16 +453,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.MultiFactors = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.zitadel.auth.api.v1.MultiFactors.repeatedFields_, null);
+proto.caos.zitadel.auth.api.v1.MultiFactors = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.MultiFactors.repeatedFields_, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.MultiFactors, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.MultiFactors, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.MultiFactors.displayName = 'proto.zitadel.auth.api.v1.MultiFactors';
+  proto.caos.zitadel.auth.api.v1.MultiFactors.displayName = 'proto.caos.zitadel.auth.api.v1.MultiFactors';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -470,16 +474,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.MultiFactor = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.MultiFactor = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.MultiFactor, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.MultiFactor, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.MultiFactor.displayName = 'proto.zitadel.auth.api.v1.MultiFactor';
+  proto.caos.zitadel.auth.api.v1.MultiFactor.displayName = 'proto.caos.zitadel.auth.api.v1.MultiFactor';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -491,16 +495,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.MfaOtpResponse, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.MfaOtpResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.MfaOtpResponse.displayName = 'proto.zitadel.auth.api.v1.MfaOtpResponse';
+  proto.caos.zitadel.auth.api.v1.MfaOtpResponse.displayName = 'proto.caos.zitadel.auth.api.v1.MfaOtpResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -512,16 +516,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.OIDCClientAuth, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.OIDCClientAuth, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.OIDCClientAuth.displayName = 'proto.zitadel.auth.api.v1.OIDCClientAuth';
+  proto.caos.zitadel.auth.api.v1.OIDCClientAuth.displayName = 'proto.caos.zitadel.auth.api.v1.OIDCClientAuth';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -533,16 +537,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.repeatedFields_, null);
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.repeatedFields_, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.displayName = 'proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest';
+  proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.displayName = 'proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -554,16 +558,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.displayName = 'proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery';
+  proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.displayName = 'proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -575,16 +579,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.repeatedFields_, null);
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.repeatedFields_, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.displayName = 'proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse';
+  proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.displayName = 'proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -596,16 +600,58 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.IsAdminResponse = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.UserGrantView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.UserGrantView.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.auth.api.v1.UserGrantView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.auth.api.v1.UserGrantView.displayName = 'proto.caos.zitadel.auth.api.v1.UserGrantView';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.displayName = 'proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.IsAdminResponse, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.IsAdminResponse.displayName = 'proto.zitadel.auth.api.v1.IsAdminResponse';
+  proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.displayName = 'proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -617,16 +663,37 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.Org = function(opt_data) {
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.displayName = 'proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.auth.api.v1.Org = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.Org, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.Org, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.Org.displayName = 'proto.zitadel.auth.api.v1.Org';
+  proto.caos.zitadel.auth.api.v1.Org.displayName = 'proto.caos.zitadel.auth.api.v1.Org';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -638,16 +705,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.zitadel.auth.api.v1.MyPermissions = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.zitadel.auth.api.v1.MyPermissions.repeatedFields_, null);
+proto.caos.zitadel.auth.api.v1.MyPermissions = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.auth.api.v1.MyPermissions.repeatedFields_, null);
 };
-goog.inherits(proto.zitadel.auth.api.v1.MyPermissions, jspb.Message);
+goog.inherits(proto.caos.zitadel.auth.api.v1.MyPermissions, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.zitadel.auth.api.v1.MyPermissions.displayName = 'proto.zitadel.auth.api.v1.MyPermissions';
+  proto.caos.zitadel.auth.api.v1.MyPermissions.displayName = 'proto.caos.zitadel.auth.api.v1.MyPermissions';
 }
 
 /**
@@ -655,7 +722,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.zitadel.auth.api.v1.UserSessionViews.repeatedFields_ = [1];
+proto.caos.zitadel.auth.api.v1.UserSessionViews.repeatedFields_ = [1];
 
 
 
@@ -670,8 +737,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UserSessionViews.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UserSessionViews.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserSessionViews.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserSessionViews.toObject(opt_includeInstance, this);
 };
 
 
@@ -680,14 +747,14 @@ proto.zitadel.auth.api.v1.UserSessionViews.prototype.toObject = function(opt_inc
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UserSessionViews} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserSessionViews} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserSessionViews.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserSessionViews.toObject = function(includeInstance, msg) {
   var f, obj = {
     userSessionsList: jspb.Message.toObjectList(msg.getUserSessionsList(),
-    proto.zitadel.auth.api.v1.UserSessionView.toObject, includeInstance)
+    proto.caos.zitadel.auth.api.v1.UserSessionView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -701,23 +768,23 @@ proto.zitadel.auth.api.v1.UserSessionViews.toObject = function(includeInstance, 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UserSessionViews}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserSessionViews}
  */
-proto.zitadel.auth.api.v1.UserSessionViews.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserSessionViews.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UserSessionViews;
-  return proto.zitadel.auth.api.v1.UserSessionViews.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserSessionViews;
+  return proto.caos.zitadel.auth.api.v1.UserSessionViews.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UserSessionViews} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserSessionViews} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UserSessionViews}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserSessionViews}
  */
-proto.zitadel.auth.api.v1.UserSessionViews.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserSessionViews.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -725,8 +792,8 @@ proto.zitadel.auth.api.v1.UserSessionViews.deserializeBinaryFromReader = functio
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new proto.zitadel.auth.api.v1.UserSessionView;
-      reader.readMessage(value,proto.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.auth.api.v1.UserSessionView;
+      reader.readMessage(value,proto.caos.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader);
       msg.addUserSessions(value);
       break;
     default:
@@ -742,9 +809,9 @@ proto.zitadel.auth.api.v1.UserSessionViews.deserializeBinaryFromReader = functio
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UserSessionViews.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionViews.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UserSessionViews.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserSessionViews.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -752,18 +819,18 @@ proto.zitadel.auth.api.v1.UserSessionViews.prototype.serializeBinary = function(
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UserSessionViews} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserSessionViews} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserSessionViews.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserSessionViews.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getUserSessionsList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
       1,
       f,
-      proto.zitadel.auth.api.v1.UserSessionView.serializeBinaryToWriter
+      proto.caos.zitadel.auth.api.v1.UserSessionView.serializeBinaryToWriter
     );
   }
 };
@@ -771,34 +838,34 @@ proto.zitadel.auth.api.v1.UserSessionViews.serializeBinaryToWriter = function(me
 
 /**
  * repeated UserSessionView user_sessions = 1;
- * @return {!Array<!proto.zitadel.auth.api.v1.UserSessionView>}
+ * @return {!Array<!proto.caos.zitadel.auth.api.v1.UserSessionView>}
  */
-proto.zitadel.auth.api.v1.UserSessionViews.prototype.getUserSessionsList = function() {
-  return /** @type{!Array<!proto.zitadel.auth.api.v1.UserSessionView>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.zitadel.auth.api.v1.UserSessionView, 1));
+proto.caos.zitadel.auth.api.v1.UserSessionViews.prototype.getUserSessionsList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.auth.api.v1.UserSessionView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.auth.api.v1.UserSessionView, 1));
 };
 
 
-/** @param {!Array<!proto.zitadel.auth.api.v1.UserSessionView>} value */
-proto.zitadel.auth.api.v1.UserSessionViews.prototype.setUserSessionsList = function(value) {
+/** @param {!Array<!proto.caos.zitadel.auth.api.v1.UserSessionView>} value */
+proto.caos.zitadel.auth.api.v1.UserSessionViews.prototype.setUserSessionsList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 1, value);
 };
 
 
 /**
- * @param {!proto.zitadel.auth.api.v1.UserSessionView=} opt_value
+ * @param {!proto.caos.zitadel.auth.api.v1.UserSessionView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.zitadel.auth.api.v1.UserSessionView}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserSessionView}
  */
-proto.zitadel.auth.api.v1.UserSessionViews.prototype.addUserSessions = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.zitadel.auth.api.v1.UserSessionView, opt_index);
+proto.caos.zitadel.auth.api.v1.UserSessionViews.prototype.addUserSessions = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.caos.zitadel.auth.api.v1.UserSessionView, opt_index);
 };
 
 
 /**
  * Clears the list making it empty but non-null.
  */
-proto.zitadel.auth.api.v1.UserSessionViews.prototype.clearUserSessionsList = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionViews.prototype.clearUserSessionsList = function() {
   this.setUserSessionsList([]);
 };
 
@@ -817,8 +884,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UserSessionView.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserSessionView.toObject(opt_includeInstance, this);
 };
 
 
@@ -827,11 +894,11 @@ proto.zitadel.auth.api.v1.UserSessionView.prototype.toObject = function(opt_incl
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UserSessionView} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserSessionView} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserSessionView.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     agentId: jspb.Message.getFieldWithDefault(msg, 2, ""),
@@ -852,23 +919,23 @@ proto.zitadel.auth.api.v1.UserSessionView.toObject = function(includeInstance, m
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UserSessionView}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserSessionView}
  */
-proto.zitadel.auth.api.v1.UserSessionView.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UserSessionView;
-  return proto.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserSessionView;
+  return proto.caos.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UserSessionView} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserSessionView} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UserSessionView}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserSessionView}
  */
-proto.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -884,7 +951,7 @@ proto.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader = function
       msg.setAgentId(value);
       break;
     case 3:
-      var value = /** @type {!proto.zitadel.auth.api.v1.UserSessionState} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.UserSessionState} */ (reader.readEnum());
       msg.setAuthState(value);
       break;
     case 4:
@@ -912,9 +979,9 @@ proto.zitadel.auth.api.v1.UserSessionView.deserializeBinaryFromReader = function
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UserSessionView.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserSessionView.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -922,11 +989,11 @@ proto.zitadel.auth.api.v1.UserSessionView.prototype.serializeBinary = function()
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UserSessionView} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserSessionView} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserSessionView.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -977,13 +1044,13 @@ proto.zitadel.auth.api.v1.UserSessionView.serializeBinaryToWriter = function(mes
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -992,28 +1059,28 @@ proto.zitadel.auth.api.v1.UserSessionView.prototype.setId = function(value) {
  * optional string agent_id = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.getAgentId = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.getAgentId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.setAgentId = function(value) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.setAgentId = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
 /**
  * optional UserSessionState auth_state = 3;
- * @return {!proto.zitadel.auth.api.v1.UserSessionState}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserSessionState}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.getAuthState = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.UserSessionState} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.getAuthState = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.UserSessionState} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.UserSessionState} value */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.setAuthState = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.UserSessionState} value */
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.setAuthState = function(value) {
   jspb.Message.setProto3EnumField(this, 3, value);
 };
 
@@ -1022,13 +1089,13 @@ proto.zitadel.auth.api.v1.UserSessionView.prototype.setAuthState = function(valu
  * optional string user_id = 4;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.getUserId = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.getUserId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.setUserId = function(value) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.setUserId = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
@@ -1037,13 +1104,13 @@ proto.zitadel.auth.api.v1.UserSessionView.prototype.setUserId = function(value) 
  * optional string user_name = 5;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.getUserName = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.getUserName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.setUserName = function(value) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.setUserName = function(value) {
   jspb.Message.setProto3StringField(this, 5, value);
 };
 
@@ -1052,13 +1119,13 @@ proto.zitadel.auth.api.v1.UserSessionView.prototype.setUserName = function(value
  * optional uint64 sequence = 6;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.getSequence = function() {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.getSequence = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.UserSessionView.prototype.setSequence = function(value) {
+proto.caos.zitadel.auth.api.v1.UserSessionView.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 6, value);
 };
 
@@ -1077,8 +1144,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.User.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.User.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.User.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.User.toObject(opt_includeInstance, this);
 };
 
 
@@ -1087,11 +1154,11 @@ proto.zitadel.auth.api.v1.User.prototype.toObject = function(opt_includeInstance
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.User} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.User} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.User.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.User.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     state: jspb.Message.getFieldWithDefault(msg, 2, 0),
@@ -1131,23 +1198,23 @@ proto.zitadel.auth.api.v1.User.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.User}
+ * @return {!proto.caos.zitadel.auth.api.v1.User}
  */
-proto.zitadel.auth.api.v1.User.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.User.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.User;
-  return proto.zitadel.auth.api.v1.User.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.User;
+  return proto.caos.zitadel.auth.api.v1.User.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.User} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.User} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.User}
+ * @return {!proto.caos.zitadel.auth.api.v1.User}
  */
-proto.zitadel.auth.api.v1.User.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.User.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -1159,7 +1226,7 @@ proto.zitadel.auth.api.v1.User.deserializeBinaryFromReader = function(msg, reade
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {!proto.zitadel.auth.api.v1.UserState} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.UserState} */ (reader.readEnum());
       msg.setState(value);
       break;
     case 3:
@@ -1212,7 +1279,7 @@ proto.zitadel.auth.api.v1.User.deserializeBinaryFromReader = function(msg, reade
       msg.setPreferredLanguage(value);
       break;
     case 14:
-      var value = /** @type {!proto.zitadel.auth.api.v1.Gender} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.Gender} */ (reader.readEnum());
       msg.setGender(value);
       break;
     case 15:
@@ -1272,9 +1339,9 @@ proto.zitadel.auth.api.v1.User.deserializeBinaryFromReader = function(msg, reade
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.User.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.User.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.User.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -1282,11 +1349,11 @@ proto.zitadel.auth.api.v1.User.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.User} message
+ * @param {!proto.caos.zitadel.auth.api.v1.User} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.User.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.User.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -1475,28 +1542,28 @@ proto.zitadel.auth.api.v1.User.serializeBinaryToWriter = function(message, write
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
  * optional UserState state = 2;
- * @return {!proto.zitadel.auth.api.v1.UserState}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserState}
  */
-proto.zitadel.auth.api.v1.User.prototype.getState = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.UserState} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.caos.zitadel.auth.api.v1.User.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.UserState} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.UserState} value */
-proto.zitadel.auth.api.v1.User.prototype.setState = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.UserState} value */
+proto.caos.zitadel.auth.api.v1.User.prototype.setState = function(value) {
   jspb.Message.setProto3EnumField(this, 2, value);
 };
 
@@ -1505,14 +1572,14 @@ proto.zitadel.auth.api.v1.User.prototype.setState = function(value) {
  * optional google.protobuf.Timestamp creation_date = 3;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.zitadel.auth.api.v1.User.prototype.getCreationDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getCreationDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.zitadel.auth.api.v1.User.prototype.setCreationDate = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setCreationDate = function(value) {
   jspb.Message.setWrapperField(this, 3, value);
 };
 
@@ -1520,7 +1587,7 @@ proto.zitadel.auth.api.v1.User.prototype.setCreationDate = function(value) {
 /**
  * Clears the message field making it undefined.
  */
-proto.zitadel.auth.api.v1.User.prototype.clearCreationDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.clearCreationDate = function() {
   this.setCreationDate(undefined);
 };
 
@@ -1529,7 +1596,7 @@ proto.zitadel.auth.api.v1.User.prototype.clearCreationDate = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.hasCreationDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.hasCreationDate = function() {
   return jspb.Message.getField(this, 3) != null;
 };
 
@@ -1538,14 +1605,14 @@ proto.zitadel.auth.api.v1.User.prototype.hasCreationDate = function() {
  * optional google.protobuf.Timestamp activation_date = 4;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.zitadel.auth.api.v1.User.prototype.getActivationDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getActivationDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.zitadel.auth.api.v1.User.prototype.setActivationDate = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setActivationDate = function(value) {
   jspb.Message.setWrapperField(this, 4, value);
 };
 
@@ -1553,7 +1620,7 @@ proto.zitadel.auth.api.v1.User.prototype.setActivationDate = function(value) {
 /**
  * Clears the message field making it undefined.
  */
-proto.zitadel.auth.api.v1.User.prototype.clearActivationDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.clearActivationDate = function() {
   this.setActivationDate(undefined);
 };
 
@@ -1562,7 +1629,7 @@ proto.zitadel.auth.api.v1.User.prototype.clearActivationDate = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.hasActivationDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.hasActivationDate = function() {
   return jspb.Message.getField(this, 4) != null;
 };
 
@@ -1571,14 +1638,14 @@ proto.zitadel.auth.api.v1.User.prototype.hasActivationDate = function() {
  * optional google.protobuf.Timestamp change_date = 5;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.zitadel.auth.api.v1.User.prototype.getChangeDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getChangeDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.zitadel.auth.api.v1.User.prototype.setChangeDate = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setChangeDate = function(value) {
   jspb.Message.setWrapperField(this, 5, value);
 };
 
@@ -1586,7 +1653,7 @@ proto.zitadel.auth.api.v1.User.prototype.setChangeDate = function(value) {
 /**
  * Clears the message field making it undefined.
  */
-proto.zitadel.auth.api.v1.User.prototype.clearChangeDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.clearChangeDate = function() {
   this.setChangeDate(undefined);
 };
 
@@ -1595,7 +1662,7 @@ proto.zitadel.auth.api.v1.User.prototype.clearChangeDate = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.hasChangeDate = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.hasChangeDate = function() {
   return jspb.Message.getField(this, 5) != null;
 };
 
@@ -1604,14 +1671,14 @@ proto.zitadel.auth.api.v1.User.prototype.hasChangeDate = function() {
  * optional google.protobuf.Timestamp last_login = 6;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.zitadel.auth.api.v1.User.prototype.getLastLogin = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getLastLogin = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.zitadel.auth.api.v1.User.prototype.setLastLogin = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setLastLogin = function(value) {
   jspb.Message.setWrapperField(this, 6, value);
 };
 
@@ -1619,7 +1686,7 @@ proto.zitadel.auth.api.v1.User.prototype.setLastLogin = function(value) {
 /**
  * Clears the message field making it undefined.
  */
-proto.zitadel.auth.api.v1.User.prototype.clearLastLogin = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.clearLastLogin = function() {
   this.setLastLogin(undefined);
 };
 
@@ -1628,7 +1695,7 @@ proto.zitadel.auth.api.v1.User.prototype.clearLastLogin = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.hasLastLogin = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.hasLastLogin = function() {
   return jspb.Message.getField(this, 6) != null;
 };
 
@@ -1637,14 +1704,14 @@ proto.zitadel.auth.api.v1.User.prototype.hasLastLogin = function() {
  * optional google.protobuf.Timestamp password_changed = 7;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.zitadel.auth.api.v1.User.prototype.getPasswordChanged = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getPasswordChanged = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.zitadel.auth.api.v1.User.prototype.setPasswordChanged = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setPasswordChanged = function(value) {
   jspb.Message.setWrapperField(this, 7, value);
 };
 
@@ -1652,7 +1719,7 @@ proto.zitadel.auth.api.v1.User.prototype.setPasswordChanged = function(value) {
 /**
  * Clears the message field making it undefined.
  */
-proto.zitadel.auth.api.v1.User.prototype.clearPasswordChanged = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.clearPasswordChanged = function() {
   this.setPasswordChanged(undefined);
 };
 
@@ -1661,7 +1728,7 @@ proto.zitadel.auth.api.v1.User.prototype.clearPasswordChanged = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.hasPasswordChanged = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.hasPasswordChanged = function() {
   return jspb.Message.getField(this, 7) != null;
 };
 
@@ -1670,13 +1737,13 @@ proto.zitadel.auth.api.v1.User.prototype.hasPasswordChanged = function() {
  * optional string user_name = 8;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getUserName = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getUserName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setUserName = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setUserName = function(value) {
   jspb.Message.setProto3StringField(this, 8, value);
 };
 
@@ -1685,13 +1752,13 @@ proto.zitadel.auth.api.v1.User.prototype.setUserName = function(value) {
  * optional string first_name = 9;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getFirstName = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getFirstName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setFirstName = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setFirstName = function(value) {
   jspb.Message.setProto3StringField(this, 9, value);
 };
 
@@ -1700,13 +1767,13 @@ proto.zitadel.auth.api.v1.User.prototype.setFirstName = function(value) {
  * optional string last_name = 10;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getLastName = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getLastName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setLastName = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setLastName = function(value) {
   jspb.Message.setProto3StringField(this, 10, value);
 };
 
@@ -1715,13 +1782,13 @@ proto.zitadel.auth.api.v1.User.prototype.setLastName = function(value) {
  * optional string nick_name = 11;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getNickName = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getNickName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setNickName = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setNickName = function(value) {
   jspb.Message.setProto3StringField(this, 11, value);
 };
 
@@ -1730,13 +1797,13 @@ proto.zitadel.auth.api.v1.User.prototype.setNickName = function(value) {
  * optional string display_name = 12;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getDisplayName = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getDisplayName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setDisplayName = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setDisplayName = function(value) {
   jspb.Message.setProto3StringField(this, 12, value);
 };
 
@@ -1745,28 +1812,28 @@ proto.zitadel.auth.api.v1.User.prototype.setDisplayName = function(value) {
  * optional string preferred_language = 13;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getPreferredLanguage = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getPreferredLanguage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 13, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setPreferredLanguage = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setPreferredLanguage = function(value) {
   jspb.Message.setProto3StringField(this, 13, value);
 };
 
 
 /**
  * optional Gender gender = 14;
- * @return {!proto.zitadel.auth.api.v1.Gender}
+ * @return {!proto.caos.zitadel.auth.api.v1.Gender}
  */
-proto.zitadel.auth.api.v1.User.prototype.getGender = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 14, 0));
+proto.caos.zitadel.auth.api.v1.User.prototype.getGender = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 14, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.Gender} value */
-proto.zitadel.auth.api.v1.User.prototype.setGender = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.Gender} value */
+proto.caos.zitadel.auth.api.v1.User.prototype.setGender = function(value) {
   jspb.Message.setProto3EnumField(this, 14, value);
 };
 
@@ -1775,13 +1842,13 @@ proto.zitadel.auth.api.v1.User.prototype.setGender = function(value) {
  * optional string email = 15;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getEmail = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getEmail = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 15, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setEmail = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setEmail = function(value) {
   jspb.Message.setProto3StringField(this, 15, value);
 };
 
@@ -1792,13 +1859,13 @@ proto.zitadel.auth.api.v1.User.prototype.setEmail = function(value) {
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.getIsEmailVerified = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getIsEmailVerified = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 16, false));
 };
 
 
 /** @param {boolean} value */
-proto.zitadel.auth.api.v1.User.prototype.setIsEmailVerified = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setIsEmailVerified = function(value) {
   jspb.Message.setProto3BooleanField(this, 16, value);
 };
 
@@ -1807,13 +1874,13 @@ proto.zitadel.auth.api.v1.User.prototype.setIsEmailVerified = function(value) {
  * optional string phone = 17;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getPhone = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getPhone = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setPhone = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setPhone = function(value) {
   jspb.Message.setProto3StringField(this, 17, value);
 };
 
@@ -1824,13 +1891,13 @@ proto.zitadel.auth.api.v1.User.prototype.setPhone = function(value) {
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.getIsPhoneVerified = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getIsPhoneVerified = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 18, false));
 };
 
 
 /** @param {boolean} value */
-proto.zitadel.auth.api.v1.User.prototype.setIsPhoneVerified = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setIsPhoneVerified = function(value) {
   jspb.Message.setProto3BooleanField(this, 18, value);
 };
 
@@ -1839,13 +1906,13 @@ proto.zitadel.auth.api.v1.User.prototype.setIsPhoneVerified = function(value) {
  * optional string country = 19;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getCountry = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getCountry = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 19, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setCountry = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setCountry = function(value) {
   jspb.Message.setProto3StringField(this, 19, value);
 };
 
@@ -1854,13 +1921,13 @@ proto.zitadel.auth.api.v1.User.prototype.setCountry = function(value) {
  * optional string locality = 20;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getLocality = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getLocality = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 20, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setLocality = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setLocality = function(value) {
   jspb.Message.setProto3StringField(this, 20, value);
 };
 
@@ -1869,13 +1936,13 @@ proto.zitadel.auth.api.v1.User.prototype.setLocality = function(value) {
  * optional string postal_code = 21;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getPostalCode = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getPostalCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 21, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setPostalCode = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setPostalCode = function(value) {
   jspb.Message.setProto3StringField(this, 21, value);
 };
 
@@ -1884,13 +1951,13 @@ proto.zitadel.auth.api.v1.User.prototype.setPostalCode = function(value) {
  * optional string region = 22;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getRegion = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getRegion = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 22, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setRegion = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setRegion = function(value) {
   jspb.Message.setProto3StringField(this, 22, value);
 };
 
@@ -1899,13 +1966,13 @@ proto.zitadel.auth.api.v1.User.prototype.setRegion = function(value) {
  * optional string street_address = 23;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.User.prototype.getStreetAddress = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getStreetAddress = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 23, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.User.prototype.setStreetAddress = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setStreetAddress = function(value) {
   jspb.Message.setProto3StringField(this, 23, value);
 };
 
@@ -1916,13 +1983,13 @@ proto.zitadel.auth.api.v1.User.prototype.setStreetAddress = function(value) {
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.User.prototype.getPasswordChangeRequired = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getPasswordChangeRequired = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 24, false));
 };
 
 
 /** @param {boolean} value */
-proto.zitadel.auth.api.v1.User.prototype.setPasswordChangeRequired = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setPasswordChangeRequired = function(value) {
   jspb.Message.setProto3BooleanField(this, 24, value);
 };
 
@@ -1931,13 +1998,13 @@ proto.zitadel.auth.api.v1.User.prototype.setPasswordChangeRequired = function(va
  * optional uint64 sequence = 25;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.User.prototype.getSequence = function() {
+proto.caos.zitadel.auth.api.v1.User.prototype.getSequence = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 25, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.User.prototype.setSequence = function(value) {
+proto.caos.zitadel.auth.api.v1.User.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 25, value);
 };
 
@@ -1956,8 +2023,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UserProfile.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserProfile.toObject(opt_includeInstance, this);
 };
 
 
@@ -1966,11 +2033,11 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.toObject = function(opt_includeI
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UserProfile} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserProfile} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserProfile.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserProfile.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     userName: jspb.Message.getFieldWithDefault(msg, 2, ""),
@@ -1980,7 +2047,9 @@ proto.zitadel.auth.api.v1.UserProfile.toObject = function(includeInstance, msg) 
     displayName: jspb.Message.getFieldWithDefault(msg, 6, ""),
     preferredLanguage: jspb.Message.getFieldWithDefault(msg, 7, ""),
     gender: jspb.Message.getFieldWithDefault(msg, 8, 0),
-    sequence: jspb.Message.getFieldWithDefault(msg, 26, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 9, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1994,23 +2063,23 @@ proto.zitadel.auth.api.v1.UserProfile.toObject = function(includeInstance, msg) 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UserProfile}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserProfile}
  */
-proto.zitadel.auth.api.v1.UserProfile.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserProfile.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UserProfile;
-  return proto.zitadel.auth.api.v1.UserProfile.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserProfile;
+  return proto.caos.zitadel.auth.api.v1.UserProfile.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UserProfile} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserProfile} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UserProfile}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserProfile}
  */
-proto.zitadel.auth.api.v1.UserProfile.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserProfile.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -2046,12 +2115,22 @@ proto.zitadel.auth.api.v1.UserProfile.deserializeBinaryFromReader = function(msg
       msg.setPreferredLanguage(value);
       break;
     case 8:
-      var value = /** @type {!proto.zitadel.auth.api.v1.Gender} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.Gender} */ (reader.readEnum());
       msg.setGender(value);
       break;
-    case 26:
+    case 9:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
+      break;
+    case 10:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 11:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
       break;
     default:
       reader.skipField();
@@ -2066,9 +2145,9 @@ proto.zitadel.auth.api.v1.UserProfile.deserializeBinaryFromReader = function(msg
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UserProfile.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserProfile.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -2076,11 +2155,11 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UserProfile} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserProfile} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserProfile.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserProfile.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -2141,8 +2220,24 @@ proto.zitadel.auth.api.v1.UserProfile.serializeBinaryToWriter = function(message
   f = message.getSequence();
   if (f !== 0) {
     writer.writeUint64(
-      26,
+      9,
       f
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      10,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      11,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
 };
@@ -2152,13 +2247,13 @@ proto.zitadel.auth.api.v1.UserProfile.serializeBinaryToWriter = function(message
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -2167,13 +2262,13 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.setId = function(value) {
  * optional string user_name = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getUserName = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getUserName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setUserName = function(value) {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setUserName = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -2182,13 +2277,13 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.setUserName = function(value) {
  * optional string first_name = 3;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getFirstName = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getFirstName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setFirstName = function(value) {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setFirstName = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
@@ -2197,13 +2292,13 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.setFirstName = function(value) {
  * optional string last_name = 4;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getLastName = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getLastName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setLastName = function(value) {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setLastName = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
@@ -2212,13 +2307,13 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.setLastName = function(value) {
  * optional string nick_name = 5;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getNickName = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getNickName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setNickName = function(value) {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setNickName = function(value) {
   jspb.Message.setProto3StringField(this, 5, value);
 };
 
@@ -2227,13 +2322,13 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.setNickName = function(value) {
  * optional string display_name = 6;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getDisplayName = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getDisplayName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setDisplayName = function(value) {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setDisplayName = function(value) {
   jspb.Message.setProto3StringField(this, 6, value);
 };
 
@@ -2242,44 +2337,110 @@ proto.zitadel.auth.api.v1.UserProfile.prototype.setDisplayName = function(value)
  * optional string preferred_language = 7;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getPreferredLanguage = function() {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getPreferredLanguage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setPreferredLanguage = function(value) {
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setPreferredLanguage = function(value) {
   jspb.Message.setProto3StringField(this, 7, value);
 };
 
 
 /**
  * optional Gender gender = 8;
- * @return {!proto.zitadel.auth.api.v1.Gender}
+ * @return {!proto.caos.zitadel.auth.api.v1.Gender}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getGender = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getGender = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.Gender} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setGender = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.Gender} value */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setGender = function(value) {
   jspb.Message.setProto3EnumField(this, 8, value);
 };
 
 
 /**
- * optional uint64 sequence = 26;
+ * optional uint64 sequence = 9;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.UserProfile.prototype.getSequence = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 26, 0));
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.UserProfile.prototype.setSequence = function(value) {
-  jspb.Message.setProto3IntField(this, 26, value);
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 9, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 10;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 10));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 10, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 10) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 11;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 11));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 11, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserProfile.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 11) != null;
 };
 
 
@@ -2297,8 +2458,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UpdateUserProfileRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -2307,11 +2468,11 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.toObject = function
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UpdateUserProfileRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     firstName: jspb.Message.getFieldWithDefault(msg, 1, ""),
     lastName: jspb.Message.getFieldWithDefault(msg, 2, ""),
@@ -2332,23 +2493,23 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.toObject = function(includeIn
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserProfileRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UpdateUserProfileRequest;
-  return proto.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest;
+  return proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserProfileRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserProfileRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -2376,7 +2537,7 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinaryFromReader =
       msg.setPreferredLanguage(value);
       break;
     case 6:
-      var value = /** @type {!proto.zitadel.auth.api.v1.Gender} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.Gender} */ (reader.readEnum());
       msg.setGender(value);
       break;
     default:
@@ -2392,9 +2553,9 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.deserializeBinaryFromReader =
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UpdateUserProfileRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -2402,11 +2563,11 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.serializeBinary = f
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserProfileRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getFirstName();
   if (f.length > 0) {
@@ -2457,13 +2618,13 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.serializeBinaryToWriter = fun
  * optional string first_name = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getFirstName = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getFirstName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setFirstName = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setFirstName = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -2472,13 +2633,13 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setFirstName = func
  * optional string last_name = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getLastName = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getLastName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setLastName = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setLastName = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -2487,13 +2648,13 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setLastName = funct
  * optional string nick_name = 3;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getNickName = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getNickName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setNickName = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setNickName = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
@@ -2502,13 +2663,13 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setNickName = funct
  * optional string display_name = 4;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getDisplayName = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getDisplayName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setDisplayName = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setDisplayName = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
@@ -2517,28 +2678,28 @@ proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setDisplayName = fu
  * optional string preferred_language = 5;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getPreferredLanguage = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getPreferredLanguage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setPreferredLanguage = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setPreferredLanguage = function(value) {
   jspb.Message.setProto3StringField(this, 5, value);
 };
 
 
 /**
  * optional Gender gender = 6;
- * @return {!proto.zitadel.auth.api.v1.Gender}
+ * @return {!proto.caos.zitadel.auth.api.v1.Gender}
  */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getGender = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.getGender = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.Gender} value */
-proto.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setGender = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.Gender} value */
+proto.caos.zitadel.auth.api.v1.UpdateUserProfileRequest.prototype.setGender = function(value) {
   jspb.Message.setProto3EnumField(this, 6, value);
 };
 
@@ -2557,8 +2718,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UserEmail.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UserEmail.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserEmail.toObject(opt_includeInstance, this);
 };
 
 
@@ -2567,16 +2728,18 @@ proto.zitadel.auth.api.v1.UserEmail.prototype.toObject = function(opt_includeIns
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UserEmail} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserEmail} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserEmail.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserEmail.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     email: jspb.Message.getFieldWithDefault(msg, 2, ""),
     isemailverified: jspb.Message.getFieldWithDefault(msg, 3, false),
-    sequence: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2590,23 +2753,23 @@ proto.zitadel.auth.api.v1.UserEmail.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UserEmail}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserEmail}
  */
-proto.zitadel.auth.api.v1.UserEmail.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserEmail.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UserEmail;
-  return proto.zitadel.auth.api.v1.UserEmail.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserEmail;
+  return proto.caos.zitadel.auth.api.v1.UserEmail.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UserEmail} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserEmail} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UserEmail}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserEmail}
  */
-proto.zitadel.auth.api.v1.UserEmail.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserEmail.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -2629,6 +2792,16 @@ proto.zitadel.auth.api.v1.UserEmail.deserializeBinaryFromReader = function(msg, 
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
+    case 5:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 6:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2642,9 +2815,9 @@ proto.zitadel.auth.api.v1.UserEmail.deserializeBinaryFromReader = function(msg, 
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UserEmail.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UserEmail.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserEmail.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -2652,11 +2825,11 @@ proto.zitadel.auth.api.v1.UserEmail.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UserEmail} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserEmail} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserEmail.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserEmail.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -2686,6 +2859,22 @@ proto.zitadel.auth.api.v1.UserEmail.serializeBinaryToWriter = function(message, 
       f
     );
   }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      5,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
 };
 
 
@@ -2693,13 +2882,13 @@ proto.zitadel.auth.api.v1.UserEmail.serializeBinaryToWriter = function(message, 
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserEmail.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserEmail.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -2708,13 +2897,13 @@ proto.zitadel.auth.api.v1.UserEmail.prototype.setId = function(value) {
  * optional string email = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserEmail.prototype.getEmail = function() {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.getEmail = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserEmail.prototype.setEmail = function(value) {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.setEmail = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -2725,13 +2914,13 @@ proto.zitadel.auth.api.v1.UserEmail.prototype.setEmail = function(value) {
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.UserEmail.prototype.getIsemailverified = function() {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.getIsemailverified = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 3, false));
 };
 
 
 /** @param {boolean} value */
-proto.zitadel.auth.api.v1.UserEmail.prototype.setIsemailverified = function(value) {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.setIsemailverified = function(value) {
   jspb.Message.setProto3BooleanField(this, 3, value);
 };
 
@@ -2740,14 +2929,80 @@ proto.zitadel.auth.api.v1.UserEmail.prototype.setIsemailverified = function(valu
  * optional uint64 sequence = 4;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.UserEmail.prototype.getSequence = function() {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.getSequence = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.UserEmail.prototype.setSequence = function(value) {
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 5;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 6;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 6, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserEmail.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
@@ -2765,8 +3020,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -2775,11 +3030,11 @@ proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.toObject = function
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     code: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -2795,23 +3050,23 @@ proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.toObject = function(includeIn
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest}
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest;
-  return proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest;
+  return proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest}
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -2835,9 +3090,9 @@ proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.deserializeBinaryFromReader =
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -2845,11 +3100,11 @@ proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.serializeBinary = f
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getCode();
   if (f.length > 0) {
@@ -2865,13 +3120,13 @@ proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.serializeBinaryToWriter = fun
  * optional string code = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.getCode = function() {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.getCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.setCode = function(value) {
+proto.caos.zitadel.auth.api.v1.VerifyMyUserEmailRequest.prototype.setCode = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -2890,8 +3145,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.VerifyUserEmailRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -2900,11 +3155,11 @@ proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.toObject = function(o
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.VerifyUserEmailRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     code: jspb.Message.getFieldWithDefault(msg, 2, "")
@@ -2921,23 +3176,23 @@ proto.zitadel.auth.api.v1.VerifyUserEmailRequest.toObject = function(includeInst
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.VerifyUserEmailRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest}
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.VerifyUserEmailRequest;
-  return proto.zitadel.auth.api.v1.VerifyUserEmailRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest;
+  return proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.VerifyUserEmailRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.VerifyUserEmailRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest}
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -2965,9 +3220,9 @@ proto.zitadel.auth.api.v1.VerifyUserEmailRequest.deserializeBinaryFromReader = f
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.VerifyUserEmailRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -2975,11 +3230,11 @@ proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.serializeBinary = fun
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.VerifyUserEmailRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -3002,13 +3257,13 @@ proto.zitadel.auth.api.v1.VerifyUserEmailRequest.serializeBinaryToWriter = funct
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -3017,13 +3272,13 @@ proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.setId = function(valu
  * optional string code = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.getCode = function() {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.getCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.setCode = function(value) {
+proto.caos.zitadel.auth.api.v1.VerifyUserEmailRequest.prototype.setCode = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -3042,8 +3297,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UpdateUserEmailRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -3052,11 +3307,11 @@ proto.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.toObject = function(o
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UpdateUserEmailRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     email: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -3072,23 +3327,23 @@ proto.zitadel.auth.api.v1.UpdateUserEmailRequest.toObject = function(includeInst
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserEmailRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UpdateUserEmailRequest;
-  return proto.zitadel.auth.api.v1.UpdateUserEmailRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest;
+  return proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserEmailRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserEmailRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -3112,9 +3367,9 @@ proto.zitadel.auth.api.v1.UpdateUserEmailRequest.deserializeBinaryFromReader = f
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UpdateUserEmailRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -3122,11 +3377,11 @@ proto.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.serializeBinary = fun
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserEmailRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getEmail();
   if (f.length > 0) {
@@ -3142,13 +3397,13 @@ proto.zitadel.auth.api.v1.UpdateUserEmailRequest.serializeBinaryToWriter = funct
  * optional string email = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.getEmail = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.getEmail = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.setEmail = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserEmailRequest.prototype.setEmail = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -3167,8 +3422,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UserPhone.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UserPhone.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserPhone.toObject(opt_includeInstance, this);
 };
 
 
@@ -3177,16 +3432,18 @@ proto.zitadel.auth.api.v1.UserPhone.prototype.toObject = function(opt_includeIns
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UserPhone} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserPhone} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserPhone.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserPhone.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     phone: jspb.Message.getFieldWithDefault(msg, 2, ""),
     isPhoneVerified: jspb.Message.getFieldWithDefault(msg, 3, false),
-    sequence: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3200,23 +3457,23 @@ proto.zitadel.auth.api.v1.UserPhone.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UserPhone}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserPhone}
  */
-proto.zitadel.auth.api.v1.UserPhone.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserPhone.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UserPhone;
-  return proto.zitadel.auth.api.v1.UserPhone.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserPhone;
+  return proto.caos.zitadel.auth.api.v1.UserPhone.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UserPhone} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserPhone} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UserPhone}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserPhone}
  */
-proto.zitadel.auth.api.v1.UserPhone.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserPhone.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -3239,6 +3496,16 @@ proto.zitadel.auth.api.v1.UserPhone.deserializeBinaryFromReader = function(msg, 
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
+    case 5:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 6:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -3252,9 +3519,9 @@ proto.zitadel.auth.api.v1.UserPhone.deserializeBinaryFromReader = function(msg, 
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UserPhone.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UserPhone.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserPhone.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -3262,11 +3529,11 @@ proto.zitadel.auth.api.v1.UserPhone.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UserPhone} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserPhone} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserPhone.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserPhone.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -3296,6 +3563,22 @@ proto.zitadel.auth.api.v1.UserPhone.serializeBinaryToWriter = function(message, 
       f
     );
   }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      5,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
 };
 
 
@@ -3303,13 +3586,13 @@ proto.zitadel.auth.api.v1.UserPhone.serializeBinaryToWriter = function(message, 
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserPhone.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserPhone.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -3318,13 +3601,13 @@ proto.zitadel.auth.api.v1.UserPhone.prototype.setId = function(value) {
  * optional string phone = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserPhone.prototype.getPhone = function() {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.getPhone = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserPhone.prototype.setPhone = function(value) {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.setPhone = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -3335,13 +3618,13 @@ proto.zitadel.auth.api.v1.UserPhone.prototype.setPhone = function(value) {
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.UserPhone.prototype.getIsPhoneVerified = function() {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.getIsPhoneVerified = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 3, false));
 };
 
 
 /** @param {boolean} value */
-proto.zitadel.auth.api.v1.UserPhone.prototype.setIsPhoneVerified = function(value) {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.setIsPhoneVerified = function(value) {
   jspb.Message.setProto3BooleanField(this, 3, value);
 };
 
@@ -3350,14 +3633,80 @@ proto.zitadel.auth.api.v1.UserPhone.prototype.setIsPhoneVerified = function(valu
  * optional uint64 sequence = 4;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.UserPhone.prototype.getSequence = function() {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.getSequence = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.UserPhone.prototype.setSequence = function(value) {
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 5;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 6;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 6, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserPhone.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
@@ -3375,8 +3724,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -3385,11 +3734,11 @@ proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.toObject = function(o
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UpdateUserPhoneRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     phone: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -3405,23 +3754,23 @@ proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.toObject = function(includeInst
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserPhoneRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UpdateUserPhoneRequest;
-  return proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest;
+  return proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserPhoneRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserPhoneRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -3445,9 +3794,9 @@ proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.deserializeBinaryFromReader = f
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -3455,11 +3804,11 @@ proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.serializeBinary = fun
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserPhoneRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getPhone();
   if (f.length > 0) {
@@ -3475,13 +3824,13 @@ proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.serializeBinaryToWriter = funct
  * optional string phone = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.getPhone = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.getPhone = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.setPhone = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserPhoneRequest.prototype.setPhone = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -3500,8 +3849,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -3510,11 +3859,11 @@ proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.toObject = function(o
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.VerifyUserPhoneRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     code: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -3530,23 +3879,23 @@ proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.toObject = function(includeInst
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.VerifyUserPhoneRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest}
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.VerifyUserPhoneRequest;
-  return proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest;
+  return proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.VerifyUserPhoneRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.VerifyUserPhoneRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest}
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -3570,9 +3919,9 @@ proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.deserializeBinaryFromReader = f
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -3580,11 +3929,11 @@ proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.serializeBinary = fun
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.VerifyUserPhoneRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getCode();
   if (f.length > 0) {
@@ -3600,13 +3949,13 @@ proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.serializeBinaryToWriter = funct
  * optional string code = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.getCode = function() {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.getCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.setCode = function(value) {
+proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest.prototype.setCode = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -3625,8 +3974,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UserAddress.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserAddress.toObject(opt_includeInstance, this);
 };
 
 
@@ -3635,11 +3984,11 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.toObject = function(opt_includeI
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UserAddress} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserAddress} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserAddress.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserAddress.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     country: jspb.Message.getFieldWithDefault(msg, 2, ""),
@@ -3647,7 +3996,9 @@ proto.zitadel.auth.api.v1.UserAddress.toObject = function(includeInstance, msg) 
     postalCode: jspb.Message.getFieldWithDefault(msg, 4, ""),
     region: jspb.Message.getFieldWithDefault(msg, 5, ""),
     streetAddress: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    sequence: jspb.Message.getFieldWithDefault(msg, 7, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3661,23 +4012,23 @@ proto.zitadel.auth.api.v1.UserAddress.toObject = function(includeInstance, msg) 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UserAddress}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserAddress}
  */
-proto.zitadel.auth.api.v1.UserAddress.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserAddress.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UserAddress;
-  return proto.zitadel.auth.api.v1.UserAddress.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserAddress;
+  return proto.caos.zitadel.auth.api.v1.UserAddress.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UserAddress} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserAddress} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UserAddress}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserAddress}
  */
-proto.zitadel.auth.api.v1.UserAddress.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserAddress.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -3712,6 +4063,16 @@ proto.zitadel.auth.api.v1.UserAddress.deserializeBinaryFromReader = function(msg
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
+    case 8:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 9:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -3725,9 +4086,9 @@ proto.zitadel.auth.api.v1.UserAddress.deserializeBinaryFromReader = function(msg
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UserAddress.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserAddress.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -3735,11 +4096,11 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UserAddress} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserAddress} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UserAddress.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserAddress.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -3790,6 +4151,22 @@ proto.zitadel.auth.api.v1.UserAddress.serializeBinaryToWriter = function(message
       f
     );
   }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      9,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
 };
 
 
@@ -3797,13 +4174,13 @@ proto.zitadel.auth.api.v1.UserAddress.serializeBinaryToWriter = function(message
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserAddress.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -3812,13 +4189,13 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.setId = function(value) {
  * optional string country = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.getCountry = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getCountry = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserAddress.prototype.setCountry = function(value) {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setCountry = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -3827,13 +4204,13 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.setCountry = function(value) {
  * optional string locality = 3;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.getLocality = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getLocality = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserAddress.prototype.setLocality = function(value) {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setLocality = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
@@ -3842,13 +4219,13 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.setLocality = function(value) {
  * optional string postal_code = 4;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.getPostalCode = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getPostalCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserAddress.prototype.setPostalCode = function(value) {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setPostalCode = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
@@ -3857,13 +4234,13 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.setPostalCode = function(value) 
  * optional string region = 5;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.getRegion = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getRegion = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserAddress.prototype.setRegion = function(value) {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setRegion = function(value) {
   jspb.Message.setProto3StringField(this, 5, value);
 };
 
@@ -3872,13 +4249,13 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.setRegion = function(value) {
  * optional string street_address = 6;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.getStreetAddress = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getStreetAddress = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UserAddress.prototype.setStreetAddress = function(value) {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setStreetAddress = function(value) {
   jspb.Message.setProto3StringField(this, 6, value);
 };
 
@@ -3887,14 +4264,80 @@ proto.zitadel.auth.api.v1.UserAddress.prototype.setStreetAddress = function(valu
  * optional uint64 sequence = 7;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.UserAddress.prototype.getSequence = function() {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getSequence = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.UserAddress.prototype.setSequence = function(value) {
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 7, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 8;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 8, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 8) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 9;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 9));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 9, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.UserAddress.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 9) != null;
 };
 
 
@@ -3912,8 +4355,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.UpdateUserAddressRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -3922,11 +4365,11 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.toObject = function
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.UpdateUserAddressRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     country: jspb.Message.getFieldWithDefault(msg, 1, ""),
     locality: jspb.Message.getFieldWithDefault(msg, 2, ""),
@@ -3946,23 +4389,23 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.toObject = function(includeIn
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserAddressRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.UpdateUserAddressRequest;
-  return proto.zitadel.auth.api.v1.UpdateUserAddressRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest;
+  return proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserAddressRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.UpdateUserAddressRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4002,9 +4445,9 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.deserializeBinaryFromReader =
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.UpdateUserAddressRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4012,11 +4455,11 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.serializeBinary = f
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.UpdateUserAddressRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getCountry();
   if (f.length > 0) {
@@ -4060,13 +4503,13 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.serializeBinaryToWriter = fun
  * optional string country = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getCountry = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getCountry = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setCountry = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setCountry = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -4075,13 +4518,13 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setCountry = functi
  * optional string locality = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getLocality = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getLocality = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setLocality = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setLocality = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -4090,13 +4533,13 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setLocality = funct
  * optional string postal_code = 3;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getPostalCode = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getPostalCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setPostalCode = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setPostalCode = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
@@ -4105,13 +4548,13 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setPostalCode = fun
  * optional string region = 4;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getRegion = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getRegion = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setRegion = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setRegion = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
@@ -4120,13 +4563,13 @@ proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setRegion = functio
  * optional string street_address = 5;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getStreetAddress = function() {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.getStreetAddress = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setStreetAddress = function(value) {
+proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest.prototype.setStreetAddress = function(value) {
   jspb.Message.setProto3StringField(this, 5, value);
 };
 
@@ -4145,8 +4588,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.PasswordID.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.PasswordID.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.PasswordID.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.PasswordID.toObject(opt_includeInstance, this);
 };
 
 
@@ -4155,11 +4598,11 @@ proto.zitadel.auth.api.v1.PasswordID.prototype.toObject = function(opt_includeIn
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.PasswordID} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordID} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.PasswordID.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.PasswordID.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -4175,23 +4618,23 @@ proto.zitadel.auth.api.v1.PasswordID.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.PasswordID}
+ * @return {!proto.caos.zitadel.auth.api.v1.PasswordID}
  */
-proto.zitadel.auth.api.v1.PasswordID.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.PasswordID.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.PasswordID;
-  return proto.zitadel.auth.api.v1.PasswordID.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.PasswordID;
+  return proto.caos.zitadel.auth.api.v1.PasswordID.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.PasswordID} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordID} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.PasswordID}
+ * @return {!proto.caos.zitadel.auth.api.v1.PasswordID}
  */
-proto.zitadel.auth.api.v1.PasswordID.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.PasswordID.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4215,9 +4658,9 @@ proto.zitadel.auth.api.v1.PasswordID.deserializeBinaryFromReader = function(msg,
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.PasswordID.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.PasswordID.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.PasswordID.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.PasswordID.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4225,11 +4668,11 @@ proto.zitadel.auth.api.v1.PasswordID.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.PasswordID} message
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordID} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.PasswordID.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.PasswordID.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -4245,13 +4688,13 @@ proto.zitadel.auth.api.v1.PasswordID.serializeBinaryToWriter = function(message,
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.PasswordID.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.PasswordID.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.PasswordID.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.PasswordID.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -4270,8 +4713,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.PasswordRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.PasswordRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.PasswordRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.PasswordRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -4280,11 +4723,11 @@ proto.zitadel.auth.api.v1.PasswordRequest.prototype.toObject = function(opt_incl
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.PasswordRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.PasswordRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.PasswordRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     password: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -4300,23 +4743,23 @@ proto.zitadel.auth.api.v1.PasswordRequest.toObject = function(includeInstance, m
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.PasswordRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.PasswordRequest}
  */
-proto.zitadel.auth.api.v1.PasswordRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.PasswordRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.PasswordRequest;
-  return proto.zitadel.auth.api.v1.PasswordRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.PasswordRequest;
+  return proto.caos.zitadel.auth.api.v1.PasswordRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.PasswordRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.PasswordRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.PasswordRequest}
  */
-proto.zitadel.auth.api.v1.PasswordRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.PasswordRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4340,9 +4783,9 @@ proto.zitadel.auth.api.v1.PasswordRequest.deserializeBinaryFromReader = function
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.PasswordRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.PasswordRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.PasswordRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.PasswordRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4350,11 +4793,11 @@ proto.zitadel.auth.api.v1.PasswordRequest.prototype.serializeBinary = function()
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.PasswordRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.PasswordRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.PasswordRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getPassword();
   if (f.length > 0) {
@@ -4370,13 +4813,13 @@ proto.zitadel.auth.api.v1.PasswordRequest.serializeBinaryToWriter = function(mes
  * optional string password = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.PasswordRequest.prototype.getPassword = function() {
+proto.caos.zitadel.auth.api.v1.PasswordRequest.prototype.getPassword = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.PasswordRequest.prototype.setPassword = function(value) {
+proto.caos.zitadel.auth.api.v1.PasswordRequest.prototype.setPassword = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -4395,8 +4838,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.PasswordChange.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.PasswordChange.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.PasswordChange.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.PasswordChange.toObject(opt_includeInstance, this);
 };
 
 
@@ -4405,11 +4848,11 @@ proto.zitadel.auth.api.v1.PasswordChange.prototype.toObject = function(opt_inclu
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.PasswordChange} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordChange} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.PasswordChange.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.PasswordChange.toObject = function(includeInstance, msg) {
   var f, obj = {
     oldPassword: jspb.Message.getFieldWithDefault(msg, 1, ""),
     newPassword: jspb.Message.getFieldWithDefault(msg, 2, "")
@@ -4426,23 +4869,23 @@ proto.zitadel.auth.api.v1.PasswordChange.toObject = function(includeInstance, ms
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.PasswordChange}
+ * @return {!proto.caos.zitadel.auth.api.v1.PasswordChange}
  */
-proto.zitadel.auth.api.v1.PasswordChange.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.PasswordChange.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.PasswordChange;
-  return proto.zitadel.auth.api.v1.PasswordChange.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.PasswordChange;
+  return proto.caos.zitadel.auth.api.v1.PasswordChange.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.PasswordChange} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordChange} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.PasswordChange}
+ * @return {!proto.caos.zitadel.auth.api.v1.PasswordChange}
  */
-proto.zitadel.auth.api.v1.PasswordChange.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.PasswordChange.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4470,9 +4913,9 @@ proto.zitadel.auth.api.v1.PasswordChange.deserializeBinaryFromReader = function(
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.PasswordChange.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.PasswordChange.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.PasswordChange.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.PasswordChange.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4480,11 +4923,11 @@ proto.zitadel.auth.api.v1.PasswordChange.prototype.serializeBinary = function() 
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.PasswordChange} message
+ * @param {!proto.caos.zitadel.auth.api.v1.PasswordChange} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.PasswordChange.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.PasswordChange.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getOldPassword();
   if (f.length > 0) {
@@ -4507,13 +4950,13 @@ proto.zitadel.auth.api.v1.PasswordChange.serializeBinaryToWriter = function(mess
  * optional string old_password = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.PasswordChange.prototype.getOldPassword = function() {
+proto.caos.zitadel.auth.api.v1.PasswordChange.prototype.getOldPassword = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.PasswordChange.prototype.setOldPassword = function(value) {
+proto.caos.zitadel.auth.api.v1.PasswordChange.prototype.setOldPassword = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -4522,13 +4965,13 @@ proto.zitadel.auth.api.v1.PasswordChange.prototype.setOldPassword = function(val
  * optional string new_password = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.PasswordChange.prototype.getNewPassword = function() {
+proto.caos.zitadel.auth.api.v1.PasswordChange.prototype.getNewPassword = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.PasswordChange.prototype.setNewPassword = function(value) {
+proto.caos.zitadel.auth.api.v1.PasswordChange.prototype.setNewPassword = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -4547,8 +4990,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.VerifyMfaOtp.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.toObject(opt_includeInstance, this);
 };
 
 
@@ -4557,11 +5000,11 @@ proto.zitadel.auth.api.v1.VerifyMfaOtp.prototype.toObject = function(opt_include
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.VerifyMfaOtp} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyMfaOtp} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.toObject = function(includeInstance, msg) {
   var f, obj = {
     code: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -4577,23 +5020,23 @@ proto.zitadel.auth.api.v1.VerifyMfaOtp.toObject = function(includeInstance, msg)
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.VerifyMfaOtp}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyMfaOtp}
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.VerifyMfaOtp;
-  return proto.zitadel.auth.api.v1.VerifyMfaOtp.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.VerifyMfaOtp;
+  return proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.VerifyMfaOtp} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyMfaOtp} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.VerifyMfaOtp}
+ * @return {!proto.caos.zitadel.auth.api.v1.VerifyMfaOtp}
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4617,9 +5060,9 @@ proto.zitadel.auth.api.v1.VerifyMfaOtp.deserializeBinaryFromReader = function(ms
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.VerifyMfaOtp.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4627,11 +5070,11 @@ proto.zitadel.auth.api.v1.VerifyMfaOtp.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.VerifyMfaOtp} message
+ * @param {!proto.caos.zitadel.auth.api.v1.VerifyMfaOtp} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getCode();
   if (f.length > 0) {
@@ -4647,13 +5090,13 @@ proto.zitadel.auth.api.v1.VerifyMfaOtp.serializeBinaryToWriter = function(messag
  * optional string code = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.prototype.getCode = function() {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.prototype.getCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.VerifyMfaOtp.prototype.setCode = function(value) {
+proto.caos.zitadel.auth.api.v1.VerifyMfaOtp.prototype.setCode = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -4664,7 +5107,7 @@ proto.zitadel.auth.api.v1.VerifyMfaOtp.prototype.setCode = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.zitadel.auth.api.v1.MultiFactors.repeatedFields_ = [1];
+proto.caos.zitadel.auth.api.v1.MultiFactors.repeatedFields_ = [1];
 
 
 
@@ -4679,8 +5122,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.MultiFactors.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.MultiFactors.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.MultiFactors.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.MultiFactors.toObject(opt_includeInstance, this);
 };
 
 
@@ -4689,14 +5132,14 @@ proto.zitadel.auth.api.v1.MultiFactors.prototype.toObject = function(opt_include
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.MultiFactors} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.MultiFactors} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MultiFactors.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.MultiFactors.toObject = function(includeInstance, msg) {
   var f, obj = {
     mfasList: jspb.Message.toObjectList(msg.getMfasList(),
-    proto.zitadel.auth.api.v1.MultiFactor.toObject, includeInstance)
+    proto.caos.zitadel.auth.api.v1.MultiFactor.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -4710,23 +5153,23 @@ proto.zitadel.auth.api.v1.MultiFactors.toObject = function(includeInstance, msg)
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.MultiFactors}
+ * @return {!proto.caos.zitadel.auth.api.v1.MultiFactors}
  */
-proto.zitadel.auth.api.v1.MultiFactors.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.MultiFactors.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.MultiFactors;
-  return proto.zitadel.auth.api.v1.MultiFactors.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.MultiFactors;
+  return proto.caos.zitadel.auth.api.v1.MultiFactors.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.MultiFactors} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.MultiFactors} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.MultiFactors}
+ * @return {!proto.caos.zitadel.auth.api.v1.MultiFactors}
  */
-proto.zitadel.auth.api.v1.MultiFactors.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.MultiFactors.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4734,8 +5177,8 @@ proto.zitadel.auth.api.v1.MultiFactors.deserializeBinaryFromReader = function(ms
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new proto.zitadel.auth.api.v1.MultiFactor;
-      reader.readMessage(value,proto.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.auth.api.v1.MultiFactor;
+      reader.readMessage(value,proto.caos.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader);
       msg.addMfas(value);
       break;
     default:
@@ -4751,9 +5194,9 @@ proto.zitadel.auth.api.v1.MultiFactors.deserializeBinaryFromReader = function(ms
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.MultiFactors.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.MultiFactors.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.MultiFactors.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.MultiFactors.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4761,18 +5204,18 @@ proto.zitadel.auth.api.v1.MultiFactors.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.MultiFactors} message
+ * @param {!proto.caos.zitadel.auth.api.v1.MultiFactors} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MultiFactors.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.MultiFactors.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getMfasList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
       1,
       f,
-      proto.zitadel.auth.api.v1.MultiFactor.serializeBinaryToWriter
+      proto.caos.zitadel.auth.api.v1.MultiFactor.serializeBinaryToWriter
     );
   }
 };
@@ -4780,34 +5223,34 @@ proto.zitadel.auth.api.v1.MultiFactors.serializeBinaryToWriter = function(messag
 
 /**
  * repeated MultiFactor mfas = 1;
- * @return {!Array<!proto.zitadel.auth.api.v1.MultiFactor>}
+ * @return {!Array<!proto.caos.zitadel.auth.api.v1.MultiFactor>}
  */
-proto.zitadel.auth.api.v1.MultiFactors.prototype.getMfasList = function() {
-  return /** @type{!Array<!proto.zitadel.auth.api.v1.MultiFactor>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.zitadel.auth.api.v1.MultiFactor, 1));
+proto.caos.zitadel.auth.api.v1.MultiFactors.prototype.getMfasList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.auth.api.v1.MultiFactor>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.auth.api.v1.MultiFactor, 1));
 };
 
 
-/** @param {!Array<!proto.zitadel.auth.api.v1.MultiFactor>} value */
-proto.zitadel.auth.api.v1.MultiFactors.prototype.setMfasList = function(value) {
+/** @param {!Array<!proto.caos.zitadel.auth.api.v1.MultiFactor>} value */
+proto.caos.zitadel.auth.api.v1.MultiFactors.prototype.setMfasList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 1, value);
 };
 
 
 /**
- * @param {!proto.zitadel.auth.api.v1.MultiFactor=} opt_value
+ * @param {!proto.caos.zitadel.auth.api.v1.MultiFactor=} opt_value
  * @param {number=} opt_index
- * @return {!proto.zitadel.auth.api.v1.MultiFactor}
+ * @return {!proto.caos.zitadel.auth.api.v1.MultiFactor}
  */
-proto.zitadel.auth.api.v1.MultiFactors.prototype.addMfas = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.zitadel.auth.api.v1.MultiFactor, opt_index);
+proto.caos.zitadel.auth.api.v1.MultiFactors.prototype.addMfas = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.caos.zitadel.auth.api.v1.MultiFactor, opt_index);
 };
 
 
 /**
  * Clears the list making it empty but non-null.
  */
-proto.zitadel.auth.api.v1.MultiFactors.prototype.clearMfasList = function() {
+proto.caos.zitadel.auth.api.v1.MultiFactors.prototype.clearMfasList = function() {
   this.setMfasList([]);
 };
 
@@ -4826,8 +5269,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.MultiFactor.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.MultiFactor.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.MultiFactor.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.MultiFactor.toObject(opt_includeInstance, this);
 };
 
 
@@ -4836,11 +5279,11 @@ proto.zitadel.auth.api.v1.MultiFactor.prototype.toObject = function(opt_includeI
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.MultiFactor} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.MultiFactor} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MultiFactor.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.MultiFactor.toObject = function(includeInstance, msg) {
   var f, obj = {
     type: jspb.Message.getFieldWithDefault(msg, 1, 0),
     state: jspb.Message.getFieldWithDefault(msg, 2, 0)
@@ -4857,23 +5300,23 @@ proto.zitadel.auth.api.v1.MultiFactor.toObject = function(includeInstance, msg) 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.MultiFactor}
+ * @return {!proto.caos.zitadel.auth.api.v1.MultiFactor}
  */
-proto.zitadel.auth.api.v1.MultiFactor.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.MultiFactor.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.MultiFactor;
-  return proto.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.MultiFactor;
+  return proto.caos.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.MultiFactor} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.MultiFactor} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.MultiFactor}
+ * @return {!proto.caos.zitadel.auth.api.v1.MultiFactor}
  */
-proto.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4881,11 +5324,11 @@ proto.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader = function(msg
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!proto.zitadel.auth.api.v1.MfaType} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.MfaType} */ (reader.readEnum());
       msg.setType(value);
       break;
     case 2:
-      var value = /** @type {!proto.zitadel.auth.api.v1.MFAState} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.MFAState} */ (reader.readEnum());
       msg.setState(value);
       break;
     default:
@@ -4901,9 +5344,9 @@ proto.zitadel.auth.api.v1.MultiFactor.deserializeBinaryFromReader = function(msg
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.MultiFactor.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.MultiFactor.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.MultiFactor.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.MultiFactor.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4911,11 +5354,11 @@ proto.zitadel.auth.api.v1.MultiFactor.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.MultiFactor} message
+ * @param {!proto.caos.zitadel.auth.api.v1.MultiFactor} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MultiFactor.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.MultiFactor.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getType();
   if (f !== 0.0) {
@@ -4936,30 +5379,30 @@ proto.zitadel.auth.api.v1.MultiFactor.serializeBinaryToWriter = function(message
 
 /**
  * optional MfaType type = 1;
- * @return {!proto.zitadel.auth.api.v1.MfaType}
+ * @return {!proto.caos.zitadel.auth.api.v1.MfaType}
  */
-proto.zitadel.auth.api.v1.MultiFactor.prototype.getType = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.MfaType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.caos.zitadel.auth.api.v1.MultiFactor.prototype.getType = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.MfaType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.MfaType} value */
-proto.zitadel.auth.api.v1.MultiFactor.prototype.setType = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.MfaType} value */
+proto.caos.zitadel.auth.api.v1.MultiFactor.prototype.setType = function(value) {
   jspb.Message.setProto3EnumField(this, 1, value);
 };
 
 
 /**
  * optional MFAState state = 2;
- * @return {!proto.zitadel.auth.api.v1.MFAState}
+ * @return {!proto.caos.zitadel.auth.api.v1.MFAState}
  */
-proto.zitadel.auth.api.v1.MultiFactor.prototype.getState = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.MFAState} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.caos.zitadel.auth.api.v1.MultiFactor.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.MFAState} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.MFAState} value */
-proto.zitadel.auth.api.v1.MultiFactor.prototype.setState = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.MFAState} value */
+proto.caos.zitadel.auth.api.v1.MultiFactor.prototype.setState = function(value) {
   jspb.Message.setProto3EnumField(this, 2, value);
 };
 
@@ -4978,8 +5421,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.MfaOtpResponse.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.MfaOtpResponse.toObject(opt_includeInstance, this);
 };
 
 
@@ -4988,11 +5431,11 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.toObject = function(opt_inclu
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.MfaOtpResponse} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.MfaOtpResponse} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
     url: jspb.Message.getFieldWithDefault(msg, 2, ""),
@@ -5011,23 +5454,23 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.toObject = function(includeInstance, ms
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.MfaOtpResponse}
+ * @return {!proto.caos.zitadel.auth.api.v1.MfaOtpResponse}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.MfaOtpResponse;
-  return proto.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.MfaOtpResponse;
+  return proto.caos.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.MfaOtpResponse} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.MfaOtpResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.MfaOtpResponse}
+ * @return {!proto.caos.zitadel.auth.api.v1.MfaOtpResponse}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -5047,7 +5490,7 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinaryFromReader = function(
       msg.setSecret(value);
       break;
     case 4:
-      var value = /** @type {!proto.zitadel.auth.api.v1.MFAState} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.MFAState} */ (reader.readEnum());
       msg.setState(value);
       break;
     default:
@@ -5063,9 +5506,9 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.deserializeBinaryFromReader = function(
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.MfaOtpResponse.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.MfaOtpResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -5073,11 +5516,11 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.serializeBinary = function() 
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.MfaOtpResponse} message
+ * @param {!proto.caos.zitadel.auth.api.v1.MfaOtpResponse} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getUserId();
   if (f.length > 0) {
@@ -5114,13 +5557,13 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.serializeBinaryToWriter = function(mess
  * optional string user_id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.getUserId = function() {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.getUserId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.setUserId = function(value) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.setUserId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -5129,13 +5572,13 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.setUserId = function(value) {
  * optional string url = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.getUrl = function() {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.getUrl = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.setUrl = function(value) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.setUrl = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -5144,28 +5587,28 @@ proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.setUrl = function(value) {
  * optional string secret = 3;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.getSecret = function() {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.getSecret = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.setSecret = function(value) {
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.setSecret = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
 
 /**
  * optional MFAState state = 4;
- * @return {!proto.zitadel.auth.api.v1.MFAState}
+ * @return {!proto.caos.zitadel.auth.api.v1.MFAState}
  */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.getState = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.MFAState} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.MFAState} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.MFAState} value */
-proto.zitadel.auth.api.v1.MfaOtpResponse.prototype.setState = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.MFAState} value */
+proto.caos.zitadel.auth.api.v1.MfaOtpResponse.prototype.setState = function(value) {
   jspb.Message.setProto3EnumField(this, 4, value);
 };
 
@@ -5184,8 +5627,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.OIDCClientAuth.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.OIDCClientAuth.toObject(opt_includeInstance, this);
 };
 
 
@@ -5194,11 +5637,11 @@ proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.toObject = function(opt_inclu
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.OIDCClientAuth} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.OIDCClientAuth} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.toObject = function(includeInstance, msg) {
   var f, obj = {
     clientId: jspb.Message.getFieldWithDefault(msg, 1, ""),
     clientSecret: jspb.Message.getFieldWithDefault(msg, 2, "")
@@ -5215,23 +5658,23 @@ proto.zitadel.auth.api.v1.OIDCClientAuth.toObject = function(includeInstance, ms
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.OIDCClientAuth}
+ * @return {!proto.caos.zitadel.auth.api.v1.OIDCClientAuth}
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.OIDCClientAuth;
-  return proto.zitadel.auth.api.v1.OIDCClientAuth.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.OIDCClientAuth;
+  return proto.caos.zitadel.auth.api.v1.OIDCClientAuth.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.OIDCClientAuth} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.OIDCClientAuth} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.OIDCClientAuth}
+ * @return {!proto.caos.zitadel.auth.api.v1.OIDCClientAuth}
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -5259,9 +5702,9 @@ proto.zitadel.auth.api.v1.OIDCClientAuth.deserializeBinaryFromReader = function(
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.OIDCClientAuth.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.OIDCClientAuth.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -5269,11 +5712,11 @@ proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.serializeBinary = function() 
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.OIDCClientAuth} message
+ * @param {!proto.caos.zitadel.auth.api.v1.OIDCClientAuth} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getClientId();
   if (f.length > 0) {
@@ -5296,13 +5739,13 @@ proto.zitadel.auth.api.v1.OIDCClientAuth.serializeBinaryToWriter = function(mess
  * optional string client_id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.getClientId = function() {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.prototype.getClientId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.setClientId = function(value) {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.prototype.setClientId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -5311,13 +5754,13 @@ proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.setClientId = function(value)
  * optional string client_secret = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.getClientSecret = function() {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.prototype.getClientSecret = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.setClientSecret = function(value) {
+proto.caos.zitadel.auth.api.v1.OIDCClientAuth.prototype.setClientSecret = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -5328,7 +5771,7 @@ proto.zitadel.auth.api.v1.OIDCClientAuth.prototype.setClientSecret = function(va
  * @private {!Array<number>}
  * @const
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.repeatedFields_ = [5];
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.repeatedFields_ = [5];
 
 
 
@@ -5343,8 +5786,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -5353,17 +5796,18 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.toObject = functio
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    sortingColumn: jspb.Message.getFieldWithDefault(msg, 3, 0),
     asc: jspb.Message.getFieldWithDefault(msg, 4, false),
     queriesList: jspb.Message.toObjectList(msg.getQueriesList(),
-    proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.toObject, includeInstance)
+    proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -5377,23 +5821,23 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.toObject = function(includeI
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest;
-  return proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest;
+  return proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -5408,13 +5852,17 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinaryFromReader 
       var value = /** @type {number} */ (reader.readUint64());
       msg.setLimit(value);
       break;
+    case 3:
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey} */ (reader.readEnum());
+      msg.setSortingColumn(value);
+      break;
     case 4:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setAsc(value);
       break;
     case 5:
-      var value = new proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery;
-      reader.readMessage(value,proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery;
+      reader.readMessage(value,proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.deserializeBinaryFromReader);
       msg.addQueries(value);
       break;
     default:
@@ -5430,9 +5878,9 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinaryFromReader 
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -5440,11 +5888,11 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.serializeBinary = 
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getOffset();
   if (f !== 0) {
@@ -5460,6 +5908,13 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.serializeBinaryToWriter = fu
       f
     );
   }
+  f = message.getSortingColumn();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      3,
+      f
+    );
+  }
   f = message.getAsc();
   if (f) {
     writer.writeBool(
@@ -5472,7 +5927,7 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.serializeBinaryToWriter = fu
     writer.writeRepeatedMessage(
       5,
       f,
-      proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.serializeBinaryToWriter
+      proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.serializeBinaryToWriter
     );
   }
 };
@@ -5482,13 +5937,13 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.serializeBinaryToWriter = fu
  * optional uint64 offset = 1;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getOffset = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.getOffset = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setOffset = function(value) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.setOffset = function(value) {
   jspb.Message.setProto3IntField(this, 1, value);
 };
 
@@ -5497,14 +5952,29 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setOffset = functi
  * optional uint64 limit = 2;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getLimit = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.getLimit = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setLimit = function(value) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.setLimit = function(value) {
   jspb.Message.setProto3IntField(this, 2, value);
+};
+
+
+/**
+ * optional UserGrantSearchKey sorting_column = 3;
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.getSortingColumn = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey} value */
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.setSortingColumn = function(value) {
+  jspb.Message.setProto3EnumField(this, 3, value);
 };
 
 
@@ -5514,47 +5984,47 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setLimit = functio
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getAsc = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.getAsc = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 4, false));
 };
 
 
 /** @param {boolean} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setAsc = function(value) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.setAsc = function(value) {
   jspb.Message.setProto3BooleanField(this, 4, value);
 };
 
 
 /**
- * repeated MyProjectOrgSearchQuery queries = 5;
- * @return {!Array<!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery>}
+ * repeated UserGrantSearchQuery queries = 5;
+ * @return {!Array<!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery>}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getQueriesList = function() {
-  return /** @type{!Array<!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery, 5));
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.getQueriesList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery, 5));
 };
 
 
-/** @param {!Array<!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery>} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setQueriesList = function(value) {
+/** @param {!Array<!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery>} value */
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.setQueriesList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 5, value);
 };
 
 
 /**
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery=} opt_value
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery=} opt_value
  * @param {number=} opt_index
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.addQueries = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 5, opt_value, proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery, opt_index);
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.addQueries = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 5, opt_value, proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery, opt_index);
 };
 
 
 /**
  * Clears the list making it empty but non-null.
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.clearQueriesList = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchRequest.prototype.clearQueriesList = function() {
   this.setQueriesList([]);
 };
 
@@ -5573,8 +6043,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.toObject(opt_includeInstance, this);
 };
 
 
@@ -5583,11 +6053,11 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.toObject = function(
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.toObject = function(includeInstance, msg) {
   var f, obj = {
     key: jspb.Message.getFieldWithDefault(msg, 1, 0),
     method: jspb.Message.getFieldWithDefault(msg, 2, 0),
@@ -5605,23 +6075,23 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.toObject = function(includeIns
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery;
-  return proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery;
+  return proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -5629,11 +6099,11 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader = 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!proto.zitadel.auth.api.v1.MyProjectOrgSearchKey} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey} */ (reader.readEnum());
       msg.setKey(value);
       break;
     case 2:
-      var value = /** @type {!proto.zitadel.auth.api.v1.SearchMethod} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.SearchMethod} */ (reader.readEnum());
       msg.setMethod(value);
       break;
     case 3:
@@ -5653,9 +6123,9 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader = 
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -5663,11 +6133,11 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.serializeBinary = fu
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getKey();
   if (f !== 0.0) {
@@ -5694,31 +6164,31 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.serializeBinaryToWriter = func
 
 
 /**
- * optional MyProjectOrgSearchKey key = 1;
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchKey}
+ * optional UserGrantSearchKey key = 1;
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.getKey = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.MyProjectOrgSearchKey} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.getKey = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchKey} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setKey = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchKey} value */
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.setKey = function(value) {
   jspb.Message.setProto3EnumField(this, 1, value);
 };
 
 
 /**
  * optional SearchMethod method = 2;
- * @return {!proto.zitadel.auth.api.v1.SearchMethod}
+ * @return {!proto.caos.zitadel.auth.api.v1.SearchMethod}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.getMethod = function() {
-  return /** @type {!proto.zitadel.auth.api.v1.SearchMethod} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.getMethod = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.SearchMethod} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
-/** @param {!proto.zitadel.auth.api.v1.SearchMethod} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setMethod = function(value) {
+/** @param {!proto.caos.zitadel.auth.api.v1.SearchMethod} value */
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.setMethod = function(value) {
   jspb.Message.setProto3EnumField(this, 2, value);
 };
 
@@ -5727,13 +6197,13 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setMethod = function
  * optional string value = 3;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.getValue = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.getValue = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setValue = function(value) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchQuery.prototype.setValue = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
@@ -5744,7 +6214,7 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setValue = function(
  * @private {!Array<number>}
  * @const
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.repeatedFields_ = [4];
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.repeatedFields_ = [4];
 
 
 
@@ -5759,8 +6229,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.toObject(opt_includeInstance, this);
 };
 
 
@@ -5769,17 +6239,17 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.toObject = functi
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.zitadel.auth.api.v1.Org.toObject, includeInstance)
+    proto.caos.zitadel.auth.api.v1.UserGrantView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -5793,23 +6263,23 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.toObject = function(include
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse;
-  return proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse;
+  return proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -5829,8 +6299,8 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinaryFromReader
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.zitadel.auth.api.v1.Org;
-      reader.readMessage(value,proto.zitadel.auth.api.v1.Org.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.auth.api.v1.UserGrantView;
+      reader.readMessage(value,proto.caos.zitadel.auth.api.v1.UserGrantView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -5846,9 +6316,9 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinaryFromReader
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -5856,11 +6326,11 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.serializeBinary =
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse} message
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getOffset();
   if (f !== 0) {
@@ -5888,7 +6358,7 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.serializeBinaryToWriter = f
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.zitadel.auth.api.v1.Org.serializeBinaryToWriter
+      proto.caos.zitadel.auth.api.v1.UserGrantView.serializeBinaryToWriter
     );
   }
 };
@@ -5898,13 +6368,13 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.serializeBinaryToWriter = f
  * optional uint64 offset = 1;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getOffset = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.getOffset = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setOffset = function(value) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.setOffset = function(value) {
   jspb.Message.setProto3IntField(this, 1, value);
 };
 
@@ -5913,13 +6383,13 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setOffset = funct
  * optional uint64 limit = 2;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getLimit = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.getLimit = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setLimit = function(value) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.setLimit = function(value) {
   jspb.Message.setProto3IntField(this, 2, value);
 };
 
@@ -5928,47 +6398,955 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setLimit = functi
  * optional uint64 total_result = 3;
  * @return {number}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getTotalResult = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.getTotalResult = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
 /** @param {number} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setTotalResult = function(value) {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.setTotalResult = function(value) {
   jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
 /**
- * repeated Org result = 4;
- * @return {!Array<!proto.zitadel.auth.api.v1.Org>}
+ * repeated UserGrantView result = 4;
+ * @return {!Array<!proto.caos.zitadel.auth.api.v1.UserGrantView>}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.zitadel.auth.api.v1.Org>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.zitadel.auth.api.v1.Org, 4));
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.getResultList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.auth.api.v1.UserGrantView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.auth.api.v1.UserGrantView, 4));
 };
 
 
-/** @param {!Array<!proto.zitadel.auth.api.v1.Org>} value */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setResultList = function(value) {
+/** @param {!Array<!proto.caos.zitadel.auth.api.v1.UserGrantView>} value */
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.zitadel.auth.api.v1.Org=} opt_value
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.zitadel.auth.api.v1.Org}
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantView}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.zitadel.auth.api.v1.Org, opt_index);
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.addResult = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.auth.api.v1.UserGrantView, opt_index);
 };
 
 
 /**
  * Clears the list making it empty but non-null.
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.clearResultList = function() {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchResponse.prototype.clearResultList = function() {
+  this.setResultList([]);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.repeatedFields_ = [4];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.UserGrantView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    orgid: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    projectid: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    userid: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    rolesList: jspb.Message.getRepeatedField(msg, 4),
+    orgname: jspb.Message.getFieldWithDefault(msg, 5, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantView}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.auth.api.v1.UserGrantView;
+  return proto.caos.zitadel.auth.api.v1.UserGrantView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.auth.api.v1.UserGrantView}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgid(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProjectid(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserid(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addRoles(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgname(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.auth.api.v1.UserGrantView.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.auth.api.v1.UserGrantView} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getOrgid();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getProjectid();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getUserid();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getRolesList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      4,
+      f
+    );
+  }
+  f = message.getOrgname();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string OrgId = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.getOrgid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.setOrgid = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string ProjectId = 2;
+ * @return {string}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.getProjectid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.setProjectid = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string UserId = 3;
+ * @return {string}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.getUserid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.setUserid = function(value) {
+  jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * repeated string Roles = 4;
+ * @return {!Array<string>}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.getRolesList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 4));
+};
+
+
+/** @param {!Array<string>} value */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.setRolesList = function(value) {
+  jspb.Message.setField(this, 4, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.addRoles = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 4, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.clearRolesList = function() {
+  this.setRolesList([]);
+};
+
+
+/**
+ * optional string OrgName = 5;
+ * @return {string}
+ */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.getOrgname = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.auth.api.v1.UserGrantView.prototype.setOrgname = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.repeatedFields_ = [5];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    asc: jspb.Message.getFieldWithDefault(msg, 4, false),
+    queriesList: jspb.Message.toObjectList(msg.getQueriesList(),
+    proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.toObject, includeInstance)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest;
+  return proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setOffset(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setLimit(value);
+      break;
+    case 4:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setAsc(value);
+      break;
+    case 5:
+      var value = new proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery;
+      reader.readMessage(value,proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader);
+      msg.addQueries(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getOffset();
+  if (f !== 0) {
+    writer.writeUint64(
+      1,
+      f
+    );
+  }
+  f = message.getLimit();
+  if (f !== 0) {
+    writer.writeUint64(
+      2,
+      f
+    );
+  }
+  f = message.getAsc();
+  if (f) {
+    writer.writeBool(
+      4,
+      f
+    );
+  }
+  f = message.getQueriesList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      5,
+      f,
+      proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional uint64 offset = 1;
+ * @return {number}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getOffset = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setOffset = function(value) {
+  jspb.Message.setProto3IntField(this, 1, value);
+};
+
+
+/**
+ * optional uint64 limit = 2;
+ * @return {number}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getLimit = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setLimit = function(value) {
+  jspb.Message.setProto3IntField(this, 2, value);
+};
+
+
+/**
+ * optional bool asc = 4;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getAsc = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 4, false));
+};
+
+
+/** @param {boolean} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setAsc = function(value) {
+  jspb.Message.setProto3BooleanField(this, 4, value);
+};
+
+
+/**
+ * repeated MyProjectOrgSearchQuery queries = 5;
+ * @return {!Array<!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery>}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.getQueriesList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery, 5));
+};
+
+
+/** @param {!Array<!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery>} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.setQueriesList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 5, value);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.addQueries = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 5, opt_value, proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchRequest.prototype.clearQueriesList = function() {
+  this.setQueriesList([]);
+};
+
+
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    key: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    method: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    value: jspb.Message.getFieldWithDefault(msg, 3, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery;
+  return proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchKey} */ (reader.readEnum());
+      msg.setKey(value);
+      break;
+    case 2:
+      var value = /** @type {!proto.caos.zitadel.auth.api.v1.SearchMethod} */ (reader.readEnum());
+      msg.setMethod(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setValue(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getKey();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      1,
+      f
+    );
+  }
+  f = message.getMethod();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      2,
+      f
+    );
+  }
+  f = message.getValue();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional MyProjectOrgSearchKey key = 1;
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchKey}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.getKey = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchKey} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchKey} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setKey = function(value) {
+  jspb.Message.setProto3EnumField(this, 1, value);
+};
+
+
+/**
+ * optional SearchMethod method = 2;
+ * @return {!proto.caos.zitadel.auth.api.v1.SearchMethod}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.getMethod = function() {
+  return /** @type {!proto.caos.zitadel.auth.api.v1.SearchMethod} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.auth.api.v1.SearchMethod} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setMethod = function(value) {
+  jspb.Message.setProto3EnumField(this, 2, value);
+};
+
+
+/**
+ * optional string value = 3;
+ * @return {string}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.getValue = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchQuery.prototype.setValue = function(value) {
+  jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.repeatedFields_ = [4];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    resultList: jspb.Message.toObjectList(msg.getResultList(),
+    proto.caos.zitadel.auth.api.v1.Org.toObject, includeInstance)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse;
+  return proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setOffset(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setLimit(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setTotalResult(value);
+      break;
+    case 4:
+      var value = new proto.caos.zitadel.auth.api.v1.Org;
+      reader.readMessage(value,proto.caos.zitadel.auth.api.v1.Org.deserializeBinaryFromReader);
+      msg.addResult(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getOffset();
+  if (f !== 0) {
+    writer.writeUint64(
+      1,
+      f
+    );
+  }
+  f = message.getLimit();
+  if (f !== 0) {
+    writer.writeUint64(
+      2,
+      f
+    );
+  }
+  f = message.getTotalResult();
+  if (f !== 0) {
+    writer.writeUint64(
+      3,
+      f
+    );
+  }
+  f = message.getResultList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      4,
+      f,
+      proto.caos.zitadel.auth.api.v1.Org.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional uint64 offset = 1;
+ * @return {number}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getOffset = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setOffset = function(value) {
+  jspb.Message.setProto3IntField(this, 1, value);
+};
+
+
+/**
+ * optional uint64 limit = 2;
+ * @return {number}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getLimit = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setLimit = function(value) {
+  jspb.Message.setProto3IntField(this, 2, value);
+};
+
+
+/**
+ * optional uint64 total_result = 3;
+ * @return {number}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getTotalResult = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setTotalResult = function(value) {
+  jspb.Message.setProto3IntField(this, 3, value);
+};
+
+
+/**
+ * repeated Org result = 4;
+ * @return {!Array<!proto.caos.zitadel.auth.api.v1.Org>}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.getResultList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.auth.api.v1.Org>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.auth.api.v1.Org, 4));
+};
+
+
+/** @param {!Array<!proto.caos.zitadel.auth.api.v1.Org>} value */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.setResultList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 4, value);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.auth.api.v1.Org=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.caos.zitadel.auth.api.v1.Org}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.addResult = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.auth.api.v1.Org, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchResponse.prototype.clearResultList = function() {
   this.setResultList([]);
 };
 
@@ -5987,8 +7365,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.IsAdminResponse.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.IsAdminResponse.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.Org.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.Org.toObject(opt_includeInstance, this);
 };
 
 
@@ -5997,138 +7375,11 @@ proto.zitadel.auth.api.v1.IsAdminResponse.prototype.toObject = function(opt_incl
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.IsAdminResponse} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.Org} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.IsAdminResponse.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    isAdmin: jspb.Message.getFieldWithDefault(msg, 1, false)
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.IsAdminResponse}
- */
-proto.zitadel.auth.api.v1.IsAdminResponse.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.IsAdminResponse;
-  return proto.zitadel.auth.api.v1.IsAdminResponse.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.IsAdminResponse} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.IsAdminResponse}
- */
-proto.zitadel.auth.api.v1.IsAdminResponse.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setIsAdmin(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.zitadel.auth.api.v1.IsAdminResponse.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.IsAdminResponse.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.IsAdminResponse} message
- * @param {!jspb.BinaryWriter} writer
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.zitadel.auth.api.v1.IsAdminResponse.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getIsAdmin();
-  if (f) {
-    writer.writeBool(
-      1,
-      f
-    );
-  }
-};
-
-
-/**
- * optional bool is_admin = 1;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.zitadel.auth.api.v1.IsAdminResponse.prototype.getIsAdmin = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 1, false));
-};
-
-
-/** @param {boolean} value */
-proto.zitadel.auth.api.v1.IsAdminResponse.prototype.setIsAdmin = function(value) {
-  jspb.Message.setProto3BooleanField(this, 1, value);
-};
-
-
-
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.zitadel.auth.api.v1.Org.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.Org.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.Org} msg The msg instance to transform.
- * @return {!Object}
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.zitadel.auth.api.v1.Org.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.Org.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     name: jspb.Message.getFieldWithDefault(msg, 2, "")
@@ -6145,23 +7396,23 @@ proto.zitadel.auth.api.v1.Org.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.Org}
+ * @return {!proto.caos.zitadel.auth.api.v1.Org}
  */
-proto.zitadel.auth.api.v1.Org.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.Org.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.Org;
-  return proto.zitadel.auth.api.v1.Org.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.Org;
+  return proto.caos.zitadel.auth.api.v1.Org.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.Org} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.Org} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.Org}
+ * @return {!proto.caos.zitadel.auth.api.v1.Org}
  */
-proto.zitadel.auth.api.v1.Org.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.Org.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -6189,9 +7440,9 @@ proto.zitadel.auth.api.v1.Org.deserializeBinaryFromReader = function(msg, reader
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.Org.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.Org.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.Org.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.Org.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -6199,11 +7450,11 @@ proto.zitadel.auth.api.v1.Org.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.Org} message
+ * @param {!proto.caos.zitadel.auth.api.v1.Org} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.Org.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.Org.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -6226,13 +7477,13 @@ proto.zitadel.auth.api.v1.Org.serializeBinaryToWriter = function(message, writer
  * optional string id = 1;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.Org.prototype.getId = function() {
+proto.caos.zitadel.auth.api.v1.Org.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.Org.prototype.setId = function(value) {
+proto.caos.zitadel.auth.api.v1.Org.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -6241,13 +7492,13 @@ proto.zitadel.auth.api.v1.Org.prototype.setId = function(value) {
  * optional string name = 2;
  * @return {string}
  */
-proto.zitadel.auth.api.v1.Org.prototype.getName = function() {
+proto.caos.zitadel.auth.api.v1.Org.prototype.getName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.zitadel.auth.api.v1.Org.prototype.setName = function(value) {
+proto.caos.zitadel.auth.api.v1.Org.prototype.setName = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -6258,7 +7509,7 @@ proto.zitadel.auth.api.v1.Org.prototype.setName = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.zitadel.auth.api.v1.MyPermissions.repeatedFields_ = [1];
+proto.caos.zitadel.auth.api.v1.MyPermissions.repeatedFields_ = [1];
 
 
 
@@ -6273,8 +7524,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.zitadel.auth.api.v1.MyPermissions.prototype.toObject = function(opt_includeInstance) {
-  return proto.zitadel.auth.api.v1.MyPermissions.toObject(opt_includeInstance, this);
+proto.caos.zitadel.auth.api.v1.MyPermissions.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.auth.api.v1.MyPermissions.toObject(opt_includeInstance, this);
 };
 
 
@@ -6283,11 +7534,11 @@ proto.zitadel.auth.api.v1.MyPermissions.prototype.toObject = function(opt_includ
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.zitadel.auth.api.v1.MyPermissions} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyPermissions} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyPermissions.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.auth.api.v1.MyPermissions.toObject = function(includeInstance, msg) {
   var f, obj = {
     permissionsList: jspb.Message.getRepeatedField(msg, 1)
   };
@@ -6303,23 +7554,23 @@ proto.zitadel.auth.api.v1.MyPermissions.toObject = function(includeInstance, msg
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.zitadel.auth.api.v1.MyPermissions}
+ * @return {!proto.caos.zitadel.auth.api.v1.MyPermissions}
  */
-proto.zitadel.auth.api.v1.MyPermissions.deserializeBinary = function(bytes) {
+proto.caos.zitadel.auth.api.v1.MyPermissions.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.zitadel.auth.api.v1.MyPermissions;
-  return proto.zitadel.auth.api.v1.MyPermissions.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.auth.api.v1.MyPermissions;
+  return proto.caos.zitadel.auth.api.v1.MyPermissions.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.zitadel.auth.api.v1.MyPermissions} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.auth.api.v1.MyPermissions} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.zitadel.auth.api.v1.MyPermissions}
+ * @return {!proto.caos.zitadel.auth.api.v1.MyPermissions}
  */
-proto.zitadel.auth.api.v1.MyPermissions.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.auth.api.v1.MyPermissions.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -6343,9 +7594,9 @@ proto.zitadel.auth.api.v1.MyPermissions.deserializeBinaryFromReader = function(m
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.zitadel.auth.api.v1.MyPermissions.prototype.serializeBinary = function() {
+proto.caos.zitadel.auth.api.v1.MyPermissions.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.zitadel.auth.api.v1.MyPermissions.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.auth.api.v1.MyPermissions.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -6353,11 +7604,11 @@ proto.zitadel.auth.api.v1.MyPermissions.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.zitadel.auth.api.v1.MyPermissions} message
+ * @param {!proto.caos.zitadel.auth.api.v1.MyPermissions} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.zitadel.auth.api.v1.MyPermissions.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.auth.api.v1.MyPermissions.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getPermissionsList();
   if (f.length > 0) {
@@ -6373,13 +7624,13 @@ proto.zitadel.auth.api.v1.MyPermissions.serializeBinaryToWriter = function(messa
  * repeated string permissions = 1;
  * @return {!Array<string>}
  */
-proto.zitadel.auth.api.v1.MyPermissions.prototype.getPermissionsList = function() {
+proto.caos.zitadel.auth.api.v1.MyPermissions.prototype.getPermissionsList = function() {
   return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 1));
 };
 
 
 /** @param {!Array<string>} value */
-proto.zitadel.auth.api.v1.MyPermissions.prototype.setPermissionsList = function(value) {
+proto.caos.zitadel.auth.api.v1.MyPermissions.prototype.setPermissionsList = function(value) {
   jspb.Message.setField(this, 1, value || []);
 };
 
@@ -6388,7 +7639,7 @@ proto.zitadel.auth.api.v1.MyPermissions.prototype.setPermissionsList = function(
  * @param {string} value
  * @param {number=} opt_index
  */
-proto.zitadel.auth.api.v1.MyPermissions.prototype.addPermissions = function(value, opt_index) {
+proto.caos.zitadel.auth.api.v1.MyPermissions.prototype.addPermissions = function(value, opt_index) {
   jspb.Message.addToRepeatedField(this, 1, value, opt_index);
 };
 
@@ -6396,7 +7647,7 @@ proto.zitadel.auth.api.v1.MyPermissions.prototype.addPermissions = function(valu
 /**
  * Clears the list making it empty but non-null.
  */
-proto.zitadel.auth.api.v1.MyPermissions.prototype.clearPermissionsList = function() {
+proto.caos.zitadel.auth.api.v1.MyPermissions.prototype.clearPermissionsList = function() {
   this.setPermissionsList([]);
 };
 
@@ -6404,7 +7655,7 @@ proto.zitadel.auth.api.v1.MyPermissions.prototype.clearPermissionsList = functio
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.UserSessionState = {
+proto.caos.zitadel.auth.api.v1.UserSessionState = {
   USERSESSIONSTATE_UNSPECIFIED: 0,
   USERSESSIONSTATE_ACTIVE: 1,
   USERSESSIONSTATE_TERMINATED: 2
@@ -6413,7 +7664,7 @@ proto.zitadel.auth.api.v1.UserSessionState = {
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.OIDCResponseType = {
+proto.caos.zitadel.auth.api.v1.OIDCResponseType = {
   OIDCRESPONSETYPE_CODE: 0,
   OIDCRESPONSETYPE_ID_TOKEN: 1,
   OIDCRESPONSETYPE_ID_TOKEN_TOKEN: 2
@@ -6422,7 +7673,7 @@ proto.zitadel.auth.api.v1.OIDCResponseType = {
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.UserState = {
+proto.caos.zitadel.auth.api.v1.UserState = {
   USERSTATE_UNSPECIEFIED: 0,
   USERSTATE_ACTIVE: 1,
   USERSTATE_INACTIVE: 2,
@@ -6435,7 +7686,7 @@ proto.zitadel.auth.api.v1.UserState = {
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.Gender = {
+proto.caos.zitadel.auth.api.v1.Gender = {
   GENDER_UNSPECIFIED: 0,
   GENDER_FEMALE: 1,
   GENDER_MALE: 2,
@@ -6445,7 +7696,7 @@ proto.zitadel.auth.api.v1.Gender = {
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.MfaType = {
+proto.caos.zitadel.auth.api.v1.MfaType = {
   MFATYPE_UNSPECIFIED: 0,
   MFATYPE_SMS: 1,
   MFATYPE_OTP: 2
@@ -6454,7 +7705,7 @@ proto.zitadel.auth.api.v1.MfaType = {
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.MFAState = {
+proto.caos.zitadel.auth.api.v1.MFAState = {
   MFASTATE_UNSPECIFIED: 0,
   MFASTATE_NOT_READY: 1,
   MFASTATE_READY: 2,
@@ -6464,7 +7715,16 @@ proto.zitadel.auth.api.v1.MFAState = {
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.MyProjectOrgSearchKey = {
+proto.caos.zitadel.auth.api.v1.UserGrantSearchKey = {
+  USERGRANTSEARCHKEY_UNKNOWN: 0,
+  USERGRANTSEARCHKEY_ORG_ID: 1,
+  USERGRANTSEARCHKEY_PROJECT_ID: 2
+};
+
+/**
+ * @enum {number}
+ */
+proto.caos.zitadel.auth.api.v1.MyProjectOrgSearchKey = {
   MYPROJECTORGSEARCHKEY_UNSPECIFIED: 0,
   MYPROJECTORGSEARCHKEY_ORG_NAME: 1
 };
@@ -6472,10 +7732,13 @@ proto.zitadel.auth.api.v1.MyProjectOrgSearchKey = {
 /**
  * @enum {number}
  */
-proto.zitadel.auth.api.v1.SearchMethod = {
+proto.caos.zitadel.auth.api.v1.SearchMethod = {
   SEARCHMETHOD_EQUALS: 0,
   SEARCHMETHOD_STARTS_WITH: 1,
-  SEARCHMETHOD_CONTAINS: 2
+  SEARCHMETHOD_CONTAINS: 2,
+  SEARCHMETHOD_EQUALS_IGNORE_CASE: 3,
+  SEARCHMETHOD_STARTS_WITH_IGNORE_CASE: 4,
+  SEARCHMETHOD_CONTAINS_IGNORE_CASE: 5
 };
 
-goog.object.extend(exports, proto.zitadel.auth.api.v1);
+goog.object.extend(exports, proto.caos.zitadel.auth.api.v1);

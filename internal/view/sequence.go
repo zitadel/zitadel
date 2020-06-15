@@ -11,7 +11,7 @@ type actualSequece struct {
 
 type currentSequence struct {
 	ViewName        string `gorm:"column:view_name;primary_key"`
-	CurrentSequence uint64 `gorm:"column:current_sequence`
+	CurrentSequence uint64 `gorm:"column:current_sequence"`
 }
 
 type SequenceSearchKey int32

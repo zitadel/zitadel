@@ -36,7 +36,7 @@ export SMTP_PASSWORD=$(gopass zitadel-secrets/zitadel/google/emailappkey)
 export EMAIL_SENDER_ADDRESS=noreply@caos.ch
 export EMAIL_SENDER_NAME=CAOS AG
 export SMTP_TLS=TRUE
-export CHAT_URL=$(gopass zitadel-secrets/zitadel/dev/google-chat-url | base64 -D)
+export CHAT_URL=$(gopass zitadel-secrets/zitadel/dev/google-chat-url)
 
 #OIDC
 export ZITADEL_ISSUER=http://localhost:50022
@@ -46,3 +46,6 @@ export ZITADEL_OAUTH=http://localhost:50022
 export ZITADEL_CONSOLE=http://localhost:4200
 export CAOS_OIDC_DEV=true
 export ZITADEL_COOKIE_DOMAIN=localhost
+
+#Console
+export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/

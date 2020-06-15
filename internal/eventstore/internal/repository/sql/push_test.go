@@ -362,7 +362,7 @@ func Test_precondtion(t *testing.T) {
 					expectBegin(nil).expectFilterEventsLimit(5, 0),
 			},
 			args: args{
-				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.CreateCaosError(nil, "SQL-LBIKm", "err"))),
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.ThrowPreconditionFailed(nil, "SQL-LBIKm", "err"))),
 			},
 			isErr: errors.IsPreconditionFailed,
 		},

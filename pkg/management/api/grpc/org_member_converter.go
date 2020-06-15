@@ -8,14 +8,18 @@ import (
 )
 
 func addOrgMemberToModel(member *AddOrgMemberRequest) *org_model.OrgMember {
-	memberModel := org_model.NewOrgMember(member.OrgId, member.UserId)
+	memberModel := &org_model.OrgMember{
+		UserID: member.UserId,
+	}
 	memberModel.Roles = member.Roles
 
 	return memberModel
 }
 
 func changeOrgMemberToModel(member *ChangeOrgMemberRequest) *org_model.OrgMember {
-	memberModel := org_model.NewOrgMember(member.OrgId, member.UserId)
+	memberModel := &org_model.OrgMember{
+		UserID: member.UserId,
+	}
 	memberModel.Roles = member.Roles
 
 	return memberModel
@@ -46,7 +50,7 @@ func orgMemberSearchRequestToModel(request *OrgMemberSearchRequest) *org_model.O
 }
 
 func orgMemberSearchQueriesToModel(queries []*OrgMemberSearchQuery) []*org_model.OrgMemberSearchQuery {
-	modelQueries := make([]*org_model.OrgMemberSearchQuery, len(queries))
+	modelQueries := make([]*org_model.OrgMemberSearchQuery, len(queries)+1)
 
 	for i, query := range queries {
 		modelQueries[i] = orgMemberSearchQueryToModel(query)
@@ -105,8 +109,8 @@ func orgMemberSearchResponseFromModel(resp *org_model.OrgMemberSearchResponse) *
 		Result:      orgMembersFromView(resp.Result),
 	}
 }
-func orgMembersFromView(viewMembers []*org_model.OrgMemberView) []*OrgMember {
-	members := make([]*OrgMember, len(viewMembers))
+func orgMembersFromView(viewMembers []*org_model.OrgMemberView) []*OrgMemberView {
+	members := make([]*OrgMemberView, len(viewMembers))
 
 	for i, member := range viewMembers {
 		members[i] = orgMemberFromView(member)
@@ -115,17 +119,21 @@ func orgMembersFromView(viewMembers []*org_model.OrgMemberView) []*OrgMember {
 	return members
 }
 
-func orgMemberFromView(member *org_model.OrgMemberView) *OrgMember {
+func orgMemberFromView(member *org_model.OrgMemberView) *OrgMemberView {
 	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
 	logging.Log("GRPC-S9LAZ").OnError(err).Debug("unable to parse changedate")
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
 	logging.Log("GRPC-oJN56").OnError(err).Debug("unable to parse creation date")
 
-	return &OrgMember{
+	return &OrgMemberView{
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Roles:        member.Roles,
 		Sequence:     member.Sequence,
 		UserId:       member.UserID,
+		UserName:     member.UserName,
+		Email:        member.Email,
+		FirstName:    member.FirstName,
+		LastName:     member.LastName,
 	}
 }

@@ -9,12 +9,16 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
-func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *model.OrgMember) (*es_models.Aggregate, error) {
+func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *model.OrgMember, resourceOwner string) (agg *es_models.Aggregate, err error) {
 	if member == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "member must not be nil")
 	}
 
-	aggregate, err := aggCreator.NewAggregate(ctx, member.AggregateID, model.OrgAggregate, model.OrgVersion, member.Sequence)
+	if resourceOwner != "" {
+		agg, err = aggCreator.NewAggregate(ctx, member.AggregateID, model.OrgAggregate, model.OrgVersion, member.Sequence, es_models.OverwriteResourceOwner(resourceOwner))
+	} else {
+		agg, err = aggCreator.NewAggregate(ctx, member.AggregateID, model.OrgAggregate, model.OrgVersion, member.Sequence)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -23,9 +27,8 @@ func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 		AggregateTypeFilter(model.OrgAggregate, usr_model.UserAggregate).
 		AggregateIDsFilter(member.AggregateID, member.UserID)
 
-	validation := addMemberValidation(aggregate, member)
-
-	return aggregate.SetPrecondition(validationQuery, validation).AppendEvent(model.OrgMemberAdded, member)
+	validation := addMemberValidation(agg, member)
+	return agg.SetPrecondition(validationQuery, validation).AppendEvent(model.OrgMemberAdded, member)
 }
 
 func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *model.OrgMember, member *model.OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {

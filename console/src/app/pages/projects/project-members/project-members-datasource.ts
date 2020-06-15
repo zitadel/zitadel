@@ -19,20 +19,24 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         super();
     }
 
-    public loadMembers(project: Project.AsObject, pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadMembers(project: Project.AsObject,
+        projectType: ProjectType,
+        pageIndex: number, pageSize: number, grantId?: string, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-
+        // TODO
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
-            project.type === ProjectType.PROJECTTYPE_SELF ?
+            projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
-                project.type === ProjectType.PROJECTTYPE_GRANTED ?
-                    this.projectService.SearchProjectGrantMembers(project.id, project.grantId, pageSize, offset) : undefined;
+                projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
+                    this.projectService.SearchProjectGrantMembers(project.id,
+                        grantId, pageSize, offset) : undefined;
         if (promise) {
             from(promise).pipe(
                 map(resp => {
                     this.totalResult = resp.toObject().totalResult;
+                    console.log(this.totalResult);
                     return resp.toObject().resultList;
                 }),
                 catchError(() => of([])),

@@ -9,6 +9,7 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     ApplicationSearchResponse,
+    GrantedProject,
     Project,
     ProjectMember,
     ProjectMemberSearchResponse,
@@ -29,7 +30,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class ProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: Project.AsObject;
+    public project!: Project.AsObject | GrantedProject.AsObject;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -56,6 +57,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
     public editstate: boolean = false;
 
     public isZitadel$: Observable<boolean> = of(false);
+    private zitadelsub: Subscription = new Subscription();
 
     constructor(
         public translate: TranslateService,
@@ -73,27 +75,27 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         this.subscription?.unsubscribe();
+        this.zitadelsub.unsubscribe();
     }
 
     private async getData({ id }: Params): Promise<void> {
         this.projectId = id;
-        this.projectService.GetProjectById(id).then(proj => {
-            this.project = proj.toObject();
-            if (this.project.type !== ProjectType.PROJECTTYPE_SELF ||
-                this.project.state === ProjectState.PROJECTSTATE_INACTIVE ||
-                this.project.state === ProjectState.PROJECTSTATE_UNSPECIFIED) {
-            }
 
-            this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
-                const ret = appsResp.toObject().resultList
-                    .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
-                return ret;
-            })); // TODO: replace with prettier thing
-        }).catch(error => {
-            this.toast.showError(error.message);
-        });
+        if (this.projectId) {
+            this.projectService.GetProjectById(id).then(proj => {
+                this.project = proj.toObject();
+                this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
+                    const ret = appsResp.toObject().resultList
+                        .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;
+                    return ret;
+                }));
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        }
+
+        this.zitadelsub = this.isZitadel$.subscribe(isZita => console.log(`zitade: ${isZita}`));
     }
-
 
     public changeState(newState: ProjectState): void {
         if (newState === ProjectState.PROJECTSTATE_ACTIVE) {
@@ -103,16 +105,12 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error.message);
             });
         } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
-            this.projectService.DeactivateProject(this.projectId).then(() => {
-                this.toast.showInfo('Deactivated Project');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
+            this.toast.showInfo('You cant update this project.');
         }
     }
 
     public saveProject(): void {
-        this.projectService.UpdateProject(this.project).then(() => {
+        this.projectService.UpdateProject(this.project as Project.AsObject).then(() => {
             this.toast.showInfo('Project updated');
         }).catch(error => {
             this.toast.showInfo(error.message);

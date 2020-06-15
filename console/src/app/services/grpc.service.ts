@@ -31,6 +31,7 @@ export class GrpcService {
 
                     this.issuer = data.issuer;
                     if (data.clientid) {
+                        console.log(data.clientid);
                         this.clientid = data.clientid;
                     }
                 }

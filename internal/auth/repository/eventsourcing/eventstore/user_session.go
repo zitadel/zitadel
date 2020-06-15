@@ -13,7 +13,7 @@ type UserSessionRepo struct {
 }
 
 func (repo *UserSessionRepo) GetMyUserSessions(ctx context.Context) ([]*usr_model.UserSessionView, error) {
-	userSessions, err := repo.View.UserSessionsByUserID(auth.GetCtxData(ctx).UserID)
+	userSessions, err := repo.View.UserSessionsByAgentID(auth.GetCtxData(ctx).AgentID)
 	if err != nil {
 		return nil, err
 	}

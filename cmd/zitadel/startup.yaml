@@ -193,10 +193,12 @@ Admin:
 
 Console:
   Port: 50050
+  EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
 
 
 Notification:
   Repository:
+    DefaultLanguage: 'de'
     Eventstore:
       ServiceName: 'Notification'
       Repository:

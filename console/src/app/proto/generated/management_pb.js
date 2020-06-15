@@ -36,6 +36,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.ApplicationSearchQuery',
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ApplicationSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ApplicationSearchResponse', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ApplicationUpdate', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.ApplicationView', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.AuthGrant', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.AuthGrantSearchKey', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.AuthGrantSearchQuery', null, global);
@@ -48,7 +49,11 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.Changes', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ClientSecret', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.CreateUserRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.Gender', null, global);
-goog.exportSymbol('proto.caos.zitadel.management.api.v1.GrantedGrantID', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.GrantedProject', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.GrantedProjectSearchKey', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.MFAState', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.MfaType', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.MultiFactor', null, global);
@@ -70,6 +75,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.OrgMemberSearchKey', nul
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.OrgMemberView', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.OrgState', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.PasswordAgePolicy', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.PasswordAgePolicyCreate', null, global);
@@ -100,6 +106,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearch
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchQuery', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantMemberView', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantState', null, global);
@@ -108,6 +115,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantUserGrantCre
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantUserGrantID', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantUserGrantSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantUserGrantUpdate', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectGrantView', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectID', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectMember', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectMemberAdd', null, global);
@@ -118,6 +126,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectMemberSearchKey',
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectMemberSearchQuery', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectMemberSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectMemberView', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRole', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRoleAdd', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRoleChange', null, global);
@@ -126,10 +135,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRoleSearchKey', n
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRoleSearchQuery', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRoleSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse', null, global);
-goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectSearchKey', null, global);
-goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectSearchQuery', null, global);
-goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectSearchRequest', null, global);
-goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectSearchResponse', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectRoleView', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectState', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectType', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.ProjectUpdateRequest', null, global);
@@ -160,6 +166,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserGrantSearchRequest',
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserGrantSearchResponse', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserGrantState', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserGrantUpdate', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserGrantView', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserID', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserPhone', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserProfile', null, global);
@@ -168,6 +175,7 @@ goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserSearchQuery', null, 
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserSearchRequest', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserSearchResponse', null, global);
 goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserState', null, global);
+goog.exportSymbol('proto.caos.zitadel.management.api.v1.UserView', null, global);
 /**
  * Generated by JsPbCodeGenerator.
  * @param {Array=} opt_data Optional initial data array, typically from a
@@ -398,6 +406,27 @@ if (goog.DEBUG && !COMPILED) {
    * @override
    */
   proto.caos.zitadel.management.api.v1.User.displayName = 'proto.caos.zitadel.management.api.v1.User';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.management.api.v1.UserView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.UserView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.UserView.displayName = 'proto.caos.zitadel.management.api.v1.UserView';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -1207,6 +1236,27 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.caos.zitadel.management.api.v1.OrgMemberView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.OrgMemberView.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.OrgMemberView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.OrgMemberView.displayName = 'proto.caos.zitadel.management.api.v1.OrgMemberView';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.repeatedFields_, null);
 };
@@ -1333,16 +1383,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.ProjectSearchResponse.repeatedFields_, null);
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.repeatedFields_, null);
 };
-goog.inherits(proto.caos.zitadel.management.api.v1.ProjectSearchResponse, jspb.Message);
+goog.inherits(proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.caos.zitadel.management.api.v1.ProjectSearchResponse.displayName = 'proto.caos.zitadel.management.api.v1.ProjectSearchResponse';
+  proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.displayName = 'proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -1354,37 +1404,58 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.ProjectSearchRequest.repeatedFields_, null);
-};
-goog.inherits(proto.caos.zitadel.management.api.v1.ProjectSearchRequest, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  /**
-   * @public
-   * @override
-   */
-  proto.caos.zitadel.management.api.v1.ProjectSearchRequest.displayName = 'proto.caos.zitadel.management.api.v1.ProjectSearchRequest';
-}
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery = function(opt_data) {
+proto.caos.zitadel.management.api.v1.GrantedProject = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.caos.zitadel.management.api.v1.ProjectSearchQuery, jspb.Message);
+goog.inherits(proto.caos.zitadel.management.api.v1.GrantedProject, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.caos.zitadel.management.api.v1.ProjectSearchQuery.displayName = 'proto.caos.zitadel.management.api.v1.ProjectSearchQuery';
+  proto.caos.zitadel.management.api.v1.GrantedProject.displayName = 'proto.caos.zitadel.management.api.v1.GrantedProject';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.displayName = 'proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.displayName = 'proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -1564,6 +1635,27 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.caos.zitadel.management.api.v1.ProjectRoleView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.ProjectRoleView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.ProjectRoleView.displayName = 'proto.caos.zitadel.management.api.v1.ProjectRoleView';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.caos.zitadel.management.api.v1.ProjectRoleRemove = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -1637,6 +1729,27 @@ if (goog.DEBUG && !COMPILED) {
    * @override
    */
   proto.caos.zitadel.management.api.v1.ProjectRoleSearchQuery.displayName = 'proto.caos.zitadel.management.api.v1.ProjectRoleSearchQuery';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.ProjectMemberView.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.ProjectMemberView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.ProjectMemberView.displayName = 'proto.caos.zitadel.management.api.v1.ProjectMemberView';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -1837,6 +1950,27 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.caos.zitadel.management.api.v1.ApplicationView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.caos.zitadel.management.api.v1.ApplicationView.oneofGroups_);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.ApplicationView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.ApplicationView.displayName = 'proto.caos.zitadel.management.api.v1.ApplicationView';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.caos.zitadel.management.api.v1.ApplicationSearchResponse = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.repeatedFields_, null);
 };
@@ -1984,16 +2118,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+proto.caos.zitadel.management.api.v1.ProjectGrantView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.ProjectGrantView.repeatedFields_, null);
 };
-goog.inherits(proto.caos.zitadel.management.api.v1.GrantedGrantID, jspb.Message);
+goog.inherits(proto.caos.zitadel.management.api.v1.ProjectGrantView, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.caos.zitadel.management.api.v1.GrantedGrantID.displayName = 'proto.caos.zitadel.management.api.v1.GrantedGrantID';
+  proto.caos.zitadel.management.api.v1.ProjectGrantView.displayName = 'proto.caos.zitadel.management.api.v1.ProjectGrantView';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -2141,6 +2275,27 @@ if (goog.DEBUG && !COMPILED) {
    * @override
    */
   proto.caos.zitadel.management.api.v1.ProjectGrantMemberRemove.displayName = 'proto.caos.zitadel.management.api.v1.ProjectGrantMemberRemove';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.ProjectGrantMemberView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.displayName = 'proto.caos.zitadel.management.api.v1.ProjectGrantMemberView';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -2393,6 +2548,27 @@ if (goog.DEBUG && !COMPILED) {
    * @override
    */
   proto.caos.zitadel.management.api.v1.ProjectGrantUserGrantUpdate.displayName = 'proto.caos.zitadel.management.api.v1.ProjectGrantUserGrantUpdate';
+}
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.caos.zitadel.management.api.v1.UserGrantView.repeatedFields_, null);
+};
+goog.inherits(proto.caos.zitadel.management.api.v1.UserGrantView, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  /**
+   * @public
+   * @override
+   */
+  proto.caos.zitadel.management.api.v1.UserGrantView.displayName = 'proto.caos.zitadel.management.api.v1.UserGrantView';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -4644,25 +4820,23 @@ proto.caos.zitadel.management.api.v1.User.toObject = function(includeInstance, m
     state: jspb.Message.getFieldWithDefault(msg, 2, 0),
     creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    lastLogin: (f = msg.getLastLogin()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    passwordChanged: (f = msg.getPasswordChanged()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    userName: jspb.Message.getFieldWithDefault(msg, 7, ""),
-    firstName: jspb.Message.getFieldWithDefault(msg, 8, ""),
-    lastName: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    displayName: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    nickName: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    preferredLanguage: jspb.Message.getFieldWithDefault(msg, 12, ""),
-    gender: jspb.Message.getFieldWithDefault(msg, 13, 0),
-    email: jspb.Message.getFieldWithDefault(msg, 14, ""),
-    isEmailVerified: jspb.Message.getFieldWithDefault(msg, 15, false),
-    phone: jspb.Message.getFieldWithDefault(msg, 16, ""),
-    isPhoneVerified: jspb.Message.getFieldWithDefault(msg, 17, false),
-    country: jspb.Message.getFieldWithDefault(msg, 18, ""),
-    locality: jspb.Message.getFieldWithDefault(msg, 19, ""),
-    postalCode: jspb.Message.getFieldWithDefault(msg, 20, ""),
-    region: jspb.Message.getFieldWithDefault(msg, 21, ""),
-    streetAddress: jspb.Message.getFieldWithDefault(msg, 22, ""),
-    sequence: jspb.Message.getFieldWithDefault(msg, 23, 0)
+    userName: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    firstName: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    lastName: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    displayName: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    nickName: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    preferredLanguage: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    gender: jspb.Message.getFieldWithDefault(msg, 11, 0),
+    email: jspb.Message.getFieldWithDefault(msg, 12, ""),
+    isEmailVerified: jspb.Message.getFieldWithDefault(msg, 13, false),
+    phone: jspb.Message.getFieldWithDefault(msg, 14, ""),
+    isPhoneVerified: jspb.Message.getFieldWithDefault(msg, 15, false),
+    country: jspb.Message.getFieldWithDefault(msg, 16, ""),
+    locality: jspb.Message.getFieldWithDefault(msg, 17, ""),
+    postalCode: jspb.Message.getFieldWithDefault(msg, 18, ""),
+    region: jspb.Message.getFieldWithDefault(msg, 19, ""),
+    streetAddress: jspb.Message.getFieldWithDefault(msg, 20, ""),
+    sequence: jspb.Message.getFieldWithDefault(msg, 21, 0)
   };
 
   if (includeInstance) {
@@ -4693,6 +4867,718 @@ proto.caos.zitadel.management.api.v1.User.deserializeBinary = function(bytes) {
  * @return {!proto.caos.zitadel.management.api.v1.User}
  */
 proto.caos.zitadel.management.api.v1.User.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.UserState} */ (reader.readEnum());
+      msg.setState(value);
+      break;
+    case 3:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 4:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserName(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFirstName(value);
+      break;
+    case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLastName(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDisplayName(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setNickName(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPreferredLanguage(value);
+      break;
+    case 11:
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.Gender} */ (reader.readEnum());
+      msg.setGender(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEmail(value);
+      break;
+    case 13:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsEmailVerified(value);
+      break;
+    case 14:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPhone(value);
+      break;
+    case 15:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsPhoneVerified(value);
+      break;
+    case 16:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setCountry(value);
+      break;
+    case 17:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocality(value);
+      break;
+    case 18:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPostalCode(value);
+      break;
+    case 19:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRegion(value);
+      break;
+    case 20:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setStreetAddress(value);
+      break;
+    case 21:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.User.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.User} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.User.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getState();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      2,
+      f
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getUserName();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+  f = message.getFirstName();
+  if (f.length > 0) {
+    writer.writeString(
+      6,
+      f
+    );
+  }
+  f = message.getLastName();
+  if (f.length > 0) {
+    writer.writeString(
+      7,
+      f
+    );
+  }
+  f = message.getDisplayName();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
+      f
+    );
+  }
+  f = message.getNickName();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
+      f
+    );
+  }
+  f = message.getPreferredLanguage();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
+      f
+    );
+  }
+  f = message.getGender();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      11,
+      f
+    );
+  }
+  f = message.getEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      12,
+      f
+    );
+  }
+  f = message.getIsEmailVerified();
+  if (f) {
+    writer.writeBool(
+      13,
+      f
+    );
+  }
+  f = message.getPhone();
+  if (f.length > 0) {
+    writer.writeString(
+      14,
+      f
+    );
+  }
+  f = message.getIsPhoneVerified();
+  if (f) {
+    writer.writeBool(
+      15,
+      f
+    );
+  }
+  f = message.getCountry();
+  if (f.length > 0) {
+    writer.writeString(
+      16,
+      f
+    );
+  }
+  f = message.getLocality();
+  if (f.length > 0) {
+    writer.writeString(
+      17,
+      f
+    );
+  }
+  f = message.getPostalCode();
+  if (f.length > 0) {
+    writer.writeString(
+      18,
+      f
+    );
+  }
+  f = message.getRegion();
+  if (f.length > 0) {
+    writer.writeString(
+      19,
+      f
+    );
+  }
+  f = message.getStreetAddress();
+  if (f.length > 0) {
+    writer.writeString(
+      20,
+      f
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      21,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional UserState state = 2;
+ * @return {!proto.caos.zitadel.management.api.v1.UserState}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.UserState} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.management.api.v1.UserState} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setState = function(value) {
+  jspb.Message.setProto3EnumField(this, 2, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 3;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 3) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 4;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 4, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional string user_name = 5;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getUserName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setUserName = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional string first_name = 6;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getFirstName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setFirstName = function(value) {
+  jspb.Message.setProto3StringField(this, 6, value);
+};
+
+
+/**
+ * optional string last_name = 7;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getLastName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setLastName = function(value) {
+  jspb.Message.setProto3StringField(this, 7, value);
+};
+
+
+/**
+ * optional string display_name = 8;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getDisplayName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setDisplayName = function(value) {
+  jspb.Message.setProto3StringField(this, 8, value);
+};
+
+
+/**
+ * optional string nick_name = 9;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getNickName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setNickName = function(value) {
+  jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+/**
+ * optional string preferred_language = 10;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getPreferredLanguage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setPreferredLanguage = function(value) {
+  jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * optional Gender gender = 11;
+ * @return {!proto.caos.zitadel.management.api.v1.Gender}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getGender = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.management.api.v1.Gender} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setGender = function(value) {
+  jspb.Message.setProto3EnumField(this, 11, value);
+};
+
+
+/**
+ * optional string email = 12;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setEmail = function(value) {
+  jspb.Message.setProto3StringField(this, 12, value);
+};
+
+
+/**
+ * optional bool is_email_verified = 13;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getIsEmailVerified = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 13, false));
+};
+
+
+/** @param {boolean} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setIsEmailVerified = function(value) {
+  jspb.Message.setProto3BooleanField(this, 13, value);
+};
+
+
+/**
+ * optional string phone = 14;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getPhone = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setPhone = function(value) {
+  jspb.Message.setProto3StringField(this, 14, value);
+};
+
+
+/**
+ * optional bool is_phone_verified = 15;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getIsPhoneVerified = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 15, false));
+};
+
+
+/** @param {boolean} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setIsPhoneVerified = function(value) {
+  jspb.Message.setProto3BooleanField(this, 15, value);
+};
+
+
+/**
+ * optional string country = 16;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getCountry = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 16, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setCountry = function(value) {
+  jspb.Message.setProto3StringField(this, 16, value);
+};
+
+
+/**
+ * optional string locality = 17;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getLocality = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setLocality = function(value) {
+  jspb.Message.setProto3StringField(this, 17, value);
+};
+
+
+/**
+ * optional string postal_code = 18;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getPostalCode = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 18, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setPostalCode = function(value) {
+  jspb.Message.setProto3StringField(this, 18, value);
+};
+
+
+/**
+ * optional string region = 19;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getRegion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 19, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setRegion = function(value) {
+  jspb.Message.setProto3StringField(this, 19, value);
+};
+
+
+/**
+ * optional string street_address = 20;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getStreetAddress = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 20, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setStreetAddress = function(value) {
+  jspb.Message.setProto3StringField(this, 20, value);
+};
+
+
+/**
+ * optional uint64 sequence = 21;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.User.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 21, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.User.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 21, value);
+};
+
+
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.management.api.v1.UserView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.UserView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.UserView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.UserView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    state: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    lastLogin: (f = msg.getLastLogin()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    passwordChanged: (f = msg.getPasswordChanged()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    userName: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    firstName: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    lastName: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    displayName: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    nickName: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    preferredLanguage: jspb.Message.getFieldWithDefault(msg, 12, ""),
+    gender: jspb.Message.getFieldWithDefault(msg, 13, 0),
+    email: jspb.Message.getFieldWithDefault(msg, 14, ""),
+    isEmailVerified: jspb.Message.getFieldWithDefault(msg, 15, false),
+    phone: jspb.Message.getFieldWithDefault(msg, 16, ""),
+    isPhoneVerified: jspb.Message.getFieldWithDefault(msg, 17, false),
+    country: jspb.Message.getFieldWithDefault(msg, 18, ""),
+    locality: jspb.Message.getFieldWithDefault(msg, 19, ""),
+    postalCode: jspb.Message.getFieldWithDefault(msg, 20, ""),
+    region: jspb.Message.getFieldWithDefault(msg, 21, ""),
+    streetAddress: jspb.Message.getFieldWithDefault(msg, 22, ""),
+    sequence: jspb.Message.getFieldWithDefault(msg, 23, 0),
+    resourceOwner: jspb.Message.getFieldWithDefault(msg, 24, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.UserView}
+ */
+proto.caos.zitadel.management.api.v1.UserView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.UserView;
+  return proto.caos.zitadel.management.api.v1.UserView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.UserView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.UserView}
+ */
+proto.caos.zitadel.management.api.v1.UserView.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -4795,6 +5681,10 @@ proto.caos.zitadel.management.api.v1.User.deserializeBinaryFromReader = function
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
+    case 24:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setResourceOwner(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -4808,9 +5698,9 @@ proto.caos.zitadel.management.api.v1.User.deserializeBinaryFromReader = function
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.serializeBinary = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.caos.zitadel.management.api.v1.User.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.management.api.v1.UserView.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -4818,11 +5708,11 @@ proto.caos.zitadel.management.api.v1.User.prototype.serializeBinary = function()
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.caos.zitadel.management.api.v1.User} message
+ * @param {!proto.caos.zitadel.management.api.v1.UserView} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.User.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.management.api.v1.UserView.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
@@ -4989,6 +5879,13 @@ proto.caos.zitadel.management.api.v1.User.serializeBinaryToWriter = function(mes
       f
     );
   }
+  f = message.getResourceOwner();
+  if (f.length > 0) {
+    writer.writeString(
+      24,
+      f
+    );
+  }
 };
 
 
@@ -4996,13 +5893,13 @@ proto.caos.zitadel.management.api.v1.User.serializeBinaryToWriter = function(mes
  * optional string id = 1;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getId = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setId = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -5011,13 +5908,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setId = function(value) {
  * optional UserState state = 2;
  * @return {!proto.caos.zitadel.management.api.v1.UserState}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getState = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getState = function() {
   return /** @type {!proto.caos.zitadel.management.api.v1.UserState} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {!proto.caos.zitadel.management.api.v1.UserState} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setState = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setState = function(value) {
   jspb.Message.setProto3EnumField(this, 2, value);
 };
 
@@ -5026,14 +5923,14 @@ proto.caos.zitadel.management.api.v1.User.prototype.setState = function(value) {
  * optional google.protobuf.Timestamp creation_date = 3;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getCreationDate = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getCreationDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setCreationDate = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setCreationDate = function(value) {
   jspb.Message.setWrapperField(this, 3, value);
 };
 
@@ -5041,7 +5938,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.setCreationDate = function(v
 /**
  * Clears the message field making it undefined.
  */
-proto.caos.zitadel.management.api.v1.User.prototype.clearCreationDate = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.clearCreationDate = function() {
   this.setCreationDate(undefined);
 };
 
@@ -5050,7 +5947,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.clearCreationDate = function
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.hasCreationDate = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.hasCreationDate = function() {
   return jspb.Message.getField(this, 3) != null;
 };
 
@@ -5059,14 +5956,14 @@ proto.caos.zitadel.management.api.v1.User.prototype.hasCreationDate = function()
  * optional google.protobuf.Timestamp change_date = 4;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getChangeDate = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getChangeDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setChangeDate = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setChangeDate = function(value) {
   jspb.Message.setWrapperField(this, 4, value);
 };
 
@@ -5074,7 +5971,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.setChangeDate = function(val
 /**
  * Clears the message field making it undefined.
  */
-proto.caos.zitadel.management.api.v1.User.prototype.clearChangeDate = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.clearChangeDate = function() {
   this.setChangeDate(undefined);
 };
 
@@ -5083,7 +5980,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.clearChangeDate = function()
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.hasChangeDate = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.hasChangeDate = function() {
   return jspb.Message.getField(this, 4) != null;
 };
 
@@ -5092,14 +5989,14 @@ proto.caos.zitadel.management.api.v1.User.prototype.hasChangeDate = function() {
  * optional google.protobuf.Timestamp last_login = 5;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getLastLogin = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getLastLogin = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setLastLogin = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setLastLogin = function(value) {
   jspb.Message.setWrapperField(this, 5, value);
 };
 
@@ -5107,7 +6004,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.setLastLogin = function(valu
 /**
  * Clears the message field making it undefined.
  */
-proto.caos.zitadel.management.api.v1.User.prototype.clearLastLogin = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.clearLastLogin = function() {
   this.setLastLogin(undefined);
 };
 
@@ -5116,7 +6013,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.clearLastLogin = function() 
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.hasLastLogin = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.hasLastLogin = function() {
   return jspb.Message.getField(this, 5) != null;
 };
 
@@ -5125,14 +6022,14 @@ proto.caos.zitadel.management.api.v1.User.prototype.hasLastLogin = function() {
  * optional google.protobuf.Timestamp password_changed = 6;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getPasswordChanged = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getPasswordChanged = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setPasswordChanged = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setPasswordChanged = function(value) {
   jspb.Message.setWrapperField(this, 6, value);
 };
 
@@ -5140,7 +6037,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.setPasswordChanged = functio
 /**
  * Clears the message field making it undefined.
  */
-proto.caos.zitadel.management.api.v1.User.prototype.clearPasswordChanged = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.clearPasswordChanged = function() {
   this.setPasswordChanged(undefined);
 };
 
@@ -5149,7 +6046,7 @@ proto.caos.zitadel.management.api.v1.User.prototype.clearPasswordChanged = funct
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.hasPasswordChanged = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.hasPasswordChanged = function() {
   return jspb.Message.getField(this, 6) != null;
 };
 
@@ -5158,13 +6055,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.hasPasswordChanged = functio
  * optional string user_name = 7;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getUserName = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getUserName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setUserName = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setUserName = function(value) {
   jspb.Message.setProto3StringField(this, 7, value);
 };
 
@@ -5173,13 +6070,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setUserName = function(value
  * optional string first_name = 8;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getFirstName = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getFirstName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setFirstName = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setFirstName = function(value) {
   jspb.Message.setProto3StringField(this, 8, value);
 };
 
@@ -5188,13 +6085,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setFirstName = function(valu
  * optional string last_name = 9;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getLastName = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getLastName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setLastName = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setLastName = function(value) {
   jspb.Message.setProto3StringField(this, 9, value);
 };
 
@@ -5203,13 +6100,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setLastName = function(value
  * optional string display_name = 10;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getDisplayName = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getDisplayName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setDisplayName = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setDisplayName = function(value) {
   jspb.Message.setProto3StringField(this, 10, value);
 };
 
@@ -5218,13 +6115,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setDisplayName = function(va
  * optional string nick_name = 11;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getNickName = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getNickName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setNickName = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setNickName = function(value) {
   jspb.Message.setProto3StringField(this, 11, value);
 };
 
@@ -5233,13 +6130,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setNickName = function(value
  * optional string preferred_language = 12;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getPreferredLanguage = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getPreferredLanguage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setPreferredLanguage = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setPreferredLanguage = function(value) {
   jspb.Message.setProto3StringField(this, 12, value);
 };
 
@@ -5248,13 +6145,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setPreferredLanguage = funct
  * optional Gender gender = 13;
  * @return {!proto.caos.zitadel.management.api.v1.Gender}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getGender = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getGender = function() {
   return /** @type {!proto.caos.zitadel.management.api.v1.Gender} */ (jspb.Message.getFieldWithDefault(this, 13, 0));
 };
 
 
 /** @param {!proto.caos.zitadel.management.api.v1.Gender} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setGender = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setGender = function(value) {
   jspb.Message.setProto3EnumField(this, 13, value);
 };
 
@@ -5263,13 +6160,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setGender = function(value) 
  * optional string email = 14;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getEmail = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getEmail = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setEmail = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setEmail = function(value) {
   jspb.Message.setProto3StringField(this, 14, value);
 };
 
@@ -5280,13 +6177,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setEmail = function(value) {
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getIsEmailVerified = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getIsEmailVerified = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 15, false));
 };
 
 
 /** @param {boolean} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setIsEmailVerified = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setIsEmailVerified = function(value) {
   jspb.Message.setProto3BooleanField(this, 15, value);
 };
 
@@ -5295,13 +6192,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setIsEmailVerified = functio
  * optional string phone = 16;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getPhone = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getPhone = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 16, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setPhone = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setPhone = function(value) {
   jspb.Message.setProto3StringField(this, 16, value);
 };
 
@@ -5312,13 +6209,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setPhone = function(value) {
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getIsPhoneVerified = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getIsPhoneVerified = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 17, false));
 };
 
 
 /** @param {boolean} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setIsPhoneVerified = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setIsPhoneVerified = function(value) {
   jspb.Message.setProto3BooleanField(this, 17, value);
 };
 
@@ -5327,13 +6224,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setIsPhoneVerified = functio
  * optional string country = 18;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getCountry = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getCountry = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 18, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setCountry = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setCountry = function(value) {
   jspb.Message.setProto3StringField(this, 18, value);
 };
 
@@ -5342,13 +6239,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setCountry = function(value)
  * optional string locality = 19;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getLocality = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getLocality = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 19, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setLocality = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setLocality = function(value) {
   jspb.Message.setProto3StringField(this, 19, value);
 };
 
@@ -5357,13 +6254,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setLocality = function(value
  * optional string postal_code = 20;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getPostalCode = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getPostalCode = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 20, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setPostalCode = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setPostalCode = function(value) {
   jspb.Message.setProto3StringField(this, 20, value);
 };
 
@@ -5372,13 +6269,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setPostalCode = function(val
  * optional string region = 21;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getRegion = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getRegion = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 21, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setRegion = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setRegion = function(value) {
   jspb.Message.setProto3StringField(this, 21, value);
 };
 
@@ -5387,13 +6284,13 @@ proto.caos.zitadel.management.api.v1.User.prototype.setRegion = function(value) 
  * optional string street_address = 22;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getStreetAddress = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getStreetAddress = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 22, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setStreetAddress = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setStreetAddress = function(value) {
   jspb.Message.setProto3StringField(this, 22, value);
 };
 
@@ -5402,14 +6299,29 @@ proto.caos.zitadel.management.api.v1.User.prototype.setStreetAddress = function(
  * optional uint64 sequence = 23;
  * @return {number}
  */
-proto.caos.zitadel.management.api.v1.User.prototype.getSequence = function() {
+proto.caos.zitadel.management.api.v1.UserView.prototype.getSequence = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 23, 0));
 };
 
 
 /** @param {number} value */
-proto.caos.zitadel.management.api.v1.User.prototype.setSequence = function(value) {
+proto.caos.zitadel.management.api.v1.UserView.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 23, value);
+};
+
+
+/**
+ * optional string resource_owner = 24;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserView.prototype.getResourceOwner = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 24, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserView.prototype.setResourceOwner = function(value) {
+  jspb.Message.setProto3StringField(this, 24, value);
 };
 
 
@@ -5897,7 +6809,7 @@ proto.caos.zitadel.management.api.v1.UserSearchResponse.toObject = function(incl
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.User.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.UserView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -5947,8 +6859,8 @@ proto.caos.zitadel.management.api.v1.UserSearchResponse.deserializeBinaryFromRea
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.User;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.User.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.UserView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.UserView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -6006,7 +6918,7 @@ proto.caos.zitadel.management.api.v1.UserSearchResponse.serializeBinaryToWriter 
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.User.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.UserView.serializeBinaryToWriter
     );
   }
 };
@@ -6058,28 +6970,28 @@ proto.caos.zitadel.management.api.v1.UserSearchResponse.prototype.setTotalResult
 
 
 /**
- * repeated User result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.User>}
+ * repeated UserView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.UserView>}
  */
 proto.caos.zitadel.management.api.v1.UserSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.User>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.User, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.UserView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.UserView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.User>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.UserView>} value */
 proto.caos.zitadel.management.api.v1.UserSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.User=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.UserView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.User}
+ * @return {!proto.caos.zitadel.management.api.v1.UserView}
  */
 proto.caos.zitadel.management.api.v1.UserSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.User, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.UserView, opt_index);
 };
 
 
@@ -9445,7 +10357,8 @@ proto.caos.zitadel.management.api.v1.PasswordComplexityPolicy.toObject = functio
     hasUppercase: jspb.Message.getFieldWithDefault(msg, 8, false),
     hasNumber: jspb.Message.getFieldWithDefault(msg, 9, false),
     hasSymbol: jspb.Message.getFieldWithDefault(msg, 10, false),
-    sequence: jspb.Message.getFieldWithDefault(msg, 11, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 11, 0),
+    isDefault: jspb.Message.getFieldWithDefault(msg, 12, false)
   };
 
   if (includeInstance) {
@@ -9527,6 +10440,10 @@ proto.caos.zitadel.management.api.v1.PasswordComplexityPolicy.deserializeBinaryF
     case 11:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
+      break;
+    case 12:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsDefault(value);
       break;
     default:
       reader.skipField();
@@ -9633,6 +10550,13 @@ proto.caos.zitadel.management.api.v1.PasswordComplexityPolicy.serializeBinaryToW
   if (f !== 0) {
     writer.writeUint64(
       11,
+      f
+    );
+  }
+  f = message.getIsDefault();
+  if (f) {
+    writer.writeBool(
+      12,
       f
     );
   }
@@ -9845,6 +10769,23 @@ proto.caos.zitadel.management.api.v1.PasswordComplexityPolicy.prototype.getSeque
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.PasswordComplexityPolicy.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 11, value);
+};
+
+
+/**
+ * optional bool is_default = 12;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.PasswordComplexityPolicy.prototype.getIsDefault = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 12, false));
+};
+
+
+/** @param {boolean} value */
+proto.caos.zitadel.management.api.v1.PasswordComplexityPolicy.prototype.setIsDefault = function(value) {
+  jspb.Message.setProto3BooleanField(this, 12, value);
 };
 
 
@@ -10573,7 +11514,8 @@ proto.caos.zitadel.management.api.v1.PasswordAgePolicy.toObject = function(inclu
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     maxAgeDays: jspb.Message.getFieldWithDefault(msg, 6, 0),
     expireWarnDays: jspb.Message.getFieldWithDefault(msg, 7, 0),
-    sequence: jspb.Message.getFieldWithDefault(msg, 8, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    isDefault: jspb.Message.getFieldWithDefault(msg, 9, false)
   };
 
   if (includeInstance) {
@@ -10643,6 +11585,10 @@ proto.caos.zitadel.management.api.v1.PasswordAgePolicy.deserializeBinaryFromRead
     case 8:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
+      break;
+    case 9:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsDefault(value);
       break;
     default:
       reader.skipField();
@@ -10728,6 +11674,13 @@ proto.caos.zitadel.management.api.v1.PasswordAgePolicy.serializeBinaryToWriter =
   if (f !== 0) {
     writer.writeUint64(
       8,
+      f
+    );
+  }
+  f = message.getIsDefault();
+  if (f) {
+    writer.writeBool(
+      9,
       f
     );
   }
@@ -10887,6 +11840,23 @@ proto.caos.zitadel.management.api.v1.PasswordAgePolicy.prototype.getSequence = f
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.PasswordAgePolicy.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 8, value);
+};
+
+
+/**
+ * optional bool is_default = 9;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.PasswordAgePolicy.prototype.getIsDefault = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 9, false));
+};
+
+
+/** @param {boolean} value */
+proto.caos.zitadel.management.api.v1.PasswordAgePolicy.prototype.setIsDefault = function(value) {
+  jspb.Message.setProto3BooleanField(this, 9, value);
 };
 
 
@@ -11437,7 +12407,8 @@ proto.caos.zitadel.management.api.v1.PasswordLockoutPolicy.toObject = function(i
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     maxAttempts: jspb.Message.getFieldWithDefault(msg, 6, 0),
     showLockOutFailures: jspb.Message.getFieldWithDefault(msg, 7, false),
-    sequence: jspb.Message.getFieldWithDefault(msg, 8, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    isDefault: jspb.Message.getFieldWithDefault(msg, 9, false)
   };
 
   if (includeInstance) {
@@ -11507,6 +12478,10 @@ proto.caos.zitadel.management.api.v1.PasswordLockoutPolicy.deserializeBinaryFrom
     case 8:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
+      break;
+    case 9:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsDefault(value);
       break;
     default:
       reader.skipField();
@@ -11592,6 +12567,13 @@ proto.caos.zitadel.management.api.v1.PasswordLockoutPolicy.serializeBinaryToWrit
   if (f !== 0) {
     writer.writeUint64(
       8,
+      f
+    );
+  }
+  f = message.getIsDefault();
+  if (f) {
+    writer.writeBool(
+      9,
       f
     );
   }
@@ -11753,6 +12735,23 @@ proto.caos.zitadel.management.api.v1.PasswordLockoutPolicy.prototype.getSequence
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.PasswordLockoutPolicy.prototype.setSequence = function(value) {
   jspb.Message.setProto3IntField(this, 8, value);
+};
+
+
+/**
+ * optional bool is_default = 9;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.PasswordLockoutPolicy.prototype.getIsDefault = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 9, false));
+};
+
+
+/** @param {boolean} value */
+proto.caos.zitadel.management.api.v1.PasswordLockoutPolicy.prototype.setIsDefault = function(value) {
+  jspb.Message.setProto3BooleanField(this, 9, value);
 };
 
 
@@ -12877,7 +13876,7 @@ proto.caos.zitadel.management.api.v1.OrgMemberRoles.prototype.clearRolesList = f
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.OrgMember.repeatedFields_ = [6];
+proto.caos.zitadel.management.api.v1.OrgMember.repeatedFields_ = [2];
 
 
 
@@ -12909,14 +13908,10 @@ proto.caos.zitadel.management.api.v1.OrgMember.prototype.toObject = function(opt
 proto.caos.zitadel.management.api.v1.OrgMember.toObject = function(includeInstance, msg) {
   var f, obj = {
     userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userName: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    email: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    firstName: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    lastName: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    rolesList: jspb.Message.getRepeatedField(msg, 6),
+    rolesList: jspb.Message.getRepeatedField(msg, 2),
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    sequence: jspb.Message.getFieldWithDefault(msg, 9, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 5, 0)
   };
 
   if (includeInstance) {
@@ -12959,35 +13954,19 @@ proto.caos.zitadel.management.api.v1.OrgMember.deserializeBinaryFromReader = fun
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUserName(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setEmail(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setFirstName(value);
-      break;
-    case 5:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setLastName(value);
-      break;
-    case 6:
-      var value = /** @type {string} */ (reader.readString());
       msg.addRoles(value);
       break;
-    case 7:
+    case 3:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setChangeDate(value);
       break;
-    case 8:
+    case 4:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreationDate(value);
       break;
-    case 9:
+    case 5:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
@@ -13027,45 +14006,17 @@ proto.caos.zitadel.management.api.v1.OrgMember.serializeBinaryToWriter = functio
       f
     );
   }
-  f = message.getUserName();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = message.getEmail();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = message.getFirstName();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
-  f = message.getLastName();
-  if (f.length > 0) {
-    writer.writeString(
-      5,
-      f
-    );
-  }
   f = message.getRolesList();
   if (f.length > 0) {
     writer.writeRepeatedString(
-      6,
+      2,
       f
     );
   }
   f = message.getChangeDate();
   if (f != null) {
     writer.writeMessage(
-      7,
+      3,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -13073,7 +14024,7 @@ proto.caos.zitadel.management.api.v1.OrgMember.serializeBinaryToWriter = functio
   f = message.getCreationDate();
   if (f != null) {
     writer.writeMessage(
-      8,
+      4,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -13081,7 +14032,7 @@ proto.caos.zitadel.management.api.v1.OrgMember.serializeBinaryToWriter = functio
   f = message.getSequence();
   if (f !== 0) {
     writer.writeUint64(
-      9,
+      5,
       f
     );
   }
@@ -13104,77 +14055,17 @@ proto.caos.zitadel.management.api.v1.OrgMember.prototype.setUserId = function(va
 
 
 /**
- * optional string user_name = 2;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.getUserName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.setUserName = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
-};
-
-
-/**
- * optional string email = 3;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.getEmail = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.setEmail = function(value) {
-  jspb.Message.setProto3StringField(this, 3, value);
-};
-
-
-/**
- * optional string first_name = 4;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.getFirstName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.setFirstName = function(value) {
-  jspb.Message.setProto3StringField(this, 4, value);
-};
-
-
-/**
- * optional string last_name = 5;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.getLastName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.OrgMember.prototype.setLastName = function(value) {
-  jspb.Message.setProto3StringField(this, 5, value);
-};
-
-
-/**
- * repeated string roles = 6;
+ * repeated string roles = 2;
  * @return {!Array<string>}
  */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.getRolesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
 };
 
 
 /** @param {!Array<string>} value */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.setRolesList = function(value) {
-  jspb.Message.setField(this, 6, value || []);
+  jspb.Message.setField(this, 2, value || []);
 };
 
 
@@ -13183,7 +14074,7 @@ proto.caos.zitadel.management.api.v1.OrgMember.prototype.setRolesList = function
  * @param {number=} opt_index
  */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.addRoles = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
 };
 
 
@@ -13196,18 +14087,18 @@ proto.caos.zitadel.management.api.v1.OrgMember.prototype.clearRolesList = functi
 
 
 /**
- * optional google.protobuf.Timestamp change_date = 7;
+ * optional google.protobuf.Timestamp change_date = 3;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.getChangeDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.setChangeDate = function(value) {
-  jspb.Message.setWrapperField(this, 7, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -13224,23 +14115,23 @@ proto.caos.zitadel.management.api.v1.OrgMember.prototype.clearChangeDate = funct
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.hasChangeDate = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp creation_date = 8;
+ * optional google.protobuf.Timestamp creation_date = 4;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.getCreationDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.setCreationDate = function(value) {
-  jspb.Message.setWrapperField(this, 8, value);
+  jspb.Message.setWrapperField(this, 4, value);
 };
 
 
@@ -13257,22 +14148,22 @@ proto.caos.zitadel.management.api.v1.OrgMember.prototype.clearCreationDate = fun
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.hasCreationDate = function() {
-  return jspb.Message.getField(this, 8) != null;
+  return jspb.Message.getField(this, 4) != null;
 };
 
 
 /**
- * optional uint64 sequence = 9;
+ * optional uint64 sequence = 5;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.getSequence = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.OrgMember.prototype.setSequence = function(value) {
-  jspb.Message.setProto3IntField(this, 9, value);
+  jspb.Message.setProto3IntField(this, 5, value);
 };
 
 
@@ -13282,7 +14173,7 @@ proto.caos.zitadel.management.api.v1.OrgMember.prototype.setSequence = function(
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.repeatedFields_ = [3];
+proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.repeatedFields_ = [2];
 
 
 
@@ -13313,9 +14204,8 @@ proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.toObject = fu
  */
 proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    orgId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    rolesList: jspb.Message.getRepeatedField(msg, 3)
+    userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    rolesList: jspb.Message.getRepeatedField(msg, 2)
   };
 
   if (includeInstance) {
@@ -13354,13 +14244,9 @@ proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.deserializeBinaryFromRe
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setOrgId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
       msg.setUserId(value);
       break;
-    case 3:
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.addRoles(value);
       break;
@@ -13393,24 +14279,17 @@ proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.serializeBina
  */
 proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getOrgId();
+  f = message.getUserId();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getUserId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
   f = message.getRolesList();
   if (f.length > 0) {
     writer.writeRepeatedString(
-      3,
+      2,
       f
     );
   }
@@ -13418,47 +14297,32 @@ proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.serializeBinaryToWriter
 
 
 /**
- * optional string org_id = 1;
+ * optional string user_id = 1;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.getOrgId = function() {
+proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.getUserId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.setOrgId = function(value) {
+proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.setUserId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional string user_id = 2;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.getUserId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.setUserId = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
-};
-
-
-/**
- * repeated string roles = 3;
+ * repeated string roles = 2;
  * @return {!Array<string>}
  */
 proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.getRolesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 3));
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
 };
 
 
 /** @param {!Array<string>} value */
 proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.setRolesList = function(value) {
-  jspb.Message.setField(this, 3, value || []);
+  jspb.Message.setField(this, 2, value || []);
 };
 
 
@@ -13467,7 +14331,7 @@ proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.setRolesList 
  * @param {number=} opt_index
  */
 proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.addRoles = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 3, value, opt_index);
+  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
 };
 
 
@@ -13485,7 +14349,7 @@ proto.caos.zitadel.management.api.v1.AddOrgMemberRequest.prototype.clearRolesLis
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.repeatedFields_ = [3];
+proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.repeatedFields_ = [2];
 
 
 
@@ -13516,9 +14380,8 @@ proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.toObject =
  */
 proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    orgId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    rolesList: jspb.Message.getRepeatedField(msg, 3)
+    userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    rolesList: jspb.Message.getRepeatedField(msg, 2)
   };
 
   if (includeInstance) {
@@ -13557,13 +14420,9 @@ proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.deserializeBinaryFro
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setOrgId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
       msg.setUserId(value);
       break;
-    case 3:
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.addRoles(value);
       break;
@@ -13596,24 +14455,17 @@ proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.serializeB
  */
 proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getOrgId();
+  f = message.getUserId();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getUserId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
   f = message.getRolesList();
   if (f.length > 0) {
     writer.writeRepeatedString(
-      3,
+      2,
       f
     );
   }
@@ -13621,47 +14473,32 @@ proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.serializeBinaryToWri
 
 
 /**
- * optional string org_id = 1;
+ * optional string user_id = 1;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.getOrgId = function() {
+proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.getUserId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.setOrgId = function(value) {
+proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.setUserId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional string user_id = 2;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.getUserId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.setUserId = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
-};
-
-
-/**
- * repeated string roles = 3;
+ * repeated string roles = 2;
  * @return {!Array<string>}
  */
 proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.getRolesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 3));
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
 };
 
 
 /** @param {!Array<string>} value */
 proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.setRolesList = function(value) {
-  jspb.Message.setField(this, 3, value || []);
+  jspb.Message.setField(this, 2, value || []);
 };
 
 
@@ -13670,7 +14507,7 @@ proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.setRolesLi
  * @param {number=} opt_index
  */
 proto.caos.zitadel.management.api.v1.ChangeOrgMemberRequest.prototype.addRoles = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 3, value, opt_index);
+  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
 };
 
 
@@ -13712,8 +14549,7 @@ proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.prototype.toObject =
  */
 proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    orgId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userId: jspb.Message.getFieldWithDefault(msg, 2, "")
+    userId: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -13752,10 +14588,6 @@ proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.deserializeBinaryFro
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setOrgId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
       msg.setUserId(value);
       break;
     default:
@@ -13787,50 +14619,28 @@ proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.prototype.serializeB
  */
 proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getOrgId();
+  f = message.getUserId();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getUserId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
 };
 
 
 /**
- * optional string org_id = 1;
+ * optional string user_id = 1;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.prototype.getOrgId = function() {
+proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.prototype.getUserId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.prototype.setOrgId = function(value) {
-  jspb.Message.setProto3StringField(this, 1, value);
-};
-
-
-/**
- * optional string user_id = 2;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.prototype.getUserId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
 proto.caos.zitadel.management.api.v1.RemoveOrgMemberRequest.prototype.setUserId = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
+  jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
@@ -13875,7 +14685,7 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.toObject = function
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.OrgMember.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.OrgMemberView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -13925,8 +14735,8 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.deserializeBinaryFr
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.OrgMember;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.OrgMember.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.OrgMemberView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.OrgMemberView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -13984,7 +14794,7 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.serializeBinaryToWr
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.OrgMember.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.OrgMemberView.serializeBinaryToWriter
     );
   }
 };
@@ -14036,28 +14846,28 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.prototype.setTotalR
 
 
 /**
- * repeated OrgMember result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.OrgMember>}
+ * repeated OrgMemberView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.OrgMemberView>}
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.OrgMember>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.OrgMember, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.OrgMemberView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.OrgMemberView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.OrgMember>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.OrgMemberView>} value */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.OrgMember=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.OrgMemberView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.OrgMember}
+ * @return {!proto.caos.zitadel.management.api.v1.OrgMemberView}
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.OrgMember, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.OrgMemberView, opt_index);
 };
 
 
@@ -14075,7 +14885,412 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchResponse.prototype.clearResu
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.repeatedFields_ = [4];
+proto.caos.zitadel.management.api.v1.OrgMemberView.repeatedFields_ = [2];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.OrgMemberView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.OrgMemberView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    rolesList: jspb.Message.getRepeatedField(msg, 2),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    sequence: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    userName: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    email: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    firstName: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    lastName: jspb.Message.getFieldWithDefault(msg, 9, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.OrgMemberView}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.OrgMemberView;
+  return proto.caos.zitadel.management.api.v1.OrgMemberView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.OrgMemberView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.OrgMemberView}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addRoles(value);
+      break;
+    case 3:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 4:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 5:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserName(value);
+      break;
+    case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEmail(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFirstName(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLastName(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.OrgMemberView.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.OrgMemberView} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getUserId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getRolesList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      2,
+      f
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      5,
+      f
+    );
+  }
+  f = message.getUserName();
+  if (f.length > 0) {
+    writer.writeString(
+      6,
+      f
+    );
+  }
+  f = message.getEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      7,
+      f
+    );
+  }
+  f = message.getFirstName();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
+      f
+    );
+  }
+  f = message.getLastName();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string user_id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getUserId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setUserId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * repeated string roles = 2;
+ * @return {!Array<string>}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getRolesList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
+};
+
+
+/** @param {!Array<string>} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setRolesList = function(value) {
+  jspb.Message.setField(this, 2, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.addRoles = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.clearRolesList = function() {
+  this.setRolesList([]);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 3;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 3) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 4;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 4, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional uint64 sequence = 5;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 5, value);
+};
+
+
+/**
+ * optional string user_name = 6;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getUserName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setUserName = function(value) {
+  jspb.Message.setProto3StringField(this, 6, value);
+};
+
+
+/**
+ * optional string email = 7;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setEmail = function(value) {
+  jspb.Message.setProto3StringField(this, 7, value);
+};
+
+
+/**
+ * optional string first_name = 8;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getFirstName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setFirstName = function(value) {
+  jspb.Message.setProto3StringField(this, 8, value);
+};
+
+
+/**
+ * optional string last_name = 9;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.getLastName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.OrgMemberView.prototype.setLastName = function(value) {
+  jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.repeatedFields_ = [3];
 
 
 
@@ -14106,9 +15321,8 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.toObject =
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    orgId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    offset: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    limit: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     queriesList: jspb.Message.toObjectList(msg.getQueriesList(),
     proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery.toObject, includeInstance)
   };
@@ -14148,18 +15362,14 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.deserializeBinaryFro
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrgId(value);
-      break;
-    case 2:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setOffset(value);
       break;
-    case 3:
+    case 2:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setLimit(value);
       break;
-    case 4:
+    case 3:
       var value = new proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery;
       reader.readMessage(value,proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery.deserializeBinaryFromReader);
       msg.addQueries(value);
@@ -14193,31 +15403,24 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.serializeB
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getOrgId();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
   f = message.getOffset();
   if (f !== 0) {
     writer.writeUint64(
-      2,
+      1,
       f
     );
   }
   f = message.getLimit();
   if (f !== 0) {
     writer.writeUint64(
-      3,
+      2,
       f
     );
   }
   f = message.getQueriesList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      4,
+      3,
       f,
       proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery.serializeBinaryToWriter
     );
@@ -14226,63 +15429,48 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.serializeBinaryToWri
 
 
 /**
- * optional string org_id = 1;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.getOrgId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.setOrgId = function(value) {
-  jspb.Message.setProto3StringField(this, 1, value);
-};
-
-
-/**
- * optional uint64 offset = 2;
+ * optional uint64 offset = 1;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.getOffset = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.setOffset = function(value) {
-  jspb.Message.setProto3IntField(this, 2, value);
+  jspb.Message.setProto3IntField(this, 1, value);
 };
 
 
 /**
- * optional uint64 limit = 3;
+ * optional uint64 limit = 2;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.getLimit = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.setLimit = function(value) {
-  jspb.Message.setProto3IntField(this, 3, value);
+  jspb.Message.setProto3IntField(this, 2, value);
 };
 
 
 /**
- * repeated OrgMemberSearchQuery queries = 4;
+ * repeated OrgMemberSearchQuery queries = 3;
  * @return {!Array<!proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery>}
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.getQueriesList = function() {
   return /** @type{!Array<!proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery, 4));
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery, 3));
 };
 
 
 /** @param {!Array<!proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery>} value */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.setQueriesList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 4, value);
+  jspb.Message.setRepeatedWrapperField(this, 3, value);
 };
 
 
@@ -14292,7 +15480,7 @@ proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.setQueries
  * @return {!proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery}
  */
 proto.caos.zitadel.management.api.v1.OrgMemberSearchRequest.prototype.addQueries = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.caos.zitadel.management.api.v1.OrgMemberSearchQuery, opt_index);
 };
 
 
@@ -14949,13 +16137,7 @@ proto.caos.zitadel.management.api.v1.Project.toObject = function(includeInstance
     state: jspb.Message.getFieldWithDefault(msg, 3, 0),
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    type: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    resourceOwner: jspb.Message.getFieldWithDefault(msg, 7, ""),
-    orgId: jspb.Message.getFieldWithDefault(msg, 8, ""),
-    orgName: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    orgDomain: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    grantId: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    sequence: jspb.Message.getFieldWithDefault(msg, 12, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 6, 0)
   };
 
   if (includeInstance) {
@@ -15015,30 +16197,6 @@ proto.caos.zitadel.management.api.v1.Project.deserializeBinaryFromReader = funct
       msg.setCreationDate(value);
       break;
     case 6:
-      var value = /** @type {!proto.caos.zitadel.management.api.v1.ProjectType} */ (reader.readEnum());
-      msg.setType(value);
-      break;
-    case 7:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setResourceOwner(value);
-      break;
-    case 8:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrgId(value);
-      break;
-    case 9:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrgName(value);
-      break;
-    case 10:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrgDomain(value);
-      break;
-    case 11:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setGrantId(value);
-      break;
-    case 12:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
@@ -15108,52 +16266,10 @@ proto.caos.zitadel.management.api.v1.Project.serializeBinaryToWriter = function(
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getType();
-  if (f !== 0.0) {
-    writer.writeEnum(
-      6,
-      f
-    );
-  }
-  f = message.getResourceOwner();
-  if (f.length > 0) {
-    writer.writeString(
-      7,
-      f
-    );
-  }
-  f = message.getOrgId();
-  if (f.length > 0) {
-    writer.writeString(
-      8,
-      f
-    );
-  }
-  f = message.getOrgName();
-  if (f.length > 0) {
-    writer.writeString(
-      9,
-      f
-    );
-  }
-  f = message.getOrgDomain();
-  if (f.length > 0) {
-    writer.writeString(
-      10,
-      f
-    );
-  }
-  f = message.getGrantId();
-  if (f.length > 0) {
-    writer.writeString(
-      11,
-      f
-    );
-  }
   f = message.getSequence();
   if (f !== 0) {
     writer.writeUint64(
-      12,
+      6,
       f
     );
   }
@@ -15272,107 +16388,17 @@ proto.caos.zitadel.management.api.v1.Project.prototype.hasCreationDate = functio
 
 
 /**
- * optional ProjectType type = 6;
- * @return {!proto.caos.zitadel.management.api.v1.ProjectType}
- */
-proto.caos.zitadel.management.api.v1.Project.prototype.getType = function() {
-  return /** @type {!proto.caos.zitadel.management.api.v1.ProjectType} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
-};
-
-
-/** @param {!proto.caos.zitadel.management.api.v1.ProjectType} value */
-proto.caos.zitadel.management.api.v1.Project.prototype.setType = function(value) {
-  jspb.Message.setProto3EnumField(this, 6, value);
-};
-
-
-/**
- * optional string resource_owner = 7;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.Project.prototype.getResourceOwner = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.Project.prototype.setResourceOwner = function(value) {
-  jspb.Message.setProto3StringField(this, 7, value);
-};
-
-
-/**
- * optional string org_id = 8;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.Project.prototype.getOrgId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.Project.prototype.setOrgId = function(value) {
-  jspb.Message.setProto3StringField(this, 8, value);
-};
-
-
-/**
- * optional string org_name = 9;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.Project.prototype.getOrgName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.Project.prototype.setOrgName = function(value) {
-  jspb.Message.setProto3StringField(this, 9, value);
-};
-
-
-/**
- * optional string org_domain = 10;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.Project.prototype.getOrgDomain = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.Project.prototype.setOrgDomain = function(value) {
-  jspb.Message.setProto3StringField(this, 10, value);
-};
-
-
-/**
- * optional string grant_id = 11;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.Project.prototype.getGrantId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.Project.prototype.setGrantId = function(value) {
-  jspb.Message.setProto3StringField(this, 11, value);
-};
-
-
-/**
- * optional uint64 sequence = 12;
+ * optional uint64 sequence = 6;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.Project.prototype.getSequence = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.Project.prototype.setSequence = function(value) {
-  jspb.Message.setProto3IntField(this, 12, value);
+  jspb.Message.setProto3IntField(this, 6, value);
 };
 
 
@@ -15382,7 +16408,7 @@ proto.caos.zitadel.management.api.v1.Project.prototype.setSequence = function(va
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.repeatedFields_ = [4];
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.repeatedFields_ = [4];
 
 
 
@@ -15397,8 +16423,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.toObject = function(opt_includeInstance) {
-  return proto.caos.zitadel.management.api.v1.ProjectSearchResponse.toObject(opt_includeInstance, this);
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.toObject(opt_includeInstance, this);
 };
 
 
@@ -15407,17 +16433,17 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.toObject = 
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchResponse} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.Project.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.GrantedProject.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -15431,23 +16457,23 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.toObject = function(i
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchResponse}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.deserializeBinary = function(bytes) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.caos.zitadel.management.api.v1.ProjectSearchResponse;
-  return proto.caos.zitadel.management.api.v1.ProjectSearchResponse.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse;
+  return proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchResponse} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchResponse}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -15467,8 +16493,8 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.deserializeBinaryFrom
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.Project;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.Project.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.GrantedProject;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.GrantedProject.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -15484,9 +16510,9 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.deserializeBinaryFrom
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.serializeBinary = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.caos.zitadel.management.api.v1.ProjectSearchResponse.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -15494,11 +16520,11 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.serializeBi
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchResponse} message
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getOffset();
   if (f !== 0) {
@@ -15526,7 +16552,7 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.serializeBinaryToWrit
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.Project.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.GrantedProject.serializeBinaryToWriter
     );
   }
 };
@@ -15536,13 +16562,13 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.serializeBinaryToWrit
  * optional uint64 offset = 1;
  * @return {number}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.getOffset = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.getOffset = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.setOffset = function(value) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.setOffset = function(value) {
   jspb.Message.setProto3IntField(this, 1, value);
 };
 
@@ -15551,13 +16577,13 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.setOffset =
  * optional uint64 limit = 2;
  * @return {number}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.getLimit = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.getLimit = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.setLimit = function(value) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.setLimit = function(value) {
   jspb.Message.setProto3IntField(this, 2, value);
 };
 
@@ -15566,58 +16592,51 @@ proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.setLimit = 
  * optional uint64 total_result = 3;
  * @return {number}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.getTotalResult = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.getTotalResult = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
 /** @param {number} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.setTotalResult = function(value) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.setTotalResult = function(value) {
   jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
 /**
- * repeated Project result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.Project>}
+ * repeated GrantedProject result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.GrantedProject>}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.Project>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.Project, 4));
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.getResultList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.GrantedProject>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.GrantedProject, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.Project>} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.setResultList = function(value) {
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.GrantedProject>} value */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.Project=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProject=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.Project}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProject}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.Project, opt_index);
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.addResult = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.GrantedProject, opt_index);
 };
 
 
 /**
  * Clears the list making it empty but non-null.
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchResponse.prototype.clearResultList = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.prototype.clearResultList = function() {
   this.setResultList([]);
 };
 
 
-
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.repeatedFields_ = [3];
 
 
 
@@ -15632,8 +16651,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.caos.zitadel.management.api.v1.ProjectSearchRequest.toObject(opt_includeInstance, this);
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.GrantedProject.toObject(opt_includeInstance, this);
 };
 
 
@@ -15642,16 +16661,24 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.toObject = f
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProject} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.management.api.v1.GrantedProject.toObject = function(includeInstance, msg) {
   var f, obj = {
-    offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    queriesList: jspb.Message.toObjectList(msg.getQueriesList(),
-    proto.caos.zitadel.management.api.v1.ProjectSearchQuery.toObject, includeInstance)
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    state: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    type: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    resourceOwner: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    orgId: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    orgName: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    orgDomain: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    grantId: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    sequence: jspb.Message.getFieldWithDefault(msg, 12, 0)
   };
 
   if (includeInstance) {
@@ -15665,23 +16692,484 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.toObject = function(in
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProject}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.deserializeBinary = function(bytes) {
+proto.caos.zitadel.management.api.v1.GrantedProject.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.caos.zitadel.management.api.v1.ProjectSearchRequest;
-  return proto.caos.zitadel.management.api.v1.ProjectSearchRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.management.api.v1.GrantedProject;
+  return proto.caos.zitadel.management.api.v1.GrantedProject.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProject} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProject}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.management.api.v1.GrantedProject.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
+    case 3:
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.ProjectState} */ (reader.readEnum());
+      msg.setState(value);
+      break;
+    case 4:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 5:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 6:
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.ProjectType} */ (reader.readEnum());
+      msg.setType(value);
+      break;
+    case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setResourceOwner(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgId(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgName(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgDomain(value);
+      break;
+    case 11:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setGrantId(value);
+      break;
+    case 12:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.GrantedProject.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProject} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getState();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      3,
+      f
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      5,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getType();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      6,
+      f
+    );
+  }
+  f = message.getResourceOwner();
+  if (f.length > 0) {
+    writer.writeString(
+      7,
+      f
+    );
+  }
+  f = message.getOrgId();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
+      f
+    );
+  }
+  f = message.getOrgName();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
+      f
+    );
+  }
+  f = message.getOrgDomain();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
+      f
+    );
+  }
+  f = message.getGrantId();
+  if (f.length > 0) {
+    writer.writeString(
+      11,
+      f
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      12,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string name = 2;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setName = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional ProjectState state = 3;
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectState}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.ProjectState} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.management.api.v1.ProjectState} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setState = function(value) {
+  jspb.Message.setProto3EnumField(this, 3, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 4;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 4, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 5;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional ProjectType type = 6;
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectType}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getType = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.ProjectType} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.management.api.v1.ProjectType} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setType = function(value) {
+  jspb.Message.setProto3EnumField(this, 6, value);
+};
+
+
+/**
+ * optional string resource_owner = 7;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getResourceOwner = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setResourceOwner = function(value) {
+  jspb.Message.setProto3StringField(this, 7, value);
+};
+
+
+/**
+ * optional string org_id = 8;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getOrgId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setOrgId = function(value) {
+  jspb.Message.setProto3StringField(this, 8, value);
+};
+
+
+/**
+ * optional string org_name = 9;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getOrgName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setOrgName = function(value) {
+  jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+/**
+ * optional string org_domain = 10;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getOrgDomain = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setOrgDomain = function(value) {
+  jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * optional string grant_id = 11;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getGrantId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setGrantId = function(value) {
+  jspb.Message.setProto3StringField(this, 11, value);
+};
+
+
+/**
+ * optional uint64 sequence = 12;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.GrantedProject.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 12, value);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.repeatedFields_ = [3];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    queriesList: jspb.Message.toObjectList(msg.getQueriesList(),
+    proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.toObject, includeInstance)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest;
+  return proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest}
+ */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -15697,8 +17185,8 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.deserializeBinaryFromR
       msg.setLimit(value);
       break;
     case 3:
-      var value = new proto.caos.zitadel.management.api.v1.ProjectSearchQuery;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectSearchQuery.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.deserializeBinaryFromReader);
       msg.addQueries(value);
       break;
     default:
@@ -15714,9 +17202,9 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.deserializeBinaryFromR
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.serializeBinary = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.caos.zitadel.management.api.v1.ProjectSearchRequest.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -15724,11 +17212,11 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.serializeBin
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest} message
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getOffset();
   if (f !== 0) {
@@ -15749,7 +17237,7 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.serializeBinaryToWrite
     writer.writeRepeatedMessage(
       3,
       f,
-      proto.caos.zitadel.management.api.v1.ProjectSearchQuery.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.serializeBinaryToWriter
     );
   }
 };
@@ -15759,13 +17247,13 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.serializeBinaryToWrite
  * optional uint64 offset = 1;
  * @return {number}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.getOffset = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.getOffset = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.setOffset = function(value) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.setOffset = function(value) {
   jspb.Message.setProto3IntField(this, 1, value);
 };
 
@@ -15774,47 +17262,47 @@ proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.setOffset = 
  * optional uint64 limit = 2;
  * @return {number}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.getLimit = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.getLimit = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.setLimit = function(value) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.setLimit = function(value) {
   jspb.Message.setProto3IntField(this, 2, value);
 };
 
 
 /**
- * repeated ProjectSearchQuery queries = 3;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectSearchQuery>}
+ * repeated GrantedProjectSearchQuery queries = 3;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery>}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.getQueriesList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectSearchQuery>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectSearchQuery, 3));
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.getQueriesList = function() {
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery, 3));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectSearchQuery>} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.setQueriesList = function(value) {
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery>} value */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.setQueriesList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 3, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchQuery=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchQuery}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.addQueries = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.caos.zitadel.management.api.v1.ProjectSearchQuery, opt_index);
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.addQueries = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery, opt_index);
 };
 
 
 /**
  * Clears the list making it empty but non-null.
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchRequest.prototype.clearQueriesList = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest.prototype.clearQueriesList = function() {
   this.setQueriesList([]);
 };
 
@@ -15833,8 +17321,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.toObject = function(opt_includeInstance) {
-  return proto.caos.zitadel.management.api.v1.ProjectSearchQuery.toObject(opt_includeInstance, this);
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.toObject(opt_includeInstance, this);
 };
 
 
@@ -15843,11 +17331,11 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.toObject = fun
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchQuery} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.toObject = function(includeInstance, msg) {
   var f, obj = {
     key: jspb.Message.getFieldWithDefault(msg, 1, 0),
     method: jspb.Message.getFieldWithDefault(msg, 2, 0),
@@ -15865,23 +17353,23 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.toObject = function(incl
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchQuery}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.deserializeBinary = function(bytes) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.caos.zitadel.management.api.v1.ProjectSearchQuery;
-  return proto.caos.zitadel.management.api.v1.ProjectSearchQuery.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery;
+  return proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchQuery} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchQuery}
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -15889,7 +17377,7 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.deserializeBinaryFromRea
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!proto.caos.zitadel.management.api.v1.ProjectSearchKey} */ (reader.readEnum());
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchKey} */ (reader.readEnum());
       msg.setKey(value);
       break;
     case 2:
@@ -15913,9 +17401,9 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.deserializeBinaryFromRea
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.serializeBinary = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.caos.zitadel.management.api.v1.ProjectSearchQuery.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -15923,11 +17411,11 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.serializeBinar
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchQuery} message
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getKey();
   if (f !== 0.0) {
@@ -15954,16 +17442,16 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.serializeBinaryToWriter 
 
 
 /**
- * optional ProjectSearchKey key = 1;
- * @return {!proto.caos.zitadel.management.api.v1.ProjectSearchKey}
+ * optional GrantedProjectSearchKey key = 1;
+ * @return {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchKey}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.getKey = function() {
-  return /** @type {!proto.caos.zitadel.management.api.v1.ProjectSearchKey} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.getKey = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchKey} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {!proto.caos.zitadel.management.api.v1.ProjectSearchKey} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.setKey = function(value) {
+/** @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchKey} value */
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.setKey = function(value) {
   jspb.Message.setProto3EnumField(this, 1, value);
 };
 
@@ -15972,13 +17460,13 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.setKey = funct
  * optional SearchMethod method = 2;
  * @return {!proto.caos.zitadel.management.api.v1.SearchMethod}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.getMethod = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.getMethod = function() {
   return /** @type {!proto.caos.zitadel.management.api.v1.SearchMethod} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {!proto.caos.zitadel.management.api.v1.SearchMethod} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.setMethod = function(value) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.setMethod = function(value) {
   jspb.Message.setProto3EnumField(this, 2, value);
 };
 
@@ -15987,13 +17475,13 @@ proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.setMethod = fu
  * optional string value = 3;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.getValue = function() {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.getValue = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectSearchQuery.prototype.setValue = function(value) {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchQuery.prototype.setValue = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
@@ -16153,7 +17641,7 @@ proto.caos.zitadel.management.api.v1.ProjectMemberRoles.prototype.clearRolesList
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.ProjectMember.repeatedFields_ = [6];
+proto.caos.zitadel.management.api.v1.ProjectMember.repeatedFields_ = [2];
 
 
 
@@ -16185,14 +17673,10 @@ proto.caos.zitadel.management.api.v1.ProjectMember.prototype.toObject = function
 proto.caos.zitadel.management.api.v1.ProjectMember.toObject = function(includeInstance, msg) {
   var f, obj = {
     userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userName: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    email: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    firstName: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    lastName: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    rolesList: jspb.Message.getRepeatedField(msg, 6),
+    rolesList: jspb.Message.getRepeatedField(msg, 2),
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    sequence: jspb.Message.getFieldWithDefault(msg, 10, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 5, 0)
   };
 
   if (includeInstance) {
@@ -16235,35 +17719,19 @@ proto.caos.zitadel.management.api.v1.ProjectMember.deserializeBinaryFromReader =
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUserName(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setEmail(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setFirstName(value);
-      break;
-    case 5:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setLastName(value);
-      break;
-    case 6:
-      var value = /** @type {string} */ (reader.readString());
       msg.addRoles(value);
       break;
-    case 7:
+    case 3:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setChangeDate(value);
       break;
-    case 8:
+    case 4:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreationDate(value);
       break;
-    case 10:
+    case 5:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
@@ -16303,45 +17771,17 @@ proto.caos.zitadel.management.api.v1.ProjectMember.serializeBinaryToWriter = fun
       f
     );
   }
-  f = message.getUserName();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = message.getEmail();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = message.getFirstName();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
-  f = message.getLastName();
-  if (f.length > 0) {
-    writer.writeString(
-      5,
-      f
-    );
-  }
   f = message.getRolesList();
   if (f.length > 0) {
     writer.writeRepeatedString(
-      6,
+      2,
       f
     );
   }
   f = message.getChangeDate();
   if (f != null) {
     writer.writeMessage(
-      7,
+      3,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -16349,7 +17789,7 @@ proto.caos.zitadel.management.api.v1.ProjectMember.serializeBinaryToWriter = fun
   f = message.getCreationDate();
   if (f != null) {
     writer.writeMessage(
-      8,
+      4,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -16357,7 +17797,7 @@ proto.caos.zitadel.management.api.v1.ProjectMember.serializeBinaryToWriter = fun
   f = message.getSequence();
   if (f !== 0) {
     writer.writeUint64(
-      10,
+      5,
       f
     );
   }
@@ -16380,77 +17820,17 @@ proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setUserId = functio
 
 
 /**
- * optional string user_name = 2;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getUserName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setUserName = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
-};
-
-
-/**
- * optional string email = 3;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getEmail = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setEmail = function(value) {
-  jspb.Message.setProto3StringField(this, 3, value);
-};
-
-
-/**
- * optional string first_name = 4;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getFirstName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setFirstName = function(value) {
-  jspb.Message.setProto3StringField(this, 4, value);
-};
-
-
-/**
- * optional string last_name = 5;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getLastName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setLastName = function(value) {
-  jspb.Message.setProto3StringField(this, 5, value);
-};
-
-
-/**
- * repeated string roles = 6;
+ * repeated string roles = 2;
  * @return {!Array<string>}
  */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getRolesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
 };
 
 
 /** @param {!Array<string>} value */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setRolesList = function(value) {
-  jspb.Message.setField(this, 6, value || []);
+  jspb.Message.setField(this, 2, value || []);
 };
 
 
@@ -16459,7 +17839,7 @@ proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setRolesList = func
  * @param {number=} opt_index
  */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.addRoles = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
 };
 
 
@@ -16472,18 +17852,18 @@ proto.caos.zitadel.management.api.v1.ProjectMember.prototype.clearRolesList = fu
 
 
 /**
- * optional google.protobuf.Timestamp change_date = 7;
+ * optional google.protobuf.Timestamp change_date = 3;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getChangeDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setChangeDate = function(value) {
-  jspb.Message.setWrapperField(this, 7, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -16500,23 +17880,23 @@ proto.caos.zitadel.management.api.v1.ProjectMember.prototype.clearChangeDate = f
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.hasChangeDate = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp creation_date = 8;
+ * optional google.protobuf.Timestamp creation_date = 4;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getCreationDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setCreationDate = function(value) {
-  jspb.Message.setWrapperField(this, 8, value);
+  jspb.Message.setWrapperField(this, 4, value);
 };
 
 
@@ -16533,22 +17913,22 @@ proto.caos.zitadel.management.api.v1.ProjectMember.prototype.clearCreationDate =
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.hasCreationDate = function() {
-  return jspb.Message.getField(this, 8) != null;
+  return jspb.Message.getField(this, 4) != null;
 };
 
 
 /**
- * optional uint64 sequence = 10;
+ * optional uint64 sequence = 5;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.getSequence = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 10, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.ProjectMember.prototype.setSequence = function(value) {
-  jspb.Message.setProto3IntField(this, 10, value);
+  jspb.Message.setProto3IntField(this, 5, value);
 };
 
 
@@ -17863,6 +19243,286 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.ProjectRoleView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectRoleView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    projectId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    key: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    displayName: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    group: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    sequence: jspb.Message.getFieldWithDefault(msg, 7, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectRoleView}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.ProjectRoleView;
+  return proto.caos.zitadel.management.api.v1.ProjectRoleView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectRoleView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectRoleView}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProjectId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setKey(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDisplayName(value);
+      break;
+    case 4:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setGroup(value);
+      break;
+    case 7:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.ProjectRoleView.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectRoleView} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getProjectId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getKey();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getDisplayName();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getGroup();
+  if (f.length > 0) {
+    writer.writeString(
+      6,
+      f
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      7,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string project_id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.getProjectId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.setProjectId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string key = 2;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.getKey = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.setKey = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string display_name = 3;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.getDisplayName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.setDisplayName = function(value) {
+  jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 4;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 4, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional string group = 6;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.getGroup = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.setGroup = function(value) {
+  jspb.Message.setProto3StringField(this, 6, value);
+};
+
+
+/**
+ * optional uint64 sequence = 7;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.ProjectRoleView.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 7, value);
+};
+
+
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
 proto.caos.zitadel.management.api.v1.ProjectRoleRemove.prototype.toObject = function(opt_includeInstance) {
   return proto.caos.zitadel.management.api.v1.ProjectRoleRemove.toObject(opt_includeInstance, this);
 };
@@ -18042,7 +19702,7 @@ proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse.toObject = functi
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.ProjectRole.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.ProjectRoleView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -18092,8 +19752,8 @@ proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse.deserializeBinary
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.ProjectRole;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectRole.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.ProjectRoleView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectRoleView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -18151,7 +19811,7 @@ proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse.serializeBinaryTo
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.ProjectRole.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.ProjectRoleView.serializeBinaryToWriter
     );
   }
 };
@@ -18203,28 +19863,28 @@ proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse.prototype.setTota
 
 
 /**
- * repeated ProjectRole result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectRole>}
+ * repeated ProjectRoleView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectRoleView>}
  */
 proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectRole>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectRole, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectRoleView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectRoleView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectRole>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectRoleView>} value */
 proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.ProjectRole=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectRoleView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.ProjectRole}
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectRoleView}
  */
 proto.caos.zitadel.management.api.v1.ProjectRoleSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectRole, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectRoleView, opt_index);
 };
 
 
@@ -18656,6 +20316,411 @@ proto.caos.zitadel.management.api.v1.ProjectRoleSearchQuery.prototype.setValue =
  * @private {!Array<number>}
  * @const
  */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.repeatedFields_ = [6];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.ProjectMemberView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectMemberView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    userName: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    email: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    firstName: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    lastName: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    rolesList: jspb.Message.getRepeatedField(msg, 6),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    sequence: jspb.Message.getFieldWithDefault(msg, 10, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectMemberView}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.ProjectMemberView;
+  return proto.caos.zitadel.management.api.v1.ProjectMemberView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectMemberView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectMemberView}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserName(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEmail(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFirstName(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLastName(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addRoles(value);
+      break;
+    case 7:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 8:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 10:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.ProjectMemberView.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectMemberView} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getUserId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getUserName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getFirstName();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = message.getLastName();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+  f = message.getRolesList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      6,
+      f
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      10,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string user_id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getUserId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setUserId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string user_name = 2;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getUserName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setUserName = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string email = 3;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setEmail = function(value) {
+  jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string first_name = 4;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getFirstName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setFirstName = function(value) {
+  jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string last_name = 5;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getLastName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setLastName = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * repeated string roles = 6;
+ * @return {!Array<string>}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getRolesList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+};
+
+
+/** @param {!Array<string>} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setRolesList = function(value) {
+  jspb.Message.setField(this, 6, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.addRoles = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.clearRolesList = function() {
+  this.setRolesList([]);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 7;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 8;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 8, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 8) != null;
+};
+
+
+/**
+ * optional uint64 sequence = 10;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 10, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.ProjectMemberView.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 10, value);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
 proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.repeatedFields_ = [4];
 
 
@@ -18691,7 +20756,7 @@ proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.toObject = func
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.ProjectMember.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.ProjectMemberView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -18741,8 +20806,8 @@ proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.deserializeBina
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.ProjectMember;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectMember.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.ProjectMemberView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectMemberView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -18800,7 +20865,7 @@ proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.serializeBinary
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.ProjectMember.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.ProjectMemberView.serializeBinaryToWriter
     );
   }
 };
@@ -18852,28 +20917,28 @@ proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.prototype.setTo
 
 
 /**
- * repeated ProjectMember result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectMember>}
+ * repeated ProjectMemberView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectMemberView>}
  */
 proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectMember>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectMember, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectMemberView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectMemberView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectMember>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectMemberView>} value */
 proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.ProjectMember=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectMemberView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.ProjectMember}
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectMemberView}
  */
 proto.caos.zitadel.management.api.v1.ProjectMemberSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectMember, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectMemberView, opt_index);
 };
 
 
@@ -21144,6 +23209,378 @@ proto.caos.zitadel.management.api.v1.ClientSecret.prototype.setClientSecret = fu
 
 
 /**
+ * Oneof group definitions for this message. Each group defines the field
+ * numbers belonging to that group. When of these fields' value is set, all
+ * other fields in the group are cleared. During deserialization, if multiple
+ * fields are encountered for a group, only the last value seen will be kept.
+ * @private {!Array<!Array<number>>}
+ * @const
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.oneofGroups_ = [[8]];
+
+/**
+ * @enum {number}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.AppConfigCase = {
+  APP_CONFIG_NOT_SET: 0,
+  OIDC_CONFIG: 8
+};
+
+/**
+ * @return {proto.caos.zitadel.management.api.v1.ApplicationView.AppConfigCase}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getAppConfigCase = function() {
+  return /** @type {proto.caos.zitadel.management.api.v1.ApplicationView.AppConfigCase} */(jspb.Message.computeOneofCase(this, proto.caos.zitadel.management.api.v1.ApplicationView.oneofGroups_[0]));
+};
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.ApplicationView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.ApplicationView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    state: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    name: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    oidcConfig: (f = msg.getOidcConfig()) && proto.caos.zitadel.management.api.v1.OIDCConfig.toObject(includeInstance, f),
+    sequence: jspb.Message.getFieldWithDefault(msg, 9, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.ApplicationView}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.ApplicationView;
+  return proto.caos.zitadel.management.api.v1.ApplicationView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.ApplicationView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.ApplicationView}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.AppState} */ (reader.readEnum());
+      msg.setState(value);
+      break;
+    case 3:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 4:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
+    case 8:
+      var value = new proto.caos.zitadel.management.api.v1.OIDCConfig;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.OIDCConfig.deserializeBinaryFromReader);
+      msg.setOidcConfig(value);
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.ApplicationView.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.ApplicationView} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getState();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      2,
+      f
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+  f = message.getOidcConfig();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      proto.caos.zitadel.management.api.v1.OIDCConfig.serializeBinaryToWriter
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      9,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.setId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional AppState state = 2;
+ * @return {!proto.caos.zitadel.management.api.v1.AppState}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.AppState} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.management.api.v1.AppState} value */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.setState = function(value) {
+  jspb.Message.setProto3EnumField(this, 2, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 3;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 3) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 4;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 4, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional string name = 5;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.setName = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional OIDCConfig oidc_config = 8;
+ * @return {?proto.caos.zitadel.management.api.v1.OIDCConfig}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getOidcConfig = function() {
+  return /** @type{?proto.caos.zitadel.management.api.v1.OIDCConfig} */ (
+    jspb.Message.getWrapperField(this, proto.caos.zitadel.management.api.v1.OIDCConfig, 8));
+};
+
+
+/** @param {?proto.caos.zitadel.management.api.v1.OIDCConfig|undefined} value */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.setOidcConfig = function(value) {
+  jspb.Message.setOneofWrapperField(this, 8, proto.caos.zitadel.management.api.v1.ApplicationView.oneofGroups_[0], value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.clearOidcConfig = function() {
+  this.setOidcConfig(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.hasOidcConfig = function() {
+  return jspb.Message.getField(this, 8) != null;
+};
+
+
+/**
+ * optional uint64 sequence = 9;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.ApplicationView.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 9, value);
+};
+
+
+
+/**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
@@ -21183,7 +23620,7 @@ proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.toObject = functi
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.Application.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.ApplicationView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -21233,8 +23670,8 @@ proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.deserializeBinary
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.Application;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.Application.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.ApplicationView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ApplicationView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -21292,7 +23729,7 @@ proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.serializeBinaryTo
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.Application.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.ApplicationView.serializeBinaryToWriter
     );
   }
 };
@@ -21344,28 +23781,28 @@ proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.prototype.setTota
 
 
 /**
- * repeated Application result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.Application>}
+ * repeated ApplicationView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.ApplicationView>}
  */
 proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.Application>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.Application, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ApplicationView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ApplicationView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.Application>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.ApplicationView>} value */
 proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.Application=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.ApplicationView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.Application}
+ * @return {!proto.caos.zitadel.management.api.v1.ApplicationView}
  */
 proto.caos.zitadel.management.api.v1.ApplicationSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.Application, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ApplicationView, opt_index);
 };
 
 
@@ -21797,7 +24234,7 @@ proto.caos.zitadel.management.api.v1.ApplicationSearchQuery.prototype.setValue =
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.ProjectGrant.repeatedFields_ = [6];
+proto.caos.zitadel.management.api.v1.ProjectGrant.repeatedFields_ = [4];
 
 
 
@@ -21831,14 +24268,11 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.toObject = function(includeIns
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     projectId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     grantedOrgId: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    grantedOrgName: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    grantedOrgDomain: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    roleKeysList: jspb.Message.getRepeatedField(msg, 6),
-    state: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    roleKeysList: jspb.Message.getRepeatedField(msg, 4),
+    state: jspb.Message.getFieldWithDefault(msg, 5, 0),
     creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    projectName: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    sequence: jspb.Message.getFieldWithDefault(msg, 11, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 9, 0)
   };
 
   if (includeInstance) {
@@ -21889,35 +24323,23 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.deserializeBinaryFromReader = 
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setGrantedOrgName(value);
-      break;
-    case 5:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setGrantedOrgDomain(value);
-      break;
-    case 6:
-      var value = /** @type {string} */ (reader.readString());
       msg.addRoleKeys(value);
       break;
-    case 7:
+    case 5:
       var value = /** @type {!proto.caos.zitadel.management.api.v1.ProjectGrantState} */ (reader.readEnum());
       msg.setState(value);
       break;
-    case 8:
+    case 6:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreationDate(value);
       break;
-    case 9:
+    case 7:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setChangeDate(value);
       break;
-    case 10:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setProjectName(value);
-      break;
-    case 11:
+    case 9:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
@@ -21971,38 +24393,24 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.serializeBinaryToWriter = func
       f
     );
   }
-  f = message.getGrantedOrgName();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
-  f = message.getGrantedOrgDomain();
-  if (f.length > 0) {
-    writer.writeString(
-      5,
-      f
-    );
-  }
   f = message.getRoleKeysList();
   if (f.length > 0) {
     writer.writeRepeatedString(
-      6,
+      4,
       f
     );
   }
   f = message.getState();
   if (f !== 0.0) {
     writer.writeEnum(
-      7,
+      5,
       f
     );
   }
   f = message.getCreationDate();
   if (f != null) {
     writer.writeMessage(
-      8,
+      6,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -22010,22 +24418,15 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.serializeBinaryToWriter = func
   f = message.getChangeDate();
   if (f != null) {
     writer.writeMessage(
-      9,
+      7,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
-    );
-  }
-  f = message.getProjectName();
-  if (f.length > 0) {
-    writer.writeString(
-      10,
-      f
     );
   }
   f = message.getSequence();
   if (f !== 0) {
     writer.writeUint64(
-      11,
+      9,
       f
     );
   }
@@ -22078,47 +24479,17 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setGrantedOrgId = fu
 
 
 /**
- * optional string granted_org_name = 4;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getGrantedOrgName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setGrantedOrgName = function(value) {
-  jspb.Message.setProto3StringField(this, 4, value);
-};
-
-
-/**
- * optional string granted_org_domain = 5;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getGrantedOrgDomain = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setGrantedOrgDomain = function(value) {
-  jspb.Message.setProto3StringField(this, 5, value);
-};
-
-
-/**
- * repeated string role_keys = 6;
+ * repeated string role_keys = 4;
  * @return {!Array<string>}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getRoleKeysList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 4));
 };
 
 
 /** @param {!Array<string>} value */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setRoleKeysList = function(value) {
-  jspb.Message.setField(this, 6, value || []);
+  jspb.Message.setField(this, 4, value || []);
 };
 
 
@@ -22127,7 +24498,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setRoleKeysList = fu
  * @param {number=} opt_index
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.addRoleKeys = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+  jspb.Message.addToRepeatedField(this, 4, value, opt_index);
 };
 
 
@@ -22140,33 +24511,33 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.clearRoleKeysList = 
 
 
 /**
- * optional ProjectGrantState state = 7;
+ * optional ProjectGrantState state = 5;
  * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantState}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getState = function() {
-  return /** @type {!proto.caos.zitadel.management.api.v1.ProjectGrantState} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+  return /** @type {!proto.caos.zitadel.management.api.v1.ProjectGrantState} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
 
 /** @param {!proto.caos.zitadel.management.api.v1.ProjectGrantState} value */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setState = function(value) {
-  jspb.Message.setProto3EnumField(this, 7, value);
+  jspb.Message.setProto3EnumField(this, 5, value);
 };
 
 
 /**
- * optional google.protobuf.Timestamp creation_date = 8;
+ * optional google.protobuf.Timestamp creation_date = 6;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getCreationDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setCreationDate = function(value) {
-  jspb.Message.setWrapperField(this, 8, value);
+  jspb.Message.setWrapperField(this, 6, value);
 };
 
 
@@ -22183,23 +24554,23 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.clearCreationDate = 
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.hasCreationDate = function() {
-  return jspb.Message.getField(this, 8) != null;
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp change_date = 9;
+ * optional google.protobuf.Timestamp change_date = 7;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getChangeDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 9));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setChangeDate = function(value) {
-  jspb.Message.setWrapperField(this, 9, value);
+  jspb.Message.setWrapperField(this, 7, value);
 };
 
 
@@ -22216,37 +24587,22 @@ proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.clearChangeDate = fu
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.hasChangeDate = function() {
-  return jspb.Message.getField(this, 9) != null;
+  return jspb.Message.getField(this, 7) != null;
 };
 
 
 /**
- * optional string project_name = 10;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getProjectName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setProjectName = function(value) {
-  jspb.Message.setProto3StringField(this, 10, value);
-};
-
-
-/**
- * optional uint64 sequence = 11;
+ * optional uint64 sequence = 9;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.getSequence = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.ProjectGrant.prototype.setSequence = function(value) {
-  jspb.Message.setProto3IntField(this, 11, value);
+  jspb.Message.setProto3IntField(this, 9, value);
 };
 
 
@@ -22809,6 +25165,13 @@ proto.caos.zitadel.management.api.v1.ProjectGrantID.prototype.setId = function(v
 
 
 
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.repeatedFields_ = [6];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -22822,8 +25185,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.prototype.toObject = function(opt_includeInstance) {
-  return proto.caos.zitadel.management.api.v1.GrantedGrantID.toObject(opt_includeInstance, this);
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.ProjectGrantView.toObject(opt_includeInstance, this);
 };
 
 
@@ -22832,13 +25195,23 @@ proto.caos.zitadel.management.api.v1.GrantedGrantID.prototype.toObject = functio
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.caos.zitadel.management.api.v1.GrantedGrantID} msg The msg instance to transform.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantView} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.toObject = function(includeInstance, msg) {
+proto.caos.zitadel.management.api.v1.ProjectGrantView.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    projectId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    grantedOrgId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    grantedOrgName: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    grantedOrgDomain: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    roleKeysList: jspb.Message.getRepeatedField(msg, 6),
+    state: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    projectName: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    sequence: jspb.Message.getFieldWithDefault(msg, 11, 0)
   };
 
   if (includeInstance) {
@@ -22852,23 +25225,23 @@ proto.caos.zitadel.management.api.v1.GrantedGrantID.toObject = function(includeI
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.caos.zitadel.management.api.v1.GrantedGrantID}
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantView}
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.deserializeBinary = function(bytes) {
+proto.caos.zitadel.management.api.v1.ProjectGrantView.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.caos.zitadel.management.api.v1.GrantedGrantID;
-  return proto.caos.zitadel.management.api.v1.GrantedGrantID.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.caos.zitadel.management.api.v1.ProjectGrantView;
+  return proto.caos.zitadel.management.api.v1.ProjectGrantView.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.caos.zitadel.management.api.v1.GrantedGrantID} msg The message object to deserialize into.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantView} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.caos.zitadel.management.api.v1.GrantedGrantID}
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantView}
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.deserializeBinaryFromReader = function(msg, reader) {
+proto.caos.zitadel.management.api.v1.ProjectGrantView.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -22878,6 +25251,48 @@ proto.caos.zitadel.management.api.v1.GrantedGrantID.deserializeBinaryFromReader 
     case 1:
       var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProjectId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setGrantedOrgId(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setGrantedOrgName(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setGrantedOrgDomain(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addRoleKeys(value);
+      break;
+    case 7:
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.ProjectGrantState} */ (reader.readEnum());
+      msg.setState(value);
+      break;
+    case 8:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 9:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProjectName(value);
+      break;
+    case 11:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
       break;
     default:
       reader.skipField();
@@ -22892,9 +25307,9 @@ proto.caos.zitadel.management.api.v1.GrantedGrantID.deserializeBinaryFromReader 
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.prototype.serializeBinary = function() {
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.caos.zitadel.management.api.v1.GrantedGrantID.serializeBinaryToWriter(this, writer);
+  proto.caos.zitadel.management.api.v1.ProjectGrantView.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -22902,16 +25317,88 @@ proto.caos.zitadel.management.api.v1.GrantedGrantID.prototype.serializeBinary = 
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.caos.zitadel.management.api.v1.GrantedGrantID} message
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantView} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.serializeBinaryToWriter = function(message, writer) {
+proto.caos.zitadel.management.api.v1.ProjectGrantView.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
   if (f.length > 0) {
     writer.writeString(
       1,
+      f
+    );
+  }
+  f = message.getProjectId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getGrantedOrgId();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getGrantedOrgName();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = message.getGrantedOrgDomain();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+  f = message.getRoleKeysList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      6,
+      f
+    );
+  }
+  f = message.getState();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      7,
+      f
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      9,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getProjectName();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
+      f
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      11,
       f
     );
   }
@@ -22922,14 +25409,217 @@ proto.caos.zitadel.management.api.v1.GrantedGrantID.serializeBinaryToWriter = fu
  * optional string id = 1;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.prototype.getId = function() {
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.GrantedGrantID.prototype.setId = function(value) {
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string project_id = 2;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getProjectId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setProjectId = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string granted_org_id = 3;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getGrantedOrgId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setGrantedOrgId = function(value) {
+  jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string granted_org_name = 4;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getGrantedOrgName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setGrantedOrgName = function(value) {
+  jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string granted_org_domain = 5;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getGrantedOrgDomain = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setGrantedOrgDomain = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * repeated string role_keys = 6;
+ * @return {!Array<string>}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getRoleKeysList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+};
+
+
+/** @param {!Array<string>} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setRoleKeysList = function(value) {
+  jspb.Message.setField(this, 6, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.addRoleKeys = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.clearRoleKeysList = function() {
+  this.setRoleKeysList([]);
+};
+
+
+/**
+ * optional ProjectGrantState state = 7;
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantState}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.ProjectGrantState} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.management.api.v1.ProjectGrantState} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setState = function(value) {
+  jspb.Message.setProto3EnumField(this, 7, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 8;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 8, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 8) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 9;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 9));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 9, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 9) != null;
+};
+
+
+/**
+ * optional string project_name = 10;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getProjectName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setProjectName = function(value) {
+  jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * optional uint64 sequence = 11;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantView.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 11, value);
 };
 
 
@@ -22974,7 +25664,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.toObject = funct
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.ProjectGrant.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.ProjectGrantView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -23024,8 +25714,8 @@ proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.deserializeBinar
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.ProjectGrant;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectGrant.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.ProjectGrantView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectGrantView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -23083,7 +25773,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.serializeBinaryT
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.ProjectGrant.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.ProjectGrantView.serializeBinaryToWriter
     );
   }
 };
@@ -23135,28 +25825,28 @@ proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.prototype.setTot
 
 
 /**
- * repeated ProjectGrant result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrant>}
+ * repeated ProjectGrantView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantView>}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectGrant>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectGrant, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectGrantView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrant>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantView>} value */
 proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.ProjectGrant=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.ProjectGrant}
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantView}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectGrant, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectGrantView, opt_index);
 };
 
 
@@ -23502,7 +26192,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMemberRoles.prototype.clearRole
  * @private {!Array<number>}
  * @const
  */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.repeatedFields_ = [6];
+proto.caos.zitadel.management.api.v1.ProjectGrantMember.repeatedFields_ = [2];
 
 
 
@@ -23534,14 +26224,10 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.toObject = fun
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.toObject = function(includeInstance, msg) {
   var f, obj = {
     userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userName: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    email: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    firstName: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    lastName: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    rolesList: jspb.Message.getRepeatedField(msg, 6),
+    rolesList: jspb.Message.getRepeatedField(msg, 2),
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    sequence: jspb.Message.getFieldWithDefault(msg, 9, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 5, 0)
   };
 
   if (includeInstance) {
@@ -23584,35 +26270,19 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.deserializeBinaryFromRea
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUserName(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setEmail(value);
-      break;
-    case 4:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setFirstName(value);
-      break;
-    case 5:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setLastName(value);
-      break;
-    case 6:
-      var value = /** @type {string} */ (reader.readString());
       msg.addRoles(value);
       break;
-    case 7:
+    case 3:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setChangeDate(value);
       break;
-    case 8:
+    case 4:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreationDate(value);
       break;
-    case 9:
+    case 5:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
@@ -23652,45 +26322,17 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.serializeBinaryToWriter 
       f
     );
   }
-  f = message.getUserName();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = message.getEmail();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = message.getFirstName();
-  if (f.length > 0) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
-  f = message.getLastName();
-  if (f.length > 0) {
-    writer.writeString(
-      5,
-      f
-    );
-  }
   f = message.getRolesList();
   if (f.length > 0) {
     writer.writeRepeatedString(
-      6,
+      2,
       f
     );
   }
   f = message.getChangeDate();
   if (f != null) {
     writer.writeMessage(
-      7,
+      3,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -23698,7 +26340,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.serializeBinaryToWriter 
   f = message.getCreationDate();
   if (f != null) {
     writer.writeMessage(
-      8,
+      4,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -23706,7 +26348,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.serializeBinaryToWriter 
   f = message.getSequence();
   if (f !== 0) {
     writer.writeUint64(
-      9,
+      5,
       f
     );
   }
@@ -23729,77 +26371,17 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setUserId = fu
 
 
 /**
- * optional string user_name = 2;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getUserName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setUserName = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
-};
-
-
-/**
- * optional string email = 3;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getEmail = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setEmail = function(value) {
-  jspb.Message.setProto3StringField(this, 3, value);
-};
-
-
-/**
- * optional string first_name = 4;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getFirstName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setFirstName = function(value) {
-  jspb.Message.setProto3StringField(this, 4, value);
-};
-
-
-/**
- * optional string last_name = 5;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getLastName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setLastName = function(value) {
-  jspb.Message.setProto3StringField(this, 5, value);
-};
-
-
-/**
- * repeated string roles = 6;
+ * repeated string roles = 2;
  * @return {!Array<string>}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getRolesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
 };
 
 
 /** @param {!Array<string>} value */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setRolesList = function(value) {
-  jspb.Message.setField(this, 6, value || []);
+  jspb.Message.setField(this, 2, value || []);
 };
 
 
@@ -23808,7 +26390,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setRolesList =
  * @param {number=} opt_index
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.addRoles = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+  jspb.Message.addToRepeatedField(this, 2, value, opt_index);
 };
 
 
@@ -23821,18 +26403,18 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.clearRolesList
 
 
 /**
- * optional google.protobuf.Timestamp change_date = 7;
+ * optional google.protobuf.Timestamp change_date = 3;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getChangeDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setChangeDate = function(value) {
-  jspb.Message.setWrapperField(this, 7, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -23849,23 +26431,23 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.clearChangeDat
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.hasChangeDate = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp creation_date = 8;
+ * optional google.protobuf.Timestamp creation_date = 4;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getCreationDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setCreationDate = function(value) {
-  jspb.Message.setWrapperField(this, 8, value);
+  jspb.Message.setWrapperField(this, 4, value);
 };
 
 
@@ -23882,22 +26464,22 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.clearCreationD
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.hasCreationDate = function() {
-  return jspb.Message.getField(this, 8) != null;
+  return jspb.Message.getField(this, 4) != null;
 };
 
 
 /**
- * optional uint64 sequence = 9;
+ * optional uint64 sequence = 5;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.getSequence = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.ProjectGrantMember.prototype.setSequence = function(value) {
-  jspb.Message.setProto3IntField(this, 9, value);
+  jspb.Message.setProto3IntField(this, 5, value);
 };
 
 
@@ -24546,6 +27128,411 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMemberRemove.prototype.setUserI
  * @private {!Array<number>}
  * @const
  */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.repeatedFields_ = [6];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    userName: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    email: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    firstName: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    lastName: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    rolesList: jspb.Message.getRepeatedField(msg, 6),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    sequence: jspb.Message.getFieldWithDefault(msg, 9, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.ProjectGrantMemberView;
+  return proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserName(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEmail(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFirstName(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLastName(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addRoles(value);
+      break;
+    case 7:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 8:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 9:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getUserId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getUserName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getFirstName();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = message.getLastName();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+  f = message.getRolesList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      6,
+      f
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      9,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string user_id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getUserId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setUserId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string user_name = 2;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getUserName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setUserName = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string email = 3;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setEmail = function(value) {
+  jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string first_name = 4;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getFirstName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setFirstName = function(value) {
+  jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string last_name = 5;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getLastName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setLastName = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * repeated string roles = 6;
+ * @return {!Array<string>}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getRolesList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+};
+
+
+/** @param {!Array<string>} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setRolesList = function(value) {
+  jspb.Message.setField(this, 6, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.addRoles = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.clearRolesList = function() {
+  this.setRolesList([]);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 7;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 8;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 8, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 8) != null;
+};
+
+
+/**
+ * optional uint64 sequence = 9;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 9, value);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
 proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.repeatedFields_ = [4];
 
 
@@ -24581,7 +27568,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.toObject =
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.ProjectGrantMember.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -24631,8 +27618,8 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.deserializ
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.ProjectGrantMember;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectGrantMember.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.ProjectGrantMemberView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -24690,7 +27677,7 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.serializeB
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.ProjectGrantMember.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.ProjectGrantMemberView.serializeBinaryToWriter
     );
   }
 };
@@ -24742,28 +27729,28 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.prototype.
 
 
 /**
- * repeated ProjectGrantMember result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantMember>}
+ * repeated ProjectGrantMemberView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView>}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantMember>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectGrantMember, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.ProjectGrantMemberView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantMember>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView>} value */
 proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantMember=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantMember}
+ * @return {!proto.caos.zitadel.management.api.v1.ProjectGrantMemberView}
  */
 proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectGrantMember, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.ProjectGrantMemberView, opt_index);
 };
 
 
@@ -25261,14 +28248,7 @@ proto.caos.zitadel.management.api.v1.UserGrant.toObject = function(includeInstan
     state: jspb.Message.getFieldWithDefault(msg, 6, 0),
     creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    userName: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    firstName: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    lastName: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    email: jspb.Message.getFieldWithDefault(msg, 12, ""),
-    orgName: jspb.Message.getFieldWithDefault(msg, 13, ""),
-    orgDomain: jspb.Message.getFieldWithDefault(msg, 14, ""),
-    projectName: jspb.Message.getFieldWithDefault(msg, 15, ""),
-    sequence: jspb.Message.getFieldWithDefault(msg, 16, 0)
+    sequence: jspb.Message.getFieldWithDefault(msg, 9, 0)
   };
 
   if (includeInstance) {
@@ -25340,34 +28320,6 @@ proto.caos.zitadel.management.api.v1.UserGrant.deserializeBinaryFromReader = fun
       msg.setChangeDate(value);
       break;
     case 9:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setUserName(value);
-      break;
-    case 10:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setFirstName(value);
-      break;
-    case 11:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setLastName(value);
-      break;
-    case 12:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setEmail(value);
-      break;
-    case 13:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrgName(value);
-      break;
-    case 14:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOrgDomain(value);
-      break;
-    case 15:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setProjectName(value);
-      break;
-    case 16:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequence(value);
       break;
@@ -25458,59 +28410,10 @@ proto.caos.zitadel.management.api.v1.UserGrant.serializeBinaryToWriter = functio
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getUserName();
-  if (f.length > 0) {
-    writer.writeString(
-      9,
-      f
-    );
-  }
-  f = message.getFirstName();
-  if (f.length > 0) {
-    writer.writeString(
-      10,
-      f
-    );
-  }
-  f = message.getLastName();
-  if (f.length > 0) {
-    writer.writeString(
-      11,
-      f
-    );
-  }
-  f = message.getEmail();
-  if (f.length > 0) {
-    writer.writeString(
-      12,
-      f
-    );
-  }
-  f = message.getOrgName();
-  if (f.length > 0) {
-    writer.writeString(
-      13,
-      f
-    );
-  }
-  f = message.getOrgDomain();
-  if (f.length > 0) {
-    writer.writeString(
-      14,
-      f
-    );
-  }
-  f = message.getProjectName();
-  if (f.length > 0) {
-    writer.writeString(
-      15,
-      f
-    );
-  }
   f = message.getSequence();
   if (f !== 0) {
     writer.writeUint64(
-      16,
+      9,
       f
     );
   }
@@ -25691,122 +28594,17 @@ proto.caos.zitadel.management.api.v1.UserGrant.prototype.hasChangeDate = functio
 
 
 /**
- * optional string user_name = 9;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.getUserName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.setUserName = function(value) {
-  jspb.Message.setProto3StringField(this, 9, value);
-};
-
-
-/**
- * optional string first_name = 10;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.getFirstName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.setFirstName = function(value) {
-  jspb.Message.setProto3StringField(this, 10, value);
-};
-
-
-/**
- * optional string last_name = 11;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.getLastName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.setLastName = function(value) {
-  jspb.Message.setProto3StringField(this, 11, value);
-};
-
-
-/**
- * optional string email = 12;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.getEmail = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.setEmail = function(value) {
-  jspb.Message.setProto3StringField(this, 12, value);
-};
-
-
-/**
- * optional string org_name = 13;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.getOrgName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 13, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.setOrgName = function(value) {
-  jspb.Message.setProto3StringField(this, 13, value);
-};
-
-
-/**
- * optional string org_domain = 14;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.getOrgDomain = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.setOrgDomain = function(value) {
-  jspb.Message.setProto3StringField(this, 14, value);
-};
-
-
-/**
- * optional string project_name = 15;
- * @return {string}
- */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.getProjectName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 15, ""));
-};
-
-
-/** @param {string} value */
-proto.caos.zitadel.management.api.v1.UserGrant.prototype.setProjectName = function(value) {
-  jspb.Message.setProto3StringField(this, 15, value);
-};
-
-
-/**
- * optional uint64 sequence = 16;
+ * optional uint64 sequence = 9;
  * @return {number}
  */
 proto.caos.zitadel.management.api.v1.UserGrant.prototype.getSequence = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 16, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
 };
 
 
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.UserGrant.prototype.setSequence = function(value) {
-  jspb.Message.setProto3IntField(this, 16, value);
+  jspb.Message.setProto3IntField(this, 9, value);
 };
 
 
@@ -27449,6 +30247,627 @@ proto.caos.zitadel.management.api.v1.ProjectGrantUserGrantUpdate.prototype.clear
  * @private {!Array<number>}
  * @const
  */
+proto.caos.zitadel.management.api.v1.UserGrantView.repeatedFields_ = [5];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.toObject = function(opt_includeInstance) {
+  return proto.caos.zitadel.management.api.v1.UserGrantView.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.caos.zitadel.management.api.v1.UserGrantView} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    userId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    orgId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    projectId: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    roleKeysList: jspb.Message.getRepeatedField(msg, 5),
+    state: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    creationDate: (f = msg.getCreationDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    userName: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    firstName: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    lastName: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    email: jspb.Message.getFieldWithDefault(msg, 12, ""),
+    orgName: jspb.Message.getFieldWithDefault(msg, 13, ""),
+    orgDomain: jspb.Message.getFieldWithDefault(msg, 14, ""),
+    projectName: jspb.Message.getFieldWithDefault(msg, 15, ""),
+    sequence: jspb.Message.getFieldWithDefault(msg, 16, 0),
+    resourceOwner: jspb.Message.getFieldWithDefault(msg, 17, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.caos.zitadel.management.api.v1.UserGrantView}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.caos.zitadel.management.api.v1.UserGrantView;
+  return proto.caos.zitadel.management.api.v1.UserGrantView.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.caos.zitadel.management.api.v1.UserGrantView} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.caos.zitadel.management.api.v1.UserGrantView}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgId(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProjectId(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addRoleKeys(value);
+      break;
+    case 6:
+      var value = /** @type {!proto.caos.zitadel.management.api.v1.UserGrantState} */ (reader.readEnum());
+      msg.setState(value);
+      break;
+    case 7:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreationDate(value);
+      break;
+    case 8:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setChangeDate(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserName(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFirstName(value);
+      break;
+    case 11:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLastName(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEmail(value);
+      break;
+    case 13:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgName(value);
+      break;
+    case 14:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOrgDomain(value);
+      break;
+    case 15:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProjectName(value);
+      break;
+    case 16:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSequence(value);
+      break;
+    case 17:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setResourceOwner(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.caos.zitadel.management.api.v1.UserGrantView.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.caos.zitadel.management.api.v1.UserGrantView} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getUserId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getOrgId();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getProjectId();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = message.getRoleKeysList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      5,
+      f
+    );
+  }
+  f = message.getState();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      6,
+      f
+    );
+  }
+  f = message.getCreationDate();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getChangeDate();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getUserName();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
+      f
+    );
+  }
+  f = message.getFirstName();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
+      f
+    );
+  }
+  f = message.getLastName();
+  if (f.length > 0) {
+    writer.writeString(
+      11,
+      f
+    );
+  }
+  f = message.getEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      12,
+      f
+    );
+  }
+  f = message.getOrgName();
+  if (f.length > 0) {
+    writer.writeString(
+      13,
+      f
+    );
+  }
+  f = message.getOrgDomain();
+  if (f.length > 0) {
+    writer.writeString(
+      14,
+      f
+    );
+  }
+  f = message.getProjectName();
+  if (f.length > 0) {
+    writer.writeString(
+      15,
+      f
+    );
+  }
+  f = message.getSequence();
+  if (f !== 0) {
+    writer.writeUint64(
+      16,
+      f
+    );
+  }
+  f = message.getResourceOwner();
+  if (f.length > 0) {
+    writer.writeString(
+      17,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string id = 1;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setId = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string user_id = 2;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getUserId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setUserId = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string org_id = 3;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getOrgId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setOrgId = function(value) {
+  jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string project_id = 4;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getProjectId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setProjectId = function(value) {
+  jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * repeated string role_keys = 5;
+ * @return {!Array<string>}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getRoleKeysList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 5));
+};
+
+
+/** @param {!Array<string>} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setRoleKeysList = function(value) {
+  jspb.Message.setField(this, 5, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.addRoleKeys = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 5, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.clearRoleKeysList = function() {
+  this.setRoleKeysList([]);
+};
+
+
+/**
+ * optional UserGrantState state = 6;
+ * @return {!proto.caos.zitadel.management.api.v1.UserGrantState}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getState = function() {
+  return /** @type {!proto.caos.zitadel.management.api.v1.UserGrantState} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+};
+
+
+/** @param {!proto.caos.zitadel.management.api.v1.UserGrantState} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setState = function(value) {
+  jspb.Message.setProto3EnumField(this, 6, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp creation_date = 7;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getCreationDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setCreationDate = function(value) {
+  jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.clearCreationDate = function() {
+  this.setCreationDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.hasCreationDate = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp change_date = 8;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getChangeDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setChangeDate = function(value) {
+  jspb.Message.setWrapperField(this, 8, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.clearChangeDate = function() {
+  this.setChangeDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.hasChangeDate = function() {
+  return jspb.Message.getField(this, 8) != null;
+};
+
+
+/**
+ * optional string user_name = 9;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getUserName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setUserName = function(value) {
+  jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+/**
+ * optional string first_name = 10;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getFirstName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setFirstName = function(value) {
+  jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * optional string last_name = 11;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getLastName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setLastName = function(value) {
+  jspb.Message.setProto3StringField(this, 11, value);
+};
+
+
+/**
+ * optional string email = 12;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setEmail = function(value) {
+  jspb.Message.setProto3StringField(this, 12, value);
+};
+
+
+/**
+ * optional string org_name = 13;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getOrgName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 13, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setOrgName = function(value) {
+  jspb.Message.setProto3StringField(this, 13, value);
+};
+
+
+/**
+ * optional string org_domain = 14;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getOrgDomain = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setOrgDomain = function(value) {
+  jspb.Message.setProto3StringField(this, 14, value);
+};
+
+
+/**
+ * optional string project_name = 15;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getProjectName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 15, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setProjectName = function(value) {
+  jspb.Message.setProto3StringField(this, 15, value);
+};
+
+
+/**
+ * optional uint64 sequence = 16;
+ * @return {number}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getSequence = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 16, 0));
+};
+
+
+/** @param {number} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setSequence = function(value) {
+  jspb.Message.setProto3IntField(this, 16, value);
+};
+
+
+/**
+ * optional string resource_owner = 17;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getResourceOwner = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setResourceOwner = function(value) {
+  jspb.Message.setProto3StringField(this, 17, value);
+};
+
+
+
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
 proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.repeatedFields_ = [4];
 
 
@@ -27484,7 +30903,7 @@ proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.toObject = function
     limit: jspb.Message.getFieldWithDefault(msg, 2, 0),
     totalResult: jspb.Message.getFieldWithDefault(msg, 3, 0),
     resultList: jspb.Message.toObjectList(msg.getResultList(),
-    proto.caos.zitadel.management.api.v1.UserGrant.toObject, includeInstance)
+    proto.caos.zitadel.management.api.v1.UserGrantView.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -27534,8 +30953,8 @@ proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.deserializeBinaryFr
       msg.setTotalResult(value);
       break;
     case 4:
-      var value = new proto.caos.zitadel.management.api.v1.UserGrant;
-      reader.readMessage(value,proto.caos.zitadel.management.api.v1.UserGrant.deserializeBinaryFromReader);
+      var value = new proto.caos.zitadel.management.api.v1.UserGrantView;
+      reader.readMessage(value,proto.caos.zitadel.management.api.v1.UserGrantView.deserializeBinaryFromReader);
       msg.addResult(value);
       break;
     default:
@@ -27593,7 +31012,7 @@ proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.serializeBinaryToWr
     writer.writeRepeatedMessage(
       4,
       f,
-      proto.caos.zitadel.management.api.v1.UserGrant.serializeBinaryToWriter
+      proto.caos.zitadel.management.api.v1.UserGrantView.serializeBinaryToWriter
     );
   }
 };
@@ -27645,28 +31064,28 @@ proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.prototype.setTotalR
 
 
 /**
- * repeated UserGrant result = 4;
- * @return {!Array<!proto.caos.zitadel.management.api.v1.UserGrant>}
+ * repeated UserGrantView result = 4;
+ * @return {!Array<!proto.caos.zitadel.management.api.v1.UserGrantView>}
  */
 proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.prototype.getResultList = function() {
-  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.UserGrant>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.UserGrant, 4));
+  return /** @type{!Array<!proto.caos.zitadel.management.api.v1.UserGrantView>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.caos.zitadel.management.api.v1.UserGrantView, 4));
 };
 
 
-/** @param {!Array<!proto.caos.zitadel.management.api.v1.UserGrant>} value */
+/** @param {!Array<!proto.caos.zitadel.management.api.v1.UserGrantView>} value */
 proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.prototype.setResultList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.UserGrant=} opt_value
+ * @param {!proto.caos.zitadel.management.api.v1.UserGrantView=} opt_value
  * @param {number=} opt_index
- * @return {!proto.caos.zitadel.management.api.v1.UserGrant}
+ * @return {!proto.caos.zitadel.management.api.v1.UserGrantView}
  */
 proto.caos.zitadel.management.api.v1.UserGrantSearchResponse.prototype.addResult = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.UserGrant, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.caos.zitadel.management.api.v1.UserGrantView, opt_index);
 };
 
 
@@ -29486,7 +32905,10 @@ proto.caos.zitadel.management.api.v1.UserSearchKey = {
 proto.caos.zitadel.management.api.v1.SearchMethod = {
   SEARCHMETHOD_EQUALS: 0,
   SEARCHMETHOD_STARTS_WITH: 1,
-  SEARCHMETHOD_CONTAINS: 2
+  SEARCHMETHOD_CONTAINS: 2,
+  SEARCHMETHOD_EQUALS_IGNORE_CASE: 3,
+  SEARCHMETHOD_STARTS_WITH_IGNORE_CASE: 4,
+  SEARCHMETHOD_CONTAINS_IGNORE_CASE: 5
 };
 
 /**
@@ -29559,15 +32981,15 @@ proto.caos.zitadel.management.api.v1.ProjectState = {
  * @enum {number}
  */
 proto.caos.zitadel.management.api.v1.ProjectType = {
-  PROJECTTYPE_UNKNOWN: 0,
-  PROJECTTYPE_SELF: 1,
+  PROJECTTYPE_UNSPECIFIED: 0,
+  PROJECTTYPE_OWNED: 1,
   PROJECTTYPE_GRANTED: 2
 };
 
 /**
  * @enum {number}
  */
-proto.caos.zitadel.management.api.v1.ProjectSearchKey = {
+proto.caos.zitadel.management.api.v1.GrantedProjectSearchKey = {
   PROJECTSEARCHKEY_UNSPECIFIED: 0,
   PROJECTSEARCHKEY_PROJECT_NAME: 1
 };
@@ -29589,7 +33011,8 @@ proto.caos.zitadel.management.api.v1.ProjectMemberSearchKey = {
   PROJECTMEMBERSEARCHKEY_FIRST_NAME: 1,
   PROJECTMEMBERSEARCHKEY_LAST_NAME: 2,
   PROJECTMEMBERSEARCHKEY_EMAIL: 3,
-  PROJECTMEMBERSEARCHKEY_USER_ID: 4
+  PROJECTMEMBERSEARCHKEY_USER_ID: 4,
+  PROJECTMEMBERSEARCHKEY_USER_NAME: 5
 };
 
 /**
@@ -29662,7 +33085,8 @@ proto.caos.zitadel.management.api.v1.ProjectGrantMemberSearchKey = {
   PROJECTGRANTMEMBERSEARCHKEY_FIRST_NAME: 1,
   PROJECTGRANTMEMBERSEARCHKEY_LAST_NAME: 2,
   PROJECTGRANTMEMBERSEARCHKEY_EMAIL: 3,
-  PROJECTGRANTMEMBERSEARCHKEY_USER_ID: 4
+  PROJECTGRANTMEMBERSEARCHKEY_USER_ID: 4,
+  PROJECTGRANTMEMBERSEARCHKEY_USER_NAME: 5
 };
 
 /**

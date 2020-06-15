@@ -16,6 +16,11 @@
         <div @animate *ngFor="let formGroup of formArray.controls; index as i" class="content">
             <ng-container [formGroup]="formGroup">
                 <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'PROJECT.ROLE.KEY' | translate }}</mat-label>
+                    <input matInput formControlName="key" />
+                    <!-- <mat-error *ngIf="name?.errors?.required">{{'ERRORS.REQUIRED' | translate}}</mat-error> -->
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'PROJECT.ROLE.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
                     <!-- <mat-error *ngIf="name?.errors?.required">{{'ERRORS.REQUIRED' | translate}}</mat-error> -->

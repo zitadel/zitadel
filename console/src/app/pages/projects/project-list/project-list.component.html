@@ -8,7 +8,7 @@
 
     <div *ngIf="!grid" class="view-toggle">
         <button (click)="grid = true" mat-icon-button>
-            <mat-icon matTooltip="show grid view">grid_on</mat-icon>
+            <i matTooltip="show grid view" class="las la-th-large"></i>
         </button>
     </div>
     <div *ngIf="!grid && projectList">
@@ -83,7 +83,7 @@
                 <ng-container matColumnDef="type">
                     <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.TYPE' | translate }} </th>
                     <td mat-cell *matCellDef="let project">
-                        <span *ngIf="project.type">{{'PROJECT.TYPE.'+project.type | translate}}</span>
+                        <span *ngIf="project.type !== undefined">{{'PROJECT.TYPE.'+project.type | translate}}</span>
                     </td>
                 </ng-container>
 

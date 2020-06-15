@@ -14,6 +14,9 @@ func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	user := new(model.UserView)
 	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_ID), userID)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
+	}
 	return user, err
 }
 
@@ -21,6 +24,9 @@ func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error
 	user := new(model.UserView)
 	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_NAME), userName)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso9s", "Errors.User.NotFound")
+	}
 	return user, err
 }
 
@@ -64,6 +70,9 @@ func GetGlobalUserByEmail(db *gorm.DB, table, email string) (*model.UserView, er
 	user := new(model.UserView)
 	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_EMAIL), email)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-8uWer", "Errors.User.NotFound")
+	}
 	return user, err
 }
 

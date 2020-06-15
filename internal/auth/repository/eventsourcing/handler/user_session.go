@@ -46,7 +46,8 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 	case es_model.UserPasswordCheckSucceeded,
 		es_model.UserPasswordCheckFailed,
 		es_model.MfaOtpCheckSucceeded,
-		es_model.MfaOtpCheckFailed:
+		es_model.MfaOtpCheckFailed,
+		es_model.SignedOut:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {
 			return err

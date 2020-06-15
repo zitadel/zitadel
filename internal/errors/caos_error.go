@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"reflect"
 )
 
 var _ Error = (*CaosError)(nil)
@@ -50,4 +51,9 @@ func (err *CaosError) GetID() string {
 func (err *CaosError) Is(target error) bool {
 	_, ok := target.(*CaosError)
 	return ok
+}
+
+func (err *CaosError) As(target interface{}) bool {
+	reflect.Indirect(reflect.ValueOf(target)).Set(reflect.ValueOf(err))
+	return true
 }

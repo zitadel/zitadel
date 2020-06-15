@@ -16,6 +16,7 @@ import (
 
 const (
 	DEFAULT_POLICY = "0"
+	orgOwnerRole   = "ORG_OWNER"
 )
 
 type OrgRepo struct {
@@ -50,8 +51,8 @@ func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) 
 	aggregates = append(aggregates, userAggregates...)
 	setupModel := &Setup{Org: org, User: user}
 
-	member := org_model.NewOrgMemberWithRoles(org.AggregateID, user.AggregateID, "ORG_ADMIN") //TODO: role as const
-	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member)
+	member := org_model.NewOrgMemberWithRoles(org.AggregateID, user.AggregateID, orgOwnerRole)
+	_, memberAggregate, err := repo.OrgEventstore.PrepareAddOrgMember(ctx, member, org.AggregateID)
 	if err != nil {
 		return nil, err
 	}

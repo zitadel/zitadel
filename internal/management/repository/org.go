@@ -17,10 +17,10 @@ type OrgRepository interface {
 	AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error)
 	RemoveMyOrgDomain(ctx context.Context, domain string) error
 
-	SearchOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error)
-	AddOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
-	ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
-	RemoveOrgMember(ctx context.Context, orgID, userID string) error
+	SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error)
+	AddMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
+	ChangeMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error)
+	RemoveMyOrgMember(ctx context.Context, userID string) error
 
 	GetOrgMemberRoles() []string
 }

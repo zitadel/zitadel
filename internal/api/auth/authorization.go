@@ -20,10 +20,6 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 	}
 
 	var perms []string
-	//TODO: Remove as soon as authentification is implemented
-	if CheckInternal(ctx) {
-		return ctx, nil
-	}
 	if requiredAuthOption.Permission == authenticated {
 		return ctx, nil
 	}
