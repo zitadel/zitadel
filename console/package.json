@@ -50,7 +50,7 @@
     "@angular-devkit/build-angular": "~0.901.7",
     "@angular/cli": "~9.1.7",
     "@angular/compiler-cli": "~9.1.10",
-    "@angular/language-service": "~9.1.10",
+    "@angular/language-service": "~9.1.11",
     "@types/jasmine": "~3.5.10",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^14.0.13",
