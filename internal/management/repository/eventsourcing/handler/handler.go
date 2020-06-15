@@ -33,7 +33,8 @@ type EventstoreRepos struct {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos) []spooler.Handler {
 	return []spooler.Handler{
-		&GrantedProject{handler: handler{view, bulkLimit, configs.cycleDuration("GrantedProject"), errorCount}, eventstore: eventstore, projectEvents: repos.ProjectEvents, orgEvents: repos.OrgEvents},
+		&Project{handler: handler{view, bulkLimit, configs.cycleDuration("Project"), errorCount}, eventstore: eventstore},
+		&ProjectGrant{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrant"), errorCount}, eventstore: eventstore, projectEvents: repos.ProjectEvents, orgEvents: repos.OrgEvents},
 		&ProjectRole{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount}, projectEvents: repos.ProjectEvents},
 		&ProjectMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount}, userEvents: repos.UserEvents},
 		&ProjectGrantMember{handler: handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount}, userEvents: repos.UserEvents},
