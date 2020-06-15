@@ -173,18 +173,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public resendVerification(): void {
         console.log('resendverification');
-        this.mgmtUserService.ResendEmailVerification(this.profile.id).then((data: any) => {
+        this.mgmtUserService.ResendEmailVerification(this.profile.id).then(() => {
             this.toast.showInfo('Email was successfully sent!');
-            this.email = data.toObject();
         }).catch(data => {
             this.toast.showError(data.message);
         });
     }
 
     public resendPhoneVerification(): void {
-        this.mgmtUserService.ResendPhoneVerification(this.profile.id).then((data: any) => {
+        this.mgmtUserService.ResendPhoneVerification(this.profile.id).then(() => {
             this.toast.showInfo('Phoneverification was successfully sent!');
-            this.email = data.toObject();
         }).catch(data => {
             this.toast.showError(data.message);
         });

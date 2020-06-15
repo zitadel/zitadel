@@ -44,5 +44,12 @@
                 </ng-template>
             </mat-menu>
         </div>
+
+        <ng-template appHasRole [appHasRole]="['iam.write']">
+            <div class="card add-org-button" [routerLink]="[ '/orgs/create' ]">
+                <mat-icon class="icon">add</mat-icon>
+                <span>Add new organization</span>
+            </div>
+        </ng-template>
     </div>
 </div>

@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { QRCodeModule } from 'angularx-qrcode';
 import { HttpLoaderFactory } from 'src/app/app.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
@@ -44,6 +45,7 @@ import { UserMfaComponent } from './user-mfa/user-mfa.component';
         ReactiveFormsModule,
         DetailFormModule,
         MatDialogModule,
+        QRCodeModule,
         MetaLayoutModule,
         MatFormFieldModule,
         UserGrantsModule,

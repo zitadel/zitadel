@@ -86,7 +86,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 newPassword: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
-            // TODO custom validator for pattern
         }).catch(error => {
             console.log('no password complexity policy defined!');
             this.passwordForm = this.fb.group({
