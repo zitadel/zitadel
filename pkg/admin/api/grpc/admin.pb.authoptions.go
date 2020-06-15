@@ -35,22 +35,22 @@ var AdminService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/zitadel.admin.api.v1.AdminService/GetOrgIamPolicy": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy": utils_auth.Option{
 		Permission: "iam.policy.read",
 		CheckParam: "",
 	},
 
-	"/zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy": utils_auth.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
 
-	"/zitadel.admin.api.v1.AdminService/UpdateOrgIamPolicy": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateOrgIamPolicy": utils_auth.Option{
 		Permission: "iam.policy.write",
 		CheckParam: "",
 	},
 
-	"/zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy": utils_auth.Option{
 		Permission: "iam.policy.delete",
 		CheckParam: "",
 	},

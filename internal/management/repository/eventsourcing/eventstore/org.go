@@ -11,7 +11,6 @@ import (
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/org/repository/view"
 )
 
 type OrgRepository struct {
@@ -93,7 +92,7 @@ func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string)
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.ORGMEMBERSEARCHKEY_ORG_ID, Method: model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID}
+	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.ORGMEMBERSEARCHKEY_ORG_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID}
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
 		return nil, err
