@@ -47,15 +47,14 @@ func (s *Server) ReactivateProject(ctx context.Context, in *ProjectID) (*Project
 	return projectFromModel(project), nil
 }
 
-func (s *Server) SearchGrantedProjects(ctx context.Context, in *GrantedProjectSearchRequest) (*GrantedProjectSearchResponse, error) {
-	request := grantedProjectSearchRequestsToModel(in)
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
-	request.AppendMyOrgQuery(orgID)
-	response, err := s.project.SearchGrantedProjects(ctx, request)
+func (s *Server) SearchProjects(ctx context.Context, in *ProjectSearchRequest) (*ProjectSearchResponse, error) {
+	request := projectSearchRequestsToModel(in)
+	request.AppendMyResourceOwnerQuery(grpc_util.GetHeader(ctx, api.ZitadelOrgID))
+	response, err := s.project.SearchProjects(ctx, request)
 	if err != nil {
 		return nil, err
 	}
-	return grantedProjectSearchResponseFromModel(response), nil
+	return projectSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, error) {
@@ -66,12 +65,22 @@ func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, erro
 	return projectFromModel(project), nil
 }
 
-func (s *Server) GetGrantedProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*GrantedProject, error) {
-	project, err := s.project.GetGrantedProjectGrantByIDs(ctx, in.ProjectId, in.Id)
+func (s *Server) SearchGrantedProjects(ctx context.Context, in *ProjectGrantSearchRequest) (*ProjectGrantSearchResponse, error) {
+	request := projectGrantSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(grpc_util.GetHeader(ctx, api.ZitadelOrgID))
+	response, err := s.project.SearchProjectGrants(ctx, request)
 	if err != nil {
 		return nil, err
 	}
-	return grantedProjectFromModel(project), nil
+	return projectGrantSearchResponseFromModel(response), nil
+}
+
+func (s *Server) GetGrantedProjectByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrantView, error) {
+	project, err := s.project.ProjectGrantViewByID(ctx, in.Id)
+	if err != nil {
+		return nil, err
+	}
+	return projectGrantFromGrantedProjectModel(project), nil
 }
 
 func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*ProjectRole, error) {

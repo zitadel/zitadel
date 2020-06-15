@@ -24,43 +24,38 @@ func projectFromModel(project *proj_model.Project) *Project {
 	}
 }
 
-func grantedProjectSearchResponseFromModel(response *proj_model.GrantedProjectSearchResponse) *GrantedProjectSearchResponse {
-	return &GrantedProjectSearchResponse{
+func projectSearchResponseFromModel(response *proj_model.ProjectViewSearchResponse) *ProjectSearchResponse {
+	return &ProjectSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
-		Result:      grantedProjectsFromModel(response.Result),
+		Result:      projectViewsFromModel(response.Result),
 	}
 }
 
-func grantedProjectsFromModel(projects []*proj_model.GrantedProjectView) []*GrantedProject {
-	converted := make([]*GrantedProject, len(projects))
+func projectViewsFromModel(projects []*proj_model.ProjectView) []*ProjectView {
+	converted := make([]*ProjectView, len(projects))
 	for i, project := range projects {
-		converted[i] = grantedProjectFromModel(project)
+		converted[i] = projectViewFromModel(project)
 	}
 	return converted
 }
 
-func grantedProjectFromModel(project *proj_model.GrantedProjectView) *GrantedProject {
+func projectViewFromModel(project *proj_model.ProjectView) *ProjectView {
 	creationDate, err := ptypes.TimestampProto(project.CreationDate)
 	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(project.ChangeDate)
 	logging.Log("GRPC-sope3").OnError(err).Debug("unable to parse timestamp")
 
-	return &GrantedProject{
-		Id:            project.ProjectID,
+	return &ProjectView{
+		ProjectId:     project.ProjectID,
 		State:         projectStateFromModel(project.State),
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
 		Name:          project.Name,
 		Sequence:      project.Sequence,
 		ResourceOwner: project.ResourceOwner,
-		OrgId:         project.OrgID,
-		OrgName:       project.OrgName,
-		OrgDomain:     project.OrgDomain,
-		GrantId:       project.GrantID,
-		Type:          projectTypeFromModel(project.Type),
 	}
 }
 
@@ -165,36 +160,36 @@ func projectRoleChangeToModel(role *ProjectRoleChange) *proj_model.ProjectRole {
 	}
 }
 
-func grantedProjectSearchRequestsToModel(project *GrantedProjectSearchRequest) *proj_model.GrantedProjectSearchRequest {
-	return &proj_model.GrantedProjectSearchRequest{
+func projectSearchRequestsToModel(project *ProjectSearchRequest) *proj_model.ProjectViewSearchRequest {
+	return &proj_model.ProjectViewSearchRequest{
 		Offset:  project.Offset,
 		Limit:   project.Limit,
-		Queries: grantedProjectSearchQueriesToModel(project.Queries),
+		Queries: projectSearchQueriesToModel(project.Queries),
 	}
 }
 
-func grantedProjectSearchQueriesToModel(queries []*GrantedProjectSearchQuery) []*proj_model.GrantedProjectSearchQuery {
-	converted := make([]*proj_model.GrantedProjectSearchQuery, len(queries))
+func projectSearchQueriesToModel(queries []*ProjectSearchQuery) []*proj_model.ProjectViewSearchQuery {
+	converted := make([]*proj_model.ProjectViewSearchQuery, len(queries))
 	for i, q := range queries {
-		converted[i] = grantedProjectSearchQueryToModel(q)
+		converted[i] = projectSearchQueryToModel(q)
 	}
 	return converted
 }
 
-func grantedProjectSearchQueryToModel(query *GrantedProjectSearchQuery) *proj_model.GrantedProjectSearchQuery {
-	return &proj_model.GrantedProjectSearchQuery{
+func projectSearchQueryToModel(query *ProjectSearchQuery) *proj_model.ProjectViewSearchQuery {
+	return &proj_model.ProjectViewSearchQuery{
 		Key:    projectSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
 }
 
-func projectSearchKeyToModel(key GrantedProjectSearchKey) proj_model.GrantedProjectSearchKey {
+func projectSearchKeyToModel(key ProjectSearchKey) proj_model.ProjectViewSearchKey {
 	switch key {
-	case GrantedProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
-		return proj_model.GRANTEDPROJECTSEARCHKEY_NAME
+	case ProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
+		return proj_model.PROJECTSEARCHKEY_NAME
 	default:
-		return proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED
+		return proj_model.PROJECTSEARCHKEY_UNSPECIFIED
 	}
 }
 
