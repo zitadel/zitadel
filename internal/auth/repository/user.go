@@ -2,12 +2,13 @@ package repository
 
 import (
 	"context"
+	org_model "github.com/caos/zitadel/internal/org/model"
 
 	"github.com/caos/zitadel/internal/user/model"
 )
 
 type UserRepository interface {
-	Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error)
+	Register(ctx context.Context, user *model.User, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
 
 	myUserRepo
 	SkipMfaInit(ctx context.Context, userID string) error
