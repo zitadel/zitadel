@@ -12,8 +12,9 @@ type ProjectRepository interface {
 	UpdateProject(ctx context.Context, project *model.Project) (*model.Project, error)
 	DeactivateProject(ctx context.Context, id string) (*model.Project, error)
 	ReactivateProject(ctx context.Context, id string) (*model.Project, error)
-	SearchGrantedProjects(ctx context.Context, request *model.GrantedProjectSearchRequest) (*model.GrantedProjectSearchResponse, error)
-	GetGrantedProjectGrantByIDs(ctx context.Context, projectID, grantID string) (*model.GrantedProjectView, error)
+	SearchProjects(ctx context.Context, request *model.ProjectViewSearchRequest) (*model.ProjectViewSearchResponse, error)
+	SearchProjectGrants(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
+	ProjectGrantViewByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
 
 	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMember, error)
 	AddProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)

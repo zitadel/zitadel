@@ -717,24 +717,24 @@ func (mr *MockManagementServiceClientMockRecorder) DeleteUser(arg0, arg1 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockManagementServiceClient)(nil).DeleteUser), varargs...)
 }
 
-// GetGrantedProjectGrantByID mocks base method
-func (m *MockManagementServiceClient) GetGrantedProjectGrantByID(arg0 context.Context, arg1 *grpc.ProjectGrantID, arg2 ...grpc0.CallOption) (*grpc.GrantedProject, error) {
+// GetGrantedProjectByID mocks base method
+func (m *MockManagementServiceClient) GetGrantedProjectByID(arg0 context.Context, arg1 *grpc.ProjectGrantID, arg2 ...grpc0.CallOption) (*grpc.ProjectGrantView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetGrantedProjectGrantByID", varargs...)
-	ret0, _ := ret[0].(*grpc.GrantedProject)
+	ret := m.ctrl.Call(m, "GetGrantedProjectByID", varargs...)
+	ret0, _ := ret[0].(*grpc.ProjectGrantView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetGrantedProjectGrantByID indicates an expected call of GetGrantedProjectGrantByID
-func (mr *MockManagementServiceClientMockRecorder) GetGrantedProjectGrantByID(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// GetGrantedProjectByID indicates an expected call of GetGrantedProjectByID
+func (mr *MockManagementServiceClientMockRecorder) GetGrantedProjectByID(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGrantedProjectGrantByID", reflect.TypeOf((*MockManagementServiceClient)(nil).GetGrantedProjectGrantByID), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGrantedProjectByID", reflect.TypeOf((*MockManagementServiceClient)(nil).GetGrantedProjectByID), varargs...)
 }
 
 // GetOrgByDomainGlobal mocks base method
@@ -1638,14 +1638,14 @@ func (mr *MockManagementServiceClientMockRecorder) SearchAuthGrant(arg0, arg1 in
 }
 
 // SearchGrantedProjects mocks base method
-func (m *MockManagementServiceClient) SearchGrantedProjects(arg0 context.Context, arg1 *grpc.GrantedProjectSearchRequest, arg2 ...grpc0.CallOption) (*grpc.GrantedProjectSearchResponse, error) {
+func (m *MockManagementServiceClient) SearchGrantedProjects(arg0 context.Context, arg1 *grpc.GrantedProjectSearchRequest, arg2 ...grpc0.CallOption) (*grpc.ProjectGrantSearchResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SearchGrantedProjects", varargs...)
-	ret0, _ := ret[0].(*grpc.GrantedProjectSearchResponse)
+	ret0, _ := ret[0].(*grpc.ProjectGrantSearchResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1795,6 +1795,26 @@ func (mr *MockManagementServiceClientMockRecorder) SearchProjectUserGrants(arg0,
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchProjectUserGrants", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchProjectUserGrants), varargs...)
+}
+
+// SearchProjects mocks base method
+func (m *MockManagementServiceClient) SearchProjects(arg0 context.Context, arg1 *grpc.ProjectSearchRequest, arg2 ...grpc0.CallOption) (*grpc.ProjectSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchProjects", varargs...)
+	ret0, _ := ret[0].(*grpc.ProjectSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchProjects indicates an expected call of SearchProjects
+func (mr *MockManagementServiceClientMockRecorder) SearchProjects(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchProjects", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchProjects), varargs...)
 }
 
 // SearchUserGrants mocks base method

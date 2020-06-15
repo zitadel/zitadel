@@ -135,10 +135,7 @@ func request_ManagementService_IsUserUnique_0(ctx context.Context, marshaler run
 	var protoReq UniqueUserRequest
 	var metadata runtime.ServerMetadata
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_IsUserUnique_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_IsUserUnique_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -357,10 +354,7 @@ func request_ManagementService_UserChanges_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_UserChanges_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_UserChanges_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -370,7 +364,7 @@ func request_ManagementService_UserChanges_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_ManagementService_ApplicationChanges_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "sec_id": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_ManagementService_ApplicationChanges_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_ManagementService_ApplicationChanges_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -395,21 +389,7 @@ func request_ManagementService_ApplicationChanges_0(ctx context.Context, marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	val, ok = pathParams["sec_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "sec_id")
-	}
-
-	protoReq.SecId, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "sec_id", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_ApplicationChanges_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_ApplicationChanges_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -444,10 +424,7 @@ func request_ManagementService_OrgChanges_0(ctx context.Context, marshaler runti
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_OrgChanges_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_OrgChanges_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -482,10 +459,7 @@ func request_ManagementService_ProjectChanges_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_ProjectChanges_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_ProjectChanges_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -960,10 +934,7 @@ func request_ManagementService_DeletePasswordComplexityPolicy_0(ctx context.Cont
 	var protoReq PasswordComplexityPolicyID
 	var metadata runtime.ServerMetadata
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_DeletePasswordComplexityPolicy_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_DeletePasswordComplexityPolicy_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1023,10 +994,7 @@ func request_ManagementService_DeletePasswordAgePolicy_0(ctx context.Context, ma
 	var protoReq PasswordAgePolicyID
 	var metadata runtime.ServerMetadata
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_DeletePasswordAgePolicy_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_DeletePasswordAgePolicy_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1086,10 +1054,7 @@ func request_ManagementService_DeletePasswordLockoutPolicy_0(ctx context.Context
 	var protoReq PasswordLockoutPolicyID
 	var metadata runtime.ServerMetadata
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ManagementService_DeletePasswordLockoutPolicy_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_DeletePasswordLockoutPolicy_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -1327,8 +1292,8 @@ func request_ManagementService_SearchMyOrgMembers_0(ctx context.Context, marshal
 
 }
 
-func request_ManagementService_SearchGrantedProjects_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GrantedProjectSearchRequest
+func request_ManagementService_SearchProjects_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ProjectSearchRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1339,7 +1304,7 @@ func request_ManagementService_SearchGrantedProjects_0(ctx context.Context, mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.SearchGrantedProjects(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.SearchProjects(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -1493,7 +1458,24 @@ func request_ManagementService_ReactivateProject_0(ctx context.Context, marshale
 
 }
 
-func request_ManagementService_GetGrantedProjectGrantByID_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ManagementService_SearchGrantedProjects_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GrantedProjectSearchRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.SearchGrantedProjects(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func request_ManagementService_GetGrantedProjectByID_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ProjectGrantID
 	var metadata runtime.ServerMetadata
 
@@ -1526,7 +1508,7 @@ func request_ManagementService_GetGrantedProjectGrantByID_0(ctx context.Context,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	msg, err := client.GetGrantedProjectGrantByID(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetGrantedProjectByID(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -4658,7 +4640,7 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("POST", pattern_ManagementService_SearchGrantedProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ManagementService_SearchProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -4667,14 +4649,14 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_SearchGrantedProjects_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_SearchProjects_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_SearchGrantedProjects_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_SearchProjects_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -4778,7 +4760,7 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("GET", pattern_ManagementService_GetGrantedProjectGrantByID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ManagementService_SearchGrantedProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -4787,14 +4769,34 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ManagementService_GetGrantedProjectGrantByID_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ManagementService_SearchGrantedProjects_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ManagementService_GetGrantedProjectGrantByID_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ManagementService_SearchGrantedProjects_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_ManagementService_GetGrantedProjectByID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ManagementService_GetGrantedProjectByID_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ManagementService_GetGrantedProjectByID_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -5802,221 +5804,223 @@ func RegisterManagementServiceHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_ManagementService_Healthz_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"healthz"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_Healthz_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"healthz"}, ""))
 
-	pattern_ManagementService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, ""))
 
-	pattern_ManagementService_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"validate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"validate"}, ""))
 
-	pattern_ManagementService_GetUserByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetUserByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, ""))
 
-	pattern_ManagementService_GetUserByEmailGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"global", "users", "email"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetUserByEmailGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"global", "users", "email"}, ""))
 
-	pattern_ManagementService_SearchUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "_search"}, ""))
 
-	pattern_ManagementService_IsUserUnique_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "_isunique"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_IsUserUnique_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "_isunique"}, ""))
 
-	pattern_ManagementService_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, ""))
 
-	pattern_ManagementService_DeactivateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_ReactivateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_LockUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_lock"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_LockUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_lock"}, ""))
 
-	pattern_ManagementService_UnlockUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_unlock"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UnlockUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_unlock"}, ""))
 
-	pattern_ManagementService_DeleteUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeleteUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, ""))
 
-	pattern_ManagementService_UserChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UserChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "changes"}, ""))
 
-	pattern_ManagementService_ApplicationChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "id", "applications", "sec_id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ApplicationChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"applications", "id", "changes"}, ""))
 
-	pattern_ManagementService_OrgChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_OrgChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "changes"}, ""))
 
-	pattern_ManagementService_ProjectChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "changes"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ProjectChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "changes"}, ""))
 
-	pattern_ManagementService_GetUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "profile"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "profile"}, ""))
 
-	pattern_ManagementService_UpdateUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "profile"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateUserProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "profile"}, ""))
 
-	pattern_ManagementService_GetUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "email"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "email"}, ""))
 
-	pattern_ManagementService_ChangeUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "email"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ChangeUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "email"}, ""))
 
-	pattern_ManagementService_ResendEmailVerificationMail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"users", "id", "email", "_resendverification"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ResendEmailVerificationMail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"users", "id", "email", "_resendverification"}, ""))
 
-	pattern_ManagementService_GetUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "phone"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "phone"}, ""))
 
-	pattern_ManagementService_ChangeUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "phone"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ChangeUserPhone_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "phone"}, ""))
 
-	pattern_ManagementService_ResendPhoneVerificationCode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"users", "id", "phone", "_resendverification"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ResendPhoneVerificationCode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"users", "id", "phone", "_resendverification"}, ""))
 
-	pattern_ManagementService_GetUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "address"}, ""))
 
-	pattern_ManagementService_UpdateUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateUserAddress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "address"}, ""))
 
-	pattern_ManagementService_GetUserMfas_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "mfas"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetUserMfas_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "mfas"}, ""))
 
-	pattern_ManagementService_SendSetPasswordNotification_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_sendsetpwnotify"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SendSetPasswordNotification_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_sendsetpwnotify"}, ""))
 
-	pattern_ManagementService_SetInitialPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_setinitialpw"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SetInitialPassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "id", "_setinitialpw"}, ""))
 
-	pattern_ManagementService_GetPasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetPasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, ""))
 
-	pattern_ManagementService_CreatePasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreatePasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, ""))
 
-	pattern_ManagementService_UpdatePasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdatePasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, ""))
 
-	pattern_ManagementService_DeletePasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeletePasswordComplexityPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "complexity"}, ""))
 
-	pattern_ManagementService_GetPasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetPasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, ""))
 
-	pattern_ManagementService_CreatePasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreatePasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, ""))
 
-	pattern_ManagementService_UpdatePasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdatePasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, ""))
 
-	pattern_ManagementService_DeletePasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeletePasswordAgePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "age"}, ""))
 
-	pattern_ManagementService_GetPasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetPasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, ""))
 
-	pattern_ManagementService_CreatePasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreatePasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, ""))
 
-	pattern_ManagementService_UpdatePasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdatePasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, ""))
 
-	pattern_ManagementService_DeletePasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeletePasswordLockoutPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"policies", "passwords", "lockout"}, ""))
 
-	pattern_ManagementService_GetOrgByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetOrgByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"orgs", "id"}, ""))
 
-	pattern_ManagementService_GetOrgByDomainGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"global", "orgs", "domain"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetOrgByDomainGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"global", "orgs", "domain"}, ""))
 
-	pattern_ManagementService_DeactivateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_ReactivateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_GetOrgMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orgs", "members", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetOrgMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orgs", "members", "roles"}, ""))
 
-	pattern_ManagementService_AddMyOrgMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orgs", "me", "members"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_AddMyOrgMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orgs", "me", "members"}, ""))
 
-	pattern_ManagementService_ChangeMyOrgMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orgs", "me", "members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ChangeMyOrgMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orgs", "me", "members", "user_id"}, ""))
 
-	pattern_ManagementService_RemoveMyOrgMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orgs", "me", "members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveMyOrgMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orgs", "me", "members", "user_id"}, ""))
 
-	pattern_ManagementService_SearchMyOrgMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"orgs", "me", "members", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchMyOrgMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"orgs", "me", "members", "_search"}, ""))
 
-	pattern_ManagementService_SearchGrantedProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"grantedprojects", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"projects", "_search"}, ""))
 
-	pattern_ManagementService_ProjectByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"projects", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ProjectByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"projects", "id"}, ""))
 
-	pattern_ManagementService_CreateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"projects"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"projects"}, ""))
 
-	pattern_ManagementService_UpdateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"projects", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"projects", "id"}, ""))
 
-	pattern_ManagementService_DeactivateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_ReactivateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_GetGrantedProjectGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"grantedprojects", "project_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchGrantedProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"grantedprojects", "_search"}, ""))
 
-	pattern_ManagementService_GetProjectMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"projects", "members", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetGrantedProjectByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"grantedprojects", "project_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_SearchProjectMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "members", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetProjectMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"projects", "members", "roles"}, ""))
 
-	pattern_ManagementService_AddProjectMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "members"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchProjectMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "members", "_search"}, ""))
 
-	pattern_ManagementService_ChangeProjectMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_AddProjectMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "members"}, ""))
 
-	pattern_ManagementService_RemoveProjectMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ChangeProjectMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "members", "user_id"}, ""))
 
-	pattern_ManagementService_SearchProjectRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "roles", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveProjectMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "members", "user_id"}, ""))
 
-	pattern_ManagementService_AddProjectRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchProjectRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "roles", "_search"}, ""))
 
-	pattern_ManagementService_ChangeProjectRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "roles", "key"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_AddProjectRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "id", "roles"}, ""))
 
-	pattern_ManagementService_RemoveProjectRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "roles", "key"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ChangeProjectRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "roles", "key"}, ""))
 
-	pattern_ManagementService_SearchApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "applications", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveProjectRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "id", "roles", "key"}, ""))
 
-	pattern_ManagementService_ApplicationByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "applications", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchApplications_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "applications", "_search"}, ""))
 
-	pattern_ManagementService_CreateOIDCApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "project_id", "oidcapplications"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ApplicationByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "applications", "id"}, ""))
 
-	pattern_ManagementService_UpdateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "applications", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreateOIDCApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "project_id", "oidcapplications"}, ""))
 
-	pattern_ManagementService_DeactivateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "applications", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "applications", "id"}, ""))
 
-	pattern_ManagementService_ReactivateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "applications", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "applications", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_RemoveApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "applications", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "applications", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_UpdateApplicationOIDCConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "applications", "application_id", "oidcconfig"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "applications", "id"}, ""))
 
-	pattern_ManagementService_RegenerateOIDCClientSecret_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5}, []string{"projects", "project_id", "applications", "id", "oidcconfig", "_changeclientsecret"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateApplicationOIDCConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "applications", "application_id", "oidcconfig"}, ""))
 
-	pattern_ManagementService_SearchProjectGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "grants", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RegenerateOIDCClientSecret_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5}, []string{"projects", "project_id", "applications", "id", "oidcconfig", "_changeclientsecret"}, ""))
 
-	pattern_ManagementService_ProjectGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchProjectGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"projects", "project_id", "grants", "_search"}, ""))
 
-	pattern_ManagementService_CreateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "project_id", "grants"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ProjectGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_UpdateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"projects", "project_id", "grants"}, ""))
 
-	pattern_ManagementService_DeactivateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "grants", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_ReactivateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "grants", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "grants", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_RemoveProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "grants", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_GetProjectGrantMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"projects", "grants", "members", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveProjectGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"projects", "project_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_SearchProjectGrantMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5}, []string{"projects", "project_id", "grants", "grant_id", "members", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_GetProjectGrantMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"projects", "grants", "members", "roles"}, ""))
 
-	pattern_ManagementService_AddProjectGrantMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "grants", "grant_id", "members"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchProjectGrantMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5}, []string{"projects", "project_id", "grants", "grant_id", "members", "_search"}, ""))
 
-	pattern_ManagementService_ChangeProjectGrantMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "grants", "grant_id", "members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_AddProjectGrantMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "grants", "grant_id", "members"}, ""))
 
-	pattern_ManagementService_RemoveProjectGrantMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "grants", "grant_id", "members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ChangeProjectGrantMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "grants", "grant_id", "members", "user_id"}, ""))
 
-	pattern_ManagementService_SearchUserGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "grants", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveProjectGrantMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "grants", "grant_id", "members", "user_id"}, ""))
 
-	pattern_ManagementService_UserGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchUserGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"users", "grants", "_search"}, ""))
 
-	pattern_ManagementService_CreateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "grants"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UserGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_UpdateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"users", "user_id", "grants"}, ""))
 
-	pattern_ManagementService_DeactivateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_id", "grants", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_ReactivateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_id", "grants", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_id", "grants", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_RemoveUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"users", "user_id", "grants", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_SearchProjectUserGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3, 2, 4}, []string{"projects", "project_id", "users", "grants", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_RemoveUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"users", "user_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_ProjectUserGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "users", "user_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchProjectUserGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3, 2, 4}, []string{"projects", "project_id", "users", "grants", "_search"}, ""))
 
-	pattern_ManagementService_CreateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "users", "user_id", "grants"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ProjectUserGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "users", "user_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_UpdateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "users", "user_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projects", "project_id", "users", "user_id", "grants"}, ""))
 
-	pattern_ManagementService_DeactivateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projects", "project_id", "users", "user_id", "grants", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projects", "project_id", "users", "user_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_ReactivateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projects", "project_id", "users", "user_id", "grants", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projects", "project_id", "users", "user_id", "grants", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_SearchProjectGrantUserGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3, 2, 4}, []string{"projectgrants", "project_grant_id", "users", "grants", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateProjectUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projects", "project_id", "users", "user_id", "grants", "id", "_reactivate"}, ""))
 
-	pattern_ManagementService_ProjectGrantUserGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_SearchProjectGrantUserGrants_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3, 2, 4}, []string{"projectgrants", "project_grant_id", "users", "grants", "_search"}, ""))
 
-	pattern_ManagementService_CreateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ProjectGrantUserGrantByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_UpdateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_CreateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants"}, ""))
 
-	pattern_ManagementService_DeactivateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id", "_deactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_UpdateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id"}, ""))
 
-	pattern_ManagementService_ReactivateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id", "_reactivate"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_DeactivateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id", "_deactivate"}, ""))
 
-	pattern_ManagementService_SearchAuthGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"authgrants", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ManagementService_ReactivateProjectGrantUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"projectgrants", "project_grant_id", "users", "user_id", "grants", "id", "_reactivate"}, ""))
+
+	pattern_ManagementService_SearchAuthGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"authgrants", "_search"}, ""))
 )
 
 var (
@@ -6122,7 +6126,7 @@ var (
 
 	forward_ManagementService_SearchMyOrgMembers_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_SearchGrantedProjects_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_SearchProjects_0 = runtime.ForwardResponseMessage
 
 	forward_ManagementService_ProjectByID_0 = runtime.ForwardResponseMessage
 
@@ -6134,7 +6138,9 @@ var (
 
 	forward_ManagementService_ReactivateProject_0 = runtime.ForwardResponseMessage
 
-	forward_ManagementService_GetGrantedProjectGrantByID_0 = runtime.ForwardResponseMessage
+	forward_ManagementService_SearchGrantedProjects_0 = runtime.ForwardResponseMessage
+
+	forward_ManagementService_GetGrantedProjectByID_0 = runtime.ForwardResponseMessage
 
 	forward_ManagementService_GetProjectMemberRoles_0 = runtime.ForwardResponseMessage
 

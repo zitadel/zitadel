@@ -571,9 +571,9 @@ service ManagementService {
     }
 
     //PROJECTS
-    rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (GrantedProjectSearchResponse) {
+    rpc SearchProjects(ProjectSearchRequest) returns (ProjectSearchResponse) {
         option (google.api.http) = {
-            post: "/grantedprojects/_search"
+            post: "/projects/_search"
             body: "*"
         };
 
@@ -641,7 +641,19 @@ service ManagementService {
     }
 
     //GRANTED_PROJECT_GRANTS
-    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (GrantedProject) {
+    rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (ProjectGrantSearchResponse) {
+        option (google.api.http) = {
+            post: "/grantedprojects/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.read"
+            check_field_name: "ProjectId"
+        };
+    }
+
+    rpc GetGrantedProjectByID(ProjectGrantID) returns (ProjectGrantView) {
         option (google.api.http) = {
             get: "/grantedprojects/{project_id}/grants/{id}"
         };
@@ -1719,6 +1731,41 @@ message ProjectUpdateRequest {
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
+message ProjectSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated ProjectView result = 4;
+}
+
+message ProjectView {
+    string project_id = 1;
+    string name = 2;
+    ProjectState state = 3;
+    google.protobuf.Timestamp change_date = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    string resource_owner = 6;
+    uint64 sequence = 7;
+}
+
+
+message ProjectSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated ProjectSearchQuery queries = 3;
+}
+
+message ProjectSearchQuery {
+    ProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum ProjectSearchKey {
+    PROJECTSEARCHKEY_UNSPECIFIED = 0;
+    PROJECTSEARCHKEY_PROJECT_NAME = 1;
+}
+
 message Projects {
     repeated Project projects = 1;
 }
@@ -1742,45 +1789,6 @@ enum ProjectType {
     PROJECTTYPE_UNSPECIFIED = 0;
     PROJECTTYPE_OWNED = 1;
     PROJECTTYPE_GRANTED = 2;
-}
-
-message GrantedProjectSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated GrantedProject result = 4;
-}
-
-message GrantedProject {
-    string id = 1;
-    string name = 2;
-    ProjectState state = 3;
-    google.protobuf.Timestamp change_date = 4;
-    google.protobuf.Timestamp creation_date = 5;
-    ProjectType type = 6;
-    string resource_owner = 7;
-    string org_id = 8;
-    string org_name = 9;
-    string org_domain = 10;
-    string grant_id = 11;
-    uint64 sequence = 12;
-}
-
-message GrantedProjectSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    repeated GrantedProjectSearchQuery queries = 3;
-}
-
-message GrantedProjectSearchQuery {
-    GrantedProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
-    SearchMethod method = 2;
-    string value = 3;
-}
-
-enum GrantedProjectSearchKey {
-    PROJECTSEARCHKEY_UNSPECIFIED = 0;
-    PROJECTSEARCHKEY_PROJECT_NAME = 1;
 }
 
 message ProjectMemberRoles {
@@ -2098,6 +2106,12 @@ message ProjectGrantSearchRequest {
     string project_id = 1;
     uint64 offset = 2;
     uint64 limit = 3;
+}
+
+message GrantedProjectSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated ProjectSearchQuery queries = 3;
 }
 
 message ProjectGrantMemberRoles {

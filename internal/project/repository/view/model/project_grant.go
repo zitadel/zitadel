@@ -12,26 +12,25 @@ import (
 )
 
 const (
-	GrantedProjectKeyProjectID     = "project_id"
-	GrantedProjectKeyGrantID       = "grant_id"
-	GrantedProjectKeyOrgID         = "org_id"
-	GrantedProjectKeyResourceOwner = "resource_owner"
-	GrantedProjectKeyName          = "project_name"
+	ProjectGrantKeyProjectID     = "project_id"
+	ProjectGrantKeyGrantID       = "grant_id"
+	ProjectGrantKeyOrgID         = "org_id"
+	ProjectGrantKeyResourceOwner = "resource_owner"
+	ProjectGrantKeyName          = "project_name"
 )
 
-type GrantedProjectView struct {
-	ProjectID       string         `json:"-" gorm:"column:project_id;primary_key"`
-	OrgID           string         `json:"-" gorm:"column:org_id;primary_key"`
+type ProjectGrantView struct {
+	GrantID         string         `json:"-" gorm:"column:grant_id;primary_key"`
+	ProjectID       string         `json:"-" gorm:"column:project_id"`
+	OrgID           string         `json:"-" gorm:"column:org_id"`
 	Name            string         `json:"name" gorm:"column:project_name"`
 	CreationDate    time.Time      `json:"-" gorm:"column:creation_date"`
 	ChangeDate      time.Time      `json:"-" gorm:"column:change_date"`
 	State           int32          `json:"-" gorm:"column:project_state"`
-	Type            int32          `json:"-" gorm:"column:project_type"`
 	ResourceOwner   string         `json:"-" gorm:"column:resource_owner"`
 	OrgName         string         `json:"-" gorm:"column:org_name"`
 	OrgDomain       string         `json:"-" gorm:"column:org_domain"`
 	Sequence        uint64         `json:"-" gorm:"column:sequence"`
-	GrantID         string         `json:"-" gorm:"column:grant_id"`
 	GrantedRoleKeys pq.StringArray `json:"-" gorm:"column:granted_role_keys"`
 }
 
@@ -41,15 +40,14 @@ type ProjectGrant struct {
 	RoleKeys     []string `json:"roleKeys"`
 }
 
-func GrantedProjectFromModel(project *model.GrantedProjectView) *GrantedProjectView {
-	return &GrantedProjectView{
+func ProjectGrantFromModel(project *model.ProjectGrantView) *ProjectGrantView {
+	return &ProjectGrantView{
 		ProjectID:       project.ProjectID,
 		OrgID:           project.OrgID,
 		Name:            project.Name,
 		ChangeDate:      project.ChangeDate,
 		CreationDate:    project.CreationDate,
 		State:           int32(project.State),
-		Type:            int32(project.Type),
 		ResourceOwner:   project.ResourceOwner,
 		OrgName:         project.OrgName,
 		GrantID:         project.GrantID,
@@ -58,15 +56,14 @@ func GrantedProjectFromModel(project *model.GrantedProjectView) *GrantedProjectV
 	}
 }
 
-func GrantedProjectToModel(project *GrantedProjectView) *model.GrantedProjectView {
-	return &model.GrantedProjectView{
+func ProjectGrantToModel(project *ProjectGrantView) *model.ProjectGrantView {
+	return &model.ProjectGrantView{
 		ProjectID:     project.ProjectID,
 		OrgID:         project.OrgID,
 		Name:          project.Name,
 		ChangeDate:    project.ChangeDate,
 		CreationDate:  project.CreationDate,
 		State:         model.ProjectState(project.State),
-		Type:          model.ProjectType(project.Type),
 		ResourceOwner: project.ResourceOwner,
 		OrgName:       project.OrgName,
 		GrantID:       project.GrantID,
@@ -74,34 +71,21 @@ func GrantedProjectToModel(project *GrantedProjectView) *model.GrantedProjectVie
 	}
 }
 
-func GrantedProjectsToModel(projects []*GrantedProjectView) []*model.GrantedProjectView {
-	result := make([]*model.GrantedProjectView, len(projects))
+func ProjectGrantsToModel(projects []*ProjectGrantView) []*model.ProjectGrantView {
+	result := make([]*model.ProjectGrantView, len(projects))
 	for i, p := range projects {
-		result[i] = GrantedProjectToModel(p)
+		result[i] = ProjectGrantToModel(p)
 	}
 	return result
 }
 
-func (p *GrantedProjectView) AppendEvent(event *models.Event) (err error) {
+func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Sequence
 	switch event.Type {
-	case es_model.ProjectAdded:
-		p.State = int32(model.PROJECTSTATE_ACTIVE)
-		p.CreationDate = event.CreationDate
-		p.Type = int32(model.PROJECTTYPE_OWNED)
-		p.setRootData(event)
-		err = p.setData(event)
-	case es_model.ProjectChanged:
-		err = p.setData(event)
-	case es_model.ProjectDeactivated:
-		p.State = int32(model.PROJECTSTATE_INACTIVE)
-	case es_model.ProjectReactivated:
-		p.State = int32(model.PROJECTSTATE_ACTIVE)
 	case es_model.ProjectGrantAdded:
 		p.State = int32(model.PROJECTSTATE_ACTIVE)
 		p.CreationDate = event.CreationDate
-		p.Type = int32(model.PROJECTTYPE_GRANTED)
 		p.setRootData(event)
 		err = p.setProjectGrantData(event)
 	case es_model.ProjectGrantChanged:
@@ -114,13 +98,12 @@ func (p *GrantedProjectView) AppendEvent(event *models.Event) (err error) {
 	return err
 }
 
-func (p *GrantedProjectView) setRootData(event *models.Event) {
+func (p *ProjectGrantView) setRootData(event *models.Event) {
 	p.ProjectID = event.AggregateID
-	p.OrgID = event.ResourceOwner
 	p.ResourceOwner = event.ResourceOwner
 }
 
-func (p *GrantedProjectView) setData(event *models.Event) error {
+func (p *ProjectGrantView) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-dlo92").WithError(err).Error("could not unmarshal event data")
 		return err
@@ -128,7 +111,7 @@ func (p *GrantedProjectView) setData(event *models.Event) error {
 	return nil
 }
 
-func (p *GrantedProjectView) setProjectGrantData(event *models.Event) error {
+func (p *ProjectGrantView) setProjectGrantData(event *models.Event) error {
 	grant := new(ProjectGrant)
 	err := grant.SetData(event)
 	if err != nil {

@@ -43,33 +43,33 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 	return repo.ProjectEvents.ReactivateProject(ctx, id)
 }
 
-func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
+func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 
 	permissions := auth.GetPermissionsFromCtx(ctx)
 	if !auth.HasGlobalPermission(permissions) {
 		ids := auth.GetPermissionCtxIDs(permissions)
-		request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IN, Value: ids})
+		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.PROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IN, Value: ids})
 	}
 
-	projects, count, err := repo.View.SearchGrantedProjects(request)
+	projects, count, err := repo.View.SearchProjects(request)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.GrantedProjectSearchResponse{
+	return &proj_model.ProjectViewSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      model.GrantedProjectsToModel(projects),
+		Result:      model.ProjectsToModel(projects),
 	}, nil
 }
 
-func (repo *ProjectRepo) GetGrantedProjectGrantByIDs(ctx context.Context, projectID, grantID string) (project *proj_model.GrantedProjectView, err error) {
-	p, err := repo.View.GrantedProjectGrantByIDs(projectID, grantID)
+func (repo *ProjectRepo) ProjectGrantViewByID(ctx context.Context, grantID string) (project *proj_model.ProjectGrantView, err error) {
+	p, err := repo.View.ProjectGrantByID(grantID)
 	if err != nil {
 		return nil, err
 	}
-	return model.GrantedProjectToModel(p), nil
+	return model.ProjectGrantToModel(p), nil
 }
 
 func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
@@ -196,6 +196,20 @@ func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, a
 
 func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, projectID, appID string) (app *proj_model.ProjectGrant, err error) {
 	return repo.ProjectEvents.ProjectGrantByIDs(ctx, projectID, appID)
+}
+
+func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	projects, count, err := repo.View.SearchProjectGrants(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectGrantViewSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectGrantsToModel(projects),
+	}, nil
 }
 
 func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, app *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {

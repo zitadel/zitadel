@@ -125,7 +125,9 @@ func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, aut
 	return &EsRepository{
 		spool,
 		eventstore.UserRepo{
+			Eventstore:   es,
 			UserEvents:   user,
+			OrgEvents:    org,
 			PolicyEvents: policy,
 			View:         view,
 		},
