@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -11,6 +11,23 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
 
+function lowercaseValidator(c: FormControl) {
+    const regex = /[a-z]/g;
+    if (regex.test(c.value)) {
+        return null;
+    } else {
+        return { lowercase: true };
+    }
+}
+
+function uppercaseValidator(c: FormControl) {
+    const regex = /[A-Z]/g;
+    if (regex.test(c.value)) {
+        return null;
+    } else {
+        return { lowercase: true };
+    }
+}
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
@@ -67,6 +84,19 @@ export class AuthUserDetailComponent implements OnDestroy {
             this.minLengthPassword.value = data.toObject().minLength;
             if (policy.minLength) {
                 validators.push(Validators.minLength(policy.minLength));
+            }
+            if (policy.hasLowercase) {
+                validators.push(Validators.pattern(/[a-z]/g));
+            }
+            if (policy.hasUppercase) {
+                validators.push(Validators.pattern(/[A-Z]/g));
+            }
+            if (policy.hasNumber) {
+                validators.push(Validators.pattern(/[0-9]/g));
+            }
+            if (policy.hasSymbol) {
+                // All characters that are not a digit or an English letter \W or a whitespace \S
+                validators.push(Validators.pattern(/[\W\S]/));
             }
 
             this.passwordForm = this.fb.group({

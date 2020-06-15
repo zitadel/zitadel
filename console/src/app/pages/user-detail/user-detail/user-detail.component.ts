@@ -83,6 +83,19 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             if (policy.minLength) {
                 validators.push(Validators.minLength(policy.minLength));
             }
+            if (policy.hasLowercase) {
+                validators.push(Validators.pattern(/[a-z]/g));
+            }
+            if (policy.hasUppercase) {
+                validators.push(Validators.pattern(/[A-Z]/g));
+            }
+            if (policy.hasNumber) {
+                validators.push(Validators.pattern(/[0-9]/g));
+            }
+            if (policy.hasSymbol) {
+                // All characters that are not a digit or an English letter \W or a whitespace \S
+                validators.push(Validators.pattern(/[\W\S]/));
+            }
 
             this.passwordForm = this.fb.group({
                 password: ['', validators],
