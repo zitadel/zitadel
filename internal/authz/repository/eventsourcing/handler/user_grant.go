@@ -108,7 +108,6 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 				ID:            u.iamProjectID + member.UserID,
 				ResourceOwner: u.iamID,
 				OrgName:       u.iamID,
-				OrgDomain:     u.iamID,
 				ProjectID:     u.iamProjectID,
 				UserID:        member.UserID,
 				RoleKeys:      member.Roles,

@@ -1,10 +1,14 @@
 package grpc
 
 import (
+	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func projectFromModel(project *proj_model.Project) *Project {
@@ -24,42 +28,38 @@ func projectFromModel(project *proj_model.Project) *Project {
 	}
 }
 
-func grantedProjectSearchResponseFromModel(response *proj_model.GrantedProjectSearchResponse) *GrantedProjectSearchResponse {
-	return &GrantedProjectSearchResponse{
+func projectSearchResponseFromModel(response *proj_model.ProjectViewSearchResponse) *ProjectSearchResponse {
+	return &ProjectSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
-		Result:      grantedProjectsFromModel(response.Result),
+		Result:      projectViewsFromModel(response.Result),
 	}
 }
 
-func grantedProjectsFromModel(projects []*proj_model.GrantedProjectView) []*GrantedProject {
-	converted := make([]*GrantedProject, len(projects))
+func projectViewsFromModel(projects []*proj_model.ProjectView) []*ProjectView {
+	converted := make([]*ProjectView, len(projects))
 	for i, project := range projects {
-		converted[i] = grantedProjectFromModel(project)
+		converted[i] = projectViewFromModel(project)
 	}
 	return converted
 }
 
-func grantedProjectFromModel(project *proj_model.GrantedProjectView) *GrantedProject {
+func projectViewFromModel(project *proj_model.ProjectView) *ProjectView {
 	creationDate, err := ptypes.TimestampProto(project.CreationDate)
 	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(project.ChangeDate)
 	logging.Log("GRPC-sope3").OnError(err).Debug("unable to parse timestamp")
 
-	return &GrantedProject{
-		Id:            project.ProjectID,
+	return &ProjectView{
+		ProjectId:     project.ProjectID,
 		State:         projectStateFromModel(project.State),
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
 		Name:          project.Name,
 		Sequence:      project.Sequence,
 		ResourceOwner: project.ResourceOwner,
-		OrgId:         project.OrgID,
-		OrgName:       project.OrgName,
-		OrgDomain:     project.OrgDomain,
-		GrantId:       project.GrantID,
 	}
 }
 
@@ -102,17 +102,6 @@ func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 		return ProjectState_PROJECTSTATE_INACTIVE
 	default:
 		return ProjectState_PROJECTSTATE_UNSPECIFIED
-	}
-}
-
-func projectTypeFromModel(projecttype proj_model.ProjectType) ProjectType {
-	switch projecttype {
-	case proj_model.PROJECTTYPE_OWNED:
-		return ProjectType_PROJECTTYPE_OWNED
-	case proj_model.PROJECTTYPE_GRANTED:
-		return ProjectType_PROJECTTYPE_GRANTED
-	default:
-		return ProjectType_PROJECTTYPE_UNSPECIFIED
 	}
 }
 
@@ -164,33 +153,65 @@ func projectRoleChangeToModel(role *ProjectRoleChange) *proj_model.ProjectRole {
 	}
 }
 
-func grantedProjectSearchRequestsToModel(project *GrantedProjectSearchRequest) *proj_model.GrantedProjectSearchRequest {
-	return &proj_model.GrantedProjectSearchRequest{
+func projectSearchRequestsToModel(project *ProjectSearchRequest) *proj_model.ProjectViewSearchRequest {
+	return &proj_model.ProjectViewSearchRequest{
 		Offset:  project.Offset,
 		Limit:   project.Limit,
-		Queries: grantedProjectSearchQueriesToModel(project.Queries),
+		Queries: projectSearchQueriesToModel(project.Queries),
+	}
+}
+func grantedProjectSearchRequestsToModel(request *GrantedProjectSearchRequest) *proj_model.ProjectGrantViewSearchRequest {
+	return &proj_model.ProjectGrantViewSearchRequest{
+		Offset:  request.Offset,
+		Limit:   request.Limit,
+		Queries: grantedPRojectSearchQueriesToModel(request.Queries),
 	}
 }
 
-func grantedProjectSearchQueriesToModel(queries []*GrantedProjectSearchQuery) []*proj_model.GrantedProjectSearchQuery {
-	converted := make([]*proj_model.GrantedProjectSearchQuery, len(queries))
+func projectSearchQueriesToModel(queries []*ProjectSearchQuery) []*proj_model.ProjectViewSearchQuery {
+	converted := make([]*proj_model.ProjectViewSearchQuery, len(queries))
 	for i, q := range queries {
-		converted[i] = grantedProjectSearchQueryToModel(q)
+		converted[i] = projectSearchQueryToModel(q)
 	}
 	return converted
 }
 
-func grantedProjectSearchQueryToModel(query *GrantedProjectSearchQuery) *proj_model.GrantedProjectSearchQuery {
-	return &proj_model.GrantedProjectSearchQuery{
+func projectSearchQueryToModel(query *ProjectSearchQuery) *proj_model.ProjectViewSearchQuery {
+	return &proj_model.ProjectViewSearchQuery{
 		Key:    projectSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
 }
 
-func projectSearchKeyToModel(key GrantedProjectSearchKey) proj_model.GrantedProjectSearchKey {
+func projectSearchKeyToModel(key ProjectSearchKey) proj_model.ProjectViewSearchKey {
 	switch key {
-	case GrantedProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
+	case ProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
+		return proj_model.PROJECTSEARCHKEY_NAME
+	default:
+		return proj_model.PROJECTSEARCHKEY_UNSPECIFIED
+	}
+}
+
+func grantedPRojectSearchQueriesToModel(queries []*ProjectSearchQuery) []*proj_model.ProjectGrantViewSearchQuery {
+	converted := make([]*proj_model.ProjectGrantViewSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = grantedProjectSearchQueryToModel(q)
+	}
+	return converted
+}
+
+func grantedProjectSearchQueryToModel(query *ProjectSearchQuery) *proj_model.ProjectGrantViewSearchQuery {
+	return &proj_model.ProjectGrantViewSearchQuery{
+		Key:    projectGrantSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func projectGrantSearchKeyToModel(key ProjectSearchKey) proj_model.ProjectGrantViewSearchKey {
+	switch key {
+	case ProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
 		return proj_model.GRANTEDPROJECTSEARCHKEY_NAME
 	default:
 		return proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED
@@ -230,4 +251,32 @@ func projectRoleSearchKeyToModel(key ProjectRoleSearchKey) proj_model.ProjectRol
 	default:
 		return proj_model.PROJECTROLESEARCHKEY_UNSPECIFIED
 	}
+}
+
+func projectChangesToResponse(response *proj_model.ProjectChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: projectChangesToMgtAPI(response),
+	}
+}
+
+func projectChangesToMgtAPI(changes *proj_model.ProjectChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		b, err := json.Marshal(change.Data)
+		data := &structpb.Struct{}
+		err = protojson.Unmarshal(b, data)
+		if err != nil {
+		}
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+		}
+	}
+
+	return result
 }

@@ -69,6 +69,8 @@ func (key UserSearchKey) ToColumnName() string {
 		return UserKeyState
 	case usr_model.USERSEARCHKEY_RESOURCEOWNER:
 		return UserKeyResourceOwner
+	case usr_model.USERSEARCHKEY_LOGIN_NAMES:
+		return UserKeyLoginNames
 	default:
 		return ""
 	}

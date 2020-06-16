@@ -33,6 +33,10 @@ const routes: Routes = [
         loadChildren: () => import('./password-policy/password-policy.module').then(m => m.PasswordPolicyModule),
     },
     {
+        path: ':orgid/members',
+        loadChildren: () => import('./org-members/org-members.module').then(m => m.OrgMembersModule),
+    },
+    {
         path: ':id',
         component: OrgDetailComponent,
     },

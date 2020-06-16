@@ -2,16 +2,21 @@ package view
 
 import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 )
 
 func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	user := new(model.UserView)
 	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_ID), userID)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
+	}
 	return user, err
 }
 
@@ -19,7 +24,36 @@ func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error
 	user := new(model.UserView)
 	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_NAME), userName)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso9s", "Errors.User.NotFound")
+	}
 	return user, err
+}
+
+func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, error) {
+	user := new(model.UserView)
+	loginNameQuery := &model.UserSearchQuery{
+		Key:    usr_model.USERSEARCHKEY_LOGIN_NAMES,
+		Method: global_model.SEARCHMETHOD_EQUALS_IN_ARRAY,
+		Value:  pq.Array([]string{loginName}),
+	}
+	query := view.PrepareGetByQuery(table, loginNameQuery)
+	err := query(db, user)
+	return user, err
+}
+
+func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
+	users := make([]*model.UserView, 0)
+	orgIDQuery := &usr_model.UserSearchQuery{
+		Key:    usr_model.USERSEARCHKEY_RESOURCEOWNER,
+		Method: global_model.SEARCHMETHOD_EQUALS,
+		Value:  orgID,
+	}
+	query := view.PrepareSearchQuery(table, model.UserSearchRequest{
+		Queries: []*usr_model.UserSearchQuery{orgIDQuery},
+	})
+	_, err := query(db, &users)
+	return users, err
 }
 
 func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([]*model.UserView, int, error) {
@@ -36,6 +70,9 @@ func GetGlobalUserByEmail(db *gorm.DB, table, email string) (*model.UserView, er
 	user := new(model.UserView)
 	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_EMAIL), email)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-8uWer", "Errors.User.NotFound")
+	}
 	return user, err
 }
 

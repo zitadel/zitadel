@@ -10,7 +10,7 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
-    GrantedGrantID,
+    GrantedProjectSearchRequest,
     OIDCApplicationCreate,
     OIDCConfig,
     OIDCConfigUpdate,
@@ -26,6 +26,8 @@ import {
     ProjectGrantMemberSearchRequest,
     ProjectGrantSearchRequest,
     ProjectGrantSearchResponse,
+    ProjectGrantUpdate,
+    ProjectGrantView,
     ProjectID,
     ProjectMemberAdd,
     ProjectMemberChange,
@@ -87,11 +89,37 @@ export class ProjectService {
         );
     }
 
+    public async SearchGrantedProjects(
+        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectGrantSearchResponse> {
+        const req = new GrantedProjectSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchGrantedProjects,
+            req,
+            f => f,
+        );
+    }
+
     public async GetProjectById(projectId: string): Promise<Project> {
         const req = new ProjectID();
         req.setId(projectId);
         return await this.request(
             c => c.projectByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async GetGrantedProjectByID(projectId: string, id: string): Promise<ProjectGrantView> {
+        const req = new ProjectGrantID();
+        req.setId(id);
+        req.setProjectId(projectId);
+        return await this.request(
+            c => c.getGrantedProjectByID,
             req,
             f => f,
         );
@@ -113,6 +141,18 @@ export class ProjectService {
         req.setId(project.id);
         return await this.request(
             c => c.updateProject,
+            req,
+            f => f,
+        );
+    }
+
+    public async UpdateProjectGrant(id: string, projectId: string, rolesList: string[]): Promise<ProjectGrant> {
+        const req = new ProjectGrantUpdate();
+        req.setRoleKeysList(rolesList);
+        req.setId(id);
+        req.setProjectId(projectId);
+        return await this.request(
+            c => c.updateProjectGrant,
             req,
             f => f,
         );
@@ -166,6 +206,18 @@ export class ProjectService {
         const req = new Empty();
         return await this.request(
             c => c.getProjectGrantMemberRoles,
+            req,
+            f => f,
+        );
+    }
+
+    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
+        const req = new ProjectMemberAdd();
+        req.setId(projectId);
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.addProjectMember,
             req,
             f => f,
         );
@@ -368,17 +420,6 @@ export class ProjectService {
         );
     }
 
-    // NEW
-    public async GetGrantedProjectGrantByID(id: string): Promise<ProjectGrant> {
-        const req = new GrantedGrantID();
-        req.setId(id);
-        return await this.request(
-            c => c.getGrantedProjectGrantByID,
-            req,
-            f => f,
-        );
-    }
-
     public async GetProjectMemberRoles(): Promise<ProjectMemberRoles> {
         const req = new Empty();
         return await this.request(
@@ -481,18 +522,6 @@ export class ProjectService {
         req.setApplicationType(oidcConfig.applicationType);
         return await this.request(
             c => c.updateApplicationOIDCConfig,
-            req,
-            f => f,
-        );
-    }
-
-    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
-        const req = new ProjectMemberAdd();
-        req.setId(projectId);
-        req.setUserId(userId);
-        req.setRolesList(rolesList);
-        return await this.request(
-            c => c.addProjectMember,
             req,
             f => f,
         );

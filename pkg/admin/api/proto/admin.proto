@@ -9,7 +9,7 @@ import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
 
-package zitadel.admin.api.v1;
+package caos.zitadel.admin.api.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/admin/api/grpc";
 
@@ -96,6 +96,49 @@ service AdminService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "iam.write"
+        };
+    }
+
+    //ORG_IAM_POLICY
+    rpc GetOrgIamPolicy(OrgIamPolicyID) returns (OrgIamPolicy) {
+        option (google.api.http) = {
+            get: "/orgs/{org_id}/iampolicy"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.read"
+        };
+    }
+
+    rpc CreateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
+        option (google.api.http) = {
+            post: "/orgs/{org_id}/iampolicy"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc UpdateOrgIamPolicy(OrgIamPolicyRequest) returns (OrgIamPolicy) {
+        option (google.api.http) = {
+            put: "/orgs/{org_id}/iampolicy"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+    }
+
+    rpc DeleteOrgIamPolicy(OrgIamPolicyID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}/iampolicy"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.policy.delete"
         };
     }
 }
@@ -234,5 +277,25 @@ enum Gender {
 
 message CreateOrgRequest {
     string name = 1 [(validate.rules).string.min_len = 1];
-    string domain = 2 [(validate.rules).string.min_len = 1];
+    string domain = 2;
+}
+
+message OrgIamPolicy {
+    string org_id = 1;
+    string description = 2;
+    bool user_login_must_be_domain = 3;
+    bool default = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+}
+
+message OrgIamPolicyRequest {
+    string org_id = 1;
+    string description = 2;
+    bool user_login_must_be_domain = 3;
+}
+
+message OrgIamPolicyID {
+    string org_id = 1;
 }

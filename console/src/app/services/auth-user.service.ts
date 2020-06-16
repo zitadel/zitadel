@@ -12,7 +12,6 @@ import {
     MyProjectOrgSearchRequest,
     MyProjectOrgSearchResponse,
     PasswordChange,
-    PasswordRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
@@ -97,6 +96,7 @@ export class AuthUserService {
         req.setDisplayName(profile.displayName);
         req.setPreferredLanguage(profile.preferredLanguage);
         req.setGender(profile.gender);
+        console.log(req.toObject());
         return await this.request(
             c => c.updateMyUserProfile,
             req,
@@ -196,17 +196,6 @@ export class AuthUserService {
         );
     }
 
-    public async SetMyPassword(id: string): Promise<Empty> {
-        const req = new PasswordRequest();
-        req.setPassword(id);
-
-        return await this.request(
-            c => c.setMyPassword,
-            req,
-            f => f,
-        );
-    }
-
     public async ChangeMyPassword(oldPassword: string, newPassword: string): Promise<Empty> {
         const req = new PasswordChange();
         req.setOldPassword(oldPassword);
@@ -234,7 +223,7 @@ export class AuthUserService {
         );
     }
 
-    public async VerifyMfaOTP(code: string): Promise<MfaOtpResponse> {
+    public async VerifyMfaOTP(code: string): Promise<Empty> {
         const req = new VerifyMfaOtp();
         req.setCode(code);
         return await this.request(
@@ -276,7 +265,12 @@ export class AuthUserService {
 
             return this.GetMyzitadelPermissions().pipe(
                 switchMap(response => {
-                    const userRoles = response.toObject().permissionsList;
+                    let userRoles = [];
+                    if (response.toObject().permissionsList) {
+                        userRoles = response.toObject().permissionsList;
+                    } else {
+                        userRoles = ['user.resourceowner'];
+                    }
                     this._roleCache = userRoles;
                     return of(this.hasRoles(userRoles, roles, each));
                 }),

@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -11,7 +10,9 @@ func (s *Server) GetProjectMemberRoles(ctx context.Context, _ *empty.Empty) (*Pr
 }
 
 func (s *Server) SearchProjectMembers(ctx context.Context, in *ProjectMemberSearchRequest) (*ProjectMemberSearchResponse, error) {
-	response, err := s.project.SearchProjectMembers(ctx, projectMemberSearchRequestsToModel(in))
+	request := projectMemberSearchRequestsToModel(in)
+	request.AppendProjectQuery(in.ProjectId)
+	response, err := s.project.SearchProjectMembers(ctx, request)
 	if err != nil {
 		return nil, err
 	}

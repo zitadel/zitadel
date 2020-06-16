@@ -2,10 +2,18 @@ package eventsourcing
 
 import (
 	"context"
+	"encoding/json"
+	"log"
+	"strings"
+
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -13,6 +21,10 @@ import (
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+)
+
+const (
+	projectOwnerRole = "PROJECT_OWNER"
 )
 
 type ProjectEventstore struct {
@@ -70,8 +82,12 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	project.AggregateID = id
 	project.State = proj_model.PROJECTSTATE_ACTIVE
 	repoProject := model.ProjectFromModel(project)
+	member := &model.ProjectMember{
+		UserID: auth.GetCtxData(ctx).UserID,
+		Roles:  []string{projectOwnerRole},
+	}
 
-	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject)
+	createAggregate := ProjectCreateAggregate(es.AggregateCreator(), repoProject, member)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, createAggregate)
 	if err != nil {
 		return nil, err
@@ -308,6 +324,70 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	return nil
 }
 
+func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
+	query := ChangesQuery(id, lastSequence)
+
+	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-328b1", "unable to get current user")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "no objects found")
+	}
+
+	result := make([]*proj_model.ProjectChange, 0)
+
+	for _, u := range events {
+		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
+		change := &proj_model.ProjectChange{
+			ChangeDate: creationDate,
+			EventType:  u.Type.String(),
+			Modifier:   u.EditorUser,
+			Sequence:   u.Sequence,
+		}
+
+		projectDummy := proj_model.Project{}
+		appDummy := model.Application{}
+		change.Data = projectDummy
+		if u.Data != nil {
+			if strings.Contains(change.EventType, "application") {
+				if err := json.Unmarshal(u.Data, &appDummy); err != nil {
+					log.Println("Error getting data!", err.Error())
+				}
+				change.Data = appDummy
+			} else {
+				if err := json.Unmarshal(u.Data, &projectDummy); err != nil {
+					log.Println("Error getting data!", err.Error())
+				}
+				change.Data = projectDummy
+			}
+		}
+
+		result = append(result, change)
+		if lastSequence < u.Sequence {
+			lastSequence = u.Sequence
+
+		}
+	}
+
+	changes := &proj_model.ProjectChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}
+
+	return changes, nil
+}
+
+func ChangesQuery(projID string, latestSequence uint64) *es_models.SearchQuery {
+	query := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.ProjectAggregate).
+		LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(projID)
+	return query
+}
+
 func (es *ProjectEventstore) ApplicationByIDs(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {
 	if projectID == "" || appID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-ld93d", "project oder app AggregateID missing")
@@ -415,6 +495,69 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	}
 	es.projectCache.cacheProject(repoProject)
 	return nil
+}
+
+func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
+	query := ChangesQuery(id, lastSequence)
+
+	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-sw6Ku", "unable to get current user")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-9IHLP", "no objects found")
+	}
+
+	result := make([]*proj_model.ApplicationChange, 0)
+
+	for _, u := range events {
+		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+		logging.Log("EVENT-MJzeN").OnError(err).Debug("unable to parse timestamp")
+		change := &proj_model.ApplicationChange{
+			ChangeDate: creationDate,
+			EventType:  u.Type.String(),
+			Modifier:   u.EditorUser,
+			Sequence:   u.Sequence,
+		}
+		appendChanges := true
+		// if change.EventType == "project.application.added" ||
+		// 	change.EventType == "project.application.changed" ||
+		// 	change.EventType == "project.application.config.oidc.added" ||
+		// 	change.EventType == "project.application.config.oidc.changed" {
+
+		if change.EventType == model.ApplicationAdded.String() ||
+			change.EventType == model.ApplicationChanged.String() ||
+			change.EventType == model.OIDCConfigAdded.String() ||
+			change.EventType == model.OIDCConfigChanged.String() {
+			appDummy := model.Application{}
+			if u.Data != nil {
+				if err := json.Unmarshal(u.Data, &appDummy); err != nil {
+					log.Println("Error getting data!", err.Error())
+				}
+			}
+			change.Data = appDummy
+			if appDummy.AppID != secId {
+				appendChanges = false
+			}
+		} else {
+			appendChanges = false
+		}
+
+		if appendChanges {
+			result = append(result, change)
+			if lastSequence < u.Sequence {
+				lastSequence = u.Sequence
+			}
+		}
+	}
+
+	changes := &proj_model.ApplicationChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}
+
+	return changes, nil
 }
 
 func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {

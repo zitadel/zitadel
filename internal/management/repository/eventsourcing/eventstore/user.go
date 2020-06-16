@@ -2,8 +2,10 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -14,6 +16,7 @@ type UserRepo struct {
 	SearchLimit  uint64
 	UserEvents   *usr_event.UserEventstore
 	PolicyEvents *policy_event.PolicyEventstore
+	OrgEvents    *org_event.OrgEventstore
 	View         *view.View
 }
 
@@ -22,11 +25,15 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_mod
 }
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.CreateUser(ctx, user, policy)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.CreateUser(ctx, user, pwPolicy, orgPolicy)
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
@@ -34,11 +41,15 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.RegisterUser(ctx, user, pwPolicy, orgPolicy, resourceOwner)
 }
 
 func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -69,6 +80,14 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		TotalResult: uint64(count),
 		Result:      model.UsersToModel(projects),
 	}, nil
+}
+
+func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*usr_model.UserChanges, error) {
+	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit)
+	if err != nil {
+		return nil, err
+	}
+	return changes, nil
 }
 
 func (repo *UserRepo) GetGlobalUserByEmail(ctx context.Context, email string) (*usr_model.UserView, error) {

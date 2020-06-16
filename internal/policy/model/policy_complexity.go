@@ -31,23 +31,23 @@ func (p *PasswordComplexityPolicy) IsValid() bool {
 
 func (p *PasswordComplexityPolicy) Check(password string) error {
 	if p.MinLength != 0 && uint64(len(password)) < p.MinLength {
-		return caos_errs.ThrowInvalidArgumentf(nil, "MODEL-HuJf6", "Passwordpolicy doesn't match: Minlength %v", p.MinLength)
+		return caos_errs.ThrowInvalidArgument(nil, "MODEL-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength")
 	}
 
 	if p.HasLowercase && !hasStringLowerCase(password) {
-		return caos_errs.ThrowInvalidArgument(nil, "MODEL-co3Xw", "Passwordpolicy doesn't match: HasLowerCase")
+		return caos_errs.ThrowInvalidArgument(nil, "MODEL-co3Xw", "Errors.User.PasswordComplexityPolicy.HasLower")
 	}
 
 	if p.HasUppercase && !hasStringUpperCase(password) {
-		return caos_errs.ThrowInvalidArgument(nil, "MODEL-VoaRj", "Passwordpolicy doesn't match: HasUpperCase")
+		return caos_errs.ThrowInvalidArgument(nil, "MODEL-VoaRj", "Errors.User.PasswordComplexityPolicy.HasUpper")
 	}
 
 	if p.HasNumber && !hasNumber(password) {
-		return caos_errs.ThrowInvalidArgument(nil, "MODEL-ZBv4H", "Passwordpolicy doesn't match: HasNumber")
+		return caos_errs.ThrowInvalidArgument(nil, "MODEL-ZBv4H", "Errors.User.PasswordComplexityPolicy.HasNumber")
 	}
 
 	if p.HasSymbol && !hasSymbol(password) {
-		return caos_errs.ThrowInvalidArgument(nil, "MODEL-ZDLwA", "Passwordpolicy doesn't match: HasSymbol")
+		return caos_errs.ThrowInvalidArgument(nil, "MODEL-ZDLwA", "Errors.User.PasswordComplexityPolicy.HasSymbol")
 	}
 	return nil
 }

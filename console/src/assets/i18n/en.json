@@ -87,6 +87,7 @@
         },
         "DATA": {
             "STATE": "Status",
+            "STATE0": "unknown",
             "STATE1": "active",
             "STATE2": "inactive",
             "STATE3": "deleted",
@@ -175,7 +176,7 @@
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"Add new account"
+        "ADDACCOUNT":"Login with another account"
     },
     "ORG": {
         "PAGES": {
@@ -195,6 +196,10 @@
             "0": "nicht definiert",
             "1": "aktiv",
             "2": "inaktiv"
+        },
+        "MEMBER": {
+            "TITLE":"Organization Managers",
+            "DESCRIPTION":"Define Accounts which can change your organizations preferences."
         },
         "POLICY": {
             "TITLE":"Explore Policies",
@@ -274,7 +279,8 @@
             "DETAIL": "Detail",
             "CREATE": "Create project",
             "CREATE_DESC": "Insert your projects name",
-            "ROLE": "Role"
+            "ROLE": "Role",
+            "NOITEMS": "No projects"
         },
         "STATE": {
             "TITLE":"State",
@@ -285,7 +291,7 @@
         "TYPE": {
             "TITLE": "Type",
             "0": "unknown type",
-            "1": "self created",
+            "1": "owned",
             "2": "granted"
         },
         "NAME": "Name",
@@ -325,6 +331,7 @@
             "NAME": "Name"
         },
         "ROLE": {
+            "KEY":"Key",
             "TITLE": "Roles",
             "DESCRIPTION":"Define some roles which can be used to create project-grants",
             "NAME": "Name",
@@ -333,7 +340,8 @@
             "ACTIONS": "Actions",
             "ADDTITLE": "Create role",
             "ADDDESCRIPTION": "Enter the data for the new role!",
-            "DELETE":"Delete Role"
+            "DELETE":"Delete Role",
+            "CREATIONDATE":"Created"
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -344,7 +352,7 @@
             "ORGNAME":"Org Name",
             "ORGDOMAIN":"Org Domain",
             "STATE":"Status",
-            "Type":"Type",
+            "TYPE":"Type",
             "CREATIONDATE":"Created At",
             "CHANGEDATE":"Last Modified"
         }
@@ -469,8 +477,12 @@
         "EVENTS": {
             "org.added": "Org created",
             "org.changed":"Org edited",
-            "org.member.added":"Organization Member created",
-            "org.member.removed":"Organization Member deleted",
+            "org.member.added":"Org Member created",
+            "org.member.removed":"Org Member deleted",
+            "org.domain.added":"Org Domain added",
+            "org.domain.verified":"Org Domain verified",
+            "org.domain.primary.set":"Primary domain set",
+            "org.iam.policy.added":"IAM Policy added",
             "project.added": "Project created",
             "project.changed":"Project edited",
             "project.deactivated":"Project deactivated",
@@ -478,7 +490,17 @@
             "project.member.removed":"Project Member deleted",
             "project.role.added":"Role created",
             "project.role.removed":"Role deleted",
+            "project.application.added":"App added",
+            "project.application.config.oidc.added":"OIDC config added",  
+            "user.added":"User added",
+            "user.initialization.code.added":"Init code added",
+            "user.phone.code.added":"Phone code added",
+            "user.phone.code.sent":"User phone code sent",
+            "user.initialization.code.sent":"Init code sent",
             "user.email.verification.sended": "User email verified",
+            "user.email.code.added":"Email code added",
+            "user.email.code.sent":"Email code sent",           
+            "user.email.verified":"Email verified",
             "user.phone.verificationsended":"User phone verification sent",
             "user.phone.code":"User phone code created",
             "user.initialization.verification.sended":"User mail verification sent",
@@ -494,8 +516,16 @@
             "user.email.password.request.sended":"Email password request sended",
             "user.password.set.requested":"Password request",
             "user.phone.verification.sended":"User Phone verification sended",
+            "user.phone.changed":"User phone changed",
+            "user.phone.verified":"User phone verified",
             "updated.user.profile":"User Profile update",
-            "user.email.init.sended":"User Email init sended"
+            "user.email.init.sended":"User Email init sended",
+            "user.password.changed":"Password geändert",
+            "user.initialization.check.succeeded":"Init check succeeded",
+            "user.password.check.succeeded":"Password check succeeded",
+            "user.mfa.init.skipped":"MFA init skipped",
+            "user.mfa.otp.added":"MFA OTP added",
+            "user.mfa.otp.verified":"MFA OTP verified"
         }
     }
 }

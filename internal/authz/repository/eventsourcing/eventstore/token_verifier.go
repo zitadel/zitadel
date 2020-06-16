@@ -49,7 +49,7 @@ func (repo *TokenVerifierRepo) ProjectIDByClientID(ctx context.Context, clientID
 	if err != nil {
 		return "", err
 	}
-	return app.ID, nil
+	return app.ProjectID, nil
 }
 
 func (repo *TokenVerifierRepo) verifierClientID(ctx context.Context, appName, appClientID string) (string, error) {

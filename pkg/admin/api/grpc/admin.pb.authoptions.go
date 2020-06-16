@@ -15,23 +15,43 @@ import (
 
 var AdminService_AuthMethods = utils_auth.MethodMapping{
 
-	"/zitadel.admin.api.v1.AdminService/IsOrgUnique": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/IsOrgUnique": utils_auth.Option{
 		Permission: "iam.read",
 		CheckParam: "",
 	},
 
-	"/zitadel.admin.api.v1.AdminService/GetOrgByID": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/GetOrgByID": utils_auth.Option{
 		Permission: "iam.read",
 		CheckParam: "",
 	},
 
-	"/zitadel.admin.api.v1.AdminService/SearchOrgs": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/SearchOrgs": utils_auth.Option{
 		Permission: "iam.read",
 		CheckParam: "",
 	},
 
-	"/zitadel.admin.api.v1.AdminService/SetUpOrg": utils_auth.Option{
+	"/caos.zitadel.admin.api.v1.AdminService/SetUpOrg": utils_auth.Option{
 		Permission: "iam.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.delete",
 		CheckParam: "",
 	},
 }

@@ -13,9 +13,9 @@ const (
 
 type FailedEvent struct {
 	ViewName       string `gorm:"column:view_name;primary_key"`
-	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key`
-	FailureCount   uint64 `gorm:"column:failure_count`
-	ErrMsg         string `gorm:"column:err_msg`
+	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key"`
+	FailureCount   uint64 `gorm:"column:failure_count"`
+	ErrMsg         string `gorm:"column:err_msg"`
 }
 
 type FailedEventSearchQuery struct {
@@ -81,10 +81,11 @@ func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*F
 	}
 
 	if errors.IsNotFound(err) {
-		failedEvent.ViewName = viewName
-		failedEvent.FailedSequence = sequence
-		failedEvent.FailureCount = 0
-		return failedEvent, nil
+		return &FailedEvent{
+			ViewName:       viewName,
+			FailedSequence: sequence,
+			FailureCount:   0,
+		}, nil
 	}
 	return nil, errors.ThrowInternalf(err, "VIEW-9LyCB", "unable to get failed events of %s", viewName)
 

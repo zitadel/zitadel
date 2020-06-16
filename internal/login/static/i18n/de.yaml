@@ -7,6 +7,8 @@ Login:
   Title: Anmeldung
   Description: Gib deine Benutzerdaten ein.
   Username: Benutzername
+  Loginname: Loginname
+  LoginnamePlaceHolder: username@domain
 
 UserSelection:
   Title: Account auswählen
@@ -115,5 +117,42 @@ Actions:
   Skip: überspringen
   Register: registrieren
   ForgotPassword: Password zurücksetzen
+
+Errors:
+  Internal: Es ist ein interner Fehler aufgetreten
+  AuthRequest:
+    NotFound: AuthRequest konnte nicht gefunden werden
+  User:
+    NotFound: Benutzer konnte nicht gefunden werden
+    NotMatchingUserID: User stimm nicht mit User in Auth Request überein
+    UserIDMissing: UserID ist leer
+    InvalidData: Userdaten sind ungültig
+    Password:
+      ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
+      Empty: Passwort ist leer
+      Invalid: Passwort ungültig
+    PasswordComplexityPolicy:
+      NotFound: Passwort Policy konnte nicht gefunden werden
+      MinLength: Passwort ist zu kurz
+      HasLower: Passwort beinhaltet keinen klein Buchstaben
+      HasUpper: Passwort beinhaltet keinen gross Buchstaben
+      HasNumber: Passwort beinhaltet keine Nummer
+      HasSymbol: Passwort beinhaltet kein Symbol
+    Code:
+      Expired: Code ist abgelaufen
+      Invalid: Code ist ungültig
+      Empty: Code ist leer
+      CryptoCodeNil: Crypto Code ist nil
+      NotFound: Code konnte nicht gefunden werden
+      GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
+    EmailVerify:
+      UserIDEmpty: UserID ist leer
+    Mfa:
+      NoProviders: Es stehen keine Multifaktorprovider zur Verfügung
+      Otp:
+        AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
+        NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
+        InvalidCode: Code ist ungültig
+        NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
 
 optional: (optional)

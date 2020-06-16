@@ -189,7 +189,6 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 				ID:            u.iamProjectID + member.UserID,
 				ResourceOwner: u.iamID,
 				OrgName:       u.iamID,
-				OrgDomain:     u.iamID,
 				ProjectID:     u.iamProjectID,
 				UserID:        member.UserID,
 				RoleKeys:      member.Roles,
@@ -334,7 +333,6 @@ func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *pr
 }
 
 func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.Org) {
-	grant.OrgDomain = org.Domain
 	grant.OrgName = org.Name
 }
 

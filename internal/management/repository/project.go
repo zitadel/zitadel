@@ -12,7 +12,9 @@ type ProjectRepository interface {
 	UpdateProject(ctx context.Context, project *model.Project) (*model.Project, error)
 	DeactivateProject(ctx context.Context, id string) (*model.Project, error)
 	ReactivateProject(ctx context.Context, id string) (*model.Project, error)
-	SearchGrantedProjects(ctx context.Context, request *model.GrantedProjectSearchRequest) (*model.GrantedProjectSearchResponse, error)
+	SearchProjects(ctx context.Context, request *model.ProjectViewSearchRequest) (*model.ProjectViewSearchResponse, error)
+	SearchProjectGrants(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
+	ProjectGrantViewByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
 
 	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMember, error)
 	AddProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)
@@ -25,6 +27,7 @@ type ProjectRepository interface {
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
 	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
+	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*model.ProjectChanges, error)
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.Application, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
@@ -35,6 +38,7 @@ type ProjectRepository interface {
 	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
+	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*model.ApplicationChanges, error)
 
 	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)

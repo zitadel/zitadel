@@ -17,6 +17,7 @@ import {
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
+import { GrpcService } from 'src/app/services/grpc.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -33,6 +34,7 @@ enum RedirectType {
     styleUrls: ['./app-detail.component.scss'],
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
+    public errorMessage: string = '';
     public selectable: boolean = false;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
@@ -71,6 +73,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public RedirectType: any = RedirectType;
 
+    public isZitadel: boolean = false;
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -79,6 +83,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
+        private grpcService: GrpcService,
     ) {
         this.appNameForm = this.fb.group({
             state: ['', []],
@@ -103,25 +108,42 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     private async getData({ projectid, id }: Params): Promise<void> {
         this.projectId = projectid;
-        this.app = (await this.projectService.GetApplicationById(projectid, id)).toObject();
-        this.appNameForm.patchValue(this.app);
-        if (this.app.state !== AppState.APPSTATE_ACTIVE) {
-            this.appNameForm.controls['name'].disable();
-            this.appForm.disable();
-        } else {
-            this.appNameForm.controls['name'].enable();
-            this.appForm.enable();
-            this.clientId?.disable();
-        }
-        if (this.app.oidcConfig?.redirectUrisList) {
-            this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
-        }
-        if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
-            this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
-        }
-        if (this.app.oidcConfig) {
-            this.appForm.patchValue(this.app.oidcConfig);
-        }
+        this.projectService.GetProjectById(this.projectId).then(project => {
+            this.isZitadel = project.toObject().name === 'Zitadel';
+            if (this.isZitadel) {
+                this.appNameForm.disable();
+                this.appForm.disable();
+            }
+        });
+
+
+        this.projectService.GetApplicationById(projectid, id).then(app => {
+            this.app = app.toObject();
+            this.appNameForm.patchValue(this.app);
+            console.log(this.grpcService.clientid, this.app.oidcConfig?.clientId);
+
+            console.log(this.isZitadel);
+            if (this.app.state !== AppState.APPSTATE_ACTIVE || this.isZitadel) {
+                this.appNameForm.controls['name'].disable();
+                this.appForm.disable();
+            } else {
+                this.appNameForm.controls['name'].enable();
+                this.appForm.enable();
+            }
+            if (this.app.oidcConfig?.redirectUrisList) {
+                this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
+            }
+            if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
+                this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
+            }
+            if (this.app.oidcConfig) {
+                this.appForm.patchValue(this.app.oidcConfig);
+            }
+        }).catch(error => {
+            console.error(error);
+            this.toast.showError(error.message);
+            this.errorMessage = error.message;
+        });
     }
 
     public changeState(event: MatButtonToggleChange): void {

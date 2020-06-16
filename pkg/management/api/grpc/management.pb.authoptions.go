@@ -230,32 +230,47 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgDomains": utils_auth.Option{
+		Permission: "org.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgDomain": utils_auth.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgDomain": utils_auth.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetOrgMemberRoles": utils_auth.Option{
 		Permission: "org.member.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/AddOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgMember": utils_auth.Option{
 		Permission: "org.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeMyOrgMember": utils_auth.Option{
 		Permission: "org.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgMember": utils_auth.Option{
 		Permission: "org.member.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchOrgMembers": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgMembers": utils_auth.Option{
 		Permission: "org.member.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjects": utils_auth.Option{
 		Permission: "project.read",
 		CheckParam: "",
 	},
@@ -285,7 +300,12 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectGrantByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": utils_auth.Option{
+		Permission: "project.read",
+		CheckParam: "ProjectId",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID": utils_auth.Option{
 		Permission: "project.read",
 		CheckParam: "",
 	},

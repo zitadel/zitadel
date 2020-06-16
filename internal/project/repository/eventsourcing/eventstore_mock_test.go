@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"encoding/json"
+
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore/mock"
@@ -9,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	repo_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/golang/mock/gomock"
 )
 
@@ -274,4 +276,58 @@ func GetMockProjectGrantMemberByIDsOK(ctrl *gomock.Controller) *ProjectEventstor
 	mockEs := mock.NewMockEventstore(ctrl)
 	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
 	return GetMockedEventstore(ctrl, mockEs)
+}
+
+func GetMockChangesProjectOK(ctrl *gomock.Controller) *ProjectEventstore {
+	project := model.Project{
+		Name: "MusterProject",
+	}
+	data, err := json.Marshal(project)
+	if err != nil {
+
+	}
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateIDProject", Sequence: 1, AggregateType: repo_model.ProjectAggregate, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
+}
+
+func GetMockChangesProjectNoEvents(ctrl *gomock.Controller) *ProjectEventstore {
+	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
+}
+
+func GetMockedEventstoreComplexity(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *ProjectEventstore {
+	return &ProjectEventstore{
+		Eventstore: mockEs,
+	}
+}
+
+func GetMockChangesApplicationOK(ctrl *gomock.Controller) *ProjectEventstore {
+	app := model.Application{
+		Name:  "MusterApp",
+		AppID: "AppId",
+		Type:  3,
+	}
+	data, err := json.Marshal(app)
+	if err != nil {
+
+	}
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateIDApp", Type: "project.application.added", Sequence: 1, AggregateType: repo_model.ProjectAggregate, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
+}
+
+func GetMockChangesApplicationNoEvents(ctrl *gomock.Controller) *ProjectEventstore {
+	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
 }

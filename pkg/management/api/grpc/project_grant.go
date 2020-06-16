@@ -13,7 +13,7 @@ func (s *Server) SearchProjectGrants(ctx context.Context, in *ProjectGrantSearch
 	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
 	request.AppendMyResourceOwnerQuery(orgID)
 	request.AppendNotMyOrgQuery(orgID)
-	response, err := s.project.SearchGrantedProjects(ctx, request)
+	response, err := s.project.SearchProjectGrants(ctx, request)
 	if err != nil {
 		return nil, err
 	}

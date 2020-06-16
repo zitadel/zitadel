@@ -6,7 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, ProjectGrantMember } from 'src/app/proto/generated/management_pb';
+import { ProjectGrant, ProjectMemberView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -36,7 +36,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     public dataSource!: ProjectGrantsDataSource;
     public selection: SelectionModel<ProjectGrant.AsObject> = new SelectionModel<ProjectGrant.AsObject>(true, []);
     public expandedElement: ProjectGrant.AsObject | null = null;
-    public selectedGrantMembers: ProjectGrantMember.AsObject[] = [];
+    public selectedGrantMembers: ProjectMemberView.AsObject[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'grantedOrgName', 'grantedOrgDomain', 'creationDate', 'changeDate', 'roleNamesList'];
@@ -95,6 +95,13 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
                 roleKeysList: grant.roleKeysList,
             },
             width: '400px',
+        });
+
+        console.log({
+            orgId: grant.grantedOrgId,
+            grantId: grant.id,
+            projectId: grant.projectId,
+            roleKeysList: grant.roleKeysList,
         });
 
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {

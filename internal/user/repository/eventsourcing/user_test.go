@@ -223,7 +223,7 @@ func TestUserCreateAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := UserCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.initCode, tt.args.phoneCode, "")
+			aggregates, err := UserCreateAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.initCode, tt.args.phoneCode, "", true)
 
 			if !tt.res.wantErr && len(aggregates) != tt.res.aggregatesLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.aggregatesLen, len(aggregates))
@@ -348,7 +348,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.emailCode)
+			aggregates, err := UserRegisterAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.new, tt.args.resourceOwner, tt.args.emailCode, false)
 
 			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))

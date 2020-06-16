@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ProjectDetailComponent } from './project-detail/project-detail.component';
-import { ProjectListComponent } from './project-list/project-list.component';
+import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
+import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
+import { ProjectsComponent } from './projects.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: ProjectListComponent,
+        component: ProjectsComponent,
         data: { animation: 'HomePage' },
     },
     {
@@ -15,8 +16,13 @@ const routes: Routes = [
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
     },
     {
+        path: ':id/grant/:grantId',
+        component: GrantedProjectDetailComponent,
+        data: { animation: 'HomePage' },
+    },
+    {
         path: ':id',
-        component: ProjectDetailComponent,
+        component: OwnedProjectDetailComponent,
         data: { animation: 'HomePage' },
     },
     {

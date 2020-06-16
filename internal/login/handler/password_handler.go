@@ -17,7 +17,7 @@ type passwordData struct {
 func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, err error) {
 	var errType, errMessage string
 	if err != nil {
-		errMessage = err.Error()
+		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
 		baseData: l.getBaseData(r, authReq, "Password", errType, errMessage),

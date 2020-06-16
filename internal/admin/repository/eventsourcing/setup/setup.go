@@ -167,8 +167,23 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 		}
 		setUp.createdOrgs[iamOrg.Name] = org
 
+		var policy *org_model.OrgIamPolicy
+		if iamOrg.OrgIamPolicy {
+			policy, err = setUp.iamorgpolicy(ctx, org)
+			if err != nil {
+				logging.LogWithFields("SETUP-IlLif", "Org Iam Policy", iamOrg.Name).WithError(err).Error("unable to create iam org policy")
+				return err
+			}
+		} else {
+			policy, err = setUp.repos.OrgEvents.GetOrgIamPolicy(ctx, DEFAULT_POLICY)
+			if err != nil {
+				logging.LogWithFields("SETUP-IS8wS", "Org Iam Policy", iamOrg.Name).WithError(err).Error("unable to get default iam org policy")
+				return err
+			}
+		}
+
 		ctx = setSetUpContextData(ctx, org.AggregateID)
-		err = setUp.users(ctx, iamOrg.Users)
+		err = setUp.users(ctx, iamOrg.Users, policy)
 		if err != nil {
 			logging.LogWithFields("SETUP-8zfwz", "Org", iamOrg.Name).WithError(err).Error("unable to set up org users")
 			return err
@@ -193,10 +208,19 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Org, error) {
 	ctx = setSetUpContextData(ctx, "")
 	createOrg := &org_model.Org{
-		Name:   org.Name,
-		Domain: org.Domain,
+		Name:    org.Name,
+		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
 	}
 	return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
+}
+
+func (setUp *initializer) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIamPolicy, error) {
+	ctx = setSetUpContextData(ctx, org.AggregateID)
+	policy := &org_model.OrgIamPolicy{
+		ObjectRoot:            models.ObjectRoot{AggregateID: org.AggregateID},
+		UserLoginMustBeDomain: false,
+	}
+	return setUp.repos.OrgEvents.AddOrgIamPolicy(ctx, policy)
 }
 
 func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error {
@@ -249,9 +273,9 @@ func (setUp *initializer) setIamProject(ctx context.Context) error {
 	return nil
 }
 
-func (setUp *initializer) users(ctx context.Context, users []types.User) error {
+func (setUp *initializer) users(ctx context.Context, users []types.User, orgPolicy *org_model.OrgIamPolicy) error {
 	for _, user := range users {
-		created, err := setUp.user(ctx, user)
+		created, err := setUp.user(ctx, user, orgPolicy)
 		if err != nil {
 			logging.LogWithFields("SETUP-9soer", "Email", user.Email).WithError(err).Error("unable to create iam user")
 			return err
@@ -261,7 +285,7 @@ func (setUp *initializer) users(ctx context.Context, users []types.User) error {
 	return nil
 }
 
-func (setUp *initializer) user(ctx context.Context, user types.User) (*usr_model.User, error) {
+func (setUp *initializer) user(ctx context.Context, user types.User, orgPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
 	createUser := &usr_model.User{
 		Profile: &usr_model.Profile{
 			UserName:  user.UserName,
@@ -276,7 +300,7 @@ func (setUp *initializer) user(ctx context.Context, user types.User) (*usr_model
 			SecretString: user.Password,
 		},
 	}
-	return setUp.repos.UserEvents.CreateUser(ctx, createUser, setUp.pwComplexityPolicy)
+	return setUp.repos.UserEvents.CreateUser(ctx, createUser, setUp.pwComplexityPolicy, orgPolicy)
 }
 
 func (setUp *initializer) orgOwners(ctx context.Context, org *org_model.Org, owners []string) error {

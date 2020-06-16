@@ -117,7 +117,7 @@ func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, aut
 	if err != nil {
 		return nil, err
 	}
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es}, systemDefaults)
 
 	repos := handler.EventstoreRepos{UserEvents: user, ProjectEvents: project, OrgEvents: org, IamEvents: iam}
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, repos, systemDefaults)
@@ -125,7 +125,9 @@ func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, aut
 	return &EsRepository{
 		spool,
 		eventstore.UserRepo{
+			Eventstore:   es,
 			UserEvents:   user,
+			OrgEvents:    org,
 			PolicyEvents: policy,
 			View:         view,
 		},

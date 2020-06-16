@@ -34,10 +34,10 @@ func (p *Profile) Changes(changed *Profile) map[string]interface{} {
 	if changed.DisplayName != p.DisplayName {
 		changes["displayName"] = changed.DisplayName
 	}
-	if p.PreferredLanguage != language.Und && changed.PreferredLanguage != p.PreferredLanguage {
+	if changed.PreferredLanguage != language.Und && changed.PreferredLanguage != p.PreferredLanguage {
 		changes["preferredLanguage"] = changed.PreferredLanguage
 	}
-	if p.Gender > 0 && changed.Gender != p.Gender {
+	if changed.Gender != p.Gender {
 		changes["gender"] = changed.Gender
 	}
 	return changes

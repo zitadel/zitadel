@@ -2,6 +2,8 @@ InternalAuthZ:
   RolePermissionMappings:
     - Role: 'IAM_OWNER'
       Permissions:
+        - "iam.read"
+        - "iam.write"
         - "org.read"
         - "org.write"
         - "org.member.read"
@@ -30,6 +32,9 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "iam.policy.read"
+        - "iam.policy.write"
+        - "iam.policy.delete"
     - Role: 'ORG_OWNER'
       Permissions:
         - "org.read"

@@ -61,9 +61,9 @@ func (u *Token) OnError(event *models.Event, err error) error {
 
 func agentIDFromSession(event *models.Event) (string, error) {
 	session := make(map[string]interface{})
-	if err := json.Unmarshal(event.Data, session); err != nil {
+	if err := json.Unmarshal(event.Data, &session); err != nil {
 		logging.Log("EVEN-s3bq9").WithError(err).Error("could not unmarshal event data")
 		return "", caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
-	return session["agentID"].(string), nil
+	return session["userAgentID"].(string), nil
 }

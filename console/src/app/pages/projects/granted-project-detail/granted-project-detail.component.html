@@ -1,0 +1,36 @@
+<app-meta-layout>
+    <div class="max-width-container">
+        <div class="head" *ngIf="project?.id">
+            <a [routerLink]="[ '/projects' ]" mat-icon-button>
+                <mat-icon class="icon">arrow_back</mat-icon>
+            </a>
+            <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.projectName}}</h1>
+
+            <div class="full-width">
+                <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
+            </div>
+        </div>
+
+        <app-card>
+            <app-project-grant-members *ngIf="project && project.projectId && project.id"
+                [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (isZitadel$ | async)"
+                [project]="project">
+            </app-project-grant-members>
+        </app-card>
+    </div>
+    <metainfo class="side">
+        <div class="details">
+            <div class="row">
+                <span class="first">{{'PROJECT.TYPE.TITLE' | translate}}:</span>
+                <span class="second">{{'PROJECT.TYPE.'+ ProjectType.PROJECTTYPE_GRANTED | translate}}</span>
+            </div>
+            <div class="row">
+                <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
+                <span *ngIf="project && project.state !== undefined"
+                    class="second">{{'PROJECT.STATE.'+project.state | translate}}</span>
+            </div>
+        </div>
+
+        <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
+    </metainfo>
+</app-meta-layout>

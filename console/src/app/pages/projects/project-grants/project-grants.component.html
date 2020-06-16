@@ -87,13 +87,15 @@
                                 <span class="mem-title">Members</span>
                                 <ng-template appHasRole
                                     [appHasRole]="['project.grant.member.write:' + projectId, 'project.grant.member.write']">
-                                    <button [disabled]="disabled" mat-icon-button
+                                    <button [disabled]="disabled || element?.roleKeysList?.length === 0"
+                                        matTooltip="disabled or no roles defined" mat-icon-button
                                         (click)="addProjectGrantMember(element)">
                                         <mat-icon>add</mat-icon>
                                     </button>
                                 </ng-template>
                             </div>
-                            <div class="mem-description">
+                            <div class="mem-description"
+                                *ngIf="selectedGrantMembers && selectedGrantMembers.length > 0">
                                 <span *ngFor="let mem of selectedGrantMembers">{{mem.firstName}} {{mem.lastName}}
                                     {{mem.email}} |
                                     <span *ngFor="let role of mem.rolesList">{{role}} </span></span>

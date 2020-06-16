@@ -24,6 +24,7 @@ type Config struct {
 	Eventstore  es_int.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
+	Domain      string
 }
 
 type EsRepository struct {
@@ -45,7 +46,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 		return nil, err
 	}
 
-	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es})
+	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
 	project, err := es_proj.StartProject(es_proj.ProjectConfig{
 		Eventstore: es,
@@ -80,18 +81,19 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 
 	eventstoreRepos := setup.EventstoreRepos{OrgEvents: org, UserEvents: user, ProjectEvents: project, IamEvents: iam, PolicyEvents: policy}
 	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute(ctx)
-	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to execute setup")
+	logging.Log("SERVE-djs3R").OnError(err).Panic("failed to execute setup")
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient)
 
 	return &EsRepository{
 		spooler: spool,
 		OrgRepo: eventstore.OrgRepo{
-			Eventstore:     es,
-			OrgEventstore:  org,
-			UserEventstore: user,
-			View:           view,
-			SearchLimit:    conf.SearchLimit,
+			Eventstore:       es,
+			OrgEventstore:    org,
+			UserEventstore:   user,
+			PolicyEventstore: policy,
+			View:             view,
+			SearchLimit:      conf.SearchLimit,
 		},
 	}, nil
 }

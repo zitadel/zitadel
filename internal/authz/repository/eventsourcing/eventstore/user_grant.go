@@ -23,7 +23,7 @@ func (repo *UserGrantRepo) Health() error {
 }
 
 func (repo *UserGrantRepo) ResolveGrants(ctx context.Context) (*auth.Grant, error) {
-	err := repo.fillIamProjectID(ctx)
+	err := repo.FillIamProjectID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	return permissions.Permissions, nil
 }
 
-func (repo *UserGrantRepo) fillIamProjectID(ctx context.Context) error {
+func (repo *UserGrantRepo) FillIamProjectID(ctx context.Context) error {
 	if repo.IamProjectID != "" {
 		return nil
 	}

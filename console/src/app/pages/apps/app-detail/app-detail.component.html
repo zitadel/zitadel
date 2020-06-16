@@ -8,16 +8,18 @@
         <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
     </div>
 
+    <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
+
     <app-card title="{{ 'APP.PAGES.DETAIL.TITLE' | translate }}" *ngIf="app">
         <form [formGroup]="appNameForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
                     <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE" matTooltip="Deactivate Org">
-                        <mat-icon svgIcon="mdi_light_off"></mat-icon>
+                        <i class="las la-toggle-off"></i>
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
                     </mat-button-toggle>
                     <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE" matTooltip="Activate Org">
-                        <mat-icon svgIcon="mdi_light_on"></mat-icon>
+                        <i class="las la-toggle-on"></i>
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
                     </mat-button-toggle>
                 </mat-button-toggle-group>
@@ -84,7 +86,7 @@
 
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
-                    <mat-chip-list #chipRedirectList>
+                    <mat-chip-list #chipRedirectList [disabled]="isZitadel">
                         <mat-chip *ngFor="let redirect of redirectUrisList" [selectable]="selectable"
                             (removed)="remove(redirect, RedirectType.REDIRECT)">
                             {{redirect}}
@@ -98,7 +100,7 @@
 
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
-                    <mat-chip-list #chipPostRedirectList>
+                    <mat-chip-list #chipPostRedirectList [disabled]="isZitadel">
                         <mat-chip *ngFor="let redirect of postLogoutRedirectUrisList" [selectable]="selectable"
                             (removed)="remove(redirect, RedirectType.POSTREDIRECT)">
                             {{redirect}}

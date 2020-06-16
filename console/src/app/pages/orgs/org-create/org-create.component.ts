@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CreateOrgRequest, Gender, OrgSetUpResponse, RegisterUserRequest } from 'src/app/proto/generated/admin_pb';
+import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -77,7 +77,7 @@ export class OrgCreateComponent {
         createOrgRequest.setName(this.name?.value);
         createOrgRequest.setDomain(this.domain?.value);
 
-        const registerUserRequest: RegisterUserRequest = new RegisterUserRequest();
+        const registerUserRequest: CreateUserRequest = new CreateUserRequest();
         registerUserRequest.setEmail(this.email?.value);
         registerUserRequest.setFirstName(this.firstName?.value);
         registerUserRequest.setLastName(this.lastName?.value);

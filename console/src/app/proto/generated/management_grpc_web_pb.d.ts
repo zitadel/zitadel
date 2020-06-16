@@ -23,7 +23,7 @@ import {
   Changes,
   ClientSecret,
   CreateUserRequest,
-  GrantedGrantID,
+  GrantedProjectSearchRequest,
   MultiFactors,
   OIDCApplicationCreate,
   OIDCConfig,
@@ -31,6 +31,7 @@ import {
   Org,
   OrgDomain,
   OrgID,
+  OrgMember,
   OrgMemberRoles,
   OrgMemberSearchRequest,
   OrgMemberSearchResponse,
@@ -66,6 +67,7 @@ import {
   ProjectGrantUserGrantID,
   ProjectGrantUserGrantSearchRequest,
   ProjectGrantUserGrantUpdate,
+  ProjectGrantView,
   ProjectID,
   ProjectMember,
   ProjectMemberAdd,
@@ -108,7 +110,8 @@ import {
   UserPhone,
   UserProfile,
   UserSearchRequest,
-  UserSearchResponse} from './management_pb';
+  UserSearchResponse,
+  UserView} from './management_pb';
 
 export class ManagementServiceClient {
   constructor (hostname: string,
@@ -147,8 +150,8 @@ export class ManagementServiceClient {
     request: UserEmailID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: User) => void
-  ): grpcWeb.ClientReadableStream<User>;
+               response: UserView) => void
+  ): grpcWeb.ClientReadableStream<UserView>;
 
   searchUsers(
     request: UserSearchRequest,
@@ -444,28 +447,28 @@ export class ManagementServiceClient {
                response: OrgMemberRoles) => void
   ): grpcWeb.ClientReadableStream<OrgMemberRoles>;
 
-  addOrgMember(
+  addMyOrgMember(
     request: AddOrgMemberRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: google_protobuf_empty_pb.Empty) => void
-  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+               response: OrgMember) => void
+  ): grpcWeb.ClientReadableStream<OrgMember>;
 
-  changeOrgMember(
+  changeMyOrgMember(
     request: ChangeOrgMemberRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: google_protobuf_empty_pb.Empty) => void
-  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+               response: OrgMember) => void
+  ): grpcWeb.ClientReadableStream<OrgMember>;
 
-  removeOrgMember(
+  removeMyOrgMember(
     request: RemoveOrgMemberRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
-  searchOrgMembers(
+  searchMyOrgMembers(
     request: OrgMemberSearchRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
@@ -514,12 +517,19 @@ export class ManagementServiceClient {
                response: Project) => void
   ): grpcWeb.ClientReadableStream<Project>;
 
-  getGrantedProjectGrantByID(
-    request: GrantedGrantID,
+  searchGrantedProjects(
+    request: GrantedProjectSearchRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: ProjectGrant) => void
-  ): grpcWeb.ClientReadableStream<ProjectGrant>;
+               response: ProjectGrantSearchResponse) => void
+  ): grpcWeb.ClientReadableStream<ProjectGrantSearchResponse>;
+
+  getGrantedProjectByID(
+    request: ProjectGrantID,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: ProjectGrantView) => void
+  ): grpcWeb.ClientReadableStream<ProjectGrantView>;
 
   getProjectMemberRoles(
     request: google_protobuf_empty_pb.Empty,
@@ -901,7 +911,7 @@ export class ManagementServicePromiseClient {
   getUserByEmailGlobal(
     request: UserEmailID,
     metadata?: grpcWeb.Metadata
-  ): Promise<User>;
+  ): Promise<UserView>;
 
   searchUsers(
     request: UserSearchRequest,
@@ -1113,22 +1123,22 @@ export class ManagementServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<OrgMemberRoles>;
 
-  addOrgMember(
+  addMyOrgMember(
     request: AddOrgMemberRequest,
     metadata?: grpcWeb.Metadata
-  ): Promise<google_protobuf_empty_pb.Empty>;
+  ): Promise<OrgMember>;
 
-  changeOrgMember(
+  changeMyOrgMember(
     request: ChangeOrgMemberRequest,
     metadata?: grpcWeb.Metadata
-  ): Promise<google_protobuf_empty_pb.Empty>;
+  ): Promise<OrgMember>;
 
-  removeOrgMember(
+  removeMyOrgMember(
     request: RemoveOrgMemberRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
 
-  searchOrgMembers(
+  searchMyOrgMembers(
     request: OrgMemberSearchRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<OrgMemberSearchResponse>;
@@ -1163,10 +1173,15 @@ export class ManagementServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<Project>;
 
-  getGrantedProjectGrantByID(
-    request: GrantedGrantID,
+  searchGrantedProjects(
+    request: GrantedProjectSearchRequest,
     metadata?: grpcWeb.Metadata
-  ): Promise<ProjectGrant>;
+  ): Promise<ProjectGrantSearchResponse>;
+
+  getGrantedProjectByID(
+    request: ProjectGrantID,
+    metadata?: grpcWeb.Metadata
+  ): Promise<ProjectGrantView>;
 
   getProjectMemberRoles(
     request: google_protobuf_empty_pb.Empty,

@@ -19,6 +19,7 @@ Mgmt:
         - x-zitadel-
   Repository:
     SearchLimit: 100
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'ManagementAPI'
       Repository:
@@ -176,6 +177,7 @@ Admin:
         - x-zitadel-
   Repository:
     SearchLimit: 100
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'Admin'
       Repository:
@@ -202,10 +204,12 @@ Admin:
 
 Console:
   Port: 50050
+  EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
 
 
 Notification:
   Repository:
+    DefaultLanguage: 'de'
     Eventstore:
       ServiceName: 'Notification'
       Repository:

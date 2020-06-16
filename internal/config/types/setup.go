@@ -16,11 +16,12 @@ type User struct {
 }
 
 type Org struct {
-	Name     string
-	Domain   string
-	Users    []User
-	Owners   []string
-	Projects []Project
+	Name         string
+	Domain       string
+	OrgIamPolicy bool
+	Users        []User
+	Owners       []string
+	Projects     []Project
 }
 
 type Project struct {

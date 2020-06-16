@@ -23,6 +23,7 @@ func projectGrantFromModel(grant *proj_model.ProjectGrant) *ProjectGrant {
 		GrantedOrgId: grant.GrantedOrgID,
 		RoleKeys:     grant.RoleKeys,
 		Sequence:     grant.Sequence,
+		ProjectId:    grant.AggregateID,
 	}
 }
 
@@ -46,24 +47,24 @@ func projectGrantUpdateToModel(grant *ProjectGrantUpdate) *proj_model.ProjectGra
 	}
 }
 
-func projectGrantSearchRequestsToModel(request *ProjectGrantSearchRequest) *proj_model.GrantedProjectSearchRequest {
-	return &proj_model.GrantedProjectSearchRequest{
+func projectGrantSearchRequestsToModel(request *ProjectGrantSearchRequest) *proj_model.ProjectGrantViewSearchRequest {
+	return &proj_model.ProjectGrantViewSearchRequest{
 		Offset:  request.Offset,
 		Limit:   request.Limit,
 		Queries: projectGrantSearchQueriesToModel(request.ProjectId),
 	}
 }
 
-func projectGrantSearchQueriesToModel(projectId string) []*proj_model.GrantedProjectSearchQuery {
-	converted := make([]*proj_model.GrantedProjectSearchQuery, 0)
-	return append(converted, &proj_model.GrantedProjectSearchQuery{
+func projectGrantSearchQueriesToModel(projectId string) []*proj_model.ProjectGrantViewSearchQuery {
+	converted := make([]*proj_model.ProjectGrantViewSearchQuery, 0)
+	return append(converted, &proj_model.ProjectGrantViewSearchQuery{
 		Key:    proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID,
 		Method: model.SEARCHMETHOD_EQUALS,
 		Value:  projectId,
 	})
 }
 
-func projectGrantSearchResponseFromModel(response *proj_model.GrantedProjectSearchResponse) *ProjectGrantSearchResponse {
+func projectGrantSearchResponseFromModel(response *proj_model.ProjectGrantViewSearchResponse) *ProjectGrantSearchResponse {
 	return &ProjectGrantSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
@@ -72,7 +73,7 @@ func projectGrantSearchResponseFromModel(response *proj_model.GrantedProjectSear
 	}
 }
 
-func projectGrantsFromGrantedProjectModel(projects []*proj_model.GrantedProjectView) []*ProjectGrantView {
+func projectGrantsFromGrantedProjectModel(projects []*proj_model.ProjectGrantView) []*ProjectGrantView {
 	converted := make([]*ProjectGrantView, len(projects))
 	for i, project := range projects {
 		converted[i] = projectGrantFromGrantedProjectModel(project)
@@ -80,7 +81,7 @@ func projectGrantsFromGrantedProjectModel(projects []*proj_model.GrantedProjectV
 	return converted
 }
 
-func projectGrantFromGrantedProjectModel(project *proj_model.GrantedProjectView) *ProjectGrantView {
+func projectGrantFromGrantedProjectModel(project *proj_model.ProjectGrantView) *ProjectGrantView {
 	creationDate, err := ptypes.TimestampProto(project.CreationDate)
 	logging.Log("GRPC-dlso3").OnError(err).Debug("unable to parse timestamp")
 

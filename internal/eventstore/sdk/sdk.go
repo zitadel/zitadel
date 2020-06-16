@@ -23,7 +23,7 @@ func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *
 	}
 	err = appender(events...)
 	if err != nil {
-		return ThrowAppendEventError(err, "SDK-awiWK", "appender failed")
+		return ThrowAppendEventError(err, "SDK-awiWK", "Errors.Internal")
 	}
 	return nil
 }
@@ -34,7 +34,7 @@ func Filter(ctx context.Context, filter filterFunc, appender appendFunc, query *
 // the given events are appended by the appender
 func Push(ctx context.Context, push pushFunc, appender appendFunc, aggregaters ...AggregateFunc) (err error) {
 	if len(aggregaters) < 1 {
-		return errors.ThrowPreconditionFailed(nil, "SDK-q9wjp", "no aggregaters passed")
+		return errors.ThrowPreconditionFailed(nil, "SDK-q9wjp", "Errors.Internal")
 	}
 
 	aggregates, err := makeAggregates(ctx, aggregaters)

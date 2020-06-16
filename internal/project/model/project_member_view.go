@@ -41,7 +41,7 @@ const (
 type ProjectMemberSearchQuery struct {
 	Key    ProjectMemberSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type ProjectMemberSearchResponse struct {
@@ -55,4 +55,7 @@ func (r *ProjectMemberSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
 	}
+}
+func (r *ProjectMemberSearchRequest) AppendProjectQuery(projectID string) {
+	r.Queries = append(r.Queries, &ProjectMemberSearchQuery{Key: PROJECTMEMBERSEARCHKEY_PROJECT_ID, Method: model.SEARCHMETHOD_EQUALS, Value: projectID})
 }
