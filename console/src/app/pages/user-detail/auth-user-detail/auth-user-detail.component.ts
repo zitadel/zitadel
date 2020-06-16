@@ -33,9 +33,9 @@ function passwordConfirmValidator(c: AbstractControl): any {
 })
 export class AuthUserDetailComponent implements OnDestroy {
     public profile!: UserProfile.AsObject;
-    public email!: UserEmail.AsObject;
-    public phone!: UserPhone.AsObject;
-    public address!: UserAddress.AsObject;
+    public email: UserEmail.AsObject = { email: '' } as any;
+    public phone: UserPhone.AsObject = { phone: '' } as any;
+    public address: UserAddress.AsObject = { id: '' } as any;
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
