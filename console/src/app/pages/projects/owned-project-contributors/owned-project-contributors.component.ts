@@ -5,27 +5,27 @@ import { BehaviorSubject, from, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { User } from 'src/app/proto/generated/auth_pb';
 import {
-    GrantedProject,
     ProjectMemberSearchResponse,
     ProjectMemberView,
     ProjectState,
     ProjectType,
+    ProjectView,
 } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import {
     CreationType,
-    ProjectMemberCreateDialogComponent,
-} from '../../../modules/add-member-dialog/project-member-create-dialog.component';
+    MemberCreateDialogComponent,
+} from '../../../modules/add-member-dialog/member-create-dialog.component';
 
 @Component({
-    selector: 'app-project-contributors',
-    templateUrl: './project-contributors.component.html',
-    styleUrls: ['./project-contributors.component.scss'],
+    selector: 'app-owned-project-contributors',
+    templateUrl: './owned-project-contributors.component.html',
+    styleUrls: ['./owned-project-contributors.component.scss'],
 })
-export class ProjectContributorsComponent implements OnInit {
-    @Input() public project!: GrantedProject.AsObject;
+export class OwnedProjectContributorsComponent implements OnInit {
+    @Input() public project!: ProjectView.AsObject;
     @Input() public projectType!: ProjectType;
 
     @Input() public disabled: boolean = false;
@@ -45,9 +45,10 @@ export class ProjectContributorsComponent implements OnInit {
         console.log('project grant members');
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
             this.projectType === ProjectType.PROJECTTYPE_OWNED ?
-                this.projectService.SearchProjectMembers(this.project.id, 100, 0) :
+                this.projectService.SearchProjectMembers(this.project.projectId, 100, 0) :
                 this.projectType === ProjectType.PROJECTTYPE_GRANTED ?
-                    this.projectService.SearchProjectGrantMembers(this.project.id, this.project.grantId, 100, 0) : undefined;
+                    this.projectService.SearchProjectGrantMembers(this.project.projectId,
+                        this.project.projectId, 100, 0) : undefined;
         if (promise) {
             from(promise).pipe(
                 map(resp => {
@@ -64,12 +65,10 @@ export class ProjectContributorsComponent implements OnInit {
     }
 
     public openAddMember(): void {
-        const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
+        const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
-                creationType: this.project.type ===
-                    ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-                    ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
-                projectId: this.project.id,
+                creationType: CreationType.PROJECT_OWNED,
+                projectId: this.project.projectId,
             },
             width: '400px',
         });
@@ -81,7 +80,7 @@ export class ProjectContributorsComponent implements OnInit {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.projectService.AddProjectMember(this.project.id, user.id, roles);
+                        return this.projectService.AddProjectMember(this.project.projectId, user.id, roles);
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
@@ -94,7 +93,7 @@ export class ProjectContributorsComponent implements OnInit {
 
     public showDetail(): void {
         if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.router.navigate(['projects', this.project.id, 'members']);
+            this.router.navigate(['projects', this.project.projectId, 'members']);
         }
     }
 }

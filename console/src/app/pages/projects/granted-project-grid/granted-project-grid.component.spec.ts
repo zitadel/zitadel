@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectContributorsComponent } from './project-contributors.component';
+import { GrantedProjectGridComponent } from './granted-project-grid.component';
 
-describe('ProjectContributorsComponent', () => {
-    let component: ProjectContributorsComponent;
-    let fixture: ComponentFixture<ProjectContributorsComponent>;
+describe('GridComponent', () => {
+    let component: GrantedProjectGridComponent;
+    let fixture: ComponentFixture<GrantedProjectGridComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [ProjectContributorsComponent],
+            declarations: [GrantedProjectGridComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ProjectContributorsComponent);
+        fixture = TestBed.createComponent(GrantedProjectGridComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

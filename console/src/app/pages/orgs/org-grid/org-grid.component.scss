@@ -53,7 +53,7 @@ h1 {
         }
 
         &.active {
-            border-color: #db4c69;
+            border: 2px solid #db4c69;
         }
 
         .selection-icon {
@@ -183,6 +183,42 @@ h1 {
 
             .selection-icon {
                 opacity: 1;
+            }
+        }
+    }
+
+    .add-org-button {
+        z-index: 100;
+        flex-basis: 250px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 166px;
+        border-radius: 0.5rem;
+        margin: 1rem;
+        box-sizing: border-box;
+        font-family: 'Rubik', sans-serif;
+
+        .icon {
+            display: flex;
+            justify-content: center;
+            align-self: center;
+            margin-bottom: 1rem;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            font-size: 2.5rem;
+        }
+
+        &:hover {
+            background-color: #ffffff25;
+
+            .icon,
+            span {
+                &.disabled {
+                    color: gray;
+                }
             }
         }
     }

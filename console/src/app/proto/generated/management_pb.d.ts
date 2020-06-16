@@ -1877,6 +1877,138 @@ export namespace ProjectUpdateRequest {
   }
 }
 
+export class ProjectSearchResponse extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getTotalResult(): number;
+  setTotalResult(value: number): void;
+
+  getResultList(): Array<ProjectView>;
+  setResultList(value: Array<ProjectView>): void;
+  clearResultList(): void;
+  addResult(value?: ProjectView, index?: number): ProjectView;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectSearchResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectSearchResponse): ProjectSearchResponse.AsObject;
+  static serializeBinaryToWriter(message: ProjectSearchResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectSearchResponse;
+  static deserializeBinaryFromReader(message: ProjectSearchResponse, reader: jspb.BinaryReader): ProjectSearchResponse;
+}
+
+export namespace ProjectSearchResponse {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    totalResult: number,
+    resultList: Array<ProjectView.AsObject>,
+  }
+}
+
+export class ProjectView extends jspb.Message {
+  getProjectId(): string;
+  setProjectId(value: string): void;
+
+  getName(): string;
+  setName(value: string): void;
+
+  getState(): ProjectState;
+  setState(value: ProjectState): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getResourceOwner(): string;
+  setResourceOwner(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectView.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectView): ProjectView.AsObject;
+  static serializeBinaryToWriter(message: ProjectView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectView;
+  static deserializeBinaryFromReader(message: ProjectView, reader: jspb.BinaryReader): ProjectView;
+}
+
+export namespace ProjectView {
+  export type AsObject = {
+    projectId: string,
+    name: string,
+    state: ProjectState,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    resourceOwner: string,
+    sequence: number,
+  }
+}
+
+export class ProjectSearchRequest extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getQueriesList(): Array<ProjectSearchQuery>;
+  setQueriesList(value: Array<ProjectSearchQuery>): void;
+  clearQueriesList(): void;
+  addQueries(value?: ProjectSearchQuery, index?: number): ProjectSearchQuery;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectSearchRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectSearchRequest): ProjectSearchRequest.AsObject;
+  static serializeBinaryToWriter(message: ProjectSearchRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectSearchRequest;
+  static deserializeBinaryFromReader(message: ProjectSearchRequest, reader: jspb.BinaryReader): ProjectSearchRequest;
+}
+
+export namespace ProjectSearchRequest {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    queriesList: Array<ProjectSearchQuery.AsObject>,
+  }
+}
+
+export class ProjectSearchQuery extends jspb.Message {
+  getKey(): ProjectSearchKey;
+  setKey(value: ProjectSearchKey): void;
+
+  getMethod(): SearchMethod;
+  setMethod(value: SearchMethod): void;
+
+  getValue(): string;
+  setValue(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectSearchQuery.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectSearchQuery): ProjectSearchQuery.AsObject;
+  static serializeBinaryToWriter(message: ProjectSearchQuery, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectSearchQuery;
+  static deserializeBinaryFromReader(message: ProjectSearchQuery, reader: jspb.BinaryReader): ProjectSearchQuery;
+}
+
+export namespace ProjectSearchQuery {
+  export type AsObject = {
+    key: ProjectSearchKey,
+    method: SearchMethod,
+    value: string,
+  }
+}
+
 export class Projects extends jspb.Message {
   getProjectsList(): Array<Project>;
   setProjectsList(value: Array<Project>): void;
@@ -1936,158 +2068,6 @@ export namespace Project {
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     sequence: number,
-  }
-}
-
-export class GrantedProjectSearchResponse extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getTotalResult(): number;
-  setTotalResult(value: number): void;
-
-  getResultList(): Array<GrantedProject>;
-  setResultList(value: Array<GrantedProject>): void;
-  clearResultList(): void;
-  addResult(value?: GrantedProject, index?: number): GrantedProject;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProjectSearchResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProjectSearchResponse): GrantedProjectSearchResponse.AsObject;
-  static serializeBinaryToWriter(message: GrantedProjectSearchResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchResponse;
-  static deserializeBinaryFromReader(message: GrantedProjectSearchResponse, reader: jspb.BinaryReader): GrantedProjectSearchResponse;
-}
-
-export namespace GrantedProjectSearchResponse {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    totalResult: number,
-    resultList: Array<GrantedProject.AsObject>,
-  }
-}
-
-export class GrantedProject extends jspb.Message {
-  getId(): string;
-  setId(value: string): void;
-
-  getName(): string;
-  setName(value: string): void;
-
-  getState(): ProjectState;
-  setState(value: ProjectState): void;
-
-  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
-  hasChangeDate(): boolean;
-  clearChangeDate(): void;
-
-  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
-  hasCreationDate(): boolean;
-  clearCreationDate(): void;
-
-  getType(): ProjectType;
-  setType(value: ProjectType): void;
-
-  getResourceOwner(): string;
-  setResourceOwner(value: string): void;
-
-  getOrgId(): string;
-  setOrgId(value: string): void;
-
-  getOrgName(): string;
-  setOrgName(value: string): void;
-
-  getOrgDomain(): string;
-  setOrgDomain(value: string): void;
-
-  getGrantId(): string;
-  setGrantId(value: string): void;
-
-  getSequence(): number;
-  setSequence(value: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProject.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProject): GrantedProject.AsObject;
-  static serializeBinaryToWriter(message: GrantedProject, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProject;
-  static deserializeBinaryFromReader(message: GrantedProject, reader: jspb.BinaryReader): GrantedProject;
-}
-
-export namespace GrantedProject {
-  export type AsObject = {
-    id: string,
-    name: string,
-    state: ProjectState,
-    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    type: ProjectType,
-    resourceOwner: string,
-    orgId: string,
-    orgName: string,
-    orgDomain: string,
-    grantId: string,
-    sequence: number,
-  }
-}
-
-export class GrantedProjectSearchRequest extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getQueriesList(): Array<GrantedProjectSearchQuery>;
-  setQueriesList(value: Array<GrantedProjectSearchQuery>): void;
-  clearQueriesList(): void;
-  addQueries(value?: GrantedProjectSearchQuery, index?: number): GrantedProjectSearchQuery;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProjectSearchRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProjectSearchRequest): GrantedProjectSearchRequest.AsObject;
-  static serializeBinaryToWriter(message: GrantedProjectSearchRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchRequest;
-  static deserializeBinaryFromReader(message: GrantedProjectSearchRequest, reader: jspb.BinaryReader): GrantedProjectSearchRequest;
-}
-
-export namespace GrantedProjectSearchRequest {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    queriesList: Array<GrantedProjectSearchQuery.AsObject>,
-  }
-}
-
-export class GrantedProjectSearchQuery extends jspb.Message {
-  getKey(): GrantedProjectSearchKey;
-  setKey(value: GrantedProjectSearchKey): void;
-
-  getMethod(): SearchMethod;
-  setMethod(value: SearchMethod): void;
-
-  getValue(): string;
-  setValue(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProjectSearchQuery.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProjectSearchQuery): GrantedProjectSearchQuery.AsObject;
-  static serializeBinaryToWriter(message: GrantedProjectSearchQuery, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchQuery;
-  static deserializeBinaryFromReader(message: GrantedProjectSearchQuery, reader: jspb.BinaryReader): GrantedProjectSearchQuery;
-}
-
-export namespace GrantedProjectSearchQuery {
-  export type AsObject = {
-    key: GrantedProjectSearchKey,
-    method: SearchMethod,
-    value: string,
   }
 }
 
@@ -3291,6 +3271,34 @@ export namespace ProjectGrantSearchRequest {
   }
 }
 
+export class GrantedProjectSearchRequest extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getQueriesList(): Array<ProjectSearchQuery>;
+  setQueriesList(value: Array<ProjectSearchQuery>): void;
+  clearQueriesList(): void;
+  addQueries(value?: ProjectSearchQuery, index?: number): ProjectSearchQuery;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GrantedProjectSearchRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GrantedProjectSearchRequest): GrantedProjectSearchRequest.AsObject;
+  static serializeBinaryToWriter(message: GrantedProjectSearchRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchRequest;
+  static deserializeBinaryFromReader(message: GrantedProjectSearchRequest, reader: jspb.BinaryReader): GrantedProjectSearchRequest;
+}
+
+export namespace GrantedProjectSearchRequest {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    queriesList: Array<ProjectSearchQuery.AsObject>,
+  }
+}
+
 export class ProjectGrantMemberRoles extends jspb.Message {
   getRolesList(): Array<string>;
   setRolesList(value: Array<string>): void;
@@ -4307,6 +4315,10 @@ export enum OrgMemberSearchKey {
   ORGMEMBERSEARCHKEY_EMAIL = 3,
   ORGMEMBERSEARCHKEY_USER_ID = 4,
 }
+export enum ProjectSearchKey { 
+  PROJECTSEARCHKEY_UNSPECIFIED = 0,
+  PROJECTSEARCHKEY_PROJECT_NAME = 1,
+}
 export enum ProjectState { 
   PROJECTSTATE_UNSPECIFIED = 0,
   PROJECTSTATE_ACTIVE = 1,
@@ -4316,10 +4328,6 @@ export enum ProjectType {
   PROJECTTYPE_UNSPECIFIED = 0,
   PROJECTTYPE_OWNED = 1,
   PROJECTTYPE_GRANTED = 2,
-}
-export enum GrantedProjectSearchKey { 
-  PROJECTSEARCHKEY_UNSPECIFIED = 0,
-  PROJECTSEARCHKEY_PROJECT_NAME = 1,
 }
 export enum ProjectRoleSearchKey { 
   PROJECTROLESEARCHKEY_UNSPECIFIED = 0,

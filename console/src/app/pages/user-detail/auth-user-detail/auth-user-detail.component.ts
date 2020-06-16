@@ -11,7 +11,6 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
 
-
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
         return;
@@ -68,13 +67,25 @@ export class AuthUserDetailComponent implements OnDestroy {
             if (policy.minLength) {
                 validators.push(Validators.minLength(policy.minLength));
             }
+            if (policy.hasLowercase) {
+                validators.push(Validators.pattern(/[a-z]/g));
+            }
+            if (policy.hasUppercase) {
+                validators.push(Validators.pattern(/[A-Z]/g));
+            }
+            if (policy.hasNumber) {
+                validators.push(Validators.pattern(/[0-9]/g));
+            }
+            if (policy.hasSymbol) {
+                // All characters that are not a digit or an English letter \W or a whitespace \S
+                validators.push(Validators.pattern(/[\W\S]/));
+            }
 
             this.passwordForm = this.fb.group({
                 currentPassword: ['', []],
                 newPassword: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
-            // TODO custom validator for pattern
         }).catch(error => {
             console.log('no password complexity policy defined!');
             this.passwordForm = this.fb.group({
@@ -160,6 +171,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             data: {
                 number: this.phone.phone,
             },
+            width: '400px',
         });
 
         dialogRef.afterClosed().subscribe(code => {

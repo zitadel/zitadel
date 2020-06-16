@@ -10,11 +10,11 @@ export enum CreationType {
     ORG = 2,
 }
 @Component({
-    selector: 'app-project-member-create-dialog',
-    templateUrl: './project-member-create-dialog.component.html',
-    styleUrls: ['./project-member-create-dialog.component.scss'],
+    selector: 'app-member-create-dialog',
+    templateUrl: './member-create-dialog.component.html',
+    styleUrls: ['./member-create-dialog.component.scss'],
 })
-export class ProjectMemberCreateDialogComponent {
+export class MemberCreateDialogComponent {
     public projectId: string = '';
     public creationType!: CreationType;
     public users: Array<User.AsObject> = [];
@@ -23,7 +23,7 @@ export class ProjectMemberCreateDialogComponent {
     public memberRoleOptions: string[] = [];
     constructor(
         private projectService: ProjectService,
-        public dialogRef: MatDialogRef<ProjectMemberCreateDialogComponent>,
+        public dialogRef: MatDialogRef<MemberCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         toastService: ToastService,
     ) {

@@ -3,14 +3,14 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { GrantedProject, Project, ProjectState } from 'src/app/proto/generated/management_pb';
+import { ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-grid',
-    templateUrl: './project-grid.component.html',
-    styleUrls: ['./project-grid.component.scss'],
+    selector: 'app-owned-project-grid',
+    templateUrl: './owned-project-grid.component.html',
+    styleUrls: ['./owned-project-grid.component.scss'],
     animations: [
         trigger('list', [
             transition(':enter', [
@@ -31,33 +31,26 @@ import { ToastService } from 'src/app/services/toast.service';
         ]),
     ],
 })
-export class ProjectGridComponent {
-    @Input() items: Array<GrantedProject.AsObject> = [];
+export class OwnedProjectGridComponent {
+    @Input() items: Array<ProjectView.AsObject> = [];
     @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
     @Output() changedView: EventEmitter<boolean> = new EventEmitter();
     @Input() loading: boolean = false;
 
-    public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
+    public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
     public selectedIndex: number = -1;
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
+    public ProjectType: any = ProjectType;
 
     constructor(private router: Router, private projectService: ProjectService, private toast: ToastService) { }
 
-    public selectItem(item: GrantedProject.AsObject, event?: any): void {
+    public selectItem(item: ProjectView.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
-            if (item.grantId) {
-                this.router.navigate(['projects', item.id, 'grant', `${item.grantId}`]);
-            } else {
-                this.router.navigate(['/projects', item.id]);
-            }
+            this.router.navigate(['/projects', item.projectId]);
         } else if (!event) {
-            if (item.grantId) {
-                this.router.navigate(['projects', item.id, 'grant', `${item.grantId}`]);
-            } else {
-                this.router.navigate(['/projects', item.id]);
-            }
+            this.router.navigate(['/projects', item.projectId]);
         }
     }
 
@@ -70,9 +63,9 @@ export class ProjectGridComponent {
         return ts;
     }
 
-    public reactivateProjects(selected: Project.AsObject[]): void {
+    public reactivateProjects(selected: ProjectView.AsObject[]): void {
         Promise.all([selected.map(proj => {
-            return this.projectService.ReactivateProject(proj.id);
+            return this.projectService.ReactivateProject(proj.projectId);
         })]).then(() => {
             this.toast.showInfo('Successful reactivated all projects');
         }).catch(error => {
@@ -80,9 +73,9 @@ export class ProjectGridComponent {
         });
     }
 
-    public deactivateProjects(selected: Project.AsObject[]): void {
+    public deactivateProjects(selected: ProjectView.AsObject[]): void {
         Promise.all([selected.map(proj => {
-            return this.projectService.DeactivateProject(proj.id);
+            return this.projectService.DeactivateProject(proj.projectId);
         })]).then(() => {
             this.toast.showInfo('Successful deactivated all projects');
         }).catch(error => {

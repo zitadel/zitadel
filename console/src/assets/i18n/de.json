@@ -176,7 +176,7 @@
         "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
-        "ADDACCOUNT":"Neuen Account hinzufügen"
+        "ADDACCOUNT":"mit einem anderen Account anmelden"
     },
     "ORG": {
         "PAGES": {
@@ -196,6 +196,10 @@
             "0": "nicht definiert",
             "1": "aktiv",
             "2": "inaktiv"
+        },
+        "MEMBER": {
+            "TITLE":"Organisations Manager verwalten",
+            "DESCRIPTION":"Definieren Sie hier die Accounts, die Operationen auf ihrer Organisationen vornehmen dürfen."
         },
         "POLICY": {
             "TITLE":"Richtlinen festlegen",
@@ -275,7 +279,8 @@
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Geben Sie den Namen ein",
-            "ROLE": "Rolle"
+            "ROLE": "Rolle",
+            "NOITEMS": "Keine Projekte"
         },
         "STATE": {
             "TITLE":"Status",
@@ -474,6 +479,10 @@
             "org.changed":"Org editiert",
             "org.member.added":"Organisation Member erstellt",
             "org.member.removed":"Organisation Member gelöscht",
+            "org.domain.added":"Org Domain hinzugefügt",
+            "org.domain.verified":"Org Domain verifiziert",
+            "org.domain.primary.set":"Primäre domain gesetzt",
+            "org.iam.policy.added":"IAM Policy hinzugefügt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
             "project.deactivated":"Projekt deaktiviert",
@@ -481,7 +490,17 @@
             "project.member.removed":"Projekt Member gelöscht",
             "project.role.added":"Rolle erstellt",
             "project.role.removed":"Rolle gelöscht",
+            "project.application.added":"App hinzugefügt",
+            "project.application.config.oidc.added":"OIDC config hinzugefügt",   
+            "user.added":"User hinzugefügt",
+            "user.initialization.code.added":"Init code hinzugefügt",
+            "user.phone.code.added":"User phone code hinzugefügt",
+            "user.phone.code.sent":"User phone code gesendet",
+            "user.initialization.code.sent":"Init code gesendet",
             "user.email.verification.sended": "User email verifiziert",
+            "user.email.code.added":"Email code hinzugefügt",
+            "user.email.code.sent":"Email code gesendet",   
+            "user.email.verified":"Email verifiziert",         
             "user.phone.verificationsended":"User phone verifikation gesendet",
             "user.phone.code":"User phone code erstellt",
             "user.initialization.verification.sended":"User mail verifikation gesendet",
@@ -496,9 +515,17 @@
             "skipped.init.mfa.user":"User MFA init überspungen",
             "user.email.password.request.sended":"User Email Password Anfrage gesended",
             "user.password.set.requested":"Password Anfrage",
-            "user.phone.verification.sended":"User Nummer verifikation gesended",
+            "user.phone.verification.sended":"User Nummer verifikation gesendet",
+            "user.phone.changed":"User phone geändert",
+            "user.phone.verified":"User phone verifiziert",
             "updated.user.profile":"User Profil update",
-            "user.email.init.sended":"User Email init sended"
+            "user.email.init.sended":"User Email init sended",
+            "user.password.changed":"Password changed",
+            "user.initialization.check.succeeded":"Init check erfolgreich",
+            "user.password.check.succeeded":"Password check erfolgreich",
+            "user.mfa.init.skipped":"MFA init übersprungen",
+            "user.mfa.otp.added":"MFA OTP hinzugefügt",
+            "user.mfa.otp.verified":"MFA OTP verifiziert"
         }
     }
 }

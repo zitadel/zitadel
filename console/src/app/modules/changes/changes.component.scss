@@ -11,7 +11,7 @@
 
     .item {
         box-sizing: border-box;
-        height: 60px;
+        height: 50px;
         padding: .5rem;
         margin: .25rem 0;
         border-radius: .5rem;
@@ -26,8 +26,7 @@
 
         .desc {
             overflow-x: auto;
-            font-size: .9rem;
-            margin: 4px 0;
+            font-size: 14px;
         }
     }
 

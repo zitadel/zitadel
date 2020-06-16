@@ -10,10 +10,7 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
-    GrantedProject,
-    GrantedProjectSearchQuery,
     GrantedProjectSearchRequest,
-    GrantedProjectSearchResponse,
     OIDCApplicationCreate,
     OIDCConfig,
     OIDCConfigUpdate,
@@ -30,6 +27,7 @@ import {
     ProjectGrantSearchRequest,
     ProjectGrantSearchResponse,
     ProjectGrantUpdate,
+    ProjectGrantView,
     ProjectID,
     ProjectMemberAdd,
     ProjectMemberChange,
@@ -42,6 +40,9 @@ import {
     ProjectRoleSearchQuery,
     ProjectRoleSearchRequest,
     ProjectRoleSearchResponse,
+    ProjectSearchQuery,
+    ProjectSearchRequest,
+    ProjectSearchResponse,
     ProjectUpdateRequest,
     ProjectUserGrantSearchRequest,
     UserGrant,
@@ -73,8 +74,23 @@ export class ProjectService {
         return responseMapper(response);
     }
 
+    public async SearchProjects(
+        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
+        const req = new ProjectSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchProjects,
+            req,
+            f => f,
+        );
+    }
+
     public async SearchGrantedProjects(
-        limit: number, offset: number, queryList?: GrantedProjectSearchQuery[]): Promise<GrantedProjectSearchResponse> {
+        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectGrantSearchResponse> {
         const req = new GrantedProjectSearchRequest();
         req.setLimit(limit);
         req.setOffset(offset);
@@ -88,21 +104,6 @@ export class ProjectService {
         );
     }
 
-    // public async SearchGrantedProjects(
-    //     limit: number, offset: number, queryList?: GrantedProjectSearchQuery[]): Promise<GrantedProjectSearchResponse> {
-    //     const req = new GrantedProjectSearchRequest();
-    //     req.setLimit(limit);
-    //     req.setOffset(offset);
-    //     if (queryList) {
-    //         req.setQueriesList(queryList);
-    //     }
-    //     return await this.request(
-    //         c => c.search,
-    //         req,
-    //         f => f,
-    //     );
-    // }
-
     public async GetProjectById(projectId: string): Promise<Project> {
         const req = new ProjectID();
         req.setId(projectId);
@@ -113,12 +114,12 @@ export class ProjectService {
         );
     }
 
-    public async GetGrantedProjectGrantByID(projectId: string, id: string): Promise<GrantedProject> {
+    public async GetGrantedProjectByID(projectId: string, id: string): Promise<ProjectGrantView> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
         return await this.request(
-            c => c.getGrantedProjectGrantByID,
+            c => c.getGrantedProjectByID,
             req,
             f => f,
         );

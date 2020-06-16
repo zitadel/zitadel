@@ -4169,80 +4169,80 @@ proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.se
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest,
- *   !proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse>}
+ *   !proto.caos.zitadel.management.api.v1.ProjectSearchRequest,
+ *   !proto.caos.zitadel.management.api.v1.ProjectSearchResponse>}
  */
-const methodDescriptor_ManagementService_SearchGrantedProjects = new grpc.web.MethodDescriptor(
-  '/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects',
+const methodDescriptor_ManagementService_SearchProjects = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.management.api.v1.ManagementService/SearchProjects',
   grpc.web.MethodType.UNARY,
-  proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest,
-  proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse,
+  proto.caos.zitadel.management.api.v1.ProjectSearchRequest,
+  proto.caos.zitadel.management.api.v1.ProjectSearchResponse,
   /**
-   * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request
+   * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.deserializeBinary
+  proto.caos.zitadel.management.api.v1.ProjectSearchResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest,
- *   !proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse>}
+ *   !proto.caos.zitadel.management.api.v1.ProjectSearchRequest,
+ *   !proto.caos.zitadel.management.api.v1.ProjectSearchResponse>}
  */
-const methodInfo_ManagementService_SearchGrantedProjects = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse,
+const methodInfo_ManagementService_SearchProjects = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.management.api.v1.ProjectSearchResponse,
   /**
-   * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request
+   * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse.deserializeBinary
+  proto.caos.zitadel.management.api.v1.ProjectSearchResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request The
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse)}
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.management.api.v1.ProjectSearchResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.management.api.v1.ProjectSearchResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.caos.zitadel.management.api.v1.ManagementServiceClient.prototype.searchGrantedProjects =
+proto.caos.zitadel.management.api.v1.ManagementServiceClient.prototype.searchProjects =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects',
+      '/caos.zitadel.management.api.v1.ManagementService/SearchProjects',
       request,
       metadata || {},
-      methodDescriptor_ManagementService_SearchGrantedProjects,
+      methodDescriptor_ManagementService_SearchProjects,
       callback);
 };
 
 
 /**
- * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request The
+ * @param {!proto.caos.zitadel.management.api.v1.ProjectSearchRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.caos.zitadel.management.api.v1.GrantedProjectSearchResponse>}
+ * @return {!Promise<!proto.caos.zitadel.management.api.v1.ProjectSearchResponse>}
  *     A native promise that resolves to the response
  */
-proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.searchGrantedProjects =
+proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.searchProjects =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects',
+      '/caos.zitadel.management.api.v1.ManagementService/SearchProjects',
       request,
       metadata || {},
-      methodDescriptor_ManagementService_SearchGrantedProjects);
+      methodDescriptor_ManagementService_SearchProjects);
 };
 
 
@@ -4649,14 +4649,94 @@ proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.re
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.caos.zitadel.management.api.v1.ProjectGrantID,
- *   !proto.caos.zitadel.management.api.v1.GrantedProject>}
+ *   !proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest,
+ *   !proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse>}
  */
-const methodDescriptor_ManagementService_GetGrantedProjectGrantByID = new grpc.web.MethodDescriptor(
-  '/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectGrantByID',
+const methodDescriptor_ManagementService_SearchGrantedProjects = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest,
+  proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse,
+  /**
+   * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest,
+ *   !proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse>}
+ */
+const methodInfo_ManagementService_SearchGrantedProjects = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse,
+  /**
+   * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.management.api.v1.ManagementServiceClient.prototype.searchGrantedProjects =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects',
+      request,
+      metadata || {},
+      methodDescriptor_ManagementService_SearchGrantedProjects,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.management.api.v1.GrantedProjectSearchRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.management.api.v1.ProjectGrantSearchResponse>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.searchGrantedProjects =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects',
+      request,
+      metadata || {},
+      methodDescriptor_ManagementService_SearchGrantedProjects);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.management.api.v1.ProjectGrantID,
+ *   !proto.caos.zitadel.management.api.v1.ProjectGrantView>}
+ */
+const methodDescriptor_ManagementService_GetGrantedProjectByID = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID',
   grpc.web.MethodType.UNARY,
   proto.caos.zitadel.management.api.v1.ProjectGrantID,
-  proto.caos.zitadel.management.api.v1.GrantedProject,
+  proto.caos.zitadel.management.api.v1.ProjectGrantView,
   /**
    * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantID} request
    * @return {!Uint8Array}
@@ -4664,7 +4744,7 @@ const methodDescriptor_ManagementService_GetGrantedProjectGrantByID = new grpc.w
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.management.api.v1.GrantedProject.deserializeBinary
+  proto.caos.zitadel.management.api.v1.ProjectGrantView.deserializeBinary
 );
 
 
@@ -4672,10 +4752,10 @@ const methodDescriptor_ManagementService_GetGrantedProjectGrantByID = new grpc.w
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
  *   !proto.caos.zitadel.management.api.v1.ProjectGrantID,
- *   !proto.caos.zitadel.management.api.v1.GrantedProject>}
+ *   !proto.caos.zitadel.management.api.v1.ProjectGrantView>}
  */
-const methodInfo_ManagementService_GetGrantedProjectGrantByID = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.caos.zitadel.management.api.v1.GrantedProject,
+const methodInfo_ManagementService_GetGrantedProjectByID = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.management.api.v1.ProjectGrantView,
   /**
    * @param {!proto.caos.zitadel.management.api.v1.ProjectGrantID} request
    * @return {!Uint8Array}
@@ -4683,7 +4763,7 @@ const methodInfo_ManagementService_GetGrantedProjectGrantByID = new grpc.web.Abs
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.management.api.v1.GrantedProject.deserializeBinary
+  proto.caos.zitadel.management.api.v1.ProjectGrantView.deserializeBinary
 );
 
 
@@ -4692,18 +4772,18 @@ const methodInfo_ManagementService_GetGrantedProjectGrantByID = new grpc.web.Abs
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.caos.zitadel.management.api.v1.GrantedProject)}
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.management.api.v1.ProjectGrantView)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.management.api.v1.GrantedProject>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.management.api.v1.ProjectGrantView>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.caos.zitadel.management.api.v1.ManagementServiceClient.prototype.getGrantedProjectGrantByID =
+proto.caos.zitadel.management.api.v1.ManagementServiceClient.prototype.getGrantedProjectByID =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectGrantByID',
+      '/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID',
       request,
       metadata || {},
-      methodDescriptor_ManagementService_GetGrantedProjectGrantByID,
+      methodDescriptor_ManagementService_GetGrantedProjectByID,
       callback);
 };
 
@@ -4713,16 +4793,16 @@ proto.caos.zitadel.management.api.v1.ManagementServiceClient.prototype.getGrante
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.caos.zitadel.management.api.v1.GrantedProject>}
+ * @return {!Promise<!proto.caos.zitadel.management.api.v1.ProjectGrantView>}
  *     A native promise that resolves to the response
  */
-proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.getGrantedProjectGrantByID =
+proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.getGrantedProjectByID =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectGrantByID',
+      '/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID',
       request,
       metadata || {},
-      methodDescriptor_ManagementService_GetGrantedProjectGrantByID);
+      methodDescriptor_ManagementService_GetGrantedProjectByID);
 };
 
 

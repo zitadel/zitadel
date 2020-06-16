@@ -2,7 +2,7 @@
 <div mat-dialog-content>
     <p translate>{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
     <div class="qrcode-wrapper">
-        <qrcode *ngIf="data" class="qrcode" [qrdata]="data" [size]="150" [level]="'M'"></qrcode>
+        <qrcode *ngIf="data" class="qrcode" [qrdata]="data" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
     </div>
 
     <mat-form-field label="Access Code" required="true">

@@ -9,7 +9,6 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     ApplicationSearchResponse,
-    GrantedProject,
     Project,
     ProjectMember,
     ProjectMemberSearchResponse,
@@ -23,14 +22,14 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-detail',
-    templateUrl: './project-detail.component.html',
-    styleUrls: ['./project-detail.component.scss'],
+    selector: 'app-owned-project-detail',
+    templateUrl: './owned-project-detail.component.html',
+    styleUrls: ['./owned-project-detail.component.scss'],
 
 })
-export class ProjectDetailComponent implements OnInit, OnDestroy {
+export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: Project.AsObject | GrantedProject.AsObject;
+    public project!: Project.AsObject;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -84,6 +83,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         if (this.projectId) {
             this.projectService.GetProjectById(id).then(proj => {
                 this.project = proj.toObject();
+                console.log(this.project);
                 this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
                     const ret = appsResp.toObject().resultList
                         .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;

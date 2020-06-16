@@ -3,18 +3,18 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { GrantedProject, Project } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-list',
-    templateUrl: './project-list.component.html',
-    styleUrls: ['./project-list.component.scss'],
+    selector: 'app-granted-project-list',
+    templateUrl: './granted-project-list.component.html',
+    styleUrls: ['./granted-project-list.component.scss'],
     animations: [
         trigger('list', [
             transition(':enter', [
@@ -35,12 +35,15 @@ import { ToastService } from 'src/app/services/toast.service';
         ]),
     ],
 })
-export class ProjectListComponent implements OnInit, OnDestroy {
+export class GrantedProjectListComponent implements OnInit, OnDestroy {
     public totalResult: number = 0;
-    public dataSource: MatTableDataSource<GrantedProject.AsObject> = new MatTableDataSource<GrantedProject.AsObject>();
-    public projectList: GrantedProject.AsObject[] = [];
+    public dataSource: MatTableDataSource<ProjectGrantView.AsObject> =
+        new MatTableDataSource<ProjectGrantView.AsObject>();
+
+    public grantedProjectList: ProjectGrantView.AsObject[] = [];
     public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'type', 'state', 'creationDate', 'changeDate'];
-    public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
+    public selection: SelectionModel<ProjectGrantView.AsObject> = new SelectionModel<ProjectGrantView.AsObject>(true, []);
+
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -49,13 +52,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router,
         public translate: TranslateService,
-        private route: ActivatedRoute,
         private projectService: ProjectService,
         private toast: ToastService,
     ) { }
 
     public ngOnInit(): void {
-        this.subscription = this.route.params.subscribe(() => this.getData(10, 0));
+        this.getData(10, 0);
     }
 
     public ngOnDestroy(): void {
@@ -83,14 +85,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     }
 
     private async getData(limit: number, offset: number): Promise<void> {
-        console.log('getprojects');
         this.loadingSubject.next(true);
         this.projectService.SearchGrantedProjects(limit, offset).then(res => {
-            this.projectList = res.toObject().resultList;
+            this.grantedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
-            this.dataSource.data = this.projectList;
+            this.dataSource.data = this.grantedProjectList;
             this.loadingSubject.next(false);
-            console.log(this.projectList);
+            console.log(this.grantedProjectList);
         }).catch(error => {
             console.error(error);
             this.toast.showError(error.message);

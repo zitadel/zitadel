@@ -1,6 +1,6 @@
 <div class="view-toggle">
     <div class="anim-list" @list *ngIf="selection.selected.length > 0">
-        <ng-template appHasRole [appHasRole]="['project.write']">
+        <!-- <ng-template appHasRole [appHasRole]="['project.write']">
             <button (click)="deactivateProjects(selection.selected)" @animate
                 matTooltip="{{'PROJECT.TABLE.DEACTIVATE' | translate}}" class="left-button" mat-icon-button>
                 <i class="las la-toggle-off"></i>
@@ -9,13 +9,12 @@
                 matTooltip="{{'PROJECT.TABLE.ACTIVATE' | translate}}" mat-icon-button>
                 <i class="las la-toggle-on"></i>
             </button>
-        </ng-template>
+        </ng-template> -->
     </div>
     <button [disabled]="selection.selected.length > 0" (click)="changedView.emit(true)" mat-icon-button>
         <i class="show list view las la-th-list"></i>
     </button>
 </div>
-
 <div class="container">
     <mat-progress-bar *ngIf="loading" class="spinner" color="accent" mode="indeterminate"></mat-progress-bar>
     <div class="item card" *ngFor="let item of items; index as i" (click)="selectItem(item, $event)"
@@ -27,10 +26,10 @@
                 {{
                         dateFromTimestamp(item.changeDate) | date: 'EEE dd. MMM, HH:mm'
             }}</span>
-            <span class="name" *ngIf="item.name">{{ item.name }}</span>
+            <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
             <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span>
-            <span class="description" *ngIf="item.type !== undefined">{{'PROJECT.TYPE.TITLE' | translate}}:
-                {{'PROJECT.TYPE.'+item.type | translate}}</span>
+            <span class="description">{{'PROJECT.TYPE.TITLE' | translate}}:
+                {{'PROJECT.TYPE.'+ProjectType.PROJECTTYPE_GRANTED | translate}}</span>
             <span *ngIf="item.changeDate" class="created">created on
                 {{
                         dateFromTimestamp(item.creationDate) | date: 'EEE dd. MMM, HH:mm'
@@ -55,8 +54,5 @@
             </ng-template>
         </mat-menu>
     </div>
-    <div class="add-project-button card" (click)="addItem()">
-        <mat-icon class="icon">add</mat-icon>
-        <span>Add new project</span>
-    </div>
+    <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
 </div>

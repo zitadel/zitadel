@@ -9,7 +9,7 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     ApplicationSearchResponse,
-    GrantedProject,
+    ProjectGrantView,
     ProjectMember,
     ProjectMemberSearchResponse,
     ProjectRole,
@@ -29,7 +29,7 @@ import { ToastService } from 'src/app/services/toast.service';
 export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public grantId: string = '';
-    public project!: GrantedProject.AsObject;
+    public project!: ProjectGrantView.AsObject;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -82,7 +82,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         this.grantId = grantId;
 
         if (this.projectId && this.grantId) {
-            this.projectService.GetGrantedProjectGrantByID(this.projectId, this.grantId).then(proj => {
+            this.projectService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
                 console.log(this.project);
                 this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {

@@ -1,17 +1,17 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { OrgMember } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectMemberSearchResponse } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 
 /**
- * Data source for the OrgMembers view. This class should
+ * Data source for the ProjectMembers view. This class should
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class OrgMembersDataSource extends DataSource<OrgMember.AsObject> {
+export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject> {
     public totalResult: number = 0;
-    public membersSubject: BehaviorSubject<OrgMember.AsObject[]> = new BehaviorSubject<OrgMember.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<ProjectMember.AsObject[]> = new BehaviorSubject<ProjectMember.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -19,21 +19,27 @@ export class OrgMembersDataSource extends DataSource<OrgMember.AsObject> {
         super();
     }
 
-    public loadMembers(pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadMembers(
+        pageIndex: number, pageSize: number, grantId?: string, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.orgService.SearchMyOrgMembers(pageSize, offset)).pipe(
-            map(resp => {
-                this.totalResult = resp.toObject().totalResult;
-                return resp.toObject().resultList;
-            }),
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false)),
-        ).subscribe(members => {
-            console.log(members);
-            this.membersSubject.next(members);
-        });
+        // TODO
+        const promise: Promise<ProjectMemberSearchResponse> =
+            this.orgService.SearchMyOrgMembers(pageSize, offset);
+        if (promise) {
+            from(promise).pipe(
+                map(resp => {
+                    this.totalResult = resp.toObject().totalResult;
+                    console.log(this.totalResult);
+                    return resp.toObject().resultList;
+                }),
+                catchError(() => of([])),
+                finalize(() => this.loadingSubject.next(false)),
+            ).subscribe(members => {
+                this.membersSubject.next(members);
+            });
+        }
     }
 
 
@@ -42,7 +48,7 @@ export class OrgMembersDataSource extends DataSource<OrgMember.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<OrgMember.AsObject[]> {
+    public connect(): Observable<ProjectMember.AsObject[]> {
         return this.membersSubject.asObservable();
     }
 
