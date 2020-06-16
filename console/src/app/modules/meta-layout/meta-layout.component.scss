@@ -22,7 +22,6 @@
 		@media only screen and (min-width: 1500px) {
 			flex-basis: 400px;
 		}
-		// overflow-y: auto;
         padding: 1rem;
         
         .meta-content {
@@ -78,10 +77,10 @@
     }
     
 
-	@media only screen and (max-width: 700px) {
-        flex-direction: column;
-        .main-content, .meta {
-            overflow-y: visible;
-        }
-    }
+	// @media only screen and (max-width: 700px) {
+    //     flex-direction: column;
+    //     .main-content, .meta {
+    //         overflow-y: visible;
+    //     }
+    // }
 }
