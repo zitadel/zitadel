@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
-import { ProjectDetailComponent } from './project-detail/project-detail.component';
+import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
 import { ProjectsComponent } from './projects.component';
 
 const routes: Routes = [
@@ -22,7 +22,7 @@ const routes: Routes = [
     },
     {
         path: ':id',
-        component: ProjectDetailComponent,
+        component: OwnedProjectDetailComponent,
         data: { animation: 'HomePage' },
     },
     {

@@ -33,12 +33,12 @@ import { UserListModule } from '../user-list/user-list.module';
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { GrantedProjectGridComponent } from './granted-project-grid/granted-project-grid.component';
 import { GrantedProjectListComponent } from './granted-project-list/granted-project-list.component';
+import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
 import { OwnedProjectGridComponent } from './owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
 import { ProjectApplicationGridComponent } from './project-application-grid/project-application-grid.component';
 import { ProjectApplicationsComponent } from './project-applications/project-applications.component';
 import { ProjectContributorsComponent } from './project-contributors/project-contributors.component';
-import { ProjectDetailComponent } from './project-detail/project-detail.component';
 import {
     ProjectGrantMembersCreateDialogComponent,
 } from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
@@ -51,16 +51,18 @@ import { ProjectsComponent } from './projects.component';
     declarations: [
         GrantedProjectListComponent,
         GrantedProjectGridComponent,
+        GrantedProjectDetailComponent,
+
         OwnedProjectListComponent,
         OwnedProjectGridComponent,
-        ProjectDetailComponent,
+        OwnedProjectDetailComponent,
+
         ProjectApplicationsComponent,
         ProjectApplicationGridComponent,
         ProjectGrantsComponent,
         ProjectGrantMembersComponent,
         ProjectGrantMembersCreateDialogComponent,
         ProjectContributorsComponent,
-        GrantedProjectDetailComponent,
         ProjectsComponent,
     ],
     imports: [

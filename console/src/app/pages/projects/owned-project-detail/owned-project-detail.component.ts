@@ -22,12 +22,12 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-detail',
-    templateUrl: './project-detail.component.html',
-    styleUrls: ['./project-detail.component.scss'],
+    selector: 'app-owned-project-detail',
+    templateUrl: './owned-project-detail.component.html',
+    styleUrls: ['./owned-project-detail.component.scss'],
 
 })
-export class ProjectDetailComponent implements OnInit, OnDestroy {
+export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public project!: Project.AsObject;
 
