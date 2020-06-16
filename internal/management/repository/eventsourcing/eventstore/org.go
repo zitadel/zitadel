@@ -70,6 +70,14 @@ func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string)
 	return repo.OrgEventstore.RemoveOrgDomain(ctx, d)
 }
 
+func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
+	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit)
+	if err != nil {
+		return nil, err
+	}
+	return changes, nil
+}
+
 func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (member *org_model.OrgMember, err error) {
 	member = org_model.NewOrgMember(orgID, userID)
 	return repo.OrgEventstore.OrgMemberByIDs(ctx, member)

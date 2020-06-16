@@ -3,6 +3,10 @@ package eventsourcing
 import (
 	"context"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"encoding/json"
+	"log"
+
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -10,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/golang/protobuf/ptypes"
 )
 
 type OrgEventstore struct {
@@ -189,6 +194,60 @@ func (es *OrgEventstore) RemoveOrgDomain(ctx context.Context, domain *org_model.
 		return err
 	}
 	return nil
+}
+
+func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
+	query := ChangesQuery(id, lastSequence)
+
+	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-328b1", "unable to get current user")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "no objects found")
+	}
+
+	result := make([]*org_model.OrgChange, 0)
+
+	for _, u := range events {
+		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
+		change := &org_model.OrgChange{
+			ChangeDate: creationDate,
+			EventType:  u.Type.String(),
+			Modifier:   u.EditorUser,
+			Sequence:   u.Sequence,
+		}
+
+		orgDummy := model.Org{}
+		if u.Data != nil {
+			if err := json.Unmarshal(u.Data, &orgDummy); err != nil {
+				log.Println("Error getting data!", err.Error())
+			}
+		}
+		change.Data = orgDummy
+
+		result = append(result, change)
+		if lastSequence < u.Sequence {
+			lastSequence = u.Sequence
+		}
+	}
+
+	changes := &org_model.OrgChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}
+
+	return changes, nil
+}
+
+func ChangesQuery(orgID string, latestSequence uint64) *es_models.SearchQuery {
+	query := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.OrgAggregate).
+		LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(orgID)
+	return query
 }
 
 func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {

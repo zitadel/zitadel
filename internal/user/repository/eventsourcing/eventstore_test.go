@@ -4,6 +4,7 @@ import (
 	"context"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"encoding/json"
 	"net"
 	"testing"
 	"time"
@@ -3254,6 +3255,74 @@ func TestRemoveOTP(t *testing.T) {
 				t.Errorf("result should not get err")
 			}
 			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangesUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es           *UserEventstore
+		id           string
+		secId        string
+		lastSequence uint64
+		limit        uint64
+	}
+	type res struct {
+		changes *model.UserChanges
+		user    *model.Profile
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "changes from events, ok",
+			args: args{
+				es:           GetMockChangesUserOK(ctrl),
+				id:           "1",
+				lastSequence: 0,
+				limit:        0,
+			},
+			res: res{
+				changes: &model.UserChanges{Changes: []*model.UserChange{&model.UserChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				user:    &model.Profile{FirstName: "Hans", LastName: "Muster", UserName: "HansMuster"},
+			},
+		},
+		{
+			name: "changes from events, no events",
+			args: args{
+				es:           GetMockChangesUserNoEvents(ctrl),
+				id:           "2",
+				lastSequence: 0,
+				limit:        0,
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.UserChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
+
+			user := &model.Profile{}
+			if result != nil && len(result.Changes) > 0 {
+				b, err := json.Marshal(result.Changes[0].Data)
+				json.Unmarshal(b, user)
+				if err != nil {
+				}
+			}
+			if !tt.res.wantErr && result.LastSequence != tt.res.changes.LastSequence && user.UserName != tt.res.user.UserName {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.changes.LastSequence, result.LastSequence)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})

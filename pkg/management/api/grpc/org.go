@@ -61,5 +61,9 @@ func (s *Server) RemoveMyOrgDomain(ctx context.Context, in *RemoveOrgDomainReque
 }
 
 func (s *Server) OrgChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-DNiIq", "unimplemented")
+	response, err := s.org.OrgChanges(ctx, changesRequest.Id, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return orgChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }

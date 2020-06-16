@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -85,5 +86,9 @@ func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *Application
 }
 
 func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-due45", "Not implemented")
+	response, err := s.project.ApplicationChanges(ctx, changesRequest.Id, changesRequest.SecId, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return appChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
