@@ -648,7 +648,7 @@ service ManagementService {
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
-            peission: "project.read"
+            permission: "project.read"
             check_field_name: "ProjectId"
         };
     }
