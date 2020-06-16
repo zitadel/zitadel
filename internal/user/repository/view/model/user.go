@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/lib/pq"
 	"time"
 
@@ -142,6 +143,24 @@ func UsersToModel(users []*UserView) []*model.UserView {
 		result[i] = UserToModel(p)
 	}
 	return result
+}
+
+func (u *UserView) GenerateLoginName(domain string) string {
+	return u.UserName + "@" + domain
+}
+
+func (u *UserView) SetLoginNames(policy *org_model.OrgIamPolicy, domains []*org_model.OrgDomain) {
+	loginNames := make([]string, 0)
+	if !policy.UserLoginMustBeDomain {
+		u.LoginNames = []string{u.UserName}
+		return
+	}
+	for _, d := range domains {
+		if d.Verified {
+			loginNames = append(loginNames, u.GenerateLoginName(d.Domain))
+		}
+	}
+	u.LoginNames = loginNames
 }
 
 func (u *UserView) AppendEvent(event *models.Event) (err error) {

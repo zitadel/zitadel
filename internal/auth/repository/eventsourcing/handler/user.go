@@ -101,22 +101,9 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	if err != nil {
 		return err
 	}
-	user.LoginNames = getLoginNames(policy, user.UserName, org.Domains)
-	user.PreferredLoginName = user.UserName + "@" + org.GetPrimaryDomain().Domain
+	user.SetLoginNames(policy, org.Domains)
+	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain)
 	return nil
-}
-
-func getLoginNames(policy *org_model.OrgIamPolicy, userName string, domains []*org_model.OrgDomain) []string {
-	loginNames := make([]string, 0)
-	if !policy.UserLoginMustBeDomain {
-		return []string{userName}
-	}
-	for _, d := range domains {
-		if d.Verified {
-			loginNames = append(loginNames, userName+"@"+d.Domain)
-		}
-	}
-	return loginNames
 }
 
 func (u *User) ProcessOrg(event *models.Event) (err error) {
@@ -152,7 +139,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 		return err
 	}
 	for _, user := range users {
-		user.LoginNames = getLoginNames(policy, user.UserName, org.Domains)
+		user.SetLoginNames(policy, org.Domains)
 		err := u.view.PutUser(user, event.Sequence)
 		if err != nil {
 			return err
@@ -178,7 +165,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 		return err
 	}
 	for _, user := range users {
-		user.PreferredLoginName = user.UserName + "@" + org.GetPrimaryDomain().Domain
+		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain)
 		err := u.view.PutUser(user, 0)
 		if err != nil {
 			return err
