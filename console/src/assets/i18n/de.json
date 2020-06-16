@@ -482,6 +482,8 @@
             "project.member.removed":"Projekt Member gelöscht",
             "project.role.added":"Rolle erstellt",
             "project.role.removed":"Rolle gelöscht",
+            "project.application.added":"App hinzugefügt",
+            "project.application.config.oidc.added":"OIDC config hinzugefügt",            
             "user.email.verification.sended": "User email verifiziert",
             "user.phone.verificationsended":"User phone verifikation gesendet",
             "user.phone.code":"User phone code erstellt",
