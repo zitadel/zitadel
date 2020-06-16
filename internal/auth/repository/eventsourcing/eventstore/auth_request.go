@@ -236,6 +236,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 	for i, session := range userSessions {
 		users[i] = model.UserSelection{
 			UserID:           session.UserID,
+			DisplayName:      session.DisplayName,
 			UserName:         session.UserName,
 			UserSessionState: session.State,
 		}

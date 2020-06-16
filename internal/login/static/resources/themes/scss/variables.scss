@@ -4,7 +4,20 @@ $headerFont: Aileron;
 
 // ----- LAYOUT ------------
 $inputHeight: 50px;
+$retina: "only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx)";
 
+@mixin retina-background-image($file, $type, $hover, $width, $height) {
+  $hovername: '';
+  @if $hover {
+    $hovername: '-hover';
+  }
+  $filename :$file + $hovername;
+  background-image: url($filename + '.' + $type);
+  @media #{$retina} {
+    background-image: url($filename + '@2x.' + $type);
+    background-size: $width $height;
+  }
+}
 
 // ----- DARK-THEME --------
 $backgroundColor: #282828;
@@ -14,6 +27,8 @@ $primaryColorHover: lighten($primaryColor, 10%);
 $labelColor: #898989;
 $inputBorderColor: #595959;
 $inputBackgroundColor: #252525;
+$profileImgDark: "/resources/images/icon-user-dark";
+$otherUserImgDark: "/resources/images/icon-newuser-dark";
 
 
 // ----- LIGHT-THEME --------
@@ -21,3 +36,5 @@ $backgroundColorLight: $fontColor;
 $fontColorLight: $backgroundColor;
 $primaryColorLight: $primaryColor;
 $primaryColorHoverLight: lighten($primaryColorLight, 10%);
+$profileImgLight: "/resources/images/icon-user-light";
+$otherUserImgLight: "/resources/images/icon-newuser-light";

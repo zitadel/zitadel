@@ -30,7 +30,6 @@ func userCreateRequestToModel(user *CreateUserRequest) *usr_model.User {
 	return &usr_model.User{
 		Profile: &usr_model.Profile{
 			UserName:          user.UserName,
-			DisplayName:       user.DisplayName,
 			FirstName:         user.FirstName,
 			LastName:          user.LastName,
 			NickName:          user.NickName,

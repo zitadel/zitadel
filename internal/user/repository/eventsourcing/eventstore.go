@@ -99,6 +99,7 @@ func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequenc
 
 func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
+	user.SetNamesAsDisplayname()
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
@@ -148,6 +149,7 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 
 func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	user.SetEmailAsUsername()
+	user.SetNamesAsDisplayname()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "user is invalid")
 	}

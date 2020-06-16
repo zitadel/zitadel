@@ -42,7 +42,6 @@ func updateProfileToModel(ctx context.Context, u *UpdateUserProfileRequest) *usr
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
-		DisplayName:       u.DisplayName,
 		PreferredLanguage: preferredLanguage,
 		Gender:            genderToModel(u.Gender),
 	}

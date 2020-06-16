@@ -66,7 +66,8 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 		}
 		return u.updateSession(session, event)
 	case es_model.UserPasswordChanged,
-		es_model.MfaOtpRemoved:
+		es_model.MfaOtpRemoved,
+		es_model.UserProfileChanged:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -90,10 +91,8 @@ func (u *UserSession) OnError(event *models.Event, err error) error {
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
 	session.Sequence = event.Sequence
 	session.AppendEvent(event)
-	if session.UserName == "" {
-		if err := u.fillUserInfo(session, event.AggregateID); err != nil {
-			return err
-		}
+	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
+		return err
 	}
 	return u.view.PutUserSession(session)
 }
@@ -104,5 +103,6 @@ func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id strin
 		return err
 	}
 	session.UserName = user.UserName
+	session.DisplayName = user.DisplayName
 	return nil
 }

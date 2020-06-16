@@ -83,10 +83,6 @@ button {
             background-color: $primaryColorHover;
         }
     }
-
-    & > .sessionstate {
-        text-transform: lowercase;
-    }
 }
 
 input:not([type='radio']), select {
@@ -141,6 +137,91 @@ form {
 
         button, a {
             margin: 10px 0;
+        }
+    }
+
+    button.clean {
+        border: none;
+        height: auto;
+        color: $fontColor;
+        text-align: left;
+        text-transform: unset;
+        display: flex;
+
+        &:hover {
+            border: none;
+            background-color: transparent;
+        }
+    }
+
+    button.user-selection {
+        margin-bottom: 25px;
+
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            @include retina-background-image($profileImgDark, "png", false, 100px, 100px);
+        }
+
+        &:hover {
+            .profile-image {
+                @include retina-background-image($profileImgDark, "png", true, 100px, 100px);
+            }
+        }
+
+        .sessionstate {
+            display: inline-block;
+            height: 20px;
+            width: 20px;
+            border-radius: 20px;
+            border-color: $inputBorderColor;
+            border-style: solid;
+            border-width: 1px;
+            position: absolute;
+            bottom: 0px;
+            right: 10px;
+
+            &.sessionstate-0 {
+                background-color: #138D00;
+            }
+
+            &.sessionstate-1 {
+                background-color: #BC372E;
+            }
+        }
+
+
+        & > div {
+            position: relative;
+
+            &.names {
+                margin: 15px;
+
+                .displayname {
+                    font-size: 1.4rem;
+                }
+            }
+        }
+    }
+
+    button.other-user {
+        margin-top: 80px;
+
+        .other-user-image {
+            width: 100px;
+            height: 75px;
+            @include retina-background-image($otherUserImgDark, "png", false, 100px, 75px);
+        }
+
+        &:hover {
+            .other-user-image {
+                @include retina-background-image($otherUserImgDark, "png", true, 100px, 75px);
+            }
+        }
+
+        & > div:nth-of-type(2) {
+            margin: 15px;
+            font-size: 1.4rem;
         }
     }
 }

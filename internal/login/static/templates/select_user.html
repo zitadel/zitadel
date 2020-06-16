@@ -12,13 +12,22 @@
 
     <div class="actions">
         {{ range $user := .Users }}
-        {{ $sessionState := (t (printf "UserSelection.SessionState%v" $user.UserSessionState)) }}
-        <button type="submit" name="userID" value="{{$user.UserID}}" class="primary">
-            <span class="username">{{$user.UserName}}</span>
-            <span class="sessionstate">({{$sessionState}})</span>
+        {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
+        <button type="submit" name="userID" value="{{$user.UserID}}" class="clean user-selection">
+            <div>
+                <div class="profile-image"></div>
+                <div class="sessionstate {{$sessionState}}"></div>
+            </div>
+            <div class="names">
+                <div class="displayname">{{$user.DisplayName}}</div>
+                <div class="username">{{$user.UserName}}</div>
+            </div>
         </button>
         {{ end }}
-        <button type="submit" name="userID" value="0" class="primary">{{t "UserSelection.OtherUser"}}</button>
+        <button type="submit" name="userID" value="0" class="clean other-user">
+            <div class="other-user-image"></div>
+            <div>{{t "UserSelection.OtherUser"}}</div>
+        </button>
     </div>
 </form>
 
