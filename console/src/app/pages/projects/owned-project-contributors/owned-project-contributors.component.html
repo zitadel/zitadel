@@ -7,7 +7,7 @@
                 <ng-container *ngFor="let member of membersSubject | async">
                     <div (click)="showDetail()" class="avatar-circle"
                         matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
-                        <mat-icon>face</mat-icon>
+                        <i class="avatar las la-user-circle"></i>
                     </div>
                 </ng-container>
             </ng-container>

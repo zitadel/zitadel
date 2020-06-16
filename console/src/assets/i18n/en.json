@@ -197,6 +197,10 @@
             "1": "aktiv",
             "2": "inaktiv"
         },
+        "MEMBER": {
+            "TITLE":"Organization Managers",
+            "DESCRIPTION":"Define Accounts which can change your organizations preferences."
+        },
         "POLICY": {
             "TITLE":"Explore Policies",
             "DESCRIPTION":"Pre-packaged solutions that save you time and ensure security",
@@ -473,8 +477,11 @@
         "EVENTS": {
             "org.added": "Org created",
             "org.changed":"Org edited",
-            "org.member.added":"Organization Member created",
-            "org.member.removed":"Organization Member deleted",
+            "org.member.added":"Org Member created",
+            "org.member.removed":"Org Member deleted",
+            "org.domain.added":"Org Domain added",
+            "org.domain.verified":"Org Domain verified",
+            "org.domain.primary.set":"Primary domain set",
             "project.added": "Project created",
             "project.changed":"Project edited",
             "project.deactivated":"Project deactivated",

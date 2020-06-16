@@ -197,6 +197,10 @@
             "1": "aktiv",
             "2": "inaktiv"
         },
+        "MEMBER": {
+            "TITLE":"Organisations Manager verwalten",
+            "DESCRIPTION":"Definieren Sie hier die Accounts, die Operationen auf ihrer Organisationen vornehmen dürfen."
+        },
         "POLICY": {
             "TITLE":"Richtlinen festlegen",
             "DESCRIPTION":"Vorgefertigte Lösungen, die Ihnen Zeit sparen und Ihre Sicherheit gewährleisten",
@@ -475,6 +479,9 @@
             "org.changed":"Org editiert",
             "org.member.added":"Organisation Member erstellt",
             "org.member.removed":"Organisation Member gelöscht",
+            "org.domain.added":"Org Domain hinzugefügt",
+            "org.domain.verified":"Org Domain verifiziert",
+            "org.domain.primary.set":"Primäre domain gesetzt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
             "project.deactivated":"Projekt deaktiviert",

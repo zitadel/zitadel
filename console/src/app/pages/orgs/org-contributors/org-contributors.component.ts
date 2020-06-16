@@ -1,10 +1,11 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
-import { tap } from 'rxjs/operators';
-import { OrgMember, User } from 'src/app/proto/generated/management_pb';
+import { Router } from '@angular/router';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
+import { Org, OrgMember, OrgMemberView, OrgState, User } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -12,61 +13,50 @@ import {
     CreationType,
     ProjectMemberCreateDialogComponent,
 } from '../../../modules/add-member-dialog/project-member-create-dialog.component';
-import { OrgMembersDataSource } from './org-contributors-datasource';
 
 @Component({
     selector: 'app-org-contributors',
     templateUrl: './org-contributors.component.html',
     styleUrls: ['./org-contributors.component.scss'],
 })
-export class OrgContributorsComponent implements AfterViewInit, OnInit {
-    @Input() public orgId: string = '';
+export class OrgContributorsComponent implements OnInit {
+    @Input() public org!: Org.AsObject;
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<OrgMember.AsObject>;
-    @Output() public changedSelection: EventEmitter<Array<OrgMember.AsObject>> = new EventEmitter();
-    public dataSource!: OrgMembersDataSource;
-    public selection: SelectionModel<OrgMember.AsObject> = new SelectionModel<OrgMember.AsObject>(true, []);
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
-    constructor(private orgService: OrgService, private dialog: MatDialog, private toast: ToastService) { }
+    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+    public totalResult: number = 0;
+    public membersSubject: BehaviorSubject<OrgMemberView.AsObject[]>
+        = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
+
+    public OrgState: any = OrgState;
+    constructor(private orgService: OrgService, private dialog: MatDialog,
+        private toast: ToastService,
+        private router: Router) { }
 
     public ngOnInit(): void {
-        this.dataSource = new OrgMembersDataSource(this.orgService);
-        this.dataSource.loadMembers(0, 25, 'asc');
+        this.loadMembers(0, 25, 'asc');
+    }
 
-        this.selection.changed.subscribe(change => {
-            console.log(change);
-            // this.changedSelection.emit(change)
+    public loadMembers(pageIndex: number, pageSize: number, sortDirection?: string): void {
+        const offset = pageIndex * pageSize;
+
+        this.loadingSubject.next(true);
+        from(this.orgService.SearchMyOrgMembers(pageSize, offset)).pipe(
+            map(resp => {
+                this.totalResult = resp.toObject().totalResult;
+                return resp.toObject().resultList;
+            }),
+            catchError(() => of([])),
+            finalize(() => this.loadingSubject.next(false)),
+        ).subscribe(members => {
+            console.log(members);
+            this.membersSubject.next(members);
         });
-    }
-
-    public ngAfterViewInit(): void {
-        this.paginator.page
-            .pipe(
-                tap(() => this.loadMembersPage()),
-            )
-            .subscribe();
-    }
-
-    private loadMembersPage(): void {
-        this.dataSource.loadMembers(
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
-        );
-    }
-
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.membersSubject.value.length;
-        return numSelected === numRows;
-    }
-
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.membersSubject.value.forEach((row: OrgMember.AsObject) => this.selection.select(row));
     }
 
     public openAddMember(): void {
@@ -95,13 +85,9 @@ export class OrgContributorsComponent implements AfterViewInit, OnInit {
         });
     }
 
-    public removeSelectedOrgMembers(): void {
-        Promise.all(this.selection.selected.map(member => {
-            return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-                this.toast.showInfo('Removed successfully');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
-        }));
+    public showDetail(): void {
+        if (this.org?.state === OrgState.ORGSTATE_ACTIVE) {
+            this.router.navigate(['orgs', this.org.id, 'members']);
+        }
     }
 }

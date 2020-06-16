@@ -1,87 +1,25 @@
-<div class="table-header-row">
-    <div class="col">
-        <ng-container *ngIf="!selection.hasValue()">
-            <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
-            <span class="count">{{dataSource.membersSubject.value.length}}</span>
-        </ng-container>
-        <ng-container *ngIf="selection.hasValue()">
-            <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
-            <span class="count">{{selection?.selected?.length}}</span>
-        </ng-container>
+<div class="groups">
+    <span class="header">{{ 'PROJECT.MEMBER.TITLE' | translate }}</span>
+    <span class="sub-header">{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}</span>
+    <div class="people">
+        <div class="img-list">
+            <ng-container *ngIf="totalResult < 10; else compact">
+                <ng-container *ngFor="let member of membersSubject | async">
+                    <div (click)="showDetail()" class="avatar-circle"
+                        matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
+                        <i class="avatar las la-user-circle"></i>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #compact>
+                <div (click)="showDetail()" class="avatar-circle" matTooltip="Click to show detail">
+                    <span>{{totalResult}}</span>
+                </div>
+            </ng-template>
+            <button class="add-img" (click)="openAddMember()" [disabled]="org?.state !== OrgState.ORGSTATE_ACTIVE"
+                mat-icon-button aria-label="Edit contributors">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
     </div>
-    <span class="fill-space"></span>
-    <ng-template appHasRole [appHasRole]="['org.member.delete']">
-        <button [disabled]="disabled" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button"
-            (click)="removeSelectedOrgMembers()" mat-icon-button *ngIf="selection.hasValue()">
-            <mat-icon>delete_outline</mat-icon>
-        </button>
-    </ng-template>
-    <ng-template appHasRole [appHasRole]="['org.member.write']">
-        <button [disabled]="disabled" color="primary" class="add-button" mat-raised-button (click)="openAddMember()">
-            <mat-icon>add</mat-icon>{{ 'ORG_DETAIL.MEMBER.ADD' | translate }}
-        </button>
-    </ng-template>
-</div>
-
-<div class="table-wrapper">
-    <div class="spinner-container" *ngIf="dataSource.loading$ | async">
-        <mat-spinner diameter="50"></mat-spinner>
-    </div>
-    <table mat-table class="background-style full-width-table" aria-label="Elements" [dataSource]="dataSource">
-
-        <ng-container matColumnDef="select">
-            <th class="selection" mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? masterToggle() : null"
-                    [checked]="selection.hasValue() && isAllSelected()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()">
-                </mat-checkbox>
-            </th>
-            <td class="selection" mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)">
-                </mat-checkbox>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="firstname">
-            <th mat-header-cell *matHeaderCellDef> {{ 'ORG_DETAIL.MEMBER.FIRSTNAME' | translate }} </th>
-            <td [routerLink]="['/user', member.userId]" class="pointer" mat-cell *matCellDef="let member">
-                {{member.firstName}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="lastname">
-            <th mat-header-cell *matHeaderCellDef> {{ 'ORG_DETAIL.MEMBER.LASTNAME' | translate }} </th>
-            <td [routerLink]="['/user', member.userId]" class="pointer" mat-cell *matCellDef="let member">
-                {{member.lastName}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="username">
-            <th mat-header-cell *matHeaderCellDef> {{ 'ORG_DETAIL.MEMBER.USERNAME' | translate }} </th>
-            <td [routerLink]="['/user', member.userId]" class="pointer" mat-cell *matCellDef="let member">
-                {{member.userName}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef> {{ 'ORG_DETAIL.MEMBER.EMAIL' | translate }} </th>
-            <td [routerLink]="['/user', member.userId]" class="pointer" mat-cell *matCellDef="let member">
-                {{member.email}}
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="roles">
-            <th mat-header-cell *matHeaderCellDef> {{ 'ORG_DETAIL.MEMBER.ROLES' | translate }} </th>
-            <td [routerLink]="['/user', member.userId]" class="pointer" mat-cell *matCellDef="let member">
-                <span class="role app-label"
-                    *ngFor="let role of member.rolesList; index as i">{{'ROLES.'+role | translate }}</span>
-
-            </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-
-    <mat-paginator class="background-style" #paginator [length]="dataSource.totalResult" [pageSize]="50"
-        [pageSizeOptions]="[25, 50, 100, 250]">
-    </mat-paginator>
 </div>
