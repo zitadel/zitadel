@@ -1,4 +1,4 @@
-# Zitadel
+# ZITADEL
 
 ![ZITADEL](./docs/img/zitadel-logo-oneline-lightdesign@2x.png)
 
