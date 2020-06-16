@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpLoaderFactory } from 'src/app/app.module';
@@ -40,6 +41,7 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         ReactiveFormsModule,
         MatButtonToggleModule,
         MetaLayoutModule,
+        MatTabsModule,
         MatTooltipModule,
         MatMenuModule,
         ChangesModule,
