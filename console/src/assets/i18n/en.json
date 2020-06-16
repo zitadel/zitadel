@@ -296,9 +296,9 @@
         },
         "NAME": "Name",
         "MEMBER": {
-            "TITLE": "Contributors",
-            "TITLEDESC":"Contributors can make changes on this very entity",
-            "DESCRIPTION":"Here you can find all contributors of this project. You can add a new member and manage persisting ones.",
+            "TITLE": "Managers",
+            "TITLEDESC":"Managers can make changes on this very entity, based on their given role in zitadel.",
+            "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage persisting ones.",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
