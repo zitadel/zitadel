@@ -684,7 +684,7 @@ func addUserNameValidation(userName string) func(...*es_models.Event) error {
 		}
 		for _, d := range domains {
 			if d.Verified && d.Domain == split[1] {
-				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "domain already reserverd")
+				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "domain already reserved")
 			}
 		}
 		return nil
