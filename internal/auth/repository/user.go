@@ -25,7 +25,7 @@ type UserRepository interface {
 
 	SignOut(ctx context.Context, agentID, userID string) error
 
-	UserByID(ctx context.Context, userID string) (*model.User, error)
+	UserByID(ctx context.Context, userID string) (*model.UserView, error)
 }
 
 type myUserRepo interface {

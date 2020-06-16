@@ -102,6 +102,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 		return err
 	}
 	user.LoginNames = getLoginNames(policy, user.UserName, org.Domains)
+	user.PreferredLoginName = user.UserName + "@" + org.GetPrimaryDomain().Domain
 	return nil
 }
 
@@ -126,6 +127,8 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 		org_es_model.OrgIamPolicyChanged,
 		org_es_model.OrgIamPolicyRemoved:
 		return u.fillLoginNamesOnOrgUsers(event)
+	case org_es_model.OrgDomainPrimarySet:
+		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
 		return u.view.ProcessedUserSequence(event.Sequence)
 	}
@@ -134,6 +137,7 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 	}
 	return nil
 }
+
 func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
 	if err != nil {
@@ -150,6 +154,32 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	for _, user := range users {
 		user.LoginNames = getLoginNames(policy, user.UserName, org.Domains)
 		err := u.view.PutUser(user, event.Sequence)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
+	org, err := u.orgEvents.OrgByID(context.Background(), org_model.NewOrg(event.ResourceOwner))
+	if err != nil {
+		return err
+	}
+	policy, err := u.orgEvents.GetOrgIamPolicy(context.Background(), event.ResourceOwner)
+	if err != nil {
+		return err
+	}
+	if !policy.UserLoginMustBeDomain {
+		return nil
+	}
+	users, err := u.view.UsersByOrgID(event.AggregateID)
+	if err != nil {
+		return err
+	}
+	for _, user := range users {
+		user.PreferredLoginName = user.UserName + "@" + org.GetPrimaryDomain().Domain
+		err := u.view.PutUser(user, 0)
 		if err != nil {
 			return err
 		}

@@ -209,6 +209,23 @@
         ]
       }
     },
+    "/iam": {
+      "get": {
+        "summary": "IAM",
+        "operationId": "GetIam",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Iam"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/orgs/me/domains": {
       "post": {
         "operationId": "AddMyOrgDomain",
@@ -2663,7 +2680,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1User"
+              "$ref": "#/definitions/v1UserView"
             }
           }
         },
@@ -2904,7 +2921,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserAddress"
+              "$ref": "#/definitions/v1UserAddressView"
             }
           }
         },
@@ -3003,7 +3020,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserEmail"
+              "$ref": "#/definitions/v1UserEmailView"
             }
           }
         },
@@ -3115,7 +3132,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserPhone"
+              "$ref": "#/definitions/v1UserPhoneView"
             }
           }
         },
@@ -3202,7 +3219,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserProfile"
+              "$ref": "#/definitions/v1UserProfileView"
             }
           }
         },
@@ -3956,6 +3973,25 @@
           "items": {
             "$ref": "#/definitions/v1ProjectSearchQuery"
           }
+        }
+      }
+    },
+    "v1Iam": {
+      "type": "object",
+      "properties": {
+        "global_org_id": {
+          "type": "string"
+        },
+        "iam_project_id": {
+          "type": "string"
+        },
+        "set_up_done": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "set_up_started": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -5960,7 +5996,69 @@
         }
       }
     },
+    "v1UserAddressView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1UserEmail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "is_email_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1UserEmailView": {
       "type": "object",
       "properties": {
         "id": {
@@ -6242,6 +6340,33 @@
         }
       }
     },
+    "v1UserPhoneView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1UserProfile": {
       "type": "object",
       "properties": {
@@ -6280,6 +6405,56 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1UserProfileView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "login_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preferred_login_name": {
+          "type": "string"
         }
       }
     },
@@ -6453,6 +6628,15 @@
           "format": "uint64"
         },
         "resource_owner": {
+          "type": "string"
+        },
+        "login_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preferred_login_name": {
           "type": "string"
         }
       }

@@ -39,6 +39,7 @@ type UserView struct {
 	LastLogin              time.Time      `json:"-" gorm:"column:last_login"`
 	UserName               string         `json:"userName" gorm:"column:user_name"`
 	LoginNames             pq.StringArray `json:"-" gorm:"column:login_names"`
+	PreferredLoginName     string         `json:"-" gorm:"column:preferred_login_name"`
 	FirstName              string         `json:"firstName" gorm:"column:first_name"`
 	LastName               string         `json:"lastName" gorm:"column:last_name"`
 	NickName               string         `json:"nickName" gorm:"column:nick_name"`
@@ -74,6 +75,7 @@ func UserFromModel(user *model.UserView) *UserView {
 		LastLogin:              user.LastLogin,
 		UserName:               user.UserName,
 		LoginNames:             user.LoginNames,
+		PreferredLoginName:     user.PreferredLanguage,
 		FirstName:              user.FirstName,
 		LastName:               user.LastName,
 		NickName:               user.NickName,
@@ -108,6 +110,7 @@ func UserToModel(user *UserView) *model.UserView {
 		PasswordChangeRequired: user.PasswordChangeRequired,
 		PasswordChanged:        user.PasswordChanged,
 		LastLogin:              user.LastLogin,
+		PreferredLoginName:     user.PreferredLanguage,
 		UserName:               user.UserName,
 		FirstName:              user.FirstName,
 		LastName:               user.LastName,

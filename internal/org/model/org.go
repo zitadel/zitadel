@@ -2,8 +2,8 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"strings"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"strings"
 )
 
 type Org struct {
@@ -55,6 +55,15 @@ func (o *Org) ContainsDomain(domain *OrgDomain) bool {
 		}
 	}
 	return false
+}
+
+func (o *Org) GetPrimaryDomain() *OrgDomain {
+	for _, d := range o.Domains {
+		if d.Primary {
+			return d
+		}
+	}
+	return nil
 }
 
 func (o *Org) ContainsMember(userID string) bool {

@@ -2,11 +2,13 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -63,7 +65,11 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
-	return repo.UserEvents.ProfileByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetProfile(), nil
 }
 
 func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error) {
@@ -74,7 +80,11 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 }
 
 func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
-	return repo.UserEvents.EmailByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetEmail(), nil
 }
 
 func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error) {
@@ -101,7 +111,11 @@ func (repo *UserRepo) ResendMyEmailVerificationMail(ctx context.Context) error {
 }
 
 func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
-	return repo.UserEvents.PhoneByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetPhone(), nil
 }
 
 func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error) {
@@ -120,7 +134,11 @@ func (repo *UserRepo) ResendMyPhoneVerificationCode(ctx context.Context) error {
 }
 
 func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
-	return repo.UserEvents.AddressByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetAddress(), nil
 }
 
 func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error) {
@@ -205,8 +223,23 @@ func (repo *UserRepo) SignOut(ctx context.Context, agentID, userID string) error
 	return repo.UserEvents.SignOut(ctx, agentID, userID)
 }
 
-func (repo *UserRepo) UserByID(ctx context.Context, userID string) (*model.User, error) {
-	return repo.UserEvents.UserByID(ctx, userID)
+func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView, error) {
+	user, err := repo.View.UserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	events, err := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	if err != nil {
+		logging.Log("EVENT-PSoc3").WithError(err).Debug("error retrieving new events")
+		return usr_view_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return usr_view_model.UserToModel(user), nil
+		}
+	}
+	return usr_view_model.UserToModel(&userCopy), nil
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
