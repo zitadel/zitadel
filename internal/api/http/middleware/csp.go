@@ -76,58 +76,50 @@ func CSPSourceOptsSelf() CSPSourceOptions {
 	return []string{"'self'"}
 }
 
-func (srcOpts *CSPSourceOptions) AddSelf() *CSPSourceOptions {
-	*srcOpts = append(*srcOpts, "'self'")
-	return srcOpts
+func (srcOpts CSPSourceOptions) AddSelf() CSPSourceOptions {
+	return append(srcOpts, "'self'")
 }
 
-func (srcOpts *CSPSourceOptions) AddInline() *CSPSourceOptions {
-	*srcOpts = append(*srcOpts, "'unsafe-inline'")
-	return srcOpts
+func (srcOpts CSPSourceOptions) AddInline() CSPSourceOptions {
+	return append(srcOpts, "'unsafe-inline'")
 }
 
-func (srcOpts *CSPSourceOptions) AddEval() *CSPSourceOptions {
-	*srcOpts = append(*srcOpts, "'unsafe-eval'")
-	return srcOpts
+func (srcOpts CSPSourceOptions) AddEval() CSPSourceOptions {
+	return append(srcOpts, "'unsafe-eval'")
 }
 
-func (srcOpts *CSPSourceOptions) AddStrictDynamic() *CSPSourceOptions {
-	*srcOpts = append(*srcOpts, "'strict-dynamic'")
-	return srcOpts
+func (srcOpts CSPSourceOptions) AddStrictDynamic() CSPSourceOptions {
+	return append(srcOpts, "'strict-dynamic'")
 }
 
-func (srcOpts *CSPSourceOptions) AddHost(h ...string) *CSPSourceOptions {
-	*srcOpts = append(*srcOpts, h...)
-	return srcOpts
+func (srcOpts CSPSourceOptions) AddHost(h ...string) CSPSourceOptions {
+	return append(srcOpts, h...)
 }
 
-func (srcOpts *CSPSourceOptions) AddScheme(s ...string) *CSPSourceOptions {
+func (srcOpts CSPSourceOptions) AddScheme(s ...string) CSPSourceOptions {
 	return srcOpts.add(s, "%v:")
 }
 
-func (srcOpts *CSPSourceOptions) AddNonce() *CSPSourceOptions {
-	*srcOpts = append(*srcOpts, "'nonce-%v'")
-	return srcOpts
+func (srcOpts CSPSourceOptions) AddNonce() CSPSourceOptions {
+	return append(srcOpts, "'nonce-%v'")
 }
 
-func (srcOpts *CSPSourceOptions) AddHash(alg, b64v string) *CSPSourceOptions {
-	*srcOpts = append(*srcOpts, fmt.Sprintf("'%v-%v'", alg, b64v))
-	return srcOpts
+func (srcOpts CSPSourceOptions) AddHash(alg, b64v string) CSPSourceOptions {
+	return append(srcOpts, fmt.Sprintf("'%v-%v'", alg, b64v))
 }
 
-func (srcOpts *CSPSourceOptions) String(nonce string) string {
-	value := strings.Join(*srcOpts, " ")
+func (srcOpts CSPSourceOptions) String(nonce string) string {
+	value := strings.Join(srcOpts, " ")
 	if !strings.Contains(value, "%v") {
 		return value
 	}
 	return fmt.Sprintf(value, nonce)
 }
 
-func (srcOpts *CSPSourceOptions) add(values []string, format string) *CSPSourceOptions {
+func (srcOpts CSPSourceOptions) add(values []string, format string) CSPSourceOptions {
 	for i, v := range values {
 		values[i] = fmt.Sprintf(format, v)
 	}
 
-	*srcOpts = append(*srcOpts, values...)
-	return srcOpts
+	return append(srcOpts, values...)
 }
