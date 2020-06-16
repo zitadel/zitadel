@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type Project struct {
@@ -13,6 +14,18 @@ type Project struct {
 	Roles        []*ProjectRole
 	Applications []*Application
 	Grants       []*ProjectGrant
+}
+type ProjectChanges struct {
+	Changes      []*ProjectChange
+	LastSequence uint64
+}
+
+type ProjectChange struct {
+	ChangeDate *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType  string               `json:"eventType,omitempty"`
+	Sequence   uint64               `json:"sequence,omitempty"`
+	Modifier   string               `json:"modifierUser,omitempty"`
+	Data       interface{}          `json:"data,omitempty"`
 }
 
 type ProjectState int32

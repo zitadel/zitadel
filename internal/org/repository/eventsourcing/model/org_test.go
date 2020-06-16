@@ -74,10 +74,10 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgChanged, Data: []byte(`{"domain": "OrgDomain"}`)},
-				org:   &Org{Name: "OrgName", Domain: "asdf"},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgChanged, Data: []byte(`{"name": "OrgName}`)},
+				org:   &Org{Name: "OrgNameChanged"},
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgName", Domain: "OrgDomain"},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgNameChanged"},
 		},
 		{
 			name: "append deactivate event",
@@ -90,6 +90,13 @@ func TestAppendEvent(t *testing.T) {
 			name: "append reactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgReactivated},
+			},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE)},
+		},
+		{
+			name: "append added domain event",
+			args: args{
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgDomainAdded},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE)},
 		},
@@ -133,16 +140,6 @@ func TestChanges(t *testing.T) {
 			args: args{
 				existing: &Org{Name: "Name"},
 				new:      &Org{Name: "NameChanged"},
-			},
-			res: res{
-				changesLen: 1,
-			},
-		},
-		{
-			name: "org domain changes",
-			args: args{
-				existing: &Org{Name: "Name", Domain: "old domain"},
-				new:      &Org{Name: "Name", Domain: "new domain"},
 			},
 			res: res{
 				changesLen: 1,

@@ -8,7 +8,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
@@ -123,7 +123,7 @@ func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_mode
 	return resp
 }
 
-func orgRespToOrgResp(orgs []*org_view.OrgView, count int) *grant_model.ProjectOrgSearchResponse {
+func orgRespToOrgResp(orgs []*org_view_model.OrgView, count int) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
 		TotalResult: uint64(count),
 	}

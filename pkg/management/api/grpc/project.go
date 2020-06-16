@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/auth"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
@@ -124,7 +125,11 @@ func (s *Server) SearchProjectRoles(ctx context.Context, in *ProjectRoleSearchRe
 }
 
 func (s *Server) ProjectChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-mci3f", "Not implemented")
+	response, err := s.project.ProjectChanges(ctx, changesRequest.Id, 0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return projectChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
 
 func (s *Server) IsZitadel(ctx context.Context, projectID string) bool {

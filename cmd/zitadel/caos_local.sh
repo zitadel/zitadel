@@ -49,3 +49,6 @@ export ZITADEL_COOKIE_DOMAIN=localhost
 
 #Console
 export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/
+
+#Org
+export ZITADEL_DEFAULT_DOMAIN=zitadel.ch

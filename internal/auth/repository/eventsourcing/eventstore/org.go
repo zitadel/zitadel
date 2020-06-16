@@ -5,7 +5,7 @@ import (
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/org/repository/view"
+	"github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
 type OrgRepository struct {
@@ -24,6 +24,6 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      view.OrgsToModel(members),
+		Result:      model.OrgsToModel(members),
 	}, nil
 }

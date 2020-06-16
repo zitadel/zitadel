@@ -18,6 +18,7 @@ type UserView struct {
 	PasswordChanged        time.Time
 	LastLogin              time.Time
 	UserName               string
+	LoginNames             []string
 	FirstName              string
 	LastName               string
 	NickName               string
@@ -61,12 +62,13 @@ const (
 	USERSEARCHKEY_EMAIL
 	USERSEARCHKEY_STATE
 	USERSEARCHKEY_RESOURCEOWNER
+	USERSEARCHKEY_LOGIN_NAMES
 )
 
 type UserSearchQuery struct {
 	Key    UserSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type UserSearchResponse struct {

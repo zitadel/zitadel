@@ -46,7 +46,7 @@ const (
 type ApplicationSearchQuery struct {
 	Key    ApplicationSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type ApplicationSearchResponse struct {

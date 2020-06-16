@@ -7,6 +7,8 @@ Login:
   Title: Anmeldung
   Description: Gib deine Benutzerdaten ein.
   Username: Benutzername
+  Loginname: Loginname
+  LoginnamePlaceHolder: username@domain
 
 UserSelection:
   Title: Account auswählen

@@ -1,4 +1,4 @@
-package view
+package model
 
 import (
 	global_model "github.com/caos/zitadel/internal/model"

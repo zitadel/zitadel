@@ -2,8 +2,15 @@ package eventsourcing
 
 import (
 	"context"
+	"encoding/json"
+	"log"
+
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/pquerna/otp/totp"
 
@@ -97,8 +104,8 @@ func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequenc
 	return es.FilterEvents(ctx, query)
 }
 
-func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	user.SetEmailAsUsername()
+func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+	err := user.CheckOrgIamPolicy(orgIamPolicy)
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
@@ -109,7 +116,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	}
 	user.AggregateID = id
 
-	err = user.HashPasswordIfExisting(policy, es.PasswordAlg, true)
+	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -126,13 +133,13 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	repoInitCode := model.InitCodeFromModel(user.InitCode)
 	repoPhoneCode := model.PhoneCodeFromModel(user.PhoneCode)
 
-	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner)
+	createAggregates, err := UserCreateAggregate(ctx, es.AggregateCreator(), repoUser, repoInitCode, repoPhoneCode, resourceOwner, orgIamPolicy.UserLoginMustBeDomain)
 
 	return repoUser, createAggregates, err
 }
 
-func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy) (*usr_model.User, error) {
-	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, policy, "")
+func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
+	repoUser, aggregates, err := es.PrepareCreateUser(ctx, user, pwPolicy, orgIamPolicy, "")
 	if err != nil {
 		return nil, err
 	}
@@ -146,8 +153,11 @@ func (es *UserEventstore) CreateUser(ctx context.Context, user *usr_model.User, 
 	return model.UserToModel(repoUser), nil
 }
 
-func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
-	user.SetEmailAsUsername()
+func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
+	err := user.CheckOrgIamPolicy(orgIamPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.InvalidData")
 	}
@@ -169,12 +179,12 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	repoUser := model.UserFromModel(user)
 	repoEmailCode := model.EmailCodeFromModel(user.EmailCode)
 
-	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode)
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode, orgIamPolicy.UserLoginMustBeDomain)
 	return repoUser, aggregates, err
 }
 
-func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, policy *policy_model.PasswordComplexityPolicy, resourceOwner string) (*usr_model.User, error) {
-	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, policy, resourceOwner)
+func (es *UserEventstore) RegisterUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*usr_model.User, error) {
+	repoUser, createAggregates, err := es.PrepareRegisterUser(ctx, user, pwPolicy, orgIamPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -262,6 +272,60 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	}
 	es.userCache.cacheUser(repoExisting)
 	return model.UserToModel(repoExisting), nil
+}
+
+func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*usr_model.UserChanges, error) {
+	query := ChangesQuery(id, lastSequence)
+
+	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	if err != nil {
+		logging.Log("EVENT-g9HCv").WithError(err).Warn("eventstore unavailable")
+		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "unable to get current user")
+	}
+	if len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6cAxe", "no objects found")
+	}
+
+	result := make([]*usr_model.UserChange, 0)
+
+	for _, u := range events {
+		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+		logging.Log("EVENT-8GTGS").OnError(err).Debug("unable to parse timestamp")
+		change := &usr_model.UserChange{
+			ChangeDate: creationDate,
+			EventType:  u.Type.String(),
+			Modifier:   u.EditorUser,
+			Sequence:   u.Sequence,
+		}
+
+		userDummy := model.Profile{}
+		if u.Data != nil {
+			if err := json.Unmarshal(u.Data, &userDummy); err != nil {
+				log.Println("Error getting data!", err.Error())
+			}
+		}
+		change.Data = userDummy
+
+		result = append(result, change)
+		if lastSequence < u.Sequence {
+			lastSequence = u.Sequence
+		}
+	}
+
+	changes := &usr_model.UserChanges{
+		Changes:      result,
+		LastSequence: lastSequence,
+	}
+
+	return changes, nil
+}
+
+func ChangesQuery(userID string, latestSequence uint64) *es_models.SearchQuery {
+	query := es_models.NewSearchQuery().
+		AggregateTypeFilter(model.UserAggregate).
+		LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(userID)
+	return query
 }
 
 func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {

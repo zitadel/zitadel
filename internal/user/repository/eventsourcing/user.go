@@ -5,7 +5,9 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"strings"
 )
 
 func UserByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
@@ -53,7 +55,7 @@ func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Ag
 	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
 }
 
-func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string) (_ []*es_models.Aggregate, err error) {
+func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string, userLoginMustBeDomain bool) (_ []*es_models.Aggregate, err error) {
 	if user == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user should not be nil")
 	}
@@ -66,6 +68,14 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 	}
 	if err != nil {
 		return nil, err
+	}
+	if !userLoginMustBeDomain {
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(org_es_model.OrgAggregate).
+			AggregateIDsFilter()
+
+		validation := addUserNameValidation(user.UserName)
+		agg.SetPrecondition(validationQuery, validation)
 	}
 
 	agg, err = agg.AppendEvent(model.UserAdded, user)
@@ -107,7 +117,7 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 	}, nil
 }
 
-func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, emailCode *model.EmailCode) ([]*es_models.Aggregate, error) {
+func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, emailCode *model.EmailCode, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
 	if user == nil || resourceOwner == "" || emailCode == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user, resourceowner, emailcode should not be nothing")
 	}
@@ -117,6 +127,14 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 		return nil, err
 	}
 
+	if !userLoginMustBeDomain {
+		validationQuery := es_models.NewSearchQuery().
+			AggregateTypeFilter(org_es_model.OrgAggregate).
+			AggregateIDsFilter()
+
+		validation := addUserNameValidation(user.UserName)
+		agg.SetPrecondition(validationQuery, validation)
+	}
 	agg, err = agg.AppendEvent(model.UserRegistered, user)
 	if err != nil {
 		return nil, err
@@ -152,9 +170,9 @@ func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.Aggregat
 	}, nil
 }
 func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userName string) (*es_models.Aggregate, error) {
-	aggregate, err := aggCreator.NewAggregate(ctx, userName, model.UserUserNameAggregate, model.UserVersion, 0)
+	aggregate, err := aggCreator.NewAggregate(ctx, userName+resourceOwner, model.UserUserNameAggregate, model.UserVersion, 0)
 	if resourceOwner != "" {
-		aggregate, err = aggCreator.NewAggregate(ctx, userName, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+		aggregate, err = aggCreator.NewAggregate(ctx, userName+resourceOwner, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
 	}
 	if err != nil {
 		return nil, err
@@ -628,6 +646,47 @@ func isEventValidation(aggregate *es_models.Aggregate, eventType es_models.Event
 			return errors.ThrowPreconditionFailedf(nil, "EVENT-eJQqe", "user is already %v", eventType)
 		}
 		aggregate.PreviousSequence = events[0].Sequence
+		return nil
+	}
+}
+
+func addUserNameValidation(userName string) func(...*es_models.Event) error {
+	return func(events ...*es_models.Event) error {
+		domains := make([]*org_es_model.OrgDomain, 0)
+		for _, event := range events {
+			switch event.Type {
+			case org_es_model.OrgDomainAdded:
+				domain := new(org_es_model.OrgDomain)
+				domain.SetData(event)
+			case org_es_model.OrgDomainVerified:
+				domain := new(org_es_model.OrgDomain)
+				domain.SetData(event)
+				for _, d := range domains {
+					if d.Domain == domain.Domain {
+						d.Verified = true
+					}
+				}
+			case org_es_model.OrgDomainRemoved:
+				domain := new(org_es_model.OrgDomain)
+				domain.SetData(event)
+				for i, d := range domains {
+					if d.Domain == domain.Domain {
+						domains[i] = domains[len(domains)-1]
+						domains[len(domains)-1] = nil
+						domains = domains[:len(domains)-1]
+					}
+				}
+			}
+		}
+		split := strings.Split(userName, "@")
+		if len(split) != 2 {
+			return nil
+		}
+		for _, d := range domains {
+			if d.Verified && d.Domain == split[1] {
+				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "domain already reserved")
+			}
+		}
 		return nil
 	}
 }

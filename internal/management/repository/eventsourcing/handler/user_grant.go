@@ -169,7 +169,6 @@ func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *pr
 }
 
 func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.Org) {
-	grant.OrgDomain = org.Domain
 	grant.OrgName = org.Name
 }
 

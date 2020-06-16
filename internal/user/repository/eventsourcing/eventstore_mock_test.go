@@ -2,8 +2,9 @@ package eventsourcing
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/id"
 	"time"
+
+	"github.com/caos/zitadel/internal/id"
 
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/crypto"
@@ -455,4 +456,35 @@ func GetMockManipulateUserNoEventsWithPw(ctrl *gomock.Controller) *UserEventstor
 	mockEs.EXPECT().AggregateCreator().Return(es_models.NewAggregateCreator("TEST"))
 	mockEs.EXPECT().PushAggregates(gomock.Any(), gomock.Any()).Return(nil)
 	return GetMockedEventstoreWithPw(ctrl, mockEs, false, false, false, true)
+}
+
+func GetMockedEventstoreComplexity(ctrl *gomock.Controller, mockEs *mock.MockEventstore) *UserEventstore {
+	return &UserEventstore{
+		Eventstore: mockEs,
+	}
+}
+
+func GetMockChangesUserOK(ctrl *gomock.Controller) *UserEventstore {
+	user := model.Profile{
+		FirstName: "Hans",
+		LastName:  "Muster",
+		UserName:  "HansMuster",
+	}
+	data, err := json.Marshal(user)
+	if err != nil {
+
+	}
+	events := []*es_models.Event{
+		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, AggregateType: model.UserAggregate, Data: data},
+	}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
+}
+
+func GetMockChangesUserNoEvents(ctrl *gomock.Controller) *UserEventstore {
+	events := []*es_models.Event{}
+	mockEs := mock.NewMockEventstore(ctrl)
+	mockEs.EXPECT().FilterEvents(gomock.Any(), gomock.Any()).Return(events, nil)
+	return GetMockedEventstoreComplexity(ctrl, mockEs)
 }

@@ -36,7 +36,7 @@ type EventstoreRepos struct {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []spooler.Handler {
 	return []spooler.Handler{
-		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
+		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, orgEvents: repos.OrgEvents},
 		&UserSession{handler: handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount}, userEvents: repos.UserEvents},
 		&Token{handler: handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount}},
 		&Key{handler: handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount}},

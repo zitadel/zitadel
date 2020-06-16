@@ -38,7 +38,7 @@ const (
 type ProjectRoleSearchQuery struct {
 	Key    ProjectRoleSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type ProjectRoleSearchResponse struct {
