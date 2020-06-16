@@ -34,11 +34,15 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, policy, resourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, pwPolicy, orgPolicy, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

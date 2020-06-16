@@ -34,6 +34,26 @@ var AdminService_AuthMethods = utils_auth.MethodMapping{
 		Permission: "iam.write",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy": utils_auth.Option{
+		Permission: "iam.policy.delete",
+		CheckParam: "",
+	},
 }
 
 func AdminService_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.Config) grpc.UnaryServerInterceptor {

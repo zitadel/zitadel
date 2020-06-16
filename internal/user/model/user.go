@@ -1,9 +1,11 @@
 package model
 
 import (
-	"time"
-
+	caos_errors "github.com/caos/zitadel/internal/errors"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"strings"
+	"time"
 	"github.com/golang/protobuf/ptypes/timestamp"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -66,10 +68,17 @@ const (
 	GENDER_DIVERSE
 )
 
-func (u *User) SetEmailAsUsername() {
-	if u.Profile != nil && u.UserName == "" && u.Email != nil {
+func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
+	if policy == nil {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Org Iam Policy should not be nil")
+	}
+	if policy.UserLoginMustBeDomain && strings.Contains(u.UserName, "@") {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Username should not be email address")
+	}
+	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.UserName == "" && u.Email != nil {
 		u.UserName = u.EmailAddress
 	}
+	return nil
 }
 
 func (u *User) IsValid() bool {

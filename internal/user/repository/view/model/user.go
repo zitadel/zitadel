@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"github.com/lib/pq"
 	"time"
 
 	"github.com/caos/logging"
@@ -23,39 +24,41 @@ const (
 	UserKeyEmail         = "email"
 	UserKeyState         = "user_state"
 	UserKeyResourceOwner = "resource_owner"
+	UserKeyLoginNames    = "login_names"
 )
 
 type UserView struct {
-	ID                     string    `json:"-" gorm:"column:id;primary_key"`
-	CreationDate           time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate             time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner          string    `json:"-" gorm:"column:resource_owner"`
-	State                  int32     `json:"-" gorm:"column:user_state"`
-	PasswordSet            bool      `json:"-" gorm:"column:password_set"`
-	PasswordChangeRequired bool      `json:"-" gorm:"column:password_change_required"`
-	PasswordChanged        time.Time `json:"-" gorm:"column:password_change"`
-	LastLogin              time.Time `json:"-" gorm:"column:last_login"`
-	UserName               string    `json:"userName" gorm:"column:user_name"`
-	FirstName              string    `json:"firstName" gorm:"column:first_name"`
-	LastName               string    `json:"lastName" gorm:"column:last_name"`
-	NickName               string    `json:"nickName" gorm:"column:nick_name"`
-	DisplayName            string    `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage      string    `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender                 int32     `json:"gender" gorm:"column:gender"`
-	Email                  string    `json:"email" gorm:"column:email"`
-	IsEmailVerified        bool      `json:"-" gorm:"column:is_email_verified"`
-	Phone                  string    `json:"phone" gorm:"column:phone"`
-	IsPhoneVerified        bool      `json:"-" gorm:"column:is_phone_verified"`
-	Country                string    `json:"country" gorm:"column:country"`
-	Locality               string    `json:"locality" gorm:"column:locality"`
-	PostalCode             string    `json:"postalCode" gorm:"column:postal_code"`
-	Region                 string    `json:"region" gorm:"column:region"`
-	StreetAddress          string    `json:"streetAddress" gorm:"column:street_address"`
-	OTPState               int32     `json:"-" gorm:"column:otp_state"`
-	MfaMaxSetUp            int32     `json:"-" gorm:"column:mfa_max_set_up"`
-	MfaInitSkipped         time.Time `json:"-" gorm:"column:mfa_init_skipped"`
-	InitRequired           bool      `json:"-" gorm:"column:init_required"`
-	Sequence               uint64    `json:"-" gorm:"column:sequence"`
+	ID                     string         `json:"-" gorm:"column:id;primary_key"`
+	CreationDate           time.Time      `json:"-" gorm:"column:creation_date"`
+	ChangeDate             time.Time      `json:"-" gorm:"column:change_date"`
+	ResourceOwner          string         `json:"-" gorm:"column:resource_owner"`
+	State                  int32          `json:"-" gorm:"column:user_state"`
+	PasswordSet            bool           `json:"-" gorm:"column:password_set"`
+	PasswordChangeRequired bool           `json:"-" gorm:"column:password_change_required"`
+	PasswordChanged        time.Time      `json:"-" gorm:"column:password_change"`
+	LastLogin              time.Time      `json:"-" gorm:"column:last_login"`
+	UserName               string         `json:"userName" gorm:"column:user_name"`
+	LoginNames             pq.StringArray `json:"-" gorm:"column:login_names"`
+	FirstName              string         `json:"firstName" gorm:"column:first_name"`
+	LastName               string         `json:"lastName" gorm:"column:last_name"`
+	NickName               string         `json:"nickName" gorm:"column:nick_name"`
+	DisplayName            string         `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage      string         `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender                 int32          `json:"gender" gorm:"column:gender"`
+	Email                  string         `json:"email" gorm:"column:email"`
+	IsEmailVerified        bool           `json:"-" gorm:"column:is_email_verified"`
+	Phone                  string         `json:"phone" gorm:"column:phone"`
+	IsPhoneVerified        bool           `json:"-" gorm:"column:is_phone_verified"`
+	Country                string         `json:"country" gorm:"column:country"`
+	Locality               string         `json:"locality" gorm:"column:locality"`
+	PostalCode             string         `json:"postalCode" gorm:"column:postal_code"`
+	Region                 string         `json:"region" gorm:"column:region"`
+	StreetAddress          string         `json:"streetAddress" gorm:"column:street_address"`
+	OTPState               int32          `json:"-" gorm:"column:otp_state"`
+	MfaMaxSetUp            int32          `json:"-" gorm:"column:mfa_max_set_up"`
+	MfaInitSkipped         time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
+	InitRequired           bool           `json:"-" gorm:"column:init_required"`
+	Sequence               uint64         `json:"-" gorm:"column:sequence"`
 }
 
 func UserFromModel(user *model.UserView) *UserView {
@@ -70,6 +73,7 @@ func UserFromModel(user *model.UserView) *UserView {
 		PasswordChanged:        user.PasswordChanged,
 		LastLogin:              user.LastLogin,
 		UserName:               user.UserName,
+		LoginNames:             user.LoginNames,
 		FirstName:              user.FirstName,
 		LastName:               user.LastName,
 		NickName:               user.NickName,

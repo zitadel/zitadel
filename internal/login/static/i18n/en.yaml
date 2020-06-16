@@ -2,6 +2,8 @@ Login:
   Title: Login
   Description: Enter your logindata.
   Username: Username
+  Loginname: Loginname
+  LoginnamePlaceHolder: username@domain
 
 UserSelection:
   Title: Select account

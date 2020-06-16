@@ -13,7 +13,6 @@ func PasswordAgePolicyQuery(recourceOwner string, latestSequence uint64) *es_mod
 		AggregateTypeFilter(model.PasswordAgePolicyAggregate).
 		LatestSequenceFilter(latestSequence).
 		ResourceOwnerFilter(recourceOwner)
-
 }
 
 func PasswordAgePolicyAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, policy *PasswordAgePolicy) (*es_models.Aggregate, error) {

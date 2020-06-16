@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) GetOrgByID(ctx context.Context, orgID *OrgID) (*Org, error) {
@@ -17,7 +18,7 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *OrgDomain) (*Org,
 	if err != nil {
 		return nil, err
 	}
-	return orgFromView(org), nil
+	return orgFromModel(org), nil
 }
 
 func (s *Server) DeactivateOrg(ctx context.Context, in *OrgID) (*Org, error) {
@@ -34,6 +35,27 @@ func (s *Server) ReactivateOrg(ctx context.Context, in *OrgID) (*Org, error) {
 		return nil, err
 	}
 	return orgFromModel(org), nil
+}
+
+func (s *Server) SearchMyOrgDomains(ctx context.Context, in *OrgDomainSearchRequest) (*OrgDomainSearchResponse, error) {
+	domains, err := s.org.SearchMyOrgDomains(ctx, orgDomainSearchRequestToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return orgDomainSearchResponseFromModel(domains), nil
+}
+
+func (s *Server) AddMyOrgDomain(ctx context.Context, in *AddOrgDomainRequest) (*OrgDomain, error) {
+	domain, err := s.org.AddMyOrgDomain(ctx, addOrgDomainToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return orgDomainFromModel(domain), nil
+}
+
+func (s *Server) RemoveMyOrgDomain(ctx context.Context, in *RemoveOrgDomainRequest) (*empty.Empty, error) {
+	err := s.org.RemoveMyOrgDomain(ctx, in.Domain)
+	return &empty.Empty{}, err
 }
 
 func (s *Server) OrgChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {

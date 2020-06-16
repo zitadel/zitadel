@@ -19,6 +19,7 @@ Mgmt:
         - x-zitadel-
   Repository:
     SearchLimit: 100
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'ManagementAPI'
       Repository:
@@ -165,6 +166,7 @@ Admin:
         - x-zitadel-
   Repository:
     SearchLimit: 100
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'Admin'
       Repository:

@@ -18,8 +18,7 @@ func GetMockedEventstoreComplexity(ctrl *gomock.Controller, mockEs *mock.MockEve
 
 func GetMockChangesOrgOK(ctrl *gomock.Controller) *OrgEventstore {
 	org := model.Org{
-		Name:   "MusterOrg",
-		Domain: "myDomain",
+		Name: "MusterOrg",
 	}
 	data, err := json.Marshal(org)
 	if err != nil {

@@ -1,4 +1,4 @@
-package view
+package model
 
 import (
 	"encoding/json"
@@ -33,7 +33,6 @@ type OrgView struct {
 
 func OrgFromModel(org *org_model.OrgView) *OrgView {
 	return &OrgView{
-		Domain:        org.Domain,
 		ChangeDate:    org.ChangeDate,
 		CreationDate:  org.CreationDate,
 		ID:            org.ID,
@@ -46,7 +45,6 @@ func OrgFromModel(org *org_model.OrgView) *OrgView {
 
 func OrgToModel(org *OrgView) *org_model.OrgView {
 	return &org_model.OrgView{
-		Domain:        org.Domain,
 		ChangeDate:    org.ChangeDate,
 		CreationDate:  org.CreationDate,
 		ID:            org.ID,

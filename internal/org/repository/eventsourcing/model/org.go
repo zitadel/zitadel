@@ -14,33 +14,42 @@ const (
 type Org struct {
 	es_models.ObjectRoot `json:"-"`
 
-	Name   string `json:"name,omitempty"`
-	Domain string `json:"domain,omitempty"`
-	State  int32  `json:"-"`
+	Name  string `json:"name,omitempty"`
+	State int32  `json:"-"`
 
-	Members []*OrgMember `json:"-"`
+	Domains      []*OrgDomain  `json:"-"`
+	Members      []*OrgMember  `json:"-"`
+	OrgIamPolicy *OrgIamPolicy `json:"-"`
 }
 
 func OrgFromModel(org *org_model.Org) *Org {
 	members := OrgMembersFromModel(org.Members)
-
-	return &Org{
+	domains := OrgDomainsFromModel(org.Domains)
+	converted := &Org{
 		ObjectRoot: org.ObjectRoot,
-		Domain:     org.Domain,
 		Name:       org.Name,
 		State:      int32(org.State),
+		Domains:    domains,
 		Members:    members,
 	}
+	if org.OrgIamPolicy != nil {
+		converted.OrgIamPolicy = OrgIamPolicyFromModel(org.OrgIamPolicy)
+	}
+	return converted
 }
 
 func OrgToModel(org *Org) *org_model.Org {
-	return &org_model.Org{
+	converted := &org_model.Org{
 		ObjectRoot: org.ObjectRoot,
-		Domain:     org.Domain,
 		Name:       org.Name,
 		State:      org_model.OrgState(org.State),
+		Domains:    OrgDomainsToModel(org.Domains),
 		Members:    OrgMembersToModel(org.Members),
 	}
+	if org.OrgIamPolicy != nil {
+		converted.OrgIamPolicy = OrgIamPolicyToModel(org.OrgIamPolicy)
+	}
+	return converted
 }
 
 func OrgFromEvents(org *Org, events ...*es_models.Event) (*Org, error) {
@@ -101,6 +110,20 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 			return err
 		}
 		o.removeMember(member.UserID)
+	case OrgDomainAdded:
+		o.appendAddDomainEvent(event)
+	case OrgDomainVerified:
+		o.appendVerifyDomainEvent(event)
+	case OrgDomainPrimarySet:
+		o.appendPrimaryDomainEvent(event)
+	case OrgDomainRemoved:
+		o.appendRemoveDomainEvent(event)
+	case OrgIamPolicyAdded:
+		o.appendAddOrgIamPolicyEvent(event)
+	case OrgIamPolicyChanged:
+		o.appendChangeOrgIamPolicyEvent(event)
+	case OrgIamPolicyRemoved:
+		o.appendRemoveOrgIamPolicyEvent()
 	}
 
 	o.ObjectRoot.AppendEvent(event)
@@ -150,9 +173,6 @@ func (o *Org) Changes(changed *Org) map[string]interface{} {
 
 	if changed.Name != "" && changed.Name != o.Name {
 		changes["name"] = changed.Name
-	}
-	if changed.Domain != "" && changed.Domain != o.Domain {
-		changes["domain"] = changed.Domain
 	}
 
 	return changes
