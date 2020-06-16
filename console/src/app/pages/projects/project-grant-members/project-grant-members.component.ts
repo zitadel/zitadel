@@ -23,7 +23,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     @Input() public projectId!: string;
     @Input() public grantId!: string;
 
-    public disabled: boolean = false;
+    @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
     public dataSource!: ProjectGrantMembersDataSource;

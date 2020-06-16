@@ -13,7 +13,8 @@
 
         <app-card>
             <app-project-grant-members *ngIf="project && project.projectId && project.id"
-                [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" [project]="project">
+                [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (isZitadel$ | async)"
+                [project]="project">
             </app-project-grant-members>
         </app-card>
     </div>

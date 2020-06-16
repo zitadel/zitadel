@@ -1,4 +1,5 @@
 <app-meta-layout>
+    ownedprojectdetail
     <div class="max-width-container">
         <div class="head" *ngIf="project?.id">
             <a [routerLink]="[ '/projects' ]" mat-icon-button>
@@ -6,11 +7,11 @@
             </a>
             <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.name}}</h1>
             <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
-                <!-- <button *ngIf="project?.type == ProjectType.PROJECTTYPE_OWNED" mat-icon-button
-                    (click)="editstate = !editstate" aria-label="Edit project name">
+                <button mat-icon-button (click)="editstate = !editstate" aria-label="Edit project name"
+                    *ngIf="(isZitadel$ | async) === false">
                     <mat-icon *ngIf="!editstate">edit</mat-icon>
                     <mat-icon *ngIf="editstate">close</mat-icon>
-                </button> -->
+                </button>
             </ng-template>
 
             <div class="full-width">
@@ -23,10 +24,10 @@
                     <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
                         <mat-icon>check</mat-icon>
                     </button>
-                    <button mat-stroked-button color="accent"
+                    <button mat-stroked-button color="accent" [disabled]="(isZitadel$ | async)"
                         *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="second"
                         (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
-                    <button mat-stroked-button color="accent"
+                    <button mat-stroked-button color="accent" [disabled]="(isZitadel$ | async)"
                         *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="second"
                         (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
                 </ng-container>
@@ -38,15 +39,16 @@
         <ng-container *ngIf="project">
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
                 <app-project-application-grid *ngIf="grid"
-                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE" (changeView)="grid = false"
-                    [projectId]="projectId"></app-project-application-grid>
+                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (isZitadel$ | async)"
+                    (changeView)="grid = false" [projectId]="projectId"></app-project-application-grid>
                 <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
                     <card-actions class="card-actions">
                         <button mat-icon-button (click)="grid = true">
                             <i matTooltip="show grid view" class="las la-th-large"></i>
                         </button>
                     </card-actions>
-                    <app-project-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
+                    <app-project-applications
+                        [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (isZitadel$ | async)"
                         [projectId]="projectId"></app-project-applications>
                 </app-card>
             </ng-template>
