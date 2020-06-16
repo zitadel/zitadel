@@ -14,11 +14,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
 import { ProjectMemberCreateDialogModule } from '../../../modules/add-member-dialog/project-member-create-dialog.module';
-import { OrgMembersComponent } from './org-members.component';
+import { OrgContributorsComponent } from './org-contributors.component';
 
 
 @NgModule({
-    declarations: [OrgMembersComponent],
+    declarations: [OrgContributorsComponent],
     imports: [
         CommonModule,
         FormsModule,
@@ -36,7 +36,7 @@ import { OrgMembersComponent } from './org-members.component';
         TranslateModule,
     ],
     exports: [
-        OrgMembersComponent,
+        OrgContributorsComponent,
     ],
 })
-export class OrgMembersModule { }
+export class OrgContributorsModule { }

@@ -12,14 +12,14 @@ import {
     CreationType,
     ProjectMemberCreateDialogComponent,
 } from '../../../modules/add-member-dialog/project-member-create-dialog.component';
-import { OrgMembersDataSource } from './org-members-datasource';
+import { OrgMembersDataSource } from './org-contributors-datasource';
 
 @Component({
-    selector: 'app-org-members',
-    templateUrl: './org-members.component.html',
-    styleUrls: ['./org-members.component.scss'],
+    selector: 'app-org-contributors',
+    templateUrl: './org-contributors.component.html',
+    styleUrls: ['./org-contributors.component.scss'],
 })
-export class OrgMembersComponent implements AfterViewInit, OnInit {
+export class OrgContributorsComponent implements AfterViewInit, OnInit {
     @Input() public orgId: string = '';
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;

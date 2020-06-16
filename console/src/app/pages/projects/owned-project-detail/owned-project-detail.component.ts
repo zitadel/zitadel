@@ -83,6 +83,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         if (this.projectId) {
             this.projectService.GetProjectById(id).then(proj => {
                 this.project = proj.toObject();
+                console.log(this.project);
                 this.isZitadel$ = from(this.projectService.SearchApplications(this.project.id, 100, 0).then(appsResp => {
                     const ret = appsResp.toObject().resultList
                         .filter(app => app.oidcConfig?.clientId === this.grpcService.clientid).length > 0;

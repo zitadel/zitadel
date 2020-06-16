@@ -28,7 +28,7 @@ import { SearchUserAutocompleteModule } from 'src/app/modules/search-user-autoco
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { ProjectRolesModule } from '../../modules/project-roles/project-roles.module';
-import { OrgMembersModule } from '../orgs/org-members/org-members.module';
+import { OrgContributorsModule } from '../orgs/org-contributors/org-contributors.module';
 import { UserListModule } from '../user-list/user-list.module';
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { GrantedProjectGridComponent } from './granted-project-grid/granted-project-grid.component';
@@ -95,7 +95,7 @@ import { ProjectsComponent } from './projects.component';
         CardModule,
         MatTooltipModule,
         MatSortModule,
-        OrgMembersModule,
+        OrgContributorsModule,
         TranslateModule.forChild({
             loader: {
                 provide: TranslateLoader,
