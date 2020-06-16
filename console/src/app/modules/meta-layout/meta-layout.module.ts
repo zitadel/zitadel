@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 import { MetaLayoutComponent } from './meta-layout.component';
 
@@ -9,6 +10,7 @@ import { MetaLayoutComponent } from './meta-layout.component';
     declarations: [MetaLayoutComponent],
     imports: [
         CommonModule,
+        MatButtonModule,
     ],
     exports: [MetaLayoutComponent],
 })

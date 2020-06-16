@@ -6,4 +6,5 @@ import { Component } from '@angular/core';
     styleUrls: ['./meta-layout.component.scss'],
 })
 export class MetaLayoutComponent {
+    public hidden: boolean = false;
 }
