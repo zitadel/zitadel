@@ -63,11 +63,11 @@ func CreateRenderer(staticDir http.FileSystem, cookieName string, defaultLanguag
 		"registerUrl": func(id string) string {
 			return fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id)
 		},
-		"usernameUrl": func() string {
-			return EndpointUsername
+		"loginNameUrl": func() string {
+			return EndpointLoginName
 		},
-		"usernameChangeUrl": func(id string) string {
-			return fmt.Sprintf("%s?%s=%s", EndpointUsername, queryAuthRequestID, id)
+		"loginNameChangeUrl": func(id string) string {
+			return fmt.Sprintf("%s?%s=%s", EndpointLoginName, queryAuthRequestID, id)
 		},
 		"userSelectionUrl": func() string {
 			return EndpointUserSelection
@@ -255,7 +255,7 @@ type errorData struct {
 
 type userData struct {
 	baseData
-	UserName            string
+	LoginName           string
 	PasswordChecked     string
 	MfaProviders        []model.MfaType
 	SelectedMfaProvider model.MfaType
@@ -268,22 +268,22 @@ type userSelectionData struct {
 
 type mfaData struct {
 	baseData
-	UserName     string
+	LoginName    string
 	MfaProviders []model.MfaType
 	MfaRequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
-	UserName string
-	MfaType  model.MfaType
+	LoginName string
+	MfaType   model.MfaType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
-	UserName string
-	MfaType  model.MfaType
+	LoginName string
+	MfaType   model.MfaType
 }
 
 type otpData struct {

@@ -72,7 +72,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	err := l.authRepo.RequestPasswordReset(setContext(r.Context(), userOrg), authReq.UserName)
+	err := l.authRepo.RequestPasswordReset(setContext(r.Context(), userOrg), authReq.LoginName)
 	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 
@@ -94,8 +94,8 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 
 func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	data := userData{
-		baseData: l.getBaseData(r, authReq, "Password Init Done", "", ""),
-		UserName: authReq.UserName,
+		baseData:  l.getBaseData(r, authReq, "Password Init Done", "", ""),
+		LoginName: authReq.LoginName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitPasswordDone], data, nil)
 }

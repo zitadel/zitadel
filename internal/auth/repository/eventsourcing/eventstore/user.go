@@ -185,8 +185,8 @@ func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
 	return repo.UserEvents.SkipMfaInit(ctx, userID)
 }
 
-func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string) error {
-	user, err := repo.View.UserByUsername(username)
+func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {
+	user, err := repo.View.UserByLoginName(loginname)
 	if err != nil {
 		return err
 	}

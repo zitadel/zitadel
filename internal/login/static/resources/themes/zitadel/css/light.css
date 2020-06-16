@@ -263,7 +263,7 @@ form button.user-selection > div.names {
 form button.user-selection > div.names .displayname {
   font-size: 1.4rem;
 }
-form button.user-selection > div.names .username {
+form button.user-selection > div.names .loginname {
   color: #898989;
 }
 .user-selection + form button.other-user {

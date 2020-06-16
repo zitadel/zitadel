@@ -106,16 +106,16 @@ func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id string) e
 	return repo.AuthRequests.DeleteAuthRequest(ctx, id)
 }
 
-func (repo *AuthRequestRepo) CheckUsername(ctx context.Context, id, username string) error {
+func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName string) error {
 	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
 	if err != nil {
 		return err
 	}
-	user, err := repo.View.UserByLoginName(username)
+	user, err := repo.View.UserByLoginName(loginName)
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner) //TODO: change to login name
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -128,7 +128,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID string) 
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner) //TODO: change to login name
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -237,7 +237,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 		users[i] = model.UserSelection{
 			UserID:           session.UserID,
 			DisplayName:      session.DisplayName,
-			UserName:         session.UserName,
+			LoginName:        session.UserName, //TODO: change to login name
 			UserSessionState: session.State,
 		}
 	}

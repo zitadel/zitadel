@@ -11,7 +11,7 @@ const (
 	EndpointHealthz          = "/healthz"
 	EndpointReadiness        = "/ready"
 	EndpointLogin            = "/login"
-	EndpointUsername         = "/username"
+	EndpointLoginName        = "/loginname"
 	EndpointUserSelection    = "/userselection"
 	EndpointPassword         = "/password"
 	EndpointInitPassword     = "/password/init"
@@ -36,8 +36,8 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointHealthz, login.handleHealthz).Methods(http.MethodGet)
 	router.HandleFunc(EndpointReadiness, login.handleReadiness).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLogin, login.handleLogin).Methods(http.MethodGet, http.MethodPost)
-	router.HandleFunc(EndpointUsername, login.handleUsername).Methods(http.MethodGet)
-	router.HandleFunc(EndpointUsername, login.handleUsernameCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointLoginName, login.handleLoginName).Methods(http.MethodGet)
+	router.HandleFunc(EndpointLoginName, login.handleLoginNameCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointUserSelection, login.handleSelectUser).Methods(http.MethodPost)
 	router.HandleFunc(EndpointPassword, login.handlePasswordCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointInitPassword, login.handleInitPassword).Methods(http.MethodGet)

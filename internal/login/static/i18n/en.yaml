@@ -1,7 +1,6 @@
 Login:
   Title: Login
   Description: Enter your logindata.
-  Username: Username
   Loginname: Loginname
   LoginnamePlaceHolder: username@domain
 
@@ -91,7 +90,7 @@ EmailVerificationDone:
 
 Registration:
   Title: Registration
-  Description: Enter your Userdata. Your email address will be used as username.
+  Description: Enter your Userdata. Your email address will be used as loginname.
   Email: E-Mail
   Firstname: Firstname
   Lastname: Lastname

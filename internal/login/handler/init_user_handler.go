@@ -93,13 +93,13 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	var userName string
+	var loginName string
 	if authReq != nil {
-		userName = authReq.UserName
+		loginName = authReq.LoginName
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authReq, "User Init Done", "", ""),
-		UserName: userName,
+		baseData:  l.getBaseData(r, authReq, "User Init Done", "", ""),
+		LoginName: loginName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUserDone], data, nil)
 }
