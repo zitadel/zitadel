@@ -150,6 +150,8 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public saveEmail(): void {
+        this.emailEditState = false;
+
         this.userService
             .SaveMyUserEmail(this.email).then((data: UserEmail) => {
                 this.toast.showInfo('Saved Email');
@@ -211,6 +213,10 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public savePhone(): void {
+        this.phoneEditState = false;
+        if (!this.phone.id) {
+            this.phone.id = this.profile.id;
+        }
         this.userService
             .SaveMyUserPhone(this.phone).then((data: UserPhone) => {
                 this.toast.showInfo('Saved Phone');

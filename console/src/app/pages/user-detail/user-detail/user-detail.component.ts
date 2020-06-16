@@ -45,7 +45,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
 export class UserDetailComponent implements OnInit, OnDestroy {
     public profile!: UserProfile.AsObject;
     public email!: UserEmail.AsObject;
-    public phone!: UserPhone.AsObject;
+    public phone: UserPhone.AsObject = { phone: '' } as any;
     public address!: UserAddress.AsObject;
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
@@ -222,6 +222,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public savePhone(): void {
         this.phoneEditState = false;
+        if (!this.phone.id) {
+            this.phone.id = this.profile.id;
+        }
         this.mgmtUserService
             .SaveUserPhone(this.phone).then((data: UserPhone) => {
                 this.toast.showInfo('Saved Phone');
