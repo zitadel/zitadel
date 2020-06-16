@@ -2,8 +2,8 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"encoding/json"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"log"
 
 	"github.com/caos/logging"
@@ -205,7 +205,7 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence
 		return nil, errors.ThrowInternal(err, "EVENT-328b1", "unable to get current user")
 	}
 	if len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "no objects found")
+		return nil, errors.ThrowNotFound(nil, "EVENT-FpQqK", "no objects found")
 	}
 
 	result := make([]*org_model.OrgChange, 0)

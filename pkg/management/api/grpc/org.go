@@ -3,8 +3,6 @@ package grpc
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
-
-	"github.com/caos/zitadel/internal/errors"
 )
 
 func (s *Server) GetOrgByID(ctx context.Context, orgID *OrgID) (*Org, error) {
