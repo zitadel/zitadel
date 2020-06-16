@@ -1,9 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
+import { User } from 'src/app/proto/generated/auth_pb';
 import { Org, ProjectMember, ProjectType } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -28,6 +31,7 @@ export class OrgMembersComponent implements AfterViewInit {
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
     constructor(private orgService: OrgService,
+        private dialog: MatDialog,
         private toast: ToastService,
         private route: ActivatedRoute) {
         this.route.params.subscribe(params => {
@@ -87,33 +91,28 @@ export class OrgMembersComponent implements AfterViewInit {
     }
 
     public openAddMember(): void {
+        const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
+            data: {
+                creationType: CreationType.ORG,
+            },
+            width: '400px',
+        });
 
-        // TODO
-        // const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
-        //     data: {
-        //         creationType: this.project.type ===
-        //             ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-        //             ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
-        //         projectId: this.project.id,
-        //     },
-        //     width: '400px',
-        // });
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                const users: User.AsObject[] = resp.users;
+                const roles: string[] = resp.roles;
 
-        // dialogRef.afterClosed().subscribe(resp => {
-        //     if (resp) {
-        //         const users: User.AsObject[] = resp.users;
-        //         const roles: string[] = resp.roles;
-
-        //         if (users && users.length && roles && roles.length) {
-        //             Promise.all(users.map(user => {
-        //                 return this.projectService.AddProjectMember(this.project.id, user.id, roles);
-        //             })).then(() => {
-        //                 this.toast.showError('members added');
-        //             }).catch(error => {
-        //                 this.toast.showError(error.message);
-        //             });
-        //         }
-        //     }
-        // });
+                if (users && users.length && roles && roles.length) {
+                    Promise.all(users.map(user => {
+                        return this.orgService.AddMyOrgMember(user.id, roles);
+                    })).then(() => {
+                        this.toast.showError('members added');
+                    }).catch(error => {
+                        this.toast.showError(error.message);
+                    });
+                }
+            }
+        });
     }
 }

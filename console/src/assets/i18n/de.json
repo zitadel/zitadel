@@ -482,6 +482,7 @@
             "org.domain.added":"Org Domain hinzugefügt",
             "org.domain.verified":"Org Domain verifiziert",
             "org.domain.primary.set":"Primäre domain gesetzt",
+            "org.iam.policy.added":"IAM Policy hinzugefügt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
             "project.deactivated":"Projekt deaktiviert",

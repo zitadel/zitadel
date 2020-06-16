@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
-import { ProjectMemberCreateDialogModule } from '../../../modules/add-member-dialog/project-member-create-dialog.module';
+import { MemberCreateDialogModule } from '../../../modules/add-member-dialog/member-create-dialog.module';
 import { OrgContributorsComponent } from './org-contributors.component';
 
 
@@ -22,7 +22,7 @@ import { OrgContributorsComponent } from './org-contributors.component';
     imports: [
         CommonModule,
         FormsModule,
-        ProjectMemberCreateDialogModule,
+        MemberCreateDialogModule,
         HasRoleModule,
         MatButtonModule,
         MatDialogModule,

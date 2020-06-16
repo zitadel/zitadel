@@ -11,8 +11,8 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import {
     CreationType,
-    ProjectMemberCreateDialogComponent,
-} from '../../../modules/add-member-dialog/project-member-create-dialog.component';
+    MemberCreateDialogComponent,
+} from '../../../modules/add-member-dialog/member-create-dialog.component';
 
 @Component({
     selector: 'app-org-contributors',
@@ -60,7 +60,7 @@ export class OrgContributorsComponent implements OnInit {
     }
 
     public openAddMember(): void {
-        const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
+        const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.ORG,
             },

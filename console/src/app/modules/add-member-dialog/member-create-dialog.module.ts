@@ -12,10 +12,10 @@ import {
     OrgMemberRolesAutocompleteModule,
 } from '../../pages/orgs/org-member-roles-autocomplete/org-member-roles-autocomplete.module';
 import { SearchRolesAutocompleteModule } from '../search-roles-autocomplete/search-roles-autocomplete.module';
-import { ProjectMemberCreateDialogComponent } from './project-member-create-dialog.component';
+import { MemberCreateDialogComponent } from './member-create-dialog.component';
 
 @NgModule({
-    declarations: [ProjectMemberCreateDialogComponent],
+    declarations: [MemberCreateDialogComponent],
     imports: [
         CommonModule,
         MatDialogModule,
@@ -29,7 +29,7 @@ import { ProjectMemberCreateDialogComponent } from './project-member-create-dial
         OrgMemberRolesAutocompleteModule,
     ],
     entryComponents: [
-        ProjectMemberCreateDialogComponent,
+        MemberCreateDialogComponent,
     ],
 })
-export class ProjectMemberCreateDialogModule { }
+export class MemberCreateDialogModule { }

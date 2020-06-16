@@ -482,6 +482,7 @@
             "org.domain.added":"Org Domain added",
             "org.domain.verified":"Org Domain verified",
             "org.domain.primary.set":"Primary domain set",
+            "org.iam.policy.added":"IAM Policy added",
             "project.added": "Project created",
             "project.changed":"Project edited",
             "project.deactivated":"Project deactivated",
