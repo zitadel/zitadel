@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OwnedProjectContributorsComponent } from './owned-project-contributors.component';
+import { ProjectContributorsComponent } from './project-contributors.component';
 
 describe('ProjectContributorsComponent', () => {
-    let component: OwnedProjectContributorsComponent;
-    let fixture: ComponentFixture<OwnedProjectContributorsComponent>;
+    let component: ProjectContributorsComponent;
+    let fixture: ComponentFixture<ProjectContributorsComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [OwnedProjectContributorsComponent],
+            declarations: [ProjectContributorsComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(OwnedProjectContributorsComponent);
+        fixture = TestBed.createComponent(ProjectContributorsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

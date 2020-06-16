@@ -88,10 +88,10 @@
 
         <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
             <mat-tab label="Details">
-                <app-owned-project-contributors *ngIf="project"
+                <app-project-contributors *ngIf="project"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
                     [projectType]="ProjectType.PROJECTTYPE_OWNED" [project]="project">
-                </app-owned-project-contributors>
+                </app-project-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
                 <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
