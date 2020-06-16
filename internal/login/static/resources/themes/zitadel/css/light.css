@@ -95,7 +95,7 @@ h1 {
 }
 
 p {
-  font-width: 300;
+  font-weight: 300;
 }
 
 header {
@@ -204,13 +204,17 @@ form button.clean {
   text-align: left;
   text-transform: unset;
   display: flex;
+  padding: 15px;
 }
 form button.clean:hover {
   border: none;
-  background-color: transparent;
+  background-color: #252525;
 }
-form button.user-selection {
-  margin-bottom: 25px;
+form button.clean * {
+  font-weight: 300;
+}
+form .user-selection-list {
+  margin-bottom: 80px;
 }
 form button.user-selection .profile-image {
   width: 100px;
@@ -237,7 +241,7 @@ form button.user-selection .sessionstate {
   height: 20px;
   width: 20px;
   border-radius: 20px;
-  border-color: white;
+  border-color: #595959;
   border-style: solid;
   border-width: 1px;
   position: absolute;
@@ -259,7 +263,10 @@ form button.user-selection > div.names {
 form button.user-selection > div.names .displayname {
   font-size: 1.4rem;
 }
-form button.other-user {
+form button.user-selection > div.names .username {
+  color: #898989;
+}
+.user-selection + form button.other-user {
   margin-top: 80px;
 }
 form button.other-user .other-user-image {
@@ -381,7 +388,7 @@ html button.user-selection .profile-image {
   }
 }
 html button.user-selection:hover {
-  color: #6778f8;
+  background-color: #252525;
 }
 html button.user-selection:hover .profile-image {
   background-image: url("/resources/images/icon-user-light-hover.png");

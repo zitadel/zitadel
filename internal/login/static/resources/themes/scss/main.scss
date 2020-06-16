@@ -25,7 +25,7 @@ h1 {
 }
 
 p {
-    font-width: 300;
+    font-weight: 300;
 }
 
 header {
@@ -147,16 +147,23 @@ form {
         text-align: left;
         text-transform: unset;
         display: flex;
+        padding: 15px;
 
         &:hover {
             border: none;
-            background-color: transparent;
+            background-color: $buttonBackgroundColorHover;
+        }
+
+        * {
+            font-weight: 300;
         }
     }
 
-    button.user-selection {
-        margin-bottom: 25px;
+    .user-selection-list {
+        margin-bottom: 80px;
+    }
 
+    button.user-selection {
         .profile-image {
             width: 100px;
             height: 100px;
@@ -200,13 +207,17 @@ form {
                 .displayname {
                     font-size: 1.4rem;
                 }
+                .username {
+                    color: $labelColor;
+                }
             }
         }
     }
 
     button.other-user {
-        margin-top: 80px;
-
+        .user-selection+&{
+            margin-top: 80px;
+        }
         .other-user-image {
             width: 100px;
             height: 75px;

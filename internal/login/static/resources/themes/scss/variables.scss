@@ -27,6 +27,7 @@ $primaryColorHover: lighten($primaryColor, 10%);
 $labelColor: #898989;
 $inputBorderColor: #595959;
 $inputBackgroundColor: #252525;
+$buttonBackgroundColorHover: $inputBackgroundColor;
 $profileImgDark: "/resources/images/icon-user-dark";
 $otherUserImgDark: "/resources/images/icon-newuser-dark";
 
@@ -36,5 +37,6 @@ $backgroundColorLight: $fontColor;
 $fontColorLight: $backgroundColor;
 $primaryColorLight: $primaryColor;
 $primaryColorHoverLight: lighten($primaryColorLight, 10%);
+$buttonBackgroundColorHoverLight: #EFEFEF;
 $profileImgLight: "/resources/images/icon-user-light";
 $otherUserImgLight: "/resources/images/icon-newuser-light";

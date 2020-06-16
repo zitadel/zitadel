@@ -41,7 +41,7 @@ html {
             }
 
             &:hover {
-                color: $primaryColorHover;
+                background-color: $buttonBackgroundColorHover;
 
                 .profile-image {
                     @include retina-background-image($profileImgLight, "png", true, 100px, 100px);

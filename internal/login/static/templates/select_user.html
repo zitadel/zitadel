@@ -11,18 +11,22 @@
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="actions">
-        {{ range $user := .Users }}
-        {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
-        <button type="submit" name="userID" value="{{$user.UserID}}" class="clean user-selection">
-            <div>
-                <div class="profile-image"></div>
-                <div class="sessionstate {{$sessionState}}"></div>
-            </div>
-            <div class="names">
-                <div class="displayname">{{$user.DisplayName}}</div>
-                <div class="username">{{$user.UserName}}</div>
-            </div>
-        </button>
+        {{ if .Users }}
+        <div class="user-selection-list">
+            {{ range $user := .Users }}
+            {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
+            <button type="submit" name="userID" value="{{$user.UserID}}" class="clean user-selection">
+                <div>
+                    <div class="profile-image"></div>
+                    <div class="sessionstate {{$sessionState}}"></div>
+                </div>
+                <div class="names">
+                    <div class="displayname">{{$user.DisplayName}}</div>
+                    <div class="username">{{$user.UserName}}</div>
+                </div>
+            </button>
+            {{ end }}
+        </div>
         {{ end }}
         <button type="submit" name="userID" value="0" class="clean other-user">
             <div class="other-user-image"></div>
