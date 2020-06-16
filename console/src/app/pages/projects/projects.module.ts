@@ -105,7 +105,7 @@ import { ProjectsComponent } from './projects.component';
     entryComponents: [
         ProjectGrantMembersCreateDialogComponent,
     ],
-    exports: [GrantedProjectListComponent, OwnedProjectListComponent],
+    exports: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
 })
 export class ProjectsModule { }

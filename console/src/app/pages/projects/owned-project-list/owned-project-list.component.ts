@@ -99,6 +99,8 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
             this.toast.showError(error.message);
             this.loadingSubject.next(false);
         });
+
+        this.ownedProjectList = [];
     }
 
     public dateFromTimestamp(date: Timestamp.AsObject): any {

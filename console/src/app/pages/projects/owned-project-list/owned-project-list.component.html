@@ -1,4 +1,4 @@
-<app-owned-project-grid *ngIf="grid && ownedProjectList" [loading]="loading$ | async" (changedView)="grid = false"
+<app-owned-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
     [items]="ownedProjectList" (newClicked)="addProject()">
 </app-owned-project-grid>
 

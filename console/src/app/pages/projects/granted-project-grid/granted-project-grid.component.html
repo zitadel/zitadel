@@ -15,9 +15,7 @@
         <i class="show list view las la-th-list"></i>
     </button>
 </div>
-
 <div class="container">
-    <h2>Granted Projects</h2>
     <mat-progress-bar *ngIf="loading" class="spinner" color="accent" mode="indeterminate"></mat-progress-bar>
     <div class="item card" *ngFor="let item of items; index as i" (click)="selectItem(item, $event)"
         [ngClass]="{ selected: selection.isSelected(item), inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
@@ -56,8 +54,5 @@
             </ng-template>
         </mat-menu>
     </div>
-    <div class="add-project-button card" (click)="addItem()">
-        <mat-icon class="icon">add</mat-icon>
-        <span>Add new project</span>
-    </div>
+    <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
 </div>

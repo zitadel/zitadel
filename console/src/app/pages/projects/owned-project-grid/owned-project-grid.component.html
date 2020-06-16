@@ -30,7 +30,7 @@
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
             <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span>
             <span class="description">{{'PROJECT.TYPE.TITLE' | translate}}:
-                {{'PROJECT.TYPE.'+ProjectType.PROJECTTYPE_GRANTED | translate}}</span>
+                {{'PROJECT.TYPE.'+ProjectType.PROJECTTYPE_OWNED | translate}}</span>
             <span *ngIf="item.changeDate" class="created">created on
                 {{
                         dateFromTimestamp(item.creationDate) | date: 'EEE dd. MMM, HH:mm'
@@ -55,6 +55,9 @@
             </ng-template>
         </mat-menu>
     </div>
+
+    <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
+
     <div class="add-project-button card" (click)="addItem()">
         <mat-icon class="icon">add</mat-icon>
         <span>Add new project</span>

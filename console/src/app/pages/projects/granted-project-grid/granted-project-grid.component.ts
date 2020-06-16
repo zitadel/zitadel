@@ -8,7 +8,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-project-grid',
+    selector: 'app-granted-project-grid',
     templateUrl: './granted-project-grid.component.html',
     styleUrls: ['./granted-project-grid.component.scss'],
     animations: [
@@ -48,17 +48,9 @@ export class GrantedProjectGridComponent {
 
     public selectItem(item: ProjectGrantView.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
-            if (item.projectId && item.id) {
-                this.router.navigate(['projects', item.projectId, 'grant', `${item.id}`]);
-            } else {
-                this.router.navigate(['/projects', item.id]);
-            }
+            this.router.navigate(['projects', item.projectId, 'grant', `${item.id}`]);
         } else if (!event) {
-            if (item.projectId && item.id) {
-                this.router.navigate(['projects', item.projectId, 'grant', `${item.id}`]);
-            } else {
-                this.router.navigate(['/projects', item.id]);
-            }
+            this.router.navigate(['projects', item.projectId, 'grant', `${item.id}`]);
         }
     }
 
@@ -70,24 +62,4 @@ export class GrantedProjectGridComponent {
         const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
         return ts;
     }
-
-    // public reactivateProjects(selected: Project.AsObject[]): void {
-    //     Promise.all([selected.map(proj => {
-    //         return this.projectService.ReactivateProject(proj.id);
-    //     })]).then(() => {
-    //         this.toast.showInfo('Successful reactivated all projects');
-    //     }).catch(error => {
-    //         this.toast.showError(error.message);
-    //     });
-    // }
-
-    // public deactivateProjects(selected: Project.AsObject[]): void {
-    //     Promise.all([selected.map(proj => {
-    //         return this.projectService.DeactivateProject(proj.id);
-    //     })]).then(() => {
-    //         this.toast.showInfo('Successful deactivated all projects');
-    //     }).catch(error => {
-    //         this.toast.showError(error.message);
-    //     });
-    // }
 }

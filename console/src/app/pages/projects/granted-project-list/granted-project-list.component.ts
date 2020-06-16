@@ -85,12 +85,11 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
     }
 
     private async getData(limit: number, offset: number): Promise<void> {
-        console.log('getprojects');
         this.loadingSubject.next(true);
         this.projectService.SearchGrantedProjects(limit, offset).then(res => {
             this.grantedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
-            // this.dataSource.data = this.grantedProjectList;
+            this.dataSource.data = this.grantedProjectList;
             this.loadingSubject.next(false);
             console.log(this.grantedProjectList);
         }).catch(error => {
@@ -98,18 +97,6 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
             this.toast.showError(error.message);
             this.loadingSubject.next(false);
         });
-
-        // this.projectService.SearchProjects(limit, offset).then(res => {
-        //     this.ownedProjectList = res.toObject().resultList;
-        //     this.totalResult = res.toObject().totalResult;
-        //     this.dataSource.data = this.ownedProjectList;
-        //     this.loadingOwnedSubject.next(false);
-        //     console.log(this.ownedProjectList);
-        // }).catch(error => {
-        //     console.error(error);
-        //     this.toast.showError(error.message);
-        //     this.loadingOwnedSubject.next(false);
-        // });
     }
 
     public dateFromTimestamp(date: Timestamp.AsObject): any {

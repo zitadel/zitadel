@@ -1,4 +1,4 @@
-<app-granted-project-grid *ngIf="grid && grantedProjectList" [loading]="loading$ | async" (changedView)="grid = false"
+<app-granted-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
     [items]="grantedProjectList" (newClicked)="addProject()">
 </app-granted-project-grid>
 
@@ -7,6 +7,7 @@
         <i matTooltip="show grid view" class="las la-th-large"></i>
     </button>
 </div>
+
 <div *ngIf="!grid && grantedProjectList">
     <div class="table-header-row">
         <div class="col">

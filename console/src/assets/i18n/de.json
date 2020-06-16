@@ -275,7 +275,8 @@
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Geben Sie den Namen ein",
-            "ROLE": "Rolle"
+            "ROLE": "Rolle",
+            "NOITEMS": "Keine Projekte"
         },
         "STATE": {
             "TITLE":"Status",
