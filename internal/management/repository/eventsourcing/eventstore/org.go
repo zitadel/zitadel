@@ -25,12 +25,12 @@ func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.O
 	return repo.OrgEventstore.OrgByID(ctx, org)
 }
 
-func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error) {
-	org, err := repo.View.OrgByDomain(domain)
+func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.Org, error) {
+	verifiedDomain, err := repo.View.VerifiedOrgDomain(domain)
 	if err != nil {
 		return nil, err
 	}
-	return model.OrgToModel(org), nil
+	return repo.OrgByID(ctx, verifiedDomain.OrgID)
 }
 
 func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {

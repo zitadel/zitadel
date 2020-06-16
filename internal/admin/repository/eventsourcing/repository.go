@@ -24,8 +24,7 @@ type Config struct {
 	Eventstore  es_int.Config
 	View        types.SQL
 	Spooler     spooler.SpoolerConfig
-	//TODO: should this be located in system-defaults?
-	Domain string
+	Domain      string
 }
 
 type EsRepository struct {

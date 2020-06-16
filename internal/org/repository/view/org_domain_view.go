@@ -8,11 +8,20 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func OrgDomainByDomain(db *gorm.DB, table, domain string) (*model.OrgDomainView, error) {
+func OrgDomainByOrgIDAndDomain(db *gorm.DB, table, orgID, domain string) (*model.OrgDomainView, error) {
 	domainView := new(model.OrgDomainView)
-
+	orgIDQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_ORG_ID, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
 	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_DOMAIN, Value: domain, Method: global_model.SEARCHMETHOD_EQUALS}
-	query := view.PrepareGetByQuery(table, domainQuery)
+	query := view.PrepareGetByQuery(table, orgIDQuery, domainQuery)
+	err := query(db, domainView)
+	return domainView, err
+}
+
+func VerifiedOrgDomain(db *gorm.DB, table, domain string) (*model.OrgDomainView, error) {
+	domainView := new(model.OrgDomainView)
+	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_DOMAIN, Value: domain, Method: global_model.SEARCHMETHOD_EQUALS}
+	verifiedQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_VERIFIED, Value: true, Method: global_model.SEARCHMETHOD_EQUALS}
+	query := view.PrepareGetByQuery(table, domainQuery, verifiedQuery)
 	err := query(db, domainView)
 	return domainView, err
 }

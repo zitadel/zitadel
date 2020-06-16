@@ -11,13 +11,15 @@ import (
 )
 
 const (
-	OrgDomainKeyOrgID  = "org_id"
-	OrgDomainKeyDomain = "domain"
+	OrgDomainKeyOrgID    = "org_id"
+	OrgDomainKeyDomain   = "domain"
+	OrgDomainKeyVerified = "verified"
+	OrgDomainKeyPrimary  = "primary_domain"
 )
 
 type OrgDomainView struct {
 	Domain   string `json:"domain" gorm:"column:domain;primary_key"`
-	OrgID    string `json:"-" gorm:"column:org_id"`
+	OrgID    string `json:"-" gorm:"column:org_id;primary_key"`
 	Verified bool   `json:"-" gorm:"column:verified"`
 	Primary  bool   `json:"-" gorm:"column:primary_domain"`
 	Sequence uint64 `json:"-" gorm:"column:sequence"`

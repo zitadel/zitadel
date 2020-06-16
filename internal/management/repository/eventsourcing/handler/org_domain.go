@@ -53,7 +53,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		domain, err = d.view.OrgDomainByDomain(domain.Domain)
+		domain, err = d.view.OrgDomainByOrgIDAndDomain(event.AggregateID, domain.Domain)
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		domain, err = d.view.OrgDomainByDomain(domain.Domain)
+		domain, err = d.view.OrgDomainByOrgIDAndDomain(event.AggregateID, domain.Domain)
 		if err != nil {
 			return err
 		}
@@ -73,7 +73,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		}
 		for _, existing := range existingDomains {
 			existing.Primary = false
-			err := d.view.PutOrgDomain(existing, event.Sequence)
+			err := d.view.PutOrgDomain(existing, 0)
 			if err != nil {
 				return err
 			}

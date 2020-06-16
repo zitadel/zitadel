@@ -42,7 +42,7 @@ const (
 type OrgMemberSearchQuery struct {
 	Key    OrgMemberSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type OrgMemberSearchResponse struct {

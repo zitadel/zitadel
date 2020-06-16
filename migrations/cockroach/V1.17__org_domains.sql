@@ -10,7 +10,7 @@ CREATE TABLE management.org_domains (
     verified BOOLEAN,
     primary_domain BOOLEAN,
 
-    PRIMARY KEY (domain)
+    PRIMARY KEY (org_id, domain)
 );
 
 COMMIT;

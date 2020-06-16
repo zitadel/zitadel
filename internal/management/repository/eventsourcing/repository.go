@@ -22,11 +22,10 @@ import (
 
 type Config struct {
 	SearchLimit uint64
-	//TODO: should this be located in system-defaults?
-	Domain     string
-	Eventstore es_int.Config
-	View       types.SQL
-	Spooler    spooler.SpoolerConfig
+	Domain      string
+	Eventstore  es_int.Config
+	View        types.SQL
+	Spooler     spooler.SpoolerConfig
 }
 
 type EsRepository struct {

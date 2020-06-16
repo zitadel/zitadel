@@ -55,6 +55,10 @@ func (key OrgDomainSearchKey) ToColumnName() string {
 		return OrgDomainKeyDomain
 	case org_model.ORGDOMAINSEARCHKEY_ORG_ID:
 		return OrgDomainKeyOrgID
+	case org_model.ORGDOMAINSEARCHKEY_VERIFIED:
+		return OrgDomainKeyVerified
+	case org_model.ORGDOMAINSEARCHKEY_PRIMARY:
+		return OrgDomainKeyPrimary
 	default:
 		return ""
 	}

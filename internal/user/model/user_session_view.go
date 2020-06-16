@@ -44,7 +44,7 @@ const (
 type UserSessionSearchQuery struct {
 	Key    UserSessionSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type UserSessionSearchResponse struct {

@@ -28,12 +28,14 @@ const (
 	ORGDOMAINSEARCHKEY_UNSPECIFIED OrgDomainSearchKey = iota
 	ORGDOMAINSEARCHKEY_DOMAIN
 	ORGDOMAINSEARCHKEY_ORG_ID
+	ORGDOMAINSEARCHKEY_VERIFIED
+	ORGDOMAINSEARCHKEY_PRIMARY
 )
 
 type OrgDomainSearchQuery struct {
 	Key    OrgDomainSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type OrgDomainSearchResponse struct {

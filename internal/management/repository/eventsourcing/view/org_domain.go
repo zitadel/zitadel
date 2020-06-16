@@ -11,12 +11,16 @@ const (
 	orgDomainTable = "management.org_domains"
 )
 
-func (v *View) OrgDomainByDomain(domain string) (*model.OrgDomainView, error) {
-	return view.OrgDomainByDomain(v.Db, orgDomainTable, domain)
+func (v *View) OrgDomainByOrgIDAndDomain(orgID, domain string) (*model.OrgDomainView, error) {
+	return view.OrgDomainByOrgIDAndDomain(v.Db, orgDomainTable, orgID, domain)
 }
 
 func (v *View) OrgDomainsByOrgID(domain string) ([]*model.OrgDomainView, error) {
 	return view.OrgDomainsByOrgID(v.Db, orgDomainTable, domain)
+}
+
+func (v *View) VerifiedOrgDomain(domain string) (*model.OrgDomainView, error) {
+	return view.VerifiedOrgDomain(v.Db, orgDomainTable, domain)
 }
 
 func (v *View) SearchOrgDomains(request *org_model.OrgDomainSearchRequest) ([]*model.OrgDomainView, int, error) {
@@ -28,7 +32,10 @@ func (v *View) PutOrgDomain(org *model.OrgDomainView, sequence uint64) error {
 	if err != nil {
 		return err
 	}
-	return v.ProcessedOrgDomainSequence(sequence)
+	if sequence != 0 {
+		return v.ProcessedOrgDomainSequence(sequence)
+	}
+	return nil
 }
 
 func (v *View) DeleteOrgDomain(domain string, eventSequence uint64) error {

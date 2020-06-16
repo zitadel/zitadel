@@ -24,13 +24,6 @@ func SearchOrgs(db *gorm.DB, table string, req *org_model.OrgSearchRequest) ([]*
 	return orgs, count, nil
 }
 
-func GetGlobalOrgByDomain(db *gorm.DB, table, domain string) (*model.OrgView, error) {
-	org := new(model.OrgView)
-	query := view.PrepareGetByKey(table, model.OrgSearchKey(org_model.ORGSEARCHKEY_ORG_DOMAIN), domain)
-	err := query(db, org)
-	return org, err
-}
-
 func PutOrg(db *gorm.DB, table string, org *model.OrgView) error {
 	save := view.PrepareSave(table)
 	return save(db, org)

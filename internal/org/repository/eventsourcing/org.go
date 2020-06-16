@@ -70,16 +70,16 @@ func orgCreatedAggregates(ctx context.Context, aggCreator *es_models.AggregateCr
 
 func addDomainAggregateAndEvents(ctx context.Context, aggCreator *es_models.AggregateCreator, orgAggregate *es_models.Aggregate, aggregates []*es_models.Aggregate, org *model.Org) ([]*es_models.Aggregate, error) {
 	for _, domain := range org.Domains {
-		domainAggregate, err := reservedUniqueDomainAggregate(ctx, aggCreator, org.AggregateID, domain.Domain)
-		if err != nil {
-			return nil, err
-		}
-		aggregates = append(aggregates, domainAggregate)
-		orgAggregate, err = orgAggregate.AppendEvent(model.OrgDomainAdded, domain)
+		orgAggregate, err := orgAggregate.AppendEvent(model.OrgDomainAdded, domain)
 		if err != nil {
 			return nil, err
 		}
 		if domain.Verified {
+			domainAggregate, err := reservedUniqueDomainAggregate(ctx, aggCreator, org.AggregateID, domain.Domain)
+			if err != nil {
+				return nil, err
+			}
+			aggregates = append(aggregates, domainAggregate)
 			orgAggregate, err = orgAggregate.AppendEvent(model.OrgDomainVerified, domain)
 			if err != nil {
 				return nil, err
@@ -234,29 +234,21 @@ func releasedUniqueNameAggregate(ctx context.Context, aggCreator *es_models.Aggr
 	return aggregate.SetPrecondition(OrgNameUniqueQuery(name), isEventValidation(aggregate, model.OrgNameReleased)), nil
 }
 
-func OrgDomainAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain) ([]*es_models.Aggregate, error) {
-	if domain == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-OSid3", "domain should not be nil")
+func OrgDomainAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if domain == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-OSid3", "domain should not be nil")
+		}
+		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.OrgDomainAdded, domain)
 	}
-	aggregates := make([]*es_models.Aggregate, 0, 2)
-	agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
-	if err != nil {
-		return nil, err
-	}
-	agg, err = agg.AppendEvent(model.OrgDomainAdded, domain)
-	if err != nil {
-		return nil, err
-	}
-	aggregates = append(aggregates, agg)
-	domainAgregate, err := reservedUniqueDomainAggregate(ctx, aggCreator, existing.AggregateID, domain.Domain)
-	if err != nil {
-		return nil, err
-	}
-	return append(aggregates, domainAgregate), nil
 }
 
-func OrgDomainVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
+func OrgDomainVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, domain *model.OrgDomain) func(ctx context.Context) ([]*es_models.Aggregate, error) {
+	return func(ctx context.Context) ([]*es_models.Aggregate, error) {
 		if domain == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DHs7s", "domain should not be nil")
 		}
@@ -264,7 +256,17 @@ func OrgDomainVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.OrgDomainVerified, domain)
+		aggregates := make([]*es_models.Aggregate, 0, 2)
+		agg, err = agg.AppendEvent(model.OrgDomainVerified, domain)
+		if err != nil {
+			return nil, err
+		}
+		domainAgregate, err := reservedUniqueDomainAggregate(ctx, aggCreator, existing.AggregateID, domain.Domain)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, domainAgregate)
+		return append(aggregates, agg), nil
 	}
 }
 

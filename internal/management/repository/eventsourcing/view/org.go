@@ -14,10 +14,6 @@ func (v *View) OrgByID(orgID string) (*model.OrgView, error) {
 	return org_view.OrgByID(v.Db, orgTable, orgID)
 }
 
-func (v *View) OrgByDomain(domain string) (*model.OrgView, error) {
-	return org_view.GetGlobalOrgByDomain(v.Db, orgTable, domain)
-}
-
 func (v *View) PutOrg(org *model.OrgView) error {
 	err := org_view.PutOrg(v.Db, orgTable, org)
 	if err != nil {

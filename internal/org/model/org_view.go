@@ -40,7 +40,7 @@ const (
 type OrgSearchQuery struct {
 	Key    OrgSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type OrgSearchResult struct {
@@ -65,7 +65,6 @@ func OrgViewToOrg(o *OrgView) *Org {
 			ResourceOwner: o.ResourceOwner,
 			Sequence:      o.Sequence,
 		},
-		//Domain: o.Domain,
 		Name:  o.Name,
 		State: o.State,
 	}

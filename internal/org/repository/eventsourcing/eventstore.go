@@ -157,11 +157,9 @@ func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.Org
 	}
 	repoOrg := model.OrgFromModel(existing)
 	repoDomain := model.OrgDomainFromModel(domain)
-	orgAggregates, err := OrgDomainAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
-	if err != nil {
-		return nil, err
-	}
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregates...)
+	aggregate := OrgDomainAddedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
+
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, aggregate)
 	if err != nil {
 		return nil, err
 	}
