@@ -93,7 +93,6 @@ export class AuthUserService {
         req.setFirstName(profile.firstName);
         req.setLastName(profile.lastName);
         req.setNickName(profile.nickName);
-        req.setDisplayName(profile.displayName);
         req.setPreferredLanguage(profile.preferredLanguage);
         req.setGender(profile.gender);
         console.log(req.toObject());

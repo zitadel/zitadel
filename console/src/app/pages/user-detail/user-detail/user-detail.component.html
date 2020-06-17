@@ -1,23 +1,23 @@
 <app-meta-layout>
 
-    <div *ngIf="profile" class="max-width-container">
+    <div *ngIf="user" class="max-width-container">
         <div class="head">
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{profile?.firstName}}</h1>
+            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.firstName}}</h1>
 
             <p class="desc">{{ 'USER.PROFILE.DESCRIPTION' | translate }}</p>
         </div>
 
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
-        <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+profile?.id]">
+        <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
             <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
                 description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
                 <app-detail-form
-                    *ngIf="((authUserService.isAllowed(['user.write:' + profile?.id, 'user.write']) | async) || false) as canwrite"
-                    [disabled]="canwrite" [genders]="genders" [languages]="languages" [profile]="profile"
+                    *ngIf="((authUserService.isAllowed(['user.write:' + user?.id, 'user.write']) | async) || false) as canwrite"
+                    [disabled]="canwrite" [genders]="genders" [languages]="languages" [profile]="user"
                     (submitData)="saveProfile($event)">
                 </app-detail-form>
             </app-card>
@@ -26,11 +26,12 @@
         <app-card title="{{'USER.PASSWORD.TITLE' | translate}}"
             description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">
             <card-actions class="card-actions">
-                <button mat-stroked-button color="primary"
+                <button *ngIf="user.state === UserState.USERSTATE_INITIAL" mat-stroked-button color="primary"
                     (click)="sendSetPasswordNotification()">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
             </card-actions>
             <form *ngIf="passwordForm" autocomplete="new-password" [formGroup]="passwordForm"
                 (ngSubmit)="setInitialPassword()">
+                <!-- {{USERSTATE_INITIAL}} -->
                 <div class="content center">
                     <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
@@ -74,11 +75,11 @@
 
                     <ng-container *ngIf="!emailEditState; else emailEdit">
                         <div class="actions">
-                            <span class="name">{{email?.email}}</span>
-                            <mat-icon *ngIf="email?.isEmailVerified" color="primary" aria-hidden="false"
+                            <span class="name">{{user?.email}}</span>
+                            <mat-icon *ngIf="user?.isEmailVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
-                            <ng-container *ngIf="email?.email && !email?.isEmailVerified">
+                            <ng-container *ngIf="user?.email && !user?.isEmailVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
@@ -95,12 +96,12 @@
                     <ng-template #emailEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input matInput [(ngModel)]="email.email" />
+                            <input matInput [(ngModel)]="user.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon>close</mat-icon>
                         </button>
-                        <button [disabled]="!email.email" class="submit-button" type="button" color="primary"
+                        <button [disabled]="!user.email" class="submit-button" type="button" color="primary"
                             (click)="saveEmail()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
@@ -110,11 +111,11 @@
 
                     <ng-container *ngIf="!phoneEditState; else phoneEdit">
                         <div class="actions">
-                            <span class="name">{{phone?.phone}}</span>
-                            <mat-icon *ngIf="phone?.isPhoneVerified" color="primary" aria-hidden="false"
+                            <span class="name">{{user?.phone}}</span>
+                            <mat-icon *ngIf="user?.isPhoneVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
-                            <ng-container *ngIf="phone?.phone && !phone?.isPhoneVerified">
+                            <ng-container *ngIf="user?.phone && !user?.isPhoneVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
 
@@ -127,7 +128,7 @@
                             <button (click)="phoneEditState = true" mat-icon-button>
                                 <mat-icon>edit</mat-icon>
                             </button>
-                            <button *ngIf="phone?.phone" (click)="deletePhone()" mat-icon-button>
+                            <button *ngIf="user?.phone" (click)="deletePhone()" mat-icon-button>
                                 <mat-icon>delete_outline</mat-icon>
                             </button>
                         </div>
@@ -136,19 +137,19 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input matInput [(ngModel)]="phone.phone" />
+                            <input matInput [(ngModel)]="user.phone" />
                         </mat-form-field>
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon>close</mat-icon>
                         </button>
-                        <button [disabled]="!phone.phone" type="button" color="primary" (click)="savePhone()"
+                        <button [disabled]="!user.phone" type="button" color="primary" (click)="savePhone()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
             </div>
         </app-card>
 
-        <app-auth-user-mfa *ngIf="profile" [profile]="profile"></app-auth-user-mfa>
+        <app-auth-user-mfa *ngIf="user" [profile]="user"></app-auth-user-mfa>
 
         <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}">
             <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
@@ -180,14 +181,14 @@
             </form>
         </app-card>
 
-        <app-card *ngIf="profile?.id" title="{{ 'USER.GRANTS.TITLE' | translate }}"
+        <app-card *ngIf="user?.id" title="{{ 'USER.GRANTS.TITLE' | translate }}"
             description="{{'USER.GRANTS.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="profile?.id"></app-user-grants>
+            <app-user-grants [userId]="user?.id"></app-user-grants>
         </app-card>
     </div>
 
-    <metainfo *ngIf="profile" class="side">
+    <metainfo *ngIf="user" class="side">
         <p class="side-section">{{ 'CHANGES.USER.TITLE' | translate }}</p>
-        <app-changes [changeType]="ChangeType.USER" [id]="profile.id"></app-changes>
+        <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </metainfo>
 </app-meta-layout>

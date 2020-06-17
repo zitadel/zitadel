@@ -644,5 +644,325 @@ proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.setUpOrg =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyID,
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ */
+const methodDescriptor_AdminService_GetOrgIamPolicy = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicyID,
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyID,
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ */
+const methodInfo_AdminService_GetOrgIamPolicy = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.OrgIamPolicy)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.OrgIamPolicy>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.getOrgIamPolicy =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetOrgIamPolicy,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.getOrgIamPolicy =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetOrgIamPolicy);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest,
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ */
+const methodDescriptor_AdminService_CreateOrgIamPolicy = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest,
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest,
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ */
+const methodInfo_AdminService_CreateOrgIamPolicy = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.OrgIamPolicy)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.OrgIamPolicy>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.createOrgIamPolicy =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_CreateOrgIamPolicy,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.createOrgIamPolicy =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/CreateOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_CreateOrgIamPolicy);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest,
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ */
+const methodDescriptor_AdminService_UpdateOrgIamPolicy = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/UpdateOrgIamPolicy',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest,
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest,
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ */
+const methodInfo_AdminService_UpdateOrgIamPolicy = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicy.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.OrgIamPolicy)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.OrgIamPolicy>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.updateOrgIamPolicy =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/UpdateOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_UpdateOrgIamPolicy,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.OrgIamPolicy>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.updateOrgIamPolicy =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/UpdateOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_UpdateOrgIamPolicy);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyID,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_AdminService_DeleteOrgIamPolicy = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.OrgIamPolicyID,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.OrgIamPolicyID,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodInfo_AdminService_DeleteOrgIamPolicy = new grpc.web.AbstractClientBase.MethodInfo(
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.deleteOrgIamPolicy =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_DeleteOrgIamPolicy,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.OrgIamPolicyID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.deleteOrgIamPolicy =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/DeleteOrgIamPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_DeleteOrgIamPolicy);
+};
+
+
 module.exports = proto.caos.zitadel.admin.api.v1;
 

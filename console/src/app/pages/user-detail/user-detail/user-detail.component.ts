@@ -10,10 +10,12 @@ import {
     Gender,
     NotificationType,
     PasswordComplexityPolicy,
+    User,
     UserAddress,
     UserEmail,
     UserPhone,
     UserProfile,
+    UserState,
 } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
@@ -43,9 +45,9 @@ function passwordConfirmValidator(c: AbstractControl): any {
     styleUrls: ['./user-detail.component.scss'],
 })
 export class UserDetailComponent implements OnInit, OnDestroy {
-    public profile!: UserProfile.AsObject;
-    public email: UserEmail.AsObject = { email: '' } as any;
-    public phone: UserPhone.AsObject = { phone: '' } as any;
+    public user!: User.AsObject;
+    // public email: UserEmail.AsObject = { email: '' } as any;
+    // public phone: UserPhone.AsObject = { phone: '' } as any;
     public address: UserAddress.AsObject = { id: '' } as any;
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
@@ -61,6 +63,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public ChangeType: any = ChangeType;
     public loading: boolean = false;
 
+    public UserState: any = UserState;
     public policy!: PasswordComplexityPolicy.AsObject;
     constructor(
         public translate: TranslateService,
@@ -97,7 +100,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 password: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
-            // TODO custom validator for pattern
         }).catch(error => {
             console.log('no password complexity policy defined!');
             this.passwordForm = this.fb.group({
@@ -131,14 +133,14 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
 
     public deletePhone(): void {
-        this.phone.phone = '';
+        this.user.phone = '';
         this.savePhone();
     }
 
     public enterCode(): void {
         const dialogRef = this.dialog.open(CodeDialogComponent, {
             data: {
-                number: this.phone.phone,
+                number: this.user.phone,
             },
         });
 
@@ -150,17 +152,18 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveProfile(profileData: UserProfile.AsObject): void {
-        this.profile.firstName = profileData.firstName;
-        this.profile.lastName = profileData.lastName;
-        this.profile.nickName = profileData.nickName;
-        this.profile.displayName = profileData.displayName;
-        this.profile.gender = profileData.gender;
-        this.profile.preferredLanguage = profileData.preferredLanguage;
+        this.user.firstName = profileData.firstName;
+        this.user.lastName = profileData.lastName;
+        this.user.nickName = profileData.nickName;
+        this.user.displayName = profileData.displayName;
+        this.user.gender = profileData.gender;
+        this.user.preferredLanguage = profileData.preferredLanguage;
+        console.log(this.user);
         this.mgmtUserService
-            .SaveUserProfile(this.profile)
+            .SaveUserProfile(this.user)
             .then((data: UserProfile) => {
                 this.toast.showInfo('Saved Profile');
-                this.profile = data.toObject();
+                this.user = Object.assign(this.user, data.toObject());
             })
             .catch(data => {
                 this.toast.showError(data.message);
@@ -169,7 +172,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public resendVerification(): void {
         console.log('resendverification');
-        this.mgmtUserService.ResendEmailVerification(this.profile.id).then(() => {
+        this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('Email was successfully sent!');
         }).catch(data => {
             this.toast.showError(data.message);
@@ -177,7 +180,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
 
     public resendPhoneVerification(): void {
-        this.mgmtUserService.ResendPhoneVerification(this.profile.id).then(() => {
+        this.mgmtUserService.ResendPhoneVerification(this.user.id).then(() => {
             this.toast.showInfo('Phoneverification was successfully sent!');
         }).catch(data => {
             this.toast.showError(data.message);
@@ -186,9 +189,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public setInitialPassword(): void {
         if (this.passwordForm.valid && this.password && this.password.value) {
-            this.mgmtUserService.SetInitialPassword(this.profile.id, this.password.value).then((data: any) => {
+            this.mgmtUserService.SetInitialPassword(this.user.id, this.password.value).then((data: any) => {
                 this.toast.showInfo('Set initial Password');
-                this.email = data.toObject();
+                this.user.email = data.toObject();
             }).catch(data => {
                 this.toast.showError(data.message);
             });
@@ -196,10 +199,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
 
     public sendSetPasswordNotification(): void {
-        this.mgmtUserService.SendSetPasswordNotification(this.profile.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
+        this.mgmtUserService.SendSetPasswordNotification(this.user.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
             .then((data: any) => {
                 this.toast.showInfo('Set initial Password');
-                this.email = data.toObject();
+                this.user.email = data.toObject();
             }).catch(data => {
                 this.toast.showError(data.message);
             });
@@ -208,9 +211,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public saveEmail(): void {
         this.emailEditState = false;
         this.mgmtUserService
-            .SaveUserEmail(this.email).then((data: UserEmail) => {
+            .SaveUserEmail(this.user.id, this.user.email).then((data: UserEmail) => {
                 this.toast.showInfo('Saved Email');
-                this.email = data.toObject();
+                this.user.email = data.toObject().email;
             }).catch(data => {
                 this.toast.showError(data.message);
             });
@@ -218,13 +221,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public savePhone(): void {
         this.phoneEditState = false;
-        if (!this.phone.id) {
-            this.phone.id = this.profile.id;
-        }
         this.mgmtUserService
-            .SaveUserPhone(this.phone).then((data: UserPhone) => {
+            .SaveUserPhone(this.user.id, this.user.phone).then((data: UserPhone) => {
                 this.toast.showInfo('Saved Phone');
-                this.phone = data.toObject();
+                this.user.phone = data.toObject().phone;
             }).catch(data => {
                 this.toast.showError(data.message);
             });
@@ -232,7 +232,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public saveAddress(): void {
         if (!this.address.id) {
-            this.address.id = this.profile.id;
+            this.address.id = this.user.id;
         }
 
         this.address.streetAddress = this.streetAddress?.value;
@@ -279,9 +279,15 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     private async getData({ id }: Params): Promise<void> {
         this.isMgmt = true;
-        this.profile = (await this.mgmtUserService.GetUserProfile(id)).toObject();
-        this.email = (await this.mgmtUserService.GetUserEmail(id)).toObject();
-        this.phone = (await this.mgmtUserService.GetUserPhone(id)).toObject();
+        this.mgmtUserService.GetUserByID(id).then(user => {
+            console.log(user.toObject());
+            this.user = user.toObject();
+        }).catch(err => {
+            console.error(err);
+        });
+        // this.profile = (await this.mgmtUserService.GetUserProfile(id)).toObject();
+        // this.email = (await this.mgmtUserService.GetUserEmail(id)).toObject();
+        // this.phone = (await this.mgmtUserService.GetUserPhone(id)).toObject();
         this.address = (await this.mgmtUserService.GetUserAddress(id)).toObject();
         this.addressForm.patchValue(this.address);
     }

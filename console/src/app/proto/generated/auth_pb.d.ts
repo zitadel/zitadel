@@ -152,6 +152,14 @@ export class User extends jspb.Message {
   getSequence(): number;
   setSequence(value: number): void;
 
+  getLoginNamesList(): Array<string>;
+  setLoginNamesList(value: Array<string>): void;
+  clearLoginNamesList(): void;
+  addLoginNames(value: string, index?: number): void;
+
+  getPreferredLoginName(): string;
+  setPreferredLoginName(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): User.AsObject;
   static toObject(includeInstance: boolean, msg: User): User.AsObject;
@@ -187,6 +195,8 @@ export namespace User {
     streetAddress: string,
     passwordChangeRequired: boolean,
     sequence: number,
+    loginNamesList: Array<string>,
+    preferredLoginName: string,
   }
 }
 
@@ -252,7 +262,13 @@ export namespace UserProfile {
   }
 }
 
-export class UpdateUserProfileRequest extends jspb.Message {
+export class UserProfileView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getUserName(): string;
+  setUserName(value: string): void;
+
   getFirstName(): string;
   setFirstName(value: string): void;
 
@@ -264,6 +280,69 @@ export class UpdateUserProfileRequest extends jspb.Message {
 
   getDisplayName(): string;
   setDisplayName(value: string): void;
+
+  getPreferredLanguage(): string;
+  setPreferredLanguage(value: string): void;
+
+  getGender(): Gender;
+  setGender(value: Gender): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getLoginNamesList(): Array<string>;
+  setLoginNamesList(value: Array<string>): void;
+  clearLoginNamesList(): void;
+  addLoginNames(value: string, index?: number): void;
+
+  getPreferredLoginName(): string;
+  setPreferredLoginName(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserProfileView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserProfileView): UserProfileView.AsObject;
+  static serializeBinaryToWriter(message: UserProfileView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserProfileView;
+  static deserializeBinaryFromReader(message: UserProfileView, reader: jspb.BinaryReader): UserProfileView;
+}
+
+export namespace UserProfileView {
+  export type AsObject = {
+    id: string,
+    userName: string,
+    firstName: string,
+    lastName: string,
+    nickName: string,
+    displayName: string,
+    preferredLanguage: string,
+    gender: Gender,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    loginNamesList: Array<string>,
+    preferredLoginName: string,
+  }
+}
+
+export class UpdateUserProfileRequest extends jspb.Message {
+  getFirstName(): string;
+  setFirstName(value: string): void;
+
+  getLastName(): string;
+  setLastName(value: string): void;
+
+  getNickName(): string;
+  setNickName(value: string): void;
 
   getPreferredLanguage(): string;
   setPreferredLanguage(value: string): void;
@@ -284,7 +363,6 @@ export namespace UpdateUserProfileRequest {
     firstName: string,
     lastName: string,
     nickName: string,
-    displayName: string,
     preferredLanguage: string,
     gender: Gender,
   }
@@ -322,6 +400,48 @@ export class UserEmail extends jspb.Message {
 }
 
 export namespace UserEmail {
+  export type AsObject = {
+    id: string,
+    email: string,
+    isemailverified: boolean,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class UserEmailView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getEmail(): string;
+  setEmail(value: string): void;
+
+  getIsemailverified(): boolean;
+  setIsemailverified(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserEmailView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserEmailView): UserEmailView.AsObject;
+  static serializeBinaryToWriter(message: UserEmailView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserEmailView;
+  static deserializeBinaryFromReader(message: UserEmailView, reader: jspb.BinaryReader): UserEmailView;
+}
+
+export namespace UserEmailView {
   export type AsObject = {
     id: string,
     email: string,
@@ -432,6 +552,48 @@ export namespace UserPhone {
   }
 }
 
+export class UserPhoneView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getPhone(): string;
+  setPhone(value: string): void;
+
+  getIsPhoneVerified(): boolean;
+  setIsPhoneVerified(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserPhoneView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserPhoneView): UserPhoneView.AsObject;
+  static serializeBinaryToWriter(message: UserPhoneView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserPhoneView;
+  static deserializeBinaryFromReader(message: UserPhoneView, reader: jspb.BinaryReader): UserPhoneView;
+}
+
+export namespace UserPhoneView {
+  export type AsObject = {
+    id: string,
+    phone: string,
+    isPhoneVerified: boolean,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
 export class UpdateUserPhoneRequest extends jspb.Message {
   getPhone(): string;
   setPhone(value: string): void;
@@ -509,6 +671,60 @@ export class UserAddress extends jspb.Message {
 }
 
 export namespace UserAddress {
+  export type AsObject = {
+    id: string,
+    country: string,
+    locality: string,
+    postalCode: string,
+    region: string,
+    streetAddress: string,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class UserAddressView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getCountry(): string;
+  setCountry(value: string): void;
+
+  getLocality(): string;
+  setLocality(value: string): void;
+
+  getPostalCode(): string;
+  setPostalCode(value: string): void;
+
+  getRegion(): string;
+  setRegion(value: string): void;
+
+  getStreetAddress(): string;
+  setStreetAddress(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserAddressView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserAddressView): UserAddressView.AsObject;
+  static serializeBinaryToWriter(message: UserAddressView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserAddressView;
+  static deserializeBinaryFromReader(message: UserAddressView, reader: jspb.BinaryReader): UserAddressView;
+}
+
+export namespace UserAddressView {
   export type AsObject = {
     id: string,
     country: string,
