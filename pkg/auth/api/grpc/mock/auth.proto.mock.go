@@ -137,6 +137,26 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyMfas(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyMfas", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyMfas), varargs...)
 }
 
+// GetMyUser mocks base method
+func (m *MockAuthServiceClient) GetMyUser(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.UserView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetMyUser", varargs...)
+	ret0, _ := ret[0].(*grpc.UserView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMyUser indicates an expected call of GetMyUser
+func (mr *MockAuthServiceClientMockRecorder) GetMyUser(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyUser", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyUser), varargs...)
+}
+
 // GetMyUserAddress mocks base method
 func (m *MockAuthServiceClient) GetMyUserAddress(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.UserAddressView, error) {
 	m.ctrl.T.Helper()

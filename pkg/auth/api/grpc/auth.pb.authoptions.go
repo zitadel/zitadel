@@ -20,6 +20,11 @@ var AuthService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUser": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserProfile": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
