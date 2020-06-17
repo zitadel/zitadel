@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -17,7 +17,6 @@ import {
     ProjectState,
     ProjectType,
 } from 'src/app/proto/generated/management_pb';
-import { GrpcService } from 'src/app/services/grpc.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -27,7 +26,7 @@ import { ToastService } from 'src/app/services/toast.service';
     templateUrl: './granted-project-detail.component.html',
     styleUrls: ['./granted-project-detail.component.scss'],
 })
-export class GrantedProjectDetailComponent implements OnInit {
+export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
     public grantId: string = '';
     public project!: ProjectGrantView.AsObject;
@@ -64,7 +63,6 @@ export class GrantedProjectDetailComponent implements OnInit {
         private toast: ToastService,
         private projectService: ProjectService,
         private _location: Location,
-        private grpcService: GrpcService,
         private orgService: OrgService,
     ) {
     }
