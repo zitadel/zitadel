@@ -30,6 +30,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     private subscription: Subscription = new Subscription();
 
     public domains: OrgDomainView.AsObject[] = [];
+    public newDomain: string = '';
 
     constructor(
         public translate: TranslateService,
@@ -75,5 +76,20 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error.message);
             });
         }
+    }
+
+    public saveNewOrgDomain(): void {
+        this.orgService.AddMyOrgDomain(this.newDomain).then(domain => {
+            this.domains.push(domain.toObject());
+        });
+    }
+
+    public removeDomain(domain: string): void {
+        console.log(domain);
+        this.orgService.RemoveMyOrgDomain(domain).then(() => {
+            this.toast.showInfo('Removed');
+        }).catch(error => {
+            this.toast.showError(error.message);
+        });
     }
 }

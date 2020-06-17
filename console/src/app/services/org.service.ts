@@ -4,6 +4,7 @@ import { Metadata } from 'grpc-web';
 
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import {
+    AddOrgDomainRequest,
     AddOrgMemberRequest,
     Iam,
     Org,
@@ -29,6 +30,7 @@ import {
     PasswordLockoutPolicyUpdate,
     ProjectGrant,
     ProjectGrantCreate,
+    RemoveOrgDomainRequest,
     RemoveOrgMemberRequest,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
@@ -69,6 +71,26 @@ export class OrgService {
         req.setId(orgId);
         return await this.request(
             c => c.getOrgByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async AddMyOrgDomain(domain: string): Promise<OrgDomain> {
+        const req: AddOrgDomainRequest = new AddOrgDomainRequest();
+        req.setDomain(domain);
+        return await this.request(
+            c => c.addMyOrgDomain,
+            req,
+            f => f,
+        );
+    }
+
+    public async RemoveMyOrgDomain(domain: string): Promise<Empty> {
+        const req: RemoveOrgDomainRequest = new RemoveOrgDomainRequest();
+        req.setDomain(domain);
+        return await this.request(
+            c => c.removeMyOrgDomain,
             req,
             f => f,
         );
