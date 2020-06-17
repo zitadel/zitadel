@@ -7,7 +7,7 @@
             <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.name}}</h1>
             <ng-template appHasRole [appHasRole]="['project.write:'+projectId, 'project.write']">
                 <button mat-icon-button (click)="editstate = !editstate" aria-label="Edit project name"
-                    *ngIf="(isZitadel$ | async) === false">
+                    *ngIf="isZitadel === false">
                     <mat-icon *ngIf="!editstate">edit</mat-icon>
                     <mat-icon *ngIf="editstate">close</mat-icon>
                 </button>
@@ -23,14 +23,17 @@
                     <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
                         <mat-icon>check</mat-icon>
                     </button>
-                    <button mat-stroked-button color="accent" [disabled]="(isZitadel$ | async)"
+                    <button mat-stroked-button color="accent" [disabled]="isZitadel"
                         *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="second"
                         (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
-                    <button mat-stroked-button color="accent" [disabled]="(isZitadel$ | async)"
+                    <button mat-stroked-button color="accent" [disabled]="isZitadel"
                         *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="second"
                         (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
                 </ng-container>
                 <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
+                <p *ngIf="isZitadel" class="zitadel-warning">This belongs to Zitadel project. If you change something,
+                    Zitadel
+                    may not behave as intended!</p>
             </div>
         </div>
 
@@ -38,7 +41,7 @@
         <ng-container *ngIf="project">
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
                 <app-project-application-grid *ngIf="grid"
-                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (isZitadel$ | async)"
+                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
                     (changeView)="grid = false" [projectId]="projectId"></app-project-application-grid>
                 <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
                     <card-actions class="card-actions">
@@ -47,12 +50,12 @@
                         </button>
                     </card-actions>
                     <app-project-applications
-                        [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (isZitadel$ | async)"
+                        [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
                         [projectId]="projectId"></app-project-applications>
                 </app-card>
             </ng-template>
 
-            <ng-container *ngIf="(isZitadel$ | async) == false">
+            <ng-container *ngIf="isZitadel == false">
                 <ng-template appHasRole [appHasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
                     <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">

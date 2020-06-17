@@ -8,13 +8,15 @@
 
             <div class="full-width">
                 <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
+                <p *ngIf="isZitadel" class="zitadel-warning">This belongs to Zitadel project. If you change something,
+                    Zitadel
+                    may not behave as intended!</p>
             </div>
         </div>
 
         <app-card>
             <app-project-grant-members *ngIf="project && project.projectId && project.id"
-                [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || (isZitadel$ | async)"
-                [project]="project">
+                [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel" [project]="project">
             </app-project-grant-members>
         </app-card>
     </div>

@@ -6,6 +6,8 @@
         <h1>{{ 'APP.PAGES.TITLE' | translate }} {{app?.name}}</h1>
 
         <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
+        <p *ngIf="isZitadel" class="zitadel-warning">This belongs to Zitadel project. If you change something, Zitadel
+            may not behave as intended!</p>
     </div>
 
     <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
@@ -86,7 +88,7 @@
 
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
-                    <mat-chip-list #chipRedirectList [disabled]="isZitadel">
+                    <mat-chip-list #chipRedirectList>
                         <mat-chip *ngFor="let redirect of redirectUrisList" [selectable]="selectable"
                             (removed)="remove(redirect, RedirectType.REDIRECT)">
                             {{redirect}}
@@ -100,7 +102,7 @@
 
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
-                    <mat-chip-list #chipPostRedirectList [disabled]="isZitadel">
+                    <mat-chip-list #chipPostRedirectList>
                         <mat-chip *ngFor="let redirect of postLogoutRedirectUrisList" [selectable]="selectable"
                             (removed)="remove(redirect, RedirectType.POSTREDIRECT)">
                             {{redirect}}

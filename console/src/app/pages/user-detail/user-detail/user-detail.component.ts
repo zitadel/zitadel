@@ -77,6 +77,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         public authUserService: AuthUserService,
     ) {
         const validators: Validators[] = [Validators.required];
+
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
             if (this.policy.minLength) {

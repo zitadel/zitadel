@@ -5,6 +5,7 @@ import { Metadata } from 'grpc-web';
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import {
     AddOrgMemberRequest,
+    Iam,
     Org,
     OrgDomain,
     OrgDomainSearchQuery,
@@ -52,6 +53,15 @@ export class OrgService {
             metadata,
         );
         return responseMapper(response);
+    }
+
+    public async GetIam(): Promise<Iam> {
+        const req: Empty = new Empty();
+        return await this.request(
+            c => c.getIam,
+            req,
+            f => f,
+        );
     }
 
     public async GetOrgById(orgId: string): Promise<Org> {
