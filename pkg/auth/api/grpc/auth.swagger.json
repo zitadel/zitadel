@@ -1170,6 +1170,12 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "login_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
         }
       }
     },

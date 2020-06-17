@@ -286,6 +286,8 @@ message UserSessionView {
   string user_id = 4;
   string user_name = 5;
   uint64 sequence = 6;
+  string login_name = 7;
+  string display_name = 8;
 }
 
 enum UserSessionState {
