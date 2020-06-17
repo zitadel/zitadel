@@ -25,7 +25,7 @@ h1 {
 }
 
 p {
-    font-width: 300;
+    font-weight: 300;
 }
 
 header {
@@ -83,10 +83,6 @@ button {
             background-color: $primaryColorHover;
         }
     }
-
-    & > .sessionstate {
-        text-transform: lowercase;
-    }
 }
 
 input:not([type='radio']), select {
@@ -143,6 +139,102 @@ form {
             margin: 10px 0;
         }
     }
+
+    button.clean {
+        border: none;
+        height: auto;
+        color: $fontColor;
+        text-align: left;
+        text-transform: unset;
+        display: flex;
+        padding: 15px;
+
+        &:hover {
+            border: none;
+            background-color: $buttonBackgroundColorHover;
+        }
+
+        * {
+            font-weight: 300;
+        }
+    }
+
+    .user-selection-list {
+        margin-bottom: 80px;
+    }
+
+    button.user-selection {
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            @include retina-background-image($profileImgDark, "png", false, 100px, 100px);
+        }
+
+        &:hover {
+            .profile-image {
+                @include retina-background-image($profileImgDark, "png", true, 100px, 100px);
+            }
+        }
+
+        .sessionstate {
+            display: inline-block;
+            height: 20px;
+            width: 20px;
+            border-radius: 20px;
+            border-color: $inputBorderColor;
+            border-style: solid;
+            border-width: 1px;
+            position: absolute;
+            bottom: 0px;
+            right: 10px;
+
+            &.sessionstate-0 {
+                background-color: #138D00;
+            }
+
+            &.sessionstate-1 {
+                background-color: #BC372E;
+            }
+        }
+
+
+        & > div {
+            position: relative;
+
+            &.names {
+                margin: 15px;
+
+                .displayname {
+                    font-size: 1.4rem;
+                }
+                .loginname {
+                    color: $labelColor;
+                }
+            }
+        }
+    }
+
+    button.other-user {
+        .user-selection+&{
+            margin-top: 80px;
+        }
+        .other-user-image {
+            width: 100px;
+            height: 75px;
+            @include retina-background-image($otherUserImgDark, "png", false, 100px, 75px);
+        }
+
+        &:hover {
+            .other-user-image {
+                @include retina-background-image($otherUserImgDark, "png", true, 100px, 75px);
+            }
+        }
+
+        & > div:nth-of-type(2) {
+            margin: 15px;
+            font-size: 1.4rem;
+        }
+    }
 }
 
 #copy-secret {
@@ -153,12 +245,12 @@ form {
 #qrcode {
     text-align: center;
 
-    svg rect[style*="fill:white"] {
-        fill: $backgroundColor !important;
+    svg rect.color {
+        fill: $fontColor;
     }
 
-    svg rect[style*="fill:black"] {
-        fill: $fontColor !important;
+    svg rect.bg-color {
+        fill: $backgroundColor;
     }
 }
 

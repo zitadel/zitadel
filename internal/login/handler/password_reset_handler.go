@@ -15,7 +15,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.RequestPasswordReset(setContext(r.Context(), authReq.UserOrgID), authReq.UserName)
+	err = l.authRepo.RequestPasswordReset(setContext(r.Context(), authReq.UserOrgID), authReq.LoginName)
 	l.renderPasswordResetDone(w, r, authReq, err)
 }
 
@@ -25,8 +25,8 @@ func (l *Login) renderPasswordResetDone(w http.ResponseWriter, r *http.Request, 
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authReq, "Password Reset Done", errType, errMessage),
-		UserName: authReq.UserName,
+		baseData:  l.getBaseData(r, authReq, "Password Reset Done", errType, errMessage),
+		LoginName: authReq.LoginName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPasswordResetDone], data, nil)
 }

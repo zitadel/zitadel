@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"net/http"
 
-	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
+
 	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/qrcode"
 )
 
 const (
@@ -67,7 +68,7 @@ func (l *Login) renderMfaInitVerify(w http.ResponseWriter, r *http.Request, auth
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data.baseData = l.getBaseData(r, authReq, "Mfa Init Verify", errType, errMessage)
-	data.UserName = authReq.UserName
+	data.LoginName = authReq.LoginName
 	if data.MfaType == model.MfaTypeOTP {
 		code, err := generateQrCode(data.otpData.Url)
 		if err == nil {
@@ -86,7 +87,7 @@ func generateQrCode(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	qs := goqrsvg.NewQrSVG(qrCode, 5)
+	qs := qrcode.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
 

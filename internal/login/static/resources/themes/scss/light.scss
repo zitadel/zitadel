@@ -30,6 +30,36 @@ html {
                 background-color: $primaryColorHover;
             }
         }
+
+        &.clean {
+            color: $fontColorLight;
+        }
+
+        &.user-selection {
+            .profile-image {
+                @include retina-background-image($profileImgLight, "png", false, 100px, 100px);
+            }
+
+            &:hover {
+                background-color: $buttonBackgroundColorHover;
+
+                .profile-image {
+                    @include retina-background-image($profileImgLight, "png", true, 100px, 100px);
+                }
+            }
+        }
+
+        &.other-user {
+            .other-user-image {
+                @include retina-background-image($otherUserImgLight, "png", false, 100px, 75px);
+            }
+
+            &:hover {
+                .other-user-image {
+                    @include retina-background-image($otherUserImgLight, "png", true, 100px, 75px);
+                }
+            }
+        }
     }
 
     input {

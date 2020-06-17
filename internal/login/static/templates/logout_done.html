@@ -5,6 +5,8 @@
 <p>{{t "LogoutDone.Description"}}</p>
 <form action="{{ loginUrl }}" method="POST">
 
+    {{ .CSRF }}
+
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Login"}}</button>
     </div>

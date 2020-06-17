@@ -109,6 +109,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	if err != nil {
 		return nil, nil, err
 	}
+	user.SetNamesAsDisplayname()
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
@@ -161,6 +162,7 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	if err != nil {
 		return nil, nil, err
 	}
+	user.SetNamesAsDisplayname()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.InvalidData")
 	}

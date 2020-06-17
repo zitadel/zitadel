@@ -4,14 +4,16 @@
 <h1>{{t "Login.Title"}}</h1>
 <p>{{t "Login.Description"}}</p>
 
-<form action="{{ usernameUrl }}" method="POST">
+<form action="{{ loginNameUrl }}" method="POST">
+
+    {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="fields">
         <div class="field">
-            <label class="label" for="username">{{t "Login.Loginname"}}</label>
-            <input class="input" type="text" id="username" name="username" placeholder="{{t "Login.LoginnamePlaceHolder"}}" value="{{ .UserName }}" autocomplete="username" autofocus required>
+            <label class="label" for="loginName">{{t "Login.Loginname"}}</label>
+            <input class="input" type="text" id="loginName" name="loginName" placeholder="{{t "Login.LoginnamePlaceHolder"}}" value="{{ .LoginName }}" autocomplete="username" autofocus required>
         </div>
     </div>
 

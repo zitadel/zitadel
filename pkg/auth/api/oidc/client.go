@@ -55,7 +55,7 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			userInfo.FamilyName = user.LastName
 			userInfo.GivenName = user.FirstName
 			userInfo.Nickname = user.NickName
-			userInfo.PreferredUsername = user.UserName
+			userInfo.PreferredUsername = user.PreferredLoginName
 			userInfo.UpdatedAt = user.ChangeDate
 			userInfo.Gender = oidc.Gender(getGender(user.Gender))
 		case scopePhone:

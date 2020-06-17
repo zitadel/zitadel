@@ -5,6 +5,8 @@
 <p>{{t "InitUserDone.Description"}}</p>
 <form action="{{ loginUrl }}" method="POST">
 
+    {{ .CSRF }}
+
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="actions">

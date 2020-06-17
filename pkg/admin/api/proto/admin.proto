@@ -220,19 +220,18 @@ message CreateUserRequest {
     string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-    string display_name = 5 [(validate.rules).string = {max_len: 200}];
-    string preferred_language = 6 [(validate.rules).string = {max_len: 200}];
-    Gender gender = 7;
-    string email = 8 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
-    bool is_email_verified = 9;
-    string phone = 11 [(validate.rules).string = {max_len: 20}];
-    bool is_phone_verified = 12;
-    string country = 13 [(validate.rules).string = {max_len: 200}];
-    string locality = 14 [(validate.rules).string = {max_len: 200}];
-    string postal_code = 15 [(validate.rules).string = {max_len: 200}];
-    string region = 16 [(validate.rules).string = {max_len: 200}];
-    string street_address = 17 [(validate.rules).string = {max_len: 200}];
-    string password = 18 [(validate.rules).string = {max_len: 72}];
+    string preferred_language = 5 [(validate.rules).string = {max_len: 200}];
+    Gender gender = 6;
+    string email = 7 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+    bool is_email_verified = 8;
+    string phone = 9 [(validate.rules).string = {max_len: 20}];
+    bool is_phone_verified = 10;
+    string country = 11 [(validate.rules).string = {max_len: 200}];
+    string locality = 12 [(validate.rules).string = {max_len: 200}];
+    string postal_code = 13 [(validate.rules).string = {max_len: 200}];
+    string region = 14 [(validate.rules).string = {max_len: 200}];
+    string street_address = 15 [(validate.rules).string = {max_len: 200}];
+    string password = 16 [(validate.rules).string = {max_len: 72}];
 }
 
 message User {

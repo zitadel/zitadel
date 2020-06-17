@@ -61,7 +61,6 @@ func userCreateToModel(u *CreateUserRequest) *usr_model.User {
 			FirstName:         u.FirstName,
 			LastName:          u.LastName,
 			NickName:          u.NickName,
-			DisplayName:       u.DisplayName,
 			PreferredLanguage: preferredLanguage,
 			Gender:            genderToModel(u.Gender),
 		},
@@ -193,7 +192,6 @@ func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
-		DisplayName:       u.DisplayName,
 		PreferredLanguage: preferredLanguage,
 		Gender:            genderToModel(u.Gender),
 	}
