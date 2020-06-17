@@ -15,6 +15,11 @@ import (
 
 var ManagementService_AuthMethods = utils_auth.MethodMapping{
 
+	"/caos.zitadel.management.api.v1.ManagementService/GetIam": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetUserByID": utils_auth.Option{
 		Permission: "user.read",
 		CheckParam: "",

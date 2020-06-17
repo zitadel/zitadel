@@ -51,8 +51,19 @@ service ManagementService {
         };
     }
 
+    //IAM
+    rpc GetIam(google.protobuf.Empty) returns (Iam) {
+        option (google.api.http) = {
+            get: "/iam"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+          permission: "authenticated"
+        };
+    }
+
     //USER
-    rpc GetUserByID(UserID) returns (User) {
+    rpc GetUserByID(UserID) returns (UserView) {
         option (google.api.http) = {
             get: "/users/{id}"
         };
@@ -199,7 +210,7 @@ service ManagementService {
     }
 
     //USER_PROFILE
-    rpc GetUserProfile(UserID) returns (UserProfile) {
+    rpc GetUserProfile(UserID) returns (UserProfileView) {
         option (google.api.http) = {
             get: "/users/{id}/profile"
         };
@@ -221,7 +232,7 @@ service ManagementService {
     }
 
     //USER_EMAIL
-    rpc GetUserEmail(UserID) returns (UserEmail) {
+    rpc GetUserEmail(UserID) returns (UserEmailView) {
         option (google.api.http) = {
             get: "/users/{id}/email"
         };
@@ -254,7 +265,7 @@ service ManagementService {
     }
 
     //USER_PHONE
-    rpc GetUserPhone(UserID) returns (UserPhone) {
+    rpc GetUserPhone(UserID) returns (UserPhoneView) {
         option (google.api.http) = {
             get: "/users/{id}/phone"
         };
@@ -287,7 +298,7 @@ service ManagementService {
     }
 
     //USER_ADDRESS
-    rpc GetUserAddress(UserID) returns (UserAddress) {
+    rpc GetUserAddress(UserID) returns (UserAddressView) {
         option (google.api.http) = {
             get: "/users/{id}/address"
         };
@@ -1266,6 +1277,13 @@ service ManagementService {
     }
 }
 
+message Iam {
+    string global_org_id = 1;
+    string iam_project_id = 2;
+    bool set_up_done = 3;
+    bool set_up_started = 4;
+}
+
 message ChangeRequest {
     string id = 1;
     string sec_id = 2;
@@ -1398,6 +1416,8 @@ message UserView {
     string street_address = 22;
     uint64 sequence = 23;
     string resource_owner = 24;
+    repeated string login_names = 25;
+    string preferred_login_name = 27;
 }
 
 message UserSearchRequest {
@@ -1455,6 +1475,22 @@ message UserProfile {
     google.protobuf.Timestamp change_date = 11;
 }
 
+message UserProfileView {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string nick_name = 4;
+    string display_name = 5;
+    string preferred_language = 6;
+    Gender gender = 7;
+    string user_name = 8;
+    uint64 sequence = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp change_date = 11;
+    repeated string login_names = 12;
+    string preferred_login_name = 27;
+}
+
 message UpdateUserProfileRequest {
     string id = 1;
     string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -1465,6 +1501,15 @@ message UpdateUserProfileRequest {
 }
 
 message UserEmail {
+    string id = 1;
+    string email = 2;
+    bool is_email_verified = 3;
+    uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
+}
+
+message UserEmailView {
     string id = 1;
     string email = 2;
     bool is_email_verified = 3;
@@ -1488,6 +1533,15 @@ message UserPhone {
     google.protobuf.Timestamp change_date = 7;
 }
 
+message UserPhoneView {
+    string id = 1;
+    string phone = 2;
+    bool is_phone_verified = 3;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+}
+
 message UpdateUserPhoneRequest {
     string id = 1;
     string phone = 2 [(validate.rules).string = {min_len: 1, max_len: 20}];
@@ -1495,6 +1549,18 @@ message UpdateUserPhoneRequest {
 }
 
 message UserAddress {
+    string id = 1;
+    string country = 2;
+    string locality = 3;
+    string postal_code = 4;
+    string region = 5;
+    string street_address = 6;
+    uint64 sequence = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    google.protobuf.Timestamp change_date = 9;
+}
+
+message UserAddressView {
     string id = 1;
     string country = 2;
     string locality = 3;

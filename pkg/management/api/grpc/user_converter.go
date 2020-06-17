@@ -159,6 +159,30 @@ func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	}
 }
 
+func profileViewFromModel(profile *usr_model.Profile) *UserProfileView {
+	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
+	logging.Log("GRPC-sk8sk").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
+	logging.Log("GRPC-s30Ks'").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserProfileView{
+		Id:                 profile.AggregateID,
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		Sequence:           profile.Sequence,
+		UserName:           profile.UserName,
+		FirstName:          profile.FirstName,
+		LastName:           profile.LastName,
+		DisplayName:        profile.DisplayName,
+		NickName:           profile.NickName,
+		PreferredLanguage:  profile.PreferredLanguage.String(),
+		Gender:             genderFromModel(profile.Gender),
+		LoginNames:         profile.LoginNames,
+		PreferredLoginName: profile.PreferredLoginName,
+	}
+}
+
 func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-d8k2s").OnError(err).Debug("language malformed")
@@ -181,6 +205,23 @@ func emailFromModel(email *usr_model.Email) *UserEmail {
 	logging.Log("GRPC-s0dkw").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserEmail{
+		Id:              email.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        email.Sequence,
+		Email:           email.EmailAddress,
+		IsEmailVerified: email.IsEmailVerified,
+	}
+}
+
+func emailViewFromModel(email *usr_model.Email) *UserEmailView {
+	creationDate, err := ptypes.TimestampProto(email.CreationDate)
+	logging.Log("GRPC-sKefs").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
+	logging.Log("GRPC-0isjD").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserEmailView{
 		Id:              email.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -215,6 +256,22 @@ func phoneFromModel(phone *usr_model.Phone) *UserPhone {
 	}
 }
 
+func phoneViewFromModel(phone *usr_model.Phone) *UserPhoneView {
+	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
+	logging.Log("GRPC-6gSj").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
+	logging.Log("GRPC-lKs8f").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserPhoneView{
+		Id:              phone.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        phone.Sequence,
+		Phone:           phone.PhoneNumber,
+		IsPhoneVerified: phone.IsPhoneVerified,
+	}
+}
 func updatePhoneToModel(e *UpdateUserPhoneRequest) *usr_model.Phone {
 	return &usr_model.Phone{
 		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
@@ -231,6 +288,26 @@ func addressFromModel(address *usr_model.Address) *UserAddress {
 	logging.Log("GRPC-si9ws").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserAddress{
+		Id:            address.AggregateID,
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Sequence:      address.Sequence,
+		Country:       address.Country,
+		StreetAddress: address.StreetAddress,
+		Region:        address.Region,
+		PostalCode:    address.PostalCode,
+		Locality:      address.Locality,
+	}
+}
+
+func addressViewFromModel(address *usr_model.Address) *UserAddressView {
+	creationDate, err := ptypes.TimestampProto(address.CreationDate)
+	logging.Log("GRPC-67stC").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
+	logging.Log("GRPC-0jSfs").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserAddressView{
 		Id:            address.AggregateID,
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
@@ -285,27 +362,29 @@ func userViewFromModel(user *usr_model.UserView) *UserView {
 	logging.Log("GRPC-dl9ws").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserView{
-		Id:              user.ID,
-		State:           userStateFromModel(user.State),
-		CreationDate:    creationDate,
-		ChangeDate:      changeDate,
-		LastLogin:       lastLogin,
-		PasswordChanged: passwordChanged,
-		Sequence:        user.Sequence,
-		ResourceOwner:   user.ResourceOwner,
-		UserName:        user.UserName,
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
-		NickName:        user.NickName,
-		Email:           user.Email,
-		IsEmailVerified: user.IsEmailVerified,
-		Phone:           user.Phone,
-		IsPhoneVerified: user.IsPhoneVerified,
-		Country:         user.Country,
-		Locality:        user.Locality,
-		Region:          user.Region,
-		PostalCode:      user.PostalCode,
-		StreetAddress:   user.StreetAddress,
+		Id:                 user.ID,
+		State:              userStateFromModel(user.State),
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		LastLogin:          lastLogin,
+		PasswordChanged:    passwordChanged,
+		Sequence:           user.Sequence,
+		ResourceOwner:      user.ResourceOwner,
+		UserName:           user.UserName,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		NickName:           user.NickName,
+		Email:              user.Email,
+		IsEmailVerified:    user.IsEmailVerified,
+		Phone:              user.Phone,
+		IsPhoneVerified:    user.IsPhoneVerified,
+		Country:            user.Country,
+		Locality:           user.Locality,
+		Region:             user.Region,
+		PostalCode:         user.PostalCode,
+		StreetAddress:      user.StreetAddress,
+		LoginNames:         user.LoginNames,
+		PreferredLoginName: user.PreferredLoginName,
 	}
 }
 

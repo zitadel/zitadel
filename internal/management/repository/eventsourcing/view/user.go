@@ -23,6 +23,10 @@ func (v *View) GetGlobalUserByEmail(email string) (*model.UserView, error) {
 	return view.GetGlobalUserByEmail(v.Db, userTable, email)
 }
 
+func (v *View) UsersByOrgID(orgID string) ([]*model.UserView, error) {
+	return view.UsersByOrgID(v.Db, userTable, orgID)
+}
+
 func (v *View) IsUserUnique(userName, email string) (bool, error) {
 	return view.IsUserUnique(v.Db, userTable, userName, email)
 }
@@ -31,12 +35,15 @@ func (v *View) UserMfas(userID string) ([]*usr_model.MultiFactor, error) {
 	return view.UserMfas(v.Db, userTable, userID)
 }
 
-func (v *View) PutUser(user *model.UserView) error {
+func (v *View) PutUser(user *model.UserView, sequence uint64) error {
 	err := view.PutUser(v.Db, userTable, user)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedUserSequence(user.Sequence)
+	if sequence != 0 {
+		return v.ProcessedUserSequence(sequence)
+	}
+	return nil
 }
 
 func (v *View) DeleteUser(userID string, eventSequence uint64) error {
