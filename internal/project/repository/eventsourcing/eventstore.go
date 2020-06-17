@@ -315,8 +315,7 @@ func (es *ProjectEventstore) PrepareRemoveProjectRole(ctx context.Context, role 
 	}
 	repoProject := model.ProjectFromModel(existing)
 	repoRole := model.ProjectRoleFromModel(role)
-	grants := es.RemoveRoleFromGrants(repoProject, role.Key)
-	projectAggregate, err := ProjectRoleRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole, grants)
+	projectAggregate, err := ProjectRoleRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole)
 	if err != nil {
 		return nil, nil, err
 	}

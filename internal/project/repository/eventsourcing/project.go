@@ -170,7 +170,7 @@ func ProjectRoleChangedAggregate(aggCreator *es_models.AggregateCreator, existin
 	}
 }
 
-func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project, role *model.ProjectRole, grants []*model.ProjectGrant) (*es_models.Aggregate, error) {
+func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project, role *model.ProjectRole) (*es_models.Aggregate, error) {
 	if role == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8eis", "member should not be nil")
 	}
@@ -178,21 +178,7 @@ func ProjectRoleRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggr
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.ProjectRoleRemoved, role)
-	if err != nil {
-		return nil, err
-	}
-	for _, grant := range grants {
-		var changes map[string]interface{}
-		if _, g := model.GetProjectGrant(existing.Grants, grant.GrantID); grant != nil {
-			changes = g.Changes(grant)
-			agg, err = agg.AppendEvent(model.ProjectGrantChanged, changes)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return agg, nil
+	return agg.AppendEvent(model.ProjectRoleRemoved, role)
 }
 
 func ApplicationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, app *model.Application) func(ctx context.Context) (*es_models.Aggregate, error) {

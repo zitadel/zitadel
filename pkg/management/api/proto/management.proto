@@ -1460,6 +1460,11 @@ enum SearchMethod {
     SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
     SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
     SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
+    SEARCHMETHOD_NOT_EQUALS = 6;
+    SEARCHMETHOD_GREATER_THAN = 7;
+    SEARCHMETHOD_LESS_THAN = 8;
+    SEARCHMETHOD_IS_ONE_OF = 9;
+    SEARCHMETHOD_LIST_CONTAINS = 10;
 }
 
 message UserProfile {
@@ -2252,17 +2257,31 @@ message ProjectGrantSearchResponse {
     repeated ProjectGrantView result = 4;
 }
 
-message ProjectGrantSearchRequest {
-    string project_id = 1;
-    uint64 offset = 2;
-    uint64 limit = 3;
-}
-
 message GrantedProjectSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
     repeated ProjectSearchQuery queries = 3;
 }
+
+message ProjectGrantSearchRequest {
+    string project_id = 1;
+    uint64 offset = 2;
+    uint64 limit = 3;
+    repeated ProjectGrantSearchQuery queries = 4;
+}
+
+message ProjectGrantSearchQuery {
+    ProjectGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum ProjectGrantSearchKey {
+    PROJECTGRANTSEARCHKEY_UNSPECIFIED = 0;
+    PROJECTGRANTSEARCHKEY_PROJECT_NAME = 1;
+    PROJECTGRANTSEARCHKEY_ROLE_KEY = 2;
+}
+
 
 message ProjectGrantMemberRoles {
     repeated string roles = 1;
@@ -2451,6 +2470,7 @@ enum UserGrantSearchKey {
     USERGRANTSEARCHKEY_PROJECT_ID = 1;
     USERGRANTSEARCHKEY_USER_ID = 2;
     USERGRANTSEARCHKEY_ORG_ID = 3;
+    USERGRANTSEARCHKEY_ROLE_KEY = 4;
 }
 
 message ProjectUserGrantSearchRequest {

@@ -5076,6 +5076,29 @@
         }
       }
     },
+    "v1ProjectGrantSearchKey": {
+      "type": "string",
+      "enum": [
+        "PROJECTGRANTSEARCHKEY_UNSPECIFIED",
+        "PROJECTGRANTSEARCHKEY_PROJECT_NAME",
+        "PROJECTGRANTSEARCHKEY_ROLE_KEY"
+      ],
+      "default": "PROJECTGRANTSEARCHKEY_UNSPECIFIED"
+    },
+    "v1ProjectGrantSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1ProjectGrantSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "v1ProjectGrantSearchRequest": {
       "type": "object",
       "properties": {
@@ -5089,6 +5112,12 @@
         "limit": {
           "type": "string",
           "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectGrantSearchQuery"
+          }
         }
       }
     },
@@ -5785,7 +5814,12 @@
         "SEARCHMETHOD_CONTAINS",
         "SEARCHMETHOD_EQUALS_IGNORE_CASE",
         "SEARCHMETHOD_STARTS_WITH_IGNORE_CASE",
-        "SEARCHMETHOD_CONTAINS_IGNORE_CASE"
+        "SEARCHMETHOD_CONTAINS_IGNORE_CASE",
+        "SEARCHMETHOD_NOT_EQUALS",
+        "SEARCHMETHOD_GREATER_THAN",
+        "SEARCHMETHOD_LESS_THAN",
+        "SEARCHMETHOD_IS_ONE_OF",
+        "SEARCHMETHOD_LIST_CONTAINS"
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },
@@ -6157,7 +6191,8 @@
         "USERGRANTSEARCHKEY_UNSPECIFIED",
         "USERGRANTSEARCHKEY_PROJECT_ID",
         "USERGRANTSEARCHKEY_USER_ID",
-        "USERGRANTSEARCHKEY_ORG_ID"
+        "USERGRANTSEARCHKEY_ORG_ID",
+        "USERGRANTSEARCHKEY_ROLE_KEY"
       ],
       "default": "USERGRANTSEARCHKEY_UNSPECIFIED"
     },

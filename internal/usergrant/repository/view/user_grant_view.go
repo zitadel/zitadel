@@ -67,7 +67,7 @@ func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string)
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
 		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_ROLE_KEY, Value: pq.Array([]string{roleKey}), Method: global_model.SEARCHMETHOD_EQUALS_IN_ARRAY},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_ROLE_KEY, Value: pq.Array([]string{roleKey}), Method: global_model.SEARCHMETHOD_LIST_CONTAINS},
 	}
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)

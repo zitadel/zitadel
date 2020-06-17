@@ -96,6 +96,8 @@ func userGrantSearchKeyToModel(key UserGrantSearchKey) grant_model.UserGrantSear
 		return grant_model.USERGRANTSEARCHKEY_PROJECT_ID
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_USER_ID:
 		return grant_model.USERGRANTSEARCHKEY_USER_ID
+	case UserGrantSearchKey_USERGRANTSEARCHKEY_ROLE_KEY:
+		return grant_model.USERGRANTSEARCHKEY_ROLE_KEY
 	default:
 		return grant_model.USERGRANTSEARCHKEY_UNSPECIFIED
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 )
 
 func ProjectGrantByProjectAndOrg(db *gorm.DB, table, projectID, orgID string) (*model.ProjectGrantView, error) {
@@ -30,6 +31,20 @@ func ProjectGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.Pr
 	projects := make([]*model.ProjectGrantView, 0)
 	queries := []*proj_model.ProjectGrantViewSearchQuery{
 		&proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+	}
+	query := view.PrepareSearchQuery(table, model.ProjectGrantSearchRequest{Queries: queries})
+	_, err := query(db, &projects)
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
+func ProjectGrantsByProjectIDAndRoleKey(db *gorm.DB, table, projectID, roleKey string) ([]*model.ProjectGrantView, error) {
+	projects := make([]*model.ProjectGrantView, 0)
+	queries := []*proj_model.ProjectGrantViewSearchQuery{
+		&proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_ROLE_KEYS, Value: pq.Array([]string{roleKey}), Method: global_model.SEARCHMETHOD_LIST_CONTAINS},
 	}
 	query := view.PrepareSearchQuery(table, model.ProjectGrantSearchRequest{Queries: queries})
 	_, err := query(db, &projects)

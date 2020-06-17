@@ -17,6 +17,7 @@ const (
 	ProjectGrantKeyOrgID         = "org_id"
 	ProjectGrantKeyResourceOwner = "resource_owner"
 	ProjectGrantKeyName          = "project_name"
+	ProjectGrantKeyRoleKeys      = "granted_role_keys"
 )
 
 type ProjectGrantView struct {

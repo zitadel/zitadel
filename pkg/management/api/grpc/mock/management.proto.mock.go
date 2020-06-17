@@ -757,6 +757,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetGrantedProjectByID(arg0, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGrantedProjectByID", reflect.TypeOf((*MockManagementServiceClient)(nil).GetGrantedProjectByID), varargs...)
 }
 
+// GetIam mocks base method
+func (m *MockManagementServiceClient) GetIam(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.Iam, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetIam", varargs...)
+	ret0, _ := ret[0].(*grpc.Iam)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIam indicates an expected call of GetIam
+func (mr *MockManagementServiceClientMockRecorder) GetIam(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIam", reflect.TypeOf((*MockManagementServiceClient)(nil).GetIam), varargs...)
+}
+
 // GetOrgByDomainGlobal mocks base method
 func (m *MockManagementServiceClient) GetOrgByDomainGlobal(arg0 context.Context, arg1 *grpc.OrgDomain, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
 	m.ctrl.T.Helper()
@@ -918,14 +938,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetProjectMemberRoles(arg0, a
 }
 
 // GetUserAddress mocks base method
-func (m *MockManagementServiceClient) GetUserAddress(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserAddress, error) {
+func (m *MockManagementServiceClient) GetUserAddress(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserAddressView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetUserAddress", varargs...)
-	ret0, _ := ret[0].(*grpc.UserAddress)
+	ret0, _ := ret[0].(*grpc.UserAddressView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -958,14 +978,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserByEmailGlobal(arg0, ar
 }
 
 // GetUserByID mocks base method
-func (m *MockManagementServiceClient) GetUserByID(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.User, error) {
+func (m *MockManagementServiceClient) GetUserByID(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetUserByID", varargs...)
-	ret0, _ := ret[0].(*grpc.User)
+	ret0, _ := ret[0].(*grpc.UserView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -978,14 +998,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserByID(arg0, arg1 interf
 }
 
 // GetUserEmail mocks base method
-func (m *MockManagementServiceClient) GetUserEmail(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserEmail, error) {
+func (m *MockManagementServiceClient) GetUserEmail(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserEmailView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetUserEmail", varargs...)
-	ret0, _ := ret[0].(*grpc.UserEmail)
+	ret0, _ := ret[0].(*grpc.UserEmailView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1018,14 +1038,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserMfas(arg0, arg1 interf
 }
 
 // GetUserPhone mocks base method
-func (m *MockManagementServiceClient) GetUserPhone(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserPhone, error) {
+func (m *MockManagementServiceClient) GetUserPhone(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserPhoneView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetUserPhone", varargs...)
-	ret0, _ := ret[0].(*grpc.UserPhone)
+	ret0, _ := ret[0].(*grpc.UserPhoneView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1038,14 +1058,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserPhone(arg0, arg1 inter
 }
 
 // GetUserProfile mocks base method
-func (m *MockManagementServiceClient) GetUserProfile(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserProfile, error) {
+func (m *MockManagementServiceClient) GetUserProfile(arg0 context.Context, arg1 *grpc.UserID, arg2 ...grpc0.CallOption) (*grpc.UserProfileView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetUserProfile", varargs...)
-	ret0, _ := ret[0].(*grpc.UserProfile)
+	ret0, _ := ret[0].(*grpc.UserProfileView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -2,11 +2,8 @@ package eventstore
 
 import (
 	"context"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"strings"
 
@@ -56,7 +53,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 	permissions := auth.GetPermissionsFromCtx(ctx)
 	if !auth.HasGlobalPermission(permissions) {
 		ids := auth.GetPermissionCtxIDs(permissions)
-		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.PROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IN, Value: ids})
+		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.PROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IS_ONE_OF, Value: ids})
 	}
 
 	projects, count, err := repo.View.SearchProjects(request)
@@ -120,40 +117,21 @@ func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_mod
 }
 
 func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key string) error {
-	role := proj_model.NewProjectRole(projectID, key)
-	aggregates := make([]*es_models.Aggregate, 0)
-	project, agg, err := repo.ProjectEvents.PrepareRemoveProjectRole(ctx, role)
+	userGrants, err := repo.View.UserGrantsByProjectIDAndRoleKey(projectID, key)
 	if err != nil {
 		return err
 	}
-	aggregates = append(aggregates, agg)
-
-	usergrants, err := repo.View.UserGrantsByProjectIDAndRoleKey(projectID, key)
+	if len(userGrants) > 0 {
+		return caos_errors.ThrowPreconditionFailed(nil, "MGMT-PS0kc", "Remove role not possible, usergrants with this role still exist")
+	}
+	projectGrants, err := repo.View.ProjectGrantsByProjectIDAndRoleKey(projectID, key)
 	if err != nil {
 		return err
 	}
-	for _, grant := range usergrants {
-		changed := &usr_grant_model.UserGrant{
-			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.ResourceOwner},
-			RoleKeys:   grant.RoleKeys,
-			ProjectID:  grant.ProjectID,
-			UserID:     grant.UserID,
-		}
-		changed.RemoveRoleKey(key)
-		_, agg, err := repo.UserGrantEvents.PrepareChangeUserGrant(ctx, changed)
-		if err != nil {
-			return err
-		}
-		aggregates = append(aggregates, agg)
+	if len(projectGrants) > 0 {
+		return caos_errors.ThrowPreconditionFailed(nil, "MGMT-Ls08e", "Remove role not possible, projectgrants with this role still exist")
 	}
-	if err != nil {
-		return err
-	}
-	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return repo.ProjectEvents.RemoveProjectRole(ctx, proj_model.NewProjectRole(projectID, key))
 }
 
 func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
