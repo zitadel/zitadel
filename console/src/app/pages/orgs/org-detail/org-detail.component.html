@@ -11,8 +11,8 @@
     <metainfo class="side">
         <div class="details">
             <div class="row">
-                <span class="first">Domain:</span>
-                <span class="second" *ngIf="org?.domain">{{org.domain}}</span>
+                <span class="first">Domains:</span>
+                <span *ngFor="let domain of domains" class="second">{{domain.domain}}</span>
             </div>
             <div class="row">
                 <span class="first">State:</span>

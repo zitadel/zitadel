@@ -7,6 +7,9 @@ import {
     AddOrgMemberRequest,
     Org,
     OrgDomain,
+    OrgDomainSearchQuery,
+    OrgDomainSearchRequest,
+    OrgDomainSearchResponse,
     OrgID,
     OrgMemberRoles,
     OrgMemberSearchRequest,
@@ -56,6 +59,22 @@ export class OrgService {
         req.setId(orgId);
         return await this.request(
             c => c.getOrgByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
+        Promise<OrgDomainSearchResponse> {
+        const req: OrgDomainSearchRequest = new OrgDomainSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+
+        return await this.request(
+            c => c.searchMyOrgDomains,
             req,
             f => f,
         );
