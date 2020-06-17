@@ -61,8 +61,8 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string) ([]*view_model.UserS
 	sessions := make([]*view_model.UserSessionView, len(m.Users))
 	for i, user := range m.Users {
 		sessions[i] = &view_model.UserSessionView{
-			UserID:   user.UserID,
-			UserName: user.LoginName, //TODO: change to login name
+			UserID:    user.UserID,
+			LoginName: user.LoginName,
 		}
 	}
 	return sessions, nil

@@ -115,7 +115,7 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName s
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner) //TODO: change to login name
+	request.SetUserInfo(user.ID, loginName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -128,7 +128,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID string) 
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, user.UserName, user.ResourceOwner) //TODO: change to login name
+	request.SetUserInfo(user.ID, user.PreferredLoginName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -237,7 +237,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *model.AuthRequest) (
 		users[i] = model.UserSelection{
 			UserID:           session.UserID,
 			DisplayName:      session.DisplayName,
-			LoginName:        session.UserName, //TODO: change to login name
+			LoginName:        session.LoginName,
 			UserSessionState: session.State,
 		}
 	}

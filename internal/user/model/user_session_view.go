@@ -15,6 +15,7 @@ type UserSessionView struct {
 	UserAgentID                 string
 	UserID                      string
 	UserName                    string
+	LoginName                   string
 	DisplayName                 string
 	PasswordVerification        time.Time
 	MfaSoftwareVerification     time.Time

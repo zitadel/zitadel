@@ -104,6 +104,7 @@ func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id strin
 		return err
 	}
 	session.UserName = user.UserName
+	session.LoginName = user.PreferredLoginName
 	session.DisplayName = user.DisplayName
 	return nil
 }

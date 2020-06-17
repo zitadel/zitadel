@@ -71,7 +71,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
 		return
 	}
-	authRequest.LoginName = user.UserName //TODO: change to login name
+	authRequest.LoginName = user.PreferredLoginName
 	l.renderNextStep(w, r, authRequest)
 }
 

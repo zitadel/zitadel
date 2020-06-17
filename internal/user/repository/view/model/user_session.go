@@ -27,7 +27,8 @@ type UserSessionView struct {
 	State                       int32     `json:"-" gorm:"column:state"`
 	UserAgentID                 string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
 	UserID                      string    `json:"userID" gorm:"column:user_id;primary_key"`
-	UserName                    string    `json:"userName" gorm:"column:user_name"`
+	UserName                    string    `json:"-" gorm:"column:user_name"`
+	LoginName                   string    `json:"-" gorm:"column:login_name"`
 	DisplayName                 string    `json:"-" gorm:"column:user_display_name"`
 	PasswordVerification        time.Time `json:"-" gorm:"column:password_verification"`
 	MfaSoftwareVerification     time.Time `json:"-" gorm:"column:mfa_software_verification"`
@@ -55,6 +56,7 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		UserAgentID:                 userSession.UserAgentID,
 		UserID:                      userSession.UserID,
 		UserName:                    userSession.UserName,
+		LoginName:                   userSession.LoginName,
 		DisplayName:                 userSession.DisplayName,
 		PasswordVerification:        userSession.PasswordVerification,
 		MfaSoftwareVerification:     userSession.MfaSoftwareVerification,
