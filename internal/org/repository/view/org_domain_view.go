@@ -58,7 +58,10 @@ func PutOrgDomain(db *gorm.DB, table string, role *model.OrgDomainView) error {
 	return save(db, role)
 }
 
-func DeleteOrgDomain(db *gorm.DB, table, domain string) error {
-	delete := view.PrepareDeleteByKey(table, model.OrgSearchKey(org_model.ORGDOMAINSEARCHKEY_DOMAIN), domain)
+func DeleteOrgDomain(db *gorm.DB, table, orgID, domain string) error {
+	delete := view.PrepareDeleteByKeys(table,
+		view.Key{Key: model.OrgDomainSearchKey(org_model.ORGDOMAINSEARCHKEY_DOMAIN), Value: domain},
+		view.Key{Key: model.OrgDomainSearchKey(org_model.ORGDOMAINSEARCHKEY_ORG_ID), Value: orgID},
+	)
 	return delete(db)
 }
