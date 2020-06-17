@@ -64,6 +64,10 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	return usr_model.UserToModel(user), nil
 }
 
+func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
+	return repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+}
+
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
 	if err != nil {

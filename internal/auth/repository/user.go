@@ -29,6 +29,8 @@ type UserRepository interface {
 }
 
 type myUserRepo interface {
+	MyUser(ctx context.Context) (*model.UserView, error)
+
 	MyProfile(ctx context.Context) (*model.Profile, error)
 	ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 

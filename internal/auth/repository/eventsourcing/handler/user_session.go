@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"time"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
@@ -99,7 +98,7 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event *
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {
-	user, err := u.userEvents.UserByID(context.Background(), id)
+	user, err := u.view.UserByID(id)
 	if err != nil {
 		return err
 	}

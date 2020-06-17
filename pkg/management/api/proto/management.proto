@@ -1417,7 +1417,7 @@ message UserView {
     uint64 sequence = 23;
     string resource_owner = 24;
     repeated string login_names = 25;
-    string preferred_login_name = 27;
+    string preferred_login_name = 26;
 }
 
 message UserSearchRequest {
