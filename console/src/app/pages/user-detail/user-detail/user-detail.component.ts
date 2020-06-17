@@ -10,12 +10,12 @@ import {
     Gender,
     NotificationType,
     PasswordComplexityPolicy,
-    User,
     UserAddress,
     UserEmail,
     UserPhone,
     UserProfile,
     UserState,
+    UserView,
 } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
@@ -45,7 +45,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
     styleUrls: ['./user-detail.component.scss'],
 })
 export class UserDetailComponent implements OnInit, OnDestroy {
-    public user!: User.AsObject;
+    public user!: UserView.AsObject;
     // public email: UserEmail.AsObject = { email: '' } as any;
     // public phone: UserPhone.AsObject = { phone: '' } as any;
     public address: UserAddress.AsObject = { id: '' } as any;

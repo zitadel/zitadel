@@ -6054,7 +6054,7 @@ proto.caos.zitadel.management.api.v1.UserView.toObject = function(includeInstanc
     sequence: jspb.Message.getFieldWithDefault(msg, 23, 0),
     resourceOwner: jspb.Message.getFieldWithDefault(msg, 24, ""),
     loginNamesList: jspb.Message.getRepeatedField(msg, 25),
-    preferredLoginName: jspb.Message.getFieldWithDefault(msg, 27, "")
+    preferredLoginName: jspb.Message.getFieldWithDefault(msg, 26, "")
   };
 
   if (includeInstance) {
@@ -6195,7 +6195,7 @@ proto.caos.zitadel.management.api.v1.UserView.deserializeBinaryFromReader = func
       var value = /** @type {string} */ (reader.readString());
       msg.addLoginNames(value);
       break;
-    case 27:
+    case 26:
       var value = /** @type {string} */ (reader.readString());
       msg.setPreferredLoginName(value);
       break;
@@ -6410,7 +6410,7 @@ proto.caos.zitadel.management.api.v1.UserView.serializeBinaryToWriter = function
   f = message.getPreferredLoginName();
   if (f.length > 0) {
     writer.writeString(
-      27,
+      26,
       f
     );
   }
@@ -6886,17 +6886,17 @@ proto.caos.zitadel.management.api.v1.UserView.prototype.clearLoginNamesList = fu
 
 
 /**
- * optional string preferred_login_name = 27;
+ * optional string preferred_login_name = 26;
  * @return {string}
  */
 proto.caos.zitadel.management.api.v1.UserView.prototype.getPreferredLoginName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 27, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 26, ""));
 };
 
 
 /** @param {string} value */
 proto.caos.zitadel.management.api.v1.UserView.prototype.setPreferredLoginName = function(value) {
-  jspb.Message.setProto3StringField(this, 27, value);
+  jspb.Message.setProto3StringField(this, 26, value);
 };
 
 

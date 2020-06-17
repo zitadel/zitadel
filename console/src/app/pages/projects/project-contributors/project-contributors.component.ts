@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { User } from 'src/app/proto/generated/auth_pb';
 import {
     ProjectGrantView,
     ProjectMemberSearchResponse,
@@ -11,6 +10,7 @@ import {
     ProjectState,
     ProjectType,
     ProjectView,
+    User,
 } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';

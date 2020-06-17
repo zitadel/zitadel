@@ -408,6 +408,86 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserSessi
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.UserView>}
+ */
+const methodDescriptor_AuthService_GetMyUser = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.auth.api.v1.AuthService/GetMyUser',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.caos.zitadel.auth.api.v1.UserView,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.UserView.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.UserView>}
+ */
+const methodInfo_AuthService_GetMyUser = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.auth.api.v1.UserView,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.UserView.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserView)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserView>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUser =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyUser',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyUser,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserView>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUser =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyUser',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyUser);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
  *   !proto.caos.zitadel.auth.api.v1.UserProfileView>}
  */
 const methodDescriptor_AuthService_GetMyUserProfile = new grpc.web.MethodDescriptor(

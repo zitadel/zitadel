@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { Gender, User, UserAddress, UserEmail, UserPhone, UserProfile } from 'src/app/proto/generated/auth_pb';
+import { Gender, UserAddress, UserEmail, UserPhone, UserProfile } from 'src/app/proto/generated/auth_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
@@ -33,8 +33,6 @@ function passwordConfirmValidator(c: AbstractControl): any {
     styleUrls: ['./auth-user-detail.component.scss'],
 })
 export class AuthUserDetailComponent implements OnDestroy {
-    public user!: User.AsObject;
-
     public profile!: UserProfile.AsObject;
     public email: UserEmail.AsObject = { email: '' } as any;
     public phone: UserPhone.AsObject = { phone: '' } as any;
@@ -267,12 +265,6 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     private async getData(): Promise<void> {
-        // this.mgmtUserService.GetUserByID(id).then(user => {
-        //     console.log(user.toObject());
-        //     this.user = user.toObject();
-        // }).catch(err => {
-        //     console.error(err);
-        // });
         this.profile = (await this.userService.GetMyUserProfile()).toObject();
         this.email = (await this.userService.GetMyUserEmail()).toObject();
         this.phone = (await this.userService.GetMyUserPhone()).toObject();
