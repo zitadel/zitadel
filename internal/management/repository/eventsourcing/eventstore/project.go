@@ -2,6 +2,12 @@ package eventstore
 
 import (
 	"context"
+	es_int "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/auth"
@@ -15,10 +21,12 @@ import (
 )
 
 type ProjectRepo struct {
-	SearchLimit   uint64
-	ProjectEvents *proj_event.ProjectEventstore
-	View          *view.View
-	Roles         []string
+	es_int.Eventstore
+	SearchLimit     uint64
+	ProjectEvents   *proj_event.ProjectEventstore
+	UserGrantEvents *usr_grant_event.UserGrantEventStore
+	View            *view.View
+	Roles           []string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
@@ -112,8 +120,40 @@ func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_mod
 }
 
 func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key string) error {
-	member := proj_model.NewProjectRole(projectID, key)
-	return repo.ProjectEvents.RemoveProjectRole(ctx, member)
+	role := proj_model.NewProjectRole(projectID, key)
+	aggregates := make([]*es_models.Aggregate, 0)
+	project, agg, err := repo.ProjectEvents.PrepareRemoveProjectRole(ctx, role)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+
+	usergrants, err := repo.View.UserGrantsByProjectIDAndRoleKey(projectID, key)
+	if err != nil {
+		return err
+	}
+	for _, grant := range usergrants {
+		changed := &usr_grant_model.UserGrant{
+			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.ResourceOwner},
+			RoleKeys:   grant.RoleKeys,
+			ProjectID:  grant.ProjectID,
+			UserID:     grant.UserID,
+		}
+		changed.RemoveRoleKey(key)
+		_, agg, err := repo.UserGrantEvents.PrepareChangeUserGrant(ctx, changed)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, agg)
+	}
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {

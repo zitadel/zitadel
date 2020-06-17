@@ -196,16 +196,22 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 				project.AppendEvent(event)
 			}
 		}
-		if existsOrg && existsUser && checkProjectConditions(resourceOwner, grant, project) {
-			return nil
+		if !existsOrg {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "org does'nt exist")
 		}
-		return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "conditions not met")
+		if !existsUser {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Sl8uS", "user does'nt exist")
+		}
+		if err := checkProjectConditions(resourceOwner, grant, project); err != nil {
+			return err
+		}
+		return nil
 	}
 }
 
-func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) bool {
+func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) error {
 	if project.State == int32(proj_model.PROJECTSTATE_REMOVED) {
-		return false
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Lxp0s", "project doesn't exist")
 	}
 	if resourceOwner == project.ResourceOwner {
 		return checkIfProjectHasRoles(grant.RoleKeys, project.Roles)
@@ -214,19 +220,19 @@ func checkProjectConditions(resourceOwner string, grant *model.UserGrant, projec
 	if _, projectGrant := proj_es_model.GetProjectGrantByResourceOwner(project.Grants, resourceOwner); projectGrant != nil {
 		return checkIfProjectGrantHasRoles(grant.RoleKeys, projectGrant.RoleKeys)
 	}
-	return false
+	return nil
 }
 
-func checkIfProjectHasRoles(roles []string, existing []*proj_es_model.ProjectRole) bool {
+func checkIfProjectHasRoles(roles []string, existing []*proj_es_model.ProjectRole) error {
 	for _, roleKey := range roles {
 		if _, role := proj_es_model.GetProjectRole(existing, roleKey); role == nil {
-			return false
+			return errors.ThrowPreconditionFailedf(nil, "EVENT-Lxp0s", "project doesn't have role %v", roleKey)
 		}
 	}
-	return true
+	return nil
 }
 
-func checkIfProjectGrantHasRoles(roles []string, existing []string) bool {
+func checkIfProjectGrantHasRoles(roles []string, existing []string) error {
 	roleExists := false
 	for _, roleKey := range roles {
 		for _, existingRoleKey := range existing {
@@ -236,8 +242,8 @@ func checkIfProjectGrantHasRoles(roles []string, existing []string) bool {
 			}
 		}
 		if !roleExists {
-			return false
+			return errors.ThrowPreconditionFailed(nil, "EVENT-LSpwi", "project grant doesn't have role")
 		}
 	}
-	return true
+	return nil
 }

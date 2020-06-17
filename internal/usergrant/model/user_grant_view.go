@@ -44,12 +44,13 @@ const (
 	USERGRANTSEARCHKEY_STATE
 	USERGRANTSEARCHKEY_GRANT_ID
 	USERGRANTSEARCHKEY_ORG_NAME
+	USERGRANTSEARCHKEY_ROLE_KEY
 )
 
 type UserGrantSearchQuery struct {
 	Key    UserGrantSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type UserGrantSearchResponse struct {

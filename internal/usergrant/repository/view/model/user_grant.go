@@ -19,6 +19,7 @@ const (
 	UserGrantKeyResourceOwner = "resource_owner"
 	UserGrantKeyState         = "state"
 	UserGrantKeyOrgName       = "org_name"
+	UserGrantKeyRole          = "role_keys"
 )
 
 type UserGrantView struct {

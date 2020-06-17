@@ -30,3 +30,13 @@ func (u *UserGrant) IsActive() bool {
 func (u *UserGrant) IsInactive() bool {
 	return u.State == USERGRANTSTATE_INACTIVE
 }
+
+func (u *UserGrant) RemoveRoleKey(key string) {
+	for i, role := range u.RoleKeys {
+		if role == key {
+			u.RoleKeys[i] = u.RoleKeys[len(u.RoleKeys)-1]
+			u.RoleKeys[len(u.RoleKeys)-1] = ""
+			u.RoleKeys = u.RoleKeys[:len(u.RoleKeys)-1]
+		}
+	}
+}

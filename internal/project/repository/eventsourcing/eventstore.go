@@ -302,25 +302,52 @@ func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_m
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sl1or", "Could not find role in list")
 }
 
-func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) error {
+func (es *ProjectEventstore) PrepareRemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*model.Project, *es_models.Aggregate, error) {
 	if role.Key == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Key is required")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Key is required")
 	}
 	existing, err := es.ProjectByID(ctx, role.AggregateID)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	if !existing.ContainsRole(role) {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Role doesn't exist on project")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Role doesn't exist on project")
 	}
 	repoProject := model.ProjectFromModel(existing)
 	repoRole := model.ProjectRoleFromModel(role)
-	projectAggregate := ProjectRoleRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	grants := es.RemoveRoleFromGrants(repoProject, role.Key)
+	projectAggregate, err := ProjectRoleRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole, grants)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoProject, projectAggregate, nil
+}
+
+func (es *ProjectEventstore) RemoveRoleFromGrants(existing *model.Project, roleKey string) []*model.ProjectGrant {
+	grants := make([]*model.ProjectGrant, 0)
+	for _, grant := range existing.Grants {
+		for i, role := range grant.RoleKeys {
+			if role == roleKey {
+				grant.RoleKeys[i] = grant.RoleKeys[len(grant.RoleKeys)-1]
+				grant.RoleKeys[len(grant.RoleKeys)-1] = ""
+				grant.RoleKeys = grant.RoleKeys[:len(grant.RoleKeys)-1]
+				grants = append(grants, grant)
+			}
+		}
+	}
+	return grants
+}
+
+func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) error {
+	project, aggregate, err := es.PrepareRemoveProjectRole(ctx, role)
 	if err != nil {
 		return err
 	}
-	es.projectCache.cacheProject(repoProject)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, project.AppendEvents, []*es_models.Aggregate{aggregate}...)
+	if err != nil {
+		return err
+	}
+	es.projectCache.cacheProject(project)
 	return nil
 }
 
