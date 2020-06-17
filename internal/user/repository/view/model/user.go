@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/lib/pq"
 	"time"
 
@@ -39,6 +40,7 @@ type UserView struct {
 	LastLogin              time.Time      `json:"-" gorm:"column:last_login"`
 	UserName               string         `json:"userName" gorm:"column:user_name"`
 	LoginNames             pq.StringArray `json:"-" gorm:"column:login_names"`
+	PreferredLoginName     string         `json:"-" gorm:"column:preferred_login_name"`
 	FirstName              string         `json:"firstName" gorm:"column:first_name"`
 	LastName               string         `json:"lastName" gorm:"column:last_name"`
 	NickName               string         `json:"nickName" gorm:"column:nick_name"`
@@ -74,6 +76,7 @@ func UserFromModel(user *model.UserView) *UserView {
 		LastLogin:              user.LastLogin,
 		UserName:               user.UserName,
 		LoginNames:             user.LoginNames,
+		PreferredLoginName:     user.PreferredLoginName,
 		FirstName:              user.FirstName,
 		LastName:               user.LastName,
 		NickName:               user.NickName,
@@ -108,6 +111,8 @@ func UserToModel(user *UserView) *model.UserView {
 		PasswordChangeRequired: user.PasswordChangeRequired,
 		PasswordChanged:        user.PasswordChanged,
 		LastLogin:              user.LastLogin,
+		PreferredLoginName:     user.PreferredLoginName,
+		LoginNames:             user.LoginNames,
 		UserName:               user.UserName,
 		FirstName:              user.FirstName,
 		LastName:               user.LastName,
@@ -138,6 +143,24 @@ func UsersToModel(users []*UserView) []*model.UserView {
 		result[i] = UserToModel(p)
 	}
 	return result
+}
+
+func (u *UserView) GenerateLoginName(domain string) string {
+	return u.UserName + "@" + domain
+}
+
+func (u *UserView) SetLoginNames(policy *org_model.OrgIamPolicy, domains []*org_model.OrgDomain) {
+	loginNames := make([]string, 0)
+	if !policy.UserLoginMustBeDomain {
+		u.LoginNames = []string{u.UserName}
+		return
+	}
+	for _, d := range domains {
+		if d.Verified {
+			loginNames = append(loginNames, u.GenerateLoginName(d.Domain))
+		}
+	}
+	u.LoginNames = loginNames
 }
 
 func (u *UserView) AppendEvent(event *models.Event) (err error) {

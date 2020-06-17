@@ -46,18 +46,12 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 	for _, scope := range scopes {
 		switch scope {
 		case scopeOpenID:
-			userInfo.Subject = user.AggregateID
+			userInfo.Subject = user.ID
 		case scopeEmail:
-			if user.Email == nil {
-				continue
-			}
-			userInfo.Email = user.EmailAddress
+			userInfo.Email = user.Email
 			userInfo.EmailVerified = user.IsEmailVerified
 		case scopeProfile:
-			if user.Profile == nil {
-				continue
-			}
-			userInfo.Name = user.FirstName + " " + user.LastName
+			userInfo.Name = user.DisplayName
 			userInfo.FamilyName = user.LastName
 			userInfo.GivenName = user.FirstName
 			userInfo.Nickname = user.NickName
@@ -65,15 +59,9 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			userInfo.UpdatedAt = user.ChangeDate
 			userInfo.Gender = oidc.Gender(getGender(user.Gender))
 		case scopePhone:
-			if user.Phone == nil {
-				continue
-			}
-			userInfo.PhoneNumber = user.PhoneNumber
+			userInfo.PhoneNumber = user.Phone
 			userInfo.PhoneNumberVerified = user.IsPhoneVerified
 		case scopeAddress:
-			if user.Address == nil {
-				continue
-			}
 			userInfo.Address.StreetAddress = user.StreetAddress
 			userInfo.Address.Locality = user.Locality
 			userInfo.Address.Region = user.Region

@@ -106,6 +106,9 @@ func (es *UserEventstore) UserEventsByID(ctx context.Context, id string, sequenc
 
 func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model.User, pwPolicy *policy_model.PasswordComplexityPolicy, orgIamPolicy *org_model.OrgIamPolicy, resourceOwner string) (*model.User, []*es_models.Aggregate, error) {
 	err := user.CheckOrgIamPolicy(orgIamPolicy)
+	if err != nil {
+		return nil, nil, err
+	}
 	if !user.IsValid() {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
 	}
