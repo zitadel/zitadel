@@ -48,10 +48,6 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public loading: boolean = false;
 
-    public minLengthPassword: any = {
-        value: 0,
-    };
-
     public policy!: PasswordComplexityPolicy.AsObject;
 
     constructor(
@@ -65,7 +61,6 @@ export class AuthUserDetailComponent implements OnDestroy {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
-            this.minLengthPassword.value = data.toObject().minLength;
             if (this.policy.minLength) {
                 validators.push(Validators.minLength(this.policy.minLength));
             }

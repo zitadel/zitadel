@@ -322,4 +322,16 @@ export class OrgService {
             f => f,
         );
     }
+
+    public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {
+        if (policy.hasNumber && policy.hasSymbol) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLANDNUMBERERROR';
+        } else if (policy.hasNumber) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.NUMBERERROR';
+        } else if (policy.hasSymbol) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLERROR';
+        } else {
+            return 'ORG.POLICY.PWD_COMPLEXITY.PATTERNERROR';
+        }
+    }
 }

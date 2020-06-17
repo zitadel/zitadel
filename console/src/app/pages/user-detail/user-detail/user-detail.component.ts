@@ -61,11 +61,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public ChangeType: any = ChangeType;
     public loading: boolean = false;
 
-
-    public minLengthPassword: any = {
-        value: 0,
-    };
-
     public policy!: PasswordComplexityPolicy.AsObject;
     constructor(
         public translate: TranslateService,
@@ -81,7 +76,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
-            this.minLengthPassword.value = data.toObject().minLength;
             if (this.policy.minLength) {
                 validators.push(Validators.minLength(this.policy.minLength));
             }

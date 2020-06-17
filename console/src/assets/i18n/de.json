@@ -158,7 +158,8 @@
         },
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
-            "REQUIRED": "Das Feld ist leer"
+            "REQUIRED": "Das Feld ist leer",
+            "MINLENGTH":"Das Password muss mindestens {{minLength}} Zeichen lang sein!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -208,7 +209,11 @@
                 "TITLE":"Passwort Komplexität",
                 "DESCRIPTION":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
                 "TITLECREATE":"Kennwortkomplexitätsrichtlinie erstellen",
-                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen"
+                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
+                "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol und eine Nummer beinhalten!",
+                "SYMBOLERROR":"Das Password msus ein Symbol beinhalten!",
+                "NUMBERERROR":"Das Password muss eine Nummer beinhalten!",
+                "PATTERNERROR":"Das vorgeschriebene Muster ist falsch!"
             },
             "PWD_AGE": {
                 "TITLE":"Passwort Maximaldauer",
