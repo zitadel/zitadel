@@ -188,6 +188,14 @@
     </div>
 
     <metainfo *ngIf="user" class="side">
+        <div class="details">
+            <div class="row" *ngIf="user?.loginNamesList">
+                <span class="first">Login Names:</span>
+                <span class="second"><span style="display: block;"
+                        *ngFor="let login of user?.loginNamesList">{{login}}</span></span>
+            </div>
+        </div>
+
         <p class="side-section">{{ 'CHANGES.USER.TITLE' | translate }}</p>
         <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </metainfo>

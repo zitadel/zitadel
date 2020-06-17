@@ -185,13 +185,17 @@
             "LISTDESCRIPTION":"Wählen Sie die Organisation für den neuen Kontext aus!",
             "ACTIVE":"AKTIV",
             "CREATE":"Organisation erstellen",
-            "ORGDETAIL_TITLE":"Geben Sie den Namen und die Domain für die neue Organisatino ein",
+            "ORGDETAIL_TITLE":"Geben Sie den Namen und die Domain für die neue Organisation ein",
             "ORGDOMAIN_TITLE":"Organisations Domain Verifikation",
             "ORGDOMAIN_VERIFICATION":"Stellen Sie Ihre Webdomain bereit und überprüfen Sie deren Besitz indem sie eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken Sie zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
             "ORGDOMAIN_VERIFICATION_SKIP":"Sie können die Überprüfung vorerst überspringen und Ihre Organisation weiter erstellen. Um Ihre Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
             "DOWNLOAD_FILE":"File download",
             "SELECTORGTOOLTIP":"Wähle diese Organisation"
+        },
+        "DOMAINS": {
+            "TITLE":"Domains",
+            "DESCRIPTION":"Konfigurieren Sie Ihre Domains mit denen sich Ihre Nutzer einloggen können."
         },
         "STATE": {
             "0": "nicht definiert",

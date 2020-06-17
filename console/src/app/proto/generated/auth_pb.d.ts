@@ -47,6 +47,12 @@ export class UserSessionView extends jspb.Message {
   getSequence(): number;
   setSequence(value: number): void;
 
+  getLoginName(): string;
+  setLoginName(value: string): void;
+
+  getDisplayName(): string;
+  setDisplayName(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserSessionView.AsObject;
   static toObject(includeInstance: boolean, msg: UserSessionView): UserSessionView.AsObject;
@@ -63,10 +69,12 @@ export namespace UserSessionView {
     userId: string,
     userName: string,
     sequence: number,
+    loginName: string,
+    displayName: string,
   }
 }
 
-export class User extends jspb.Message {
+export class UserView extends jspb.Message {
   getId(): string;
   setId(value: string): void;
 
@@ -77,11 +85,6 @@ export class User extends jspb.Message {
   setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
   hasCreationDate(): boolean;
   clearCreationDate(): void;
-
-  getActivationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setActivationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
-  hasActivationDate(): boolean;
-  clearActivationDate(): void;
 
   getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
@@ -107,11 +110,11 @@ export class User extends jspb.Message {
   getLastName(): string;
   setLastName(value: string): void;
 
-  getNickName(): string;
-  setNickName(value: string): void;
-
   getDisplayName(): string;
   setDisplayName(value: string): void;
+
+  getNickName(): string;
+  setNickName(value: string): void;
 
   getPreferredLanguage(): string;
   setPreferredLanguage(value: string): void;
@@ -146,11 +149,11 @@ export class User extends jspb.Message {
   getStreetAddress(): string;
   setStreetAddress(value: string): void;
 
-  getPasswordChangeRequired(): boolean;
-  setPasswordChangeRequired(value: boolean): void;
-
   getSequence(): number;
   setSequence(value: number): void;
+
+  getResourceOwner(): string;
+  setResourceOwner(value: string): void;
 
   getLoginNamesList(): Array<string>;
   setLoginNamesList(value: Array<string>): void;
@@ -161,27 +164,26 @@ export class User extends jspb.Message {
   setPreferredLoginName(value: string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): User.AsObject;
-  static toObject(includeInstance: boolean, msg: User): User.AsObject;
-  static serializeBinaryToWriter(message: User, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): User;
-  static deserializeBinaryFromReader(message: User, reader: jspb.BinaryReader): User;
+  toObject(includeInstance?: boolean): UserView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserView): UserView.AsObject;
+  static serializeBinaryToWriter(message: UserView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserView;
+  static deserializeBinaryFromReader(message: UserView, reader: jspb.BinaryReader): UserView;
 }
 
-export namespace User {
+export namespace UserView {
   export type AsObject = {
     id: string,
     state: UserState,
     creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    activationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     lastLogin?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     passwordChanged?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     userName: string,
     firstName: string,
     lastName: string,
-    nickName: string,
     displayName: string,
+    nickName: string,
     preferredLanguage: string,
     gender: Gender,
     email: string,
@@ -193,8 +195,8 @@ export namespace User {
     postalCode: string,
     region: string,
     streetAddress: string,
-    passwordChangeRequired: boolean,
     sequence: number,
+    resourceOwner: string,
     loginNamesList: Array<string>,
     preferredLoginName: string,
   }
@@ -1215,7 +1217,7 @@ export enum OIDCResponseType {
   OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2,
 }
 export enum UserState { 
-  USERSTATE_UNSPECIEFIED = 0,
+  USERSTATE_UNSPECIFIED = 0,
   USERSTATE_ACTIVE = 1,
   USERSTATE_INACTIVE = 2,
   USERSTATE_DELETED = 3,

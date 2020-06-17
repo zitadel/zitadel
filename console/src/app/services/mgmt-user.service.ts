@@ -34,6 +34,7 @@ import {
     UserSearchQuery,
     UserSearchRequest,
     UserSearchResponse,
+    UserView,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -82,7 +83,7 @@ export class MgmtUserService {
         );
     }
 
-    public async GetUserByID(id: string): Promise<User> {
+    public async GetUserByID(id: string): Promise<UserView> {
         const req = new UserID();
         req.setId(id);
         return await this.request(

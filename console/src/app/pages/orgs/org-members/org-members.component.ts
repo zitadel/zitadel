@@ -6,8 +6,7 @@ import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { User } from 'src/app/proto/generated/auth_pb';
-import { Org, ProjectMember, ProjectType } from 'src/app/proto/generated/management_pb';
+import { Org, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 

@@ -193,6 +193,10 @@
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organization"
         },
+        "DOMAINS": {
+            "TITLE":"Domains",
+            "DESCRIPTION":"Configure your domains on which your users will be registered."
+        },
         "STATE": {
             "0": "nicht definiert",
             "1": "aktiv",

@@ -30,6 +30,7 @@ import {
   UserProfile,
   UserProfileView,
   UserSessionViews,
+  UserView,
   VerifyMfaOtp,
   VerifyMyUserEmailRequest,
   VerifyUserPhoneRequest} from './auth_pb';
@@ -66,6 +67,13 @@ export class AuthServiceClient {
     callback: (err: grpcWeb.Error,
                response: UserSessionViews) => void
   ): grpcWeb.ClientReadableStream<UserSessionViews>;
+
+  getMyUser(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: UserView) => void
+  ): grpcWeb.ClientReadableStream<UserView>;
 
   getMyUserProfile(
     request: google_protobuf_empty_pb.Empty,
@@ -233,6 +241,11 @@ export class AuthServicePromiseClient {
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
   ): Promise<UserSessionViews>;
+
+  getMyUser(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<UserView>;
 
   getMyUserProfile(
     request: google_protobuf_empty_pb.Empty,
