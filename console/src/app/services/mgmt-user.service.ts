@@ -66,7 +66,6 @@ export class MgmtUserService {
         req.setFirstName(user.firstName);
         req.setLastName(user.lastName);
         req.setNickName(user.nickName);
-        req.setDisplayName(user.displayName);
         req.setPassword(user.password);
         req.setPreferredLanguage(user.preferredLanguage);
         req.setGender(user.gender);
@@ -78,6 +77,16 @@ export class MgmtUserService {
         req.setCountry(user.country);
         return await this.request(
             c => c.createUser,
+            req,
+            f => f,
+        );
+    }
+
+    public async GetUserByID(id: string): Promise<User> {
+        const req = new UserID();
+        req.setId(id);
+        return await this.request(
+            c => c.getUserByID,
             req,
             f => f,
         );
@@ -109,7 +118,6 @@ export class MgmtUserService {
         req.setFirstName(profile.firstName);
         req.setLastName(profile.lastName);
         req.setNickName(profile.nickName);
-        req.setDisplayName(profile.displayName);
         req.setPreferredLanguage(profile.preferredLanguage);
         req.setGender(profile.gender);
         return await this.request(
@@ -129,10 +137,10 @@ export class MgmtUserService {
         );
     }
 
-    public async SaveUserEmail(email: UserEmail.AsObject): Promise<UserEmail> {
+    public async SaveUserEmail(id: string, email: string): Promise<UserEmail> {
         const req = new UpdateUserEmailRequest();
-        req.setId(email.id);
-        req.setEmail(email.email);
+        req.setId(id);
+        req.setEmail(email);
         return await this.request(
             c => c.changeUserEmail,
             req,
@@ -150,10 +158,10 @@ export class MgmtUserService {
         );
     }
 
-    public async SaveUserPhone(phone: UserPhone.AsObject): Promise<UserPhone> {
+    public async SaveUserPhone(id: string, phone: string): Promise<UserPhone> {
         const req = new UpdateUserPhoneRequest();
-        req.setId(phone.id);
-        req.setPhone(phone.phone);
+        req.setId(id);
+        req.setPhone(phone);
         return await this.request(
             c => c.changeUserPhone,
             req,
@@ -202,7 +210,9 @@ export class MgmtUserService {
         const req = new ProjectRoleAdd();
         req.setId(id);
         req.setKey(key);
-        req.setDisplayName(displayName);
+        if (displayName) {
+            req.setDisplayName(displayName);
+        }
         req.setGroup(group);
         return await this.request(
             c => c.addProjectRole,

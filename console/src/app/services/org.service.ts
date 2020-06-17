@@ -5,8 +5,12 @@ import { Metadata } from 'grpc-web';
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import {
     AddOrgMemberRequest,
+    Iam,
     Org,
     OrgDomain,
+    OrgDomainSearchQuery,
+    OrgDomainSearchRequest,
+    OrgDomainSearchResponse,
     OrgID,
     OrgMemberRoles,
     OrgMemberSearchRequest,
@@ -51,11 +55,36 @@ export class OrgService {
         return responseMapper(response);
     }
 
+    public async GetIam(): Promise<Iam> {
+        const req: Empty = new Empty();
+        return await this.request(
+            c => c.getIam,
+            req,
+            f => f,
+        );
+    }
+
     public async GetOrgById(orgId: string): Promise<Org> {
         const req: OrgID = new OrgID();
         req.setId(orgId);
         return await this.request(
             c => c.getOrgByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
+        Promise<OrgDomainSearchResponse> {
+        const req: OrgDomainSearchRequest = new OrgDomainSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+
+        return await this.request(
+            c => c.searchMyOrgDomains,
             req,
             f => f,
         );
@@ -321,5 +350,17 @@ export class OrgService {
             req,
             f => f,
         );
+    }
+
+    public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {
+        if (policy.hasNumber && policy.hasSymbol) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLANDNUMBERERROR';
+        } else if (policy.hasNumber) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.NUMBERERROR';
+        } else if (policy.hasSymbol) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLERROR';
+        } else {
+            return 'ORG.POLICY.PWD_COMPLEXITY.PATTERNERROR';
+        }
     }
 }

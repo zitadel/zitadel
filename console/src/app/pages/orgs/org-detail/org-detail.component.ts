@@ -6,7 +6,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
-import { Org, OrgMember, OrgMemberSearchResponse, OrgState } from 'src/app/proto/generated/management_pb';
+import { Org, OrgDomainView, OrgMember, OrgMemberSearchResponse, OrgState } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -28,6 +28,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public ChangeType: any = ChangeType;
 
     private subscription: Subscription = new Subscription();
+
+    public domains: OrgDomainView.AsObject[] = [];
 
     constructor(
         public translate: TranslateService,
@@ -51,6 +53,11 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             this.org = org.toObject();
         }).catch(error => {
             this.toast.showError(error.message);
+        });
+
+        this.orgService.SearchMyOrgDomains(0, 100).then(result => {
+            console.log(result.toObject().resultList);
+            this.domains = result.toObject().resultList;
         });
     }
 

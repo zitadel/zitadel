@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpLoaderFactory } from 'src/app/app.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { OrgCreateRoutingModule } from './org-create-routing.module';
 import { OrgCreateComponent } from './org-create.component';
@@ -25,6 +26,7 @@ import { OrgCreateComponent } from './org-create.component';
         MatButtonModule,
         MatIconModule,
         MatSelectModule,
+        PipesModule,
         TranslateModule.forChild({
             loader: {
                 provide: TranslateLoader,

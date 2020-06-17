@@ -28,7 +28,6 @@ export class UserCreateComponent implements OnDestroy {
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             nickName: [''],
-            displayName: [{ value: '', disabled: false }],
             gender: [Gender.GENDER_UNSPECIFIED],
             preferredLanguage: [''],
             phone: [''],
@@ -74,9 +73,6 @@ export class UserCreateComponent implements OnDestroy {
     }
     public get nickName(): AbstractControl | null {
         return this.userForm.get('nickName');
-    }
-    public get displayName(): AbstractControl | null {
-        return this.userForm.get('displayName');
     }
     public get gender(): AbstractControl | null {
         return this.userForm.get('gender');

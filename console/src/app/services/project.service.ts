@@ -345,7 +345,9 @@ export class ProjectService {
     public async AddProjectRole(role: ProjectRoleAdd.AsObject): Promise<Empty> {
         const req = new ProjectRoleAdd();
         req.setId(role.id);
-        req.setDisplayName(role.displayName);
+        if (role.displayName) {
+            req.setDisplayName(role.displayName);
+        }
         req.setKey(role.key);
         req.setGroup(role.group);
         return await this.request(
