@@ -11,6 +11,49 @@ import (
 	"golang.org/x/text/language"
 )
 
+func userViewFromModel(user *usr_model.UserView) *UserView {
+	creationDate, err := ptypes.TimestampProto(user.CreationDate)
+	logging.Log("GRPC-sd32g").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
+	logging.Log("GRPC-FJKq1").OnError(err).Debug("unable to parse timestamp")
+
+	lastLogin, err := ptypes.TimestampProto(user.LastLogin)
+	logging.Log("GRPC-Gteh2").OnError(err).Debug("unable to parse timestamp")
+
+	passwordChanged, err := ptypes.TimestampProto(user.PasswordChanged)
+	logging.Log("GRPC-fgQFT").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserView{
+		Id:                 user.ID,
+		State:              userStateFromModel(user.State),
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		LastLogin:          lastLogin,
+		PasswordChanged:    passwordChanged,
+		UserName:           user.UserName,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		DisplayName:        user.DisplayName,
+		NickName:           user.NickName,
+		PreferredLanguage:  user.PreferredLanguage,
+		Gender:             genderFromModel(user.Gender),
+		Email:              user.Email,
+		IsEmailVerified:    user.IsEmailVerified,
+		Phone:              user.Phone,
+		IsPhoneVerified:    user.IsPhoneVerified,
+		Country:            user.Country,
+		Locality:           user.Locality,
+		PostalCode:         user.PostalCode,
+		Region:             user.Region,
+		StreetAddress:      user.StreetAddress,
+		Sequence:           user.Sequence,
+		ResourceOwner:      user.ResourceOwner,
+		LoginNames:         user.LoginNames,
+		PreferredLoginName: user.PreferredLoginName,
+	}
+}
+
 func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
 	logging.Log("GRPC-56t5s").OnError(err).Debug("unable to parse timestamp")
@@ -210,6 +253,23 @@ func otpFromModel(otp *usr_model.OTP) *MfaOtpResponse {
 		Url:    otp.Url,
 		Secret: otp.SecretString,
 		State:  mfaStateFromModel(otp.State),
+	}
+}
+
+func userStateFromModel(state usr_model.UserState) UserState {
+	switch state {
+	case usr_model.USERSTATE_ACTIVE:
+		return UserState_USERSTATE_ACTIVE
+	case usr_model.USERSTATE_INACTIVE:
+		return UserState_USERSTATE_INACTIVE
+	case usr_model.USERSTATE_LOCKED:
+		return UserState_USERSTATE_LOCKED
+	case usr_model.USERSTATE_INITIAL:
+		return UserState_USERSTATE_INITIAL
+	case usr_model.USERSTATE_SUSPEND:
+		return UserState_USERSTATE_SUSPEND
+	default:
+		return UserState_USERSTATE_UNSPECIFIED
 	}
 }
 

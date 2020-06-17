@@ -62,6 +62,16 @@ service AuthService {
   }
 
   //User
+  rpc GetMyUser(google.protobuf.Empty) returns (UserView) {
+    option (google.api.http) = {
+      get: "/users/me"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc GetMyUserProfile(google.protobuf.Empty) returns (UserProfileView) {
     option (google.api.http) = {
       get: "/users/me/profile"
@@ -286,6 +296,8 @@ message UserSessionView {
   string user_id = 4;
   string user_name = 5;
   uint64 sequence = 6;
+  string login_name = 7;
+  string display_name = 8;
 }
 
 enum UserSessionState {
@@ -300,38 +312,37 @@ enum OIDCResponseType {
   OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
 }
 
-message User {
+message UserView {
   string id = 1;
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
-  google.protobuf.Timestamp activation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
-  google.protobuf.Timestamp last_login = 6;
-  google.protobuf.Timestamp password_changed = 7;
-  string user_name = 8;
-  string first_name = 9;
-  string last_name = 10;
+  google.protobuf.Timestamp change_date = 4;
+  google.protobuf.Timestamp last_login = 5;
+  google.protobuf.Timestamp password_changed = 6;
+  string user_name = 7;
+  string first_name = 8;
+  string last_name = 9;
+  string display_name = 10;
   string nick_name = 11;
-  string display_name = 12;
-  string preferred_language = 13;
-  Gender gender = 14;
-  string email = 15;
-  bool is_email_verified = 16;
-  string phone = 17;
-  bool is_phone_verified = 18;
-  string country = 19;
-  string locality = 20;
-  string postal_code = 21;
-  string region = 22;
-  string street_address = 23;
-  bool password_change_required = 24;
-  uint64 sequence = 25;
-  repeated string login_names = 26;
-  string preferred_login_name = 27;
+  string preferred_language = 12;
+  Gender gender = 13;
+  string email = 14;
+  bool is_email_verified = 15;
+  string phone = 16;
+  bool is_phone_verified = 17;
+  string country = 18;
+  string locality = 19;
+  string postal_code = 20;
+  string region = 21;
+  string street_address = 22;
+  uint64 sequence = 23;
+  string resource_owner = 24;
+  repeated string login_names = 25;
+  string preferred_login_name = 26;
 }
 
 enum UserState {
-  USERSTATE_UNSPECIEFIED = 0;
+  USERSTATE_UNSPECIFIED = 0;
   USERSTATE_ACTIVE = 1;
   USERSTATE_INACTIVE = 2;
   USERSTATE_DELETED = 3;
