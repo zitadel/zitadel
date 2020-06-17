@@ -84,7 +84,7 @@ func (d *OrgDomain) processOrgDomain(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return d.view.DeleteOrgDomain(domain.Domain, event.Sequence)
+		return d.view.DeleteOrgDomain(event.AggregateID, domain.Domain, event.Sequence)
 	default:
 		return d.view.ProcessedOrgDomainSequence(event.Sequence)
 	}
