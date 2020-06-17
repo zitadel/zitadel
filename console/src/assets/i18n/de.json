@@ -296,8 +296,8 @@
         },
         "NAME": "Name",
         "MEMBER": {
-            "TITLE": "Mitwirkende",
-            "TITLEDESC":"Mitwirkende können Änderungen an dieser Entität vornehmen",
+            "TITLE": "Manager",
+            "TITLEDESC":"Manager können Änderungen an dieser Entität vornehmen",
             "DESCRIPTION":"Hier finden Sie alle Mitwirkenden dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",

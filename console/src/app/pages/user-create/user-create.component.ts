@@ -38,11 +38,6 @@ export class UserCreateComponent implements OnDestroy {
             region: [''],
             country: [''],
         });
-        if (this.email) {
-            this.sub = this.email?.valueChanges.subscribe(value => {
-                this.userName?.setValue(value);
-            });
-        }
     }
 
     public createUser(): void {

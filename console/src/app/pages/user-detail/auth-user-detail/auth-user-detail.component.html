@@ -68,16 +68,16 @@
     <app-card *ngIf="profile" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
         description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
         <div class="method-col">
-            <div *ngIf="email" class="method-row">
+            <div class="method-row">
                 <span class="label">{{ 'USER.EMAIL' | translate }}</span>
 
                 <ng-container *ngIf="!emailEditState; else emailEdit">
                     <div class="actions">
-                        <span class="name">{{email.email}}</span>
-                        <mat-icon *ngIf="email.isemailverified" color="primary" aria-hidden="false"
+                        <span class="name">{{email?.email}}</span>
+                        <mat-icon *ngIf="email?.isemailverified" color="primary" aria-hidden="false"
                             aria-label="verified icon">
                             check_circle_outline</mat-icon>
-                        <ng-container *ngIf="email.email && !email.isemailverified">
+                        <ng-container *ngIf="email?.email && !email?.isemailverified">
                             <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                             </mat-icon>
                             <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
@@ -104,16 +104,16 @@
                 </ng-template>
             </div>
 
-            <div *ngIf="phone" class="method-row">
+            <div class="method-row">
                 <span class="label">{{ 'USER.PHONE' | translate }}</span>
 
                 <ng-container *ngIf="!phoneEditState; else phoneEdit">
                     <div class="actions">
-                        <span class="name">{{phone.phone}}</span>
-                        <mat-icon *ngIf="phone.isPhoneVerified" color="primary" aria-hidden="false"
+                        <span class="name">{{phone?.phone}}</span>
+                        <mat-icon *ngIf="phone?.isPhoneVerified" color="primary" aria-hidden="false"
                             aria-label="verified icon">
                             check_circle_outline</mat-icon>
-                        <ng-container *ngIf="phone.phone && !phone.isPhoneVerified">
+                        <ng-container *ngIf="phone?.phone && !phone?.isPhoneVerified">
                             <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                             </mat-icon>
                             <a class="verify" matTooltip="{{'USER.LOGINMETHODS.ENTERCODE_DESC' | translate}}"
@@ -127,7 +127,7 @@
                         <button (click)="phoneEditState = true" mat-icon-button>
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button *ngIf="phone.phone" (click)="deletePhone()" mat-icon-button>
+                        <button *ngIf="phone?.phone" (click)="deletePhone()" mat-icon-button>
                             <mat-icon>delete_outline</mat-icon>
                         </button>
                     </div>
@@ -150,7 +150,7 @@
 
     <app-auth-user-mfa *ngIf="profile" [profile]="profile"></app-auth-user-mfa>
 
-    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="address && profile">
+    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="profile">
         <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
             <div class="content">
                 <mat-form-field class="formfield">

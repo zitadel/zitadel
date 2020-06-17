@@ -5,6 +5,7 @@ import { BehaviorSubject, from, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { User } from 'src/app/proto/generated/auth_pb';
 import {
+    ProjectGrantView,
     ProjectMemberSearchResponse,
     ProjectMemberView,
     ProjectState,
@@ -20,12 +21,12 @@ import {
 } from '../../../modules/add-member-dialog/member-create-dialog.component';
 
 @Component({
-    selector: 'app-owned-project-contributors',
-    templateUrl: './owned-project-contributors.component.html',
-    styleUrls: ['./owned-project-contributors.component.scss'],
+    selector: 'app-project-contributors',
+    templateUrl: './project-contributors.component.html',
+    styleUrls: ['./project-contributors.component.scss'],
 })
-export class OwnedProjectContributorsComponent implements OnInit {
-    @Input() public project!: ProjectView.AsObject;
+export class ProjectContributorsComponent implements OnInit {
+    @Input() public project!: ProjectView.AsObject | ProjectGrantView.AsObject;
     @Input() public projectType!: ProjectType;
 
     @Input() public disabled: boolean = false;
