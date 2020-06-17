@@ -52,6 +52,8 @@ export class AuthUserDetailComponent implements OnDestroy {
         value: 0,
     };
 
+    public policy!: PasswordComplexityPolicy.AsObject;
+
     constructor(
         public translate: TranslateService,
         private toast: ToastService,
@@ -62,21 +64,21 @@ export class AuthUserDetailComponent implements OnDestroy {
     ) {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
-            const policy: PasswordComplexityPolicy.AsObject = data.toObject();
+            this.policy = data.toObject();
             this.minLengthPassword.value = data.toObject().minLength;
-            if (policy.minLength) {
-                validators.push(Validators.minLength(policy.minLength));
+            if (this.policy.minLength) {
+                validators.push(Validators.minLength(this.policy.minLength));
             }
-            if (policy.hasLowercase) {
+            if (this.policy.hasLowercase) {
                 validators.push(Validators.pattern(/[a-z]/g));
             }
-            if (policy.hasUppercase) {
+            if (this.policy.hasUppercase) {
                 validators.push(Validators.pattern(/[A-Z]/g));
             }
-            if (policy.hasNumber) {
+            if (this.policy.hasNumber) {
                 validators.push(Validators.pattern(/[0-9]/g));
             }
-            if (policy.hasSymbol) {
+            if (this.policy.hasSymbol) {
                 // All characters that are not a digit or an English letter \W or a whitespace \S
                 validators.push(Validators.pattern(/[\W\S]/));
             }

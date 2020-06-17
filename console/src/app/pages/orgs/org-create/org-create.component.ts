@@ -59,7 +59,6 @@ export class OrgCreateComponent {
         this.userForm = this.fb.group({
             firstName: ['', [Validators.required]],
             lastName: ['', [Validators.required]],
-            displayName: [''],
             email: ['', [Validators.required]],
             gender: [''],
             nickName: [''],
@@ -82,7 +81,6 @@ export class OrgCreateComponent {
         registerUserRequest.setFirstName(this.firstName?.value);
         registerUserRequest.setLastName(this.lastName?.value);
         registerUserRequest.setNickName(this.nickName?.value);
-        registerUserRequest.setDisplayName(this.displayName?.value);
         registerUserRequest.setGender(this.gender?.value);
         registerUserRequest.setPassword(this.password?.value);
         registerUserRequest.setPreferredLanguage(this.preferredLanguage?.value);
@@ -120,10 +118,6 @@ export class OrgCreateComponent {
 
     public get lastName(): AbstractControl | null {
         return this.userForm.get('lastName');
-    }
-
-    public get displayName(): AbstractControl | null {
-        return this.userForm.get('displayName');
     }
 
     public get email(): AbstractControl | null {

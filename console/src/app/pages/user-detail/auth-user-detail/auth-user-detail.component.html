@@ -36,10 +36,10 @@
                         formControlName="newPassword" />
                     <mat-error *ngIf="newPassword?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
                     </mat-error>
-                    <mat-error *ngIf="newPassword?.errors?.pattern">{{ 'USER.VALIDATION.INVALIDPATTERN' | translate }}
+                    <mat-error *ngIf="newPassword?.errors?.pattern">{{ policy.description }}
                     </mat-error>
                     <mat-error *ngIf="newPassword?.errors?.minlength">
-                        {{ 'USER.PASSWORD.MINLENGTHERROR' | translate: minLengthPassword }}
+                        {{ policy.description }}
                     </mat-error>
                 </mat-form-field>
                 <mat-form-field class="formfield">
@@ -49,10 +49,10 @@
                     <mat-error *ngIf="confirmPassword?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
                     </mat-error>
                     <mat-error *ngIf="confirmPassword?.errors?.pattern">
-                        {{ 'USER.VALIDATION.INVALIDPATTERN' | translate }}
+                        {{ policy.description }}
                     </mat-error>
                     <mat-error *ngIf="confirmPassword?.errors?.minlength">
-                        {{ 'USER.PASSWORD.MINLENGTHERROR' | translate: minLengthPassword }}
+                        {{ policy.description }}
                     </mat-error>
                     <mat-error *ngIf="confirmPassword?.errors?.notequal">{{ 'USER.PASSWORD.NOTEQUAL' | translate }}
                     </mat-error>
