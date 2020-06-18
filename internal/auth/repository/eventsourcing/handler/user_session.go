@@ -89,7 +89,6 @@ func (u *UserSession) OnError(event *models.Event, err error) error {
 }
 
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
-	session.Sequence = event.Sequence
 	session.AppendEvent(event)
 	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
 		return err
