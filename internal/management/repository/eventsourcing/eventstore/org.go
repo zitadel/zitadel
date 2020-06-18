@@ -45,6 +45,10 @@ func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_m
 	return repo.OrgEventstore.ReactivateOrg(ctx, id)
 }
 
+func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIamPolicy, error) {
+	return repo.OrgEventstore.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+}
+
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_ORG_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID})
