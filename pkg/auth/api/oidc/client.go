@@ -6,6 +6,7 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/user/model"
 )
 
@@ -15,6 +16,8 @@ const (
 	scopeEmail   = "email"
 	scopePhone   = "phone"
 	scopeAddress = "address"
+
+	oidcCtx = "oidc"
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Client, error) {
@@ -26,6 +29,10 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
+	ctx = auth.SetCtxData(ctx, auth.CtxData{
+		UserID: oidcCtx,
+		OrgID:  oidcCtx,
+	})
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
