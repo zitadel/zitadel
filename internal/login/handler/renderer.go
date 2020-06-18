@@ -168,7 +168,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *model.MfaPromptStep:
 		l.renderMfaPrompt(w, r, authReq, step, err)
 	case *model.InitUserStep:
-		l.renderInitUser(w, r, authReq, "", "", nil)
+		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

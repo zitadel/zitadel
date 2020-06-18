@@ -21,6 +21,7 @@ type NotifyUser struct {
 	VerifiedEmail     string
 	LastPhone         string
 	VerifiedPhone     string
+	PasswordSet       bool
 	Sequence          uint64
 }
 
