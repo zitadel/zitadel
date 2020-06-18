@@ -229,27 +229,34 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 	}, nil
 }
 
-func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, app *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.AddProjectGrant(ctx, app)
+func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.AddProjectGrant(ctx, grant)
 }
 
-func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, app *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.ChangeProjectGrant(ctx, app)
+func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.ChangeProjectGrant(ctx, grant)
 }
 
-func (repo *ProjectRepo) DeactivateProjectGrant(ctx context.Context, projectID, appID string) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.DeactivateProjectGrant(ctx, projectID, appID)
+func (repo *ProjectRepo) DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.DeactivateProjectGrant(ctx, projectID, grantID)
 }
 
-func (repo *ProjectRepo) ReactivateProjectGrant(ctx context.Context, projectID, appID string) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.ReactivateProjectGrant(ctx, projectID, appID)
+func (repo *ProjectRepo) ReactivateProjectGrant(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.ReactivateProjectGrant(ctx, projectID, grantID)
 }
 
-func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, appID string) error {
-	app := proj_model.NewProjectGrant(projectID, appID)
-	return repo.ProjectEvents.RemoveProjectGrant(ctx, app)
+func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, grantID string) error {
+	grant := proj_model.NewProjectGrant(projectID, grantID)
+	return repo.ProjectEvents.RemoveProjectGrant(ctx, grant)
 }
 
+func (repo *ProjectRepo) BulkChangeProjectGrant(ctx context.Context, grants ...*proj_model.ProjectGrant) error {
+	return repo.ProjectEvents.ChangeProjectGrants(ctx, grants...)
+}
+
+func (repo *ProjectRepo) BulkRemoveProjectGrant(ctx context.Context, grants ...*proj_model.ProjectGrant) error {
+	return repo.ProjectEvents.RemoveProjectGrants(ctx, grants...)
+}
 func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (member *proj_model.ProjectGrantMember, err error) {
 	member = proj_model.NewProjectGrantMember(projectID, grantID, userID)
 	return repo.ProjectEvents.ProjectGrantMemberByIDs(ctx, member)

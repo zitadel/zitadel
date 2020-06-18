@@ -26,6 +26,14 @@ func usergrantFromModel(grant *grant_model.UserGrant) *UserGrant {
 	}
 }
 
+func userGrantCreateBulkToModel(u *UserGrantCreateBulk) []*grant_model.UserGrant {
+	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
+	for i, grant := range u.UserGrants {
+		grants[i] = userGrantCreateToModel(grant)
+	}
+	return grants
+}
+
 func userGrantCreateToModel(u *UserGrantCreate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.UserId},
@@ -35,11 +43,27 @@ func userGrantCreateToModel(u *UserGrantCreate) *grant_model.UserGrant {
 	}
 }
 
+func userGrantUpdateBulkToModel(u *UserGrantUpdateBulk) []*grant_model.UserGrant {
+	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
+	for i, grant := range u.UserGrants {
+		grants[i] = userGrantUpdateToModel(grant)
+	}
+	return grants
+}
+
 func userGrantUpdateToModel(u *UserGrantUpdate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
 	}
+}
+
+func userGrantRemoveBulkToModel(u *UserGrantRemoveBulk) []string {
+	ids := make([]string, len(u.Ids))
+	for i, id := range u.Ids {
+		ids[i] = id
+	}
+	return ids
 }
 
 func projectUserGrantUpdateToModel(u *ProjectUserGrantUpdate) *grant_model.UserGrant {

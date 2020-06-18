@@ -59,6 +59,9 @@ func PushAggregates(ctx context.Context, push pushFunc, appender appendFunc, agg
 	if err != nil {
 		return err
 	}
+	if appender == nil {
+		return nil
+	}
 
 	return appendAggregates(appender, aggregates)
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
 	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 )
 
 func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, error) {
@@ -67,7 +66,7 @@ func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string)
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
 		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_ROLE_KEY, Value: pq.Array([]string{roleKey}), Method: global_model.SEARCHMETHOD_LIST_CONTAINS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_ROLE_KEY, Value: roleKey, Method: global_model.SEARCHMETHOD_LIST_CONTAINS},
 	}
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)

@@ -30,6 +30,7 @@ func (s *Server) CreateUserGrant(ctx context.Context, in *UserGrantCreate) (*Use
 	}
 	return usergrantFromModel(user), nil
 }
+
 func (s *Server) UpdateUserGrant(ctx context.Context, in *UserGrantUpdate) (*UserGrant, error) {
 	user, err := s.usergrant.ChangeUserGrant(ctx, userGrantUpdateToModel(in))
 	if err != nil {
@@ -54,6 +55,21 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, in *UserGrantID) (*Use
 
 func (s *Server) RemoveUserGrant(ctx context.Context, in *UserGrantID) (*empty.Empty, error) {
 	err := s.usergrant.RemoveUserGrant(ctx, in.Id)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) BulkCreateUserGrant(ctx context.Context, in *UserGrantCreateBulk) (*empty.Empty, error) {
+	err := s.usergrant.BulkAddUserGrant(ctx, userGrantCreateBulkToModel(in)...)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) BulkUpdateUserGrant(ctx context.Context, in *UserGrantUpdateBulk) (*empty.Empty, error) {
+	err := s.usergrant.BulkChangeUserGrant(ctx, userGrantUpdateBulkToModel(in)...)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) BulkRemoveUserGrant(ctx context.Context, in *UserGrantRemoveBulk) (*empty.Empty, error) {
+	err := s.usergrant.BulkRemoveUserGrant(ctx, userGrantRemoveBulkToModel(in)...)
 	return &empty.Empty{}, err
 }
 

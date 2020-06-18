@@ -1545,6 +1545,68 @@
         ]
       }
     },
+    "/projects/{project_id}/_bulk": {
+      "delete": {
+        "operationId": "BulkRemoveProjectGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectGrantRemoveBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "BulkUpdateProjectGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectGrantUpdateBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/projects/{project_id}/applications/_search": {
       "post": {
         "summary": "APPLICATIONS",
@@ -2563,6 +2625,32 @@
         ]
       }
     },
+    "/usergrants/_bulk": {
+      "post": {
+        "operationId": "BulkCreateUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantCreateBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/users": {
       "post": {
         "operationId": "CreateUser",
@@ -3460,6 +3548,56 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1UserGrantID"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/usersgrants/_bulk": {
+      "delete": {
+        "operationId": "BulkRemoveUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantRemoveBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "BulkUpdateUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantUpdateBulk"
             }
           }
         ],
@@ -5076,6 +5214,20 @@
         }
       }
     },
+    "v1ProjectGrantRemoveBulk": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string"
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "v1ProjectGrantSearchKey": {
       "type": "string",
       "enum": [
@@ -5166,6 +5318,20 @@
           "type": "array",
           "items": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "v1ProjectGrantUpdateBulk": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string"
+        },
+        "project_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectGrantUpdate"
           }
         }
       }
@@ -6174,6 +6340,17 @@
         }
       }
     },
+    "v1UserGrantCreateBulk": {
+      "type": "object",
+      "properties": {
+        "user_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrantCreate"
+          }
+        }
+      }
+    },
     "v1UserGrantID": {
       "type": "object",
       "properties": {
@@ -6182,6 +6359,17 @@
         },
         "id": {
           "type": "string"
+        }
+      }
+    },
+    "v1UserGrantRemoveBulk": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -6274,6 +6462,17 @@
           "type": "array",
           "items": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "v1UserGrantUpdateBulk": {
+      "type": "object",
+      "properties": {
+        "user_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrantUpdate"
           }
         }
       }

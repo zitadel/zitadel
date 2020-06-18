@@ -37,6 +37,14 @@ func projectGrantCreateToModel(grant *ProjectGrantCreate) *proj_model.ProjectGra
 	}
 }
 
+//func projectGrantUpdateBulkToModel(update *ProjectGrantUpdateBulk) []*proj_model.ProjectGrant{
+//	grants := make([]*proj_model.ProjectGrant, len(update.ProjectGrants))
+//	for i, grant := range update.UserGrants {
+//		grants[i] = userGrantUpdateToModel(grant)
+//	}
+//	return grants
+//}
+
 func projectGrantUpdateToModel(grant *ProjectGrantUpdate) *proj_model.ProjectGrant {
 	return &proj_model.ProjectGrant{
 		ObjectRoot: models.ObjectRoot{

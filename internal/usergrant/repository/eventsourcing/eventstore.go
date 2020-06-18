@@ -55,18 +55,7 @@ func (es *UserGrantEventStore) UserGrantByID(ctx context.Context, id string) (*g
 }
 
 func (es *UserGrantEventStore) AddUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*grant_model.UserGrant, error) {
-	if grant == nil || !grant.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
-	}
-	id, err := es.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	grant.AggregateID = id
-
-	repoGrant := model.UserGrantFromModel(grant)
-
-	addAggregates, err := UserGrantAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoGrant)
+	repoGrant, addAggregates, err := es.PrepareAddUserGrant(ctx, grant)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +64,39 @@ func (es *UserGrantEventStore) AddUserGrant(ctx context.Context, grant *grant_mo
 		return nil, err
 	}
 	return model.UserGrantToModel(repoGrant), nil
+}
+
+func (es *UserGrantEventStore) AddUserGrants(ctx context.Context, grants ...*grant_model.UserGrant) error {
+	aggregates := make([]*es_models.Aggregate, 0)
+	for _, grant := range grants {
+		_, addAggregates, err := es.PrepareAddUserGrant(ctx, grant)
+		if err != nil {
+			return err
+		}
+		for _, agg := range addAggregates {
+			aggregates = append(aggregates, agg)
+		}
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
+}
+
+func (es *UserGrantEventStore) PrepareAddUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*model.UserGrant, []*es_models.Aggregate, error) {
+	if grant == nil || !grant.IsValid() {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
+	}
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+	grant.AggregateID = id
+
+	repoGrant := model.UserGrantFromModel(grant)
+
+	addAggregates, err := UserGrantAddedAggregate(ctx, es.Eventstore.AggregateCreator(), repoGrant)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoGrant, addAggregates, nil
 }
 
 func (es *UserGrantEventStore) PrepareChangeUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*model.UserGrant, *es_models.Aggregate, error) {
@@ -101,6 +123,7 @@ func (es *UserGrantEventStore) ChangeUserGrant(ctx context.Context, grant *grant
 	if err != nil {
 		return nil, err
 	}
+
 	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, agg)
 	if err != nil {
 		return nil, err
@@ -109,23 +132,57 @@ func (es *UserGrantEventStore) ChangeUserGrant(ctx context.Context, grant *grant
 	return model.UserGrantToModel(repoExisting), nil
 }
 
+func (es *UserGrantEventStore) ChangeUserGrants(ctx context.Context, grants ...*grant_model.UserGrant) error {
+	aggregates := make([]*es_models.Aggregate, len(grants))
+	for i, grant := range grants {
+		_, agg, err := es.PrepareChangeUserGrant(ctx, grant)
+		if err != nil {
+			return err
+		}
+		aggregates[i] = agg
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
+}
+
 func (es *UserGrantEventStore) RemoveUserGrant(ctx context.Context, grantID string) error {
-	existing, err := es.UserGrantByID(ctx, grantID)
+	existing, projectAggregates, err := es.PrepareRemoveUserGrant(ctx, grantID)
 	if err != nil {
 		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, existing.AppendEvents, projectAggregates...)
+	if err != nil {
+		return err
+	}
+	es.userGrantCache.cacheUserGrant(existing)
+	return nil
+}
+
+func (es *UserGrantEventStore) RemoveUserGrants(ctx context.Context, grantIDs ...string) error {
+	aggregates := make([]*es_models.Aggregate, 0)
+	for _, grantID := range grantIDs {
+		_, aggs, err := es.PrepareRemoveUserGrant(ctx, grantID)
+		if err != nil {
+			return err
+		}
+		for _, agg := range aggs {
+			aggregates = append(aggregates, agg)
+		}
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
+}
+
+func (es *UserGrantEventStore) PrepareRemoveUserGrant(ctx context.Context, grantID string) (*model.UserGrant, []*es_models.Aggregate, error) {
+	existing, err := es.UserGrantByID(ctx, grantID)
+	if err != nil {
+		return nil, nil, err
 	}
 	repoExisting := model.UserGrantFromModel(existing)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
 	projectAggregates, err := UserGrantRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, repoExisting.AppendEvents, projectAggregates...)
-	if err != nil {
-		return err
-	}
-	es.userGrantCache.cacheUserGrant(repoExisting)
-	return nil
+	return repoExisting, projectAggregates, nil
 }
 
 func (es *UserGrantEventStore) DeactivateUserGrant(ctx context.Context, grantID string) (*grant_model.UserGrant, error) {

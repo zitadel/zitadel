@@ -14,6 +14,11 @@ type ProjectGrant struct {
 	Members      []*ProjectGrantMember
 }
 
+type ProjectGrantIDs struct {
+	ProjectID string
+	GrantID   string
+}
+
 type ProjectGrantState int32
 
 const (

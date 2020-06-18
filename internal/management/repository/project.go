@@ -41,12 +41,15 @@ type ProjectRepository interface {
 	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*model.ApplicationChanges, error)
 
 	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
-	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
-	ChangeProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
+	AddProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)
+	ChangeProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)
 	DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	ReactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	RemoveProjectGrant(ctx context.Context, projectID, grantID string) error
 	SearchProjectGrantMembers(ctx context.Context, request *model.ProjectGrantMemberSearchRequest) (*model.ProjectGrantMemberSearchResponse, error)
+
+	BulkChangeProjectGrant(ctx context.Context, grants ...*model.ProjectGrant) error
+	BulkRemoveProjectGrant(ctx context.Context, grants ...*model.ProjectGrant) error
 
 	ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (*model.ProjectGrantMember, error)
 	AddProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)

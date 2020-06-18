@@ -119,11 +119,10 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 		} else {
 			newRoles := member.Roles
 			if grant.RoleKeys != nil {
-				grant.RoleKeys = mergeExistingRoles(rolePrefix, grant.RoleKeys, newRoles)
+				grant.RoleKeys = mergeExistingRoles(rolePrefix, "", grant.RoleKeys, newRoles)
 			} else {
 				grant.RoleKeys = newRoles
 			}
-
 		}
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
@@ -149,7 +148,9 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix string, suffix
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
+		roleSuffix := ""
 		if suffix {
+			roleSuffix = event.AggregateID
 			roleKeys = suffixRoles(event.AggregateID, roleKeys)
 		}
 		if errors.IsNotFound(err) {
@@ -164,7 +165,7 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix string, suffix
 		} else {
 			newRoles := roleKeys
 			if grant.RoleKeys != nil {
-				grant.RoleKeys = mergeExistingRoles(rolePrefix, grant.RoleKeys, newRoles)
+				grant.RoleKeys = mergeExistingRoles(rolePrefix, roleSuffix, grant.RoleKeys, newRoles)
 			} else {
 				grant.RoleKeys = newRoles
 			}
@@ -194,10 +195,14 @@ func suffixRoles(suffix string, roles []string) []string {
 	return suffixedRoles
 }
 
-func mergeExistingRoles(rolePrefix string, existingRoles, newRoles []string) []string {
+func mergeExistingRoles(rolePrefix, suffix string, existingRoles, newRoles []string) []string {
 	mergedRoles := make([]string, 0)
 	for _, existing := range existingRoles {
 		if !strings.HasPrefix(existing, rolePrefix) {
+			mergedRoles = append(mergedRoles, existing)
+			continue
+		}
+		if suffix != "" && !strings.HasSuffix(existing, suffix) {
 			mergedRoles = append(mergedRoles, existing)
 		}
 	}

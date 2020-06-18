@@ -5,6 +5,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/model"
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 )
 
 type SearchRequest interface {
@@ -105,7 +106,11 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	case model.SEARCHMETHOD_IS_ONE_OF:
 		query = query.Where(column+" IN (?)", value)
 	case model.SEARCHMETHOD_LIST_CONTAINS:
-		query = query.Where("? <@ "+column, value)
+		valueText, ok := value.(string)
+		if !ok {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-Psois", "list contains only possible for strings")
+		}
+		query = query.Where("? <@ "+column, pq.Array([]string{valueText}))
 	default:
 		return nil, nil
 	}

@@ -62,3 +62,15 @@ func (s *Server) RemoveProjectGrant(ctx context.Context, in *ProjectGrantID) (*e
 	err := s.project.RemoveProjectGrant(ctx, in.ProjectId, in.Id)
 	return &empty.Empty{}, err
 }
+
+func (s *Server) BulkUpdateProjectGrant(ctx context.Context, in *ProjectGrantUpdateBulk) (*empty.Empty, error) {
+	//err := s.project.BulkChangeProjectGrant(ctx, projectGrantUpdateBulkToModel(in))
+	//return &empty.Empty{}, err
+	return nil, nil
+}
+
+func (s *Server) BulkRemoveProjectGrant(ctx context.Context, in *ProjectGrantRemoveBulk) (*empty.Empty, error) {
+	//err := s.project.BulkChangeProjectGrant(ctx, projectGrantUpdateBulkToModel(in))
+	//return &empty.Empty{}, err
+	return nil, nil
+}

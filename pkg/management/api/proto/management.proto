@@ -997,6 +997,28 @@ service ManagementService {
         };
     }
 
+    rpc BulkUpdateProjectGrant(ProjectGrantUpdateBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/projects/{project_id}/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.grant.write"
+        };
+    }
+
+    rpc BulkRemoveProjectGrant(ProjectGrantRemoveBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{project_id}/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.grant.delete"
+        };
+    }
+
     //PROJECT_GRANT_MEMBER
     rpc GetProjectGrantMemberRoles(google.protobuf.Empty) returns (ProjectGrantMemberRoles) {
         option (google.api.http) = {
@@ -1119,6 +1141,39 @@ service ManagementService {
     rpc RemoveUserGrant(UserGrantID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/users/{user_id}/grants/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.delete"
+        };
+    }
+
+    rpc BulkCreateUserGrant(UserGrantCreateBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/usergrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc BulkUpdateUserGrant(UserGrantUpdateBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/usersgrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc BulkRemoveUserGrant(UserGrantRemoveBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/usersgrants/_bulk"
+            body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -2219,10 +2274,20 @@ message ProjectGrantCreate {
     repeated string role_keys = 3;
 }
 
+message ProjectGrantUpdateBulk {
+    string project_id = 1;
+    repeated ProjectGrantUpdate project_grants = 2;
+}
+
 message ProjectGrantUpdate {
     string project_id = 1;
     string id = 2;
     repeated string role_keys = 3;
+}
+
+message ProjectGrantRemoveBulk {
+    string project_id = 1;
+    repeated string ids = 2;
 }
 
 message ProjectGrantID {
@@ -2369,16 +2434,28 @@ message UserGrant {
     uint64 sequence = 9;
 }
 
+message UserGrantCreateBulk {
+    repeated UserGrantCreate user_grants = 1;
+}
+
 message UserGrantCreate {
     string user_id = 1;
     string project_id = 2;
     repeated string role_keys = 3;
 }
 
+message UserGrantUpdateBulk {
+    repeated UserGrantUpdate user_grants = 1;
+}
+
 message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
     repeated string role_keys = 3;
+}
+
+message UserGrantRemoveBulk {
+    repeated string ids = 1;
 }
 
 message UserGrantID {
