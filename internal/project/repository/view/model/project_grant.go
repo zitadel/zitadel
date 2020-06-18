@@ -88,7 +88,7 @@ func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setProjectGrantData(event)
-	case es_model.ProjectGrantChanged:
+	case es_model.ProjectGrantChanged, es_model.ProjectGrantCascadeChanged:
 		err = p.setProjectGrantData(event)
 	case es_model.ProjectGrantDeactivated:
 		p.State = int32(model.PROJECTSTATE_INACTIVE)

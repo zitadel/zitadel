@@ -67,7 +67,7 @@ func (p *ProjectGrant) Process(event *models.Event) (err error) {
 			return err
 		}
 		p.fillOrgData(grantedProject, org)
-	case es_model.ProjectGrantChanged:
+	case es_model.ProjectGrantChanged, es_model.ProjectGrantCascadeChanged:
 		grant := new(view_model.ProjectGrant)
 		err := grant.SetData(event)
 		if err != nil {

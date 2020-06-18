@@ -99,7 +99,7 @@ func (es *UserGrantEventStore) PrepareAddUserGrant(ctx context.Context, grant *g
 	return repoGrant, addAggregates, nil
 }
 
-func (es *UserGrantEventStore) PrepareChangeUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*model.UserGrant, *es_models.Aggregate, error) {
+func (es *UserGrantEventStore) PrepareChangeUserGrant(ctx context.Context, grant *grant_model.UserGrant, cascade bool) (*model.UserGrant, *es_models.Aggregate, error) {
 	if grant == nil {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo0s9", "invalid grant")
 	}
@@ -110,7 +110,7 @@ func (es *UserGrantEventStore) PrepareChangeUserGrant(ctx context.Context, grant
 	repoExisting := model.UserGrantFromModel(existing)
 	repoGrant := model.UserGrantFromModel(grant)
 
-	aggFunc := UserGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
+	aggFunc := UserGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoExisting, repoGrant, cascade)
 	projectAggregate, err := aggFunc(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -119,7 +119,7 @@ func (es *UserGrantEventStore) PrepareChangeUserGrant(ctx context.Context, grant
 }
 
 func (es *UserGrantEventStore) ChangeUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*grant_model.UserGrant, error) {
-	repoExisting, agg, err := es.PrepareChangeUserGrant(ctx, grant)
+	repoExisting, agg, err := es.PrepareChangeUserGrant(ctx, grant, false)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (es *UserGrantEventStore) ChangeUserGrant(ctx context.Context, grant *grant
 func (es *UserGrantEventStore) ChangeUserGrants(ctx context.Context, grants ...*grant_model.UserGrant) error {
 	aggregates := make([]*es_models.Aggregate, len(grants))
 	for i, grant := range grants {
-		_, agg, err := es.PrepareChangeUserGrant(ctx, grant)
+		_, agg, err := es.PrepareChangeUserGrant(ctx, grant, false)
 		if err != nil {
 			return err
 		}

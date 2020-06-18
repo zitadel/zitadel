@@ -857,6 +857,7 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 		ctx        context.Context
 		existing   *model.Project
 		new        *model.ProjectRole
+		grants     []*model.ProjectGrant
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -881,6 +882,25 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 			res: res{
 				eventLen:   1,
 				eventTypes: []models.EventType{model.ProjectRoleRemoved},
+			},
+		},
+		{
+			name: "projectrole changed with grant",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.Project{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					Name:       "ProjectName",
+					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					Grants:     []*model.ProjectGrant{&model.ProjectGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"ROLE"}}},
+				},
+				new:        &model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
+				grants:     []*model.ProjectGrant{&model.ProjectGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{}}},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   2,
+				eventTypes: []models.EventType{model.ProjectRoleRemoved, model.ProjectGrantCascadeChanged},
 			},
 		},
 		{
@@ -911,7 +931,7 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectRoleRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
+			agg, err := ProjectRoleRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.grants)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))

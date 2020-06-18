@@ -95,7 +95,7 @@ func releasedUniqueUserGrantAggregate(ctx context.Context, aggCreator *es_models
 	return aggregate.SetPrecondition(UserGrantUniqueQuery(grant.ResourceOwner, grant.ProjectID, grant.UserID), isEventValidation(aggregate, model.UserGrantReleased)), nil
 }
 
-func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant, cascade bool) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-osl8x", "grant should not be nil")
@@ -105,7 +105,10 @@ func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing 
 			return nil, err
 		}
 		changes := existing.Changes(grant)
-		return agg.AppendEvent(model.UserGrantChanged, changes)
+		if !cascade {
+			return agg.AppendEvent(model.UserGrantChanged, changes)
+		}
+		return agg.AppendEvent(model.UserGrantCascadeChanged, changes)
 	}
 }
 

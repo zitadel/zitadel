@@ -89,6 +89,7 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 		}
 		err = u.fillData(grant, event.ResourceOwner)
 	case grant_es_model.UserGrantChanged,
+		grant_es_model.UserGrantCascadeChanged,
 		grant_es_model.UserGrantDeactivated,
 		grant_es_model.UserGrantReactivated:
 		grant, err = u.view.UserGrantByID(event.AggregateID)
@@ -96,7 +97,7 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 			return err
 		}
 		err = grant.AppendEvent(event)
-	case grant_es_model.UserGrantRemoved:
+	case grant_es_model.UserGrantRemoved, grant_es_model.UserGrantCascadeRemoved:
 		err = u.view.DeleteUserGrant(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
