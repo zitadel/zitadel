@@ -123,7 +123,6 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 			} else {
 				grant.RoleKeys = newRoles
 			}
-
 		}
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate

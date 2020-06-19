@@ -1496,8 +1496,41 @@
         ]
       }
     },
+    "/projects/{id}/roles/_bulk": {
+      "post": {
+        "operationId": "BulkAddProjectRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectRoleAddBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/projects/{id}/roles/{key}": {
       "delete": {
+        "summary": "RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project",
         "operationId": "RemoveProjectRole",
         "responses": {
           "200": {
@@ -2580,6 +2613,56 @@
         ]
       }
     },
+    "/usergrants/_bulk": {
+      "post": {
+        "operationId": "BulkCreateUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantCreateBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "operationId": "BulkUpdateUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantUpdateBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/users": {
       "post": {
         "operationId": "CreateUser",
@@ -3477,6 +3560,32 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1UserGrantID"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/usersgrants/_bulk": {
+      "delete": {
+        "operationId": "BulkRemoveUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantRemoveBulk"
             }
           }
         ],
@@ -5109,6 +5218,29 @@
         }
       }
     },
+    "v1ProjectGrantSearchKey": {
+      "type": "string",
+      "enum": [
+        "PROJECTGRANTSEARCHKEY_UNSPECIFIED",
+        "PROJECTGRANTSEARCHKEY_PROJECT_NAME",
+        "PROJECTGRANTSEARCHKEY_ROLE_KEY"
+      ],
+      "default": "PROJECTGRANTSEARCHKEY_UNSPECIFIED"
+    },
+    "v1ProjectGrantSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1ProjectGrantSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "v1ProjectGrantSearchRequest": {
       "type": "object",
       "properties": {
@@ -5122,6 +5254,12 @@
         "limit": {
           "type": "string",
           "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectGrantSearchQuery"
+          }
         }
       }
     },
@@ -5268,9 +5406,6 @@
         "granted_org_name": {
           "type": "string"
         },
-        "granted_org_domain": {
-          "type": "string"
-        },
         "role_keys": {
           "type": "array",
           "items": {
@@ -5294,6 +5429,12 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "resource_owner_name": {
+          "type": "string"
         }
       }
     },
@@ -5528,6 +5669,20 @@
         },
         "group": {
           "type": "string"
+        }
+      }
+    },
+    "v1ProjectRoleAddBulk": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectRoleAdd"
+          }
         }
       }
     },
@@ -5818,7 +5973,12 @@
         "SEARCHMETHOD_CONTAINS",
         "SEARCHMETHOD_EQUALS_IGNORE_CASE",
         "SEARCHMETHOD_STARTS_WITH_IGNORE_CASE",
-        "SEARCHMETHOD_CONTAINS_IGNORE_CASE"
+        "SEARCHMETHOD_CONTAINS_IGNORE_CASE",
+        "SEARCHMETHOD_NOT_EQUALS",
+        "SEARCHMETHOD_GREATER_THAN",
+        "SEARCHMETHOD_LESS_THAN",
+        "SEARCHMETHOD_IS_ONE_OF",
+        "SEARCHMETHOD_LIST_CONTAINS"
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },
@@ -6170,6 +6330,17 @@
         }
       }
     },
+    "v1UserGrantCreateBulk": {
+      "type": "object",
+      "properties": {
+        "user_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrantCreate"
+          }
+        }
+      }
+    },
     "v1UserGrantID": {
       "type": "object",
       "properties": {
@@ -6181,13 +6352,25 @@
         }
       }
     },
+    "v1UserGrantRemoveBulk": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "v1UserGrantSearchKey": {
       "type": "string",
       "enum": [
         "USERGRANTSEARCHKEY_UNSPECIFIED",
         "USERGRANTSEARCHKEY_PROJECT_ID",
         "USERGRANTSEARCHKEY_USER_ID",
-        "USERGRANTSEARCHKEY_ORG_ID"
+        "USERGRANTSEARCHKEY_ORG_ID",
+        "USERGRANTSEARCHKEY_ROLE_KEY"
       ],
       "default": "USERGRANTSEARCHKEY_UNSPECIFIED"
     },
@@ -6269,6 +6452,17 @@
           "type": "array",
           "items": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "v1UserGrantUpdateBulk": {
+      "type": "object",
+      "properties": {
+        "user_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrantUpdate"
           }
         }
       }

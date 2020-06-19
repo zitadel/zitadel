@@ -248,28 +248,37 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	return err
 }
 
-func (es *ProjectEventstore) AddProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
-	if !role.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Key is required")
+func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	if roles == nil || len(roles) == 0 {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "must be at least one role")
 	}
-	existing, err := es.ProjectByID(ctx, role.AggregateID)
+	for _, role := range roles {
+		if !role.IsValid() {
+			return nil, caos_errs.ThrowPreconditionFailedf(nil, "EVENT-idue3", "role is invalid %v", role)
+		}
+	}
+	existing, err := es.ProjectByID(ctx, roles[0].AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	if existing.ContainsRole(role) {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Project contains role with same key")
+	for _, role := range roles {
+		if existing.ContainsRole(role) {
+			return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Project contains role with same key")
+		}
 	}
+
 	repoProject := model.ProjectFromModel(existing)
-	repoRole := model.ProjectRoleFromModel(role)
-	projectAggregate := ProjectRoleAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	repoRoles := model.ProjectRolesFromModel(roles)
+	projectAggregate := ProjectRoleAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRoles...)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
 	}
-
+	if len(repoRoles) > 1 {
+		return nil, nil
+	}
 	es.projectCache.cacheProject(repoProject)
-
-	if _, r := model.GetProjectRole(repoProject.Roles, role.Key); r != nil {
+	if _, r := model.GetProjectRole(repoProject.Roles, repoRoles[0].Key); r != nil {
 		return model.ProjectRoleToModel(r), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sie83", "Could not find role in list")
@@ -302,25 +311,52 @@ func (es *ProjectEventstore) ChangeProjectRole(ctx context.Context, role *proj_m
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sl1or", "Could not find role in list")
 }
 
-func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) error {
+func (es *ProjectEventstore) PrepareRemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*model.Project, *es_models.Aggregate, error) {
 	if role.Key == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Key is required")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-id823", "Key is required")
 	}
 	existing, err := es.ProjectByID(ctx, role.AggregateID)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	if !existing.ContainsRole(role) {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Role doesn't exist on project")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-oe823", "Role doesn't exist on project")
 	}
 	repoProject := model.ProjectFromModel(existing)
 	repoRole := model.ProjectRoleFromModel(role)
-	projectAggregate := ProjectRoleRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
+	grants := es.RemoveRoleFromGrants(repoProject, role.Key)
+	projectAggregate, err := ProjectRoleRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoProject, repoRole, grants)
+	if err != nil {
+		return nil, nil, err
+	}
+	return repoProject, projectAggregate, nil
+}
+
+func (es *ProjectEventstore) RemoveRoleFromGrants(existing *model.Project, roleKey string) []*model.ProjectGrant {
+	grants := make([]*model.ProjectGrant, 0)
+	for _, grant := range existing.Grants {
+		for i, role := range grant.RoleKeys {
+			if role == roleKey {
+				grant.RoleKeys[i] = grant.RoleKeys[len(grant.RoleKeys)-1]
+				grant.RoleKeys[len(grant.RoleKeys)-1] = ""
+				grant.RoleKeys = grant.RoleKeys[:len(grant.RoleKeys)-1]
+				grants = append(grants, grant)
+			}
+		}
+	}
+	return grants
+}
+
+func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_model.ProjectRole) error {
+	project, aggregate, err := es.PrepareRemoveProjectRole(ctx, role)
 	if err != nil {
 		return err
 	}
-	es.projectCache.cacheProject(repoProject)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, project.AppendEvents, aggregate)
+	if err != nil {
+		return err
+	}
+	es.projectCache.cacheProject(project)
 	return nil
 }
 
@@ -766,56 +802,73 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sk3t5", "Could not find grant in list")
 }
 
-func (es *ProjectEventstore) ChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
+func (es *ProjectEventstore) PrepareChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*model.Project, func(ctx context.Context) (*es_models.Aggregate, error), []string, error) {
 	if grant == nil && grant.GrantID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8sie3", "invalid grant")
+		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8sie3", "invalid grant")
 	}
 	existing, err := es.ProjectByID(ctx, grant.AggregateID)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
-	if _, g := existing.GetGrant(grant.GrantID); g == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "Grant not existing on project")
+	_, existingGrant := existing.GetGrant(grant.GrantID)
+	if existingGrant == nil {
+		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "Grant not existing on project")
 	}
 	if !existing.ContainsRoles(grant.RoleKeys) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
+		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
 	}
+	removedRoles := existingGrant.GetRemovedRoles(grant.RoleKeys)
 	repoProject := model.ProjectFromModel(existing)
 	repoGrant := model.GrantFromModel(grant)
 
 	projectAggregate := ProjectGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-
-	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
-		return model.GrantToModel(g), nil
-	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
+	return repoProject, projectAggregate, removedRoles, nil
 }
 
 func (es *ProjectEventstore) RemoveProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) error {
-	if grant.GrantID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-8eud6", "GrantId is required")
-	}
-	existing, err := es.ProjectByID(ctx, grant.AggregateID)
+	repoProject, projectAggregate, err := es.PrepareRemoveProjectGrant(ctx, grant)
 	if err != nil {
 		return err
 	}
-	if _, g := existing.GetGrant(grant.GrantID); g == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-9ie3s", "Grant doesn't exist on project")
-	}
-	repoProject := model.ProjectFromModel(existing)
-	grantRepo := model.GrantFromModel(grant)
-	projectAggregate := ProjectGrantRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, grantRepo)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return err
 	}
 	es.projectCache.cacheProject(repoProject)
 	return nil
+}
+
+func (es *ProjectEventstore) RemoveProjectGrants(ctx context.Context, grants ...*proj_model.ProjectGrant) error {
+	aggregates := make([]*es_models.Aggregate, len(grants))
+	for i, grant := range grants {
+		_, projectAggregate, err := es.PrepareRemoveProjectGrant(ctx, grant)
+		if err != nil {
+			return err
+		}
+		agg, err := projectAggregate(ctx)
+		if err != nil {
+			return err
+		}
+		aggregates[i] = agg
+	}
+	return es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
+}
+
+func (es *ProjectEventstore) PrepareRemoveProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*model.Project, func(ctx context.Context) (*es_models.Aggregate, error), error) {
+	if grant.GrantID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8eud6", "GrantId is required")
+	}
+	existing, err := es.ProjectByID(ctx, grant.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, g := existing.GetGrant(grant.GrantID); g == nil {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9ie3s", "Grant doesn't exist on project")
+	}
+	repoProject := model.ProjectFromModel(existing)
+	grantRepo := model.GrantFromModel(grant)
+	projectAggregate := ProjectGrantRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, grantRepo)
+	return repoProject, projectAggregate, nil
 }
 
 func (es *ProjectEventstore) DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {

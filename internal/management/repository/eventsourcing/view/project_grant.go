@@ -23,6 +23,10 @@ func (v *View) ProjectGrantsByProjectID(projectID string) ([]*model.ProjectGrant
 	return view.ProjectGrantsByProjectID(v.Db, grantedProjectTable, projectID)
 }
 
+func (v *View) ProjectGrantsByProjectIDAndRoleKey(projectID, key string) ([]*model.ProjectGrantView, error) {
+	return view.ProjectGrantsByProjectIDAndRoleKey(v.Db, grantedProjectTable, projectID, key)
+}
+
 func (v *View) SearchProjectGrants(request *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, int, error) {
 	return view.SearchProjectGrants(v.Db, grantedProjectTable, request)
 }
@@ -38,7 +42,7 @@ func (v *View) PutProjectGrant(project *model.ProjectGrantView) error {
 func (v *View) DeleteProjectGrant(grantID string, eventSequence uint64) error {
 	err := view.DeleteProjectGrant(v.Db, grantedProjectTable, grantID)
 	if err != nil {
-		return nil
+		return err
 	}
 	return v.ProcessedProjectGrantSequence(eventSequence)
 }

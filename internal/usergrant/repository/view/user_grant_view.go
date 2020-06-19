@@ -62,6 +62,34 @@ func UserGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.UserG
 	return users, nil
 }
 
+func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string) ([]*model.UserGrantView, error) {
+	users := make([]*model.UserGrantView, 0)
+	queries := []*grant_model.UserGrantSearchQuery{
+		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_ROLE_KEY, Value: roleKey, Method: global_model.SEARCHMETHOD_LIST_CONTAINS},
+	}
+	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
+	_, err := query(db, &users)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func UserGrantsByOrgIDAndProjectID(db *gorm.DB, table, orgID, projectID string) ([]*model.UserGrantView, error) {
+	users := make([]*model.UserGrantView, 0)
+	queries := []*grant_model.UserGrantSearchQuery{
+		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+	}
+	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
+	_, err := query(db, &users)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func UserGrantsByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{

@@ -28,6 +28,7 @@ type ProjectRepository interface {
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
 	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*model.ProjectChanges, error)
+	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 
 	ApplicationByID(ctx context.Context, projectID, appID string) (*model.Application, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
@@ -41,8 +42,8 @@ type ProjectRepository interface {
 	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*model.ApplicationChanges, error)
 
 	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
-	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
-	ChangeProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
+	AddProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)
+	ChangeProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)
 	DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	ReactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	RemoveProjectGrant(ctx context.Context, projectID, grantID string) error

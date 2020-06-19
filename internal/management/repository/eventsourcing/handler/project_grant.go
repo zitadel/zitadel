@@ -66,8 +66,12 @@ func (p *ProjectGrant) Process(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.fillOrgData(grantedProject, org)
-	case es_model.ProjectGrantChanged:
+		resourceOwner, err := p.orgEvents.OrgByID(context.TODO(), org_model.NewOrg(grantedProject.ResourceOwner))
+		if err != nil {
+			return err
+		}
+		p.fillOrgData(grantedProject, org, resourceOwner)
+	case es_model.ProjectGrantChanged, es_model.ProjectGrantCascadeChanged:
 		grant := new(view_model.ProjectGrant)
 		err := grant.SetData(event)
 		if err != nil {
@@ -94,8 +98,9 @@ func (p *ProjectGrant) Process(event *models.Event) (err error) {
 	return p.view.PutProjectGrant(grantedProject)
 }
 
-func (p *ProjectGrant) fillOrgData(grantedProject *view_model.ProjectGrantView, org *org_model.Org) {
+func (p *ProjectGrant) fillOrgData(grantedProject *view_model.ProjectGrantView, org, resourceOwner *org_model.Org) {
 	grantedProject.OrgName = org.Name
+	grantedProject.ResourceOwnerName = resourceOwner.Name
 }
 
 func (p *ProjectGrant) getProject(projectID string) (*proj_model.Project, error) {

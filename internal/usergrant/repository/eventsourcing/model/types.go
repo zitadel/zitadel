@@ -13,4 +13,7 @@ const (
 	UserGrantReactivated models.EventType = "user.grant.reactivated"
 	UserGrantReserved    models.EventType = "user.grant.reserved"
 	UserGrantReleased    models.EventType = "user.grant.released"
+
+	UserGrantCascadeRemoved models.EventType = "user.grant.cascade.removed"
+	UserGrantCascadeChanged models.EventType = "user.grant.cascade.changed"
 )

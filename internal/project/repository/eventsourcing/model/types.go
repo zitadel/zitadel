@@ -19,11 +19,12 @@ const (
 	ProjectRoleChanged models.EventType = "project.role.changed"
 	ProjectRoleRemoved models.EventType = "project.role.removed"
 
-	ProjectGrantAdded       models.EventType = "project.grant.added"
-	ProjectGrantChanged     models.EventType = "project.grant.changed"
-	ProjectGrantRemoved     models.EventType = "project.grant.removed"
-	ProjectGrantDeactivated models.EventType = "project.grant.deactivated"
-	ProjectGrantReactivated models.EventType = "project.grant.reactivated"
+	ProjectGrantAdded          models.EventType = "project.grant.added"
+	ProjectGrantChanged        models.EventType = "project.grant.changed"
+	ProjectGrantRemoved        models.EventType = "project.grant.removed"
+	ProjectGrantDeactivated    models.EventType = "project.grant.deactivated"
+	ProjectGrantReactivated    models.EventType = "project.grant.reactivated"
+	ProjectGrantCascadeChanged models.EventType = "project.grant.cascade.changed"
 
 	ProjectGrantMemberAdded   models.EventType = "project.grant.member.added"
 	ProjectGrantMemberChanged models.EventType = "project.grant.member.changed"

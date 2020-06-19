@@ -81,6 +81,12 @@ func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*Proje
 	}
 	return projectRoleFromModel(role), nil
 }
+
+func (s *Server) BulkAddProjectRole(ctx context.Context, in *ProjectRoleAddBulk) (*empty.Empty, error) {
+	err := s.project.BulkAddProjectRole(ctx, projectRoleAddBulkToModel(in))
+	return &empty.Empty{}, err
+}
+
 func (s *Server) ChangeProjectRole(ctx context.Context, in *ProjectRoleChange) (*ProjectRole, error) {
 	role, err := s.project.ChangeProjectRole(ctx, projectRoleChangeToModel(in))
 	if err != nil {

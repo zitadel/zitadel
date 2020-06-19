@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	"reflect"
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/auth"
@@ -707,9 +706,9 @@ func TestRemoveProjectMember(t *testing.T) {
 func TestAddProjectRole(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es   *ProjectEventstore
-		ctx  context.Context
-		role *model.ProjectRole
+		es    *ProjectEventstore
+		ctx   context.Context
+		roles []*model.ProjectRole
 	}
 	type res struct {
 		result  *model.ProjectRole
@@ -724,9 +723,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "add project role, ok",
 			args: args{
-				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProject(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				result: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
@@ -735,9 +734,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "no key",
 			args: args{
-				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProject(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				wantErr: true,
@@ -747,9 +746,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "role already existing",
 			args: args{
-				es:   GetMockManipulateProjectWithRole(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProjectWithRole(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				wantErr: true,
@@ -759,9 +758,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "existing project not found",
 			args: args{
-				es:   GetMockManipulateProjectNoEvents(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProjectNoEvents(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				wantErr: true,
@@ -771,7 +770,7 @@ func TestAddProjectRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.AddProjectRole(tt.args.ctx, tt.args.role)
+			result, err := tt.args.es.AddProjectRoles(tt.args.ctx, tt.args.roles...)
 
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")
@@ -1942,126 +1941,6 @@ func TestAddProjectGrant(t *testing.T) {
 
 			if !tt.res.wantErr && result.GrantID == "" {
 				t.Errorf("result has no id")
-			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-		})
-	}
-}
-
-func TestChangeProjectGrant(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	type args struct {
-		es    *ProjectEventstore
-		ctx   context.Context
-		grant *model.ProjectGrant
-	}
-	type res struct {
-		result  *model.ProjectGrant
-		wantErr bool
-		errFunc func(err error) bool
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "change grant, ok",
-			args: args{
-				es:  GetMockManipulateProjectWithGrantExistingRole(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
-					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"KeyChanged"},
-				},
-			},
-			res: res{
-				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
-					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"KeyChanged"},
-				},
-			},
-		},
-		{
-			name: "invalid grant",
-			args: args{
-				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:  "GrantID",
-					RoleKeys: []string{"KeyChanged"},
-				},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "grant not existing",
-			args: args{
-				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
-					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"KeyChanged"},
-				},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "role not existing",
-			args: args{
-				es:  GetMockManipulateProjectWithGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
-					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"KeyChanged"},
-				},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "existing project not found",
-			args: args{
-				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
-					GrantID:      "GrantID",
-					GrantedOrgID: "GrantedOrgID",
-					RoleKeys:     []string{"KeyChanged"},
-				},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsNotFound,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ChangeProjectGrant(tt.args.ctx, tt.args.grant)
-
-			if !tt.res.wantErr && result.AggregateID == "" {
-				t.Errorf("result has no id")
-			}
-			if !tt.res.wantErr && result.GrantID != tt.res.result.GrantID {
-				t.Errorf("got wrong result GrantID: expected: %v, actual: %v ", tt.res.result.GrantID, result.GrantID)
-			}
-			if !tt.res.wantErr && !reflect.DeepEqual(result.RoleKeys, tt.res.result.RoleKeys) {
-				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.RoleKeys, result.GrantID)
 			}
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)

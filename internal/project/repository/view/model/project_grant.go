@@ -17,20 +17,22 @@ const (
 	ProjectGrantKeyOrgID         = "org_id"
 	ProjectGrantKeyResourceOwner = "resource_owner"
 	ProjectGrantKeyName          = "project_name"
+	ProjectGrantKeyRoleKeys      = "granted_role_keys"
 )
 
 type ProjectGrantView struct {
-	GrantID         string         `json:"-" gorm:"column:grant_id;primary_key"`
-	ProjectID       string         `json:"-" gorm:"column:project_id"`
-	OrgID           string         `json:"-" gorm:"column:org_id"`
-	Name            string         `json:"name" gorm:"column:project_name"`
-	CreationDate    time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate      time.Time      `json:"-" gorm:"column:change_date"`
-	State           int32          `json:"-" gorm:"column:project_state"`
-	ResourceOwner   string         `json:"-" gorm:"column:resource_owner"`
-	OrgName         string         `json:"-" gorm:"column:org_name"`
-	Sequence        uint64         `json:"-" gorm:"column:sequence"`
-	GrantedRoleKeys pq.StringArray `json:"-" gorm:"column:granted_role_keys"`
+	GrantID           string         `json:"-" gorm:"column:grant_id;primary_key"`
+	ProjectID         string         `json:"-" gorm:"column:project_id"`
+	OrgID             string         `json:"-" gorm:"column:org_id"`
+	Name              string         `json:"name" gorm:"column:project_name"`
+	CreationDate      time.Time      `json:"-" gorm:"column:creation_date"`
+	ChangeDate        time.Time      `json:"-" gorm:"column:change_date"`
+	State             int32          `json:"-" gorm:"column:project_state"`
+	ResourceOwner     string         `json:"-" gorm:"column:resource_owner"`
+	ResourceOwnerName string         `json:"-" gorm:"column:resource_owner_name"`
+	OrgName           string         `json:"-" gorm:"column:org_name"`
+	Sequence          uint64         `json:"-" gorm:"column:sequence"`
+	GrantedRoleKeys   pq.StringArray `json:"-" gorm:"column:granted_role_keys"`
 }
 
 type ProjectGrant struct {
@@ -41,32 +43,35 @@ type ProjectGrant struct {
 
 func ProjectGrantFromModel(project *model.ProjectGrantView) *ProjectGrantView {
 	return &ProjectGrantView{
-		ProjectID:       project.ProjectID,
-		OrgID:           project.OrgID,
-		Name:            project.Name,
-		ChangeDate:      project.ChangeDate,
-		CreationDate:    project.CreationDate,
-		State:           int32(project.State),
-		ResourceOwner:   project.ResourceOwner,
-		OrgName:         project.OrgName,
-		GrantID:         project.GrantID,
-		GrantedRoleKeys: project.GrantedRoleKeys,
-		Sequence:        project.Sequence,
+		ProjectID:         project.ProjectID,
+		OrgID:             project.OrgID,
+		Name:              project.Name,
+		ChangeDate:        project.ChangeDate,
+		CreationDate:      project.CreationDate,
+		State:             int32(project.State),
+		ResourceOwner:     project.ResourceOwner,
+		ResourceOwnerName: project.ResourceOwnerName,
+		OrgName:           project.OrgName,
+		GrantID:           project.GrantID,
+		GrantedRoleKeys:   project.GrantedRoleKeys,
+		Sequence:          project.Sequence,
 	}
 }
 
 func ProjectGrantToModel(project *ProjectGrantView) *model.ProjectGrantView {
 	return &model.ProjectGrantView{
-		ProjectID:     project.ProjectID,
-		OrgID:         project.OrgID,
-		Name:          project.Name,
-		ChangeDate:    project.ChangeDate,
-		CreationDate:  project.CreationDate,
-		State:         model.ProjectState(project.State),
-		ResourceOwner: project.ResourceOwner,
-		OrgName:       project.OrgName,
-		GrantID:       project.GrantID,
-		Sequence:      project.Sequence,
+		ProjectID:         project.ProjectID,
+		OrgID:             project.OrgID,
+		Name:              project.Name,
+		ChangeDate:        project.ChangeDate,
+		CreationDate:      project.CreationDate,
+		State:             model.ProjectState(project.State),
+		ResourceOwner:     project.ResourceOwner,
+		ResourceOwnerName: project.ResourceOwnerName,
+		OrgName:           project.OrgName,
+		GrantID:           project.GrantID,
+		Sequence:          project.Sequence,
+		GrantedRoleKeys:   project.GrantedRoleKeys,
 	}
 }
 
@@ -87,7 +92,7 @@ func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setProjectGrantData(event)
-	case es_model.ProjectGrantChanged:
+	case es_model.ProjectGrantChanged, es_model.ProjectGrantCascadeChanged:
 		err = p.setProjectGrantData(event)
 	case es_model.ProjectGrantDeactivated:
 		p.State = int32(model.PROJECTSTATE_INACTIVE)

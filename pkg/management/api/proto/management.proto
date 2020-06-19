@@ -801,6 +801,18 @@ service ManagementService {
         };
     }
 
+    rpc BulkAddProjectRole(ProjectRoleAddBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/projects/{id}/roles/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.role.write"
+            check_field_name: "Id"
+        };
+    }
+
     rpc ChangeProjectRole(ProjectRoleChange) returns (ProjectRole) {
         option (google.api.http) = {
             put: "/projects/{id}/roles/{key}"
@@ -813,6 +825,7 @@ service ManagementService {
         };
     }
 
+    /* RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project */
     rpc RemoveProjectRole(ProjectRoleRemove) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/projects/{id}/roles/{key}"
@@ -1130,6 +1143,39 @@ service ManagementService {
     rpc RemoveUserGrant(UserGrantID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/users/{user_id}/grants/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.delete"
+        };
+    }
+
+    rpc BulkCreateUserGrant(UserGrantCreateBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/usergrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc BulkUpdateUserGrant(UserGrantUpdateBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/usergrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc BulkRemoveUserGrant(UserGrantRemoveBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/usersgrants/_bulk"
+            body: "*"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1470,6 +1516,11 @@ enum SearchMethod {
     SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
     SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
     SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
+    SEARCHMETHOD_NOT_EQUALS = 6;
+    SEARCHMETHOD_GREATER_THAN = 7;
+    SEARCHMETHOD_LESS_THAN = 8;
+    SEARCHMETHOD_IS_ONE_OF = 9;
+    SEARCHMETHOD_LIST_CONTAINS = 10;
 }
 
 message UserProfile {
@@ -1993,6 +2044,11 @@ message ProjectRoleAdd {
      string group = 4;
 }
 
+message ProjectRoleAddBulk {
+    string id = 1;
+    repeated ProjectRoleAdd project_roles = 2;
+}
+
 message ProjectRoleChange {
     string id = 1;
     string key = 2;
@@ -2252,13 +2308,14 @@ message ProjectGrantView {
     string project_id = 2;
     string granted_org_id = 3;
     string granted_org_name = 4;
-    string granted_org_domain = 5;
-    repeated string role_keys = 6;
-    ProjectGrantState state = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    google.protobuf.Timestamp change_date = 9;
-    string project_name = 10;
-    uint64 sequence = 11;
+    repeated string role_keys = 5;
+    ProjectGrantState state = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    google.protobuf.Timestamp change_date = 8;
+    string project_name = 9;
+    uint64 sequence = 10;
+    string resource_owner = 11;
+    string resource_owner_name = 12;
 }
 
 message ProjectGrantSearchResponse {
@@ -2268,17 +2325,31 @@ message ProjectGrantSearchResponse {
     repeated ProjectGrantView result = 4;
 }
 
-message ProjectGrantSearchRequest {
-    string project_id = 1;
-    uint64 offset = 2;
-    uint64 limit = 3;
-}
-
 message GrantedProjectSearchRequest {
     uint64 offset = 1;
     uint64 limit = 2;
     repeated ProjectSearchQuery queries = 3;
 }
+
+message ProjectGrantSearchRequest {
+    string project_id = 1;
+    uint64 offset = 2;
+    uint64 limit = 3;
+    repeated ProjectGrantSearchQuery queries = 4;
+}
+
+message ProjectGrantSearchQuery {
+    ProjectGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum ProjectGrantSearchKey {
+    PROJECTGRANTSEARCHKEY_UNSPECIFIED = 0;
+    PROJECTGRANTSEARCHKEY_PROJECT_NAME = 1;
+    PROJECTGRANTSEARCHKEY_ROLE_KEY = 2;
+}
+
 
 message ProjectGrantMemberRoles {
     repeated string roles = 1;
@@ -2366,16 +2437,28 @@ message UserGrant {
     uint64 sequence = 9;
 }
 
+message UserGrantCreateBulk {
+    repeated UserGrantCreate user_grants = 1;
+}
+
 message UserGrantCreate {
     string user_id = 1;
     string project_id = 2;
     repeated string role_keys = 3;
 }
 
+message UserGrantUpdateBulk {
+    repeated UserGrantUpdate user_grants = 1;
+}
+
 message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
     repeated string role_keys = 3;
+}
+
+message UserGrantRemoveBulk {
+    repeated string ids = 1;
 }
 
 message UserGrantID {
@@ -2467,6 +2550,7 @@ enum UserGrantSearchKey {
     USERGRANTSEARCHKEY_PROJECT_ID = 1;
     USERGRANTSEARCHKEY_USER_ID = 2;
     USERGRANTSEARCHKEY_ORG_ID = 3;
+    USERGRANTSEARCHKEY_ROLE_KEY = 4;
 }
 
 message ProjectUserGrantSearchRequest {

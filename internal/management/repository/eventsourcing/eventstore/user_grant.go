@@ -38,6 +38,18 @@ func (repo *UserGrantRepo) RemoveUserGrant(ctx context.Context, grantID string) 
 	return repo.UserGrantEvents.RemoveUserGrant(ctx, grantID)
 }
 
+func (repo *UserGrantRepo) BulkAddUserGrant(ctx context.Context, grants ...*grant_model.UserGrant) error {
+	return repo.UserGrantEvents.AddUserGrants(ctx, grants...)
+}
+
+func (repo *UserGrantRepo) BulkChangeUserGrant(ctx context.Context, grants ...*grant_model.UserGrant) error {
+	return repo.UserGrantEvents.ChangeUserGrants(ctx, grants...)
+}
+
+func (repo *UserGrantRepo) BulkRemoveUserGrant(ctx context.Context, grantIDs ...string) error {
+	return repo.UserGrantEvents.RemoveUserGrants(ctx, grantIDs...)
+}
+
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	grants, count, err := repo.View.SearchUserGrants(request)
