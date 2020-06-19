@@ -2,12 +2,14 @@ package grpc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) SearchUserGrants(ctx context.Context, in *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
 	request := userGrantSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
 	response, err := s.usergrant.SearchUserGrants(ctx, request)
 	if err != nil {
 		return nil, err
