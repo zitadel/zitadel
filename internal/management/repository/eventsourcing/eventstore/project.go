@@ -114,7 +114,7 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 }
 
 func (repo *ProjectRepo) AddProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
-	return repo.ProjectEvents.AddProjectRoles(ctx, []*proj_model.ProjectRole{role}...)
+	return repo.ProjectEvents.AddProjectRoles(ctx, role)
 }
 
 func (repo *ProjectRepo) BulkAddProjectRole(ctx context.Context, roles []*proj_model.ProjectRole) error {

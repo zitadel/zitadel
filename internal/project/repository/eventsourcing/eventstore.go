@@ -352,7 +352,7 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	if err != nil {
 		return err
 	}
-	err = es_sdk.PushAggregates(ctx, es.PushAggregates, project.AppendEvents, []*es_models.Aggregate{aggregate}...)
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, project.AppendEvents, aggregate)
 	if err != nil {
 		return err
 	}
