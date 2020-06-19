@@ -4,7 +4,6 @@ updates:
   directory: "/console"
   schedule:
     interval: weekly
-    time: '04:00'
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
@@ -13,7 +12,14 @@ updates:
   directory: "/"
   schedule:
     interval: weekly
-    time: '04:00'
+  open-pull-requests-limit: 10
+  commit-message:
+    prefix: chore
+    include: scope
+- package-ecosystem: "docker"
+  directory: "/build/docker"
+  schedule:
+    interval: "weekly"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
