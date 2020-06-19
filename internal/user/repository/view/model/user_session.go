@@ -76,20 +76,25 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 }
 
 func (v *UserSessionView) AppendEvent(event *models.Event) {
+	v.Sequence = event.Sequence
 	v.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded:
 		v.PasswordVerification = event.CreationDate
+		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.UserPasswordCheckFailed,
 		es_model.UserPasswordChanged:
 		v.PasswordVerification = time.Time{}
 	case es_model.MfaOtpCheckSucceeded:
 		v.MfaSoftwareVerification = event.CreationDate
 		v.MfaSoftwareVerificationType = int32(req_model.MfaTypeOTP)
+		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.MfaOtpCheckFailed,
 		es_model.MfaOtpRemoved:
 		v.MfaSoftwareVerification = time.Time{}
-	case es_model.SignedOut:
+	case es_model.SignedOut,
+		es_model.UserLocked,
+		es_model.UserDeactivated:
 		v.PasswordVerification = time.Time{}
 		v.MfaSoftwareVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)

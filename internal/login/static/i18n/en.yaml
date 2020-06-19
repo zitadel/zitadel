@@ -154,6 +154,8 @@ Errors:
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         InvalidCode: Invalid code
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
+    Locked: User is locked
+    NotActive: User is not active
 
 
 optional: (optional)

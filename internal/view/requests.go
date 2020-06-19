@@ -60,7 +60,7 @@ func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
 	}
 }
 
-func PrepareDeleteByKey(table string, key ColumnKey, id string) func(db *gorm.DB) error {
+func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		err := db.Table(table).
 			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).

@@ -35,7 +35,7 @@ func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {
 }
 
 func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64) error {
-	err := view.DeleteTokens(v.Db, tokenTable, agentID, userID)
+	err := view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
 	if err != nil {
 		return nil
 	}

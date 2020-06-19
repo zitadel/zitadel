@@ -6,7 +6,10 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/errors"
+	proj_model "github.com/caos/zitadel/internal/project/model"
+	user_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -15,6 +18,8 @@ const (
 	scopeEmail   = "email"
 	scopePhone   = "phone"
 	scopeAddress = "address"
+
+	oidcCtx = "oidc"
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Client, error) {
@@ -22,10 +27,17 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	if err != nil {
 		return nil, err
 	}
+	if client.State != proj_model.APPSTATE_ACTIVE {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
+	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
+	ctx = auth.SetCtxData(ctx, auth.CtxData{
+		UserID: oidcCtx,
+		OrgID:  oidcCtx,
+	})
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
@@ -72,13 +84,13 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 	return userInfo, nil
 }
 
-func getGender(gender model.Gender) string {
+func getGender(gender user_model.Gender) string {
 	switch gender {
-	case model.GENDER_FEMALE:
+	case user_model.GENDER_FEMALE:
 		return "female"
-	case model.GENDER_MALE:
+	case user_model.GENDER_MALE:
 		return "male"
-	case model.GENDER_DIVERSE:
+	case user_model.GENDER_DIVERSE:
 		return "diverse"
 	}
 	return ""

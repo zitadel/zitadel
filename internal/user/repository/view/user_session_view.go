@@ -59,7 +59,7 @@ func PutUserSession(db *gorm.DB, table string, session *model.UserSessionView) e
 	return save(db, session)
 }
 
-func DeleteUserSession(db *gorm.DB, table, sessionID string) error {
-	delete := view.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.USERSESSIONSEARCHKEY_USER_ID), sessionID)
+func DeleteUserSessions(db *gorm.DB, table, userID string) error {
+	delete := view.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.USERSESSIONSEARCHKEY_USER_ID), userID)
 	return delete(db)
 }
