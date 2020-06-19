@@ -82,7 +82,7 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 		}
 		err = grant.AppendEvent(event)
 	case grant_es_model.UserGrantRemoved, grant_es_model.UserGrantCascadeRemoved:
-		err = u.view.DeleteUserGrant(event.AggregateID, event.Sequence)
+		return u.view.DeleteUserGrant(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
