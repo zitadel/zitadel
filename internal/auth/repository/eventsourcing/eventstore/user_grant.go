@@ -81,6 +81,19 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	return permissions.Permissions, nil
 }
 
+func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]string, error) {
+	ctxData := auth.GetCtxData(ctx)
+	usergrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, ctxData.ProjectID, ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	permissions := make([]string, len(usergrant.RoleKeys))
+	for i, role := range usergrant.RoleKeys {
+		permissions[i] = role
+	}
+	return permissions, nil
+}
+
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	searchRequest := &org_model.OrgSearchRequest{}
 	if len(request.Queries) > 0 {
