@@ -43,11 +43,11 @@ func (u *Token) Process(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		err = u.view.DeleteSessionTokens(id, event.AggregateID, event.Sequence)
-		if err != nil {
-			return err
-		}
-		return u.view.ProcessedTokenSequence(event.Sequence)
+		return u.view.DeleteSessionTokens(id, event.AggregateID, event.Sequence)
+	case es_model.UserLocked,
+		es_model.UserDeactivated,
+		es_model.UserRemoved:
+		return u.view.DeleteUserTokens(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedTokenSequence(event.Sequence)
 	}

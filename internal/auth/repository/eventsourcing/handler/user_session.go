@@ -67,7 +67,9 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 		return u.updateSession(session, event)
 	case es_model.UserPasswordChanged,
 		es_model.MfaOtpRemoved,
-		es_model.UserProfileChanged:
+		es_model.UserProfileChanged,
+		es_model.UserLocked,
+		es_model.UserDeactivated:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -78,6 +80,8 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 			}
 		}
 		return nil
+	case es_model.UserRemoved:
+		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserSessionSequence(event.Sequence)
 	}

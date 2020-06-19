@@ -66,6 +66,14 @@ func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64)
 	return v.ProcessedTokenSequence(eventSequence)
 }
 
+func (v *View) DeleteUserTokens(userID string, eventSequence uint64) error {
+	err := view.DeleteUserTokens(v.Db, tokenTable, userID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedTokenSequence(eventSequence)
+}
+
 func (v *View) GetLatestTokenSequence() (uint64, error) {
 	return v.latestSequence(tokenTable)
 }
