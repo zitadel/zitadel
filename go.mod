@@ -23,8 +23,8 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
-	github.com/gorilla/csrf v1.7.0
 	github.com/golang/protobuf v1.4.2
+	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/securecookie v1.1.1
@@ -33,7 +33,7 @@ require (
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
-	github.com/jinzhu/gorm v1.9.12
+	github.com/jinzhu/gorm v1.9.14
 	github.com/kevinburke/go-types v0.0.0-20200309064045-f2d4aea18a7a // indirect
 	github.com/kevinburke/go.uuid v1.2.0 // indirect
 	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8 // indirect
