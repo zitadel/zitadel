@@ -179,3 +179,12 @@ func orgChangesToMgtAPI(changes *org_model.OrgChanges) (_ []*Change) {
 
 	return result
 }
+
+func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *OrgIamPolicy {
+	return &OrgIamPolicy{
+		OrgId:                 policy.AggregateID,
+		Description:           policy.Description,
+		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
+		Default:               policy.Default,
+	}
+}

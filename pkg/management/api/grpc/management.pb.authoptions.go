@@ -250,6 +250,11 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrgIamPolicy": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetOrgMemberRoles": utils_auth.Option{
 		Permission: "org.member.read",
 		CheckParam: "",
