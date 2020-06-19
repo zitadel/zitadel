@@ -3,4 +3,4 @@ const copyToClipboard = str => {
 }
 
 let copyButton = document.getElementsByClassName("copy")[0];
-copyButton.addEventListener("click", copyToClipboard(copyButton.getAttribute("data-copy").value));
+copyButton.addEventListener("click", copyToClipboard(copyButton.getAttribute("data-copy")));
