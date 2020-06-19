@@ -707,9 +707,9 @@ func TestRemoveProjectMember(t *testing.T) {
 func TestAddProjectRole(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
-		es   *ProjectEventstore
-		ctx  context.Context
-		role *model.ProjectRole
+		es    *ProjectEventstore
+		ctx   context.Context
+		roles []*model.ProjectRole
 	}
 	type res struct {
 		result  *model.ProjectRole
@@ -724,9 +724,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "add project role, ok",
 			args: args{
-				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProject(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				result: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
@@ -735,9 +735,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "no key",
 			args: args{
-				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProject(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				wantErr: true,
@@ -747,9 +747,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "role already existing",
 			args: args{
-				es:   GetMockManipulateProjectWithRole(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProjectWithRole(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				wantErr: true,
@@ -759,9 +759,9 @@ func TestAddProjectRole(t *testing.T) {
 		{
 			name: "existing project not found",
 			args: args{
-				es:   GetMockManipulateProjectNoEvents(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
-				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
+				es:    GetMockManipulateProjectNoEvents(ctrl),
+				ctx:   auth.NewMockContext("orgID", "userID"),
+				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
 				wantErr: true,
@@ -771,7 +771,7 @@ func TestAddProjectRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.AddProjectRole(tt.args.ctx, tt.args.role)
+			result, err := tt.args.es.AddProjectRoles(tt.args.ctx, tt.args.roles...)
 
 			if !tt.res.wantErr && result.AggregateID == "" {
 				t.Errorf("result has no id")

@@ -694,7 +694,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Project
-		new        *model.ProjectRole
+		new        []*model.ProjectRole
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -713,11 +713,27 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
 				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
-				new:        &model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
+				new:        []*model.ProjectRole{&model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
+				eventType: model.ProjectRoleAdded,
+			},
+		},
+		{
+			name: "projectrole multiple added ok",
+			args: args{
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				new: []*model.ProjectRole{
+					&model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
+					&model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key2"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  2,
 				eventType: model.ProjectRoleAdded,
 			},
 		},
@@ -753,7 +769,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectRoleAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := ProjectRoleAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new...)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
