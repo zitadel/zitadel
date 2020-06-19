@@ -2292,13 +2292,14 @@ message ProjectGrantView {
     string project_id = 2;
     string granted_org_id = 3;
     string granted_org_name = 4;
-    string granted_org_domain = 5;
-    repeated string role_keys = 6;
-    ProjectGrantState state = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    google.protobuf.Timestamp change_date = 9;
-    string project_name = 10;
-    uint64 sequence = 11;
+    repeated string role_keys = 5;
+    ProjectGrantState state = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    google.protobuf.Timestamp change_date = 8;
+    string project_name = 9;
+    uint64 sequence = 10;
+    string resource_owner = 11;
+    string resource_owner_name = 12;
 }
 
 message ProjectGrantSearchResponse {

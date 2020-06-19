@@ -5373,9 +5373,6 @@
         "granted_org_name": {
           "type": "string"
         },
-        "granted_org_domain": {
-          "type": "string"
-        },
         "role_keys": {
           "type": "array",
           "items": {
@@ -5399,6 +5396,12 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "resource_owner_name": {
+          "type": "string"
         }
       }
     },

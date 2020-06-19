@@ -6,18 +6,19 @@ import (
 )
 
 type ProjectGrantView struct {
-	ProjectID       string
-	Name            string
-	CreationDate    time.Time
-	ChangeDate      time.Time
-	State           ProjectState
-	ResourceOwner   string
-	OrgID           string
-	OrgName         string
-	OrgDomain       string
-	Sequence        uint64
-	GrantID         string
-	GrantedRoleKeys []string
+	ProjectID         string
+	Name              string
+	CreationDate      time.Time
+	ChangeDate        time.Time
+	State             ProjectState
+	ResourceOwner     string
+	ResourceOwnerName string
+	OrgID             string
+	OrgName           string
+	OrgDomain         string
+	Sequence          uint64
+	GrantID           string
+	GrantedRoleKeys   []string
 }
 
 type ProjectGrantViewSearchRequest struct {

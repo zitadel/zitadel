@@ -120,17 +120,18 @@ func projectGrantFromGrantedProjectModel(project *proj_model.ProjectGrantView) *
 	logging.Log("GRPC-sope3").OnError(err).Debug("unable to parse timestamp")
 
 	return &ProjectGrantView{
-		ProjectId:        project.ProjectID,
-		State:            projectGrantStateFromProjectStateModel(project.State),
-		CreationDate:     creationDate,
-		ChangeDate:       changeDate,
-		ProjectName:      project.Name,
-		Sequence:         project.Sequence,
-		GrantedOrgId:     project.OrgID,
-		GrantedOrgName:   project.OrgName,
-		GrantedOrgDomain: project.OrgDomain,
-		Id:               project.GrantID,
-		RoleKeys:         project.GrantedRoleKeys,
+		ProjectId:         project.ProjectID,
+		State:             projectGrantStateFromProjectStateModel(project.State),
+		CreationDate:      creationDate,
+		ChangeDate:        changeDate,
+		ProjectName:       project.Name,
+		Sequence:          project.Sequence,
+		GrantedOrgId:      project.OrgID,
+		GrantedOrgName:    project.OrgName,
+		Id:                project.GrantID,
+		RoleKeys:          project.GrantedRoleKeys,
+		ResourceOwner:     project.ResourceOwner,
+		ResourceOwnerName: project.ResourceOwnerName,
 	}
 }
 
