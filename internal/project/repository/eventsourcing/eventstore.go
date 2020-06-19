@@ -248,28 +248,37 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	return err
 }
 
-func (es *ProjectEventstore) AddProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
-	if !role.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Key is required")
+func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	if roles == nil || len(roles) == 0 {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "must be at least one role")
 	}
-	existing, err := es.ProjectByID(ctx, role.AggregateID)
+	for _, role := range roles {
+		if !role.IsValid() {
+			return nil, caos_errs.ThrowPreconditionFailedf(nil, "EVENT-idue3", "role is invalid %v", role)
+		}
+	}
+	existing, err := es.ProjectByID(ctx, roles[0].AggregateID)
 	if err != nil {
 		return nil, err
 	}
-	if existing.ContainsRole(role) {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Project contains role with same key")
+	for _, role := range roles {
+		if existing.ContainsRole(role) {
+			return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-sk35t", "Project contains role with same key")
+		}
 	}
+
 	repoProject := model.ProjectFromModel(existing)
-	repoRole := model.ProjectRoleFromModel(role)
-	projectAggregate := ProjectRoleAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRole)
+	repoRoles := model.ProjectRolesFromModel(roles)
+	projectAggregate := ProjectRoleAddedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoRoles...)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
 	if err != nil {
 		return nil, err
 	}
-
+	if len(repoRoles) > 1 {
+		return nil, nil
+	}
 	es.projectCache.cacheProject(repoProject)
-
-	if _, r := model.GetProjectRole(repoProject.Roles, role.Key); r != nil {
+	if _, r := model.GetProjectRole(repoProject.Roles, repoRoles[0].Key); r != nil {
 		return model.ProjectRoleToModel(r), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sie83", "Could not find role in list")

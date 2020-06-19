@@ -1479,6 +1479,38 @@
         ]
       }
     },
+    "/projects/{id}/roles/_bulk": {
+      "post": {
+        "operationId": "BulkAddProjectRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectRoleAddBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/projects/{id}/roles/{key}": {
       "delete": {
         "summary": "RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project",
@@ -5691,6 +5723,20 @@
         },
         "group": {
           "type": "string"
+        }
+      }
+    },
+    "v1ProjectRoleAddBulk": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectRoleAdd"
+          }
         }
       }
     },

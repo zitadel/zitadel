@@ -790,6 +790,18 @@ service ManagementService {
         };
     }
 
+    rpc BulkAddProjectRole(ProjectRoleAddBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/projects/{id}/roles/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.role.write"
+            check_field_name: "Id"
+        };
+    }
+
     rpc ChangeProjectRole(ProjectRoleChange) returns (ProjectRole) {
         option (google.api.http) = {
             put: "/projects/{id}/roles/{key}"
@@ -2036,6 +2048,11 @@ message ProjectRoleAdd {
      string key = 2;
      string display_name = 3;
      string group = 4;
+}
+
+message ProjectRoleAddBulk {
+    string id = 1;
+    repeated ProjectRoleAdd project_roles = 2;
 }
 
 message ProjectRoleChange {

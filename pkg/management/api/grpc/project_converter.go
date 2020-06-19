@@ -131,6 +131,21 @@ func projectRoleFromModel(role *proj_model.ProjectRole) *ProjectRole {
 	}
 }
 
+func projectRoleAddBulkToModel(bulk *ProjectRoleAddBulk) []*proj_model.ProjectRole {
+	roles := make([]*proj_model.ProjectRole, len(bulk.ProjectRoles))
+	for i, role := range bulk.ProjectRoles {
+		roles[i] = &proj_model.ProjectRole{
+			ObjectRoot: models.ObjectRoot{
+				AggregateID: bulk.Id,
+			},
+			Key:         role.Key,
+			DisplayName: role.DisplayName,
+			Group:       role.Group,
+		}
+	}
+	return roles
+}
+
 func projectRoleAddToModel(role *ProjectRoleAdd) *proj_model.ProjectRole {
 	return &proj_model.ProjectRole{
 		ObjectRoot: models.ObjectRoot{

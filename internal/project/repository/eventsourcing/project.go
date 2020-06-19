@@ -144,16 +144,22 @@ func ProjectMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func ProjectRoleAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, role *model.ProjectRole) func(ctx context.Context) (*es_models.Aggregate, error) {
+func ProjectRoleAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, roles ...*model.ProjectRole) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		if role == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sleo9", "role should not be nil")
+		if roles == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sleo9", "roles should not be nil")
 		}
 		agg, err := ProjectAggregate(ctx, aggCreator, existing)
 		if err != nil {
 			return nil, err
 		}
-		return agg.AppendEvent(model.ProjectRoleAdded, role)
+		for _, role := range roles {
+			agg, err = agg.AppendEvent(model.ProjectRoleAdded, role)
+			if err != nil {
+				return nil, err
+			}
+		}
+		return agg, nil
 	}
 }
 
