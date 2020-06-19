@@ -3,6 +3,38 @@
         <h1>{{org?.name}}</h1>
         <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}
         </p>
+        <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
+            description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
+            <div *ngFor="let domain of domains" class="domain">
+                <span class="title">{{domain.domain}}</span>
+                <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
+                <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-chess-queen"></i>
+                <span class="fill-space"></span>
+                <button disabled mat-icon-button
+                    matTooltip="download /.well-known/caos-developer-domain-association.txt and deploy it on your domain. Then verify"><i
+                        class="las la-file-download"></i></button>
+                <button matTooltip="Remove domain" color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
+                        class="las la-trash"></i></button>
+            </div>
+
+            <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
+            <div class="new-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>new domain</mat-label>
+                    <input matInput [(ngModel)]="newDomain" />
+                </mat-form-field>
+
+                <button matTooltip="Add domain" mat-icon-button color="accent" (click)="saveNewOrgDomain()">
+                    <mat-icon>check</mat-icon>
+                </button>
+
+                <button disabled mat-icon-button
+                    matTooltip="download /.well-known/caos-developer-domain-association.txt and deploy it on your domain. Then verify"><i
+                        class="las la-file-download"></i></button>
+                <button disabled mat-icon-button matTooltip="Verify"><i class=" las la-check-circle"></i></button>
+            </div>
+        </app-card>
+
         <ng-template appHasRole [appHasRole]="['policy.read']">
             <app-policy-grid></app-policy-grid>
         </ng-template>
@@ -11,8 +43,9 @@
     <metainfo class="side">
         <div class="details">
             <div class="row">
-                <span class="first">Domain:</span>
-                <span class="second" *ngIf="org?.domain">{{org.domain}}</span>
+                <span class="first">Domains:</span>
+                <span class="second"><span style="display: block;"
+                        *ngFor="let domain of domains">{{domain.domain}}</span></span>
             </div>
             <div class="row">
                 <span class="first">State:</span>

@@ -74,13 +74,6 @@
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
                     </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.DISPLAYNAME' | translate }}</mat-label>
-                        <input matInput formControlName="displayName" />
-                        <mat-error *ngIf="displayName?.invalid && displayName?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
 
                     <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
 
@@ -115,7 +108,10 @@
                             type="password" />
                         <mat-error *ngIf="password?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
-                        <mat-error *ngIf="password?.errors?.pattern">{{ 'USER.VALIDATION.INVALIDPATTERN' | translate }}
+                        <mat-error *ngIf="password?.errors?.pattern">{{ policy | passwordPattern | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.minlength">
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:policy }}
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field class="formfield">
@@ -124,6 +120,11 @@
                             type="password" />
                         <mat-error *ngIf="confirmPassword?.errors?.required">
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.pattern">{{ policy | passwordPattern | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.minlength">
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:policy }}
                         </mat-error>
                     </mat-form-field>
 

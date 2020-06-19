@@ -46,8 +46,8 @@ type mockViewUserSession struct {
 }
 
 type mockUser struct {
-	UserID   string
-	UserName string
+	UserID    string
+	LoginName string
 }
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string) (*view_model.UserSessionView, error) {
@@ -61,8 +61,8 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string) ([]*view_model.UserS
 	sessions := make([]*view_model.UserSessionView, len(m.Users))
 	for i, user := range m.Users {
 		sessions[i] = &view_model.UserSessionView{
-			UserID:   user.UserID,
-			UserName: user.UserName,
+			UserID:    user.UserID,
+			LoginName: user.LoginName,
 		}
 	}
 	return sessions, nil
@@ -175,11 +175,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					Users: []mockUser{
 						{
 							"id1",
-							"username1",
+							"loginname1",
 						},
 						{
 							"id2",
-							"username2",
+							"loginname2",
 						},
 					},
 				},
@@ -191,12 +191,12 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				&model.SelectUserStep{
 					Users: []model.UserSelection{
 						{
-							UserID:   "id1",
-							UserName: "username1",
+							UserID:    "id1",
+							LoginName: "loginname1",
 						},
 						{
-							UserID:   "id2",
-							UserName: "username2",
+							UserID:    "id2",
+							LoginName: "loginname2",
 						},
 					},
 				}},

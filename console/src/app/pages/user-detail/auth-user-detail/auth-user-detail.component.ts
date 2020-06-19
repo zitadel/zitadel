@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { Gender, UserAddress, UserEmail, UserPhone, UserProfile } from 'src/app/proto/generated/auth_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
+import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -48,13 +49,12 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public loading: boolean = false;
 
-    public minLengthPassword: any = {
-        value: 0,
-    };
+    public policy!: PasswordComplexityPolicy.AsObject;
 
     constructor(
         public translate: TranslateService,
         private toast: ToastService,
+        private mgmtUserService: MgmtUserService,
         private userService: AuthUserService,
         private fb: FormBuilder,
         private dialog: MatDialog,
@@ -62,21 +62,20 @@ export class AuthUserDetailComponent implements OnDestroy {
     ) {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
-            const policy: PasswordComplexityPolicy.AsObject = data.toObject();
-            this.minLengthPassword.value = data.toObject().minLength;
-            if (policy.minLength) {
-                validators.push(Validators.minLength(policy.minLength));
+            this.policy = data.toObject();
+            if (this.policy.minLength) {
+                validators.push(Validators.minLength(this.policy.minLength));
             }
-            if (policy.hasLowercase) {
+            if (this.policy.hasLowercase) {
                 validators.push(Validators.pattern(/[a-z]/g));
             }
-            if (policy.hasUppercase) {
+            if (this.policy.hasUppercase) {
                 validators.push(Validators.pattern(/[A-Z]/g));
             }
-            if (policy.hasNumber) {
+            if (this.policy.hasNumber) {
                 validators.push(Validators.pattern(/[0-9]/g));
             }
-            if (policy.hasSymbol) {
+            if (this.policy.hasSymbol) {
                 // All characters that are not a digit or an English letter \W or a whitespace \S
                 validators.push(Validators.pattern(/[\W\S]/));
             }

@@ -24,4 +24,6 @@ type OrgRepository interface {
 	RemoveMyOrgMember(ctx context.Context, userID string) error
 
 	GetOrgMemberRoles() []string
+
+	GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIamPolicy, error)
 }

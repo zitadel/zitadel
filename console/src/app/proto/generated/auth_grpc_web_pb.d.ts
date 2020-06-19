@@ -20,12 +20,17 @@ import {
   UpdateUserPhoneRequest,
   UpdateUserProfileRequest,
   UserAddress,
+  UserAddressView,
   UserEmail,
+  UserEmailView,
   UserGrantSearchRequest,
   UserGrantSearchResponse,
   UserPhone,
+  UserPhoneView,
   UserProfile,
+  UserProfileView,
   UserSessionViews,
+  UserView,
   VerifyMfaOtp,
   VerifyMyUserEmailRequest,
   VerifyUserPhoneRequest} from './auth_pb';
@@ -63,12 +68,19 @@ export class AuthServiceClient {
                response: UserSessionViews) => void
   ): grpcWeb.ClientReadableStream<UserSessionViews>;
 
+  getMyUser(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: UserView) => void
+  ): grpcWeb.ClientReadableStream<UserView>;
+
   getMyUserProfile(
     request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: UserProfile) => void
-  ): grpcWeb.ClientReadableStream<UserProfile>;
+               response: UserProfileView) => void
+  ): grpcWeb.ClientReadableStream<UserProfileView>;
 
   updateMyUserProfile(
     request: UpdateUserProfileRequest,
@@ -81,8 +93,8 @@ export class AuthServiceClient {
     request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: UserEmail) => void
-  ): grpcWeb.ClientReadableStream<UserEmail>;
+               response: UserEmailView) => void
+  ): grpcWeb.ClientReadableStream<UserEmailView>;
 
   changeMyUserEmail(
     request: UpdateUserEmailRequest,
@@ -109,8 +121,8 @@ export class AuthServiceClient {
     request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: UserPhone) => void
-  ): grpcWeb.ClientReadableStream<UserPhone>;
+               response: UserPhoneView) => void
+  ): grpcWeb.ClientReadableStream<UserPhoneView>;
 
   changeMyUserPhone(
     request: UpdateUserPhoneRequest,
@@ -137,8 +149,8 @@ export class AuthServiceClient {
     request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: UserAddress) => void
-  ): grpcWeb.ClientReadableStream<UserAddress>;
+               response: UserAddressView) => void
+  ): grpcWeb.ClientReadableStream<UserAddressView>;
 
   updateMyUserAddress(
     request: UpdateUserAddressRequest,
@@ -230,10 +242,15 @@ export class AuthServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<UserSessionViews>;
 
+  getMyUser(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<UserView>;
+
   getMyUserProfile(
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
-  ): Promise<UserProfile>;
+  ): Promise<UserProfileView>;
 
   updateMyUserProfile(
     request: UpdateUserProfileRequest,
@@ -243,7 +260,7 @@ export class AuthServicePromiseClient {
   getMyUserEmail(
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
-  ): Promise<UserEmail>;
+  ): Promise<UserEmailView>;
 
   changeMyUserEmail(
     request: UpdateUserEmailRequest,
@@ -263,7 +280,7 @@ export class AuthServicePromiseClient {
   getMyUserPhone(
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
-  ): Promise<UserPhone>;
+  ): Promise<UserPhoneView>;
 
   changeMyUserPhone(
     request: UpdateUserPhoneRequest,
@@ -283,7 +300,7 @@ export class AuthServicePromiseClient {
   getMyUserAddress(
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
-  ): Promise<UserAddress>;
+  ): Promise<UserAddressView>;
 
   updateMyUserAddress(
     request: UpdateUserAddressRequest,

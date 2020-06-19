@@ -158,7 +158,8 @@
         },
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
-            "REQUIRED": "The input field is empty"
+            "REQUIRED": "The input field is empty",
+            "MINLENGTH":"The password has to be at least {{minLength}} characters long!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -192,6 +193,10 @@
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organization"
         },
+        "DOMAINS": {
+            "TITLE":"Domains",
+            "DESCRIPTION":"Configure your domains on which your users will be registered."
+        },
         "STATE": {
             "0": "nicht definiert",
             "1": "aktiv",
@@ -208,7 +213,12 @@
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
                 "TITLECREATE":"Create Password Complexity Policy",
-                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern"
+                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern",
+                "SYMBOLANDNUMBERERROR":"The password must consist of a number and a symbol",
+                "SYMBOLERROR":"The password must include a symbol!",
+                "NUMBERERROR":"The password must include a number!",
+                "PATTERNERROR":"The required pattern is not fulfilled!"
+
             },
             "PWD_AGE": {
                 "TITLE":"Password Age",

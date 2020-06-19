@@ -64,6 +64,10 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 	return usr_model.UserToModel(user), nil
 }
 
+func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
+	return repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+}
+
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
 	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
 	if err != nil {
@@ -203,8 +207,8 @@ func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
 	return repo.UserEvents.SkipMfaInit(ctx, userID)
 }
 
-func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string) error {
-	user, err := repo.View.UserByUsername(username)
+func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {
+	user, err := repo.View.UserByLoginName(loginname)
 	if err != nil {
 		return err
 	}

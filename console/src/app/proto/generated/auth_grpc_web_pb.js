@@ -408,13 +408,13 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserSessi
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserProfile>}
+ *   !proto.caos.zitadel.auth.api.v1.UserView>}
  */
-const methodDescriptor_AuthService_GetMyUserProfile = new grpc.web.MethodDescriptor(
-  '/caos.zitadel.auth.api.v1.AuthService/GetMyUserProfile',
+const methodDescriptor_AuthService_GetMyUser = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.auth.api.v1.AuthService/GetMyUser',
   grpc.web.MethodType.UNARY,
   google_protobuf_empty_pb.Empty,
-  proto.caos.zitadel.auth.api.v1.UserProfile,
+  proto.caos.zitadel.auth.api.v1.UserView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -422,7 +422,7 @@ const methodDescriptor_AuthService_GetMyUserProfile = new grpc.web.MethodDescrip
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserProfile.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserView.deserializeBinary
 );
 
 
@@ -430,10 +430,10 @@ const methodDescriptor_AuthService_GetMyUserProfile = new grpc.web.MethodDescrip
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserProfile>}
+ *   !proto.caos.zitadel.auth.api.v1.UserView>}
  */
-const methodInfo_AuthService_GetMyUserProfile = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.caos.zitadel.auth.api.v1.UserProfile,
+const methodInfo_AuthService_GetMyUser = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.auth.api.v1.UserView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -441,7 +441,7 @@ const methodInfo_AuthService_GetMyUserProfile = new grpc.web.AbstractClientBase.
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserProfile.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserView.deserializeBinary
 );
 
 
@@ -450,9 +450,89 @@ const methodInfo_AuthService_GetMyUserProfile = new grpc.web.AbstractClientBase.
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserProfile)}
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserView)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserProfile>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserView>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUser =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyUser',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyUser,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserView>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUser =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyUser',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyUser);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.UserProfileView>}
+ */
+const methodDescriptor_AuthService_GetMyUserProfile = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.auth.api.v1.AuthService/GetMyUserProfile',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.caos.zitadel.auth.api.v1.UserProfileView,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.UserProfileView.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.UserProfileView>}
+ */
+const methodInfo_AuthService_GetMyUserProfile = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.auth.api.v1.UserProfileView,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.UserProfileView.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserProfileView)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserProfileView>|undefined}
  *     The XHR Node Readable Stream
  */
 proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserProfile =
@@ -471,7 +551,7 @@ proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserProfile =
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserProfile>}
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserProfileView>}
  *     A native promise that resolves to the response
  */
 proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserProfile =
@@ -568,13 +648,13 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.updateMyUserPr
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserEmail>}
+ *   !proto.caos.zitadel.auth.api.v1.UserEmailView>}
  */
 const methodDescriptor_AuthService_GetMyUserEmail = new grpc.web.MethodDescriptor(
   '/caos.zitadel.auth.api.v1.AuthService/GetMyUserEmail',
   grpc.web.MethodType.UNARY,
   google_protobuf_empty_pb.Empty,
-  proto.caos.zitadel.auth.api.v1.UserEmail,
+  proto.caos.zitadel.auth.api.v1.UserEmailView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -582,7 +662,7 @@ const methodDescriptor_AuthService_GetMyUserEmail = new grpc.web.MethodDescripto
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserEmail.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserEmailView.deserializeBinary
 );
 
 
@@ -590,10 +670,10 @@ const methodDescriptor_AuthService_GetMyUserEmail = new grpc.web.MethodDescripto
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserEmail>}
+ *   !proto.caos.zitadel.auth.api.v1.UserEmailView>}
  */
 const methodInfo_AuthService_GetMyUserEmail = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.caos.zitadel.auth.api.v1.UserEmail,
+  proto.caos.zitadel.auth.api.v1.UserEmailView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -601,7 +681,7 @@ const methodInfo_AuthService_GetMyUserEmail = new grpc.web.AbstractClientBase.Me
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserEmail.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserEmailView.deserializeBinary
 );
 
 
@@ -610,9 +690,9 @@ const methodInfo_AuthService_GetMyUserEmail = new grpc.web.AbstractClientBase.Me
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserEmail)}
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserEmailView)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserEmail>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserEmailView>|undefined}
  *     The XHR Node Readable Stream
  */
 proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserEmail =
@@ -631,7 +711,7 @@ proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserEmail =
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserEmail>}
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserEmailView>}
  *     A native promise that resolves to the response
  */
 proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserEmail =
@@ -888,13 +968,13 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.resendMyEmailV
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserPhone>}
+ *   !proto.caos.zitadel.auth.api.v1.UserPhoneView>}
  */
 const methodDescriptor_AuthService_GetMyUserPhone = new grpc.web.MethodDescriptor(
   '/caos.zitadel.auth.api.v1.AuthService/GetMyUserPhone',
   grpc.web.MethodType.UNARY,
   google_protobuf_empty_pb.Empty,
-  proto.caos.zitadel.auth.api.v1.UserPhone,
+  proto.caos.zitadel.auth.api.v1.UserPhoneView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -902,7 +982,7 @@ const methodDescriptor_AuthService_GetMyUserPhone = new grpc.web.MethodDescripto
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserPhone.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserPhoneView.deserializeBinary
 );
 
 
@@ -910,10 +990,10 @@ const methodDescriptor_AuthService_GetMyUserPhone = new grpc.web.MethodDescripto
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserPhone>}
+ *   !proto.caos.zitadel.auth.api.v1.UserPhoneView>}
  */
 const methodInfo_AuthService_GetMyUserPhone = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.caos.zitadel.auth.api.v1.UserPhone,
+  proto.caos.zitadel.auth.api.v1.UserPhoneView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -921,7 +1001,7 @@ const methodInfo_AuthService_GetMyUserPhone = new grpc.web.AbstractClientBase.Me
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserPhone.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserPhoneView.deserializeBinary
 );
 
 
@@ -930,9 +1010,9 @@ const methodInfo_AuthService_GetMyUserPhone = new grpc.web.AbstractClientBase.Me
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserPhone)}
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserPhoneView)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserPhone>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserPhoneView>|undefined}
  *     The XHR Node Readable Stream
  */
 proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserPhone =
@@ -951,7 +1031,7 @@ proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserPhone =
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserPhone>}
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserPhoneView>}
  *     A native promise that resolves to the response
  */
 proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserPhone =
@@ -1208,13 +1288,13 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.resendMyPhoneV
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserAddress>}
+ *   !proto.caos.zitadel.auth.api.v1.UserAddressView>}
  */
 const methodDescriptor_AuthService_GetMyUserAddress = new grpc.web.MethodDescriptor(
   '/caos.zitadel.auth.api.v1.AuthService/GetMyUserAddress',
   grpc.web.MethodType.UNARY,
   google_protobuf_empty_pb.Empty,
-  proto.caos.zitadel.auth.api.v1.UserAddress,
+  proto.caos.zitadel.auth.api.v1.UserAddressView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -1222,7 +1302,7 @@ const methodDescriptor_AuthService_GetMyUserAddress = new grpc.web.MethodDescrip
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserAddress.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserAddressView.deserializeBinary
 );
 
 
@@ -1230,10 +1310,10 @@ const methodDescriptor_AuthService_GetMyUserAddress = new grpc.web.MethodDescrip
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
  *   !proto.google.protobuf.Empty,
- *   !proto.caos.zitadel.auth.api.v1.UserAddress>}
+ *   !proto.caos.zitadel.auth.api.v1.UserAddressView>}
  */
 const methodInfo_AuthService_GetMyUserAddress = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.caos.zitadel.auth.api.v1.UserAddress,
+  proto.caos.zitadel.auth.api.v1.UserAddressView,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -1241,7 +1321,7 @@ const methodInfo_AuthService_GetMyUserAddress = new grpc.web.AbstractClientBase.
   function(request) {
     return request.serializeBinary();
   },
-  proto.caos.zitadel.auth.api.v1.UserAddress.deserializeBinary
+  proto.caos.zitadel.auth.api.v1.UserAddressView.deserializeBinary
 );
 
 
@@ -1250,9 +1330,9 @@ const methodInfo_AuthService_GetMyUserAddress = new grpc.web.AbstractClientBase.
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserAddress)}
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.UserAddressView)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserAddress>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.UserAddressView>|undefined}
  *     The XHR Node Readable Stream
  */
 proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserAddress =
@@ -1271,7 +1351,7 @@ proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserAddress =
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserAddress>}
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.UserAddressView>}
  *     A native promise that resolves to the response
  */
 proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserAddress =

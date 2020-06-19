@@ -42,8 +42,8 @@ func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSess
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := mfaData{
-		baseData: l.getBaseData(r, authSession, "Mfa Prompt", errType, errMessage),
-		UserName: authSession.UserName,
+		baseData:  l.getBaseData(r, authSession, "Mfa Prompt", errType, errMessage),
+		LoginName: authSession.LoginName,
 	}
 
 	if mfaPromptData == nil {

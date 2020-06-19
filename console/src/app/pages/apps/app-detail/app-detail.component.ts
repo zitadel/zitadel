@@ -18,6 +18,7 @@ import {
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
 import { GrpcService } from 'src/app/services/grpc.service';
+import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -84,6 +85,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private _location: Location,
         private dialog: MatDialog,
         private grpcService: GrpcService,
+        private orgService: OrgService,
     ) {
         this.appNameForm = this.fb.group({
             state: ['', []],
@@ -108,12 +110,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     private async getData({ projectid, id }: Params): Promise<void> {
         this.projectId = projectid;
-        this.projectService.GetProjectById(this.projectId).then(project => {
-            this.isZitadel = project.toObject().name === 'Zitadel';
-            if (this.isZitadel) {
-                this.appNameForm.disable();
-                this.appForm.disable();
-            }
+        this.orgService.GetIam().then(iam => {
+            this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
 
@@ -122,8 +120,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.appNameForm.patchValue(this.app);
             console.log(this.grpcService.clientid, this.app.oidcConfig?.clientId);
 
-            console.log(this.isZitadel);
-            if (this.app.state !== AppState.APPSTATE_ACTIVE || this.isZitadel) {
+            if (this.app.state !== AppState.APPSTATE_ACTIVE) {
                 this.appNameForm.controls['name'].disable();
                 this.appForm.disable();
             } else {

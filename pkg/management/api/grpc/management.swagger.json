@@ -302,6 +302,23 @@
         ]
       }
     },
+    "/orgs/me/iampolicy": {
+      "get": {
+        "summary": "ORG_IAM_POLICY",
+        "operationId": "GetMyOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicy"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/orgs/me/members": {
       "post": {
         "operationId": "AddMyOrgMember",
@@ -4013,9 +4030,6 @@
         "nick_name": {
           "type": "string"
         },
-        "display_name": {
-          "type": "string"
-        },
         "preferred_language": {
           "type": "string"
         },
@@ -4469,6 +4483,25 @@
       "properties": {
         "id": {
           "type": "string"
+        }
+      }
+    },
+    "v1OrgIamPolicy": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "user_login_must_be_domain": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -6035,9 +6068,6 @@
           "type": "string"
         },
         "nick_name": {
-          "type": "string"
-        },
-        "display_name": {
           "type": "string"
         },
         "preferred_language": {

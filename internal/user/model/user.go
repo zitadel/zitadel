@@ -81,6 +81,12 @@ func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
 	return nil
 }
 
+func (u *User) SetNamesAsDisplayname() {
+	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
+		u.DisplayName = u.FirstName + " " + u.LastName
+	}
+}
+
 func (u *User) IsValid() bool {
 	return u.Profile != nil && u.FirstName != "" && u.LastName != "" && u.UserName != "" && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.IsValid())
 }

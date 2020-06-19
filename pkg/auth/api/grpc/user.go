@@ -8,6 +8,14 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
+func (s *Server) GetMyUser(ctx context.Context, _ *empty.Empty) (*UserView, error) {
+	user, err := s.repo.MyUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return userViewFromModel(user), nil
+}
+
 func (s *Server) GetMyUserProfile(ctx context.Context, _ *empty.Empty) (*UserProfileView, error) {
 	profile, err := s.repo.MyProfile(ctx)
 	if err != nil {

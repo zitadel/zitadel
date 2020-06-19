@@ -76,6 +76,7 @@ func createMux(ctx context.Context, g Gateway) *runtime.ServeMux {
 
 func addInterceptors(handler http.Handler, g Gateway) http.Handler {
 	handler = http_mw.DefaultTraceHandler(handler)
+	handler = http_mw.NoCacheInterceptor(handler)
 	if interceptor, ok := g.(grpcGatewayCustomInterceptor); ok {
 		handler = interceptor.GatewayHTTPInterceptor(handler)
 	}
