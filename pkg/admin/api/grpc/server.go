@@ -7,6 +7,7 @@ import (
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
@@ -35,12 +36,12 @@ func (s *Server) GRPCPort() string {
 	return s.port
 }
 
-func (s *Server) GRPCServer() (*grpc.Server, error) {
+func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error) {
 	gs := grpc.NewServer(
 		middleware.TracingStatsServer("/Healthz", "/Ready", "/Validate"),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				middleware.ErrorHandler(),
+				middleware.ErrorHandler(defaults.DefaultLanguage),
 				AdminService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),
 		),

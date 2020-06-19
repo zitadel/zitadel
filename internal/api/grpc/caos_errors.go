@@ -1,19 +1,26 @@
 package grpc
 
 import (
+	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/i18n"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
-func CaosToGRPCError(err error) error {
+func CaosToGRPCError(err error, ctx context.Context, translator *i18n.Translator) error {
 	if err == nil {
 		return nil
 	}
 	code, msg, ok := Extract(err)
 	if !ok {
 		return status.Convert(err).Err()
+	}
+	if translator != nil {
+		//TODO: How to get langs?
+		langs := []string{}
+		msg = translator.Localize(msg, nil, langs...)
+
 	}
 	return status.Error(code, msg)
 }

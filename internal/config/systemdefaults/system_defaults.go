@@ -9,9 +9,11 @@ import (
 	"github.com/caos/zitadel/internal/notification/templates"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	pol "github.com/caos/zitadel/internal/policy"
+	"golang.org/x/text/language"
 )
 
 type SystemDefaults struct {
+	DefaultLanguage       language.Tag
 	SecretGenerators      SecretGenerators
 	UserVerificationKey   *crypto.KeyConfig
 	Multifactors          MultifactorConfig
