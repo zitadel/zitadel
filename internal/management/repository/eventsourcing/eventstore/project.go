@@ -268,8 +268,42 @@ func (repo *ProjectRepo) ReactivateProjectGrant(ctx context.Context, projectID, 
 }
 
 func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, grantID string) error {
-	grant := proj_model.NewProjectGrant(projectID, grantID)
-	return repo.ProjectEvents.RemoveProjectGrant(ctx, grant)
+	grant, err := repo.ProjectEvents.ProjectGrantByIDs(ctx, projectID, grantID)
+	if err != nil {
+		return err
+	}
+	aggregates := make([]*es_models.Aggregate, 0)
+	project, aggFunc, err := repo.ProjectEvents.PrepareRemoveProjectGrant(ctx, grant)
+	if err != nil {
+		return err
+	}
+	agg, err := aggFunc(ctx)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+
+	usergrants, err := repo.View.UserGrantsByOrgIDAndProjectID(grant.GrantedOrgID, projectID)
+	if err != nil {
+		return err
+	}
+	for _, grant := range usergrants {
+		_, grantAggregates, err := repo.UserGrantEvents.PrepareRemoveUserGrant(ctx, grant.ID, true)
+		if err != nil {
+			return err
+		}
+		for _, agg := range grantAggregates {
+			aggregates = append(aggregates, agg)
+		}
+	}
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (repo *ProjectRepo) BulkChangeProjectGrant(ctx context.Context, grants ...*proj_model.ProjectGrant) error {

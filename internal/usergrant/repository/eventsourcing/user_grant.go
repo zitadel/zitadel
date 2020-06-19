@@ -138,7 +138,7 @@ func UserGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func UserGrantRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant) ([]*es_models.Aggregate, error) {
+func UserGrantRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant, cascade bool) ([]*es_models.Aggregate, error) {
 	if grant == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo21s", "grant should not be nil")
 	}
@@ -146,7 +146,11 @@ func UserGrantRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.UserGrantRemoved, nil)
+	eventType := model.UserGrantRemoved
+	if cascade {
+		eventType = model.UserGrantCascadeRemoved
+	}
+	agg, err = agg.AppendEvent(eventType, nil)
 	if err != nil {
 		return nil, err
 	}

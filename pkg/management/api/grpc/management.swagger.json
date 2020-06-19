@@ -1481,6 +1481,7 @@
     },
     "/projects/{id}/roles/{key}": {
       "delete": {
+        "summary": "RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project",
         "operationId": "RemoveProjectRole",
         "responses": {
           "200": {
@@ -2649,6 +2650,30 @@
         "tags": [
           "ManagementService"
         ]
+      },
+      "put": {
+        "operationId": "BulkUpdateUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantUpdateBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
       }
     },
     "/users": {
@@ -3574,30 +3599,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1UserGrantRemoveBulk"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      },
-      "put": {
-        "operationId": "BulkUpdateUserGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1UserGrantUpdateBulk"
             }
           }
         ],

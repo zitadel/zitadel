@@ -1162,7 +1162,7 @@ service ManagementService {
 
     rpc BulkUpdateUserGrant(UserGrantUpdateBulk) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            put: "/usersgrants/_bulk"
+            put: "/usergrants/_bulk"
             body: "*"
         };
 

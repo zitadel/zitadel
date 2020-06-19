@@ -145,7 +145,7 @@ func (es *UserGrantEventStore) ChangeUserGrants(ctx context.Context, grants ...*
 }
 
 func (es *UserGrantEventStore) RemoveUserGrant(ctx context.Context, grantID string) error {
-	existing, projectAggregates, err := es.PrepareRemoveUserGrant(ctx, grantID)
+	existing, projectAggregates, err := es.PrepareRemoveUserGrant(ctx, grantID, false)
 	if err != nil {
 		return err
 	}
@@ -160,7 +160,7 @@ func (es *UserGrantEventStore) RemoveUserGrant(ctx context.Context, grantID stri
 func (es *UserGrantEventStore) RemoveUserGrants(ctx context.Context, grantIDs ...string) error {
 	aggregates := make([]*es_models.Aggregate, 0)
 	for _, grantID := range grantIDs {
-		_, aggs, err := es.PrepareRemoveUserGrant(ctx, grantID)
+		_, aggs, err := es.PrepareRemoveUserGrant(ctx, grantID, false)
 		if err != nil {
 			return err
 		}
@@ -171,14 +171,14 @@ func (es *UserGrantEventStore) RemoveUserGrants(ctx context.Context, grantIDs ..
 	return es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
 }
 
-func (es *UserGrantEventStore) PrepareRemoveUserGrant(ctx context.Context, grantID string) (*model.UserGrant, []*es_models.Aggregate, error) {
+func (es *UserGrantEventStore) PrepareRemoveUserGrant(ctx context.Context, grantID string, cascade bool) (*model.UserGrant, []*es_models.Aggregate, error) {
 	existing, err := es.UserGrantByID(ctx, grantID)
 	if err != nil {
 		return nil, nil, err
 	}
 	repoExisting := model.UserGrantFromModel(existing)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
-	projectAggregates, err := UserGrantRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoExisting, repoGrant)
+	projectAggregates, err := UserGrantRemovedAggregate(ctx, es.Eventstore.AggregateCreator(), repoExisting, repoGrant, cascade)
 	if err != nil {
 		return nil, nil, err
 	}

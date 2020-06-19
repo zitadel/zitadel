@@ -6400,7 +6400,7 @@ var (
 
 	pattern_ManagementService_BulkCreateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"usergrants", "_bulk"}, ""))
 
-	pattern_ManagementService_BulkUpdateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"usersgrants", "_bulk"}, ""))
+	pattern_ManagementService_BulkUpdateUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"usergrants", "_bulk"}, ""))
 
 	pattern_ManagementService_BulkRemoveUserGrant_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"usersgrants", "_bulk"}, ""))
 
