@@ -12,7 +12,19 @@ A `customer` can either choose to use one `organization` or multiple, depending 
 
 ## Policies
 
+`Policies` define a certain set of rules applied to a `ZITADEL` resource. For example a `password complexity policy` defines how complex a password need to be witin a `organization`.
+
 ## Session
+
+A `session` is created upon the `users` authentication against `ZTIADEL`. It contains information about the `useragent` and `credentials` used by the `user`. Within one `user-agent`, multiple users can have active sessions.
+
+## Reauthentication
+
+After a certain amount of time a `session` is terminated and the `user` needs to present certain `credentials`.
+
+## Multiuser
+
+Each `useragent` can have multiple active `users`.
 
 ## User
 
@@ -57,6 +69,10 @@ TBA
 ## Authorization
 
 ## Credentials
+
+## Secrets
+
+## Multifactor
 
 ## OTP
 
