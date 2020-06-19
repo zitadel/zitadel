@@ -49,9 +49,6 @@ type ProjectRepository interface {
 	RemoveProjectGrant(ctx context.Context, projectID, grantID string) error
 	SearchProjectGrantMembers(ctx context.Context, request *model.ProjectGrantMemberSearchRequest) (*model.ProjectGrantMemberSearchResponse, error)
 
-	BulkChangeProjectGrant(ctx context.Context, grants ...*model.ProjectGrant) error
-	BulkRemoveProjectGrant(ctx context.Context, grants ...*model.ProjectGrant) error
-
 	ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (*model.ProjectGrantMember, error)
 	AddProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
 	ChangeProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)

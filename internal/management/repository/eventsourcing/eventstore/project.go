@@ -2,10 +2,12 @@ package eventstore
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"strings"
@@ -144,7 +146,7 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 			ProjectID:  grant.ProjectID,
 			UserID:     grant.UserID,
 		}
-		changed.RemoveRoleKey(key)
+		changed.RemoveRoleKeyIfExisting(key)
 		_, agg, err := repo.UserGrantEvents.PrepareChangeUserGrant(ctx, changed, true)
 		if err != nil {
 			return err
@@ -261,7 +263,48 @@ func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, grant *proj_model.
 }
 
 func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.ChangeProjectGrant(ctx, grant)
+	project, aggFunc, removedRoles, err := repo.ProjectEvents.PrepareChangeProjectGrant(ctx, grant)
+	if err != nil {
+		return nil, err
+	}
+	agg, err := aggFunc(ctx)
+	if err != nil {
+		return nil, err
+	}
+	aggregates := make([]*es_models.Aggregate, 0)
+	aggregates = append(aggregates, agg)
+
+	usergrants, err := repo.View.UserGrantsByProjectID(grant.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	for _, grant := range usergrants {
+		changed := &usr_grant_model.UserGrant{
+			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.ResourceOwner},
+			RoleKeys:   grant.RoleKeys,
+			ProjectID:  grant.ProjectID,
+			UserID:     grant.UserID,
+		}
+		existing := changed.RemoveRoleKeysIfExisting(removedRoles)
+		if existing {
+			_, agg, err := repo.UserGrantEvents.PrepareChangeUserGrant(ctx, changed, true)
+			if err != nil {
+				return nil, err
+			}
+			aggregates = append(aggregates, agg)
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := es_proj_model.GetProjectGrant(project.Grants, grant.GrantID); g != nil {
+		return es_proj_model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
 }
 
 func (repo *ProjectRepo) DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {
@@ -311,13 +354,6 @@ func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, gran
 	return nil
 }
 
-func (repo *ProjectRepo) BulkChangeProjectGrant(ctx context.Context, grants ...*proj_model.ProjectGrant) error {
-	return repo.ProjectEvents.ChangeProjectGrants(ctx, grants...)
-}
-
-func (repo *ProjectRepo) BulkRemoveProjectGrant(ctx context.Context, grants ...*proj_model.ProjectGrant) error {
-	return repo.ProjectEvents.RemoveProjectGrants(ctx, grants...)
-}
 func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (member *proj_model.ProjectGrantMember, err error) {
 	member = proj_model.NewProjectGrantMember(projectID, grantID, userID)
 	return repo.ProjectEvents.ProjectGrantMemberByIDs(ctx, member)

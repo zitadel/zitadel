@@ -46,3 +46,22 @@ func (p *ProjectGrant) GetMember(userID string) (int, *ProjectGrantMember) {
 	}
 	return -1, nil
 }
+
+func (p *ProjectGrant) GetRemovedRoles(roleKeys []string) []string {
+	removed := make([]string, 0)
+	for _, role := range p.RoleKeys {
+		if !containsKey(roleKeys, role) {
+			removed = append(removed, role)
+		}
+	}
+	return removed
+}
+
+func containsKey(roles []string, key string) bool {
+	for _, role := range roles {
+		if role == key {
+			return true
+		}
+	}
+	return false
+}

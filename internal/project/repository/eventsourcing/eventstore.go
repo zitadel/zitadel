@@ -802,58 +802,27 @@ func (es *ProjectEventstore) AddProjectGrant(ctx context.Context, grant *proj_mo
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-sk3t5", "Could not find grant in list")
 }
 
-func (es *ProjectEventstore) ChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
-	repoProject, projectAggregate, err := es.PrepareChangeProjectGrant(ctx, grant)
-	if err != nil {
-		return nil, err
-	}
-	err = es_sdk.Push(ctx, es.PushAggregates, repoProject.AppendEvents, projectAggregate)
-	if err != nil {
-		return nil, err
-	}
-	es.projectCache.cacheProject(repoProject)
-
-	if _, g := model.GetProjectGrant(repoProject.Grants, grant.GrantID); g != nil {
-		return model.GrantToModel(g), nil
-	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
-}
-
-func (es *ProjectEventstore) ChangeProjectGrants(ctx context.Context, grants ...*proj_model.ProjectGrant) error {
-	aggregates := make([]*es_models.Aggregate, 0)
-	for i, grant := range grants {
-		_, projectAggregate, err := es.PrepareChangeProjectGrant(ctx, grant)
-		if err != nil {
-			return err
-		}
-		agg, err := projectAggregate(ctx)
-		if err != nil {
-			return err
-		}
-		aggregates[i] = agg
-	}
-	return es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
-}
-
-func (es *ProjectEventstore) PrepareChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*model.Project, func(ctx context.Context) (*es_models.Aggregate, error), error) {
+func (es *ProjectEventstore) PrepareChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*model.Project, func(ctx context.Context) (*es_models.Aggregate, error), []string, error) {
 	if grant == nil && grant.GrantID == "" {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8sie3", "invalid grant")
+		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8sie3", "invalid grant")
 	}
 	existing, err := es.ProjectByID(ctx, grant.AggregateID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	if _, g := existing.GetGrant(grant.GrantID); g == nil {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "Grant not existing on project")
+	_, existingGrant := existing.GetGrant(grant.GrantID)
+	if existingGrant == nil {
+		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die83", "Grant not existing on project")
 	}
 	if !existing.ContainsRoles(grant.RoleKeys) {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
+		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83d", "One role doesnt exist in Project")
 	}
+	removedRoles := existingGrant.GetRemovedRoles(grant.RoleKeys)
 	repoProject := model.ProjectFromModel(existing)
 	repoGrant := model.GrantFromModel(grant)
 
 	projectAggregate := ProjectGrantChangedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoGrant)
-	return repoProject, projectAggregate, nil
+	return repoProject, projectAggregate, removedRoles, nil
 }
 
 func (es *ProjectEventstore) RemoveProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) error {
