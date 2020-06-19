@@ -1,7 +1,5 @@
 # Principles
 
-> This is just an outline!
-
 - Be transparent about you decisions
 - Stateless Application design
 - System of records is the eventstore

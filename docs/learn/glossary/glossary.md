@@ -1,6 +1,6 @@
-# Resources
+# Glossary
 
-This chapter explaines some information about the resources provided by `ZITADEL`.
+This chapter explaines the wording used with `ZITADEL`.
 
 ## Organisation
 
@@ -10,48 +10,56 @@ Each `organization` consist of at least one `domainname` which is relevant for t
 
 A `customer` can either choose to use one `organization` or multiple, depending on their needs.
 
-### Policies
+## Policies
 
-#### Password complexity
+## Session
 
-TBA
-
-### Identity Providers
-
-TBA
-
-### User
+## User
 
 The `user` stores information about the person unitilizing it. For example the `username`, `email address`, `multifactors` and so on
 Each `user` is stored in exactly one `organization`. A `user` can have some `roles` which define it's possible `access rights`to a `project`.
 
-### Service Accounts
+## Service Accounts
 
 For `machines`, where no interactive login is possible, ZITADEL provides the possibility to create `service accounts`. These `service accounts` primarly distinct them from a `user` because of their `credentials`. They are stored in exatly one `organization` and can have `roles` from `projects` and `permissions` from `ZITADEL`.
 
 A `service accounts` could for example be used to interface with the `ZITADEL management API` to create new users in a `register flow` within your own `project`.
 
-### Project
+## Project
 
 The `project` could also be described as set of `applications`, `services` or `clients` who share the same `roles`. For example if you have a `single page application` and an `API` who are used as one. You could setup both to are located in the same `proejct`. By this both would use the same `roles`.
 
-#### Roles
+## Roles
 
 With `roles` you can achieve a `role based access control` (RBAC) oriented setup to manage which `user`, `service account`, or `organization` can access what in your `project`.
 
-#### Grants
+## Project Grants
 
 Some could describe `grants` also as `delegations`, the primary usage of `grants` is to give a certain amount of control `(roles)` to a third party.
 For example, if you build a `SaaS system` and you would like to delegate the management of a `tenant` to a customer you can achieve this by `granting` them said `roles`. In this example your company could have a CRM with the `roles`: `system-admin` (can manage everything), `tenant-admin` (is the admin inside of a tenant), `tenant-user`(a user inside a tenant) to achieve that your `customer` can manage it's `access rights` you would simply `grant` their `organization` the `role` `tenant-admin`.
 
-#### Clients
+## User Grants
+
+## Clients
 
 That your `application` can use `ZITADEL` as `authentication` and `authorization` system you need to register the `client`. As the `clients` is stored inside the `project`. This can either be a `openid connect / oauth 2.0` and / or in the future as well a `SAML 2.0` `client`.
 
-##### OpenID Connect / Oauth 2.0
+## OpenID Connect / Oauth 2.0
 
 The `client` has a generated `clientID` and `clientSecret` and configures things like allowed`redirect_uris`, `grant_types`, `response_types`, and so on.
 
-##### SAML 2.0
+## SAML 2.0
 
 TBA
+
+## Authentication
+
+## Authorization
+
+## Credentials
+
+## OTP
+
+## WebAuthN
+
+## Identity Providers
