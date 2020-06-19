@@ -224,7 +224,7 @@ func checkProjectConditions(resourceOwner string, grant *model.UserGrant, projec
 		return checkIfProjectHasRoles(grant.RoleKeys, project.Roles)
 	}
 
-	if _, projectGrant := proj_es_model.GetProjectGrantByResourceOwner(project.Grants, resourceOwner); projectGrant != nil {
+	if _, projectGrant := proj_es_model.GetProjectGrantByOrgID(project.Grants, resourceOwner); projectGrant != nil {
 		return checkIfProjectGrantHasRoles(grant.RoleKeys, projectGrant.RoleKeys)
 	}
 	return nil
