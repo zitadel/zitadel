@@ -1,5 +1,6 @@
 Errors:
   Internal: An internal error occured
+  NoChangesFound: No changes found
   User:
     NotFound: User could not be found
     UserIDMissing: User ID missing
@@ -8,3 +9,33 @@ Errors:
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
     DomainNotAllowedAsUsername: Domain is already reserverd
+    AlreadyInactive: User already inactive
+    NotInactive: User is not inactive
+    ShouldBeActiveOrInitial: User is not active or inital
+    NotLocked: User is not locked
+    NoChanges: No changes found
+    InitCodeNotFound: Initial Code not found
+    ProfileNotFound: Profile not found
+    ProfileInvalid: Profildata invalid
+    EmailNotFound: Email not found
+    EmailInvalid: Email is invalid
+    EmailAlreadyVerified: Email is alredy verified
+    PhoneNotFound: Phone not found
+    PhoneInvalid: Phone is invalid
+    PhoneAlreadyVerified: Phone already verified
+    AddressNotFound: Address not found
+    Code:
+      Empty: Code is empty
+      NotFound: Code not found
+      Expired: Code is expired
+      GeneratorAlgNotSupported: Unsupported generator algorithm
+    Password:
+      NotFound: Passoword not found
+      Empty: Password is empty
+      Invalid: Passwort is invalid
+    Mfa:
+      Otp:
+        AlreadyReady: Multifactor OTP (OneTimePassword) is already setup
+        NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
+        NotReady: Multifactor OTP (OneTimePassword) isn't ready
+        InvalidCode: Invalid code

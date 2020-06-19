@@ -1,10 +1,41 @@
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten
+  NoChangesFound: Keine Änderungen gefunden
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     UserIDMissing: User ID fehlt
-    UserIsNil: User ist leer
+    UserIsNil: Benutzer ist leer
     OrgIamPolicyNil: Organisations Policy ist leer
-    EmailAsUsernameNotAllowed: Username darf keine E-Mail Adresse sein
-    Invalid: Userdaten sind nicht valid
+    EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
+    Invalid: Benutzerdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
+    AlreadyInactive: Benutzer ist bereits deaktiviert
+    NotInactive: Benutzer ist nicht inaktiv
+    ShouldBeActiveOrInitial: Benutzer ist nicht aktive oder initial
+    NotLocked: Benutzer ist nicht gesperrt
+    NoChanges: Keine Änderungen gefunden
+    InitCodeNotFound: Kein Initial Code gefunden
+    ProfileNotFound: Profil nicht gefunden
+    ProfileInvalid: Profildaten sind ungültig
+    EmailNotFound: Email nicht gefunden
+    EmailInvalid: Email ist ungültig
+    EmailAlreadyVerified: Email ist bereits verifiziert
+    PhoneNotFound: Telfonnummer nicht gefunden
+    PhoneInvalid: Telefonnummer is ungültig
+    PhoneAlreadyVerified: Telefonnummer bereits verifiziert
+    AddressNotFound: Addresse nicht gefunden
+    Code:
+      Empty: Code ist leer
+      NotFound: Code konnte nicht gefunden werden
+      Expired: Code ist abgelaufen
+      GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
+    Password:
+      NotFound: Password nicht gefunden
+      Empty: Passwort ist leer
+      Invalid: Passwort ungültig
+    Mfa:
+      Otp:
+        AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
+        NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
+        NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
+        InvalidCode: Code ist ungültig

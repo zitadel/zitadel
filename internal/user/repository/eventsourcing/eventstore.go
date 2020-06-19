@@ -164,7 +164,7 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	}
 	user.SetNamesAsDisplayname()
 	if !user.IsValid() || user.Password == nil || user.SecretString == "" {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.InvalidData")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.Invalid")
 	}
 	id, err := es.idGenerator.Next()
 	if err != nil {
@@ -209,7 +209,7 @@ func (es *UserEventstore) DeactivateUser(ctx context.Context, id string) (*usr_m
 		return nil, err
 	}
 	if existing.IsInactive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "cant deactivate inactive user")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-die45", "Errors.User.AlreadyInactive")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -228,7 +228,7 @@ func (es *UserEventstore) ReactivateUser(ctx context.Context, id string) (*usr_m
 		return nil, err
 	}
 	if !existing.IsInactive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do94s", "user must be inactive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do94s", "Errors.User.NotInactive")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -247,7 +247,7 @@ func (es *UserEventstore) LockUser(ctx context.Context, id string) (*usr_model.U
 		return nil, err
 	}
 	if !existing.IsActive() && !existing.IsInitial() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "user must be active or initial")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di83s", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -266,7 +266,7 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 		return nil, err
 	}
 	if !existing.IsLocked() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dks83", "user must be locked")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dks83", "Errors.User.NotLocked")
 	}
 
 	repoExisting := model.UserFromModel(existing)
@@ -285,10 +285,10 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
 		logging.Log("EVENT-g9HCv").WithError(err).Warn("eventstore unavailable")
-		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "unable to get current user")
+		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "Errors.Internal")
 	}
 	if len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6cAxe", "no objects found")
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6cAxe", "Errors.USer.NoChanges")
 	}
 
 	result := make([]*usr_model.UserChange, 0)
@@ -335,7 +335,7 @@ func ChangesQuery(userID string, latestSequence uint64) *es_models.SearchQuery {
 
 func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d8diw", "userID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d8diw", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -345,12 +345,12 @@ func (es *UserEventstore) InitializeUserCodeByID(ctx context.Context, userID str
 	if user.InitCode != nil {
 		return user.InitCode, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "init code not found")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "Erorrs.User.InitCodeNotFound")
 }
 
 func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, userID string) (*usr_model.InitUserCode, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "userID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dic8s", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -377,7 +377,7 @@ func (es *UserEventstore) CreateInitializeUserCodeByID(ctx context.Context, user
 
 func (es *UserEventstore) InitCodeSent(ctx context.Context, userID string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0posw", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0posw", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -453,7 +453,7 @@ func (es *UserEventstore) SkipMfaInit(ctx context.Context, userID string) error 
 
 func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (*usr_model.Password, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -463,7 +463,7 @@ func (es *UserEventstore) UserPasswordByID(ctx context.Context, userID string) (
 	if user.Password != nil {
 		return user.Password, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "password not found")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-d8e2", "Errors.User.Password.NotFound")
 }
 
 func (es *UserEventstore) CheckPassword(ctx context.Context, userID, password string, authRequest *req_model.AuthRequest) error {
@@ -596,7 +596,7 @@ func (es *UserEventstore) PasswordCodeSent(ctx context.Context, userID string) e
 
 func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -606,12 +606,12 @@ func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_
 	if user.Profile != nil {
 		return user.Profile, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dk23f", "profile not found")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dk23f", "Errors.User.ProfileNotFound")
 }
 
 func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
 	if !profile.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "profile is invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "Errors.User.ProfileInvalid")
 	}
 	existing, err := es.UserByID(ctx, profile.AggregateID)
 	if err != nil {
@@ -632,7 +632,7 @@ func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.
 
 func (es *UserEventstore) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "userID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di834", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -642,12 +642,12 @@ func (es *UserEventstore) EmailByID(ctx context.Context, userID string) (*usr_mo
 	if user.Email != nil {
 		return user.Email, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dki89", "email not found")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-dki89", "Errors.User.EmailNotFound")
 }
 
 func (es *UserEventstore) ChangeEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
 	if !email.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "email is invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "Errors.User.EmailInvalid")
 	}
 	existing, err := es.UserByID(ctx, email.AggregateID)
 	if err != nil {
@@ -713,17 +713,17 @@ func (es *UserEventstore) setEmailVerifyResult(ctx context.Context, existing *us
 
 func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userID string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-lco09", "Errors.User.UserIDMissing")
 	}
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	if existing.Email == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "no email existing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.EmailNotFound")
 	}
 	if existing.IsEmailVerified {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "email already verified")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-pdo9s", "Errors.User.EmailAlreadyVerified")
 	}
 
 	emailCode := new(usr_model.EmailCode)
@@ -746,7 +746,7 @@ func (es *UserEventstore) CreateEmailVerificationCode(ctx context.Context, userI
 
 func (es *UserEventstore) EmailVerificationCodeSent(ctx context.Context, userID string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-spo0w", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-spo0w", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -765,7 +765,7 @@ func (es *UserEventstore) EmailVerificationCodeSent(ctx context.Context, userID 
 
 func (es *UserEventstore) PhoneByID(ctx context.Context, userID string) (*usr_model.Phone, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "userID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9se", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -775,12 +775,12 @@ func (es *UserEventstore) PhoneByID(ctx context.Context, userID string) (*usr_mo
 	if user.Phone != nil {
 		return user.Phone, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-pos9e", "phone not found")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-pos9e", "Errors.User.PhoneNotFound")
 }
 
 func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phone) (*usr_model.Phone, error) {
 	if !phone.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "phone is invalid")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9s4", "Errors.User.PhoneInvalid")
 	}
 	existing, err := es.UserByID(ctx, phone.AggregateID)
 	if err != nil {
@@ -808,14 +808,14 @@ func (es *UserEventstore) ChangePhone(ctx context.Context, phone *usr_model.Phon
 
 func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationCode string) error {
 	if userID == "" || verificationCode == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dsi8s", "userId or Code empty")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-dsi8s", "Errors.User.UserIDMissing")
 	}
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	if existing.PhoneCode == nil {
-		return caos_errs.ThrowNotFound(nil, "EVENT-slp0s", "code not found")
+		return caos_errs.ThrowNotFound(nil, "EVENT-slp0s", "Errors.User.Code.NotFound")
 	}
 
 	err = crypto.VerifyCode(existing.PhoneCode.CreationDate, existing.PhoneCode.Expiry, existing.PhoneCode.Code, verificationCode, es.PhoneVerificationCode)
@@ -825,7 +825,7 @@ func (es *UserEventstore) VerifyPhone(ctx context.Context, userID, verificationC
 	if err := es.setPhoneVerifyResult(ctx, existing, PhoneVerificationFailedAggregate); err != nil {
 		return err
 	}
-	return caos_errs.ThrowInvalidArgument(err, "EVENT-dsf4G", "invalid code")
+	return caos_errs.ThrowInvalidArgument(err, "EVENT-dsf4G", "Errors.User.Code.Invalid")
 }
 
 func (es *UserEventstore) setPhoneVerifyResult(ctx context.Context, existing *usr_model.User, check func(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc) error {
@@ -840,17 +840,17 @@ func (es *UserEventstore) setPhoneVerifyResult(ctx context.Context, existing *us
 
 func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userID string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9sw", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-do9sw", "Errors.User.UserIDMissing")
 	}
 	existing, err := es.UserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
 	if existing.Phone == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "no phone existing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp9fs", "Errors.User.PhoneNotFound")
 	}
 	if existing.IsPhoneVerified {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "phone already verified")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sleis", "Errors.User.PhoneAlreadyVerified")
 	}
 
 	phoneCode := new(usr_model.PhoneCode)
@@ -873,7 +873,7 @@ func (es *UserEventstore) CreatePhoneVerificationCode(ctx context.Context, userI
 
 func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID string) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0wa", "userID missing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0wa", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -892,7 +892,7 @@ func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID 
 
 func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di8ws", "userID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di8ws", "Errors.User.UserIDMissing")
 	}
 	user, err := es.UserByID(ctx, userID)
 	if err != nil {
@@ -902,7 +902,7 @@ func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_
 	if user.Address != nil {
 		return user.Address, nil
 	}
-	return nil, caos_errs.ThrowNotFound(nil, "EVENT-so9wa", "address not found")
+	return nil, caos_errs.ThrowNotFound(nil, "EVENT-so9wa", "Errors.User.AddressNotFound")
 }
 
 func (es *UserEventstore) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
@@ -960,7 +960,7 @@ func (es *UserEventstore) RemoveOTP(ctx context.Context, userID string) error {
 		return err
 	}
 	if existing.OTP == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "no otp existing")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-sp0de", "Errors.User.Mfa.Otp.NotExisting")
 	}
 	repoExisting := model.UserFromModel(existing)
 	updateAggregate := MfaOTPRemoveAggregate(es.AggregateCreator(), repoExisting)
