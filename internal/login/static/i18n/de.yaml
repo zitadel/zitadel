@@ -153,5 +153,7 @@ Errors:
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         InvalidCode: Code ist ungültig
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
+    Locked: Benutzer ist gesperrt
+    NotActive: Benutzer ist nicht aktiv
 
 optional: (optional)

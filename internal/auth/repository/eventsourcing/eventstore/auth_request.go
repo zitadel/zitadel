@@ -176,7 +176,7 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id string, chec
 
 func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest, checkLoggedIn bool) ([]model.NextStep, error) {
 	if request == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "request must not be nil")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
 	}
 	steps := make([]model.NextStep, 0)
 	if !checkLoggedIn && request.Prompt == model.PromptNone {
@@ -338,7 +338,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 				continue
 			}
 		case es_model.UserRemoved:
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "user deleted")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
 		sessionCopy.AppendEvent(event)
 	}
@@ -350,15 +350,18 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if err != nil {
 		return nil, err
 	}
+	if user.State == user_model.USERSTATE_LOCKED || user.State == user_model.USERSTATE_SUSPEND {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
+	}
 	if !(user.State == user_model.USERSTATE_ACTIVE || user.State == user_model.USERSTATE_INITIAL) {
-		return nil, errors.ThrowPreconditionFailedf(nil, "EVENT-FJ262", "user is not allowed to login, status is %v", user.State)
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
 	org, err := orgViewProvider.OrgByID(user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if org.State != int32(org_model.ORGSTATE_ACTIVE) {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Zws3s", "user is not allowed to login, org is not active")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Zws3s", "Errors.User.NotActive")
 	}
 	return user, nil
 }
