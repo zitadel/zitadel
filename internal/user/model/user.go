@@ -4,9 +4,9 @@ import (
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"strings"
 	"time"
-	"github.com/golang/protobuf/ptypes/timestamp"
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -70,10 +70,10 @@ const (
 
 func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
 	if policy == nil {
-		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Org Iam Policy should not be nil")
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
 	}
 	if policy.UserLoginMustBeDomain && strings.Contains(u.UserName, "@") {
-		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Username should not be email address")
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.UserName == "" && u.Email != nil {
 		u.UserName = u.EmailAddress

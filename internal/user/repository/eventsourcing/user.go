@@ -12,7 +12,7 @@ import (
 
 func UserByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8isw", "id should be filled")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d8isw", "Errors.User.UserIDMissing")
 	}
 	return UserQuery(latestSequence).
 		AggregateIDFilter(id), nil
@@ -42,14 +42,14 @@ func UserEmailUniqueQuery(email string) *es_models.SearchQuery {
 
 func UserAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User) (*es_models.Aggregate, error) {
 	if user == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing user should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "Errors.User.UserIsNil")
 	}
 	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence)
 }
 
 func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwnerID string, userID string) (*es_models.Aggregate, error) {
 	if user == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing user should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "Errors.Internal")
 	}
 
 	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
@@ -57,7 +57,7 @@ func UserAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.Ag
 
 func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, initCode *model.InitUserCode, phoneCode *model.PhoneCode, resourceOwner string, userLoginMustBeDomain bool) (_ []*es_models.Aggregate, err error) {
 	if user == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "user should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-duxk2", "Errors.Internal")
 	}
 
 	var agg *es_models.Aggregate
@@ -684,7 +684,7 @@ func addUserNameValidation(userName string) func(...*es_models.Event) error {
 		}
 		for _, d := range domains {
 			if d.Verified && d.Domain == split[1] {
-				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "domain already reserved")
+				return errors.ThrowPreconditionFailed(nil, "EVENT-us5Zw", "Errors.User.DomainNotAllowedAsUsername")
 			}
 		}
 		return nil

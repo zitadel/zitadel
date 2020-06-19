@@ -111,7 +111,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	}
 	user.SetNamesAsDisplayname()
 	if !user.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "User is invalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.User.Invalid")
 	}
 
 	id, err := es.idGenerator.Next()

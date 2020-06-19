@@ -1,2 +1,10 @@
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten
+  User:
+    NotFound: Benutzer konnte nicht gefunden werden
+    UserIDMissing: User ID fehlt
+    UserIsNil: User ist leer
+    OrgIamPolicyNil: Organisations Policy ist leer
+    EmailAsUsernameNotAllowed: Username darf keine E-Mail Adresse sein
+    Invalid: Userdaten sind nicht valid
+    DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
