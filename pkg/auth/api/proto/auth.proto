@@ -284,6 +284,16 @@ service AuthService {
       permission: "authenticated"
     };
   }
+
+  rpc GetMyProjectPermissions(google.protobuf.Empty) returns (MyPermissions) {
+    option (google.api.http) = {
+      get: "/permissions/me"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
 }
 
 message UserSessionViews {

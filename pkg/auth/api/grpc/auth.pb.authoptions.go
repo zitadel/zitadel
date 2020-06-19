@@ -124,6 +124,11 @@ var AuthService_AuthMethods = utils_auth.MethodMapping{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyProjectPermissions": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
 }
 
 func AuthService_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.Config) grpc.UnaryServerInterceptor {
