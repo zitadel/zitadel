@@ -12,10 +12,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/id"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type AuthRequestRepo struct {
@@ -26,6 +28,7 @@ type AuthRequestRepo struct {
 	UserSessionViewProvider userSessionViewProvider
 	UserViewProvider        userViewProvider
 	UserEventProvider       userEventProvider
+	OrgViewProvider         orgViewProvider
 
 	IdGenerator id.Generator
 
@@ -36,15 +39,19 @@ type AuthRequestRepo struct {
 }
 
 type userSessionViewProvider interface {
-	UserSessionByIDs(string, string) (*view_model.UserSessionView, error)
-	UserSessionsByAgentID(string) ([]*view_model.UserSessionView, error)
+	UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error)
+	UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error)
 }
 type userViewProvider interface {
-	UserByID(string) (*view_model.UserView, error)
+	UserByID(string) (*user_view_model.UserView, error)
 }
 
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
+}
+
+type orgViewProvider interface {
+	OrgByID(string) (*org_view_model.OrgView, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -124,7 +131,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID string) 
 	if err != nil {
 		return err
 	}
-	user, err := repo.View.UserByID(userID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, userID)
 	if err != nil {
 		return err
 	}
@@ -169,7 +176,7 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id string, chec
 
 func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest, checkLoggedIn bool) ([]model.NextStep, error) {
 	if request == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "request must not be nil")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
 	}
 	steps := make([]model.NextStep, 0)
 	if !checkLoggedIn && request.Prompt == model.PromptNone {
@@ -186,7 +193,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 		}
 		return steps, nil
 	}
-	user, err := userByID(ctx, repo.UserViewProvider, repo.UserEventProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, request.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +303,7 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string)
 	if err != nil {
 		return nil, err
 	}
-	return view_model.UserSessionsToModel(session), nil
+	return user_view_model.UserSessionsToModel(session), nil
 }
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
@@ -305,12 +312,12 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		if !errors.IsNotFound(err) {
 			return nil, err
 		}
-		session = &view_model.UserSessionView{}
+		session = &user_view_model.UserSessionView{}
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
 		logging.Log("EVENT-Hse6s").WithError(err).Debug("error retrieving new events")
-		return view_model.UserSessionToModel(session), nil
+		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
 	for _, event := range events {
@@ -319,19 +326,44 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			es_model.UserPasswordCheckFailed,
 			es_model.MfaOtpCheckSucceeded,
 			es_model.MfaOtpCheckFailed,
-			es_model.SignedOut:
-			eventData, err := view_model.UserSessionFromEvent(event)
+			es_model.SignedOut,
+			es_model.UserLocked,
+			es_model.UserDeactivated:
+			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).Debug("error getting event data")
-				return view_model.UserSessionToModel(session), nil
+				return user_view_model.UserSessionToModel(session), nil
 			}
 			if eventData.UserAgentID != agentID {
 				continue
 			}
+		case es_model.UserRemoved:
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
 		sessionCopy.AppendEvent(event)
 	}
-	return view_model.UserSessionToModel(&sessionCopy), nil
+	return user_view_model.UserSessionToModel(&sessionCopy), nil
+}
+
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, orgViewProvider orgViewProvider, userID string) (*user_model.UserView, error) {
+	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user.State == user_model.USERSTATE_LOCKED || user.State == user_model.USERSTATE_SUSPEND {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
+	}
+	if !(user.State == user_model.USERSTATE_ACTIVE || user.State == user_model.USERSTATE_INITIAL) {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
+	}
+	org, err := orgViewProvider.OrgByID(user.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if org.State != int32(org_model.ORGSTATE_ACTIVE) {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Zws3s", "Errors.User.NotActive")
+	}
+	return user, nil
 }
 
 func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider userEventProvider, userID string) (*user_model.UserView, error) {
@@ -342,13 +374,13 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-dfg42").WithError(err).Debug("error retrieving new events")
-		return view_model.UserToModel(user), nil
+		return user_view_model.UserToModel(user), nil
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return view_model.UserToModel(user), nil
+			return user_view_model.UserToModel(user), nil
 		}
 	}
-	return view_model.UserToModel(&userCopy), nil
+	return user_view_model.UserToModel(&userCopy), nil
 }

@@ -59,7 +59,23 @@ func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {
 }
 
 func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64) error {
-	err := view.DeleteTokens(v.Db, tokenTable, agentID, userID)
+	err := view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedTokenSequence(eventSequence)
+}
+
+func (v *View) DeleteUserTokens(userID string, eventSequence uint64) error {
+	err := view.DeleteUserTokens(v.Db, tokenTable, userID)
+	if err != nil {
+		return nil
+	}
+	return v.ProcessedTokenSequence(eventSequence)
+}
+
+func (v *View) DeleteApplicationTokens(eventSequence uint64, ids ...string) error {
+	err := view.DeleteApplicationTokens(v.Db, tokenTable, ids)
 	if err != nil {
 		return nil
 	}

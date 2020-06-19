@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/errors"
 	token_model "github.com/caos/zitadel/internal/token/model"
@@ -39,10 +40,20 @@ func DeleteToken(db *gorm.DB, table, tokenID string) error {
 	return delete(db)
 }
 
-func DeleteTokens(db *gorm.DB, table, agentID, userID string) error {
+func DeleteSessionTokens(db *gorm.DB, table, agentID, userID string) error {
 	delete := view.PrepareDeleteByKeys(table,
 		view.Key{Key: model.TokenSearchKey(token_model.TOKENSEARCHKEY_USER_AGENT_ID), Value: agentID},
 		view.Key{Key: model.TokenSearchKey(token_model.TOKENSEARCHKEY_USER_ID), Value: userID},
 	)
+	return delete(db)
+}
+
+func DeleteUserTokens(db *gorm.DB, table, userID string) error {
+	delete := view.PrepareDeleteByKey(table, model.TokenSearchKey(token_model.TOKENSEARCHKEY_USER_ID), userID)
+	return delete(db)
+}
+
+func DeleteApplicationTokens(db *gorm.DB, table string, appIDs []string) error {
+	delete := view.PrepareDeleteByKey(table, model.TokenSearchKey(token_model.TOKENSEARCHKEY_APPLICATION_ID), pq.StringArray(appIDs))
 	return delete(db)
 }

@@ -30,6 +30,7 @@ type NotifyUser struct {
 	VerifiedEmail     string    `json:"-" gorm:"column:verified_email"`
 	LastPhone         string    `json:"phone" gorm:"column:last_phone"`
 	VerifiedPhone     string    `json:"-" gorm:"column:verified_phone"`
+	PasswordSet       bool      `json:"-" gorm:"column:password_set"`
 	Sequence          uint64    `json:"-" gorm:"column:sequence"`
 }
 
@@ -50,6 +51,7 @@ func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
 		VerifiedEmail:     user.VerifiedEmail,
 		LastPhone:         user.LastPhone,
 		VerifiedPhone:     user.VerifiedPhone,
+		PasswordSet:       user.PasswordSet,
 		Sequence:          user.Sequence,
 	}
 }
@@ -71,6 +73,7 @@ func NotifyUserToModel(user *NotifyUser) *model.NotifyUser {
 		VerifiedEmail:     user.VerifiedEmail,
 		LastPhone:         user.LastPhone,
 		VerifiedPhone:     user.VerifiedPhone,
+		PasswordSet:       user.PasswordSet,
 		Sequence:          user.Sequence,
 	}
 }
@@ -84,6 +87,10 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		err = u.setData(event)
+		if err != nil {
+			return err
+		}
+		err = u.setPasswordData(event)
 	case es_model.UserProfileChanged:
 		err = u.setData(event)
 	case es_model.UserEmailChanged:
@@ -94,6 +101,8 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 		err = u.setData(event)
 	case es_model.UserPhoneVerified:
 		u.VerifiedPhone = u.LastPhone
+	case es_model.UserPasswordChanged:
+		err = u.setPasswordData(event)
 	}
 	return err
 }
@@ -105,8 +114,18 @@ func (u *NotifyUser) setRootData(event *models.Event) {
 
 func (u *NotifyUser) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
-		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
+		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
+	return nil
+}
+
+func (u *NotifyUser) setPasswordData(event *models.Event) error {
+	password := new(es_model.Password)
+	if err := json.Unmarshal(event.Data, password); err != nil {
+		logging.Log("MODEL-dfhw6").WithError(err).Error("could not unmarshal event data")
+		return caos_errs.ThrowInternal(nil, "MODEL-BHFD2", "could not unmarshal data")
+	}
+	u.PasswordSet = password.Secret != nil
 	return nil
 }

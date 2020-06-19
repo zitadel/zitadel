@@ -38,7 +38,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 	return []spooler.Handler{
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, orgEvents: repos.OrgEvents},
 		&UserSession{handler: handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount}, userEvents: repos.UserEvents},
-		&Token{handler: handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount}},
+		&Token{handler: handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount}, ProjectEvents: repos.ProjectEvents},
 		&Key{handler: handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount}},
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},

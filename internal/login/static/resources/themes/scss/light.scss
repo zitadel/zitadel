@@ -68,12 +68,12 @@ html {
     }
 
     #qrcode {
-        svg rect[style*="fill:white"] {
-            fill: $backgroundColorLight !important;
+        svg rect.color {
+            fill: $fontColorLight;
         }
 
-        svg rect[style*="fill:black"] {
-            fill: $fontColorLight !important;
+        svg rect.bg-color {
+            fill: $backgroundColorLight;
         }
     }
 

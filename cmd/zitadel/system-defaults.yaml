@@ -116,7 +116,7 @@ SystemDefaults:
   Notifications:
     DebugMode: $DEBUG_MODE
     Endpoints:
-      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}'
+      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}'
       PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
       VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
     Providers:
