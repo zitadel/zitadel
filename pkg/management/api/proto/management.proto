@@ -802,6 +802,7 @@ service ManagementService {
         };
     }
 
+    /* RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project */
     rpc RemoveProjectRole(ProjectRoleRemove) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/projects/{id}/roles/{key}"
