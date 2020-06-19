@@ -130,6 +130,7 @@ func projectGrantFromGrantedProjectModel(project *proj_model.ProjectGrantView) *
 		GrantedOrgName:   project.OrgName,
 		GrantedOrgDomain: project.OrgDomain,
 		Id:               project.GrantID,
+		RoleKeys:         project.GrantedRoleKeys,
 	}
 }
 

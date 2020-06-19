@@ -58,16 +58,17 @@ func ProjectGrantFromModel(project *model.ProjectGrantView) *ProjectGrantView {
 
 func ProjectGrantToModel(project *ProjectGrantView) *model.ProjectGrantView {
 	return &model.ProjectGrantView{
-		ProjectID:     project.ProjectID,
-		OrgID:         project.OrgID,
-		Name:          project.Name,
-		ChangeDate:    project.ChangeDate,
-		CreationDate:  project.CreationDate,
-		State:         model.ProjectState(project.State),
-		ResourceOwner: project.ResourceOwner,
-		OrgName:       project.OrgName,
-		GrantID:       project.GrantID,
-		Sequence:      project.Sequence,
+		ProjectID:       project.ProjectID,
+		OrgID:           project.OrgID,
+		Name:            project.Name,
+		ChangeDate:      project.ChangeDate,
+		CreationDate:    project.CreationDate,
+		State:           model.ProjectState(project.State),
+		ResourceOwner:   project.ResourceOwner,
+		OrgName:         project.OrgName,
+		GrantID:         project.GrantID,
+		Sequence:        project.Sequence,
+		GrantedRoleKeys: project.GrantedRoleKeys,
 	}
 }
 
