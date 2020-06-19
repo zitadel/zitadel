@@ -777,6 +777,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetIam(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIam", reflect.TypeOf((*MockManagementServiceClient)(nil).GetIam), varargs...)
 }
 
+// GetMyOrgIamPolicy mocks base method
+func (m *MockManagementServiceClient) GetMyOrgIamPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.OrgIamPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetMyOrgIamPolicy", varargs...)
+	ret0, _ := ret[0].(*grpc.OrgIamPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMyOrgIamPolicy indicates an expected call of GetMyOrgIamPolicy
+func (mr *MockManagementServiceClientMockRecorder) GetMyOrgIamPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyOrgIamPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetMyOrgIamPolicy), varargs...)
+}
+
 // GetOrgByDomainGlobal mocks base method
 func (m *MockManagementServiceClient) GetOrgByDomainGlobal(arg0 context.Context, arg1 *grpc.OrgDomain, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
 	m.ctrl.T.Helper()

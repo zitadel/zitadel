@@ -560,6 +560,17 @@ service ManagementService {
         };
     }
 
+    //ORG_IAM_POLICY
+    rpc GetMyOrgIamPolicy(google.protobuf.Empty) returns (OrgIamPolicy) {
+        option (google.api.http) = {
+            get: "/orgs/me/iampolicy"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     //ORG_MEMBERS
     rpc GetOrgMemberRoles(google.protobuf.Empty) returns (OrgMemberRoles) {
         option (google.api.http) = {
@@ -1728,6 +1739,13 @@ enum PolicyState {
     POLICYSTATE_ACTIVE = 1;
     POLICYSTATE_INACTIVE = 2;
     POLICYSTATE_DELETED = 3;
+}
+
+message OrgIamPolicy {
+    string org_id = 1;
+    string description = 2;
+    bool user_login_must_be_domain = 3;
+    bool default = 4;
 }
 
 message OrgID {
