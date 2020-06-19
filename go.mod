@@ -23,8 +23,8 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
-	github.com/gorilla/csrf v1.7.0
 	github.com/golang/protobuf v1.4.2
+	github.com/gorilla/csrf v1.7.0
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/securecookie v1.1.1
@@ -50,7 +50,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.1.0
-	go.opencensus.io v0.22.3
+	go.opencensus.io v0.22.4
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
 	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
