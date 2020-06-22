@@ -41,7 +41,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         new MatTableDataSource<ProjectGrantView.AsObject>();
 
     public grantedProjectList: ProjectGrantView.AsObject[] = [];
-    public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'type', 'state', 'creationDate', 'changeDate'];
+    public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'state', 'creationDate', 'changeDate'];
     public selection: SelectionModel<ProjectGrantView.AsObject> = new SelectionModel<ProjectGrantView.AsObject>(true, []);
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
