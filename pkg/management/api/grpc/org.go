@@ -5,20 +5,20 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) GetOrgByID(ctx context.Context, orgID *OrgID) (*Org, error) {
+func (s *Server) GetOrgByID(ctx context.Context, orgID *OrgID) (*OrgView, error) {
 	org, err := s.org.OrgByID(ctx, orgID.Id)
 	if err != nil {
 		return nil, err
 	}
-	return orgFromModel(org), nil
+	return orgViewFromModel(org), nil
 }
 
-func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *OrgDomain) (*Org, error) {
+func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *OrgDomain) (*OrgView, error) {
 	org, err := s.org.OrgByDomainGlobal(ctx, in.Domain)
 	if err != nil {
 		return nil, err
 	}
-	return orgFromModel(org), nil
+	return orgViewFromModel(org), nil
 }
 
 func (s *Server) DeactivateOrg(ctx context.Context, in *OrgID) (*Org, error) {

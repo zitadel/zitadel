@@ -53,7 +53,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Org"
+              "$ref": "#/definitions/v1OrgView"
             }
           }
         },
@@ -450,7 +450,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Org"
+              "$ref": "#/definitions/v1OrgView"
             }
           }
         },
@@ -1673,7 +1673,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Application"
+              "$ref": "#/definitions/v1ApplicationView"
             }
           }
         },
@@ -2100,7 +2100,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrant"
+              "$ref": "#/definitions/v1ProjectGrantView"
             }
           }
         },
@@ -4655,6 +4655,32 @@
         "ORGSTATE_INACTIVE"
       ],
       "default": "ORGSTATE_UNSPECIFIED"
+    },
+    "v1OrgView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1OrgState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
     },
     "v1PasswordAgePolicy": {
       "type": "object",

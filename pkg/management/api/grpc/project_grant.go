@@ -20,12 +20,12 @@ func (s *Server) SearchProjectGrants(ctx context.Context, in *ProjectGrantSearch
 	return projectGrantSearchResponseFromModel(response), nil
 }
 
-func (s *Server) ProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrant, error) {
-	grant, err := s.project.ProjectGrantByID(ctx, in.ProjectId, in.Id)
+func (s *Server) ProjectGrantByID(ctx context.Context, in *ProjectGrantID) (*ProjectGrantView, error) {
+	grant, err := s.project.ProjectGrantByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return projectGrantFromModel(grant), nil
+	return projectGrantFromGrantedProjectModel(grant), nil
 }
 
 func (s *Server) CreateProjectGrant(ctx context.Context, in *ProjectGrantCreate) (*ProjectGrant, error) {
