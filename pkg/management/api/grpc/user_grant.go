@@ -17,12 +17,12 @@ func (s *Server) SearchUserGrants(ctx context.Context, in *UserGrantSearchReques
 	return userGrantSearchResponseFromModel(response), nil
 }
 
-func (s *Server) UserGrantByID(ctx context.Context, request *UserGrantID) (*UserGrant, error) {
+func (s *Server) UserGrantByID(ctx context.Context, request *UserGrantID) (*UserGrantView, error) {
 	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantViewFromModel(user), nil
 }
 
 func (s *Server) CreateUserGrant(ctx context.Context, in *UserGrantCreate) (*UserGrant, error) {
@@ -79,12 +79,12 @@ func (s *Server) SearchProjectUserGrants(ctx context.Context, request *ProjectUs
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-8jdSw", "Not implemented")
 }
 
-func (s *Server) ProjectUserGrantByID(ctx context.Context, request *ProjectUserGrantID) (*UserGrant, error) {
+func (s *Server) ProjectUserGrantByID(ctx context.Context, request *ProjectUserGrantID) (*UserGrantView, error) {
 	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantViewFromModel(user), nil
 }
 
 func (s *Server) CreateProjectUserGrant(ctx context.Context, in *UserGrantCreate) (*UserGrant, error) {
@@ -122,12 +122,12 @@ func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, request *Proj
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-32sFs", "Not implemented")
 }
 
-func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *ProjectGrantUserGrantID) (*UserGrant, error) {
+func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *ProjectGrantUserGrantID) (*UserGrantView, error) {
 	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantViewFromModel(user), nil
 }
 
 func (s *Server) CreateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantCreate) (*UserGrant, error) {

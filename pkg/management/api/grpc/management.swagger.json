@@ -914,7 +914,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserGrant"
+              "$ref": "#/definitions/v1UserGrantView"
             }
           }
         },
@@ -2438,7 +2438,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserGrant"
+              "$ref": "#/definitions/v1UserGrantView"
             }
           }
         },
@@ -3405,7 +3405,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserGrant"
+              "$ref": "#/definitions/v1UserGrantView"
             }
           }
         },
