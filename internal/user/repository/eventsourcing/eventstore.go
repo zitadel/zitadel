@@ -288,7 +288,7 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 		return nil, errors.ThrowInternal(err, "EVENT-htuG9", "Errors.Internal")
 	}
 	if len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6cAxe", "Errors.USer.NoChanges")
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6cAxe", "Errors.User.NoChanges")
 	}
 
 	result := make([]*usr_model.UserChange, 0)

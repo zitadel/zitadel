@@ -4,17 +4,16 @@ Errors:
   User:
     NotFound: User could not be found
     UserIDMissing: User ID missing
-    UserIsNil: User is empty
     OrgIamPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
-    DomainNotAllowedAsUsername: Domain is already reserverd
+    DomainNotAllowedAsUsername: Domain is already reserved
     AlreadyInactive: User already inactive
     NotInactive: User is not inactive
     ShouldBeActiveOrInitial: User is not active or inital
     NotLocked: User is not locked
     NoChanges: No changes found
-    InitCodeNotFound: Initial Code not found
+    InitCodeNotFound: Initialization Code not found
     ProfileNotFound: Profile not found
     ProfileInvalid: Profildata invalid
     EmailNotFound: Email not found
@@ -36,13 +35,13 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short
-      HasLower: Password must contain lower letter
-      HasUpper: Password must contain upper letter
+      HasLower: Password must contain lower case
+      HasUpper: Password must contain upper case
       HasNumber: Password must contain number
       HasSymbol: Password must contain symbol
     Mfa:
       Otp:
-        AlreadyReady: Multifactor OTP (OneTimePassword) is already setup
+        AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
         InvalidCode: Invalid code
@@ -74,7 +73,7 @@ Errors:
     MemberNotFound: Project member not found
     MemberInvalid: Project member is invalid
     MemberAlreadyExists: Project member already exists
-    MemberNotExisting: Projekt member not existing
+    MemberNotExisting: Projekt member doesn't exist
     MinimumOneRoleNeeded: At least one role should be added
     RoleAlreadyExists: Role already exists
     RoleInvalid: Role is invalid
@@ -94,8 +93,8 @@ Errors:
     UserIDMisisng: User ID missing
   Iam:
     MemberInvalid: Member is invalid
-    MemberAlreadyExisting: Member is already existing
-    MemberNotExisting: Member not existing
+    MemberAlreadyExisting: Member already exists
+    MemberNotExisting: Member does not exist
     IDMissing: Id missing
     GlobalOrgMissing: Global organisation missing
     IamProjectIDMisisng: Iam project id missing

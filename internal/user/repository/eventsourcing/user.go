@@ -42,7 +42,7 @@ func UserEmailUniqueQuery(email string) *es_models.SearchQuery {
 
 func UserAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User) (*es_models.Aggregate, error) {
 	if user == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "Errors.User.UserIsNil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "Errors.Internal")
 	}
 	return aggCreator.NewAggregate(ctx, user.AggregateID, model.UserAggregate, model.UserVersion, user.Sequence)
 }

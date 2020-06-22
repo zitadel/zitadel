@@ -4,24 +4,23 @@ Errors:
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     UserIDMissing: User ID fehlt
-    UserIsNil: Benutzer ist leer
     OrgIamPolicyNil: Organisations Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
     Invalid: Benutzerdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     AlreadyInactive: Benutzer ist bereits deaktiviert
     NotInactive: Benutzer ist nicht inaktiv
-    ShouldBeActiveOrInitial: Benutzer ist nicht aktive oder initial
+    ShouldBeActiveOrInitial: Benutzer ist nicht aktiv oder initialisiert
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
-    InitCodeNotFound: Kein Initial Code gefunden
+    InitCodeNotFound: Kein Initialisierungs Code gefunden
     ProfileNotFound: Profil nicht gefunden
     ProfileInvalid: Profildaten sind ungültig
     EmailNotFound: Email nicht gefunden
     EmailInvalid: Email ist ungültig
     EmailAlreadyVerified: Email ist bereits verifiziert
     PhoneNotFound: Telfonnummer nicht gefunden
-    PhoneInvalid: Telefonnummer is ungültig
+    PhoneInvalid: Telefonnummer ist ungültig
     PhoneAlreadyVerified: Telefonnummer bereits verifiziert
     AddressNotFound: Addresse nicht gefunden
     Code:
@@ -36,8 +35,8 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
-      HasLower: Passwort beinhaltet keinen klein Buchstaben
-      HasUpper: Passwort beinhaltet keinen gross Buchstaben
+      HasLower: Passwort beinhaltet keinen Kleinbuchstaben
+      HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
       HasSymbol: Passwort beinhaltet kein Symbol
     Mfa:
@@ -106,6 +105,6 @@ Errors:
     Invalid: Benutzer Berechtigung ist ungültig
     IDMissing: Id fehlt
     NotActive: Benutzer Berechtigung ist nicht aktiv
-    NotInactive: Benutzer Berechitigung ist nicht deaktiviert
+    NotInactive: Benutzer Berechtigung ist nicht deaktiviert
   Changes:
-    NotFound: Es konnte keine History gefunden werden
+    NotFound: Es konnte kein Änderungsverlauf gefunden werden
