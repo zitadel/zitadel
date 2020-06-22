@@ -149,7 +149,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 		return err
 	}
 	for _, user := range users {
-		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain)
+		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
 		err := u.view.PutUser(user, 0)
 		if err != nil {
 			return err
@@ -168,7 +168,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 		return err
 	}
 	user.SetLoginNames(policy, org.Domains)
-	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain)
+	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
 	return nil
 }
 
