@@ -101,5 +101,11 @@ Errors:
     IamProjectIDMisisng: Iam Project ID fehlt
   Policy:
     AlreadyExists: Policy existiert bereits
+  UserGrant:
+    NotFound: Benutzer Berechtigung konnte nicht gefunden werden
+    Invalid: Benutzer Berechtigung ist ungültig
+    IDMissing: Id fehlt
+    NotActive: Benutzer Berechtigung ist nicht aktiv
+    NotInactive: Benutzer Berechitigung ist nicht deaktiviert
   Changes:
     NotFound: Es konnte keine History gefunden werden

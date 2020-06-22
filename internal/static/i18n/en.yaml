@@ -101,5 +101,11 @@ Errors:
     IamProjectIDMisisng: Iam project id missing
   Policy:
     AlreadyExists: Policy already exists
+  UserGrant:
+    NotFound: User grant not found
+    Invalid: User grant is invalid
+    IDMissing: Id missing
+    NotActive: User grant is not active
+    NotInactive: User grant is not deactivated
   Changes:
     NotFound: No history found
