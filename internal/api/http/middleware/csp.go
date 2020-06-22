@@ -6,29 +6,31 @@ import (
 )
 
 type CSP struct {
-	DefaultSrc CSPSourceOptions
-	ScriptSrc  CSPSourceOptions
-	ObjectSrc  CSPSourceOptions
-	StyleSrc   CSPSourceOptions
-	ImgSrc     CSPSourceOptions
-	MediaSrc   CSPSourceOptions
-	FrameSrc   CSPSourceOptions
-	FontSrc    CSPSourceOptions
-	ConnectSrc CSPSourceOptions
-	FormAction CSPSourceOptions
+	DefaultSrc  CSPSourceOptions
+	ScriptSrc   CSPSourceOptions
+	ObjectSrc   CSPSourceOptions
+	StyleSrc    CSPSourceOptions
+	ImgSrc      CSPSourceOptions
+	MediaSrc    CSPSourceOptions
+	FrameSrc    CSPSourceOptions
+	FontSrc     CSPSourceOptions
+	ManifestSrc CSPSourceOptions
+	ConnectSrc  CSPSourceOptions
+	FormAction  CSPSourceOptions
 }
 
 var (
 	DefaultSCP = CSP{
-		DefaultSrc: CSPSourceOptsNone(),
-		ScriptSrc:  CSPSourceOptsSelf(),
-		ObjectSrc:  CSPSourceOptsNone(),
-		StyleSrc:   CSPSourceOptsSelf(),
-		ImgSrc:     CSPSourceOptsSelf(),
-		MediaSrc:   CSPSourceOptsNone(),
-		FrameSrc:   CSPSourceOptsNone(),
-		FontSrc:    CSPSourceOptsSelf(),
-		ConnectSrc: CSPSourceOptsSelf(),
+		DefaultSrc:  CSPSourceOptsNone(),
+		ScriptSrc:   CSPSourceOptsSelf(),
+		ObjectSrc:   CSPSourceOptsNone(),
+		StyleSrc:    CSPSourceOptsSelf(),
+		ImgSrc:      CSPSourceOptsSelf(),
+		MediaSrc:    CSPSourceOptsNone(),
+		FrameSrc:    CSPSourceOptsNone(),
+		FontSrc:     CSPSourceOptsSelf(),
+		ManifestSrc: CSPSourceOptsSelf(),
+		ConnectSrc:  CSPSourceOptsSelf(),
 	}
 )
 
@@ -49,16 +51,17 @@ func (csp *CSP) Value(nonce string) string {
 
 func (csp *CSP) asMap() map[string]CSPSourceOptions {
 	return map[string]CSPSourceOptions{
-		"default-src": csp.DefaultSrc,
-		"script-src":  csp.ScriptSrc,
-		"object-src":  csp.ObjectSrc,
-		"style-src":   csp.StyleSrc,
-		"img-src":     csp.ImgSrc,
-		"media-src":   csp.MediaSrc,
-		"frame-src":   csp.FrameSrc,
-		"font-src":    csp.FontSrc,
-		"connect-src": csp.ConnectSrc,
-		"form-action": csp.FormAction,
+		"default-src":  csp.DefaultSrc,
+		"script-src":   csp.ScriptSrc,
+		"object-src":   csp.ObjectSrc,
+		"style-src":    csp.StyleSrc,
+		"img-src":      csp.ImgSrc,
+		"media-src":    csp.MediaSrc,
+		"frame-src":    csp.FrameSrc,
+		"font-src":     csp.FontSrc,
+		"manifest-src": csp.ManifestSrc,
+		"connect-src":  csp.ConnectSrc,
+		"form-action":  csp.FormAction,
 	}
 }
 

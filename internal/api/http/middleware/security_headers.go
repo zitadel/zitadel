@@ -48,7 +48,16 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var err error
 		nonce, err = generateNonce(h.nonceLength)
 		if err != nil {
-			h.errorHandler(err).ServeHTTP(w, r)
+			errorHandler := h.errorHandler
+			if errorHandler == nil {
+				errorHandler = func(err error) http.Handler {
+					return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					})
+				}
+			}
+			errorHandler(err).ServeHTTP(w, r)
 			return
 		}
 		r = saveContext(r, nonceKey, nonce)
