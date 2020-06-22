@@ -61,5 +61,36 @@ Errors:
     UserIDMissing: User ID fehlt
     PolicyAlreadyExists: Policy existiert bereits
     PolicyNotExisting: Policy existiert nicht
+  Project:
+    ProjectIDMissing: Project Id fehlt
+    AlreadyExists: Project existiert bereits auf der Organisation
+    OrgNotExisting: Organisation existiert nicht
+    UserNotExisting: User existiert nicht
+    CouldNotGenerateClientSecret: Client Secret konnte nicht generiert werden
+    Invalid: Projekt ist ungültig
+    NotActive: Projekt ist nicht aktiv
+    NotInactive: Projekt ist nicht deaktiviert
+    UserIDMissing: User ID fehlt
+    MemberNotFound: Member konnte nicht gefunden werden
+    MemberInvalid: Member ist ungültig
+    MemberAlreadyExists: Member existiert bereits
+    MemberNotExisting: Member existiert nicht
+    MinimumOneRoleNeeded: Es muss mindestend eine Rolle hinzugefügt werden
+    RoleAlreadyExists: Rolle existiert bereits
+    RoleInvalid: Rolle ist ungültig
+    RoleNotExisting: Rolle existiert nicht
+    IDMissing: ID fehlt
+    AppNotFound: Applikation nicht gefunden
+    AppInvalid: Applikation ist ungültig
+    AppNotExisting: Applikation exisitert nicht
+    OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+    AppIsNotOIDC: Applikation ist nicht vom Typ OIDC
+    RequiredFieldsMissing: Benötigte Felder fehlen
+    GrantNotFound: Grant konnte nicht gefunden werden
+    GrantInvalid: Projekt Grant ist ungültig
+    GrantAlreadyExists: Projekt Grant existiert bereits
+    GrantNotExists: Projekt Grant existiert nicht
+    GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
+    UserIDMisisng: User ID fehlt
   Changes:
     NotFound: Es konnte keine History gefunden werden

@@ -56,10 +56,41 @@ Errors:
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organisation
     MemberIDMissing: Member ID missing
-    MemberNotFound: Organisations Member not found
-    InvalidMember: Organisation Member is invalid
+    MemberNotFound: Organisations member not found
+    InvalidMember: Organisation member is invalid
     UserIDMissing: User ID missing
     PolicyAlreadyExists: Policy alredy exists
     PolicyNotExisting: Policy doesn't exist
+  Project:
+    ProjectIDMissing: Project Id missing
+    AlreadyExists: Project already exists on organisation
+    OrgNotExisting: Organisation doesn't exist
+    UserNotExisting: User doesn't exist
+    CouldNotGenerateClientSecret: Could not generate client secret
+    Invalid: Project is invalid
+    NotActive: Project is not active
+    NotInactive: Projekt is not deactivated
+    UserIDMissing: User ID missing
+    MemberNotFound: Project member not found
+    MemberInvalid: Project member is invalid
+    MemberAlreadyExists: Project member already exists
+    MemberNotExisting: Projekt member not existing
+    MinimumOneRoleNeeded: At least one role should be added
+    RoleAlreadyExists: Role already exists
+    RoleInvalid: Role is invalid
+    RoleNotExisting: Role doesn't exist
+    IDMissing: ID missing
+    AppNotFound: Application not found
+    AppInvalid: Application invalid
+    AppNotExisting: Application doesn't exist
+    OIDCConfigInvalid: OIDC configuration is invalid
+    AppIsNotOIDC: Application is not type oidc
+    RequiredFieldsMissing: Some required fields are missing
+    GrantNotFound: Grant not found
+    GrantInvalid: Project grant is invalid
+    GrantAlreadyExists: Project grant already exists
+    GrantNotExists: Project grant doesn't exist
+    GrantHasNotExistingRole: One role doesn't exist on project
+    UserIDMisisng: User ID missing
   Changes:
     NotFound: No history found
