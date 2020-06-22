@@ -92,5 +92,12 @@ Errors:
     GrantNotExists: Project grant doesn't exist
     GrantHasNotExistingRole: One role doesn't exist on project
     UserIDMisisng: User ID missing
+  Iam:
+    MemberInvalid: Member is invalid
+    MemberAlreadyExisting: Member is already existing
+    MemberNotExisting: Member not existing
+    IDMissing: Id missing
+    GlobalOrgMissing: Global organisation missing
+    IamProjectIDMisisng: Iam project id missing
   Changes:
     NotFound: No history found
