@@ -637,7 +637,7 @@ service ManagementService {
         };
     }
 
-    rpc ProjectByID(ProjectID) returns (Project) {
+    rpc ProjectByID(ProjectID) returns (ProjectView) {
         option (google.api.http) = {
             get: "/projects/{id}"
         };

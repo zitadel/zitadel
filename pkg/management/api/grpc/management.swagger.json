@@ -1167,7 +1167,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Project"
+              "$ref": "#/definitions/v1ProjectView"
             }
           }
         },

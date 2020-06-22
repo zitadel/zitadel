@@ -31,8 +31,12 @@ type ProjectRepo struct {
 	Roles           []string
 }
 
-func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
-	return repo.ProjectEvents.ProjectByID(ctx, id)
+func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
+	project, err := repo.View.ProjectByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectToModel(project), nil
 }
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
