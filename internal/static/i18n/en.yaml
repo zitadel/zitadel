@@ -1,0 +1,110 @@
+Errors:
+  Internal: An internal error occured
+  NoChangesFound: No changes found
+  User:
+    NotFound: User could not be found
+    UserIDMissing: User ID missing
+    OrgIamPolicyNil: Organisation Policy is empty
+    EmailAsUsernameNotAllowed: Email is not allowed as username
+    Invalid: Userdata is invalid
+    DomainNotAllowedAsUsername: Domain is already reserved
+    AlreadyInactive: User already inactive
+    NotInactive: User is not inactive
+    ShouldBeActiveOrInitial: User is not active or inital
+    NotLocked: User is not locked
+    NoChanges: No changes found
+    InitCodeNotFound: Initialization Code not found
+    ProfileNotFound: Profile not found
+    ProfileInvalid: Profildata invalid
+    EmailNotFound: Email not found
+    EmailInvalid: Email is invalid
+    EmailAlreadyVerified: Email is alredy verified
+    PhoneNotFound: Phone not found
+    PhoneInvalid: Phone is invalid
+    PhoneAlreadyVerified: Phone already verified
+    AddressNotFound: Address not found
+    Code:
+      Empty: Code is empty
+      NotFound: Code not found
+      Expired: Code is expired
+      GeneratorAlgNotSupported: Unsupported generator algorithm
+    Password:
+      NotFound: Passoword not found
+      Empty: Password is empty
+      Invalid: Passwort is invalid
+    PasswordComplexityPolicy:
+      NotFound: Password policy not found
+      MinLength: Password is to short
+      HasLower: Password must contain lower case
+      HasUpper: Password must contain upper case
+      HasNumber: Password must contain number
+      HasSymbol: Password must contain symbol
+    Mfa:
+      Otp:
+        AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
+        NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
+        NotReady: Multifactor OTP (OneTimePassword) isn't ready
+        InvalidCode: Invalid code
+  Org:
+    Invalid: Organisation is invalid
+    AlreadyDeactivated: Organisation is already deactivated
+    AlreadyActive: Organisation is already ative
+    Empty: Organisation is empty
+    NotFound: Organisation not found
+    InvalidDomain: Invalid domain
+    DomainMissing: Domain missing
+    DomainNotOnOrg: Domain doesn't exist on organisation
+    MemberIDMissing: Member ID missing
+    MemberNotFound: Organisations member not found
+    InvalidMember: Organisation member is invalid
+    UserIDMissing: User ID missing
+    PolicyAlreadyExists: Policy alredy exists
+    PolicyNotExisting: Policy doesn't exist
+  Project:
+    ProjectIDMissing: Project Id missing
+    AlreadyExists: Project already exists on organisation
+    OrgNotExisting: Organisation doesn't exist
+    UserNotExisting: User doesn't exist
+    CouldNotGenerateClientSecret: Could not generate client secret
+    Invalid: Project is invalid
+    NotActive: Project is not active
+    NotInactive: Projekt is not deactivated
+    UserIDMissing: User ID missing
+    MemberNotFound: Project member not found
+    MemberInvalid: Project member is invalid
+    MemberAlreadyExists: Project member already exists
+    MemberNotExisting: Projekt member doesn't exist
+    MinimumOneRoleNeeded: At least one role should be added
+    RoleAlreadyExists: Role already exists
+    RoleInvalid: Role is invalid
+    RoleNotExisting: Role doesn't exist
+    IDMissing: ID missing
+    AppNotFound: Application not found
+    AppInvalid: Application invalid
+    AppNotExisting: Application doesn't exist
+    OIDCConfigInvalid: OIDC configuration is invalid
+    AppIsNotOIDC: Application is not type oidc
+    RequiredFieldsMissing: Some required fields are missing
+    GrantNotFound: Grant not found
+    GrantInvalid: Project grant is invalid
+    GrantAlreadyExists: Project grant already exists
+    GrantNotExists: Project grant doesn't exist
+    GrantHasNotExistingRole: One role doesn't exist on project
+    UserIDMisisng: User ID missing
+  Iam:
+    MemberInvalid: Member is invalid
+    MemberAlreadyExisting: Member already exists
+    MemberNotExisting: Member does not exist
+    IDMissing: Id missing
+    GlobalOrgMissing: Global organisation missing
+    IamProjectIDMisisng: Iam project id missing
+  Policy:
+    AlreadyExists: Policy already exists
+  UserGrant:
+    NotFound: User grant not found
+    Invalid: User grant is invalid
+    IDMissing: Id missing
+    NotActive: User grant is not active
+    NotInactive: User grant is not deactivated
+  Changes:
+    NotFound: No history found

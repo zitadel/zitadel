@@ -42,13 +42,13 @@ func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEvents
 
 func (es *OrgEventstore) PrepareCreateOrg(ctx context.Context, orgModel *org_model.Org) (*model.Org, []*es_models.Aggregate, error) {
 	if orgModel == nil || !orgModel.IsValid() {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-OeLSk", "org not valid")
+		return nil, nil, errors.ThrowInvalidArgument(nil, "EVENT-OeLSk", "Errors.Org.Invalid")
 	}
 	orgModel.AddIAMDomain(es.IAMDomain)
 
 	id, err := es.idGenerator.Next()
 	if err != nil {
-		return nil, nil, errors.ThrowInternal(err, "EVENT-OwciI", "id gen failed")
+		return nil, nil, errors.ThrowInternal(err, "EVENT-OwciI", "Errors.Internal")
 	}
 	orgModel.AggregateID = id
 	org := model.OrgFromModel(orgModel)
@@ -70,7 +70,7 @@ func (es *OrgEventstore) CreateOrg(ctx context.Context, orgModel *org_model.Org)
 
 func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
 	if org == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-gQTYP", "org not set")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-gQTYP", "Errors.Org.Empty")
 	}
 	query, err := OrgByIDQuery(org.AggregateID, org.Sequence)
 	if err != nil {
@@ -83,7 +83,7 @@ func (es *OrgEventstore) OrgByID(ctx context.Context, org *org_model.Org) (*org_
 		return nil, err
 	}
 	if esOrg.Sequence == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-kVLb2", "org not found")
+		return nil, errors.ThrowNotFound(nil, "EVENT-kVLb2", "Errors.Org.NotFound")
 	}
 
 	return model.OrgToModel(esOrg), nil
@@ -118,7 +118,7 @@ func isUniqueValidation(unique *bool) func(events ...*es_models.Event) error {
 func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgID string) (*org_model.Org, error) {
 	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not found")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "Errors.Org.NotFound")
 	}
 	org := model.OrgFromModel(existingOrg)
 
@@ -134,7 +134,7 @@ func (es *OrgEventstore) DeactivateOrg(ctx context.Context, orgID string) (*org_
 func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_model.Org, error) {
 	existingOrg, err := es.OrgByID(ctx, org_model.NewOrg(orgID))
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "org not set")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-oL9nT", "Errors.Org.Empty")
 	}
 	org := model.OrgFromModel(existingOrg)
 
@@ -149,7 +149,7 @@ func (es *OrgEventstore) ReactivateOrg(ctx context.Context, orgID string) (*org_
 
 func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
 	if !domain.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8sFJW", "domain is invalid")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8sFJW", "Errors.Org.InvalidDomain")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
@@ -167,19 +167,19 @@ func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.Org
 	if _, d := model.GetDomain(repoOrg.Domains, domain.Domain); d != nil {
 		return model.OrgDomainToModel(d), nil
 	}
-	return nil, errors.ThrowInternal(nil, "EVENT-ISOP0", "Could not find org in list")
+	return nil, errors.ThrowInternal(nil, "EVENT-ISOP0", "Errors.Internal")
 }
 
 func (es *OrgEventstore) RemoveOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
 	if domain.Domain == "" {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-SJsK3", "Domain is required")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-SJsK3", "Errors.Org.DomainMissing")
 	}
 	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
 	if err != nil {
 		return err
 	}
 	if !existing.ContainsDomain(domain) {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Domain doesn't exist on project")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.DomainNotOnOrg")
 	}
 	repoOrg := model.OrgFromModel(existing)
 	repoDomain := model.OrgDomainFromModel(domain)
@@ -200,10 +200,10 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
 		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
-		return nil, errors.ThrowInternal(err, "EVENT-328b1", "unable to get current user")
+		return nil, errors.ThrowInternal(err, "EVENT-328b1", "Errors.Org.NotFound")
 	}
 	if len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-FpQqK", "no objects found")
+		return nil, errors.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
 	}
 
 	result := make([]*org_model.OrgChange, 0)
@@ -250,7 +250,7 @@ func ChangesQuery(orgID string, latestSequence uint64) *es_models.SearchQuery {
 
 func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
 	if member == nil || member.UserID == "" || member.AggregateID == "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ld93d", "member not set")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-ld93d", "Errors.Org.MemberIDMissing")
 	}
 
 	org, err := es.OrgByID(ctx, &org_model.Org{ObjectRoot: member.ObjectRoot, Members: []*org_model.OrgMember{member}})
@@ -264,12 +264,12 @@ func (es *OrgEventstore) OrgMemberByIDs(ctx context.Context, member *org_model.O
 		}
 	}
 
-	return nil, errors.ThrowNotFound(nil, "EVENT-SXji6", "member not found")
+	return nil, errors.ThrowNotFound(nil, "EVENT-SXji6", "Errors.Org.MemberNotFound")
 }
 
 func (es *OrgEventstore) PrepareAddOrgMember(ctx context.Context, member *org_model.OrgMember, resourceOwner string) (*model.OrgMember, *es_models.Aggregate, error) {
 	if member == nil || !member.IsValid() {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
+		return nil, nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Org.InvalidMember")
 	}
 
 	repoMember := model.OrgMemberFromModel(member)
@@ -293,7 +293,7 @@ func (es *OrgEventstore) AddOrgMember(ctx context.Context, member *org_model.Org
 
 func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
 	if member == nil || !member.IsValid() {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "UserID and Roles are required")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Org.InvalidMember")
 	}
 
 	existingMember, err := es.OrgMemberByIDs(ctx, member)
@@ -316,7 +316,7 @@ func (es *OrgEventstore) ChangeOrgMember(ctx context.Context, member *org_model.
 
 func (es *OrgEventstore) RemoveOrgMember(ctx context.Context, member *org_model.OrgMember) error {
 	if member == nil || member.UserID == "" {
-		return errors.ThrowInvalidArgument(nil, "EVENT-d43fs", "UserID is required")
+		return errors.ThrowInvalidArgument(nil, "EVENT-d43fs", "Errors.Org.UserIDMissing")
 	}
 
 	existingMember, err := es.OrgMemberByIDs(ctx, member)
@@ -351,7 +351,7 @@ func (es *OrgEventstore) AddOrgIamPolicy(ctx context.Context, policy *org_model.
 		return nil, err
 	}
 	if existing.OrgIamPolicy != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Usj3", "Policy already exists")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-7Usj3", "Errors.Org.PolicyAlreadyExists")
 	}
 	repoOrg := model.OrgFromModel(existing)
 	repoPolicy := model.OrgIamPolicyFromModel(policy)
@@ -373,7 +373,7 @@ func (es *OrgEventstore) ChangeOrgIamPolicy(ctx context.Context, policy *org_mod
 		return nil, err
 	}
 	if existing.OrgIamPolicy == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8juSd", "Policy doesnt exist")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8juSd", "Errors.Org.PolicyNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existing)
 	repoPolicy := model.OrgIamPolicyFromModel(policy)
@@ -395,7 +395,7 @@ func (es *OrgEventstore) RemoveOrgIamPolicy(ctx context.Context, orgID string) e
 		return err
 	}
 	if existing.OrgIamPolicy == nil {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-z6Dse", "Policy doesnt exist")
+		return errors.ThrowPreconditionFailed(nil, "EVENT-z6Dse", "Errors.Org.PolicyNotExisting")
 	}
 	repoOrg := model.OrgFromModel(existing)
 	orgAggregate := OrgIamPolicyRemovedAggregate(es.Eventstore.AggregateCreator(), repoOrg)

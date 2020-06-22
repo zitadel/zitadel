@@ -125,7 +125,7 @@ Errors:
     NotFound: Benutzer konnte nicht gefunden werden
     NotMatchingUserID: User stimm nicht mit User in Auth Request überein
     UserIDMissing: UserID ist leer
-    InvalidData: Userdaten sind ungültig
+    Invalid: Userdaten sind ungültig
     Password:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer

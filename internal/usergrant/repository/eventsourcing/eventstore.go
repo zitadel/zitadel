@@ -49,7 +49,7 @@ func (es *UserGrantEventStore) UserGrantByID(ctx context.Context, id string) (*g
 	}
 	es.userGrantCache.cacheUserGrant(grant)
 	if grant.State == int32(grant_model.USERGRANTSTATE_REMOVED) {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2ks8d", "UserGrant not found")
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2ks8d", "Errors.UserGrant.NotFound")
 	}
 	return model.UserGrantToModel(grant), nil
 }
@@ -82,7 +82,7 @@ func (es *UserGrantEventStore) AddUserGrants(ctx context.Context, grants ...*gra
 
 func (es *UserGrantEventStore) PrepareAddUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*model.UserGrant, []*es_models.Aggregate, error) {
 	if grant == nil || !grant.IsValid() {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "User grant invalid")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sdiw3", "Errors.UserGrant.Invalid")
 	}
 	id, err := es.idGenerator.Next()
 	if err != nil {
@@ -101,7 +101,7 @@ func (es *UserGrantEventStore) PrepareAddUserGrant(ctx context.Context, grant *g
 
 func (es *UserGrantEventStore) PrepareChangeUserGrant(ctx context.Context, grant *grant_model.UserGrant, cascade bool) (*model.UserGrant, *es_models.Aggregate, error) {
 	if grant == nil {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo0s9", "invalid grant")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo0s9", "Errors.UserGrant.Invalid")
 	}
 	existing, err := es.UserGrantByID(ctx, grant.AggregateID)
 	if err != nil {
@@ -187,14 +187,14 @@ func (es *UserGrantEventStore) PrepareRemoveUserGrant(ctx context.Context, grant
 
 func (es *UserGrantEventStore) DeactivateUserGrant(ctx context.Context, grantID string) (*grant_model.UserGrant, error) {
 	if grantID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8si34", "grantID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-8si34", "Errors.UserGrant.IDMissing")
 	}
 	existing, err := es.UserGrantByID(ctx, grantID)
 	if err != nil {
 		return nil, err
 	}
 	if !existing.IsActive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "deactivate only possible for active grant")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "Errors.UserGrant.NotActive")
 	}
 	repoExisting := model.UserGrantFromModel(existing)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}
@@ -210,14 +210,14 @@ func (es *UserGrantEventStore) DeactivateUserGrant(ctx context.Context, grantID 
 
 func (es *UserGrantEventStore) ReactivateUserGrant(ctx context.Context, grantID string) (*grant_model.UserGrant, error) {
 	if grantID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sksiw", "grantID missing")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-sksiw", "Errors.UserGrant.IDMissing")
 	}
 	existing, err := es.UserGrantByID(ctx, grantID)
 	if err != nil {
 		return nil, err
 	}
 	if !existing.IsInactive() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "reactivate only possible for inactive grant")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-lo9sw", "Errors.UserGrant.NotInactive")
 	}
 	repoExisting := model.UserGrantFromModel(existing)
 	repoGrant := &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: grantID}}

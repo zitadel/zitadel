@@ -10,7 +10,7 @@ import (
 func OrgIamPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-i9sJS", "policy should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-i9sJS", "Errors.Internal")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
@@ -23,7 +23,7 @@ func OrgIamPolicyAddedAggregate(aggCreator *es_models.AggregateCreator, existing
 func OrgIamPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Org, policy *model.OrgIamPolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9Ksie", "policy should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9Ksie", "Errors.Internal")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, existing.AggregateID, existing.Sequence)
 		if err != nil {
@@ -31,7 +31,7 @@ func OrgIamPolicyChangedAggregate(aggCreator *es_models.AggregateCreator, existi
 		}
 		changes := existing.OrgIamPolicy.Changes(policy)
 		if len(changes) == 0 {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Js6Vs", "no changes")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Js6Vs", "Errors.NoChangesFound")
 		}
 		return agg.AppendEvent(model.OrgIamPolicyChanged, changes)
 	}

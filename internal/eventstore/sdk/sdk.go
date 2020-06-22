@@ -52,7 +52,7 @@ func Push(ctx context.Context, push pushFunc, appender appendFunc, aggregaters .
 
 func PushAggregates(ctx context.Context, push pushFunc, appender appendFunc, aggregates ...*models.Aggregate) (err error) {
 	if len(aggregates) < 1 {
-		return errors.ThrowPreconditionFailed(nil, "SDK-q9wjp", "no aggregaters passed")
+		return errors.ThrowPreconditionFailed(nil, "SDK-q9wjp", "Errors.Internal")
 	}
 
 	err = push(ctx, aggregates...)
@@ -70,7 +70,7 @@ func appendAggregates(appender appendFunc, aggregates []*models.Aggregate) error
 	for _, aggregate := range aggregates {
 		err := appender(aggregate.Events...)
 		if err != nil {
-			return ThrowAppendEventError(err, "SDK-o6kzK", "aggregator failed")
+			return ThrowAppendEventError(err, "SDK-o6kzK", "Errors.Internal")
 		}
 	}
 	return nil
