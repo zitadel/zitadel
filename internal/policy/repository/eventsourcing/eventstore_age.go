@@ -25,16 +25,13 @@ func (es *PolicyEventstore) GetPasswordAgePolicy(ctx context.Context, id string)
 }
 
 func (es *PolicyEventstore) CreatePasswordAgePolicy(ctx context.Context, policy *pol_model.PasswordAgePolicy) (*pol_model.PasswordAgePolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-fbX5K", "Description is required")
-	}
 	ctxData := auth.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordAgePolicy(ctx, ctxData.OrgID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 	if existingPolicy != nil && existingPolicy.Sequence > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Errors.Policy.AlreadyExists")
 	}
 
 	id, err := es.idGenerator.Next()
@@ -56,9 +53,6 @@ func (es *PolicyEventstore) CreatePasswordAgePolicy(ctx context.Context, policy 
 }
 
 func (es *PolicyEventstore) UpdatePasswordAgePolicy(ctx context.Context, policy *pol_model.PasswordAgePolicy) (*pol_model.PasswordAgePolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-44jB3", "Description is required")
-	}
 	ctxData := auth.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordAgePolicy(ctx, ctxData.OrgID)
 	if err != nil {

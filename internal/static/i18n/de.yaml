@@ -99,5 +99,7 @@ Errors:
     IDMissing: Id fehlt
     GlobalOrgMissing: Globale Organisation fehlt
     IamProjectIDMisisng: Iam Project ID fehlt
+  Policy:
+    AlreadyExists: Policy existiert bereits
   Changes:
     NotFound: Es konnte keine History gefunden werden
