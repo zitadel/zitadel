@@ -33,9 +33,33 @@ Errors:
       NotFound: Password nicht gefunden
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
+    PasswordComplexityPolicy:
+      NotFound: Passwort Policy konnte nicht gefunden werden
+      MinLength: Passwort ist zu kurz
+      HasLower: Passwort beinhaltet keinen klein Buchstaben
+      HasUpper: Passwort beinhaltet keinen gross Buchstaben
+      HasNumber: Passwort beinhaltet keine Nummer
+      HasSymbol: Passwort beinhaltet kein Symbol
     Mfa:
       Otp:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
         InvalidCode: Code ist ungültig
+  Org:
+    Invalid: Organisation ist ungültig
+    AlreadyDeactivated: Organisation ist bereits deaktiviert
+    AlreadyActive: Organisation ist bereits aktiv
+    Empty: Organisation ist leer
+    NotFound: Organisation konnte nicht gefunden werden
+    InvalidDomain: Domäne ist ungültig
+    DomainMissing: Domäne fehlt
+    DomainNotOnOrg: Domäne fehlt auf Organisation
+    MemberIDMissing: Member ID fehlt
+    MemberNotFound: Organisations Member konnte nicht gefunden werden
+    InvalidMember: Organisations Member ist ungültig
+    UserIDMissing: User ID fehlt
+    PolicyAlreadyExists: Policy existiert bereits
+    PolicyNotExisting: Policy existiert nicht
+  Changes:
+    NotFound: Es konnte keine History gefunden werden

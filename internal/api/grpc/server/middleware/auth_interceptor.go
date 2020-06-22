@@ -19,7 +19,7 @@ func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Conf
 		}
 
 		authToken := ""
-		//TODO: Remoce check internal as soon as authentification is implemented
+		//TODO: Remove check internal as soon as authentification is implemented
 		if !auth.CheckInternal(ctx) {
 			authToken = grpc_util.GetAuthorizationHeader(ctx)
 			if authToken == "" {

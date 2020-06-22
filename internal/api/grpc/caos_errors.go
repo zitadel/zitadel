@@ -17,9 +17,7 @@ func CaosToGRPCError(err error, ctx context.Context, translator *i18n.Translator
 		return status.Convert(err).Err()
 	}
 	if translator != nil {
-		//TODO: How to get langs?
-		langs := []string{}
-		msg = translator.Localize(msg, nil, langs...)
+		msg = translator.LocalizeFromCtx(ctx, msg, nil)
 
 	}
 	return status.Error(code, msg)

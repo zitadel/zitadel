@@ -17,10 +17,11 @@ const (
 )
 
 type CtxData struct {
-	UserID    string
-	OrgID     string
-	ProjectID string
-	AgentID   string
+	UserID            string
+	OrgID             string
+	ProjectID         string
+	AgentID           string
+	PreferredLanguage string
 }
 
 func (ctxData CtxData) IsZero() bool {
