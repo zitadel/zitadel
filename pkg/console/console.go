@@ -53,7 +53,7 @@ func Start(ctx context.Context, config Config) error {
 	cache := AssetsCacheInterceptorIgnoreManifest(config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
 	security := middleware.SecurityHeaders(csp(config.CSPDomain), nil)
 	http.Handle("/", cache(security(http.FileServer(&spaHandler{statikFS}))))
-	http.Handle(envRequestPath, http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))
+	http.Handle(envRequestPath, cache(security(http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))))
 	return http.ListenAndServe(":"+config.Port, nil)
 }
 
