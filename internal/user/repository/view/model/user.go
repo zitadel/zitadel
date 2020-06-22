@@ -145,20 +145,22 @@ func UsersToModel(users []*UserView) []*model.UserView {
 	return result
 }
 
-func (u *UserView) GenerateLoginName(domain string) string {
+func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
+	if !appendDomain {
+		return u.UserName
+	}
 	return u.UserName + "@" + domain
 }
 
 func (u *UserView) SetLoginNames(policy *org_model.OrgIamPolicy, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
-	if !policy.UserLoginMustBeDomain {
-		u.LoginNames = []string{u.UserName}
-		return
-	}
 	for _, d := range domains {
 		if d.Verified {
-			loginNames = append(loginNames, u.GenerateLoginName(d.Domain))
+			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
 		}
+	}
+	if !policy.UserLoginMustBeDomain {
+		loginNames = append(loginNames, u.UserName)
 	}
 	u.LoginNames = loginNames
 }
