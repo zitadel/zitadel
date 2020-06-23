@@ -258,15 +258,15 @@ func otpFromModel(otp *usr_model.OTP) *MfaOtpResponse {
 
 func userStateFromModel(state usr_model.UserState) UserState {
 	switch state {
-	case usr_model.USERSTATE_ACTIVE:
+	case usr_model.UserStateActive:
 		return UserState_USERSTATE_ACTIVE
-	case usr_model.USERSTATE_INACTIVE:
+	case usr_model.UserStateInactive:
 		return UserState_USERSTATE_INACTIVE
-	case usr_model.USERSTATE_LOCKED:
+	case usr_model.UserStateLocked:
 		return UserState_USERSTATE_LOCKED
-	case usr_model.USERSTATE_INITIAL:
+	case usr_model.UserStateInitial:
 		return UserState_USERSTATE_INITIAL
-	case usr_model.USERSTATE_SUSPEND:
+	case usr_model.UserStateSuspend:
 		return UserState_USERSTATE_SUSPEND
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
@@ -275,11 +275,11 @@ func userStateFromModel(state usr_model.UserState) UserState {
 
 func genderFromModel(gender usr_model.Gender) Gender {
 	switch gender {
-	case usr_model.GENDER_FEMALE:
+	case usr_model.GenderFemale:
 		return Gender_GENDER_FEMALE
-	case usr_model.GENDER_MALE:
+	case usr_model.GenderMale:
 		return Gender_GENDER_MALE
-	case usr_model.GENDER_DIVERSE:
+	case usr_model.GenderDiverse:
 		return Gender_GENDER_DIVERSE
 	default:
 		return Gender_GENDER_UNSPECIFIED
@@ -289,21 +289,21 @@ func genderFromModel(gender usr_model.Gender) Gender {
 func genderToModel(gender Gender) usr_model.Gender {
 	switch gender {
 	case Gender_GENDER_FEMALE:
-		return usr_model.GENDER_FEMALE
+		return usr_model.GenderFemale
 	case Gender_GENDER_MALE:
-		return usr_model.GENDER_MALE
+		return usr_model.GenderMale
 	case Gender_GENDER_DIVERSE:
-		return usr_model.GENDER_DIVERSE
+		return usr_model.GenderDiverse
 	default:
-		return usr_model.GENDER_UNDEFINED
+		return usr_model.GenderUnspecified
 	}
 }
 
 func mfaStateFromModel(state usr_model.MfaState) MFAState {
 	switch state {
-	case usr_model.MFASTATE_READY:
+	case usr_model.MfaStateReady:
 		return MFAState_MFASTATE_NOT_READY
-	case usr_model.MFASTATE_NOTREADY:
+	case usr_model.MfaStateNotReady:
 		return MFAState_MFASTATE_NOT_READY
 	default:
 		return MFAState_MFASTATE_UNSPECIFIED

@@ -70,15 +70,15 @@ func projectMemberSearchQueryToModel(query *ProjectMemberSearchQuery) *proj_mode
 func projectMemberSearchKeyToModel(key ProjectMemberSearchKey) proj_model.ProjectMemberSearchKey {
 	switch key {
 	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_EMAIL:
-		return proj_model.PROJECTMEMBERSEARCHKEY_EMAIL
+		return proj_model.ProjectMemberSearchKeyEmail
 	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_FIRST_NAME:
-		return proj_model.PROJECTMEMBERSEARCHKEY_FIRST_NAME
+		return proj_model.ProjectMemberSearchKeyFirstName
 	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_LAST_NAME:
-		return proj_model.PROJECTMEMBERSEARCHKEY_LAST_NAME
+		return proj_model.ProjectMemberSearchKeyLastName
 	case ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_USER_NAME:
-		return proj_model.PROJECTMEMBERSEARCHKEY_USER_NAME
+		return proj_model.ProjectMemberSearchKeyUserName
 	default:
-		return proj_model.PROJECTMEMBERSEARCHKEY_UNSPECIFIED
+		return proj_model.ProjectMemberSearchKeyUnspecified
 	}
 }
 

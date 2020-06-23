@@ -36,7 +36,7 @@ func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
 	return eventsourcing.ProjectQuery(sequence), nil
 }
 
-func (p *ProjectRole) Process(event *models.Event) (err error) {
+func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 	role := new(view_model.ProjectRoleView)
 	switch event.Type {
 	case es_model.ProjectRoleAdded:

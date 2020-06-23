@@ -17,20 +17,20 @@ type OTP struct {
 type MfaState int32
 
 const (
-	MFASTATE_UNSPECIFIED MfaState = iota
-	MFASTATE_NOTREADY
-	MFASTATE_READY
+	MfaStateUnspecified MfaState = iota
+	MfaStateNotReady
+	MfaStateReady
 )
 
 type MultiFactor struct {
-	Type  MFAType
+	Type  MfaType
 	State MfaState
 }
 
-type MFAType int32
+type MfaType int32
 
 const (
-	MFATYPE_UNSPECIFIED MFAType = iota
-	MFATYPE_OTP
-	MFATYPE_SMS
+	MfaTypeUnspecified MfaType = iota
+	MfaTypeOTP
+	MfaTypeSMS
 )

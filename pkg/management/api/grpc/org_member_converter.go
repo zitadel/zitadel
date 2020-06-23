@@ -70,32 +70,32 @@ func orgMemberSearchQueryToModel(query *OrgMemberSearchQuery) *org_model.OrgMemb
 func orgMemberSearchKeyToModel(key OrgMemberSearchKey) org_model.OrgMemberSearchKey {
 	switch key {
 	case OrgMemberSearchKey_ORGMEMBERSEARCHKEY_EMAIL:
-		return org_model.ORGMEMBERSEARCHKEY_EMAIL
+		return org_model.OrgMemberSearchKeyEmail
 	case OrgMemberSearchKey_ORGMEMBERSEARCHKEY_FIRST_NAME:
-		return org_model.ORGMEMBERSEARCHKEY_FIRST_NAME
+		return org_model.OrgMemberSearchKeyFirstName
 	case OrgMemberSearchKey_ORGMEMBERSEARCHKEY_LAST_NAME:
-		return org_model.ORGMEMBERSEARCHKEY_LAST_NAME
+		return org_model.OrgMemberSearchKeyLastName
 	case OrgMemberSearchKey_ORGMEMBERSEARCHKEY_USER_ID:
-		return org_model.ORGMEMBERSEARCHKEY_USER_ID
+		return org_model.OrgMemberSearchKeyUserID
 	default:
-		return org_model.ORGMEMBERSEARCHKEY_UNSPECIFIED
+		return org_model.OrgMemberSearchKeyUnspecified
 	}
 }
 
 func orgMemberSearchMethodToModel(key SearchMethod) model.SearchMethod {
 	switch key {
 	case SearchMethod_SEARCHMETHOD_CONTAINS:
-		return model.SEARCHMETHOD_CONTAINS
+		return model.SearchMethodContains
 	case SearchMethod_SEARCHMETHOD_CONTAINS_IGNORE_CASE:
-		return model.SEARCHMETHOD_CONTAINS_IGNORE_CASE
+		return model.SearchMethodContainsIgnoreCase
 	case SearchMethod_SEARCHMETHOD_EQUALS:
-		return model.SEARCHMETHOD_EQUALS
+		return model.SearchMethodEquals
 	case SearchMethod_SEARCHMETHOD_EQUALS_IGNORE_CASE:
-		return model.SEARCHMETHOD_EQUALS_IGNORE_CASE
+		return model.SearchMethodEqualsIgnoreCase
 	case SearchMethod_SEARCHMETHOD_STARTS_WITH:
-		return model.SEARCHMETHOD_STARTS_WITH
+		return model.SearchMethodStartsWith
 	case SearchMethod_SEARCHMETHOD_STARTS_WITH_IGNORE_CASE:
-		return model.SEARCHMETHOD_STARTS_WITH_IGNORE_CASE
+		return model.SearchMethodStartsWithIgnoreCase
 	default:
 		return -1
 	}

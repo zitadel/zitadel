@@ -115,15 +115,15 @@ func userGrantSearchQueryToModel(query *UserGrantSearchQuery) *grant_model.UserG
 func userGrantSearchKeyToModel(key UserGrantSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_ORG_ID:
-		return grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER
+		return grant_model.UserGrantSearchKeyResourceOwner
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_PROJECT_ID:
-		return grant_model.USERGRANTSEARCHKEY_PROJECT_ID
+		return grant_model.UserGrantSearchKeyProjectID
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_USER_ID:
-		return grant_model.USERGRANTSEARCHKEY_USER_ID
+		return grant_model.UserGrantSearchKeyUserID
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_ROLE_KEY:
-		return grant_model.USERGRANTSEARCHKEY_ROLE_KEY
+		return grant_model.UserGrantSearchKeyRoleKey
 	default:
-		return grant_model.USERGRANTSEARCHKEY_UNSPECIFIED
+		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 
@@ -171,9 +171,9 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *UserGrantView {
 
 func usergrantStateFromModel(state grant_model.UserGrantState) UserGrantState {
 	switch state {
-	case grant_model.USERGRANTSTATE_ACTIVE:
+	case grant_model.UserGrantStateActive:
 		return UserGrantState_USERGRANTSTATE_ACTIVE
-	case grant_model.USERGRANTSTATE_INACTIVE:
+	case grant_model.UserGrantStateInactive:
 		return UserGrantState_USERGRANTSTATE_INACTIVE
 	default:
 		return UserGrantState_USERGRANTSTATE_UNSPECIFIED

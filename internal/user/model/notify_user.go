@@ -36,8 +36,8 @@ type NotifyUserSearchRequest struct {
 type NotifyUserSearchKey int32
 
 const (
-	NOTIFYUSERSEARCHKEY_UNSPECIFIED UserSearchKey = iota
-	NOTIFYUSERSEARCHKEY_USER_ID
+	NotifyUserSearchKeyUnspecified UserSearchKey = iota
+	NotifyUserSearchKeyUserID
 )
 
 type NotifyUserSearchQuery struct {

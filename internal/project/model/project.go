@@ -31,17 +31,17 @@ type ProjectChange struct {
 type ProjectState int32
 
 const (
-	PROJECTSTATE_ACTIVE ProjectState = iota
-	PROJECTSTATE_INACTIVE
-	PROJECTSTATE_REMOVED
+	ProjectStateActive ProjectState = iota
+	ProjectStateInactive
+	ProjectStateRemoved
 )
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: PROJECTSTATE_ACTIVE}
+	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: ProjectStateActive}
 }
 
 func (p *Project) IsActive() bool {
-	return p.State == PROJECTSTATE_ACTIVE
+	return p.State == ProjectStateActive
 }
 
 func (p *Project) IsValid() bool {

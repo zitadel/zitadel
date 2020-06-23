@@ -100,7 +100,7 @@ func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
 	}
 	config.ObjectRoot.CreationDate = event.CreationDate
 	if i, a := GetApplication(p.Applications, config.AppID); a != nil {
-		p.Applications[i].Type = int32(model.APPTYPE_OIDC)
+		p.Applications[i].Type = int32(model.AppTypeOIDC)
 		p.Applications[i].OIDCConfig = config
 	}
 	return nil

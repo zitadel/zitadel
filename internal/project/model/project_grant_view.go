@@ -32,13 +32,13 @@ type ProjectGrantViewSearchRequest struct {
 type ProjectGrantViewSearchKey int32
 
 const (
-	GRANTEDPROJECTSEARCHKEY_UNSPECIFIED ProjectGrantViewSearchKey = iota
-	GRANTEDPROJECTSEARCHKEY_NAME
-	GRANTEDPROJECTSEARCHKEY_PROJECTID
-	GRANTEDPROJECTSEARCHKEY_GRANTID
-	GRANTEDPROJECTSEARCHKEY_ORGID
-	GRANTEDPROJECTSEARCHKEY_RESOURCE_OWNER
-	GRANTEDPROJECTSEARCHKEY_ROLE_KEYS
+	GrantedProjectSearchKeyUnspecified ProjectGrantViewSearchKey = iota
+	GrantedProjectSearchKeyName
+	GrantedProjectSearchKeyProjectID
+	GrantedProjectSearchKeyGrantID
+	GrantedProjectSearchKeyOrgID
+	GrantedProjectSearchKeyResourceOwner
+	GrantedProjectSearchKeyRoleKeys
 )
 
 type ProjectGrantViewSearchQuery struct {
@@ -55,15 +55,15 @@ type ProjectGrantViewSearchResponse struct {
 }
 
 func (r *ProjectGrantViewSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GRANTEDPROJECTSEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: model.SearchMethodEquals, Value: orgID})
 }
 
 func (r *ProjectGrantViewSearchRequest) AppendNotMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GRANTEDPROJECTSEARCHKEY_ORGID, Method: model.SEARCHMETHOD_NOT_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: model.SearchMethodNotEquals, Value: orgID})
 }
 
 func (r *ProjectGrantViewSearchRequest) AppendMyResourceOwnerQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GRANTEDPROJECTSEARCHKEY_RESOURCE_OWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
 
 func (r *ProjectGrantViewSearchRequest) EnsureLimit(limit uint64) {

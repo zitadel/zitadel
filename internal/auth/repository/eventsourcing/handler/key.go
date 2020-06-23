@@ -35,7 +35,7 @@ func (k *Key) EventQuery() (*models.SearchQuery, error) {
 	return eventsourcing.KeyPairQuery(sequence), nil
 }
 
-func (k *Key) Process(event *models.Event) error {
+func (k *Key) Reduce(event *models.Event) error {
 	switch event.Type {
 	case es_model.KeyPairAdded:
 		privateKey, publicKey, err := view_model.KeysFromPairEvent(event)

@@ -141,7 +141,7 @@ func orgDeactivateAggregate(aggCreator *es_models.AggregateCreator, org *model.O
 		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-R03z8", "Errors.Internal")
 		}
-		if org.State == int32(org_model.ORGSTATE_INACTIVE) {
+		if org.State == int32(org_model.OrgStateInactive) {
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-mcPH0", "Errors.Internal.AlreadyDeactivated")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)
@@ -158,7 +158,7 @@ func orgReactivateAggregate(aggCreator *es_models.AggregateCreator, org *model.O
 		if org == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-cTHLd", "Errors.Internal")
 		}
-		if org.State == int32(org_model.ORGSTATE_ACTIVE) {
+		if org.State == int32(org_model.OrgStateActive) {
 			return nil, errors.ThrowInvalidArgument(nil, "EVENT-pUSMs", "Errors.Org.AlreadyActive")
 		}
 		agg, err := OrgAggregate(ctx, aggCreator, org.AggregateID, org.Sequence)

@@ -19,7 +19,7 @@ func (req ProjectGrantSearchRequest) GetOffset() uint64 {
 }
 
 func (req ProjectGrantSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == proj_model.GrantedProjectSearchKeyUnspecified {
 		return nil
 	}
 	return ProjectGrantSearchKey(req.SortingColumn)
@@ -51,17 +51,17 @@ func (req ProjectGrantSearchQuery) GetValue() interface{} {
 
 func (key ProjectGrantSearchKey) ToColumnName() string {
 	switch proj_model.ProjectGrantViewSearchKey(key) {
-	case proj_model.GRANTEDPROJECTSEARCHKEY_NAME:
+	case proj_model.GrantedProjectSearchKeyName:
 		return ProjectGrantKeyName
-	case proj_model.GRANTEDPROJECTSEARCHKEY_GRANTID:
+	case proj_model.GrantedProjectSearchKeyGrantID:
 		return ProjectGrantKeyGrantID
-	case proj_model.GRANTEDPROJECTSEARCHKEY_ORGID:
+	case proj_model.GrantedProjectSearchKeyOrgID:
 		return ProjectGrantKeyOrgID
-	case proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID:
+	case proj_model.GrantedProjectSearchKeyProjectID:
 		return ProjectGrantKeyProjectID
-	case proj_model.GRANTEDPROJECTSEARCHKEY_RESOURCE_OWNER:
+	case proj_model.GrantedProjectSearchKeyResourceOwner:
 		return ProjectGrantKeyResourceOwner
-	case proj_model.GRANTEDPROJECTSEARCHKEY_ROLE_KEYS:
+	case proj_model.GrantedProjectSearchKeyRoleKeys:
 		return ProjectGrantKeyRoleKeys
 	default:
 		return ""

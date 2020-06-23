@@ -84,9 +84,9 @@ func (o *Org) AppendEvent(event *es_models.Event) error {
 			return err
 		}
 	case OrgDeactivated:
-		o.State = int32(org_model.ORGSTATE_INACTIVE)
+		o.State = int32(org_model.OrgStateInactive)
 	case OrgReactivated:
-		o.State = int32(org_model.ORGSTATE_ACTIVE)
+		o.State = int32(org_model.OrgStateActive)
 	case OrgMemberAdded:
 		member, err := OrgMemberFromEvent(nil, event)
 		if err != nil {

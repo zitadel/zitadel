@@ -39,18 +39,18 @@ func (req FailedEventSearchQuery) GetValue() interface{} {
 type FailedEventSearchKey int32
 
 const (
-	FAILEDEVENTKEY_UNDEFINED FailedEventSearchKey = iota
-	FAILEDEVENTKEY_VIEW_NAME
-	FAILEDEVENTKEY_FAILED_SEQUENCE
+	FailedEventKeyUndefined FailedEventSearchKey = iota
+	FailedEventKeyViewName
+	FailedEventKeyFailedSequence
 )
 
 type failedEventSearchKey FailedEventSearchKey
 
 func (key failedEventSearchKey) ToColumnName() string {
 	switch FailedEventSearchKey(key) {
-	case FAILEDEVENTKEY_VIEW_NAME:
+	case FailedEventKeyViewName:
 		return "view_name"
-	case FAILEDEVENTKEY_FAILED_SEQUENCE:
+	case FailedEventKeyFailedSequence:
 		return "failed_sequence"
 	default:
 		return ""
@@ -70,8 +70,8 @@ func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error 
 func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*FailedEvent, error) {
 	failedEvent := new(FailedEvent)
 	queries := []SearchQuery{
-		FailedEventSearchQuery{Key: FAILEDEVENTKEY_VIEW_NAME, Method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, Value: viewName},
-		FailedEventSearchQuery{Key: FAILEDEVENTKEY_FAILED_SEQUENCE, Method: model.SEARCHMETHOD_EQUALS, Value: sequence},
+		FailedEventSearchQuery{Key: FailedEventKeyViewName, Method: model.SearchMethodEqualsIgnoreCase, Value: viewName},
+		FailedEventSearchQuery{Key: FailedEventKeyFailedSequence, Method: model.SearchMethodEquals, Value: sequence},
 	}
 	query := PrepareGetByQuery(table, queries...)
 	err := query(db, failedEvent)

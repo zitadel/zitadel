@@ -23,31 +23,31 @@ func TestProjectAppendEvent(t *testing.T) {
 				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectAdded, ResourceOwner: "OrgID", Data: mockProjectData(&es_model.Project{Name: "ProjectName"})},
 				project: &ProjectView{},
 			},
-			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},
 		},
 		{
 			name: "append change project event",
 			args: args{
 				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectChanged, ResourceOwner: "OrgID", Data: mockProjectData(&es_model.Project{Name: "ProjectNameChanged"})},
-				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},
 			},
-			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectNameChanged", State: int32(model.PROJECTSTATE_ACTIVE)},
+			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectNameChanged", State: int32(model.ProjectStateActive)},
 		},
 		{
 			name: "append project deactivate event",
 			args: args{
 				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectDeactivated, ResourceOwner: "OrgID"},
-				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},
 			},
-			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.PROJECTSTATE_INACTIVE)},
+			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.ProjectStateInactive)},
 		},
 		{
 			name: "append project reactivate event",
 			args: args{
 				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectReactivated, ResourceOwner: "OrgID"},
-				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.PROJECTSTATE_INACTIVE)},
+				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.ProjectStateInactive)},
 			},
-			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.PROJECTSTATE_ACTIVE)},
+			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "OrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},
 		},
 	}
 	for _, tt := range tests {

@@ -217,7 +217,7 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 }
 
 func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) error {
-	if project.State == int32(proj_model.PROJECTSTATE_REMOVED) {
+	if project.State == int32(proj_model.ProjectStateRemoved) {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Lxp0s", "project doesn't exist")
 	}
 	if resourceOwner == project.ResourceOwner {

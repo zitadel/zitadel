@@ -39,7 +39,7 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 	return eventsourcing.UserQuery(sequence), nil
 }
 
-func (u *UserSession) Process(event *models.Event) (err error) {
+func (u *UserSession) Reduce(event *models.Event) (err error) {
 	var session *view_model.UserSessionView
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded,

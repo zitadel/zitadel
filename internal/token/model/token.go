@@ -31,13 +31,13 @@ type TokenSearchRequest struct {
 type TokenSearchKey int32
 
 const (
-	TOKENSEARCHKEY_UNSPECIFIED TokenSearchKey = iota
-	TOKENSEARCHKEY_TOKEN_ID
-	TOKENSEARCHKEY_USER_ID
-	TOKENSEARCHKEY_APPLICATION_ID
-	TOKENSEARCHKEY_USER_AGENT_ID
-	TOKENSEARCHKEY_EXPIRATION
-	TOKENSEARCHKEY_RESOURCEOWNER
+	TokenSearchKeyUnspecified TokenSearchKey = iota
+	TokenSearchKeyTokenID
+	TokenSearchKeyUserID
+	TokenSearchKeyApplicationID
+	TokenSearchKeyUserAgentID
+	TokenSearchKeyExpiration
+	TokenSearchKeyResourceOwner
 )
 
 type TokenSearchQuery struct {

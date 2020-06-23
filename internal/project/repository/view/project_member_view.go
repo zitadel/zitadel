@@ -11,8 +11,8 @@ import (
 func ProjectMemberByIDs(db *gorm.DB, table, projectID, userID string) (*model.ProjectMemberView, error) {
 	role := new(model.ProjectMemberView)
 
-	projectIDQuery := model.ProjectMemberSearchQuery{Key: proj_model.PROJECTMEMBERSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
-	userIDQuery := model.ProjectMemberSearchQuery{Key: proj_model.PROJECTMEMBERSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS}
+	projectIDQuery := model.ProjectMemberSearchQuery{Key: proj_model.ProjectMemberSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
+	userIDQuery := model.ProjectMemberSearchQuery{Key: proj_model.ProjectMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, projectIDQuery, userIDQuery)
 	err := query(db, role)
 	return role, err
@@ -30,7 +30,7 @@ func SearchProjectMembers(db *gorm.DB, table string, req *proj_model.ProjectMemb
 func ProjectMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.ProjectMemberView, error) {
 	members := make([]*model.ProjectMemberView, 0)
 	queries := []*proj_model.ProjectMemberSearchQuery{
-		&proj_model.ProjectMemberSearchQuery{Key: proj_model.PROJECTMEMBERSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&proj_model.ProjectMemberSearchQuery{Key: proj_model.ProjectMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.ProjectMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)

@@ -19,7 +19,7 @@ func (req ProjectGrantMemberSearchRequest) GetOffset() uint64 {
 }
 
 func (req ProjectGrantMemberSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == proj_model.PROJECTGRANTMEMBERSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == proj_model.ProjectGrantMemberSearchKeyUnspecified {
 		return nil
 	}
 	return ProjectGrantMemberSearchKey(req.SortingColumn)
@@ -51,17 +51,17 @@ func (req ProjectGrantMemberSearchQuery) GetValue() interface{} {
 
 func (key ProjectGrantMemberSearchKey) ToColumnName() string {
 	switch proj_model.ProjectGrantMemberSearchKey(key) {
-	case proj_model.PROJECTGRANTMEMBERSEARCHKEY_EMAIL:
+	case proj_model.ProjectGrantMemberSearchKeyEmail:
 		return ProjectGrantMemberKeyEmail
-	case proj_model.PROJECTGRANTMEMBERSEARCHKEY_FIRST_NAME:
+	case proj_model.ProjectGrantMemberSearchKeyFirstName:
 		return ProjectGrantMemberKeyFirstName
-	case proj_model.PROJECTGRANTMEMBERSEARCHKEY_LAST_NAME:
+	case proj_model.ProjectGrantMemberSearchKeyLastName:
 		return ProjectGrantMemberKeyLastName
-	case proj_model.PROJECTGRANTMEMBERSEARCHKEY_USER_NAME:
+	case proj_model.ProjectGrantMemberSearchKeyUserName:
 		return ProjectGrantMemberKeyUserName
-	case proj_model.PROJECTGRANTMEMBERSEARCHKEY_USER_ID:
+	case proj_model.ProjectGrantMemberSearchKeyUserID:
 		return ProjectGrantMemberKeyUserID
-	case proj_model.PROJECTGRANTMEMBERSEARCHKEY_GRANT_ID:
+	case proj_model.ProjectGrantMemberSearchKeyGrantID:
 		return ProjectGrantMemberKeyGrantID
 	default:
 		return ""

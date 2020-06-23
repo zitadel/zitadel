@@ -61,11 +61,11 @@ func (c *Client) AccessTokenType() op.AccessTokenType {
 
 func authMethodToOIDC(authType model.OIDCAuthMethodType) op.AuthMethod {
 	switch authType {
-	case model.OIDCAUTHMETHODTYPE_BASIC:
+	case model.OIDCAuthMethodTypeBasic:
 		return op.AuthMethodBasic
-	case model.OIDCAUTHMETHODTYPE_POST:
+	case model.OIDCAuthMethodTypePost:
 		return op.AuthMethodPost
-	case model.OIDCAUTHMETHODTYPE_NONE:
+	case model.OIDCAuthMethodTypeNone:
 		return op.AuthMethodNone
 	default:
 		return op.AuthMethodBasic

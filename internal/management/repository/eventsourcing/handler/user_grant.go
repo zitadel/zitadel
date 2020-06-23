@@ -51,7 +51,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (u *UserGrant) Process(event *models.Event) (err error) {
+func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case grant_es_model.UserGrantAggregate:
 		err = u.processUserGrant(event)

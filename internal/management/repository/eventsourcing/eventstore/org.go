@@ -54,7 +54,7 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*org_model.Or
 
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_ORG_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID})
+	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: auth.GetCtxData(ctx).OrgID})
 	domains, count, err := repo.View.SearchOrgDomains(request)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string)
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.ORGMEMBERSEARCHKEY_ORG_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID}
+	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: auth.GetCtxData(ctx).OrgID}
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
 		return nil, err

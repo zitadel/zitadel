@@ -63,16 +63,16 @@ func (p *ProjectView) AppendEvent(event *models.Event) (err error) {
 	p.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.ProjectAdded:
-		p.State = int32(model.PROJECTSTATE_ACTIVE)
+		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setData(event)
 	case es_model.ProjectChanged:
 		err = p.setData(event)
 	case es_model.ProjectDeactivated:
-		p.State = int32(model.PROJECTSTATE_INACTIVE)
+		p.State = int32(model.ProjectStateInactive)
 	case es_model.ProjectReactivated:
-		p.State = int32(model.PROJECTSTATE_ACTIVE)
+		p.State = int32(model.ProjectStateActive)
 	}
 	return err
 }

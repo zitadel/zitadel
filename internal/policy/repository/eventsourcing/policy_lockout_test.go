@@ -143,7 +143,7 @@ func TestPasswordLockoutPolicyCreateAggregate(t *testing.T) {
 			name: "policy update aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				new:        &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.POLICYSTATE_ACTIVE)},
+				new:        &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -208,8 +208,8 @@ func TestPasswordLockoutPolicyUpdateAggregate(t *testing.T) {
 			name: "policy update aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.POLICYSTATE_ACTIVE)},
-				new:        &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName_Changed", State: int32(policy_model.POLICYSTATE_ACTIVE)},
+				existing:   &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
+				new:        &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName_Changed", State: int32(policy_model.PolicyStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -235,7 +235,7 @@ func TestPasswordLockoutPolicyUpdateAggregate(t *testing.T) {
 			name: "new policy nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "ProjectName", State: int32(policy_model.POLICYSTATE_ACTIVE)},
+				existing:   &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "ProjectName", State: int32(policy_model.PolicyStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},

@@ -60,8 +60,8 @@ func (v *View) ApplicationByClientID(_ context.Context, clientID string) (*model
 		Limit: 1,
 		Queries: []*proj_model.ApplicationSearchQuery{
 			{
-				Key:    proj_model.APPLICATIONSEARCHKEY_OIDC_CLIENT_ID,
-				Method: global_model.SEARCHMETHOD_EQUALS,
+				Key:    proj_model.AppSearchKeyOIDCClientID,
+				Method: global_model.SearchMethodEquals,
 				Value:  clientID,
 			},
 		},
@@ -84,8 +84,8 @@ func (v *View) AppIDsFromProjectByClientID(ctx context.Context, clientID string)
 	req := &proj_model.ApplicationSearchRequest{
 		Queries: []*proj_model.ApplicationSearchQuery{
 			{
-				Key:    proj_model.APPLICATIONSEARCHKEY_PROJECT_ID,
-				Method: global_model.SEARCHMETHOD_EQUALS,
+				Key:    proj_model.AppSearchKeyProjectID,
+				Method: global_model.SearchMethodEquals,
 				Value:  app.ProjectID,
 			},
 		},

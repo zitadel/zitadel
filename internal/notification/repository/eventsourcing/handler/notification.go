@@ -32,7 +32,7 @@ type Notification struct {
 
 const (
 	notificationTable = "notification.notifications"
-	NOTIFY_USER       = "NOTIFICATION"
+	NotifyUserID      = "NOTIFICATION"
 )
 
 func (n *Notification) MinimumCycleDuration() time.Duration { return n.cycleDuration }
@@ -49,7 +49,7 @@ func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 	return eventsourcing.UserQuery(sequence), nil
 }
 
-func (n *Notification) Process(event *models.Event) (err error) {
+func (n *Notification) Reduce(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.InitializedUserCodeAdded:
 		err = n.handleInitUserCode(event)
@@ -168,5 +168,5 @@ func (n *Notification) OnError(event *models.Event, err error) error {
 }
 
 func getSetNotifyContextData(orgID string) context.Context {
-	return auth.SetCtxData(context.Background(), auth.CtxData{UserID: NOTIFY_USER, OrgID: orgID})
+	return auth.SetCtxData(context.Background(), auth.CtxData{UserID: NotifyUserID, OrgID: orgID})
 }

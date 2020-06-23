@@ -23,7 +23,7 @@ type UserGrantRepo struct {
 
 func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_USER_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).UserID})
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Method: global_model.SearchMethodEquals, Value: auth.GetCtxData(ctx).UserID})
 	grants, count, err := repo.View.SearchUserGrants(request)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 			return repo.SearchAdminOrgs(request)
 		}
 	}
-	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: ctxData.ProjectID})
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodEquals, Value: ctxData.ProjectID})
 
 	grants, err := repo.SearchMyUserGrants(ctx, request)
 	if err != nil {
@@ -98,8 +98,8 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 	searchRequest := &org_model.OrgSearchRequest{}
 	if len(request.Queries) > 0 {
 		for _, q := range request.Queries {
-			if q.Key == grant_model.USERGRANTSEARCHKEY_ORG_NAME {
-				searchRequest.Queries = append(searchRequest.Queries, &org_model.OrgSearchQuery{Key: org_model.ORGSEARCHKEY_ORG_NAME, Method: q.Method, Value: q.Value})
+			if q.Key == grant_model.UserGrantSearchKeyOrgName {
+				searchRequest.Queries = append(searchRequest.Queries, &org_model.OrgSearchQuery{Key: org_model.OrgSearchKeyOrgName, Method: q.Method, Value: q.Value})
 			}
 		}
 	}
@@ -113,7 +113,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
 	grantSearch := &grant_model.UserGrantSearchRequest{
 		Queries: []*grant_model.UserGrantSearchQuery{
-			&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER, Method: global_model.SEARCHMETHOD_EQUALS, Value: repo.IamID},
+			&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyResourceOwner, Method: global_model.SearchMethodEquals, Value: repo.IamID},
 		}}
 	result, err := repo.SearchMyUserGrants(ctx, grantSearch)
 	if err != nil {

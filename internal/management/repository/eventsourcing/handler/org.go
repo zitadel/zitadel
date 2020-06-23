@@ -33,7 +33,7 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	return eventsourcing.OrgQuery(sequence), nil
 }
 
-func (o *Org) Process(event *es_models.Event) error {
+func (o *Org) Reduce(event *es_models.Event) error {
 	org := new(org_model.OrgView)
 
 	switch event.Type {

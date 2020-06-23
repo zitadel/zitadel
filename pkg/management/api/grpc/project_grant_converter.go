@@ -58,8 +58,8 @@ func projectGrantSearchRequestsToModel(request *ProjectGrantSearchRequest) *proj
 func projectGrantSearchQueriesToModel(projectId string, queries []*ProjectGrantSearchQuery) []*proj_model.ProjectGrantViewSearchQuery {
 	converted := make([]*proj_model.ProjectGrantViewSearchQuery, 0)
 	converted = append(converted, &proj_model.ProjectGrantViewSearchQuery{
-		Key:    proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID,
-		Method: model.SEARCHMETHOD_EQUALS,
+		Key:    proj_model.GrantedProjectSearchKeyProjectID,
+		Method: model.SearchMethodEquals,
 		Value:  projectId,
 	})
 	for i, query := range queries {
@@ -79,11 +79,11 @@ func projectGrantSearchQueryToModel(query *ProjectGrantSearchQuery) *proj_model.
 func projectGrantViewSearchKeyToModel(key ProjectGrantSearchKey) proj_model.ProjectGrantViewSearchKey {
 	switch key {
 	case ProjectGrantSearchKey_PROJECTGRANTSEARCHKEY_PROJECT_NAME:
-		return proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID
+		return proj_model.GrantedProjectSearchKeyProjectID
 	case ProjectGrantSearchKey_PROJECTGRANTSEARCHKEY_ROLE_KEY:
-		return proj_model.GRANTEDPROJECTSEARCHKEY_ROLE_KEYS
+		return proj_model.GrantedProjectSearchKeyRoleKeys
 	default:
-		return proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED
+		return proj_model.GrantedProjectSearchKeyUnspecified
 	}
 }
 
@@ -129,9 +129,9 @@ func projectGrantFromGrantedProjectModel(project *proj_model.ProjectGrantView) *
 
 func projectGrantStateFromModel(state proj_model.ProjectGrantState) ProjectGrantState {
 	switch state {
-	case proj_model.PROJECTGRANTSTATE_ACTIVE:
+	case proj_model.ProjectGrantStateActive:
 		return ProjectGrantState_PROJECTGRANTSTATE_ACTIVE
-	case proj_model.PROJECTGRANTSTATE_INACTIVE:
+	case proj_model.ProjectGrantStateInactive:
 		return ProjectGrantState_PROJECTGRANTSTATE_INACTIVE
 	default:
 		return ProjectGrantState_PROJECTGRANTSTATE_UNSPECIFIED
@@ -140,9 +140,9 @@ func projectGrantStateFromModel(state proj_model.ProjectGrantState) ProjectGrant
 
 func projectGrantStateFromProjectStateModel(state proj_model.ProjectState) ProjectGrantState {
 	switch state {
-	case proj_model.PROJECTSTATE_ACTIVE:
+	case proj_model.ProjectStateActive:
 		return ProjectGrantState_PROJECTGRANTSTATE_ACTIVE
-	case proj_model.PROJECTSTATE_INACTIVE:
+	case proj_model.ProjectStateInactive:
 		return ProjectGrantState_PROJECTGRANTSTATE_INACTIVE
 	default:
 		return ProjectGrantState_PROJECTGRANTSTATE_UNSPECIFIED

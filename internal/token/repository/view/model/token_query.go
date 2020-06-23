@@ -19,7 +19,7 @@ func (req TokenSearchRequest) GetOffset() uint64 {
 }
 
 func (req TokenSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == token_model.TOKENSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == token_model.TokenSearchKeyUnspecified {
 		return nil
 	}
 	return TokenSearchKey(req.SortingColumn)
@@ -51,17 +51,17 @@ func (req TokenSearchQuery) GetValue() interface{} {
 
 func (key TokenSearchKey) ToColumnName() string {
 	switch token_model.TokenSearchKey(key) {
-	case token_model.TOKENSEARCHKEY_TOKEN_ID:
+	case token_model.TokenSearchKeyTokenID:
 		return TokenKeyTokenID
-	case token_model.TOKENSEARCHKEY_USER_AGENT_ID:
+	case token_model.TokenSearchKeyUserAgentID:
 		return TokenKeyUserAgentID
-	case token_model.TOKENSEARCHKEY_USER_ID:
+	case token_model.TokenSearchKeyUserID:
 		return TokenKeyUserID
-	case token_model.TOKENSEARCHKEY_APPLICATION_ID:
+	case token_model.TokenSearchKeyApplicationID:
 		return TokenKeyApplicationID
-	case token_model.TOKENSEARCHKEY_EXPIRATION:
+	case token_model.TokenSearchKeyExpiration:
 		return TokenKeyExpiration
-	case token_model.TOKENSEARCHKEY_RESOURCEOWNER:
+	case token_model.TokenSearchKeyResourceOwner:
 		return TokenKeyResourceOwner
 	default:
 		return ""

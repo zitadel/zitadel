@@ -48,7 +48,7 @@ func (es *UserGrantEventStore) UserGrantByID(ctx context.Context, id string) (*g
 		return nil, err
 	}
 	es.userGrantCache.cacheUserGrant(grant)
-	if grant.State == int32(grant_model.USERGRANTSTATE_REMOVED) {
+	if grant.State == int32(grant_model.UserGrantStateRemoved) {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2ks8d", "Errors.UserGrant.NotFound")
 	}
 	return model.UserGrantToModel(grant), nil

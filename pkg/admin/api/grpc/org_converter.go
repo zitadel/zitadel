@@ -148,9 +148,9 @@ func userFromModel(user *usr_model.User) *User {
 
 func orgStateFromModel(state org_model.OrgState) OrgState {
 	switch state {
-	case org_model.ORGSTATE_ACTIVE:
+	case org_model.OrgStateActive:
 		return OrgState_ORGSTATE_ACTIVE
-	case org_model.ORGSTATE_INACTIVE:
+	case org_model.OrgStateInactive:
 		return OrgState_ORGSTATE_INACTIVE
 	default:
 		return OrgState_ORGSTATE_UNSPECIFIED
@@ -159,11 +159,11 @@ func orgStateFromModel(state org_model.OrgState) OrgState {
 
 func genderFromModel(gender usr_model.Gender) Gender {
 	switch gender {
-	case usr_model.GENDER_FEMALE:
+	case usr_model.GenderFemale:
 		return Gender_GENDER_FEMALE
-	case usr_model.GENDER_MALE:
+	case usr_model.GenderMale:
 		return Gender_GENDER_MALE
-	case usr_model.GENDER_DIVERSE:
+	case usr_model.GenderDiverse:
 		return Gender_GENDER_DIVERSE
 	default:
 		return Gender_GENDER_UNSPECIFIED
@@ -173,23 +173,23 @@ func genderFromModel(gender usr_model.Gender) Gender {
 func genderToModel(gender Gender) usr_model.Gender {
 	switch gender {
 	case Gender_GENDER_FEMALE:
-		return usr_model.GENDER_FEMALE
+		return usr_model.GenderFemale
 	case Gender_GENDER_MALE:
-		return usr_model.GENDER_MALE
+		return usr_model.GenderMale
 	case Gender_GENDER_DIVERSE:
-		return usr_model.GENDER_DIVERSE
+		return usr_model.GenderDiverse
 	default:
-		return usr_model.GENDER_UNDEFINED
+		return usr_model.GenderUnspecified
 	}
 }
 
 func userStateFromModel(state usr_model.UserState) UserState {
 	switch state {
-	case usr_model.USERSTATE_ACTIVE:
+	case usr_model.UserStateActive:
 		return UserState_USERSTATE_ACTIVE
-	case usr_model.USERSTATE_INACTIVE:
+	case usr_model.UserStateInactive:
 		return UserState_USERSTATE_INACTIVE
-	case usr_model.USERSTATE_LOCKED:
+	case usr_model.UserStateLocked:
 		return UserState_USERSTATE_LOCKED
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
@@ -227,24 +227,24 @@ func orgQueryToModel(query *OrgSearchQuery) *org_model.OrgSearchQuery {
 func orgQueryKeyToModel(key OrgSearchKey) org_model.OrgSearchKey {
 	switch key {
 	case OrgSearchKey_ORGSEARCHKEY_DOMAIN:
-		return org_model.ORGSEARCHKEY_ORG_DOMAIN
+		return org_model.OrgSearchKeyOrgDomain
 	case OrgSearchKey_ORGSEARCHKEY_ORG_NAME:
-		return org_model.ORGSEARCHKEY_ORG_NAME
+		return org_model.OrgSearchKeyOrgName
 	case OrgSearchKey_ORGSEARCHKEY_STATE:
-		return org_model.ORGSEARCHKEY_STATE
+		return org_model.OrgSearchKeyState
 	default:
-		return org_model.ORGSEARCHKEY_UNSPECIFIED
+		return org_model.OrgSearchKeyUnspecified
 	}
 }
 
 func orgQueryMethodToModel(method OrgSearchMethod) model.SearchMethod {
 	switch method {
 	case OrgSearchMethod_ORGSEARCHMETHOD_CONTAINS:
-		return model.SEARCHMETHOD_CONTAINS
+		return model.SearchMethodContains
 	case OrgSearchMethod_ORGSEARCHMETHOD_EQUALS:
-		return model.SEARCHMETHOD_EQUALS
+		return model.SearchMethodEquals
 	case OrgSearchMethod_ORGSEARCHMETHOD_STARTS_WITH:
-		return model.SEARCHMETHOD_STARTS_WITH
+		return model.SearchMethodStartsWith
 	default:
 		return 0
 	}

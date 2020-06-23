@@ -10,7 +10,7 @@ import (
 
 func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, error) {
 	user := new(model.UserGrantView)
-	query := view.PrepareGetByKey(table, model.UserGrantSearchKey(grant_model.USERGRANTSEARCHKEY_GRANT_ID), grantID)
+	query := view.PrepareGetByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyGrantID), grantID)
 	err := query(db, user)
 	return user, err
 }
@@ -18,9 +18,9 @@ func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, er
 func UserGrantByIDs(db *gorm.DB, table, resourceOwnerID, projectID, userID string) (*model.UserGrantView, error) {
 	user := new(model.UserGrantView)
 
-	resourceOwnerIDQuery := model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER, Value: resourceOwnerID, Method: global_model.SEARCHMETHOD_EQUALS}
-	projectIDQuery := model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
-	userIDQuery := model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS}
+	resourceOwnerIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: resourceOwnerID, Method: global_model.SearchMethodEquals}
+	projectIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
+	userIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, resourceOwnerIDQuery, projectIDQuery, userIDQuery)
 	err := query(db, user)
 	return user, err
@@ -39,7 +39,7 @@ func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearc
 func UserGrantsByUserID(db *gorm.DB, table, userID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -52,7 +52,7 @@ func UserGrantsByUserID(db *gorm.DB, table, userID string) ([]*model.UserGrantVi
 func UserGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -65,8 +65,8 @@ func UserGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.UserG
 func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_ROLE_KEY, Value: roleKey, Method: global_model.SEARCHMETHOD_LIST_CONTAINS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyRoleKey, Value: roleKey, Method: global_model.SearchMethodListContains},
 	}
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -79,8 +79,8 @@ func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string)
 func UserGrantsByOrgIDAndProjectID(db *gorm.DB, table, orgID, projectID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS},
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: orgID, Method: global_model.SearchMethodEquals},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -93,7 +93,7 @@ func UserGrantsByOrgIDAndProjectID(db *gorm.DB, table, orgID, projectID string) 
 func UserGrantsByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
-		&grant_model.UserGrantSearchQuery{Key: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyResourceOwner, Value: orgID, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
@@ -109,6 +109,6 @@ func PutUserGrant(db *gorm.DB, table string, grant *model.UserGrantView) error {
 }
 
 func DeleteUserGrant(db *gorm.DB, table, grantID string) error {
-	delete := view.PrepareDeleteByKey(table, model.UserGrantSearchKey(grant_model.USERGRANTSEARCHKEY_GRANT_ID), grantID)
+	delete := view.PrepareDeleteByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyGrantID), grantID)
 	return delete(db)
 }

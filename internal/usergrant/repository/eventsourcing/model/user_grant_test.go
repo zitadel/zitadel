@@ -24,9 +24,9 @@ func TestAppendGrantStateEvent(t *testing.T) {
 				existing: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}},
 				grant:    &UserGrantID{GrantID: "GrantID"},
 				event:    &es_models.Event{},
-				state:    model.USERGRANTSTATE_INACTIVE,
+				state:    model.UserGrantStateInactive,
 			},
-			result: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}, State: int32(model.USERGRANTSTATE_INACTIVE)},
+			result: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}, State: int32(model.UserGrantStateInactive)},
 		},
 		{
 			name: "append reactivate grant event",
@@ -34,9 +34,9 @@ func TestAppendGrantStateEvent(t *testing.T) {
 				existing: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}},
 				grant:    &UserGrantID{GrantID: "GrantID"},
 				event:    &es_models.Event{},
-				state:    model.USERGRANTSTATE_ACTIVE,
+				state:    model.UserGrantStateActive,
 			},
-			result: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}, State: int32(model.USERGRANTSTATE_ACTIVE)},
+			result: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}, State: int32(model.UserGrantStateActive)},
 		},
 		{
 			name: "append remove grant event",
@@ -44,9 +44,9 @@ func TestAppendGrantStateEvent(t *testing.T) {
 				existing: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}},
 				grant:    &UserGrantID{GrantID: "GrantID"},
 				event:    &es_models.Event{},
-				state:    model.USERGRANTSTATE_REMOVED,
+				state:    model.UserGrantStateRemoved,
 			},
-			result: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}, State: int32(model.USERGRANTSTATE_REMOVED)},
+			result: &UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID", RoleKeys: []string{"Key"}, State: int32(model.UserGrantStateRemoved)},
 		},
 	}
 	for _, tt := range tests {

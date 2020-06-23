@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/org/repository/view/model"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
@@ -10,13 +9,14 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/org/repository/view/model"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
 	policy_es "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 const (
-	DEFAULT_POLICY = "0"
-	orgOwnerRole   = "ORG_OWNER"
+	orgOwnerRole = "ORG_OWNER"
 )
 
 type OrgRepo struct {
@@ -31,11 +31,11 @@ type OrgRepo struct {
 }
 
 func (repo *OrgRepo) SetUpOrg(ctx context.Context, setUp *admin_model.SetupOrg) (*admin_model.SetupOrg, error) {
-	pwPolicy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
+	pwPolicy, err := repo.PolicyEventstore.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEventstore.GetOrgIamPolicy(ctx, DEFAULT_POLICY)
+	orgPolicy, err := repo.OrgEventstore.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		return nil, err
 	}
