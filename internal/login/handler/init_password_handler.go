@@ -93,9 +93,13 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 }
 
 func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
+	loginName := ""
+	if authReq != nil {
+		loginName = authReq.LoginName
+	}
 	data := userData{
 		baseData:  l.getBaseData(r, authReq, "Password Init Done", "", ""),
-		LoginName: authReq.LoginName,
+		LoginName: loginName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitPasswordDone], data, nil)
 }

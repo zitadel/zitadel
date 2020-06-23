@@ -106,7 +106,7 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 			return nil, err
 		}
 	}
-	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user, resourceOwner)
+	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user, resourceOwner, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	if err != nil {
 		return nil, err
 	}
-	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user, resourceOwner)
+	uniqueAggregates, err := getUniqueUserAggregates(ctx, aggCreator, user, resourceOwner, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}
@@ -154,8 +154,8 @@ func UserRegisterAggregate(ctx context.Context, aggCreator *es_models.AggregateC
 	}, nil
 }
 
-func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string) ([]*es_models.Aggregate, error) {
-	userNameAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, user.UserName)
+func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.AggregateCreator, user *model.User, resourceOwner string, userLoginMustBeDomain bool) ([]*es_models.Aggregate, error) {
+	userNameAggregate, err := reservedUniqueUserNameAggregate(ctx, aggCreator, resourceOwner, user.UserName, userLoginMustBeDomain)
 	if err != nil {
 		return nil, err
 	}
@@ -169,10 +169,14 @@ func getUniqueUserAggregates(ctx context.Context, aggCreator *es_models.Aggregat
 		emailAggregate,
 	}, nil
 }
-func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userName string) (*es_models.Aggregate, error) {
-	aggregate, err := aggCreator.NewAggregate(ctx, userName+resourceOwner, model.UserUserNameAggregate, model.UserVersion, 0)
+func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, userName string, userLoginMustBeDomain bool) (*es_models.Aggregate, error) {
+	uniqueUserName := userName
+	if userLoginMustBeDomain {
+		uniqueUserName = userName + resourceOwner
+	}
+	aggregate, err := aggCreator.NewAggregate(ctx, uniqueUserName, model.UserUserNameAggregate, model.UserVersion, 0)
 	if resourceOwner != "" {
-		aggregate, err = aggCreator.NewAggregate(ctx, userName+resourceOwner, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
+		aggregate, err = aggCreator.NewAggregate(ctx, uniqueUserName, model.UserUserNameAggregate, model.UserVersion, 0, es_models.OverwriteResourceOwner(resourceOwner))
 	}
 	if err != nil {
 		return nil, err
@@ -182,7 +186,7 @@ func reservedUniqueUserNameAggregate(ctx context.Context, aggCreator *es_models.
 		return nil, err
 	}
 
-	return aggregate.SetPrecondition(UserUserNameUniqueQuery(userName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
+	return aggregate.SetPrecondition(UserUserNameUniqueQuery(uniqueUserName), isEventValidation(aggregate, model.UserUserNameReserved)), nil
 }
 
 func reservedUniqueEmailAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, resourceOwner, email string) (aggregate *es_models.Aggregate, err error) {
