@@ -37,11 +37,11 @@ const routes: Routes = [
         loadChildren: () => import('./org-members/org-members.module').then(m => m.OrgMembersModule),
     },
     {
-        path: ':id',
+        path: '',
         component: OrgDetailComponent,
     },
     {
-        path: '',
+        path: 'overview',
         component: OrgGridComponent,
     },
 ];

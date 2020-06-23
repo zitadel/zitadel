@@ -4,7 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { Project, ProjectMember, ProjectType } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -16,7 +16,7 @@ import { ProjectMembersDataSource } from './project-members-datasource';
     styleUrls: ['./project-members.component.scss'],
 })
 export class ProjectMembersComponent implements AfterViewInit {
-    public project!: Project.AsObject;
+    public project!: ProjectView.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
@@ -60,7 +60,7 @@ export class ProjectMembersComponent implements AfterViewInit {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.projectService.RemoveProjectMember(this.project.id, member.userId).then(() => {
+            return this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
                 this.toast.showError(error.message);
@@ -69,7 +69,7 @@ export class ProjectMembersComponent implements AfterViewInit {
     }
 
     public removeMember(member: ProjectMember.AsObject): void {
-        this.projectService.RemoveProjectMember(this.project.id, member.userId).then(() => {
+        this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
             this.toast.showInfo('Member removed successfully');
         }).catch(error => {
             this.toast.showError(error.message);

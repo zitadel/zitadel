@@ -7,6 +7,7 @@ import {
     ChangeRequest,
     Changes,
     CreateUserRequest,
+    Email,
     MultiFactors,
     NotificationType,
     PasswordRequest,
@@ -22,7 +23,6 @@ import {
     User,
     UserAddress,
     UserEmail,
-    UserEmailID,
     UserGrant,
     UserGrantCreate,
     UserGrantSearchQuery,
@@ -322,7 +322,7 @@ export class MgmtUserService {
     }
 
     public async GetUserByEmailGlobal(email: string): Promise<User> {
-        const req = new UserEmailID();
+        const req = new Email();
         req.setEmail(email);
         return await this.request(
             c => c.getUserByEmailGlobal,

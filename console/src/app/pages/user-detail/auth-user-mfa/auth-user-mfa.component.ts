@@ -58,7 +58,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public getOTP(): void {
-        console.log('otp');
+        console.log('otp', this.profile);
         this.mgmtUserService.getUserMfas(this.profile.id).then(mfas => {
             this.mfaSubject.next(mfas.toObject().mfasList);
             console.log(mfas.toObject());
