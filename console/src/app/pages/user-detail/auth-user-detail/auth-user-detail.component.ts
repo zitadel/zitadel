@@ -49,6 +49,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public loading: boolean = false;
 
     public policy!: PasswordComplexityPolicy.AsObject;
+    public copied: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -280,5 +281,23 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.address = (await this.userService.GetMyUserAddress()).toObject();
 
         this.addressForm.patchValue(this.address);
+    }
+
+    public copytoclipboard(value: string): void {
+        const selBox = document.createElement('textarea');
+        selBox.style.position = 'fixed';
+        selBox.style.left = '0';
+        selBox.style.top = '0';
+        selBox.style.opacity = '0';
+        selBox.value = value;
+        document.body.appendChild(selBox);
+        selBox.focus();
+        selBox.select();
+        document.execCommand('copy');
+        document.body.removeChild(selBox);
+        this.copied = true;
+        setTimeout(() => {
+            this.copied = false;
+        }, 3000);
     }
 }

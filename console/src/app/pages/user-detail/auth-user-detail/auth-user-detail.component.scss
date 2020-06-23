@@ -29,6 +29,31 @@ h1 {
     color: #81868a;
     margin-bottom: 2rem;
   }
+
+  .login-name-row {
+        display: flex;
+        align-items: center;
+        padding: .5rem 0;
+
+        button {
+            transition: opacity .15s ease-in-out;
+            visibility: hidden;
+            opacity: 0;
+
+            &[disabled] {
+                visibility: visible;
+                color: white;
+                opacity: 1;
+            }
+        }
+
+        &:hover {
+            button {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+  }
   
   .content {
     display: flex;

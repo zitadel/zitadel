@@ -51,7 +51,12 @@
             "DESCRIPTION": "Hier können Sie neue User anlegen sowie bereits erfasste Userdaten bearbeiten, activieren oder deaktivieren",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
-            "MY": "Meine Informationen"
+            "MY": "Meine Informationen",
+            "LOGINNAMES":"Loginnamen",
+            "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
+            "COPY":"In die Zwischenablage kopieren",
+            "COPIED":"In die Zwischenablage kopiert!",
+            "NOUSER":"Kein User"
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
@@ -289,7 +294,8 @@
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Geben Sie den Namen ein",
             "ROLE": "Rolle",
-            "NOITEMS": "Keine Projekte"
+            "NOITEMS": "Keine Projekte",
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!"
         },
         "STATE": {
             "TITLE":"Status",

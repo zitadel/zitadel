@@ -6,8 +6,7 @@
         <h1>{{ 'APP.PAGES.TITLE' | translate }} {{app?.name}}</h1>
 
         <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
-        <p *ngIf="isZitadel" class="zitadel-warning">This belongs to Zitadel project. If you change something, Zitadel
-            may not behave as intended!</p>
+        <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
     </div>
 
     <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>

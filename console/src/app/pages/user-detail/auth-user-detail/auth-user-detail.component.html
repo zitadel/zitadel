@@ -4,7 +4,20 @@
 
     <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
-    <span *ngIf="!loading && !user">No user</span>
+    <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
+
+    <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
+        description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
+        <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
+            <span>{{login}}</span>
+            <button color="primary" [disabled]="copied"
+                [matTooltip]="(!copied ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                (click)="copytoclipboard(login)" mat-icon-button>
+                <i *ngIf="!copied" class="las la-clipboard"></i>
+                <i *ngIf="copied" class="las la-clipboard-check"></i>
+            </button>
+        </div>
+    </app-card>
 
     <div class="col" *ngIf="user">
         <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"

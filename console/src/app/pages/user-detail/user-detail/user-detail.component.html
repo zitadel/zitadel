@@ -12,6 +12,8 @@
 
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
+        <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
+
         <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
             <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
                 description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
