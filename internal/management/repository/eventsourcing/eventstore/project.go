@@ -31,8 +31,12 @@ type ProjectRepo struct {
 	Roles           []string
 }
 
-func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
-	return repo.ProjectEvents.ProjectByID(ctx, id)
+func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
+	project, err := repo.View.ProjectByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectToModel(project), nil
 }
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
@@ -81,9 +85,12 @@ func (repo *ProjectRepo) ProjectGrantViewByID(ctx context.Context, grantID strin
 	return model.ProjectGrantToModel(p), nil
 }
 
-func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
-	member = proj_model.NewProjectMember(projectID, userID)
-	return repo.ProjectEvents.ProjectMemberByIDs(ctx, member)
+func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectMemberView, error) {
+	member, err := repo.View.ProjectMemberByIDs(projectID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectMemberToModel(member), nil
 }
 
 func (repo *ProjectRepo) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
@@ -185,8 +192,12 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 	return changes, nil
 }
 
-func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (app *proj_model.Application, err error) {
-	return repo.ProjectEvents.ApplicationByIDs(ctx, projectID, appID)
+func (repo *ProjectRepo) ApplicationByID(ctx context.Context, appID string) (*proj_model.ApplicationView, error) {
+	app, err := repo.View.ApplicationByID(appID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ApplicationViewToModel(app), nil
 }
 
 func (repo *ProjectRepo) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
@@ -240,8 +251,12 @@ func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, a
 	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
 }
 
-func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, projectID, appID string) (app *proj_model.ProjectGrant, err error) {
-	return repo.ProjectEvents.ProjectGrantByIDs(ctx, projectID, appID)
+func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {
+	grant, err := repo.View.ProjectGrantByID(grantID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectGrantToModel(grant), nil
 }
 
 func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
@@ -354,9 +369,12 @@ func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, gran
 	return nil
 }
 
-func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (member *proj_model.ProjectGrantMember, err error) {
-	member = proj_model.NewProjectGrantMember(projectID, grantID, userID)
-	return repo.ProjectEvents.ProjectGrantMemberByIDs(ctx, member)
+func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectGrantMemberView, error) {
+	member, err := repo.View.ProjectGrantMemberByIDs(projectID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectGrantMemberToModel(member), nil
 }
 
 func (repo *ProjectRepo) AddProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {

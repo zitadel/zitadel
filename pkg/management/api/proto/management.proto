@@ -485,7 +485,7 @@ service ManagementService {
     }
 
     //ORG
-    rpc GetOrgByID(OrgID) returns (Org) {
+    rpc GetOrgByID(OrgID) returns (OrgView) {
         option (google.api.http) = {
             get: "/orgs/{id}"
         };
@@ -495,7 +495,7 @@ service ManagementService {
         };
     }
 
-    rpc GetOrgByDomainGlobal(OrgDomain) returns (Org) {
+    rpc GetOrgByDomainGlobal(OrgDomain) returns (OrgView) {
         option (google.api.http) = {
             get: "/global/orgs/domain/{domain}"
         };
@@ -526,7 +526,6 @@ service ManagementService {
             permission: "org.write"
         };
     }
-
 
     rpc SearchMyOrgDomains(OrgDomainSearchRequest) returns (OrgDomainSearchResponse) {
         option (google.api.http) = {
@@ -637,7 +636,7 @@ service ManagementService {
         };
     }
 
-    rpc ProjectByID(ProjectID) returns (Project) {
+    rpc ProjectByID(ProjectID) returns (ProjectView) {
         option (google.api.http) = {
             get: "/projects/{id}"
         };
@@ -850,7 +849,7 @@ service ManagementService {
         };
     }
 
-    rpc ApplicationByID(ApplicationID) returns (Application) {
+    rpc ApplicationByID(ApplicationID) returns (ApplicationView) {
         option (google.api.http) = {
             get: "/projects/{project_id}/applications/{id}"
         };
@@ -957,7 +956,7 @@ service ManagementService {
         };
     }
 
-    rpc ProjectGrantByID(ProjectGrantID) returns (ProjectGrant) {
+    rpc ProjectGrantByID(ProjectGrantID) returns (ProjectGrantView) {
         option (google.api.http) = {
             get: "/projects/{project_id}/grants/{id}"
         };
@@ -1086,7 +1085,7 @@ service ManagementService {
         };
     }
 
-    rpc UserGrantByID(UserGrantID) returns (UserGrant) {
+    rpc UserGrantByID(UserGrantID) returns (UserGrantView) {
         option (google.api.http) = {
             get: "/users/{user_id}/grants/{id}"
         };
@@ -1196,7 +1195,7 @@ service ManagementService {
         };
     }
 
-    rpc ProjectUserGrantByID(ProjectUserGrantID) returns (UserGrant) {
+    rpc ProjectUserGrantByID(ProjectUserGrantID) returns (UserGrantView) {
         option (google.api.http) = {
             get: "/projects/{project_id}/users/{user_id}/grants/{id}"
         };
@@ -1267,7 +1266,7 @@ service ManagementService {
         };
     }
 
-    rpc ProjectGrantUserGrantByID(ProjectGrantUserGrantID) returns (UserGrant) {
+    rpc ProjectGrantUserGrantByID(ProjectGrantUserGrantID) returns (UserGrantView) {
         option (google.api.http) = {
             get: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
         };
@@ -1804,6 +1803,15 @@ message OrgID {
 }
 
 message Org {
+    string id = 1;
+    OrgState state = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+    string name = 5;
+    uint64 sequence = 6;
+}
+
+message OrgView {
     string id = 1;
     OrgState state = 2;
     google.protobuf.Timestamp creation_date = 3;

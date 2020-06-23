@@ -34,14 +34,14 @@ func orgFromModel(org *org_model.Org) *Org {
 	}
 }
 
-func orgFromView(org *org_model.OrgView) *Org {
+func orgViewFromModel(org *org_model.OrgView) *OrgView {
 	creationDate, err := ptypes.TimestampProto(org.CreationDate)
 	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
 
 	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
-	return &Org{
+	return &OrgView{
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.ID,
