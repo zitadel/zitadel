@@ -160,7 +160,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this.user.preferredLanguage = profileData.preferredLanguage;
         console.log(this.user);
         this.mgmtUserService
-            .SaveUserProfile(this.user)
+            .SaveUserProfile(
+                this.user.id,
+                this.user.firstName,
+                this.user.lastName,
+                this.user.nickName,
+                this.user.preferredLanguage,
+                this.user.gender)
             .then((data: UserProfile) => {
                 this.toast.showInfo('Saved Profile');
                 this.user = Object.assign(this.user, data.toObject());

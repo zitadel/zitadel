@@ -148,7 +148,7 @@
         </div>
     </app-card>
 
-    <app-auth-user-mfa *ngIf="user" [profile]="user"></app-auth-user-mfa>
+    <app-auth-user-mfa *ngIf="user"></app-auth-user-mfa>
 
     <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="user">
         <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">

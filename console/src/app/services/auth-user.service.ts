@@ -6,6 +6,7 @@ import { switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
+    Gender,
     MfaOtpResponse,
     MultiFactors,
     MyProjectOrgSearchQuery,
@@ -97,13 +98,29 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserProfile(profile: UserView.AsObject): Promise<UserProfile> {
+    public async SaveMyUserProfile(
+        firstName?: string,
+        lastName?: string,
+        nickName?: string,
+        preferredLanguage?: string,
+        gender?: Gender,
+    ): Promise<UserProfile> {
         const req = new UpdateUserProfileRequest();
-        req.setFirstName(profile.firstName);
-        req.setLastName(profile.lastName);
-        req.setNickName(profile.nickName);
-        req.setPreferredLanguage(profile.preferredLanguage);
-        req.setGender(profile.gender);
+        if (firstName) {
+            req.setFirstName(firstName);
+        }
+        if (lastName) {
+            req.setLastName(lastName);
+        }
+        if (nickName) {
+            req.setNickName(nickName);
+        }
+        if (gender) {
+            req.setGender(gender);
+        }
+        if (preferredLanguage) {
+            req.setPreferredLanguage(preferredLanguage);
+        }
         console.log(req.toObject());
         return await this.request(
             c => c.updateMyUserProfile,
