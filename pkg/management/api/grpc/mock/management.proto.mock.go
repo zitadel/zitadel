@@ -138,14 +138,14 @@ func (mr *MockManagementServiceClientMockRecorder) AddProjectRole(arg0, arg1 int
 }
 
 // ApplicationByID mocks base method
-func (m *MockManagementServiceClient) ApplicationByID(arg0 context.Context, arg1 *grpc.ApplicationID, arg2 ...grpc0.CallOption) (*grpc.Application, error) {
+func (m *MockManagementServiceClient) ApplicationByID(arg0 context.Context, arg1 *grpc.ApplicationID, arg2 ...grpc0.CallOption) (*grpc.ApplicationView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ApplicationByID", varargs...)
-	ret0, _ := ret[0].(*grpc.Application)
+	ret0, _ := ret[0].(*grpc.ApplicationView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -597,24 +597,24 @@ func (mr *MockManagementServiceClientMockRecorder) DeactivateApplication(arg0, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateApplication", reflect.TypeOf((*MockManagementServiceClient)(nil).DeactivateApplication), varargs...)
 }
 
-// DeactivateOrg mocks base method
-func (m *MockManagementServiceClient) DeactivateOrg(arg0 context.Context, arg1 *grpc.OrgID, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
+// DeactivateMyOrg mocks base method
+func (m *MockManagementServiceClient) DeactivateMyOrg(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "DeactivateOrg", varargs...)
+	ret := m.ctrl.Call(m, "DeactivateMyOrg", varargs...)
 	ret0, _ := ret[0].(*grpc.Org)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// DeactivateOrg indicates an expected call of DeactivateOrg
-func (mr *MockManagementServiceClientMockRecorder) DeactivateOrg(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// DeactivateMyOrg indicates an expected call of DeactivateMyOrg
+func (mr *MockManagementServiceClientMockRecorder) DeactivateMyOrg(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateOrg", reflect.TypeOf((*MockManagementServiceClient)(nil).DeactivateOrg), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateMyOrg", reflect.TypeOf((*MockManagementServiceClient)(nil).DeactivateMyOrg), varargs...)
 }
 
 // DeactivateProject mocks base method
@@ -857,6 +857,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetIam(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIam", reflect.TypeOf((*MockManagementServiceClient)(nil).GetIam), varargs...)
 }
 
+// GetMyOrg mocks base method
+func (m *MockManagementServiceClient) GetMyOrg(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.OrgView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetMyOrg", varargs...)
+	ret0, _ := ret[0].(*grpc.OrgView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMyOrg indicates an expected call of GetMyOrg
+func (mr *MockManagementServiceClientMockRecorder) GetMyOrg(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyOrg", reflect.TypeOf((*MockManagementServiceClient)(nil).GetMyOrg), varargs...)
+}
+
 // GetMyOrgIamPolicy mocks base method
 func (m *MockManagementServiceClient) GetMyOrgIamPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.OrgIamPolicy, error) {
 	m.ctrl.T.Helper()
@@ -878,14 +898,14 @@ func (mr *MockManagementServiceClientMockRecorder) GetMyOrgIamPolicy(arg0, arg1 
 }
 
 // GetOrgByDomainGlobal mocks base method
-func (m *MockManagementServiceClient) GetOrgByDomainGlobal(arg0 context.Context, arg1 *grpc.OrgDomain, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
+func (m *MockManagementServiceClient) GetOrgByDomainGlobal(arg0 context.Context, arg1 *grpc.Domain, arg2 ...grpc0.CallOption) (*grpc.OrgView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetOrgByDomainGlobal", varargs...)
-	ret0, _ := ret[0].(*grpc.Org)
+	ret0, _ := ret[0].(*grpc.OrgView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -895,26 +915,6 @@ func (mr *MockManagementServiceClientMockRecorder) GetOrgByDomainGlobal(arg0, ar
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgByDomainGlobal", reflect.TypeOf((*MockManagementServiceClient)(nil).GetOrgByDomainGlobal), varargs...)
-}
-
-// GetOrgByID mocks base method
-func (m *MockManagementServiceClient) GetOrgByID(arg0 context.Context, arg1 *grpc.OrgID, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetOrgByID", varargs...)
-	ret0, _ := ret[0].(*grpc.Org)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOrgByID indicates an expected call of GetOrgByID
-func (mr *MockManagementServiceClientMockRecorder) GetOrgByID(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgByID", reflect.TypeOf((*MockManagementServiceClient)(nil).GetOrgByID), varargs...)
 }
 
 // GetOrgMemberRoles mocks base method
@@ -1058,7 +1058,7 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserAddress(arg0, arg1 int
 }
 
 // GetUserByEmailGlobal mocks base method
-func (m *MockManagementServiceClient) GetUserByEmailGlobal(arg0 context.Context, arg1 *grpc.UserEmailID, arg2 ...grpc0.CallOption) (*grpc.UserView, error) {
+func (m *MockManagementServiceClient) GetUserByEmailGlobal(arg0 context.Context, arg1 *grpc.Email, arg2 ...grpc0.CallOption) (*grpc.UserView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -1258,14 +1258,14 @@ func (mr *MockManagementServiceClientMockRecorder) OrgChanges(arg0, arg1 interfa
 }
 
 // ProjectByID mocks base method
-func (m *MockManagementServiceClient) ProjectByID(arg0 context.Context, arg1 *grpc.ProjectID, arg2 ...grpc0.CallOption) (*grpc.Project, error) {
+func (m *MockManagementServiceClient) ProjectByID(arg0 context.Context, arg1 *grpc.ProjectID, arg2 ...grpc0.CallOption) (*grpc.ProjectView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProjectByID", varargs...)
-	ret0, _ := ret[0].(*grpc.Project)
+	ret0, _ := ret[0].(*grpc.ProjectView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1298,14 +1298,14 @@ func (mr *MockManagementServiceClientMockRecorder) ProjectChanges(arg0, arg1 int
 }
 
 // ProjectGrantByID mocks base method
-func (m *MockManagementServiceClient) ProjectGrantByID(arg0 context.Context, arg1 *grpc.ProjectGrantID, arg2 ...grpc0.CallOption) (*grpc.ProjectGrant, error) {
+func (m *MockManagementServiceClient) ProjectGrantByID(arg0 context.Context, arg1 *grpc.ProjectGrantID, arg2 ...grpc0.CallOption) (*grpc.ProjectGrantView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProjectGrantByID", varargs...)
-	ret0, _ := ret[0].(*grpc.ProjectGrant)
+	ret0, _ := ret[0].(*grpc.ProjectGrantView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1318,14 +1318,14 @@ func (mr *MockManagementServiceClientMockRecorder) ProjectGrantByID(arg0, arg1 i
 }
 
 // ProjectGrantUserGrantByID mocks base method
-func (m *MockManagementServiceClient) ProjectGrantUserGrantByID(arg0 context.Context, arg1 *grpc.ProjectGrantUserGrantID, arg2 ...grpc0.CallOption) (*grpc.UserGrant, error) {
+func (m *MockManagementServiceClient) ProjectGrantUserGrantByID(arg0 context.Context, arg1 *grpc.ProjectGrantUserGrantID, arg2 ...grpc0.CallOption) (*grpc.UserGrantView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProjectGrantUserGrantByID", varargs...)
-	ret0, _ := ret[0].(*grpc.UserGrant)
+	ret0, _ := ret[0].(*grpc.UserGrantView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1338,14 +1338,14 @@ func (mr *MockManagementServiceClientMockRecorder) ProjectGrantUserGrantByID(arg
 }
 
 // ProjectUserGrantByID mocks base method
-func (m *MockManagementServiceClient) ProjectUserGrantByID(arg0 context.Context, arg1 *grpc.ProjectUserGrantID, arg2 ...grpc0.CallOption) (*grpc.UserGrant, error) {
+func (m *MockManagementServiceClient) ProjectUserGrantByID(arg0 context.Context, arg1 *grpc.ProjectUserGrantID, arg2 ...grpc0.CallOption) (*grpc.UserGrantView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProjectUserGrantByID", varargs...)
-	ret0, _ := ret[0].(*grpc.UserGrant)
+	ret0, _ := ret[0].(*grpc.UserGrantView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -1377,24 +1377,24 @@ func (mr *MockManagementServiceClientMockRecorder) ReactivateApplication(arg0, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReactivateApplication", reflect.TypeOf((*MockManagementServiceClient)(nil).ReactivateApplication), varargs...)
 }
 
-// ReactivateOrg mocks base method
-func (m *MockManagementServiceClient) ReactivateOrg(arg0 context.Context, arg1 *grpc.OrgID, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
+// ReactivateMyOrg mocks base method
+func (m *MockManagementServiceClient) ReactivateMyOrg(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "ReactivateOrg", varargs...)
+	ret := m.ctrl.Call(m, "ReactivateMyOrg", varargs...)
 	ret0, _ := ret[0].(*grpc.Org)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ReactivateOrg indicates an expected call of ReactivateOrg
-func (mr *MockManagementServiceClientMockRecorder) ReactivateOrg(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// ReactivateMyOrg indicates an expected call of ReactivateMyOrg
+func (mr *MockManagementServiceClientMockRecorder) ReactivateMyOrg(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReactivateOrg", reflect.TypeOf((*MockManagementServiceClient)(nil).ReactivateOrg), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReactivateMyOrg", reflect.TypeOf((*MockManagementServiceClient)(nil).ReactivateMyOrg), varargs...)
 }
 
 // ReactivateProject mocks base method
@@ -2358,14 +2358,14 @@ func (mr *MockManagementServiceClientMockRecorder) UserChanges(arg0, arg1 interf
 }
 
 // UserGrantByID mocks base method
-func (m *MockManagementServiceClient) UserGrantByID(arg0 context.Context, arg1 *grpc.UserGrantID, arg2 ...grpc0.CallOption) (*grpc.UserGrant, error) {
+func (m *MockManagementServiceClient) UserGrantByID(arg0 context.Context, arg1 *grpc.UserGrantID, arg2 ...grpc0.CallOption) (*grpc.UserGrantView, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "UserGrantByID", varargs...)
-	ret0, _ := ret[0].(*grpc.UserGrant)
+	ret0, _ := ret[0].(*grpc.UserGrantView)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
