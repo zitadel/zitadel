@@ -78,11 +78,11 @@ export class OrgCreateComponent {
                 validators.push(Validators.pattern(/[0-9]/g));
             }
             if (this.policy.hasSymbol) {
-                // All characters that are not a digit or an English letter \W or a whitespace \S
-                validators.push(Validators.pattern(/[\W\S]/));
+                validators.push(Validators.pattern(/[^a-z0-9]/gi));
             }
 
             this.userForm = this.fb.group({
+                userName: ['', [Validators.required]],
                 firstName: ['', [Validators.required]],
                 lastName: ['', [Validators.required]],
                 email: ['', [Validators.required]],
@@ -96,6 +96,7 @@ export class OrgCreateComponent {
             console.log('no password complexity policy defined!');
             console.error(error);
             this.userForm = this.fb.group({
+                userName: ['', [Validators.required]],
                 firstName: ['', [Validators.required]],
                 lastName: ['', [Validators.required]],
                 email: ['', [Validators.required]],
@@ -117,6 +118,7 @@ export class OrgCreateComponent {
         createOrgRequest.setDomain(this.domain?.value);
 
         const registerUserRequest: CreateUserRequest = new CreateUserRequest();
+        registerUserRequest.setUserName(this.userName?.value);
         registerUserRequest.setEmail(this.email?.value);
         registerUserRequest.setFirstName(this.firstName?.value);
         registerUserRequest.setLastName(this.lastName?.value);
@@ -151,6 +153,9 @@ export class OrgCreateComponent {
         return this.orgForm.get('domain');
     }
 
+    public get userName(): AbstractControl | null {
+      return this.userForm.get('userName');
+    }
 
     public get firstName(): AbstractControl | null {
         return this.userForm.get('firstName');

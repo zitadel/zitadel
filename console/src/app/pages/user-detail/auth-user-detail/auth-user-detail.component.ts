@@ -76,8 +76,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 validators.push(Validators.pattern(/[0-9]/g));
             }
             if (this.policy.hasSymbol) {
-                // All characters that are not a digit or an English letter \W or a whitespace \S
-                validators.push(Validators.pattern(/[\W\S]/));
+                validators.push(Validators.pattern(/[^a-z0-9]/gi));
             }
 
             this.passwordForm = this.fb.group({
