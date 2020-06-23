@@ -14,9 +14,9 @@ type UserGrant struct {
 type UserGrantState int32
 
 const (
-	USERGRANTSTATE_ACTIVE UserGrantState = iota
-	USERGRANTSTATE_INACTIVE
-	USERGRANTSTATE_REMOVED
+	UserGrantStateActive UserGrantState = iota
+	UserGrantStateInactive
+	UserGrantStateRemoved
 )
 
 func (u *UserGrant) IsValid() bool {
@@ -24,11 +24,11 @@ func (u *UserGrant) IsValid() bool {
 }
 
 func (u *UserGrant) IsActive() bool {
-	return u.State == USERGRANTSTATE_ACTIVE
+	return u.State == UserGrantStateActive
 }
 
 func (u *UserGrant) IsInactive() bool {
-	return u.State == USERGRANTSTATE_INACTIVE
+	return u.State == UserGrantStateInactive
 }
 
 func (u *UserGrant) RemoveRoleKeyIfExisting(key string) bool {

@@ -25,6 +25,6 @@ const (
 type PolicyState int32
 
 const (
-	POLICYSTATE_ACTIVE PolicyState = iota
-	POLICYSTATE_INACTIVE
+	PolicyStateActive PolicyState = iota
+	PolicyStateInactive
 )

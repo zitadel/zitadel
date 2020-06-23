@@ -27,7 +27,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	if err != nil {
 		return nil, err
 	}
-	if client.State != proj_model.APPSTATE_ACTIVE {
+	if client.State != proj_model.AppStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
@@ -86,11 +86,11 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 
 func getGender(gender user_model.Gender) string {
 	switch gender {
-	case user_model.GENDER_FEMALE:
+	case user_model.GenderFemale:
 		return "female"
-	case user_model.GENDER_MALE:
+	case user_model.GenderMale:
 		return "male"
-	case user_model.GENDER_DIVERSE:
+	case user_model.GenderDiverse:
 		return "diverse"
 	}
 	return ""

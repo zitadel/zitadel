@@ -30,13 +30,13 @@ type ProjectGrantMemberSearchRequest struct {
 type ProjectGrantMemberSearchKey int32
 
 const (
-	PROJECTGRANTMEMBERSEARCHKEY_UNSPECIFIED ProjectGrantMemberSearchKey = iota
-	PROJECTGRANTMEMBERSEARCHKEY_USER_NAME
-	PROJECTGRANTMEMBERSEARCHKEY_EMAIL
-	PROJECTGRANTMEMBERSEARCHKEY_FIRST_NAME
-	PROJECTGRANTMEMBERSEARCHKEY_LAST_NAME
-	PROJECTGRANTMEMBERSEARCHKEY_GRANT_ID
-	PROJECTGRANTMEMBERSEARCHKEY_USER_ID
+	ProjectGrantMemberSearchKeyUnspecified ProjectGrantMemberSearchKey = iota
+	ProjectGrantMemberSearchKeyUserName
+	ProjectGrantMemberSearchKeyEmail
+	ProjectGrantMemberSearchKeyFirstName
+	ProjectGrantMemberSearchKeyLastName
+	ProjectGrantMemberSearchKeyGrantID
+	ProjectGrantMemberSearchKeyUserID
 )
 
 type ProjectGrantMemberSearchQuery struct {

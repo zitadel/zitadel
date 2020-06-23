@@ -37,14 +37,14 @@ type UserGrantSearchRequest struct {
 type UserGrantSearchKey int32
 
 const (
-	USERGRANTSEARCHKEY_UNSPECIFIED UserGrantSearchKey = iota
-	USERGRANTSEARCHKEY_USER_ID
-	USERGRANTSEARCHKEY_PROJECT_ID
-	USERGRANTSEARCHKEY_RESOURCEOWNER
-	USERGRANTSEARCHKEY_STATE
-	USERGRANTSEARCHKEY_GRANT_ID
-	USERGRANTSEARCHKEY_ORG_NAME
-	USERGRANTSEARCHKEY_ROLE_KEY
+	UserGrantSearchKeyUnspecified UserGrantSearchKey = iota
+	UserGrantSearchKeyUserID
+	UserGrantSearchKeyProjectID
+	UserGrantSearchKeyResourceOwner
+	UserGrantSearchKeyState
+	UserGrantSearchKeyGrantID
+	UserGrantSearchKeyOrgName
+	UserGrantSearchKeyRoleKey
 )
 
 type UserGrantSearchQuery struct {
@@ -67,5 +67,5 @@ func (r *UserGrantSearchRequest) EnsureLimit(limit uint64) {
 }
 
 func (r *UserGrantSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: USERGRANTSEARCHKEY_RESOURCEOWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }

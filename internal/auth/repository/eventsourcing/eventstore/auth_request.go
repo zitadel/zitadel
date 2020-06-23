@@ -350,17 +350,17 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if err != nil {
 		return nil, err
 	}
-	if user.State == user_model.USERSTATE_LOCKED || user.State == user_model.USERSTATE_SUSPEND {
+	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
 	}
-	if !(user.State == user_model.USERSTATE_ACTIVE || user.State == user_model.USERSTATE_INITIAL) {
+	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
 	org, err := orgViewProvider.OrgByID(user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	if org.State != int32(org_model.ORGSTATE_ACTIVE) {
+	if org.State != int32(org_model.OrgStateActive) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Zws3s", "Errors.User.NotActive")
 	}
 	return user, nil

@@ -19,7 +19,7 @@ func (req ProjectRoleSearchRequest) GetOffset() uint64 {
 }
 
 func (req ProjectRoleSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == proj_model.PROJECTROLESEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == proj_model.ProjectRoleSearchKeyUnspecified {
 		return nil
 	}
 	return ProjectRoleSearchKey(req.SortingColumn)
@@ -51,13 +51,13 @@ func (req ProjectRoleSearchQuery) GetValue() interface{} {
 
 func (key ProjectRoleSearchKey) ToColumnName() string {
 	switch proj_model.ProjectRoleSearchKey(key) {
-	case proj_model.PROJECTROLESEARCHKEY_KEY:
+	case proj_model.ProjectRoleSearchKeyKey:
 		return ProjectRoleKeyKey
-	case proj_model.PROJECTROLESEARCHKEY_ORGID:
+	case proj_model.ProjectRoleSearchKeyOrgID:
 		return ProjectRoleKeyOrgID
-	case proj_model.PROJECTROLESEARCHKEY_PROJECTID:
+	case proj_model.ProjectRoleSearchKeyProjectID:
 		return ProjectRoleKeyProjectID
-	case proj_model.PROJECTROLESEARCHKEY_RESOURCEOWNER:
+	case proj_model.ProjectRoleSearchKeyResourceOwner:
 		return ProjectRoleKeyResourceOwner
 	default:
 		return ""

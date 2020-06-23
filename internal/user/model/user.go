@@ -50,22 +50,22 @@ type InitUserCode struct {
 type UserState int32
 
 const (
-	USERSTATE_UNSPECIFIED UserState = iota
-	USERSTATE_ACTIVE
-	USERSTATE_INACTIVE
-	USERSTATE_DELETED
-	USERSTATE_LOCKED
-	USERSTATE_SUSPEND
-	USERSTATE_INITIAL
+	UserStateUnspecified UserState = iota
+	UserStateActive
+	UserStateInactive
+	UserStateDeleted
+	UserStateLocked
+	UserStateSuspend
+	UserStateInitial
 )
 
 type Gender int32
 
 const (
-	GENDER_UNDEFINED Gender = iota
-	GENDER_FEMALE
-	GENDER_MALE
-	GENDER_DIVERSE
+	GenderUnspecified Gender = iota
+	GenderFemale
+	GenderMale
+	GenderDiverse
 )
 
 func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
@@ -96,23 +96,23 @@ func (u *User) IsInitialState() bool {
 }
 
 func (u *User) IsActive() bool {
-	return u.State == USERSTATE_ACTIVE
+	return u.State == UserStateActive
 }
 
 func (u *User) IsInitial() bool {
-	return u.State == USERSTATE_INITIAL
+	return u.State == UserStateInitial
 }
 
 func (u *User) IsInactive() bool {
-	return u.State == USERSTATE_INACTIVE
+	return u.State == UserStateInactive
 }
 
 func (u *User) IsLocked() bool {
-	return u.State == USERSTATE_LOCKED
+	return u.State == UserStateLocked
 }
 
 func (u *User) IsOTPReady() bool {
-	return u.OTP != nil && u.OTP.State == MFASTATE_READY
+	return u.OTP != nil && u.OTP.State == MfaStateReady
 }
 
 func (u *User) HashPasswordIfExisting(policy *policy_model.PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {

@@ -26,7 +26,7 @@ func TestAppendMfaOTPAddedEvent(t *testing.T) {
 				otp:   &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}},
 				event: &es_models.Event{},
 			},
-			result: &User{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MFASTATE_NOTREADY)}},
+			result: &User{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MfaStateNotReady)}},
 		},
 	}
 	for _, tt := range tests {
@@ -61,7 +61,7 @@ func TestAppendMfaOTPVerifyEvent(t *testing.T) {
 				otp:   &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}},
 				event: &es_models.Event{},
 			},
-			result: &User{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MFASTATE_READY)}},
+			result: &User{OTP: &OTP{Secret: &crypto.CryptoValue{KeyID: "KeyID"}, State: int32(model.MfaStateReady)}},
 		},
 	}
 	for _, tt := range tests {

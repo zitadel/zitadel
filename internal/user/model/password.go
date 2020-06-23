@@ -27,8 +27,8 @@ type PasswordCode struct {
 type NotificationType int32
 
 const (
-	NOTIFICATIONTYPE_EMAIL NotificationType = iota
-	NOTIFICATIONTYPE_SMS
+	NotificationTypeEmail NotificationType = iota
+	NotificationTypeSms
 )
 
 func (p *Password) IsValid() bool {

@@ -96,9 +96,9 @@ func projectRoleViewFromModel(role *proj_model.ProjectRoleView) *ProjectRoleView
 
 func projectStateFromModel(state proj_model.ProjectState) ProjectState {
 	switch state {
-	case proj_model.PROJECTSTATE_ACTIVE:
+	case proj_model.ProjectStateActive:
 		return ProjectState_PROJECTSTATE_ACTIVE
-	case proj_model.PROJECTSTATE_INACTIVE:
+	case proj_model.ProjectStateInactive:
 		return ProjectState_PROJECTSTATE_INACTIVE
 	default:
 		return ProjectState_PROJECTSTATE_UNSPECIFIED
@@ -202,9 +202,9 @@ func projectSearchQueryToModel(query *ProjectSearchQuery) *proj_model.ProjectVie
 func projectSearchKeyToModel(key ProjectSearchKey) proj_model.ProjectViewSearchKey {
 	switch key {
 	case ProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
-		return proj_model.PROJECTSEARCHKEY_NAME
+		return proj_model.ProjectViewSearchKeyName
 	default:
-		return proj_model.PROJECTSEARCHKEY_UNSPECIFIED
+		return proj_model.ProjectViewSearchKeyUnspecified
 	}
 }
 
@@ -227,9 +227,9 @@ func grantedProjectSearchQueryToModel(query *ProjectSearchQuery) *proj_model.Pro
 func projectGrantSearchKeyToModel(key ProjectSearchKey) proj_model.ProjectGrantViewSearchKey {
 	switch key {
 	case ProjectSearchKey_PROJECTSEARCHKEY_PROJECT_NAME:
-		return proj_model.GRANTEDPROJECTSEARCHKEY_NAME
+		return proj_model.GrantedProjectSearchKeyName
 	default:
-		return proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED
+		return proj_model.GrantedProjectSearchKeyUnspecified
 	}
 }
 
@@ -260,11 +260,11 @@ func projectRoleSearchQueryToModel(query *ProjectRoleSearchQuery) *proj_model.Pr
 func projectRoleSearchKeyToModel(key ProjectRoleSearchKey) proj_model.ProjectRoleSearchKey {
 	switch key {
 	case ProjectRoleSearchKey_PROJECTROLESEARCHKEY_KEY:
-		return proj_model.PROJECTROLESEARCHKEY_KEY
+		return proj_model.ProjectRoleSearchKeyKey
 	case ProjectRoleSearchKey_PROJECTROLESEARCHKEY_DISPLAY_NAME:
-		return proj_model.PROJECTROLESEARCHKEY_DISPLAY_NAME
+		return proj_model.ProjectRoleSearchKeyDisplayName
 	default:
-		return proj_model.PROJECTROLESEARCHKEY_UNSPECIFIED
+		return proj_model.ProjectRoleSearchKeyUnspecified
 	}
 }
 

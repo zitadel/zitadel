@@ -113,7 +113,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "test", "=", "VALUE"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodEqualsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -126,7 +126,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryCaseSensitive("TESTTABLE", "test", "=", "VALUE"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_EQUALS, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodEquals, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -139,7 +139,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "test", "LIKE", "VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_STARTS_WITH_IGNORE_CASE, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodStartsWithIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -152,7 +152,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryCaseSensitive("TESTTABLE", "test", "LIKE", "VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_STARTS_WITH, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodStartsWith, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -165,7 +165,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "test", "LIKE", "%VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_CONTAINS_IGNORE_CASE, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContainsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -178,7 +178,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryCaseSensitive("TESTTABLE", "test", "LIKE", "%VALUE%"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_CONTAINS, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContains, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -191,7 +191,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryErr("TESTTABLE", "test", "LIKE", "%VALUE%", gorm.ErrRecordNotFound),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_CONTAINS_IGNORE_CASE, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContainsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -205,7 +205,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQueryErr("TESTTABLE", "test", "LIKE", "%VALUE%", gorm.ErrUnaddressable),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SEARCHMETHOD_CONTAINS_IGNORE_CASE, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_TEST, method: model.SearchMethodContainsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},
@@ -219,7 +219,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 				expectGetByQuery("TESTTABLE", "", "=", "VALUE"),
 			args{
 				table:       "TESTTABLE",
-				searchQuery: TestSearchQuery{key: TestSearchKey_UNDEFINED, method: model.SEARCHMETHOD_EQUALS_IGNORE_CASE, value: "VALUE"},
+				searchQuery: TestSearchQuery{key: TestSearchKey_UNDEFINED, method: model.SearchMethodEqualsIgnoreCase, value: "VALUE"},
 			},
 			res{
 				result:  Test{ID: "VALUE"},

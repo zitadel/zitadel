@@ -19,7 +19,7 @@ func (req UserGrantSearchRequest) GetOffset() uint64 {
 }
 
 func (req UserGrantSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == grant_model.USERGRANTSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == grant_model.UserGrantSearchKeyUnspecified {
 		return nil
 	}
 	return UserGrantSearchKey(req.SortingColumn)
@@ -51,19 +51,19 @@ func (req UserGrantSearchQuery) GetValue() interface{} {
 
 func (key UserGrantSearchKey) ToColumnName() string {
 	switch grant_model.UserGrantSearchKey(key) {
-	case grant_model.USERGRANTSEARCHKEY_USER_ID:
+	case grant_model.UserGrantSearchKeyUserID:
 		return UserGrantKeyUserID
-	case grant_model.USERGRANTSEARCHKEY_PROJECT_ID:
+	case grant_model.UserGrantSearchKeyProjectID:
 		return UserGrantKeyProjectID
-	case grant_model.USERGRANTSEARCHKEY_STATE:
+	case grant_model.UserGrantSearchKeyState:
 		return UserGrantKeyState
-	case grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER:
+	case grant_model.UserGrantSearchKeyResourceOwner:
 		return UserGrantKeyResourceOwner
-	case grant_model.USERGRANTSEARCHKEY_GRANT_ID:
+	case grant_model.UserGrantSearchKeyGrantID:
 		return UserGrantKeyID
-	case grant_model.USERGRANTSEARCHKEY_ORG_NAME:
+	case grant_model.UserGrantSearchKeyOrgName:
 		return UserGrantKeyOrgName
-	case grant_model.USERGRANTSEARCHKEY_ROLE_KEY:
+	case grant_model.UserGrantSearchKeyRoleKey:
 		return UserGrantKeyRole
 	default:
 		return ""

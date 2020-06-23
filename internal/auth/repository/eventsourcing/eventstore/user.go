@@ -212,7 +212,7 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 	if err != nil {
 		return err
 	}
-	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NOTIFICATIONTYPE_EMAIL)
+	return repo.UserEvents.RequestSetPassword(ctx, user.ID, model.NotificationTypeEmail)
 }
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {

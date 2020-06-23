@@ -29,12 +29,12 @@ type OrgSearchRequest struct {
 type OrgSearchKey int32
 
 const (
-	ORGSEARCHKEY_UNSPECIFIED OrgSearchKey = iota
-	ORGSEARCHKEY_ORG_ID
-	ORGSEARCHKEY_ORG_NAME
-	ORGSEARCHKEY_ORG_DOMAIN
-	ORGSEARCHKEY_STATE
-	ORGSEARCHKEY_RESOURCEOWNER
+	OrgSearchKeyUnspecified OrgSearchKey = iota
+	OrgSearchKeyOrgID
+	OrgSearchKeyOrgName
+	OrgSearchKeyOrgDomain
+	OrgSearchKeyState
+	OrgSearchKeyResourceOwner
 )
 
 type OrgSearchQuery struct {

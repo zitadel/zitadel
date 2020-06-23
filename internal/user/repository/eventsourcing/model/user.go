@@ -180,9 +180,9 @@ func (u *User) AppendEvent(event *es_models.Event) (err error) {
 func (u *User) ComputeObject() {
 	if u.State == 0 {
 		if u.Email != nil && u.IsEmailVerified {
-			u.State = int32(model.USERSTATE_ACTIVE)
+			u.State = int32(model.UserStateActive)
 		} else {
-			u.State = int32(model.USERSTATE_INITIAL)
+			u.State = int32(model.UserStateInitial)
 		}
 	}
 	if u.Password != nil && u.Password.ObjectRoot.IsZero() {
@@ -211,19 +211,19 @@ func (u *User) setData(event *es_models.Event) error {
 }
 
 func (u *User) appendDeactivatedEvent() {
-	u.State = int32(model.USERSTATE_INACTIVE)
+	u.State = int32(model.UserStateInactive)
 }
 
 func (u *User) appendReactivatedEvent() {
-	u.State = int32(model.USERSTATE_ACTIVE)
+	u.State = int32(model.UserStateActive)
 }
 
 func (u *User) appendLockedEvent() {
-	u.State = int32(model.USERSTATE_LOCKED)
+	u.State = int32(model.UserStateLocked)
 }
 
 func (u *User) appendUnlockedEvent() {
-	u.State = int32(model.USERSTATE_ACTIVE)
+	u.State = int32(model.UserStateActive)
 }
 
 func (u *User) appendInitUsercodeCreatedEvent(event *es_models.Event) error {

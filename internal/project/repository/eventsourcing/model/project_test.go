@@ -69,7 +69,7 @@ func TestProjectFromEvents(t *testing.T) {
 				},
 				project: &Project{Name: "ProjectName"},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.PROJECTSTATE_ACTIVE), Name: "ProjectName"},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
 		},
 		{
 			name: "project from events, nil project",
@@ -79,7 +79,7 @@ func TestProjectFromEvents(t *testing.T) {
 				},
 				project: nil,
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.PROJECTSTATE_ACTIVE)},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -112,7 +112,7 @@ func TestAppendEvent(t *testing.T) {
 				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
 				project: &Project{Name: "ProjectName"},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.PROJECTSTATE_ACTIVE), Name: "ProjectName"},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
 		},
 		{
 			name: "append change event",
@@ -120,21 +120,21 @@ func TestAppendEvent(t *testing.T) {
 				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectChanged},
 				project: &Project{Name: "ProjectName"},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.PROJECTSTATE_ACTIVE), Name: "ProjectName"},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
 		},
 		{
 			name: "append deactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectDeactivated},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.PROJECTSTATE_INACTIVE)},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectReactivated},
 			},
-			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.PROJECTSTATE_ACTIVE)},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -172,7 +172,7 @@ func TestAppendDeactivatedEvent(t *testing.T) {
 			args: args{
 				project: &Project{},
 			},
-			result: &Project{State: int32(model.PROJECTSTATE_INACTIVE)},
+			result: &Project{State: int32(model.ProjectStateInactive)},
 		},
 	}
 	for _, tt := range tests {
@@ -199,7 +199,7 @@ func TestAppendReactivatedEvent(t *testing.T) {
 			args: args{
 				project: &Project{},
 			},
-			result: &Project{State: int32(model.PROJECTSTATE_ACTIVE)},
+			result: &Project{State: int32(model.ProjectStateActive)},
 		},
 	}
 	for _, tt := range tests {

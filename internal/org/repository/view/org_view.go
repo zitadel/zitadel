@@ -9,7 +9,7 @@ import (
 
 func OrgByID(db *gorm.DB, table, orgID string) (*model.OrgView, error) {
 	org := new(model.OrgView)
-	query := view.PrepareGetByKey(table, model.OrgSearchKey(org_model.ORGSEARCHKEY_ORG_ID), orgID)
+	query := view.PrepareGetByKey(table, model.OrgSearchKey(org_model.OrgSearchKeyOrgID), orgID)
 	err := query(db, org)
 	return org, err
 }
@@ -30,6 +30,6 @@ func PutOrg(db *gorm.DB, table string, org *model.OrgView) error {
 }
 
 func DeleteOrg(db *gorm.DB, table, orgID string) error {
-	delete := view.PrepareDeleteByKey(table, model.OrgSearchKey(org_model.ORGSEARCHKEY_ORG_ID), orgID)
+	delete := view.PrepareDeleteByKey(table, model.OrgSearchKey(org_model.OrgSearchKeyOrgID), orgID)
 	return delete(db)
 }

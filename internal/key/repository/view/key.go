@@ -14,8 +14,8 @@ import (
 func KeyByIDAndType(db *gorm.DB, table, keyID string, private bool) (*model.KeyView, error) {
 	key := new(model.KeyView)
 	query := view.PrepareGetByQuery(table,
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_ID, Method: global_model.SEARCHMETHOD_EQUALS, Value: keyID},
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SEARCHMETHOD_EQUALS, Value: private},
+		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_ID, Method: global_model.SearchMethodEquals, Value: keyID},
+		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SearchMethodEquals, Value: private},
 	)
 	err := query(db, key)
 	return key, err
@@ -24,9 +24,9 @@ func KeyByIDAndType(db *gorm.DB, table, keyID string, private bool) (*model.KeyV
 func GetSigningKey(db *gorm.DB, table string) (*model.KeyView, error) {
 	key := new(model.KeyView)
 	query := view.PrepareGetByQuery(table,
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SEARCHMETHOD_EQUALS, Value: true},
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_USAGE, Method: global_model.SEARCHMETHOD_EQUALS, Value: key_model.KeyUsageSigning},
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_EXPIRY, Method: global_model.SEARCHMETHOD_GREATER_THAN, Value: time.Now().UTC()},
+		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SearchMethodEquals, Value: true},
+		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_USAGE, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_EXPIRY, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
 	)
 	err := query(db, key)
 	return key, err
@@ -37,9 +37,9 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 	query := view.PrepareSearchQuery(table,
 		model.KeySearchRequest{
 			Queries: []*key_model.KeySearchQuery{
-				{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SEARCHMETHOD_EQUALS, Value: false},
-				{Key: key_model.KEYSEARCHKEY_USAGE, Method: global_model.SEARCHMETHOD_EQUALS, Value: key_model.KeyUsageSigning},
-				{Key: key_model.KEYSEARCHKEY_EXPIRY, Method: global_model.SEARCHMETHOD_GREATER_THAN, Value: time.Now().UTC()},
+				{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SearchMethodEquals, Value: false},
+				{Key: key_model.KEYSEARCHKEY_USAGE, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+				{Key: key_model.KEYSEARCHKEY_EXPIRY, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
 			},
 		},
 	)

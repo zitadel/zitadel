@@ -118,9 +118,9 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case ApplicationRemoved:
 		return p.appendRemoveAppEvent(event)
 	case ApplicationDeactivated:
-		return p.appendAppStateEvent(event, model.APPSTATE_INACTIVE)
+		return p.appendAppStateEvent(event, model.AppStateInactive)
 	case ApplicationReactivated:
-		return p.appendAppStateEvent(event, model.APPSTATE_ACTIVE)
+		return p.appendAppStateEvent(event, model.AppStateActive)
 	case OIDCConfigAdded:
 		return p.appendAddOIDCConfigEvent(event)
 	case OIDCConfigChanged, OIDCConfigSecretChanged:
@@ -130,9 +130,9 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 	case ProjectGrantChanged, ProjectGrantCascadeChanged:
 		return p.appendChangeGrantEvent(event)
 	case ProjectGrantDeactivated:
-		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_INACTIVE)
+		return p.appendGrantStateEvent(event, model.ProjectGrantStateInactive)
 	case ProjectGrantReactivated:
-		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_ACTIVE)
+		return p.appendGrantStateEvent(event, model.ProjectGrantStateActive)
 	case ProjectGrantRemoved:
 		return p.appendRemoveGrantEvent(event)
 	case ProjectGrantMemberAdded:
@@ -147,22 +147,22 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 
 func (p *Project) AppendAddProjectEvent(event *es_models.Event) error {
 	p.setData(event)
-	p.State = int32(model.PROJECTSTATE_ACTIVE)
+	p.State = int32(model.ProjectStateActive)
 	return nil
 }
 
 func (p *Project) appendDeactivatedEvent() error {
-	p.State = int32(model.PROJECTSTATE_INACTIVE)
+	p.State = int32(model.ProjectStateInactive)
 	return nil
 }
 
 func (p *Project) appendReactivatedEvent() error {
-	p.State = int32(model.PROJECTSTATE_ACTIVE)
+	p.State = int32(model.ProjectStateActive)
 	return nil
 }
 
 func (p *Project) appendRemovedEvent() error {
-	p.State = int32(model.PROJECTSTATE_REMOVED)
+	p.State = int32(model.ProjectStateRemoved)
 	return nil
 }
 

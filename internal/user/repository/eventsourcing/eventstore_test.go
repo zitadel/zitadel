@@ -2,9 +2,9 @@ package eventsourcing
 
 import (
 	"context"
+	"encoding/json"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
-	"encoding/json"
 	"net"
 	"testing"
 	"time"
@@ -539,7 +539,7 @@ func TestDeactivateUser(t *testing.T) {
 				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.USERSTATE_INACTIVE},
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateInactive},
 			},
 		},
 		{
@@ -606,7 +606,7 @@ func TestReactivateUser(t *testing.T) {
 				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.USERSTATE_ACTIVE},
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
 			},
 		},
 		{
@@ -673,7 +673,7 @@ func TestLockUser(t *testing.T) {
 				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.USERSTATE_LOCKED},
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateLocked},
 			},
 		},
 		{
@@ -740,7 +740,7 @@ func TestUnlockUser(t *testing.T) {
 				existing: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
-				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.USERSTATE_ACTIVE},
+				user: &model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, State: model.UserStateActive},
 			},
 		},
 		{
@@ -1752,7 +1752,7 @@ func TestRequestSetPassword(t *testing.T) {
 				es:         GetMockManipulateUserWithPasswordCodeGen(ctrl, repo_model.User{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}}),
 				ctx:        auth.NewMockContext("orgID", "userID"),
 				userID:     "AggregateID",
-				notifyType: model.NOTIFICATIONTYPE_EMAIL,
+				notifyType: model.NotificationTypeEmail,
 			},
 			res: res{
 				password: &model.Password{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, ChangeRequired: false},
@@ -1762,7 +1762,7 @@ func TestRequestSetPassword(t *testing.T) {
 			name: "empty userid",
 			args: args{
 				es:         GetMockManipulateUser(ctrl),
-				notifyType: model.NOTIFICATIONTYPE_EMAIL,
+				notifyType: model.NotificationTypeEmail,
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -1774,7 +1774,7 @@ func TestRequestSetPassword(t *testing.T) {
 				es:         GetMockManipulateUserNoEvents(ctrl),
 				ctx:        auth.NewMockContext("orgID", "userID"),
 				userID:     "AggregateID",
-				notifyType: model.NOTIFICATIONTYPE_EMAIL,
+				notifyType: model.NotificationTypeEmail,
 			},
 			res: res{
 				errFunc: caos_errs.IsNotFound,

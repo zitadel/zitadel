@@ -194,19 +194,19 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case es_model.UserPhoneVerified:
 		u.IsPhoneVerified = true
 	case es_model.UserDeactivated:
-		u.State = int32(model.USERSTATE_INACTIVE)
+		u.State = int32(model.UserStateInactive)
 	case es_model.UserReactivated,
 		es_model.UserUnlocked:
-		u.State = int32(model.USERSTATE_ACTIVE)
+		u.State = int32(model.UserStateActive)
 	case es_model.UserLocked:
-		u.State = int32(model.USERSTATE_LOCKED)
+		u.State = int32(model.UserStateLocked)
 	case es_model.MfaOtpAdded:
-		u.OTPState = int32(model.MFASTATE_NOTREADY)
+		u.OTPState = int32(model.MfaStateNotReady)
 	case es_model.MfaOtpVerified:
-		u.OTPState = int32(model.MFASTATE_READY)
+		u.OTPState = int32(model.MfaStateReady)
 		u.MfaInitSkipped = time.Time{}
 	case es_model.MfaOtpRemoved:
-		u.OTPState = int32(model.MFASTATE_UNSPECIFIED)
+		u.OTPState = int32(model.MfaStateUnspecified)
 	case es_model.MfaInitSkipped:
 		u.MfaInitSkipped = event.CreationDate
 	case es_model.InitializedUserCodeAdded:
@@ -244,14 +244,14 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 }
 
 func (u *UserView) ComputeObject() {
-	if u.State == int32(model.USERSTATE_UNSPECIFIED) || u.State == int32(model.USERSTATE_INITIAL) {
+	if u.State == int32(model.UserStateUnspecified) || u.State == int32(model.UserStateInitial) {
 		if u.IsEmailVerified {
-			u.State = int32(model.USERSTATE_ACTIVE)
+			u.State = int32(model.UserStateActive)
 		} else {
-			u.State = int32(model.USERSTATE_INITIAL)
+			u.State = int32(model.UserStateInitial)
 		}
 	}
-	if u.OTPState == int32(model.MFASTATE_READY) {
+	if u.OTPState == int32(model.MfaStateReady) {
 		u.MfaMaxSetUp = int32(req_model.MfaLevelSoftware)
 	}
 }

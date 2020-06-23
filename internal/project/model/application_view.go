@@ -28,23 +28,23 @@ type ApplicationView struct {
 type ApplicationSearchRequest struct {
 	Offset        uint64
 	Limit         uint64
-	SortingColumn ApplicationSearchKey
+	SortingColumn AppSearchKey
 	Asc           bool
 	Queries       []*ApplicationSearchQuery
 }
 
-type ApplicationSearchKey int32
+type AppSearchKey int32
 
 const (
-	APPLICATIONSEARCHKEY_UNSPECIFIED ApplicationSearchKey = iota
-	APPLICATIONSEARCHKEY_NAME
-	APPLICATIONSEARCHKEY_OIDC_CLIENT_ID
-	APPLICATIONSEARCHKEY_PROJECT_ID
-	APPLICATIONSEARCHKEY_APP_ID
+	AppSearchKeyUnspecified AppSearchKey = iota
+	AppSearchKeyName
+	AppSearchKeyOIDCClientID
+	AppSearchKeyProjectID
+	AppSearchKeyAppID
 )
 
 type ApplicationSearchQuery struct {
-	Key    ApplicationSearchKey
+	Key    AppSearchKey
 	Method model.SearchMethod
 	Value  interface{}
 }

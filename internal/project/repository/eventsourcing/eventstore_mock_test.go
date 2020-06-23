@@ -136,8 +136,8 @@ func GetMockManipulateProjectWithOIDCApp(ctrl *gomock.Controller) *ProjectEvents
 	appData, _ := json.Marshal(model.Application{AppID: "AppID", Name: "Name"})
 	oidcData, _ := json.Marshal(model.OIDCConfig{
 		AppID:         "AppID",
-		ResponseTypes: []int32{int32(proj_model.OIDCRESPONSETYPE_CODE)},
-		GrantTypes:    []int32{int32(proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE)},
+		ResponseTypes: []int32{int32(proj_model.OIDCResponseTypeCode)},
+		GrantTypes:    []int32{int32(proj_model.OIDCGrantTypeAuthorizationCode)},
 	})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.ProjectAdded, Data: data},

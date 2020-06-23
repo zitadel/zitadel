@@ -19,7 +19,7 @@ func (req ProjectSearchRequest) GetOffset() uint64 {
 }
 
 func (req ProjectSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == proj_model.PROJECTSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == proj_model.ProjectViewSearchKeyUnspecified {
 		return nil
 	}
 	return ProjectSearchKey(req.SortingColumn)
@@ -51,11 +51,11 @@ func (req ProjectSearchQuery) GetValue() interface{} {
 
 func (key ProjectSearchKey) ToColumnName() string {
 	switch proj_model.ProjectViewSearchKey(key) {
-	case proj_model.PROJECTSEARCHKEY_NAME:
+	case proj_model.ProjectViewSearchKeyName:
 		return ProjectKeyName
-	case proj_model.PROJECTSEARCHKEY_PROJECTID:
+	case proj_model.ProjectViewSearchKeyProjectID:
 		return ProjectKeyProjectID
-	case proj_model.PROJECTSEARCHKEY_RESOURCE_OWNER:
+	case proj_model.ProjectViewSearchKeyResourceOwner:
 		return ProjectKeyResourceOwner
 	default:
 		return ""

@@ -136,9 +136,9 @@ func TestAppendGrantStateEvent(t *testing.T) {
 				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
 				grant:   &ProjectGrantID{GrantID: "GrantID"},
 				event:   &es_models.Event{},
-				state:   model.PROJECTGRANTSTATE_INACTIVE,
+				state:   model.ProjectGrantStateInactive,
 			},
-			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.PROJECTGRANTSTATE_INACTIVE)}}},
+			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.ProjectGrantStateInactive)}}},
 		},
 		{
 			name: "append reactivate grant event",
@@ -146,9 +146,9 @@ func TestAppendGrantStateEvent(t *testing.T) {
 				project: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}}}},
 				grant:   &ProjectGrantID{GrantID: "GrantID"},
 				event:   &es_models.Event{},
-				state:   model.PROJECTGRANTSTATE_ACTIVE,
+				state:   model.ProjectGrantStateActive,
 			},
-			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.PROJECTGRANTSTATE_ACTIVE)}}},
+			result: &Project{Grants: []*ProjectGrant{&ProjectGrant{GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"Key"}, State: int32(model.ProjectGrantStateActive)}}},
 		},
 	}
 	for _, tt := range tests {

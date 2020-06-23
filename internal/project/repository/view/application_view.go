@@ -10,14 +10,14 @@ import (
 
 func ApplicationByID(db *gorm.DB, table, appID string) (*model.ApplicationView, error) {
 	app := new(model.ApplicationView)
-	query := view.PrepareGetByKey(table, model.ApplicationSearchKey(proj_model.APPLICATIONSEARCHKEY_APP_ID), appID)
+	query := view.PrepareGetByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
 	err := query(db, app)
 	return app, err
 }
 
 func ApplicationByOIDCClientID(db *gorm.DB, table, clientID string) (*model.ApplicationView, error) {
 	app := new(model.ApplicationView)
-	clientIDQuery := model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_OIDC_CLIENT_ID, Value: clientID, Method: global_model.SEARCHMETHOD_EQUALS}
+	clientIDQuery := model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyOIDCClientID, Value: clientID, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, clientIDQuery)
 	err := query(db, app)
 	return app, err
@@ -25,8 +25,8 @@ func ApplicationByOIDCClientID(db *gorm.DB, table, clientID string) (*model.Appl
 
 func ApplicationByProjectIDAndAppName(db *gorm.DB, table, projectID, appName string) (*model.ApplicationView, error) {
 	app := new(model.ApplicationView)
-	projectIDQuery := model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_PROJECT_ID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
-	appNameQuery := model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_NAME, Value: appName, Method: global_model.SEARCHMETHOD_EQUALS}
+	projectIDQuery := model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
+	appNameQuery := model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyName, Value: appName, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, projectIDQuery, appNameQuery)
 	err := query(db, app)
 	return app, err
@@ -45,6 +45,6 @@ func PutApplication(db *gorm.DB, table string, app *model.ApplicationView) error
 }
 
 func DeleteApplication(db *gorm.DB, table, appID string) error {
-	delete := view.PrepareDeleteByKey(table, model.ApplicationSearchKey(proj_model.APPLICATIONSEARCHKEY_APP_ID), appID)
+	delete := view.PrepareDeleteByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
 	return delete(db)
 }

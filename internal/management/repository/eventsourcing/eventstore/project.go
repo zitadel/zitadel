@@ -62,7 +62,7 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 	permissions := auth.GetPermissionsFromCtx(ctx)
 	if !auth.HasGlobalPermission(permissions) {
 		ids := auth.GetPermissionCtxIDs(permissions)
-		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.PROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IS_ONE_OF, Value: ids})
+		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
 	}
 
 	projects, count, err := repo.View.SearchProjects(request)

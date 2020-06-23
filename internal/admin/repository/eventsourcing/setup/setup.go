@@ -381,13 +381,13 @@ func getOIDCResponseTypes(responseTypes []string) []proj_model.OIDCResponseType 
 func getOIDCResponseType(responseType string) proj_model.OIDCResponseType {
 	switch responseType {
 	case OIDCResponseType_CODE:
-		return proj_model.OIDCRESPONSETYPE_CODE
+		return proj_model.OIDCResponseTypeCode
 	case OIDCResponseType_ID_TOKEN:
-		return proj_model.OIDCRESPONSETYPE_ID_TOKEN
+		return proj_model.OIDCResponseTypeIDToken
 	case OIDCResponseType_TOKEN:
-		return proj_model.OIDCRESPONSETYPE_TOKEN
+		return proj_model.OIDCResponseTypeToken
 	}
-	return proj_model.OIDCRESPONSETYPE_CODE
+	return proj_model.OIDCResponseTypeCode
 }
 
 func getOIDCGrantTypes(grantTypes []string) []proj_model.OIDCGrantType {
@@ -401,37 +401,37 @@ func getOIDCGrantTypes(grantTypes []string) []proj_model.OIDCGrantType {
 func getOIDCGrantType(grantTypes string) proj_model.OIDCGrantType {
 	switch grantTypes {
 	case OIDCGrantType_AUTHORIZATION_CODE:
-		return proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE
+		return proj_model.OIDCGrantTypeAuthorizationCode
 	case OIDCGrantType_IMPLICIT:
-		return proj_model.OIDCGRANTTYPE_IMPLICIT
+		return proj_model.OIDCGrantTypeImplicit
 	case OIDCGrantType_REFRESH_TOKEN:
-		return proj_model.OIDCGRANTTYPE_REFRESH_TOKEN
+		return proj_model.OIDCGrantTypeRefreshToken
 	}
-	return proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE
+	return proj_model.OIDCGrantTypeAuthorizationCode
 }
 
 func getOIDCApplicationType(appType string) proj_model.OIDCApplicationType {
 	switch appType {
 	case OIDCApplicationType_NATIVE:
-		return proj_model.OIDCAPPLICATIONTYPE_NATIVE
+		return proj_model.OIDCApplicationTypeNative
 	case OIDCApplicationType_USER_AGENT:
-		return proj_model.OIDCAPPLICATIONTYPE_USER_AGENT
+		return proj_model.OIDCApplicationTypeUserAgent
 	case OIDCApplicationType_WEB:
-		return proj_model.OIDCAPPLICATIONTYPE_WEB
+		return proj_model.OIDCApplicationTypeWeb
 	}
-	return proj_model.OIDCAPPLICATIONTYPE_WEB
+	return proj_model.OIDCApplicationTypeWeb
 }
 
 func getOIDCAuthMethod(authMethod string) proj_model.OIDCAuthMethodType {
 	switch authMethod {
 	case OIDCAuthMethodType_NONE:
-		return proj_model.OIDCAUTHMETHODTYPE_NONE
+		return proj_model.OIDCAuthMethodTypeNone
 	case OIDCAuthMethodType_BASIC:
-		return proj_model.OIDCAUTHMETHODTYPE_BASIC
+		return proj_model.OIDCAuthMethodTypeBasic
 	case OIDCAuthMethodType_POST:
-		return proj_model.OIDCAUTHMETHODTYPE_POST
+		return proj_model.OIDCAuthMethodTypePost
 	}
-	return proj_model.OIDCAUTHMETHODTYPE_NONE
+	return proj_model.OIDCAuthMethodTypeNone
 }
 
 func setSetUpContextData(ctx context.Context, orgID string) context.Context {
