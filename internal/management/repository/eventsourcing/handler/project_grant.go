@@ -42,7 +42,7 @@ func (p *ProjectGrant) EventQuery() (*models.SearchQuery, error) {
 	return proj_event.ProjectQuery(sequence), nil
 }
 
-func (p *ProjectGrant) Process(event *models.Event) (err error) {
+func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 	grantedProject := new(view_model.ProjectGrantView)
 	switch event.Type {
 	case es_model.ProjectChanged:

@@ -39,7 +39,7 @@ func (p *ProjectGrantMember) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (p *ProjectGrantMember) Process(event *models.Event) (err error) {
+func (p *ProjectGrantMember) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case proj_es_model.ProjectAggregate:
 		err = p.processProjectGrantMember(event)

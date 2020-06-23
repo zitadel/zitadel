@@ -40,7 +40,7 @@ func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (m *OrgMember) Process(event *models.Event) (err error) {
+func (m *OrgMember) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate:
 		err = m.processOrgMember(event)

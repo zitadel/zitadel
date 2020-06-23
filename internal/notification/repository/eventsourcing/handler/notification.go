@@ -49,7 +49,7 @@ func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 	return eventsourcing.UserQuery(sequence), nil
 }
 
-func (n *Notification) Process(event *models.Event) (err error) {
+func (n *Notification) Reduce(event *models.Event) (err error) {
 	switch event.Type {
 	case es_model.InitializedUserCodeAdded:
 		err = n.handleInitUserCode(event)

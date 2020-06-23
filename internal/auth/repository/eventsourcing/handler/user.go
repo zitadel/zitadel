@@ -43,7 +43,7 @@ func (p *User) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (u *User) Process(event *models.Event) (err error) {
+func (u *User) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case es_model.UserAggregate:
 		return u.ProcessUser(event)
