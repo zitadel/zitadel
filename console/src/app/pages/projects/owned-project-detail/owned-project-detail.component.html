@@ -1,6 +1,6 @@
 <app-meta-layout>
     <div class="max-width-container">
-        <div class="head" *ngIf="project?.id">
+        <div class="head" *ngIf="project?.projectId">
             <a [routerLink]="[ '/projects' ]" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
@@ -39,7 +39,7 @@
 
         <!-- show only on owned projects-->
         <ng-container *ngIf="project">
-            <ng-template appHasRole [appHasRole]="['project.app.read:' + project.id, 'project.app.read']">
+            <ng-template appHasRole [appHasRole]="['project.app.read:' + project.projectId, 'project.app.read']">
                 <app-project-application-grid *ngIf="grid"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
                     (changeView)="grid = false" [projectId]="projectId"></app-project-application-grid>
@@ -56,7 +56,8 @@
             </ng-template>
 
             <ng-container *ngIf="isZitadel == false">
-                <ng-template appHasRole [appHasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
+                <ng-template appHasRole
+                    [appHasRole]="['project.grant.read:' + project.projectId, 'project.grant.read']">
                     <app-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
                         description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
                         <app-project-grants [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
@@ -65,7 +66,7 @@
                     </app-card>
                 </ng-template>
 
-                <ng-template appHasRole [appHasRole]="['project.role.read:' + project.id, 'project.role.read']">
+                <ng-template appHasRole [appHasRole]="['project.role.read:' + project.projectId, 'project.role.read']">
                     <app-card title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
                         description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
                         <app-project-roles [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
@@ -97,7 +98,7 @@
                 </app-project-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
-                <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
+                <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></app-changes>
             </mat-tab>
         </mat-tab-group>
     </metainfo>
