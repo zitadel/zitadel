@@ -17,6 +17,7 @@ import {
   ApplicationSearchRequest,
   ApplicationSearchResponse,
   ApplicationUpdate,
+  ApplicationView,
   AuthGrantSearchRequest,
   AuthGrantSearchResponse,
   ChangeOrgMemberRequest,
@@ -35,10 +36,12 @@ import {
   OrgDomainSearchRequest,
   OrgDomainSearchResponse,
   OrgID,
+  OrgIamPolicy,
   OrgMember,
   OrgMemberRoles,
   OrgMemberSearchRequest,
   OrgMemberSearchResponse,
+  OrgView,
   PasswordAgePolicy,
   PasswordAgePolicyCreate,
   PasswordAgePolicyID,
@@ -82,6 +85,7 @@ import {
   ProjectMemberSearchResponse,
   ProjectRole,
   ProjectRoleAdd,
+  ProjectRoleAddBulk,
   ProjectRoleChange,
   ProjectRoleRemove,
   ProjectRoleSearchRequest,
@@ -92,6 +96,7 @@ import {
   ProjectUserGrantID,
   ProjectUserGrantSearchRequest,
   ProjectUserGrantUpdate,
+  ProjectView,
   RemoveOrgDomainRequest,
   RemoveOrgMemberRequest,
   SetPasswordNotificationRequest,
@@ -109,10 +114,14 @@ import {
   UserEmailView,
   UserGrant,
   UserGrantCreate,
+  UserGrantCreateBulk,
   UserGrantID,
+  UserGrantRemoveBulk,
   UserGrantSearchRequest,
   UserGrantSearchResponse,
   UserGrantUpdate,
+  UserGrantUpdateBulk,
+  UserGrantView,
   UserID,
   UserPhone,
   UserPhoneView,
@@ -432,15 +441,15 @@ export class ManagementServiceClient {
     request: OrgID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: Org) => void
-  ): grpcWeb.ClientReadableStream<Org>;
+               response: OrgView) => void
+  ): grpcWeb.ClientReadableStream<OrgView>;
 
   getOrgByDomainGlobal(
     request: OrgDomain,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: Org) => void
-  ): grpcWeb.ClientReadableStream<Org>;
+               response: OrgView) => void
+  ): grpcWeb.ClientReadableStream<OrgView>;
 
   deactivateOrg(
     request: OrgID,
@@ -476,6 +485,13 @@ export class ManagementServiceClient {
     callback: (err: grpcWeb.Error,
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  getMyOrgIamPolicy(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: OrgIamPolicy) => void
+  ): grpcWeb.ClientReadableStream<OrgIamPolicy>;
 
   getOrgMemberRoles(
     request: google_protobuf_empty_pb.Empty,
@@ -523,8 +539,8 @@ export class ManagementServiceClient {
     request: ProjectID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: Project) => void
-  ): grpcWeb.ClientReadableStream<Project>;
+               response: ProjectView) => void
+  ): grpcWeb.ClientReadableStream<ProjectView>;
 
   createProject(
     request: ProjectCreateRequest,
@@ -617,6 +633,13 @@ export class ManagementServiceClient {
                response: ProjectRole) => void
   ): grpcWeb.ClientReadableStream<ProjectRole>;
 
+  bulkAddProjectRole(
+    request: ProjectRoleAddBulk,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
   changeProjectRole(
     request: ProjectRoleChange,
     metadata: grpcWeb.Metadata | undefined,
@@ -642,8 +665,8 @@ export class ManagementServiceClient {
     request: ApplicationID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: Application) => void
-  ): grpcWeb.ClientReadableStream<Application>;
+               response: ApplicationView) => void
+  ): grpcWeb.ClientReadableStream<ApplicationView>;
 
   createOIDCApplication(
     request: OIDCApplicationCreate,
@@ -705,8 +728,8 @@ export class ManagementServiceClient {
     request: ProjectGrantID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: ProjectGrant) => void
-  ): grpcWeb.ClientReadableStream<ProjectGrant>;
+               response: ProjectGrantView) => void
+  ): grpcWeb.ClientReadableStream<ProjectGrantView>;
 
   createProjectGrant(
     request: ProjectGrantCreate,
@@ -789,8 +812,8 @@ export class ManagementServiceClient {
     request: UserGrantID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: UserGrant) => void
-  ): grpcWeb.ClientReadableStream<UserGrant>;
+               response: UserGrantView) => void
+  ): grpcWeb.ClientReadableStream<UserGrantView>;
 
   createUserGrant(
     request: UserGrantCreate,
@@ -827,6 +850,27 @@ export class ManagementServiceClient {
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
+  bulkCreateUserGrant(
+    request: UserGrantCreateBulk,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  bulkUpdateUserGrant(
+    request: UserGrantUpdateBulk,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  bulkRemoveUserGrant(
+    request: UserGrantRemoveBulk,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
   searchProjectUserGrants(
     request: ProjectUserGrantSearchRequest,
     metadata: grpcWeb.Metadata | undefined,
@@ -838,8 +882,8 @@ export class ManagementServiceClient {
     request: ProjectUserGrantID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: UserGrant) => void
-  ): grpcWeb.ClientReadableStream<UserGrant>;
+               response: UserGrantView) => void
+  ): grpcWeb.ClientReadableStream<UserGrantView>;
 
   createProjectUserGrant(
     request: UserGrantCreate,
@@ -880,8 +924,8 @@ export class ManagementServiceClient {
     request: ProjectGrantUserGrantID,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: UserGrant) => void
-  ): grpcWeb.ClientReadableStream<UserGrant>;
+               response: UserGrantView) => void
+  ): grpcWeb.ClientReadableStream<UserGrantView>;
 
   createProjectGrantUserGrant(
     request: ProjectGrantUserGrantCreate,
@@ -1143,12 +1187,12 @@ export class ManagementServicePromiseClient {
   getOrgByID(
     request: OrgID,
     metadata?: grpcWeb.Metadata
-  ): Promise<Org>;
+  ): Promise<OrgView>;
 
   getOrgByDomainGlobal(
     request: OrgDomain,
     metadata?: grpcWeb.Metadata
-  ): Promise<Org>;
+  ): Promise<OrgView>;
 
   deactivateOrg(
     request: OrgID,
@@ -1174,6 +1218,11 @@ export class ManagementServicePromiseClient {
     request: RemoveOrgDomainRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
+
+  getMyOrgIamPolicy(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<OrgIamPolicy>;
 
   getOrgMemberRoles(
     request: google_protobuf_empty_pb.Empty,
@@ -1208,7 +1257,7 @@ export class ManagementServicePromiseClient {
   projectByID(
     request: ProjectID,
     metadata?: grpcWeb.Metadata
-  ): Promise<Project>;
+  ): Promise<ProjectView>;
 
   createProject(
     request: ProjectCreateRequest,
@@ -1275,6 +1324,11 @@ export class ManagementServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<ProjectRole>;
 
+  bulkAddProjectRole(
+    request: ProjectRoleAddBulk,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
   changeProjectRole(
     request: ProjectRoleChange,
     metadata?: grpcWeb.Metadata
@@ -1293,7 +1347,7 @@ export class ManagementServicePromiseClient {
   applicationByID(
     request: ApplicationID,
     metadata?: grpcWeb.Metadata
-  ): Promise<Application>;
+  ): Promise<ApplicationView>;
 
   createOIDCApplication(
     request: OIDCApplicationCreate,
@@ -1338,7 +1392,7 @@ export class ManagementServicePromiseClient {
   projectGrantByID(
     request: ProjectGrantID,
     metadata?: grpcWeb.Metadata
-  ): Promise<ProjectGrant>;
+  ): Promise<ProjectGrantView>;
 
   createProjectGrant(
     request: ProjectGrantCreate,
@@ -1398,7 +1452,7 @@ export class ManagementServicePromiseClient {
   userGrantByID(
     request: UserGrantID,
     metadata?: grpcWeb.Metadata
-  ): Promise<UserGrant>;
+  ): Promise<UserGrantView>;
 
   createUserGrant(
     request: UserGrantCreate,
@@ -1425,6 +1479,21 @@ export class ManagementServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
 
+  bulkCreateUserGrant(
+    request: UserGrantCreateBulk,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
+  bulkUpdateUserGrant(
+    request: UserGrantUpdateBulk,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
+  bulkRemoveUserGrant(
+    request: UserGrantRemoveBulk,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
   searchProjectUserGrants(
     request: ProjectUserGrantSearchRequest,
     metadata?: grpcWeb.Metadata
@@ -1433,7 +1502,7 @@ export class ManagementServicePromiseClient {
   projectUserGrantByID(
     request: ProjectUserGrantID,
     metadata?: grpcWeb.Metadata
-  ): Promise<UserGrant>;
+  ): Promise<UserGrantView>;
 
   createProjectUserGrant(
     request: UserGrantCreate,
@@ -1463,7 +1532,7 @@ export class ManagementServicePromiseClient {
   projectGrantUserGrantByID(
     request: ProjectGrantUserGrantID,
     metadata?: grpcWeb.Metadata
-  ): Promise<UserGrant>;
+  ): Promise<UserGrantView>;
 
   createProjectGrantUserGrant(
     request: ProjectGrantUserGrantCreate,
