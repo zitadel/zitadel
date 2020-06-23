@@ -93,7 +93,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 validators.push(Validators.pattern(/[0-9]/g));
             }
             if (this.policy.hasSymbol) {
-              validators.push(Validators.pattern(/[^a-z0-9]/gi));;
+                validators.push(Validators.pattern(/[^a-z0-9]/gi));
             }
 
             this.passwordForm = this.fb.group({
