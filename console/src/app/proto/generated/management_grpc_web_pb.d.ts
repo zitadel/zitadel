@@ -18,13 +18,13 @@ import {
   ApplicationSearchResponse,
   ApplicationUpdate,
   ApplicationView,
-  AuthGrantSearchRequest,
-  AuthGrantSearchResponse,
   ChangeOrgMemberRequest,
   ChangeRequest,
   Changes,
   ClientSecret,
   CreateUserRequest,
+  Domain,
+  Email,
   GrantedProjectSearchRequest,
   Iam,
   MultiFactors,
@@ -35,7 +35,6 @@ import {
   OrgDomain,
   OrgDomainSearchRequest,
   OrgDomainSearchResponse,
-  OrgID,
   OrgIamPolicy,
   OrgMember,
   OrgMemberRoles,
@@ -110,7 +109,6 @@ import {
   UserAddress,
   UserAddressView,
   UserEmail,
-  UserEmailID,
   UserEmailView,
   UserGrant,
   UserGrantCreate,
@@ -172,7 +170,7 @@ export class ManagementServiceClient {
   ): grpcWeb.ClientReadableStream<UserView>;
 
   getUserByEmailGlobal(
-    request: UserEmailID,
+    request: Email,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
                response: UserView) => void
@@ -437,29 +435,29 @@ export class ManagementServiceClient {
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
-  getOrgByID(
-    request: OrgID,
+  getMyOrg(
+    request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
                response: OrgView) => void
   ): grpcWeb.ClientReadableStream<OrgView>;
 
   getOrgByDomainGlobal(
-    request: OrgDomain,
+    request: Domain,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
                response: OrgView) => void
   ): grpcWeb.ClientReadableStream<OrgView>;
 
-  deactivateOrg(
-    request: OrgID,
+  deactivateMyOrg(
+    request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
                response: Org) => void
   ): grpcWeb.ClientReadableStream<Org>;
 
-  reactivateOrg(
-    request: OrgID,
+  reactivateMyOrg(
+    request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
                response: Org) => void
@@ -955,13 +953,6 @@ export class ManagementServiceClient {
                response: UserGrant) => void
   ): grpcWeb.ClientReadableStream<UserGrant>;
 
-  searchAuthGrant(
-    request: AuthGrantSearchRequest,
-    metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
-               response: AuthGrantSearchResponse) => void
-  ): grpcWeb.ClientReadableStream<AuthGrantSearchResponse>;
-
 }
 
 export class ManagementServicePromiseClient {
@@ -995,7 +986,7 @@ export class ManagementServicePromiseClient {
   ): Promise<UserView>;
 
   getUserByEmailGlobal(
-    request: UserEmailID,
+    request: Email,
     metadata?: grpcWeb.Metadata
   ): Promise<UserView>;
 
@@ -1184,23 +1175,23 @@ export class ManagementServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
 
-  getOrgByID(
-    request: OrgID,
+  getMyOrg(
+    request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
   ): Promise<OrgView>;
 
   getOrgByDomainGlobal(
-    request: OrgDomain,
+    request: Domain,
     metadata?: grpcWeb.Metadata
   ): Promise<OrgView>;
 
-  deactivateOrg(
-    request: OrgID,
+  deactivateMyOrg(
+    request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
   ): Promise<Org>;
 
-  reactivateOrg(
-    request: OrgID,
+  reactivateMyOrg(
+    request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
   ): Promise<Org>;
 
@@ -1553,11 +1544,6 @@ export class ManagementServicePromiseClient {
     request: ProjectGrantUserGrantID,
     metadata?: grpcWeb.Metadata
   ): Promise<UserGrant>;
-
-  searchAuthGrant(
-    request: AuthGrantSearchRequest,
-    metadata?: grpcWeb.Metadata
-  ): Promise<AuthGrantSearchResponse>;
 
 }
 

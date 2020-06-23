@@ -193,19 +193,19 @@ export namespace UserID {
   }
 }
 
-export class UserEmailID extends jspb.Message {
+export class Email extends jspb.Message {
   getEmail(): string;
   setEmail(value: string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): UserEmailID.AsObject;
-  static toObject(includeInstance: boolean, msg: UserEmailID): UserEmailID.AsObject;
-  static serializeBinaryToWriter(message: UserEmailID, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): UserEmailID;
-  static deserializeBinaryFromReader(message: UserEmailID, reader: jspb.BinaryReader): UserEmailID;
+  toObject(includeInstance?: boolean): Email.AsObject;
+  static toObject(includeInstance: boolean, msg: Email): Email.AsObject;
+  static serializeBinaryToWriter(message: Email, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Email;
+  static deserializeBinaryFromReader(message: Email, reader: jspb.BinaryReader): Email;
 }
 
-export namespace UserEmailID {
+export namespace Email {
   export type AsObject = {
     email: string,
   }
@@ -1862,6 +1862,24 @@ export namespace OrgView {
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     name: string,
     sequence: number,
+  }
+}
+
+export class Domain extends jspb.Message {
+  getDomain(): string;
+  setDomain(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Domain.AsObject;
+  static toObject(includeInstance: boolean, msg: Domain): Domain.AsObject;
+  static serializeBinaryToWriter(message: Domain, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Domain;
+  static deserializeBinaryFromReader(message: Domain, reader: jspb.BinaryReader): Domain;
+}
+
+export namespace Domain {
+  export type AsObject = {
+    domain: string,
   }
 }
 
@@ -4773,132 +4791,6 @@ export namespace ProjectGrantUserGrantSearchRequest {
   }
 }
 
-export class AuthGrantSearchRequest extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getSortingColumn(): AuthGrantSearchKey;
-  setSortingColumn(value: AuthGrantSearchKey): void;
-
-  getAsc(): boolean;
-  setAsc(value: boolean): void;
-
-  getQueriesList(): Array<AuthGrantSearchQuery>;
-  setQueriesList(value: Array<AuthGrantSearchQuery>): void;
-  clearQueriesList(): void;
-  addQueries(value?: AuthGrantSearchQuery, index?: number): AuthGrantSearchQuery;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrantSearchRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrantSearchRequest): AuthGrantSearchRequest.AsObject;
-  static serializeBinaryToWriter(message: AuthGrantSearchRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrantSearchRequest;
-  static deserializeBinaryFromReader(message: AuthGrantSearchRequest, reader: jspb.BinaryReader): AuthGrantSearchRequest;
-}
-
-export namespace AuthGrantSearchRequest {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    sortingColumn: AuthGrantSearchKey,
-    asc: boolean,
-    queriesList: Array<AuthGrantSearchQuery.AsObject>,
-  }
-}
-
-export class AuthGrantSearchQuery extends jspb.Message {
-  getKey(): AuthGrantSearchKey;
-  setKey(value: AuthGrantSearchKey): void;
-
-  getMethod(): SearchMethod;
-  setMethod(value: SearchMethod): void;
-
-  getValue(): string;
-  setValue(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrantSearchQuery.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrantSearchQuery): AuthGrantSearchQuery.AsObject;
-  static serializeBinaryToWriter(message: AuthGrantSearchQuery, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrantSearchQuery;
-  static deserializeBinaryFromReader(message: AuthGrantSearchQuery, reader: jspb.BinaryReader): AuthGrantSearchQuery;
-}
-
-export namespace AuthGrantSearchQuery {
-  export type AsObject = {
-    key: AuthGrantSearchKey,
-    method: SearchMethod,
-    value: string,
-  }
-}
-
-export class AuthGrantSearchResponse extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getTotalResult(): number;
-  setTotalResult(value: number): void;
-
-  getResultList(): Array<AuthGrant>;
-  setResultList(value: Array<AuthGrant>): void;
-  clearResultList(): void;
-  addResult(value?: AuthGrant, index?: number): AuthGrant;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrantSearchResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrantSearchResponse): AuthGrantSearchResponse.AsObject;
-  static serializeBinaryToWriter(message: AuthGrantSearchResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrantSearchResponse;
-  static deserializeBinaryFromReader(message: AuthGrantSearchResponse, reader: jspb.BinaryReader): AuthGrantSearchResponse;
-}
-
-export namespace AuthGrantSearchResponse {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    totalResult: number,
-    resultList: Array<AuthGrant.AsObject>,
-  }
-}
-
-export class AuthGrant extends jspb.Message {
-  getOrgid(): string;
-  setOrgid(value: string): void;
-
-  getProjectid(): string;
-  setProjectid(value: string): void;
-
-  getUserid(): string;
-  setUserid(value: string): void;
-
-  getRolesList(): Array<string>;
-  setRolesList(value: Array<string>): void;
-  clearRolesList(): void;
-  addRoles(value: string, index?: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrant.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrant): AuthGrant.AsObject;
-  static serializeBinaryToWriter(message: AuthGrant, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrant;
-  static deserializeBinaryFromReader(message: AuthGrant, reader: jspb.BinaryReader): AuthGrant;
-}
-
-export namespace AuthGrant {
-  export type AsObject = {
-    orgid: string,
-    projectid: string,
-    userid: string,
-    rolesList: Array<string>,
-  }
-}
-
 export enum UserState { 
   USERSTATE_UNSPECIFIED = 0,
   USERSTATE_ACTIVE = 1,
@@ -5059,10 +4951,4 @@ export enum UserGrantSearchKey {
   USERGRANTSEARCHKEY_USER_ID = 2,
   USERGRANTSEARCHKEY_ORG_ID = 3,
   USERGRANTSEARCHKEY_ROLE_KEY = 4,
-}
-export enum AuthGrantSearchKey { 
-  AUTHGRANTSEARCHKEY_UNSPECIFIED = 0,
-  AUTHGRANTSEARCHKEY_ORG_ID = 1,
-  AUTHGRANTSEARCHKEY_PROJECT_ID = 2,
-  AUTHGRANTSEARCHKEY_USER_ID = 3,
 }
