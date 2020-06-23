@@ -2,12 +2,14 @@ package grpc
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
 func (s *Server) SearchUserGrants(ctx context.Context, in *UserGrantSearchRequest) (*UserGrantSearchResponse, error) {
 	request := userGrantSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
 	response, err := s.usergrant.SearchUserGrants(ctx, request)
 	if err != nil {
 		return nil, err
@@ -15,12 +17,12 @@ func (s *Server) SearchUserGrants(ctx context.Context, in *UserGrantSearchReques
 	return userGrantSearchResponseFromModel(response), nil
 }
 
-func (s *Server) UserGrantByID(ctx context.Context, request *UserGrantID) (*UserGrant, error) {
+func (s *Server) UserGrantByID(ctx context.Context, request *UserGrantID) (*UserGrantView, error) {
 	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantViewFromModel(user), nil
 }
 
 func (s *Server) CreateUserGrant(ctx context.Context, in *UserGrantCreate) (*UserGrant, error) {
@@ -30,6 +32,7 @@ func (s *Server) CreateUserGrant(ctx context.Context, in *UserGrantCreate) (*Use
 	}
 	return usergrantFromModel(user), nil
 }
+
 func (s *Server) UpdateUserGrant(ctx context.Context, in *UserGrantUpdate) (*UserGrant, error) {
 	user, err := s.usergrant.ChangeUserGrant(ctx, userGrantUpdateToModel(in))
 	if err != nil {
@@ -57,16 +60,31 @@ func (s *Server) RemoveUserGrant(ctx context.Context, in *UserGrantID) (*empty.E
 	return &empty.Empty{}, err
 }
 
+func (s *Server) BulkCreateUserGrant(ctx context.Context, in *UserGrantCreateBulk) (*empty.Empty, error) {
+	err := s.usergrant.BulkAddUserGrant(ctx, userGrantCreateBulkToModel(in)...)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) BulkUpdateUserGrant(ctx context.Context, in *UserGrantUpdateBulk) (*empty.Empty, error) {
+	err := s.usergrant.BulkChangeUserGrant(ctx, userGrantUpdateBulkToModel(in)...)
+	return &empty.Empty{}, err
+}
+
+func (s *Server) BulkRemoveUserGrant(ctx context.Context, in *UserGrantRemoveBulk) (*empty.Empty, error) {
+	err := s.usergrant.BulkRemoveUserGrant(ctx, userGrantRemoveBulkToModel(in)...)
+	return &empty.Empty{}, err
+}
+
 func (s *Server) SearchProjectUserGrants(ctx context.Context, request *ProjectUserGrantSearchRequest) (*UserGrantSearchResponse, error) {
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-8jdSw", "Not implemented")
 }
 
-func (s *Server) ProjectUserGrantByID(ctx context.Context, request *ProjectUserGrantID) (*UserGrant, error) {
+func (s *Server) ProjectUserGrantByID(ctx context.Context, request *ProjectUserGrantID) (*UserGrantView, error) {
 	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantViewFromModel(user), nil
 }
 
 func (s *Server) CreateProjectUserGrant(ctx context.Context, in *UserGrantCreate) (*UserGrant, error) {
@@ -104,12 +122,12 @@ func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, request *Proj
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-32sFs", "Not implemented")
 }
 
-func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *ProjectGrantUserGrantID) (*UserGrant, error) {
+func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *ProjectGrantUserGrantID) (*UserGrantView, error) {
 	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
 	if err != nil {
 		return nil, err
 	}
-	return usergrantFromModel(user), nil
+	return userGrantViewFromModel(user), nil
 }
 
 func (s *Server) CreateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantCreate) (*UserGrant, error) {

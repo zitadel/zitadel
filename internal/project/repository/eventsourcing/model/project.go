@@ -127,7 +127,7 @@ func (p *Project) AppendEvent(event *es_models.Event) error {
 		return p.appendChangeOIDCConfigEvent(event)
 	case ProjectGrantAdded:
 		return p.appendAddGrantEvent(event)
-	case ProjectGrantChanged:
+	case ProjectGrantChanged, ProjectGrantCascadeChanged:
 		return p.appendChangeGrantEvent(event)
 	case ProjectGrantDeactivated:
 		return p.appendGrantStateEvent(event, model.PROJECTGRANTSTATE_INACTIVE)

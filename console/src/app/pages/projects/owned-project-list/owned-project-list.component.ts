@@ -41,7 +41,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         new MatTableDataSource<ProjectView.AsObject>();
 
     public ownedProjectList: ProjectView.AsObject[] = [];
-    public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'type', 'state', 'creationDate', 'changeDate'];
+    public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate'];
     public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);

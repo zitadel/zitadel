@@ -95,7 +95,7 @@ func releasedUniqueUserGrantAggregate(ctx context.Context, aggCreator *es_models
 	return aggregate.SetPrecondition(UserGrantUniqueQuery(grant.ResourceOwner, grant.ProjectID, grant.UserID), isEventValidation(aggregate, model.UserGrantReleased)), nil
 }
 
-func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant) func(ctx context.Context) (*es_models.Aggregate, error) {
+func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant, cascade bool) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if grant == nil {
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-osl8x", "grant should not be nil")
@@ -105,7 +105,10 @@ func UserGrantChangedAggregate(aggCreator *es_models.AggregateCreator, existing 
 			return nil, err
 		}
 		changes := existing.Changes(grant)
-		return agg.AppendEvent(model.UserGrantChanged, changes)
+		if !cascade {
+			return agg.AppendEvent(model.UserGrantChanged, changes)
+		}
+		return agg.AppendEvent(model.UserGrantCascadeChanged, changes)
 	}
 }
 
@@ -135,7 +138,7 @@ func UserGrantReactivatedAggregate(aggCreator *es_models.AggregateCreator, exist
 	}
 }
 
-func UserGrantRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant) ([]*es_models.Aggregate, error) {
+func UserGrantRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.UserGrant, grant *model.UserGrant, cascade bool) ([]*es_models.Aggregate, error) {
 	if grant == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo21s", "grant should not be nil")
 	}
@@ -143,7 +146,11 @@ func UserGrantRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggreg
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.UserGrantRemoved, nil)
+	eventType := model.UserGrantRemoved
+	if cascade {
+		eventType = model.UserGrantCascadeRemoved
+	}
+	agg, err = agg.AppendEvent(eventType, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -196,37 +203,43 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 				project.AppendEvent(event)
 			}
 		}
-		if existsOrg && existsUser && checkProjectConditions(resourceOwner, grant, project) {
-			return nil
+		if !existsOrg {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "org doesn't exist")
 		}
-		return errors.ThrowPreconditionFailed(nil, "EVENT-3OfIm", "conditions not met")
+		if !existsUser {
+			return errors.ThrowPreconditionFailed(nil, "EVENT-Sl8uS", "user doesn't exist")
+		}
+		if err := checkProjectConditions(resourceOwner, grant, project); err != nil {
+			return err
+		}
+		return nil
 	}
 }
 
-func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) bool {
+func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) error {
 	if project.State == int32(proj_model.PROJECTSTATE_REMOVED) {
-		return false
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Lxp0s", "project doesn't exist")
 	}
 	if resourceOwner == project.ResourceOwner {
 		return checkIfProjectHasRoles(grant.RoleKeys, project.Roles)
 	}
 
-	if _, projectGrant := proj_es_model.GetProjectGrantByResourceOwner(project.Grants, resourceOwner); projectGrant != nil {
+	if _, projectGrant := proj_es_model.GetProjectGrantByOrgID(project.Grants, resourceOwner); projectGrant != nil {
 		return checkIfProjectGrantHasRoles(grant.RoleKeys, projectGrant.RoleKeys)
 	}
-	return false
+	return nil
 }
 
-func checkIfProjectHasRoles(roles []string, existing []*proj_es_model.ProjectRole) bool {
+func checkIfProjectHasRoles(roles []string, existing []*proj_es_model.ProjectRole) error {
 	for _, roleKey := range roles {
 		if _, role := proj_es_model.GetProjectRole(existing, roleKey); role == nil {
-			return false
+			return errors.ThrowPreconditionFailedf(nil, "EVENT-Lxp0s", "project doesn't have role %v", roleKey)
 		}
 	}
-	return true
+	return nil
 }
 
-func checkIfProjectGrantHasRoles(roles []string, existing []string) bool {
+func checkIfProjectGrantHasRoles(roles []string, existing []string) error {
 	roleExists := false
 	for _, roleKey := range roles {
 		for _, existingRoleKey := range existing {
@@ -236,8 +249,8 @@ func checkIfProjectGrantHasRoles(roles []string, existing []string) bool {
 			}
 		}
 		if !roleExists {
-			return false
+			return errors.ThrowPreconditionFailed(nil, "EVENT-LSpwi", "project grant doesn't have role")
 		}
 	}
-	return true
+	return nil
 }

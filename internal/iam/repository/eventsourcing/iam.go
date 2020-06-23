@@ -9,7 +9,7 @@ import (
 
 func IamByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0soe4", "id should be filled")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-0soe4", "Errors.Iam.IDMissing")
 	}
 	return IamQuery(latestSequence).
 		AggregateIDFilter(id), nil
@@ -23,14 +23,14 @@ func IamQuery(latestSequence uint64) *es_models.SearchQuery {
 
 func IamAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, iam *model.Iam) (*es_models.Aggregate, error) {
 	if iam == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo04e", "existing iam should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-lo04e", "Errors.Internal")
 	}
 	return aggCreator.NewAggregate(ctx, iam.AggregateID, model.IamAggregate, model.IamVersion, iam.Sequence)
 }
 
 func IamAggregateOverwriteContext(ctx context.Context, aggCreator *es_models.AggregateCreator, iam *model.Iam, resourceOwnerID string, userID string) (*es_models.Aggregate, error) {
 	if iam == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "existing iam should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dis83", "Errors.Internal")
 	}
 
 	return aggCreator.NewAggregate(ctx, iam.AggregateID, model.IamAggregate, model.IamVersion, iam.Sequence, es_models.OverwriteResourceOwner(resourceOwnerID), es_models.OverwriteEditorUser(userID))
@@ -60,7 +60,7 @@ func IamSetupDoneAggregate(aggCreator *es_models.AggregateCreator, iam *model.Ia
 func IamSetGlobalOrgAggregate(aggCreator *es_models.AggregateCreator, iam *model.Iam, globalOrg string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if globalOrg == "" {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8siwa", "globalOrg must be set")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-8siwa", "Errors.Iam.GlobalOrgMissing")
 		}
 		agg, err := IamAggregate(ctx, aggCreator, iam)
 		if err != nil {
@@ -73,7 +73,7 @@ func IamSetGlobalOrgAggregate(aggCreator *es_models.AggregateCreator, iam *model
 func IamSetIamProjectAggregate(aggCreator *es_models.AggregateCreator, iam *model.Iam, projectID string) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if projectID == "" {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sjuw3", "projectID must be set")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-sjuw3", "Errors.Iam.IamProjectIDMisisng")
 		}
 		agg, err := IamAggregate(ctx, aggCreator, iam)
 		if err != nil {
@@ -86,7 +86,7 @@ func IamSetIamProjectAggregate(aggCreator *es_models.AggregateCreator, iam *mode
 func IamMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, member *model.IamMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9sope", "member should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9sope", "Errors.Internal")
 		}
 		agg, err := IamAggregate(ctx, aggCreator, existing)
 		if err != nil {
@@ -99,7 +99,7 @@ func IamMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *m
 func IamMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, member *model.IamMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-38skf", "member should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-38skf", "Errors.Internal")
 		}
 
 		agg, err := IamAggregate(ctx, aggCreator, existing)
@@ -113,7 +113,7 @@ func IamMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existing 
 func IamMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, member *model.IamMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-90lsw", "member should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-90lsw", "Errors.Internal")
 		}
 		agg, err := IamAggregate(ctx, aggCreator, existing)
 		if err != nil {

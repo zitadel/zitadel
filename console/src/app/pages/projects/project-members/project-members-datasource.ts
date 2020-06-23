@@ -1,7 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { Project, ProjectMember, ProjectMemberSearchResponse, ProjectType } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectMemberSearchResponse, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 
 /**
@@ -19,7 +19,7 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         super();
     }
 
-    public loadMembers(project: Project.AsObject,
+    public loadMembers(project: ProjectView.AsObject,
         projectType: ProjectType,
         pageIndex: number, pageSize: number, grantId?: string, sortDirection?: string): void {
         const offset = pageIndex * pageSize;
@@ -28,9 +28,9 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         // TODO
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
             projectType === ProjectType.PROJECTTYPE_OWNED ?
-                this.projectService.SearchProjectMembers(project.id, pageSize, offset) :
+                this.projectService.SearchProjectMembers(project.projectId, pageSize, offset) :
                 projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
-                    this.projectService.SearchProjectGrantMembers(project.id,
+                    this.projectService.SearchProjectGrantMembers(project.projectId,
                         grantId, pageSize, offset) : undefined;
         if (promise) {
             from(promise).pipe(

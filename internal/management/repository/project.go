@@ -7,7 +7,7 @@ import (
 )
 
 type ProjectRepository interface {
-	ProjectByID(ctx context.Context, id string) (*model.Project, error)
+	ProjectByID(ctx context.Context, id string) (*model.ProjectView, error)
 	CreateProject(ctx context.Context, name string) (*model.Project, error)
 	UpdateProject(ctx context.Context, project *model.Project) (*model.Project, error)
 	DeactivateProject(ctx context.Context, id string) (*model.Project, error)
@@ -16,7 +16,7 @@ type ProjectRepository interface {
 	SearchProjectGrants(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
 	ProjectGrantViewByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
 
-	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMember, error)
+	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMemberView, error)
 	AddProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)
 	ChangeProjectMember(ctx context.Context, member *model.ProjectMember) (*model.ProjectMember, error)
 	RemoveProjectMember(ctx context.Context, projectID, userID string) error
@@ -28,8 +28,9 @@ type ProjectRepository interface {
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
 	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*model.ProjectChanges, error)
+	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 
-	ApplicationByID(ctx context.Context, projectID, appID string) (*model.Application, error)
+	ApplicationByID(ctx context.Context, appID string) (*model.ApplicationView, error)
 	AddApplication(ctx context.Context, app *model.Application) (*model.Application, error)
 	ChangeApplication(ctx context.Context, app *model.Application) (*model.Application, error)
 	DeactivateApplication(ctx context.Context, projectID, appID string) (*model.Application, error)
@@ -40,15 +41,15 @@ type ProjectRepository interface {
 	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
 	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*model.ApplicationChanges, error)
 
-	ProjectGrantByID(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
-	AddProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
-	ChangeProjectGrant(ctx context.Context, app *model.ProjectGrant) (*model.ProjectGrant, error)
+	ProjectGrantByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
+	AddProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)
+	ChangeProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)
 	DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	ReactivateProjectGrant(ctx context.Context, projectID, grantID string) (*model.ProjectGrant, error)
 	RemoveProjectGrant(ctx context.Context, projectID, grantID string) error
 	SearchProjectGrantMembers(ctx context.Context, request *model.ProjectGrantMemberSearchRequest) (*model.ProjectGrantMemberSearchResponse, error)
 
-	ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (*model.ProjectGrantMember, error)
+	ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectGrantMemberView, error)
 	AddProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
 	ChangeProjectGrantMember(ctx context.Context, member *model.ProjectGrantMember) (*model.ProjectGrantMember, error)
 	RemoveProjectGrantMember(ctx context.Context, projectID, grantID, userID string) error

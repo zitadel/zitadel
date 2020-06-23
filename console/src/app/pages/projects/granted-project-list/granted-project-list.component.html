@@ -1,7 +1,3 @@
-<app-granted-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
-    [items]="grantedProjectList" (newClicked)="addProject()">
-</app-granted-project-grid>
-
 <div *ngIf="!grid" class="view-toggle">
     <button (click)="grid = true" mat-icon-button>
         <i matTooltip="show grid view" class="las la-th-large"></i>
@@ -75,13 +71,6 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.STATE' | translate }} </th>
                 <td mat-cell *matCellDef="let project"><span
                         *ngIf="project.state">{{'PROJECT.STATE.'+project.state | translate}}</span></td>
-            </ng-container>
-
-            <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.TYPE' | translate }} </th>
-                <td mat-cell *matCellDef="let project">
-                    <span *ngIf="project.type !== undefined">{{'PROJECT.TYPE.'+project.type | translate}}</span>
-                </td>
             </ng-container>
 
             <ng-container matColumnDef="creationDate">

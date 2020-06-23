@@ -10,7 +10,3 @@ type PasswordLockoutPolicy struct {
 	MaxAttempts         uint64
 	ShowLockOutFailures bool
 }
-
-func (p *PasswordLockoutPolicy) IsValid() bool {
-	return p.Description != ""
-}

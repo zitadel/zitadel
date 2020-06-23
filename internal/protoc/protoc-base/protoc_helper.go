@@ -65,6 +65,7 @@ func Run(generator ProtocGenerator) {
 	}
 
 	registry := descriptor.NewRegistry()
+	registry.SetAllowDeleteBody(true)
 	if err = registry.Load(req); err != nil {
 		glog.Fatal(err)
 	}

@@ -1,13 +1,13 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
-	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 )
 
 func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
@@ -34,8 +34,8 @@ func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, err
 	user := new(model.UserView)
 	loginNameQuery := &model.UserSearchQuery{
 		Key:    usr_model.USERSEARCHKEY_LOGIN_NAMES,
-		Method: global_model.SEARCHMETHOD_EQUALS_IN_ARRAY,
-		Value:  pq.Array([]string{loginName}),
+		Method: global_model.SEARCHMETHOD_LIST_CONTAINS,
+		Value:  loginName,
 	}
 	query := view.PrepareGetByQuery(table, loginNameQuery)
 	err := query(db, user)

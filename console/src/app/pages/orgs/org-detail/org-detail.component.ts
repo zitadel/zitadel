@@ -2,7 +2,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -17,7 +16,6 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./org-detail.component.scss'],
 })
 export class OrgDetailComponent implements OnInit, OnDestroy {
-    public orgId: string = '';
     public org!: Org.AsObject;
 
     public dataSource: MatTableDataSource<OrgMember.AsObject> = new MatTableDataSource<OrgMember.AsObject>();
@@ -34,23 +32,20 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
     constructor(
         public translate: TranslateService,
-        private route: ActivatedRoute,
         private orgService: OrgService,
         private toast: ToastService,
     ) { }
 
     public ngOnInit(): void {
-        this.subscription = this.route.params.subscribe(params => this.getData(params));
+        this.getData();
     }
 
     public ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
 
-    private async getData({ id }: Params): Promise<void> {
-        this.orgId = id;
-
-        this.orgService.GetOrgById(this.orgId).then((org: Org) => {
+    private async getData(): Promise<void> {
+        this.orgService.GetMyOrg().then((org: Org) => {
             this.org = org.toObject();
         }).catch(error => {
             this.toast.showError(error.message);
@@ -64,15 +59,15 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
     public changeState(event: MatButtonToggleChange | any): void {
         if (event.value === OrgState.ORGSTATE_ACTIVE) {
-            this.orgService.ReactivateOrg(this.orgId).then(() => {
+            this.orgService.ReactivateMyOrg().then(() => {
                 this.toast.showInfo('Reactivated Org');
-            }).catch(error => {
+            }).catch((error) => {
                 this.toast.showError(error.message);
             });
         } else if (event.value === OrgState.ORGSTATE_INACTIVE) {
-            this.orgService.DeactivateOrg(this.orgId).then(() => {
+            this.orgService.DeactivateMyOrg().then(() => {
                 this.toast.showInfo('Deactivated Org');
-            }).catch(error => {
+            }).catch((error) => {
                 this.toast.showError(error.message);
             });
         }

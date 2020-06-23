@@ -4,12 +4,12 @@
 
     <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
-    <span *ngIf="!loading && !profile">No user</span>
+    <span *ngIf="!loading && !user">No user</span>
 
-    <div class="col" *ngIf="profile">
+    <div class="col" *ngIf="user">
         <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
             description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
-            <app-detail-form [genders]="genders" [languages]="languages" [profile]="profile"
+            <app-detail-form [genders]="genders" [languages]="languages" [profile]="user"
                 (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
             </app-detail-form>
         </app-card>
@@ -19,7 +19,7 @@
         </app-card>
     </div>
 
-    <app-card *ngIf="profile" title="{{'USER.PASSWORD.TITLE' | translate}}"
+    <app-card *ngIf="user" title="{{'USER.PASSWORD.TITLE' | translate}}"
         description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">
         <form *ngIf="passwordForm" [formGroup]="passwordForm" (ngSubmit)="setPassword()">
             <div class="content">
@@ -65,7 +65,7 @@
         </form>
     </app-card>
 
-    <app-card *ngIf="profile" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
+    <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
         description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
         <div class="method-col">
             <div class="method-row">
@@ -148,9 +148,9 @@
         </div>
     </app-card>
 
-    <app-auth-user-mfa *ngIf="profile" [profile]="profile"></app-auth-user-mfa>
+    <app-auth-user-mfa *ngIf="user" [profile]="user"></app-auth-user-mfa>
 
-    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="profile">
+    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="user">
         <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
             <div class="content">
                 <mat-form-field class="formfield">

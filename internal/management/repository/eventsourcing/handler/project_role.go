@@ -56,7 +56,7 @@ func (p *ProjectRole) Process(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		err = p.removeRoleFromAllResourceowners(event, role)
+		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence)
 	case es_model.ProjectGrantAdded:
 		return p.addGrantRoles(event)
 	case es_model.ProjectGrantChanged:

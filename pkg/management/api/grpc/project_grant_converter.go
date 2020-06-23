@@ -51,17 +51,40 @@ func projectGrantSearchRequestsToModel(request *ProjectGrantSearchRequest) *proj
 	return &proj_model.ProjectGrantViewSearchRequest{
 		Offset:  request.Offset,
 		Limit:   request.Limit,
-		Queries: projectGrantSearchQueriesToModel(request.ProjectId),
+		Queries: projectGrantSearchQueriesToModel(request.ProjectId, request.Queries),
 	}
 }
 
-func projectGrantSearchQueriesToModel(projectId string) []*proj_model.ProjectGrantViewSearchQuery {
+func projectGrantSearchQueriesToModel(projectId string, queries []*ProjectGrantSearchQuery) []*proj_model.ProjectGrantViewSearchQuery {
 	converted := make([]*proj_model.ProjectGrantViewSearchQuery, 0)
-	return append(converted, &proj_model.ProjectGrantViewSearchQuery{
+	converted = append(converted, &proj_model.ProjectGrantViewSearchQuery{
 		Key:    proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID,
 		Method: model.SEARCHMETHOD_EQUALS,
 		Value:  projectId,
 	})
+	for i, query := range queries {
+		converted[i] = projectGrantSearchQueryToModel(query)
+	}
+	return converted
+}
+
+func projectGrantSearchQueryToModel(query *ProjectGrantSearchQuery) *proj_model.ProjectGrantViewSearchQuery {
+	return &proj_model.ProjectGrantViewSearchQuery{
+		Key:    projectGrantViewSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func projectGrantViewSearchKeyToModel(key ProjectGrantSearchKey) proj_model.ProjectGrantViewSearchKey {
+	switch key {
+	case ProjectGrantSearchKey_PROJECTGRANTSEARCHKEY_PROJECT_NAME:
+		return proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID
+	case ProjectGrantSearchKey_PROJECTGRANTSEARCHKEY_ROLE_KEY:
+		return proj_model.GRANTEDPROJECTSEARCHKEY_ROLE_KEYS
+	default:
+		return proj_model.GRANTEDPROJECTSEARCHKEY_UNSPECIFIED
+	}
 }
 
 func projectGrantSearchResponseFromModel(response *proj_model.ProjectGrantViewSearchResponse) *ProjectGrantSearchResponse {
@@ -89,16 +112,18 @@ func projectGrantFromGrantedProjectModel(project *proj_model.ProjectGrantView) *
 	logging.Log("GRPC-sope3").OnError(err).Debug("unable to parse timestamp")
 
 	return &ProjectGrantView{
-		ProjectId:        project.ProjectID,
-		State:            projectGrantStateFromProjectStateModel(project.State),
-		CreationDate:     creationDate,
-		ChangeDate:       changeDate,
-		ProjectName:      project.Name,
-		Sequence:         project.Sequence,
-		GrantedOrgId:     project.OrgID,
-		GrantedOrgName:   project.OrgName,
-		GrantedOrgDomain: project.OrgDomain,
-		Id:               project.GrantID,
+		ProjectId:         project.ProjectID,
+		State:             projectGrantStateFromProjectStateModel(project.State),
+		CreationDate:      creationDate,
+		ChangeDate:        changeDate,
+		ProjectName:       project.Name,
+		Sequence:          project.Sequence,
+		GrantedOrgId:      project.OrgID,
+		GrantedOrgName:    project.OrgName,
+		Id:                project.GrantID,
+		RoleKeys:          project.GrantedRoleKeys,
+		ResourceOwner:     project.ResourceOwner,
+		ResourceOwnerName: project.ResourceOwnerName,
 	}
 }
 

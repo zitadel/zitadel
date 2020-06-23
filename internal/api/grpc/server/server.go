@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"net"
 
 	"github.com/caos/logging"
@@ -16,18 +17,18 @@ const (
 
 type Server interface {
 	GRPCPort() string
-	GRPCServer() (*grpc.Server, error)
+	GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error)
 }
 
-func StartServer(ctx context.Context, s Server) {
+func StartServer(ctx context.Context, s Server, defaults systemdefaults.SystemDefaults) {
 	port := grpcPort(s.GRPCPort())
 	listener := http.CreateListener(port)
-	server := createGrpcServer(s)
+	server := createGrpcServer(s, defaults)
 	serveServer(ctx, server, listener, port)
 }
 
-func createGrpcServer(s Server) *grpc.Server {
-	grpcServer, err := s.GRPCServer()
+func createGrpcServer(s Server, defaults systemdefaults.SystemDefaults) *grpc.Server {
+	grpcServer, err := s.GRPCServer(defaults)
 	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to create grpc server")
 	return grpcServer
 }

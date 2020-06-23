@@ -25,10 +25,6 @@ type PasswordComplexityPolicy struct {
 	HasSymbol    bool
 }
 
-func (p *PasswordComplexityPolicy) IsValid() bool {
-	return p.Description != ""
-}
-
 func (p *PasswordComplexityPolicy) Check(password string) error {
 	if p.MinLength != 0 && uint64(len(password)) < p.MinLength {
 		return caos_errs.ThrowInvalidArgument(nil, "MODEL-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength")

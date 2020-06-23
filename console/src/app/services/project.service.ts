@@ -45,6 +45,7 @@ import {
     ProjectSearchResponse,
     ProjectUpdateRequest,
     ProjectUserGrantSearchRequest,
+    ProjectView,
     UserGrant,
     UserGrantCreate,
     UserGrantSearchQuery,
@@ -104,7 +105,7 @@ export class ProjectService {
         );
     }
 
-    public async GetProjectById(projectId: string): Promise<Project> {
+    public async GetProjectById(projectId: string): Promise<ProjectView> {
         const req = new ProjectID();
         req.setId(projectId);
         return await this.request(
@@ -135,10 +136,10 @@ export class ProjectService {
         );
     }
 
-    public async UpdateProject(project: Project.AsObject): Promise<Project> {
+    public async UpdateProject(id: string, name: string): Promise<Project> {
         const req = new ProjectUpdateRequest();
-        req.setName(project.name);
-        req.setId(project.id);
+        req.setName(name);
+        req.setId(id);
         return await this.request(
             c => c.updateProject,
             req,

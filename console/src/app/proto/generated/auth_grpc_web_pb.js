@@ -2084,5 +2084,85 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyZitadelPe
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.MyPermissions>}
+ */
+const methodDescriptor_AuthService_GetMyProjectPermissions = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.auth.api.v1.AuthService/GetMyProjectPermissions',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.caos.zitadel.auth.api.v1.MyPermissions,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.MyPermissions.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.MyPermissions>}
+ */
+const methodInfo_AuthService_GetMyProjectPermissions = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.auth.api.v1.MyPermissions,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.MyPermissions.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.MyPermissions)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.MyPermissions>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyProjectPermissions =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyProjectPermissions',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyProjectPermissions,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.MyPermissions>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyProjectPermissions =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyProjectPermissions',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyProjectPermissions);
+};
+
+
 module.exports = proto.caos.zitadel.auth.api.v1;
 

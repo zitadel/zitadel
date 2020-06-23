@@ -16,10 +16,10 @@ type Config struct {
 	GRPC grpc_util.Config
 }
 
-func Start(ctx context.Context, conf Config, authZRepo *authz_repo.EsRepository, authZ auth.Config, sd systemdefaults.SystemDefaults, repo repository.Repository) {
-	grpcServer := grpc.StartServer(conf.GRPC.ToServerConfig(), authZRepo, authZ, sd, repo)
+func Start(ctx context.Context, conf Config, authZRepo *authz_repo.EsRepository, authZ auth.Config, defaults systemdefaults.SystemDefaults, repo repository.Repository) {
+	grpcServer := grpc.StartServer(conf.GRPC.ToServerConfig(), authZRepo, authZ, defaults, repo)
 	grpcGateway := grpc.StartGateway(conf.GRPC.ToGatewayConfig())
 
-	server.StartServer(ctx, grpcServer)
+	server.StartServer(ctx, grpcServer, defaults)
 	server.StartGateway(ctx, grpcGateway)
 }

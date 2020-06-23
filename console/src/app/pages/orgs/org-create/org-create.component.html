@@ -47,6 +47,13 @@
                 <div class="content">
                     <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
                     <mat-form-field class="formfield">
+                      <mat-label>{{ 'USER.PROFILE.USERNAME' | translate }}</mat-label>
+                      <input matInput formControlName="userName" required />
+                      <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
+                        {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                      </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.PROFILE.EMAIL' | translate }}</mat-label>
                         <input matInput formControlName="email" required />
                         <mat-error *ngIf="email?.invalid && email?.errors?.required">

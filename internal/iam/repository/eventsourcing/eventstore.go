@@ -120,14 +120,14 @@ func (es *IamEventstore) SetIamProject(ctx context.Context, iamID, iamProjectID 
 
 func (es *IamEventstore) AddIamMember(ctx context.Context, member *iam_model.IamMember) (*iam_model.IamMember, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-89osr", "UserID and Roles are required")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-89osr", "Errors.Iam.MemberInvalid")
 	}
 	existing, err := es.IamByID(ctx, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
 	if _, m := existing.GetMember(member.UserID); m != nil {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "User is already member of this Iam")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-idke6", "Errors.Iam.MemberAlreadyExisting")
 	}
 	repoIam := model.IamFromModel(existing)
 	repoMember := model.IamMemberFromModel(member)
@@ -142,19 +142,19 @@ func (es *IamEventstore) AddIamMember(ctx context.Context, member *iam_model.Iam
 	if _, m := model.GetIamMember(repoIam.Members, member.UserID); m != nil {
 		return model.IamMemberToModel(m), nil
 	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-s90pw", "Could not find member in list")
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-s90pw", "Errors.Internal")
 }
 
 func (es *IamEventstore) ChangeIamMember(ctx context.Context, member *iam_model.IamMember) (*iam_model.IamMember, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s9ipe", "UserID and Roles are required")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s9ipe", "Errors.Iam.MemberInvalid")
 	}
 	existing, err := es.IamByID(ctx, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
 	if _, m := existing.GetMember(member.UserID); m == nil {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s7ucs", "User is not member of this project")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-s7ucs", "Errors.Iam.MemberNotExisting")
 	}
 	repoIam := model.IamFromModel(existing)
 	repoMember := model.IamMemberFromModel(member)
@@ -166,19 +166,19 @@ func (es *IamEventstore) ChangeIamMember(ctx context.Context, member *iam_model.
 	if _, m := model.GetIamMember(repoIam.Members, member.UserID); m != nil {
 		return model.IamMemberToModel(m), nil
 	}
-	return nil, caos_errs.ThrowInternal(nil, "EVENT-29cws", "Could not find member in list")
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-29cws", "Errors.Internal")
 }
 
 func (es *IamEventstore) RemoveIamMember(ctx context.Context, member *iam_model.IamMember) error {
 	if member.UserID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0pors", "UserID and Roles are required")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-0pors", "Errors.Iam.MemberInvalid")
 	}
 	existing, err := es.IamByID(ctx, member.AggregateID)
 	if err != nil {
 		return err
 	}
 	if _, m := existing.GetMember(member.UserID); m == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "User is not member of this project")
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-29skr", "Errors.Iam.MemberNotExisting")
 	}
 	repoIam := model.IamFromModel(existing)
 	repoMember := model.IamMemberFromModel(member)

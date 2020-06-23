@@ -48,12 +48,12 @@ func (s *Server) SearchProjects(ctx context.Context, in *ProjectSearchRequest) (
 	return projectSearchResponseFromModel(response), nil
 }
 
-func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, error) {
+func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*ProjectView, error) {
 	project, err := s.project.ProjectByID(ctx, id.Id)
 	if err != nil {
 		return nil, err
 	}
-	return projectFromModel(project), nil
+	return projectViewFromModel(project), nil
 }
 
 func (s *Server) SearchGrantedProjects(ctx context.Context, in *GrantedProjectSearchRequest) (*ProjectGrantSearchResponse, error) {
@@ -81,6 +81,12 @@ func (s *Server) AddProjectRole(ctx context.Context, in *ProjectRoleAdd) (*Proje
 	}
 	return projectRoleFromModel(role), nil
 }
+
+func (s *Server) BulkAddProjectRole(ctx context.Context, in *ProjectRoleAddBulk) (*empty.Empty, error) {
+	err := s.project.BulkAddProjectRole(ctx, projectRoleAddBulkToModel(in))
+	return &empty.Empty{}, err
+}
+
 func (s *Server) ChangeProjectRole(ctx context.Context, in *ProjectRoleChange) (*ProjectRole, error) {
 	role, err := s.project.ChangeProjectRole(ctx, projectRoleChangeToModel(in))
 	if err != nil {

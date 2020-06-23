@@ -19,6 +19,7 @@ const (
 	UserGrantKeyResourceOwner = "resource_owner"
 	UserGrantKeyState         = "state"
 	UserGrantKeyOrgName       = "org_name"
+	UserGrantKeyRole          = "role_keys"
 )
 
 type UserGrantView struct {
@@ -98,7 +99,7 @@ func (g *UserGrantView) AppendEvent(event *models.Event) (err error) {
 		g.CreationDate = event.CreationDate
 		g.setRootData(event)
 		err = g.setData(event)
-	case es_model.UserGrantChanged:
+	case es_model.UserGrantChanged, es_model.UserGrantCascadeChanged:
 		err = g.setData(event)
 	case es_model.UserGrantDeactivated:
 		g.State = int32(model.USERGRANTSTATE_INACTIVE)

@@ -31,9 +31,9 @@ func GetProjectGrant(grants []*ProjectGrant, id string) (int, *ProjectGrant) {
 	return -1, nil
 }
 
-func GetProjectGrantByResourceOwner(grants []*ProjectGrant, resourceOwner string) (int, *ProjectGrant) {
+func GetProjectGrantByOrgID(grants []*ProjectGrant, resourceOwner string) (int, *ProjectGrant) {
 	for i, g := range grants {
-		if g.ResourceOwner == resourceOwner {
+		if g.GrantedOrgID == resourceOwner {
 			return i, g
 		}
 	}

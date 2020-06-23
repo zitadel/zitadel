@@ -39,6 +39,20 @@ func ProjectGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.Pr
 	return projects, nil
 }
 
+func ProjectGrantsByProjectIDAndRoleKey(db *gorm.DB, table, projectID, roleKey string) ([]*model.ProjectGrantView, error) {
+	projects := make([]*model.ProjectGrantView, 0)
+	queries := []*proj_model.ProjectGrantViewSearchQuery{
+		&proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_ROLE_KEYS, Value: roleKey, Method: global_model.SEARCHMETHOD_LIST_CONTAINS},
+	}
+	query := view.PrepareSearchQuery(table, model.ProjectGrantSearchRequest{Queries: queries})
+	_, err := query(db, &projects)
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
 func SearchProjectGrants(db *gorm.DB, table string, req *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, int, error) {
 	projects := make([]*model.ProjectGrantView, 0)
 	query := view.PrepareSearchQuery(table, model.ProjectGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
@@ -55,6 +69,6 @@ func PutProjectGrant(db *gorm.DB, table string, project *model.ProjectGrantView)
 }
 
 func DeleteProjectGrant(db *gorm.DB, table, grantID string) error {
-	delete := view.PrepareDeleteByKey(table, model.ProjectSearchKey(proj_model.PROJECTGRANTMEMBERSEARCHKEY_GRANT_ID), grantID)
+	delete := view.PrepareDeleteByKey(table, model.ProjectSearchKey(proj_model.GRANTEDPROJECTSEARCHKEY_GRANTID), grantID)
 	return delete(db)
 }

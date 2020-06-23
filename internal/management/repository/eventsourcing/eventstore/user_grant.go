@@ -14,8 +14,12 @@ type UserGrantRepo struct {
 	View            *view.View
 }
 
-func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrant, error) {
-	return repo.UserGrantEvents.UserGrantByID(ctx, grantID)
+func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrantView, error) {
+	grant, err := repo.View.UserGrantByID(grantID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantToModel(grant), nil
 }
 
 func (repo *UserGrantRepo) AddUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*grant_model.UserGrant, error) {
@@ -36,6 +40,18 @@ func (repo *UserGrantRepo) ReactivateUserGrant(ctx context.Context, grantID stri
 
 func (repo *UserGrantRepo) RemoveUserGrant(ctx context.Context, grantID string) error {
 	return repo.UserGrantEvents.RemoveUserGrant(ctx, grantID)
+}
+
+func (repo *UserGrantRepo) BulkAddUserGrant(ctx context.Context, grants ...*grant_model.UserGrant) error {
+	return repo.UserGrantEvents.AddUserGrants(ctx, grants...)
+}
+
+func (repo *UserGrantRepo) BulkChangeUserGrant(ctx context.Context, grants ...*grant_model.UserGrant) error {
+	return repo.UserGrantEvents.ChangeUserGrants(ctx, grants...)
+}
+
+func (repo *UserGrantRepo) BulkRemoveUserGrant(ctx context.Context, grantIDs ...string) error {
+	return repo.UserGrantEvents.RemoveUserGrants(ctx, grantIDs...)
 }
 
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
