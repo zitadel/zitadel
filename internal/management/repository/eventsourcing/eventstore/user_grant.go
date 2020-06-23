@@ -14,8 +14,12 @@ type UserGrantRepo struct {
 	View            *view.View
 }
 
-func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrant, error) {
-	return repo.UserGrantEvents.UserGrantByID(ctx, grantID)
+func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrantView, error) {
+	grant, err := repo.View.UserGrantByID(grantID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantToModel(grant), nil
 }
 
 func (repo *UserGrantRepo) AddUserGrant(ctx context.Context, grant *grant_model.UserGrant) (*grant_model.UserGrant, error) {

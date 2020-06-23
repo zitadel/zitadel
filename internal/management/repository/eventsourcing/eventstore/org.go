@@ -20,12 +20,15 @@ type OrgRepository struct {
 	Roles []string
 }
 
-func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
-	org := org_model.NewOrg(id)
-	return repo.OrgEventstore.OrgByID(ctx, org)
+func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
+	org, err := repo.View.OrgByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return model.OrgToModel(org), nil
 }
 
-func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.Org, error) {
+func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error) {
 	verifiedDomain, err := repo.View.VerifiedOrgDomain(domain)
 	if err != nil {
 		return nil, err
@@ -82,9 +85,12 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	return changes, nil
 }
 
-func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (member *org_model.OrgMember, err error) {
-	member = org_model.NewOrgMember(orgID, userID)
-	return repo.OrgEventstore.OrgMemberByIDs(ctx, member)
+func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (*org_model.OrgMemberView, error) {
+	member, err := repo.View.OrgMemberByIDs(orgID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.OrgMemberToModel(member), nil
 }
 
 func (repo *OrgRepository) AddMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {

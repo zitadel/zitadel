@@ -48,12 +48,12 @@ func (s *Server) SearchProjects(ctx context.Context, in *ProjectSearchRequest) (
 	return projectSearchResponseFromModel(response), nil
 }
 
-func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*Project, error) {
+func (s *Server) ProjectByID(ctx context.Context, id *ProjectID) (*ProjectView, error) {
 	project, err := s.project.ProjectByID(ctx, id.Id)
 	if err != nil {
 		return nil, err
 	}
-	return projectFromModel(project), nil
+	return projectViewFromModel(project), nil
 }
 
 func (s *Server) SearchGrantedProjects(ctx context.Context, in *GrantedProjectSearchRequest) (*ProjectGrantSearchResponse, error) {

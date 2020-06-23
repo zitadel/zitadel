@@ -6,7 +6,7 @@ import (
 )
 
 type UserGrantRepository interface {
-	UserGrantByID(ctx context.Context, grantID string) (*model.UserGrant, error)
+	UserGrantByID(ctx context.Context, grantID string) (*model.UserGrantView, error)
 	AddUserGrant(ctx context.Context, grant *model.UserGrant) (*model.UserGrant, error)
 	ChangeUserGrant(ctx context.Context, grant *model.UserGrant) (*model.UserGrant, error)
 	DeactivateUserGrant(ctx context.Context, grantID string) (*model.UserGrant, error)

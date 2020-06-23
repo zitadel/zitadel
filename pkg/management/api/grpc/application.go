@@ -14,12 +14,12 @@ func (s *Server) SearchApplications(ctx context.Context, in *ApplicationSearchRe
 	return applicationSearchResponseFromModel(response), nil
 }
 
-func (s *Server) ApplicationByID(ctx context.Context, in *ApplicationID) (*Application, error) {
-	app, err := s.project.ApplicationByID(ctx, in.ProjectId, in.Id)
+func (s *Server) ApplicationByID(ctx context.Context, in *ApplicationID) (*ApplicationView, error) {
+	app, err := s.project.ApplicationByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return appFromModel(app), nil
+	return applicationViewFromModel(app), nil
 }
 
 func (s *Server) CreateOIDCApplication(ctx context.Context, in *OIDCApplicationCreate) (*Application, error) {
