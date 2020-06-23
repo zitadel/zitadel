@@ -19,33 +19,6 @@
     "application/grpc"
   ],
   "paths": {
-    "/authgrants/_search": {
-      "post": {
-        "summary": "Grant",
-        "operationId": "SearchAuthGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1AuthGrantSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1AuthGrantSearchRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/global/orgs/_bydomain": {
       "get": {
         "summary": "search a organisation by its domain overall organisations",
@@ -3802,99 +3775,6 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
-        }
-      }
-    },
-    "v1AuthGrant": {
-      "type": "object",
-      "properties": {
-        "orgId": {
-          "type": "string"
-        },
-        "projectId": {
-          "type": "string"
-        },
-        "userId": {
-          "type": "string"
-        },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "v1AuthGrantSearchKey": {
-      "type": "string",
-      "enum": [
-        "AUTHGRANTSEARCHKEY_UNSPECIFIED",
-        "AUTHGRANTSEARCHKEY_ORG_ID",
-        "AUTHGRANTSEARCHKEY_PROJECT_ID",
-        "AUTHGRANTSEARCHKEY_USER_ID"
-      ],
-      "default": "AUTHGRANTSEARCHKEY_UNSPECIFIED"
-    },
-    "v1AuthGrantSearchQuery": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "$ref": "#/definitions/v1AuthGrantSearchKey"
-        },
-        "method": {
-          "$ref": "#/definitions/v1SearchMethod"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
-    "v1AuthGrantSearchRequest": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "sorting_column": {
-          "$ref": "#/definitions/v1AuthGrantSearchKey"
-        },
-        "asc": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1AuthGrantSearchQuery"
-          }
-        }
-      }
-    },
-    "v1AuthGrantSearchResponse": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "total_result": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1AuthGrant"
-          }
         }
       }
     },

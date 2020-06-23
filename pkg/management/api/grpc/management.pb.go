@@ -14371,7 +14371,7 @@ var file_management_proto_rawDesc = []byte{
 	0x45, 0x41, 0x52, 0x43, 0x48, 0x4b, 0x45, 0x59, 0x5f, 0x50, 0x52, 0x4f, 0x4a, 0x45, 0x43, 0x54,
 	0x5f, 0x49, 0x44, 0x10, 0x02, 0x12, 0x1e, 0x0a, 0x1a, 0x41, 0x55, 0x54, 0x48, 0x47, 0x52, 0x41,
 	0x4e, 0x54, 0x53, 0x45, 0x41, 0x52, 0x43, 0x48, 0x4b, 0x45, 0x59, 0x5f, 0x55, 0x53, 0x45, 0x52,
-	0x5f, 0x49, 0x44, 0x10, 0x03, 0x32, 0x8b, 0xa6, 0x01, 0x0a, 0x11, 0x4d, 0x61, 0x6e, 0x61, 0x67,
+	0x5f, 0x49, 0x44, 0x10, 0x03, 0x32, 0xe6, 0xa4, 0x01, 0x0a, 0x11, 0x4d, 0x61, 0x6e, 0x61, 0x67,
 	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4b, 0x0a, 0x07,
 	0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x7a, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a,
@@ -15689,31 +15689,21 @@ var file_management_proto_rawDesc = []byte{
 	0x61, 0x63, 0x74, 0x69, 0x76, 0x61, 0x74, 0x65, 0x3a, 0x01, 0x2a, 0x82, 0xb5, 0x18, 0x30, 0x0a,
 	0x1e, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x2e, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x2e, 0x75,
 	0x73, 0x65, 0x72, 0x2e, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x2e, 0x77, 0x72, 0x69, 0x74, 0x65, 0x12,
-	0x0e, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x49, 0x64, 0x12,
-	0xa2, 0x01, 0x0a, 0x0f, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x41, 0x75, 0x74, 0x68, 0x47, 0x72,
-	0x61, 0x6e, 0x74, 0x12, 0x36, 0x2e, 0x63, 0x61, 0x6f, 0x73, 0x2e, 0x7a, 0x69, 0x74, 0x61, 0x64,
-	0x65, 0x6c, 0x2e, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x61, 0x70,
-	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74, 0x68, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x53, 0x65,
-	0x61, 0x72, 0x63, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x37, 0x2e, 0x63, 0x61,
-	0x6f, 0x73, 0x2e, 0x7a, 0x69, 0x74, 0x61, 0x64, 0x65, 0x6c, 0x2e, 0x6d, 0x61, 0x6e, 0x61, 0x67,
-	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x75, 0x74,
-	0x68, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x1e, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x18, 0x22, 0x13, 0x2f, 0x61,
-	0x75, 0x74, 0x68, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x73, 0x2f, 0x5f, 0x73, 0x65, 0x61, 0x72, 0x63,
-	0x68, 0x3a, 0x01, 0x2a, 0x42, 0xc9, 0x01, 0x5a, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x61, 0x6f, 0x73, 0x2f, 0x7a, 0x69, 0x74, 0x61, 0x64, 0x65, 0x6c,
-	0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x92, 0x41, 0x94, 0x01, 0x12, 0x47, 0x0a, 0x0e,
-	0x4d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x20, 0x41, 0x50, 0x49, 0x22, 0x30,
-	0x12, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x73, 0x3a, 0x2f, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x61, 0x6f, 0x73, 0x2f, 0x7a, 0x69, 0x74, 0x61, 0x64, 0x65,
-	0x6c, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x6d, 0x65, 0x6e, 0x74,
-	0x32, 0x03, 0x30, 0x2e, 0x31, 0x2a, 0x01, 0x02, 0x32, 0x10, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x6a, 0x73, 0x6f, 0x6e, 0x32, 0x10, 0x61, 0x70, 0x70, 0x6c,
-	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x3a, 0x10, 0x61, 0x70,
-	0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x6a, 0x73, 0x6f, 0x6e, 0x3a, 0x10,
-	0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x67, 0x72, 0x70, 0x63,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x0e, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x49, 0x64, 0x42,
+	0xc9, 0x01, 0x5a, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63,
+	0x61, 0x6f, 0x73, 0x2f, 0x7a, 0x69, 0x74, 0x61, 0x64, 0x65, 0x6c, 0x2f, 0x70, 0x6b, 0x67, 0x2f,
+	0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67,
+	0x72, 0x70, 0x63, 0x92, 0x41, 0x94, 0x01, 0x12, 0x47, 0x0a, 0x0e, 0x4d, 0x61, 0x6e, 0x61, 0x67,
+	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x20, 0x41, 0x50, 0x49, 0x22, 0x30, 0x12, 0x2e, 0x68, 0x74, 0x74,
+	0x70, 0x73, 0x3a, 0x2f, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x63, 0x61, 0x6f, 0x73, 0x2f, 0x7a, 0x69, 0x74, 0x61, 0x64, 0x65, 0x6c, 0x2f, 0x70, 0x6b, 0x67,
+	0x2f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x32, 0x03, 0x30, 0x2e, 0x31,
+	0x2a, 0x01, 0x02, 0x32, 0x10, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x2f, 0x6a, 0x73, 0x6f, 0x6e, 0x32, 0x10, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x3a, 0x10, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x6a, 0x73, 0x6f, 0x6e, 0x3a, 0x10, 0x61, 0x70, 0x70, 0x6c, 0x69,
+	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -16188,127 +16178,125 @@ var file_management_proto_depIdxs = []int32{
 	161, // 277: caos.zitadel.management.api.v1.ManagementService.UpdateProjectGrantUserGrant:input_type -> caos.zitadel.management.api.v1.ProjectGrantUserGrantUpdate
 	159, // 278: caos.zitadel.management.api.v1.ManagementService.DeactivateProjectGrantUserGrant:input_type -> caos.zitadel.management.api.v1.ProjectGrantUserGrantID
 	159, // 279: caos.zitadel.management.api.v1.ManagementService.ReactivateProjectGrantUserGrant:input_type -> caos.zitadel.management.api.v1.ProjectGrantUserGrantID
-	168, // 280: caos.zitadel.management.api.v1.ManagementService.SearchAuthGrant:input_type -> caos.zitadel.management.api.v1.AuthGrantSearchRequest
-	174, // 281: caos.zitadel.management.api.v1.ManagementService.Healthz:output_type -> google.protobuf.Empty
-	174, // 282: caos.zitadel.management.api.v1.ManagementService.Ready:output_type -> google.protobuf.Empty
-	173, // 283: caos.zitadel.management.api.v1.ManagementService.Validate:output_type -> google.protobuf.Struct
-	28,  // 284: caos.zitadel.management.api.v1.ManagementService.GetIam:output_type -> caos.zitadel.management.api.v1.Iam
-	40,  // 285: caos.zitadel.management.api.v1.ManagementService.GetUserByID:output_type -> caos.zitadel.management.api.v1.UserView
-	40,  // 286: caos.zitadel.management.api.v1.ManagementService.GetUserByEmailGlobal:output_type -> caos.zitadel.management.api.v1.UserView
-	43,  // 287: caos.zitadel.management.api.v1.ManagementService.SearchUsers:output_type -> caos.zitadel.management.api.v1.UserSearchResponse
-	37,  // 288: caos.zitadel.management.api.v1.ManagementService.IsUserUnique:output_type -> caos.zitadel.management.api.v1.UniqueUserResponse
-	39,  // 289: caos.zitadel.management.api.v1.ManagementService.CreateUser:output_type -> caos.zitadel.management.api.v1.User
-	39,  // 290: caos.zitadel.management.api.v1.ManagementService.DeactivateUser:output_type -> caos.zitadel.management.api.v1.User
-	39,  // 291: caos.zitadel.management.api.v1.ManagementService.ReactivateUser:output_type -> caos.zitadel.management.api.v1.User
-	39,  // 292: caos.zitadel.management.api.v1.ManagementService.LockUser:output_type -> caos.zitadel.management.api.v1.User
-	39,  // 293: caos.zitadel.management.api.v1.ManagementService.UnlockUser:output_type -> caos.zitadel.management.api.v1.User
-	174, // 294: caos.zitadel.management.api.v1.ManagementService.DeleteUser:output_type -> google.protobuf.Empty
-	30,  // 295: caos.zitadel.management.api.v1.ManagementService.UserChanges:output_type -> caos.zitadel.management.api.v1.Changes
-	30,  // 296: caos.zitadel.management.api.v1.ManagementService.ApplicationChanges:output_type -> caos.zitadel.management.api.v1.Changes
-	30,  // 297: caos.zitadel.management.api.v1.ManagementService.OrgChanges:output_type -> caos.zitadel.management.api.v1.Changes
-	30,  // 298: caos.zitadel.management.api.v1.ManagementService.ProjectChanges:output_type -> caos.zitadel.management.api.v1.Changes
-	45,  // 299: caos.zitadel.management.api.v1.ManagementService.GetUserProfile:output_type -> caos.zitadel.management.api.v1.UserProfileView
-	44,  // 300: caos.zitadel.management.api.v1.ManagementService.UpdateUserProfile:output_type -> caos.zitadel.management.api.v1.UserProfile
-	48,  // 301: caos.zitadel.management.api.v1.ManagementService.GetUserEmail:output_type -> caos.zitadel.management.api.v1.UserEmailView
-	47,  // 302: caos.zitadel.management.api.v1.ManagementService.ChangeUserEmail:output_type -> caos.zitadel.management.api.v1.UserEmail
-	174, // 303: caos.zitadel.management.api.v1.ManagementService.ResendEmailVerificationMail:output_type -> google.protobuf.Empty
-	51,  // 304: caos.zitadel.management.api.v1.ManagementService.GetUserPhone:output_type -> caos.zitadel.management.api.v1.UserPhoneView
-	50,  // 305: caos.zitadel.management.api.v1.ManagementService.ChangeUserPhone:output_type -> caos.zitadel.management.api.v1.UserPhone
-	174, // 306: caos.zitadel.management.api.v1.ManagementService.ResendPhoneVerificationCode:output_type -> google.protobuf.Empty
-	54,  // 307: caos.zitadel.management.api.v1.ManagementService.GetUserAddress:output_type -> caos.zitadel.management.api.v1.UserAddressView
-	53,  // 308: caos.zitadel.management.api.v1.ManagementService.UpdateUserAddress:output_type -> caos.zitadel.management.api.v1.UserAddress
-	56,  // 309: caos.zitadel.management.api.v1.ManagementService.GetUserMfas:output_type -> caos.zitadel.management.api.v1.MultiFactors
-	174, // 310: caos.zitadel.management.api.v1.ManagementService.SendSetPasswordNotification:output_type -> google.protobuf.Empty
-	174, // 311: caos.zitadel.management.api.v1.ManagementService.SetInitialPassword:output_type -> google.protobuf.Empty
-	63,  // 312: caos.zitadel.management.api.v1.ManagementService.GetPasswordComplexityPolicy:output_type -> caos.zitadel.management.api.v1.PasswordComplexityPolicy
-	63,  // 313: caos.zitadel.management.api.v1.ManagementService.CreatePasswordComplexityPolicy:output_type -> caos.zitadel.management.api.v1.PasswordComplexityPolicy
-	63,  // 314: caos.zitadel.management.api.v1.ManagementService.UpdatePasswordComplexityPolicy:output_type -> caos.zitadel.management.api.v1.PasswordComplexityPolicy
-	174, // 315: caos.zitadel.management.api.v1.ManagementService.DeletePasswordComplexityPolicy:output_type -> google.protobuf.Empty
-	67,  // 316: caos.zitadel.management.api.v1.ManagementService.GetPasswordAgePolicy:output_type -> caos.zitadel.management.api.v1.PasswordAgePolicy
-	67,  // 317: caos.zitadel.management.api.v1.ManagementService.CreatePasswordAgePolicy:output_type -> caos.zitadel.management.api.v1.PasswordAgePolicy
-	67,  // 318: caos.zitadel.management.api.v1.ManagementService.UpdatePasswordAgePolicy:output_type -> caos.zitadel.management.api.v1.PasswordAgePolicy
-	174, // 319: caos.zitadel.management.api.v1.ManagementService.DeletePasswordAgePolicy:output_type -> google.protobuf.Empty
-	71,  // 320: caos.zitadel.management.api.v1.ManagementService.GetPasswordLockoutPolicy:output_type -> caos.zitadel.management.api.v1.PasswordLockoutPolicy
-	71,  // 321: caos.zitadel.management.api.v1.ManagementService.CreatePasswordLockoutPolicy:output_type -> caos.zitadel.management.api.v1.PasswordLockoutPolicy
-	71,  // 322: caos.zitadel.management.api.v1.ManagementService.UpdatePasswordLockoutPolicy:output_type -> caos.zitadel.management.api.v1.PasswordLockoutPolicy
-	174, // 323: caos.zitadel.management.api.v1.ManagementService.DeletePasswordLockoutPolicy:output_type -> google.protobuf.Empty
-	77,  // 324: caos.zitadel.management.api.v1.ManagementService.GetMyOrg:output_type -> caos.zitadel.management.api.v1.OrgView
-	77,  // 325: caos.zitadel.management.api.v1.ManagementService.GetOrgByDomainGlobal:output_type -> caos.zitadel.management.api.v1.OrgView
-	76,  // 326: caos.zitadel.management.api.v1.ManagementService.DeactivateMyOrg:output_type -> caos.zitadel.management.api.v1.Org
-	76,  // 327: caos.zitadel.management.api.v1.ManagementService.ReactivateMyOrg:output_type -> caos.zitadel.management.api.v1.Org
-	84,  // 328: caos.zitadel.management.api.v1.ManagementService.SearchMyOrgDomains:output_type -> caos.zitadel.management.api.v1.OrgDomainSearchResponse
-	80,  // 329: caos.zitadel.management.api.v1.ManagementService.AddMyOrgDomain:output_type -> caos.zitadel.management.api.v1.OrgDomain
-	174, // 330: caos.zitadel.management.api.v1.ManagementService.RemoveMyOrgDomain:output_type -> google.protobuf.Empty
-	74,  // 331: caos.zitadel.management.api.v1.ManagementService.GetMyOrgIamPolicy:output_type -> caos.zitadel.management.api.v1.OrgIamPolicy
-	87,  // 332: caos.zitadel.management.api.v1.ManagementService.GetOrgMemberRoles:output_type -> caos.zitadel.management.api.v1.OrgMemberRoles
-	88,  // 333: caos.zitadel.management.api.v1.ManagementService.AddMyOrgMember:output_type -> caos.zitadel.management.api.v1.OrgMember
-	88,  // 334: caos.zitadel.management.api.v1.ManagementService.ChangeMyOrgMember:output_type -> caos.zitadel.management.api.v1.OrgMember
-	174, // 335: caos.zitadel.management.api.v1.ManagementService.RemoveMyOrgMember:output_type -> google.protobuf.Empty
-	92,  // 336: caos.zitadel.management.api.v1.ManagementService.SearchMyOrgMembers:output_type -> caos.zitadel.management.api.v1.OrgMemberSearchResponse
-	98,  // 337: caos.zitadel.management.api.v1.ManagementService.SearchProjects:output_type -> caos.zitadel.management.api.v1.ProjectSearchResponse
-	99,  // 338: caos.zitadel.management.api.v1.ManagementService.ProjectByID:output_type -> caos.zitadel.management.api.v1.ProjectView
-	103, // 339: caos.zitadel.management.api.v1.ManagementService.CreateProject:output_type -> caos.zitadel.management.api.v1.Project
-	103, // 340: caos.zitadel.management.api.v1.ManagementService.UpdateProject:output_type -> caos.zitadel.management.api.v1.Project
-	103, // 341: caos.zitadel.management.api.v1.ManagementService.DeactivateProject:output_type -> caos.zitadel.management.api.v1.Project
-	103, // 342: caos.zitadel.management.api.v1.ManagementService.ReactivateProject:output_type -> caos.zitadel.management.api.v1.Project
-	137, // 343: caos.zitadel.management.api.v1.ManagementService.SearchGrantedProjects:output_type -> caos.zitadel.management.api.v1.ProjectGrantSearchResponse
-	136, // 344: caos.zitadel.management.api.v1.ManagementService.GetGrantedProjectByID:output_type -> caos.zitadel.management.api.v1.ProjectGrantView
-	104, // 345: caos.zitadel.management.api.v1.ManagementService.GetProjectMemberRoles:output_type -> caos.zitadel.management.api.v1.ProjectMemberRoles
-	119, // 346: caos.zitadel.management.api.v1.ManagementService.SearchProjectMembers:output_type -> caos.zitadel.management.api.v1.ProjectMemberSearchResponse
-	105, // 347: caos.zitadel.management.api.v1.ManagementService.AddProjectMember:output_type -> caos.zitadel.management.api.v1.ProjectMember
-	105, // 348: caos.zitadel.management.api.v1.ManagementService.ChangeProjectMember:output_type -> caos.zitadel.management.api.v1.ProjectMember
-	174, // 349: caos.zitadel.management.api.v1.ManagementService.RemoveProjectMember:output_type -> google.protobuf.Empty
-	115, // 350: caos.zitadel.management.api.v1.ManagementService.SearchProjectRoles:output_type -> caos.zitadel.management.api.v1.ProjectRoleSearchResponse
-	112, // 351: caos.zitadel.management.api.v1.ManagementService.AddProjectRole:output_type -> caos.zitadel.management.api.v1.ProjectRole
-	174, // 352: caos.zitadel.management.api.v1.ManagementService.BulkAddProjectRole:output_type -> google.protobuf.Empty
-	112, // 353: caos.zitadel.management.api.v1.ManagementService.ChangeProjectRole:output_type -> caos.zitadel.management.api.v1.ProjectRole
-	174, // 354: caos.zitadel.management.api.v1.ManagementService.RemoveProjectRole:output_type -> google.protobuf.Empty
-	129, // 355: caos.zitadel.management.api.v1.ManagementService.SearchApplications:output_type -> caos.zitadel.management.api.v1.ApplicationSearchResponse
-	128, // 356: caos.zitadel.management.api.v1.ManagementService.ApplicationByID:output_type -> caos.zitadel.management.api.v1.ApplicationView
-	122, // 357: caos.zitadel.management.api.v1.ManagementService.CreateOIDCApplication:output_type -> caos.zitadel.management.api.v1.Application
-	122, // 358: caos.zitadel.management.api.v1.ManagementService.UpdateApplication:output_type -> caos.zitadel.management.api.v1.Application
-	122, // 359: caos.zitadel.management.api.v1.ManagementService.DeactivateApplication:output_type -> caos.zitadel.management.api.v1.Application
-	122, // 360: caos.zitadel.management.api.v1.ManagementService.ReactivateApplication:output_type -> caos.zitadel.management.api.v1.Application
-	174, // 361: caos.zitadel.management.api.v1.ManagementService.RemoveApplication:output_type -> google.protobuf.Empty
-	124, // 362: caos.zitadel.management.api.v1.ManagementService.UpdateApplicationOIDCConfig:output_type -> caos.zitadel.management.api.v1.OIDCConfig
-	127, // 363: caos.zitadel.management.api.v1.ManagementService.RegenerateOIDCClientSecret:output_type -> caos.zitadel.management.api.v1.ClientSecret
-	137, // 364: caos.zitadel.management.api.v1.ManagementService.SearchProjectGrants:output_type -> caos.zitadel.management.api.v1.ProjectGrantSearchResponse
-	136, // 365: caos.zitadel.management.api.v1.ManagementService.ProjectGrantByID:output_type -> caos.zitadel.management.api.v1.ProjectGrantView
-	132, // 366: caos.zitadel.management.api.v1.ManagementService.CreateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
-	132, // 367: caos.zitadel.management.api.v1.ManagementService.UpdateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
-	132, // 368: caos.zitadel.management.api.v1.ManagementService.DeactivateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
-	132, // 369: caos.zitadel.management.api.v1.ManagementService.ReactivateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
-	174, // 370: caos.zitadel.management.api.v1.ManagementService.RemoveProjectGrant:output_type -> google.protobuf.Empty
-	141, // 371: caos.zitadel.management.api.v1.ManagementService.GetProjectGrantMemberRoles:output_type -> caos.zitadel.management.api.v1.ProjectGrantMemberRoles
-	147, // 372: caos.zitadel.management.api.v1.ManagementService.SearchProjectGrantMembers:output_type -> caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse
-	142, // 373: caos.zitadel.management.api.v1.ManagementService.AddProjectGrantMember:output_type -> caos.zitadel.management.api.v1.ProjectGrantMember
-	142, // 374: caos.zitadel.management.api.v1.ManagementService.ChangeProjectGrantMember:output_type -> caos.zitadel.management.api.v1.ProjectGrantMember
-	174, // 375: caos.zitadel.management.api.v1.ManagementService.RemoveProjectGrantMember:output_type -> google.protobuf.Empty
-	163, // 376: caos.zitadel.management.api.v1.ManagementService.SearchUserGrants:output_type -> caos.zitadel.management.api.v1.UserGrantSearchResponse
-	162, // 377: caos.zitadel.management.api.v1.ManagementService.UserGrantByID:output_type -> caos.zitadel.management.api.v1.UserGrantView
-	150, // 378: caos.zitadel.management.api.v1.ManagementService.CreateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 379: caos.zitadel.management.api.v1.ManagementService.UpdateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 380: caos.zitadel.management.api.v1.ManagementService.DeactivateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 381: caos.zitadel.management.api.v1.ManagementService.ReactivateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	174, // 382: caos.zitadel.management.api.v1.ManagementService.RemoveUserGrant:output_type -> google.protobuf.Empty
-	174, // 383: caos.zitadel.management.api.v1.ManagementService.BulkCreateUserGrant:output_type -> google.protobuf.Empty
-	174, // 384: caos.zitadel.management.api.v1.ManagementService.BulkUpdateUserGrant:output_type -> google.protobuf.Empty
-	174, // 385: caos.zitadel.management.api.v1.ManagementService.BulkRemoveUserGrant:output_type -> google.protobuf.Empty
-	163, // 386: caos.zitadel.management.api.v1.ManagementService.SearchProjectUserGrants:output_type -> caos.zitadel.management.api.v1.UserGrantSearchResponse
-	162, // 387: caos.zitadel.management.api.v1.ManagementService.ProjectUserGrantByID:output_type -> caos.zitadel.management.api.v1.UserGrantView
-	150, // 388: caos.zitadel.management.api.v1.ManagementService.CreateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 389: caos.zitadel.management.api.v1.ManagementService.UpdateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 390: caos.zitadel.management.api.v1.ManagementService.DeactivateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 391: caos.zitadel.management.api.v1.ManagementService.ReactivateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	163, // 392: caos.zitadel.management.api.v1.ManagementService.SearchProjectGrantUserGrants:output_type -> caos.zitadel.management.api.v1.UserGrantSearchResponse
-	162, // 393: caos.zitadel.management.api.v1.ManagementService.ProjectGrantUserGrantByID:output_type -> caos.zitadel.management.api.v1.UserGrantView
-	150, // 394: caos.zitadel.management.api.v1.ManagementService.CreateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 395: caos.zitadel.management.api.v1.ManagementService.UpdateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 396: caos.zitadel.management.api.v1.ManagementService.DeactivateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	150, // 397: caos.zitadel.management.api.v1.ManagementService.ReactivateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
-	170, // 398: caos.zitadel.management.api.v1.ManagementService.SearchAuthGrant:output_type -> caos.zitadel.management.api.v1.AuthGrantSearchResponse
-	281, // [281:399] is the sub-list for method output_type
-	163, // [163:281] is the sub-list for method input_type
+	174, // 280: caos.zitadel.management.api.v1.ManagementService.Healthz:output_type -> google.protobuf.Empty
+	174, // 281: caos.zitadel.management.api.v1.ManagementService.Ready:output_type -> google.protobuf.Empty
+	173, // 282: caos.zitadel.management.api.v1.ManagementService.Validate:output_type -> google.protobuf.Struct
+	28,  // 283: caos.zitadel.management.api.v1.ManagementService.GetIam:output_type -> caos.zitadel.management.api.v1.Iam
+	40,  // 284: caos.zitadel.management.api.v1.ManagementService.GetUserByID:output_type -> caos.zitadel.management.api.v1.UserView
+	40,  // 285: caos.zitadel.management.api.v1.ManagementService.GetUserByEmailGlobal:output_type -> caos.zitadel.management.api.v1.UserView
+	43,  // 286: caos.zitadel.management.api.v1.ManagementService.SearchUsers:output_type -> caos.zitadel.management.api.v1.UserSearchResponse
+	37,  // 287: caos.zitadel.management.api.v1.ManagementService.IsUserUnique:output_type -> caos.zitadel.management.api.v1.UniqueUserResponse
+	39,  // 288: caos.zitadel.management.api.v1.ManagementService.CreateUser:output_type -> caos.zitadel.management.api.v1.User
+	39,  // 289: caos.zitadel.management.api.v1.ManagementService.DeactivateUser:output_type -> caos.zitadel.management.api.v1.User
+	39,  // 290: caos.zitadel.management.api.v1.ManagementService.ReactivateUser:output_type -> caos.zitadel.management.api.v1.User
+	39,  // 291: caos.zitadel.management.api.v1.ManagementService.LockUser:output_type -> caos.zitadel.management.api.v1.User
+	39,  // 292: caos.zitadel.management.api.v1.ManagementService.UnlockUser:output_type -> caos.zitadel.management.api.v1.User
+	174, // 293: caos.zitadel.management.api.v1.ManagementService.DeleteUser:output_type -> google.protobuf.Empty
+	30,  // 294: caos.zitadel.management.api.v1.ManagementService.UserChanges:output_type -> caos.zitadel.management.api.v1.Changes
+	30,  // 295: caos.zitadel.management.api.v1.ManagementService.ApplicationChanges:output_type -> caos.zitadel.management.api.v1.Changes
+	30,  // 296: caos.zitadel.management.api.v1.ManagementService.OrgChanges:output_type -> caos.zitadel.management.api.v1.Changes
+	30,  // 297: caos.zitadel.management.api.v1.ManagementService.ProjectChanges:output_type -> caos.zitadel.management.api.v1.Changes
+	45,  // 298: caos.zitadel.management.api.v1.ManagementService.GetUserProfile:output_type -> caos.zitadel.management.api.v1.UserProfileView
+	44,  // 299: caos.zitadel.management.api.v1.ManagementService.UpdateUserProfile:output_type -> caos.zitadel.management.api.v1.UserProfile
+	48,  // 300: caos.zitadel.management.api.v1.ManagementService.GetUserEmail:output_type -> caos.zitadel.management.api.v1.UserEmailView
+	47,  // 301: caos.zitadel.management.api.v1.ManagementService.ChangeUserEmail:output_type -> caos.zitadel.management.api.v1.UserEmail
+	174, // 302: caos.zitadel.management.api.v1.ManagementService.ResendEmailVerificationMail:output_type -> google.protobuf.Empty
+	51,  // 303: caos.zitadel.management.api.v1.ManagementService.GetUserPhone:output_type -> caos.zitadel.management.api.v1.UserPhoneView
+	50,  // 304: caos.zitadel.management.api.v1.ManagementService.ChangeUserPhone:output_type -> caos.zitadel.management.api.v1.UserPhone
+	174, // 305: caos.zitadel.management.api.v1.ManagementService.ResendPhoneVerificationCode:output_type -> google.protobuf.Empty
+	54,  // 306: caos.zitadel.management.api.v1.ManagementService.GetUserAddress:output_type -> caos.zitadel.management.api.v1.UserAddressView
+	53,  // 307: caos.zitadel.management.api.v1.ManagementService.UpdateUserAddress:output_type -> caos.zitadel.management.api.v1.UserAddress
+	56,  // 308: caos.zitadel.management.api.v1.ManagementService.GetUserMfas:output_type -> caos.zitadel.management.api.v1.MultiFactors
+	174, // 309: caos.zitadel.management.api.v1.ManagementService.SendSetPasswordNotification:output_type -> google.protobuf.Empty
+	174, // 310: caos.zitadel.management.api.v1.ManagementService.SetInitialPassword:output_type -> google.protobuf.Empty
+	63,  // 311: caos.zitadel.management.api.v1.ManagementService.GetPasswordComplexityPolicy:output_type -> caos.zitadel.management.api.v1.PasswordComplexityPolicy
+	63,  // 312: caos.zitadel.management.api.v1.ManagementService.CreatePasswordComplexityPolicy:output_type -> caos.zitadel.management.api.v1.PasswordComplexityPolicy
+	63,  // 313: caos.zitadel.management.api.v1.ManagementService.UpdatePasswordComplexityPolicy:output_type -> caos.zitadel.management.api.v1.PasswordComplexityPolicy
+	174, // 314: caos.zitadel.management.api.v1.ManagementService.DeletePasswordComplexityPolicy:output_type -> google.protobuf.Empty
+	67,  // 315: caos.zitadel.management.api.v1.ManagementService.GetPasswordAgePolicy:output_type -> caos.zitadel.management.api.v1.PasswordAgePolicy
+	67,  // 316: caos.zitadel.management.api.v1.ManagementService.CreatePasswordAgePolicy:output_type -> caos.zitadel.management.api.v1.PasswordAgePolicy
+	67,  // 317: caos.zitadel.management.api.v1.ManagementService.UpdatePasswordAgePolicy:output_type -> caos.zitadel.management.api.v1.PasswordAgePolicy
+	174, // 318: caos.zitadel.management.api.v1.ManagementService.DeletePasswordAgePolicy:output_type -> google.protobuf.Empty
+	71,  // 319: caos.zitadel.management.api.v1.ManagementService.GetPasswordLockoutPolicy:output_type -> caos.zitadel.management.api.v1.PasswordLockoutPolicy
+	71,  // 320: caos.zitadel.management.api.v1.ManagementService.CreatePasswordLockoutPolicy:output_type -> caos.zitadel.management.api.v1.PasswordLockoutPolicy
+	71,  // 321: caos.zitadel.management.api.v1.ManagementService.UpdatePasswordLockoutPolicy:output_type -> caos.zitadel.management.api.v1.PasswordLockoutPolicy
+	174, // 322: caos.zitadel.management.api.v1.ManagementService.DeletePasswordLockoutPolicy:output_type -> google.protobuf.Empty
+	77,  // 323: caos.zitadel.management.api.v1.ManagementService.GetMyOrg:output_type -> caos.zitadel.management.api.v1.OrgView
+	77,  // 324: caos.zitadel.management.api.v1.ManagementService.GetOrgByDomainGlobal:output_type -> caos.zitadel.management.api.v1.OrgView
+	76,  // 325: caos.zitadel.management.api.v1.ManagementService.DeactivateMyOrg:output_type -> caos.zitadel.management.api.v1.Org
+	76,  // 326: caos.zitadel.management.api.v1.ManagementService.ReactivateMyOrg:output_type -> caos.zitadel.management.api.v1.Org
+	84,  // 327: caos.zitadel.management.api.v1.ManagementService.SearchMyOrgDomains:output_type -> caos.zitadel.management.api.v1.OrgDomainSearchResponse
+	80,  // 328: caos.zitadel.management.api.v1.ManagementService.AddMyOrgDomain:output_type -> caos.zitadel.management.api.v1.OrgDomain
+	174, // 329: caos.zitadel.management.api.v1.ManagementService.RemoveMyOrgDomain:output_type -> google.protobuf.Empty
+	74,  // 330: caos.zitadel.management.api.v1.ManagementService.GetMyOrgIamPolicy:output_type -> caos.zitadel.management.api.v1.OrgIamPolicy
+	87,  // 331: caos.zitadel.management.api.v1.ManagementService.GetOrgMemberRoles:output_type -> caos.zitadel.management.api.v1.OrgMemberRoles
+	88,  // 332: caos.zitadel.management.api.v1.ManagementService.AddMyOrgMember:output_type -> caos.zitadel.management.api.v1.OrgMember
+	88,  // 333: caos.zitadel.management.api.v1.ManagementService.ChangeMyOrgMember:output_type -> caos.zitadel.management.api.v1.OrgMember
+	174, // 334: caos.zitadel.management.api.v1.ManagementService.RemoveMyOrgMember:output_type -> google.protobuf.Empty
+	92,  // 335: caos.zitadel.management.api.v1.ManagementService.SearchMyOrgMembers:output_type -> caos.zitadel.management.api.v1.OrgMemberSearchResponse
+	98,  // 336: caos.zitadel.management.api.v1.ManagementService.SearchProjects:output_type -> caos.zitadel.management.api.v1.ProjectSearchResponse
+	99,  // 337: caos.zitadel.management.api.v1.ManagementService.ProjectByID:output_type -> caos.zitadel.management.api.v1.ProjectView
+	103, // 338: caos.zitadel.management.api.v1.ManagementService.CreateProject:output_type -> caos.zitadel.management.api.v1.Project
+	103, // 339: caos.zitadel.management.api.v1.ManagementService.UpdateProject:output_type -> caos.zitadel.management.api.v1.Project
+	103, // 340: caos.zitadel.management.api.v1.ManagementService.DeactivateProject:output_type -> caos.zitadel.management.api.v1.Project
+	103, // 341: caos.zitadel.management.api.v1.ManagementService.ReactivateProject:output_type -> caos.zitadel.management.api.v1.Project
+	137, // 342: caos.zitadel.management.api.v1.ManagementService.SearchGrantedProjects:output_type -> caos.zitadel.management.api.v1.ProjectGrantSearchResponse
+	136, // 343: caos.zitadel.management.api.v1.ManagementService.GetGrantedProjectByID:output_type -> caos.zitadel.management.api.v1.ProjectGrantView
+	104, // 344: caos.zitadel.management.api.v1.ManagementService.GetProjectMemberRoles:output_type -> caos.zitadel.management.api.v1.ProjectMemberRoles
+	119, // 345: caos.zitadel.management.api.v1.ManagementService.SearchProjectMembers:output_type -> caos.zitadel.management.api.v1.ProjectMemberSearchResponse
+	105, // 346: caos.zitadel.management.api.v1.ManagementService.AddProjectMember:output_type -> caos.zitadel.management.api.v1.ProjectMember
+	105, // 347: caos.zitadel.management.api.v1.ManagementService.ChangeProjectMember:output_type -> caos.zitadel.management.api.v1.ProjectMember
+	174, // 348: caos.zitadel.management.api.v1.ManagementService.RemoveProjectMember:output_type -> google.protobuf.Empty
+	115, // 349: caos.zitadel.management.api.v1.ManagementService.SearchProjectRoles:output_type -> caos.zitadel.management.api.v1.ProjectRoleSearchResponse
+	112, // 350: caos.zitadel.management.api.v1.ManagementService.AddProjectRole:output_type -> caos.zitadel.management.api.v1.ProjectRole
+	174, // 351: caos.zitadel.management.api.v1.ManagementService.BulkAddProjectRole:output_type -> google.protobuf.Empty
+	112, // 352: caos.zitadel.management.api.v1.ManagementService.ChangeProjectRole:output_type -> caos.zitadel.management.api.v1.ProjectRole
+	174, // 353: caos.zitadel.management.api.v1.ManagementService.RemoveProjectRole:output_type -> google.protobuf.Empty
+	129, // 354: caos.zitadel.management.api.v1.ManagementService.SearchApplications:output_type -> caos.zitadel.management.api.v1.ApplicationSearchResponse
+	128, // 355: caos.zitadel.management.api.v1.ManagementService.ApplicationByID:output_type -> caos.zitadel.management.api.v1.ApplicationView
+	122, // 356: caos.zitadel.management.api.v1.ManagementService.CreateOIDCApplication:output_type -> caos.zitadel.management.api.v1.Application
+	122, // 357: caos.zitadel.management.api.v1.ManagementService.UpdateApplication:output_type -> caos.zitadel.management.api.v1.Application
+	122, // 358: caos.zitadel.management.api.v1.ManagementService.DeactivateApplication:output_type -> caos.zitadel.management.api.v1.Application
+	122, // 359: caos.zitadel.management.api.v1.ManagementService.ReactivateApplication:output_type -> caos.zitadel.management.api.v1.Application
+	174, // 360: caos.zitadel.management.api.v1.ManagementService.RemoveApplication:output_type -> google.protobuf.Empty
+	124, // 361: caos.zitadel.management.api.v1.ManagementService.UpdateApplicationOIDCConfig:output_type -> caos.zitadel.management.api.v1.OIDCConfig
+	127, // 362: caos.zitadel.management.api.v1.ManagementService.RegenerateOIDCClientSecret:output_type -> caos.zitadel.management.api.v1.ClientSecret
+	137, // 363: caos.zitadel.management.api.v1.ManagementService.SearchProjectGrants:output_type -> caos.zitadel.management.api.v1.ProjectGrantSearchResponse
+	136, // 364: caos.zitadel.management.api.v1.ManagementService.ProjectGrantByID:output_type -> caos.zitadel.management.api.v1.ProjectGrantView
+	132, // 365: caos.zitadel.management.api.v1.ManagementService.CreateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
+	132, // 366: caos.zitadel.management.api.v1.ManagementService.UpdateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
+	132, // 367: caos.zitadel.management.api.v1.ManagementService.DeactivateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
+	132, // 368: caos.zitadel.management.api.v1.ManagementService.ReactivateProjectGrant:output_type -> caos.zitadel.management.api.v1.ProjectGrant
+	174, // 369: caos.zitadel.management.api.v1.ManagementService.RemoveProjectGrant:output_type -> google.protobuf.Empty
+	141, // 370: caos.zitadel.management.api.v1.ManagementService.GetProjectGrantMemberRoles:output_type -> caos.zitadel.management.api.v1.ProjectGrantMemberRoles
+	147, // 371: caos.zitadel.management.api.v1.ManagementService.SearchProjectGrantMembers:output_type -> caos.zitadel.management.api.v1.ProjectGrantMemberSearchResponse
+	142, // 372: caos.zitadel.management.api.v1.ManagementService.AddProjectGrantMember:output_type -> caos.zitadel.management.api.v1.ProjectGrantMember
+	142, // 373: caos.zitadel.management.api.v1.ManagementService.ChangeProjectGrantMember:output_type -> caos.zitadel.management.api.v1.ProjectGrantMember
+	174, // 374: caos.zitadel.management.api.v1.ManagementService.RemoveProjectGrantMember:output_type -> google.protobuf.Empty
+	163, // 375: caos.zitadel.management.api.v1.ManagementService.SearchUserGrants:output_type -> caos.zitadel.management.api.v1.UserGrantSearchResponse
+	162, // 376: caos.zitadel.management.api.v1.ManagementService.UserGrantByID:output_type -> caos.zitadel.management.api.v1.UserGrantView
+	150, // 377: caos.zitadel.management.api.v1.ManagementService.CreateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 378: caos.zitadel.management.api.v1.ManagementService.UpdateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 379: caos.zitadel.management.api.v1.ManagementService.DeactivateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 380: caos.zitadel.management.api.v1.ManagementService.ReactivateUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	174, // 381: caos.zitadel.management.api.v1.ManagementService.RemoveUserGrant:output_type -> google.protobuf.Empty
+	174, // 382: caos.zitadel.management.api.v1.ManagementService.BulkCreateUserGrant:output_type -> google.protobuf.Empty
+	174, // 383: caos.zitadel.management.api.v1.ManagementService.BulkUpdateUserGrant:output_type -> google.protobuf.Empty
+	174, // 384: caos.zitadel.management.api.v1.ManagementService.BulkRemoveUserGrant:output_type -> google.protobuf.Empty
+	163, // 385: caos.zitadel.management.api.v1.ManagementService.SearchProjectUserGrants:output_type -> caos.zitadel.management.api.v1.UserGrantSearchResponse
+	162, // 386: caos.zitadel.management.api.v1.ManagementService.ProjectUserGrantByID:output_type -> caos.zitadel.management.api.v1.UserGrantView
+	150, // 387: caos.zitadel.management.api.v1.ManagementService.CreateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 388: caos.zitadel.management.api.v1.ManagementService.UpdateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 389: caos.zitadel.management.api.v1.ManagementService.DeactivateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 390: caos.zitadel.management.api.v1.ManagementService.ReactivateProjectUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	163, // 391: caos.zitadel.management.api.v1.ManagementService.SearchProjectGrantUserGrants:output_type -> caos.zitadel.management.api.v1.UserGrantSearchResponse
+	162, // 392: caos.zitadel.management.api.v1.ManagementService.ProjectGrantUserGrantByID:output_type -> caos.zitadel.management.api.v1.UserGrantView
+	150, // 393: caos.zitadel.management.api.v1.ManagementService.CreateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 394: caos.zitadel.management.api.v1.ManagementService.UpdateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 395: caos.zitadel.management.api.v1.ManagementService.DeactivateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	150, // 396: caos.zitadel.management.api.v1.ManagementService.ReactivateProjectGrantUserGrant:output_type -> caos.zitadel.management.api.v1.UserGrant
+	280, // [280:397] is the sub-list for method output_type
+	163, // [163:280] is the sub-list for method input_type
 	163, // [163:163] is the sub-list for extension type_name
 	163, // [163:163] is the sub-list for extension extendee
 	0,   // [0:163] is the sub-list for field type_name
@@ -18251,8 +18239,6 @@ type ManagementServiceClient interface {
 	// reactivate user grant based on a projectgrant
 	// This request is required that the user authorizations of zitadel can be differentiated
 	ReactivateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantID, opts ...grpc.CallOption) (*UserGrant, error)
-	//Grant
-	SearchAuthGrant(ctx context.Context, in *AuthGrantSearchRequest, opts ...grpc.CallOption) (*AuthGrantSearchResponse, error)
 }
 
 type managementServiceClient struct {
@@ -19316,15 +19302,6 @@ func (c *managementServiceClient) ReactivateProjectGrantUserGrant(ctx context.Co
 	return out, nil
 }
 
-func (c *managementServiceClient) SearchAuthGrant(ctx context.Context, in *AuthGrantSearchRequest, opts ...grpc.CallOption) (*AuthGrantSearchResponse, error) {
-	out := new(AuthGrantSearchResponse)
-	err := c.cc.Invoke(ctx, "/caos.zitadel.management.api.v1.ManagementService/SearchAuthGrant", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ManagementServiceServer is the server API for ManagementService service.
 type ManagementServiceServer interface {
 	//READINESS
@@ -19490,8 +19467,6 @@ type ManagementServiceServer interface {
 	// reactivate user grant based on a projectgrant
 	// This request is required that the user authorizations of zitadel can be differentiated
 	ReactivateProjectGrantUserGrant(context.Context, *ProjectGrantUserGrantID) (*UserGrant, error)
-	//Grant
-	SearchAuthGrant(context.Context, *AuthGrantSearchRequest) (*AuthGrantSearchResponse, error)
 }
 
 // UnimplementedManagementServiceServer can be embedded to have forward compatible implementations.
@@ -19848,9 +19823,6 @@ func (*UnimplementedManagementServiceServer) DeactivateProjectGrantUserGrant(con
 }
 func (*UnimplementedManagementServiceServer) ReactivateProjectGrantUserGrant(context.Context, *ProjectGrantUserGrantID) (*UserGrant, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReactivateProjectGrantUserGrant not implemented")
-}
-func (*UnimplementedManagementServiceServer) SearchAuthGrant(context.Context, *AuthGrantSearchRequest) (*AuthGrantSearchResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchAuthGrant not implemented")
 }
 
 func RegisterManagementServiceServer(s *grpc.Server, srv ManagementServiceServer) {
@@ -21963,24 +21935,6 @@ func _ManagementService_ReactivateProjectGrantUserGrant_Handler(srv interface{},
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ManagementService_SearchAuthGrant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AuthGrantSearchRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagementServiceServer).SearchAuthGrant(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/caos.zitadel.management.api.v1.ManagementService/SearchAuthGrant",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagementServiceServer).SearchAuthGrant(ctx, req.(*AuthGrantSearchRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _ManagementService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "caos.zitadel.management.api.v1.ManagementService",
 	HandlerType: (*ManagementServiceServer)(nil),
@@ -22452,10 +22406,6 @@ var _ManagementService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReactivateProjectGrantUserGrant",
 			Handler:    _ManagementService_ReactivateProjectGrantUserGrant_Handler,
-		},
-		{
-			MethodName: "SearchAuthGrant",
-			Handler:    _ManagementService_SearchAuthGrant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

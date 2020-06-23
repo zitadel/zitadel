@@ -1347,13 +1347,6 @@ service ManagementService {
             check_field_name: "ProjectGrantId"
         };
     }
-    //Grant
-    rpc SearchAuthGrant(AuthGrantSearchRequest) returns (AuthGrantSearchResponse) {
-        option (google.api.http) = {
-            post: "/authgrants/_search"
-            body: "*"
-        };
-    }
 }
 
 message Iam {
