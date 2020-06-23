@@ -65,7 +65,10 @@ func csp(zitadelDomain string) *middleware.CSP {
 	csp.StyleSrc = csp.StyleSrc.AddInline().AddHost("fonts.googleapis.com").AddHost("maxst.icons8.com") //TODO: host it
 	csp.FontSrc = csp.FontSrc.AddHost("fonts.gstatic.com").AddHost("maxst.icons8.com")                  //TODO: host it
 	csp.ScriptSrc = csp.ScriptSrc.AddEval()
-	csp.ConnectSrc = csp.ConnectSrc.AddHost(zitadelDomain)
+	csp.ConnectSrc = csp.ConnectSrc.AddHost(zitadelDomain).
+		AddHost("fonts.googleapis.com").
+		AddHost("fonts.gstatic.com").
+		AddHost("maxst.icons8.com") //TODO: host it
 	return &csp
 }
 
