@@ -68,6 +68,7 @@ h1 {
     justify-content: space-evenly;
     padding: .5rem;
     border-bottom: 1px solid #ffffff20;
+    flex-wrap: wrap;
 
     .label, .name {
       margin-right: 1rem;

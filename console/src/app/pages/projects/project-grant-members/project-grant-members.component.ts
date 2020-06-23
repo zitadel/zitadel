@@ -10,8 +10,8 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import {
     CreationType,
-    ProjectMemberCreateDialogComponent,
-} from '../../../modules/add-member-dialog/project-member-create-dialog.component';
+    MemberCreateDialogComponent,
+} from '../../../modules/add-member-dialog/member-create-dialog.component';
 import { ProjectGrantMembersDataSource } from './project-grant-members-datasource';
 
 @Component({
@@ -23,7 +23,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     @Input() public projectId!: string;
     @Input() public grantId!: string;
 
-    public disabled: boolean = false;
+    @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
     public dataSource!: ProjectGrantMembersDataSource;
@@ -91,7 +91,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     }
 
     public openAddMember(): void {
-        const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
+        const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.PROJECT_GRANTED,
                 projectId: this.projectId,

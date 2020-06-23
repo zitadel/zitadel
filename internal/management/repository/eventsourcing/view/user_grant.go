@@ -31,6 +31,14 @@ func (v *View) UserGrantsByOrgID(orgID string) ([]*model.UserGrantView, error) {
 	return view.UserGrantsByOrgID(v.Db, userGrantTable, orgID)
 }
 
+func (v *View) UserGrantsByProjectIDAndRoleKey(projectID, roleKey string) ([]*model.UserGrantView, error) {
+	return view.UserGrantsByProjectIDAndRole(v.Db, userGrantTable, projectID, roleKey)
+}
+
+func (v *View) UserGrantsByOrgIDAndProjectID(orgID, projectID string) ([]*model.UserGrantView, error) {
+	return view.UserGrantsByOrgIDAndProjectID(v.Db, userGrantTable, orgID, projectID)
+}
+
 func (v *View) PutUserGrant(grant *model.UserGrantView, sequence uint64) error {
 	err := view.PutUserGrant(v.Db, userGrantTable, grant)
 	if err != nil {

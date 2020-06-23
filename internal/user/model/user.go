@@ -1,7 +1,11 @@
 package model
 
 import (
+	caos_errors "github.com/caos/zitadel/internal/errors"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"strings"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -22,6 +26,18 @@ type User struct {
 	PhoneCode    *PhoneCode
 	PasswordCode *PasswordCode
 	OTP          *OTP
+}
+type UserChanges struct {
+	Changes      []*UserChange
+	LastSequence uint64
+}
+
+type UserChange struct {
+	ChangeDate *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType  string               `json:"eventType,omitempty"`
+	Sequence   uint64               `json:"sequence,omitempty"`
+	Modifier   string               `json:"modifierUser,omitempty"`
+	Data       interface{}          `json:"data,omitempty"`
 }
 
 type InitUserCode struct {
@@ -52,9 +68,22 @@ const (
 	GENDER_DIVERSE
 )
 
-func (u *User) SetEmailAsUsername() {
-	if u.Profile != nil && u.UserName == "" && u.Email != nil {
+func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
+	if policy == nil {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
+	}
+	if policy.UserLoginMustBeDomain && strings.Contains(u.UserName, "@") {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
+	}
+	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.UserName == "" && u.Email != nil {
 		u.UserName = u.EmailAddress
+	}
+	return nil
+}
+
+func (u *User) SetNamesAsDisplayname() {
+	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
+		u.DisplayName = u.FirstName + " " + u.LastName
 	}
 }
 

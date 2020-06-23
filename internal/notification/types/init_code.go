@@ -16,8 +16,9 @@ type InitCodeEmailData struct {
 }
 
 type UrlData struct {
-	UserID string
-	Code   string
+	UserID      string
+	Code        string
+	PasswordSet bool
 }
 
 func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm) error {
@@ -25,7 +26,7 @@ func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_mod
 	if err != nil {
 		return err
 	}
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.InitCode, &UrlData{UserID: user.ID, Code: codeString})
+	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.InitCode, &UrlData{UserID: user.ID, Code: codeString, PasswordSet: user.PasswordSet})
 	if err != nil {
 		return err
 	}

@@ -28,16 +28,13 @@ func (es *PolicyEventstore) GetPasswordComplexityPolicy(ctx context.Context, id 
 }
 
 func (es *PolicyEventstore) CreatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Description is required")
-	}
 	ctxData := auth.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 	if existingPolicy != nil && existingPolicy.Sequence > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Errors.Policy.AlreadyExists")
 	}
 
 	id, err := es.idGenerator.Next()
@@ -59,9 +56,6 @@ func (es *PolicyEventstore) CreatePasswordComplexityPolicy(ctx context.Context, 
 }
 
 func (es *PolicyEventstore) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Description is required")
-	}
 	ctxData := auth.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
 	if err != nil {

@@ -267,9 +267,6 @@ export class CreateUserRequest extends jspb.Message {
   getNickName(): string;
   setNickName(value: string): void;
 
-  getDisplayName(): string;
-  setDisplayName(value: string): void;
-
   getPreferredLanguage(): string;
   setPreferredLanguage(value: string): void;
 
@@ -320,7 +317,6 @@ export namespace CreateUserRequest {
     firstName: string,
     lastName: string,
     nickName: string,
-    displayName: string,
     preferredLanguage: string,
     gender: Gender,
     email: string,
@@ -457,6 +453,96 @@ export namespace CreateOrgRequest {
   export type AsObject = {
     name: string,
     domain: string,
+  }
+}
+
+export class OrgIamPolicy extends jspb.Message {
+  getOrgId(): string;
+  setOrgId(value: string): void;
+
+  getDescription(): string;
+  setDescription(value: string): void;
+
+  getUserLoginMustBeDomain(): boolean;
+  setUserLoginMustBeDomain(value: boolean): void;
+
+  getDefault(): boolean;
+  setDefault(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgIamPolicy.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgIamPolicy): OrgIamPolicy.AsObject;
+  static serializeBinaryToWriter(message: OrgIamPolicy, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgIamPolicy;
+  static deserializeBinaryFromReader(message: OrgIamPolicy, reader: jspb.BinaryReader): OrgIamPolicy;
+}
+
+export namespace OrgIamPolicy {
+  export type AsObject = {
+    orgId: string,
+    description: string,
+    userLoginMustBeDomain: boolean,
+    pb_default: boolean,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class OrgIamPolicyRequest extends jspb.Message {
+  getOrgId(): string;
+  setOrgId(value: string): void;
+
+  getDescription(): string;
+  setDescription(value: string): void;
+
+  getUserLoginMustBeDomain(): boolean;
+  setUserLoginMustBeDomain(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgIamPolicyRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgIamPolicyRequest): OrgIamPolicyRequest.AsObject;
+  static serializeBinaryToWriter(message: OrgIamPolicyRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgIamPolicyRequest;
+  static deserializeBinaryFromReader(message: OrgIamPolicyRequest, reader: jspb.BinaryReader): OrgIamPolicyRequest;
+}
+
+export namespace OrgIamPolicyRequest {
+  export type AsObject = {
+    orgId: string,
+    description: string,
+    userLoginMustBeDomain: boolean,
+  }
+}
+
+export class OrgIamPolicyID extends jspb.Message {
+  getOrgId(): string;
+  setOrgId(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgIamPolicyID.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgIamPolicyID): OrgIamPolicyID.AsObject;
+  static serializeBinaryToWriter(message: OrgIamPolicyID, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgIamPolicyID;
+  static deserializeBinaryFromReader(message: OrgIamPolicyID, reader: jspb.BinaryReader): OrgIamPolicyID;
+}
+
+export namespace OrgIamPolicyID {
+  export type AsObject = {
+    orgId: string,
   }
 }
 

@@ -2,6 +2,13 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/sdk"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -13,7 +20,9 @@ import (
 )
 
 type UserRepo struct {
+	Eventstore   eventstore.Eventstore
 	UserEvents   *user_event.UserEventstore
+	OrgEvents    *org_event.OrgEventstore
 	PolicyEvents *policy_event.PolicyEventstore
 	View         *view.View
 }
@@ -22,20 +31,49 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.UserEvents.Health(ctx)
 }
 
-func (repo *UserRepo) Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error) {
+func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
 	policyResourceOwner := auth.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, policyResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	user, aggregates, err := repo.UserEvents.PrepareRegisterUser(ctx, registerUser, pwPolicy, orgPolicy, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if orgMember != nil {
+		orgMember.UserID = user.AggregateID
+		_, memberAggregate, err := repo.OrgEvents.PrepareAddOrgMember(ctx, orgMember, policyResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		aggregates = append(aggregates, memberAggregate)
+	}
+
+	err = sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, user.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+	return usr_model.UserToModel(user), nil
+}
+
+func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
+	return repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
-	return repo.UserEvents.ProfileByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetProfile(), nil
 }
 
 func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error) {
@@ -46,7 +84,11 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 }
 
 func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
-	return repo.UserEvents.EmailByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetEmail(), nil
 }
 
 func (repo *UserRepo) ChangeMyEmail(ctx context.Context, email *model.Email) (*model.Email, error) {
@@ -73,7 +115,11 @@ func (repo *UserRepo) ResendMyEmailVerificationMail(ctx context.Context) error {
 }
 
 func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
-	return repo.UserEvents.PhoneByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetPhone(), nil
 }
 
 func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error) {
@@ -92,7 +138,11 @@ func (repo *UserRepo) ResendMyPhoneVerificationCode(ctx context.Context) error {
 }
 
 func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
-	return repo.UserEvents.AddressByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetAddress(), nil
 }
 
 func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Address) (*model.Address, error) {
@@ -157,8 +207,8 @@ func (repo *UserRepo) SkipMfaInit(ctx context.Context, userID string) error {
 	return repo.UserEvents.SkipMfaInit(ctx, userID)
 }
 
-func (repo *UserRepo) RequestPasswordReset(ctx context.Context, username string) error {
-	user, err := repo.View.UserByUsername(username)
+func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string) error {
+	user, err := repo.View.UserByLoginName(loginname)
 	if err != nil {
 		return err
 	}
@@ -177,8 +227,23 @@ func (repo *UserRepo) SignOut(ctx context.Context, agentID, userID string) error
 	return repo.UserEvents.SignOut(ctx, agentID, userID)
 }
 
-func (repo *UserRepo) UserByID(ctx context.Context, userID string) (*model.User, error) {
-	return repo.UserEvents.UserByID(ctx, userID)
+func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView, error) {
+	user, err := repo.View.UserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	events, err := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	if err != nil {
+		logging.Log("EVENT-PSoc3").WithError(err).Debug("error retrieving new events")
+		return usr_view_model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return usr_view_model.UserToModel(user), nil
+		}
+	}
+	return usr_view_model.UserToModel(&userCopy), nil
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {

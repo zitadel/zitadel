@@ -33,6 +33,14 @@ func ReadKeys(path string) (Keys, error) {
 	return *keys, err
 }
 
+func LoadKey(config *KeyConfig, id string) (string, error) {
+	keys, _, err := LoadKeys(config)
+	if err != nil {
+		return "", err
+	}
+	return keys[id], nil
+}
+
 func LoadKeys(config *KeyConfig) (map[string]string, []string, error) {
 	if config == nil {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "CRYPT-dJK8s", "config must not be nil")

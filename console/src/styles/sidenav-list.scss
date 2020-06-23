@@ -3,7 +3,7 @@
 @mixin sidenav-list-theme($theme) {
     $primary: map-get($theme, primary);
     $primary-color: mat-color($primary, 500);
-    $primary-dark: mat-color($primary, A800);
+    $primary-dark: mat-color($primary, A900);
 
     .mat-menu-item {
         &.show-all {

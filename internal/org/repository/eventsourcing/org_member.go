@@ -11,7 +11,7 @@ import (
 
 func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, member *model.OrgMember, resourceOwner string) (agg *es_models.Aggregate, err error) {
 	if member == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "member must not be nil")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-c63Ap", "Errors.Internal")
 	}
 
 	if resourceOwner != "" {
@@ -34,12 +34,12 @@ func orgMemberAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 func orgMemberChangedAggregate(aggCreator *es_models.AggregateCreator, existingMember *model.OrgMember, member *model.OrgMember) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if member == nil || existingMember == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "member must not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-d34fs", "Errors.Internal")
 		}
 
 		changes := existingMember.Changes(member)
 		if len(changes) == 0 {
-			return nil, errors.ThrowInvalidArgument(nil, "EVENT-VLMGn", "nothing changed")
+			return nil, errors.ThrowInvalidArgument(nil, "EVENT-VLMGn", "Errors.NoChangesFound")
 		}
 
 		agg, err := OrgAggregate(ctx, aggCreator, existingMember.AggregateID, existingMember.Sequence)

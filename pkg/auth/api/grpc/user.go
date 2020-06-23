@@ -8,36 +8,44 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-func (s *Server) GetMyUserProfile(ctx context.Context, _ *empty.Empty) (*UserProfile, error) {
+func (s *Server) GetMyUser(ctx context.Context, _ *empty.Empty) (*UserView, error) {
+	user, err := s.repo.MyUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return userViewFromModel(user), nil
+}
+
+func (s *Server) GetMyUserProfile(ctx context.Context, _ *empty.Empty) (*UserProfileView, error) {
 	profile, err := s.repo.MyProfile(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return profileFromModel(profile), nil
+	return profileViewFromModel(profile), nil
 }
 
-func (s *Server) GetMyUserEmail(ctx context.Context, _ *empty.Empty) (*UserEmail, error) {
+func (s *Server) GetMyUserEmail(ctx context.Context, _ *empty.Empty) (*UserEmailView, error) {
 	email, err := s.repo.MyEmail(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return emailFromModel(email), nil
+	return emailViewFromModel(email), nil
 }
 
-func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*UserPhone, error) {
+func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*UserPhoneView, error) {
 	phone, err := s.repo.MyPhone(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return phoneFromModel(phone), nil
+	return phoneViewFromModel(phone), nil
 }
 
-func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*UserAddress, error) {
+func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*UserAddressView, error) {
 	address, err := s.repo.MyAddress(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return addressFromModel(address), nil
+	return addressViewFromModel(address), nil
 }
 
 func (s *Server) GetMyMfas(ctx context.Context, _ *empty.Empty) (*MultiFactors, error) {

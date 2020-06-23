@@ -91,18 +91,6 @@ func TestCreatePasswordComplexityPolicy(t *testing.T) {
 				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name"},
 			},
 		},
-		{
-			name: "create policy no name",
-			args: args{
-				es:     GetMockPasswordComplexityPolicyNoEvents(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
-				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -147,18 +135,6 @@ func TestUpdatePasswordComplexityPolicy(t *testing.T) {
 			},
 			res: res{
 				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew"},
-			},
-		},
-		{
-			name: "update policy no name",
-			args: args{
-				es:  GetMockPasswordComplexityPolicy(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: ""},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{

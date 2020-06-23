@@ -19,6 +19,7 @@ const (
 	UserGrantKeyResourceOwner = "resource_owner"
 	UserGrantKeyState         = "state"
 	UserGrantKeyOrgName       = "org_name"
+	UserGrantKeyRole          = "role_keys"
 )
 
 type UserGrantView struct {
@@ -32,7 +33,6 @@ type UserGrantView struct {
 	Email         string         `json:"-" gorm:"column:email"`
 	ProjectName   string         `json:"-" gorm:"column:project_name"`
 	OrgName       string         `json:"-" gorm:"column:org_name"`
-	OrgDomain     string         `json:"-" gorm:"column:org_domain"`
 	RoleKeys      pq.StringArray `json:"roleKeys" gorm:"column:role_keys"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
@@ -57,7 +57,6 @@ func UserGrantFromModel(grant *model.UserGrantView) *UserGrantView {
 		Email:         grant.Email,
 		ProjectName:   grant.ProjectName,
 		OrgName:       grant.OrgName,
-		OrgDomain:     grant.OrgDomain,
 		RoleKeys:      grant.RoleKeys,
 		Sequence:      grant.Sequence,
 	}
@@ -78,7 +77,6 @@ func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 		Email:         grant.Email,
 		ProjectName:   grant.ProjectName,
 		OrgName:       grant.OrgName,
-		OrgDomain:     grant.OrgDomain,
 		RoleKeys:      grant.RoleKeys,
 		Sequence:      grant.Sequence,
 	}
@@ -101,7 +99,7 @@ func (g *UserGrantView) AppendEvent(event *models.Event) (err error) {
 		g.CreationDate = event.CreationDate
 		g.setRootData(event)
 		err = g.setData(event)
-	case es_model.UserGrantChanged:
+	case es_model.UserGrantChanged, es_model.UserGrantCascadeChanged:
 		err = g.setData(event)
 	case es_model.UserGrantDeactivated:
 		g.State = int32(model.USERGRANTSTATE_INACTIVE)

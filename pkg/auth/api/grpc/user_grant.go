@@ -28,3 +28,11 @@ func (s *Server) GetMyZitadelPermissions(ctx context.Context, _ *empty.Empty) (*
 	}
 	return &MyPermissions{Permissions: perms}, nil
 }
+
+func (s *Server) GetMyProjectPermissions(ctx context.Context, _ *empty.Empty) (*MyPermissions, error) {
+	perms, err := s.repo.SearchMyProjectPermissions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &MyPermissions{Permissions: perms}, nil
+}

@@ -158,7 +158,8 @@
         },
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
-            "REQUIRED": "The input field is empty"
+            "REQUIRED": "The input field is empty",
+            "MINLENGTH":"The password has to be at least {{minLength}} characters long!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -176,7 +177,7 @@
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"Add new account"
+        "ADDACCOUNT":"log in with another account"
     },
     "ORG": {
         "PAGES": {
@@ -192,10 +193,18 @@
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organization"
         },
+        "DOMAINS": {
+            "TITLE":"Domains",
+            "DESCRIPTION":"Configure your domains on which your users will be registered."
+        },
         "STATE": {
             "0": "nicht definiert",
             "1": "aktiv",
             "2": "inaktiv"
+        },
+        "MEMBER": {
+            "TITLE":"Organization Managers",
+            "DESCRIPTION":"Define Accounts which can change your organizations preferences."
         },
         "POLICY": {
             "TITLE":"Explore Policies",
@@ -204,7 +213,12 @@
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
                 "TITLECREATE":"Create Password Complexity Policy",
-                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern"
+                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern",
+                "SYMBOLANDNUMBERERROR":"The password must consist of a number and a symbol",
+                "SYMBOLERROR":"The password must include a symbol!",
+                "NUMBERERROR":"The password must include a number!",
+                "PATTERNERROR":"The required pattern is not fulfilled!"
+
             },
             "PWD_AGE": {
                 "TITLE":"Password Age",
@@ -275,7 +289,8 @@
             "DETAIL": "Detail",
             "CREATE": "Create project",
             "CREATE_DESC": "Insert your projects name",
-            "ROLE": "Role"
+            "ROLE": "Role",
+            "NOITEMS": "No projects"
         },
         "STATE": {
             "TITLE":"State",
@@ -291,9 +306,9 @@
         },
         "NAME": "Name",
         "MEMBER": {
-            "TITLE": "Contributors",
-            "TITLEDESC":"Contributors can make changes on this very entity",
-            "DESCRIPTION":"Here you can find all contributors of this project. You can add a new member and manage persisting ones.",
+            "TITLE": "Managers",
+            "TITLEDESC":"Managers can make changes on this very entity, based on their given role in zitadel.",
+            "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage persisting ones.",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
@@ -472,8 +487,12 @@
         "EVENTS": {
             "org.added": "Org created",
             "org.changed":"Org edited",
-            "org.member.added":"Organization Member created",
-            "org.member.removed":"Organization Member deleted",
+            "org.member.added":"Org Member created",
+            "org.member.removed":"Org Member deleted",
+            "org.domain.added":"Org Domain added",
+            "org.domain.verified":"Org Domain verified",
+            "org.domain.primary.set":"Primary domain set",
+            "org.iam.policy.added":"IAM Policy added",
             "project.added": "Project created",
             "project.changed":"Project edited",
             "project.deactivated":"Project deactivated",
@@ -481,7 +500,17 @@
             "project.member.removed":"Project Member deleted",
             "project.role.added":"Role created",
             "project.role.removed":"Role deleted",
+            "project.application.added":"App added",
+            "project.application.config.oidc.added":"OIDC config added",  
+            "user.added":"User added",
+            "user.initialization.code.added":"Init code added",
+            "user.phone.code.added":"Phone code added",
+            "user.phone.code.sent":"User phone code sent",
+            "user.initialization.code.sent":"Init code sent",
             "user.email.verification.sended": "User email verified",
+            "user.email.code.added":"Email code added",
+            "user.email.code.sent":"Email code sent",           
+            "user.email.verified":"Email verified",
             "user.phone.verificationsended":"User phone verification sent",
             "user.phone.code":"User phone code created",
             "user.initialization.verification.sended":"User mail verification sent",
@@ -497,8 +526,16 @@
             "user.email.password.request.sended":"Email password request sended",
             "user.password.set.requested":"Password request",
             "user.phone.verification.sended":"User Phone verification sended",
+            "user.phone.changed":"User phone changed",
+            "user.phone.verified":"User phone verified",
             "updated.user.profile":"User Profile update",
-            "user.email.init.sended":"User Email init sended"
+            "user.email.init.sended":"User Email init sended",
+            "user.password.changed":"Password geändert",
+            "user.initialization.check.succeeded":"Init check succeeded",
+            "user.password.check.succeeded":"Password check succeeded",
+            "user.mfa.init.skipped":"MFA init skipped",
+            "user.mfa.otp.added":"MFA OTP added",
+            "user.mfa.otp.verified":"MFA OTP verified"
         }
     }
 }

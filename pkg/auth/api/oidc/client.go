@@ -6,7 +6,10 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/errors"
+	proj_model "github.com/caos/zitadel/internal/project/model"
+	user_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -15,6 +18,8 @@ const (
 	scopeEmail   = "email"
 	scopePhone   = "phone"
 	scopeAddress = "address"
+
+	oidcCtx = "oidc"
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Client, error) {
@@ -22,10 +27,17 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 	if err != nil {
 		return nil, err
 	}
+	if client.State != proj_model.APPSTATE_ACTIVE {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
+	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime)
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
+	ctx = auth.SetCtxData(ctx, auth.CtxData{
+		UserID: oidcCtx,
+		OrgID:  oidcCtx,
+	})
 	return o.repo.AuthorizeOIDCApplication(ctx, id, secret)
 }
 
@@ -46,34 +58,22 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 	for _, scope := range scopes {
 		switch scope {
 		case scopeOpenID:
-			userInfo.Subject = user.AggregateID
+			userInfo.Subject = user.ID
 		case scopeEmail:
-			if user.Email == nil {
-				continue
-			}
-			userInfo.Email = user.EmailAddress
+			userInfo.Email = user.Email
 			userInfo.EmailVerified = user.IsEmailVerified
 		case scopeProfile:
-			if user.Profile == nil {
-				continue
-			}
-			userInfo.Name = user.FirstName + " " + user.LastName
+			userInfo.Name = user.DisplayName
 			userInfo.FamilyName = user.LastName
 			userInfo.GivenName = user.FirstName
 			userInfo.Nickname = user.NickName
-			userInfo.PreferredUsername = user.UserName
+			userInfo.PreferredUsername = user.PreferredLoginName
 			userInfo.UpdatedAt = user.ChangeDate
 			userInfo.Gender = oidc.Gender(getGender(user.Gender))
 		case scopePhone:
-			if user.Phone == nil {
-				continue
-			}
-			userInfo.PhoneNumber = user.PhoneNumber
+			userInfo.PhoneNumber = user.Phone
 			userInfo.PhoneNumberVerified = user.IsPhoneVerified
 		case scopeAddress:
-			if user.Address == nil {
-				continue
-			}
 			userInfo.Address.StreetAddress = user.StreetAddress
 			userInfo.Address.Locality = user.Locality
 			userInfo.Address.Region = user.Region
@@ -84,13 +84,13 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 	return userInfo, nil
 }
 
-func getGender(gender model.Gender) string {
+func getGender(gender user_model.Gender) string {
 	switch gender {
-	case model.GENDER_FEMALE:
+	case user_model.GENDER_FEMALE:
 		return "female"
-	case model.GENDER_MALE:
+	case user_model.GENDER_MALE:
 		return "male"
-	case model.GENDER_DIVERSE:
+	case user_model.GENDER_DIVERSE:
 		return "diverse"
 	}
 	return ""

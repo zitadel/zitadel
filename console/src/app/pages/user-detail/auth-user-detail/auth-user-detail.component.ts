@@ -3,14 +3,13 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { Gender, UserAddress, UserEmail, UserPhone, UserProfile } from 'src/app/proto/generated/auth_pb';
+import { Gender, UserAddress, UserEmail, UserPhone, UserProfile, UserView } from 'src/app/proto/generated/auth_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
-
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
@@ -33,10 +32,10 @@ function passwordConfirmValidator(c: AbstractControl): any {
     styleUrls: ['./auth-user-detail.component.scss'],
 })
 export class AuthUserDetailComponent implements OnDestroy {
-    public profile!: UserProfile.AsObject;
-    public email!: UserEmail.AsObject;
-    public phone!: UserPhone.AsObject;
-    public address!: UserAddress.AsObject;
+    public user!: UserView.AsObject;
+    public email: UserEmail.AsObject = { email: '' } as any;
+    public phone: UserPhone.AsObject = { phone: '' } as any;
+    public address: UserAddress.AsObject = { id: '' } as any;
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
@@ -49,9 +48,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public loading: boolean = false;
 
-    public minLengthPassword: any = {
-        value: 0,
-    };
+    public policy!: PasswordComplexityPolicy.AsObject;
 
     constructor(
         public translate: TranslateService,
@@ -63,10 +60,21 @@ export class AuthUserDetailComponent implements OnDestroy {
     ) {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
-            const policy: PasswordComplexityPolicy.AsObject = data.toObject();
-            this.minLengthPassword.value = data.toObject().minLength;
-            if (policy.minLength) {
-                validators.push(Validators.minLength(policy.minLength));
+            this.policy = data.toObject();
+            if (this.policy.minLength) {
+                validators.push(Validators.minLength(this.policy.minLength));
+            }
+            if (this.policy.hasLowercase) {
+                validators.push(Validators.pattern(/[a-z]/g));
+            }
+            if (this.policy.hasUppercase) {
+                validators.push(Validators.pattern(/[A-Z]/g));
+            }
+            if (this.policy.hasNumber) {
+                validators.push(Validators.pattern(/[0-9]/g));
+            }
+            if (this.policy.hasSymbol) {
+                validators.push(Validators.pattern(/[^a-z0-9]/gi));
             }
 
             this.passwordForm = this.fb.group({
@@ -74,7 +82,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 newPassword: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
-            // TODO custom validator for pattern
         }).catch(error => {
             console.log('no password complexity policy defined!');
             this.passwordForm = this.fb.group({
@@ -106,18 +113,18 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public saveProfile(profileData: UserProfile.AsObject): void {
         console.log(profileData);
-        this.profile.firstName = profileData.firstName;
-        this.profile.lastName = profileData.lastName;
-        this.profile.nickName = profileData.nickName;
-        this.profile.displayName = profileData.displayName;
-        this.profile.gender = profileData.gender;
-        this.profile.preferredLanguage = profileData.preferredLanguage;
-        console.log(this.profile);
+        this.user.firstName = profileData.firstName;
+        this.user.lastName = profileData.lastName;
+        this.user.nickName = profileData.nickName;
+        this.user.displayName = profileData.displayName;
+        this.user.gender = profileData.gender;
+        this.user.preferredLanguage = profileData.preferredLanguage;
+        console.log(this.user);
         this.userService
-            .SaveMyUserProfile(this.profile as UserProfile.AsObject)
+            .SaveMyUserProfile(this.user as UserView.AsObject)
             .then((data: UserProfile) => {
                 this.toast.showInfo('Saved Profile');
-                this.profile = data.toObject();
+                this.user = Object.assign(this.user, data.toObject());
             })
             .catch(data => {
                 this.toast.showError(data.message);
@@ -139,6 +146,8 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public saveEmail(): void {
+        this.emailEditState = false;
+
         this.userService
             .SaveMyUserEmail(this.email).then((data: UserEmail) => {
                 this.toast.showInfo('Saved Email');
@@ -160,6 +169,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             data: {
                 number: this.phone.phone,
             },
+            width: '400px',
         });
 
         dialogRef.afterClosed().subscribe(code => {
@@ -199,6 +209,10 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public savePhone(): void {
+        this.phoneEditState = false;
+        if (!this.phone.id) {
+            this.phone.id = this.user.id;
+        }
         this.userService
             .SaveMyUserPhone(this.phone).then((data: UserPhone) => {
                 this.toast.showInfo('Saved Phone');
@@ -248,12 +262,17 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     private async getData(): Promise<void> {
-        this.profile = (await this.userService.GetMyUserProfile()).toObject();
+        this.userService.GetMyUser().then(user => {
+            console.log(user.toObject());
+            this.user = user.toObject();
+        }).catch(err => {
+            console.error(err);
+        });
+
         this.email = (await this.userService.GetMyUserEmail()).toObject();
         this.phone = (await this.userService.GetMyUserPhone()).toObject();
         this.address = (await this.userService.GetMyUserAddress()).toObject();
 
-        console.log(this.profile);
         this.addressForm.patchValue(this.address);
     }
 }

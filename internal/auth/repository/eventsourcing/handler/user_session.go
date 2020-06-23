@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"time"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
@@ -67,7 +66,10 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 		}
 		return u.updateSession(session, event)
 	case es_model.UserPasswordChanged,
-		es_model.MfaOtpRemoved:
+		es_model.MfaOtpRemoved,
+		es_model.UserProfileChanged,
+		es_model.UserLocked,
+		es_model.UserDeactivated:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -78,6 +80,8 @@ func (u *UserSession) Process(event *models.Event) (err error) {
 			}
 		}
 		return nil
+	case es_model.UserRemoved:
+		return u.view.DeleteUserSessions(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserSessionSequence(event.Sequence)
 	}
@@ -89,21 +93,20 @@ func (u *UserSession) OnError(event *models.Event, err error) error {
 }
 
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {
-	session.Sequence = event.Sequence
 	session.AppendEvent(event)
-	if session.UserName == "" {
-		if err := u.fillUserInfo(session, event.AggregateID); err != nil {
-			return err
-		}
+	if err := u.fillUserInfo(session, event.AggregateID); err != nil {
+		return err
 	}
 	return u.view.PutUserSession(session)
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {
-	user, err := u.userEvents.UserByID(context.Background(), id)
+	user, err := u.view.UserByID(id)
 	if err != nil {
 		return err
 	}
 	session.UserName = user.UserName
+	session.LoginName = user.PreferredLoginName
+	session.DisplayName = user.DisplayName
 	return nil
 }

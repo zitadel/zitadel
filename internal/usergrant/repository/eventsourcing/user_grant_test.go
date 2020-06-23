@@ -74,6 +74,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 		ctx        context.Context
 		existing   *model.UserGrant
 		new        *model.UserGrant
+		cascade    bool
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -106,6 +107,29 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 			res: res{
 				eventLen:   1,
 				eventTypes: []models.EventType{model.UserGrantChanged},
+			},
+		},
+		{
+			name: "change project grant cascade",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.UserGrant{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserID:     "UserID",
+					ProjectID:  "ProjectID",
+					RoleKeys:   []string{"Key"}},
+				new: &model.UserGrant{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserID:     "UserID",
+					ProjectID:  "ProjectID",
+					RoleKeys:   []string{"KeyChanged"},
+				},
+				cascade:    true,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.UserGrantCascadeChanged},
 			},
 		},
 		{
@@ -143,7 +167,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := UserGrantChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := UserGrantChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)(tt.args.ctx)
 
 			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -169,6 +193,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 		ctx        context.Context
 		existing   *model.UserGrant
 		new        *model.UserGrant
+		cascade    bool
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -201,6 +226,26 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 			},
 		},
 		{
+			name: "remove app cascade",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.UserGrant{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					UserID:     "UserID",
+					ProjectID:  "ProjectID",
+					RoleKeys:   []string{"Key"}},
+				new: &model.UserGrant{
+					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+				},
+				cascade:    true,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.UserGrantCascadeRemoved},
+			},
+		},
+		{
 			name: "existing project nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
@@ -230,7 +275,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			aggregates, err := UserGrantRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new)
+			aggregates, err := UserGrantRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.cascade)
 
 			if tt.res.errFunc == nil && len(aggregates[0].Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(aggregates[0].Events))

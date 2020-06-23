@@ -1,44 +1,41 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { OrgMember, User } from 'src/app/proto/generated/management_pb';
+import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
+import { Org, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    CreationType,
-    ProjectMemberCreateDialogComponent,
-} from '../../../modules/add-member-dialog/project-member-create-dialog.component';
-import { OrgMembersDataSource } from './org-members-datasource';
+import { ProjectMembersDataSource } from './org-members-datasource';
 
 @Component({
     selector: 'app-org-members',
     templateUrl: './org-members.component.html',
     styleUrls: ['./org-members.component.scss'],
 })
-export class OrgMembersComponent implements AfterViewInit, OnInit {
-    @Input() public orgId: string = '';
-    @Input() public disabled: boolean = false;
+export class OrgMembersComponent implements AfterViewInit {
+    public org!: Org.AsObject;
+    public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
+    public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<OrgMember.AsObject>;
-    @Output() public changedSelection: EventEmitter<Array<OrgMember.AsObject>> = new EventEmitter();
-    public dataSource!: OrgMembersDataSource;
-    public selection: SelectionModel<OrgMember.AsObject> = new SelectionModel<OrgMember.AsObject>(true, []);
+    @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
+    public dataSource!: ProjectMembersDataSource;
+    public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
+
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
-    constructor(private orgService: OrgService, private dialog: MatDialog, private toast: ToastService) { }
-
-    public ngOnInit(): void {
-        this.dataSource = new OrgMembersDataSource(this.orgService);
-        this.dataSource.loadMembers(0, 25, 'asc');
-
-        this.selection.changed.subscribe(change => {
-            console.log(change);
-            // this.changedSelection.emit(change)
+    constructor(private orgService: OrgService,
+        private dialog: MatDialog,
+        private toast: ToastService) {
+        this.orgService.GetMyOrg().then(org => {
+            this.org = org.toObject();
+            console.log(this.org);
+            this.dataSource = new ProjectMembersDataSource(this.orgService);
+            this.dataSource.loadMembers(0, 25, 'asc');
         });
     }
 
@@ -48,6 +45,7 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
                 tap(() => this.loadMembersPage()),
             )
             .subscribe();
+
     }
 
     private loadMembersPage(): void {
@@ -55,6 +53,24 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
             this.paginator.pageIndex,
             this.paginator.pageSize,
         );
+    }
+
+    public removeProjectMemberSelection(): void {
+        Promise.all(this.selection.selected.map(member => {
+            return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
+                this.toast.showInfo('Removed successfully');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        }));
+    }
+
+    public removeMember(member: ProjectMember.AsObject): void {
+        this.orgService.RemoveMyOrgMember(member.userId).then(() => {
+            this.toast.showInfo('Member removed successfully');
+        }).catch(error => {
+            this.toast.showError(error.message);
+        });
     }
 
     public isAllSelected(): boolean {
@@ -66,11 +82,11 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
     public masterToggle(): void {
         this.isAllSelected() ?
             this.selection.clear() :
-            this.dataSource.membersSubject.value.forEach((row: OrgMember.AsObject) => this.selection.select(row));
+            this.dataSource.membersSubject.value.forEach(row => this.selection.select(row));
     }
 
     public openAddMember(): void {
-        const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
+        const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
                 creationType: CreationType.ORG,
             },
@@ -93,15 +109,5 @@ export class OrgMembersComponent implements AfterViewInit, OnInit {
                 }
             }
         });
-    }
-
-    public removeSelectedOrgMembers(): void {
-        Promise.all(this.selection.selected.map(member => {
-            return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-                this.toast.showInfo('Removed successfully');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
-        }));
     }
 }

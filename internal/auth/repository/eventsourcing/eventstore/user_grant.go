@@ -8,7 +8,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	org_view_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
@@ -81,6 +81,19 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	return permissions.Permissions, nil
 }
 
+func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]string, error) {
+	ctxData := auth.GetCtxData(ctx)
+	usergrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, ctxData.ProjectID, ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	permissions := make([]string, len(usergrant.RoleKeys))
+	for i, role := range usergrant.RoleKeys {
+		permissions[i] = role
+	}
+	return permissions, nil
+}
+
 func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	searchRequest := &org_model.OrgSearchRequest{}
 	if len(request.Queries) > 0 {
@@ -123,7 +136,7 @@ func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_mode
 	return resp
 }
 
-func orgRespToOrgResp(orgs []*org_view.OrgView, count int) *grant_model.ProjectOrgSearchResponse {
+func orgRespToOrgResp(orgs []*org_view_model.OrgView, count int) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
 		TotalResult: uint64(count),
 	}

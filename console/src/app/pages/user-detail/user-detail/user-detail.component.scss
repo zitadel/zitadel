@@ -71,6 +71,7 @@
         justify-content: space-evenly;
         padding: .5rem;
         border-bottom: 1px solid #ffffff20;
+        flex-wrap: wrap;
     
         .label, .name {
           margin-right: 1rem;
@@ -124,6 +125,63 @@
     // height: calc(100vh - 60px - 2rem);
     // display: flex;
     // flex-direction: column;
+
+    .details {
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #81868a40;
+        padding-bottom: 1rem;
+    
+        .row {
+            display: flex;
+            margin-bottom: 0.5rem;
+            align-items: center;
+    
+            button {
+                display: none;
+                visibility: hidden;
+            }
+    
+            &:hover {
+                button {
+                    display: inline-block;
+                    visibility: visible;
+                    mat-icon {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+    
+            .first {
+                flex: 1;
+                font-size: 0.8rem;
+                margin-right: 0.5rem;
+                white-space: nowrap;
+            }
+    
+            .fill-space {
+                flex: 1;
+            }
+    
+            .second {
+                font-size: 0.8rem;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-left: 1rem;
+                text-align: right;
+            }
+
+            a {
+                &:hover {
+                    cursor: pointer;
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .side-section {
+            color: #81868a;
+        }
+    }  
 
     .details {
         margin-bottom: 1rem;

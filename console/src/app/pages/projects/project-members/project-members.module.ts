@@ -12,6 +12,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
 import { ProjectMembersRoutingModule } from './project-members-routing.module';
 import { ProjectMembersComponent } from './project-members.component';
@@ -23,6 +24,7 @@ import { ProjectMembersComponent } from './project-members.component';
         ProjectMembersRoutingModule,
         CommonModule,
         MatAutocompleteModule,
+        HasRoleModule,
         MatChipsModule,
         MatButtonModule,
         MatCheckboxModule,

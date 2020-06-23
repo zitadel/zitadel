@@ -6,9 +6,10 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { from } from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
 import {
-    GrantedProjectSearchKey,
-    GrantedProjectSearchQuery,
     Project,
+    ProjectGrantView,
+    ProjectSearchKey,
+    ProjectSearchQuery,
     SearchMethod,
 } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -25,21 +26,22 @@ export class SearchProjectAutocompleteComponent {
     public separatorKeysCodes: number[] = [ENTER, COMMA];
     public myControl: FormControl = new FormControl();
     public names: string[] = [];
-    public projects: Array<Project.AsObject> = [];
-    public filteredProjects: Array<Project.AsObject> = [];
+    public projects: Array<ProjectGrantView.AsObject> = [];
+    public filteredProjects: Array<ProjectGrantView.AsObject> = [];
     public isLoading: boolean = false;
     @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
     @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
     @Input() public singleOutput: boolean = false;
-    @Output() public selectionChanged: EventEmitter<Project.AsObject[] | Project.AsObject> = new EventEmitter();
+    @Output() public selectionChanged: EventEmitter<ProjectGrantView.AsObject[] | ProjectGrantView.AsObject>
+        = new EventEmitter();
     constructor(private projectService: ProjectService) {
         this.myControl.valueChanges
             .pipe(
                 debounceTime(200),
                 tap(() => this.isLoading = true),
                 switchMap(value => {
-                    const query = new GrantedProjectSearchQuery();
-                    query.setKey(GrantedProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
+                    const query = new ProjectSearchQuery();
+                    query.setKey(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
                     query.setValue(value);
                     query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
                     return from(this.projectService.SearchGrantedProjects(10, 0, [query]));
@@ -63,8 +65,8 @@ export class SearchProjectAutocompleteComponent {
 
             if ((value || '').trim()) {
                 const index = this.filteredProjects.findIndex((project) => {
-                    if (project.name) {
-                        return project.name === value;
+                    if (project.projectName) {
+                        return project.projectName === value;
                     }
                 });
                 if (index > -1) {
@@ -82,7 +84,7 @@ export class SearchProjectAutocompleteComponent {
         }
     }
 
-    public remove(project: Project.AsObject): void {
+    public remove(project: ProjectGrantView.AsObject): void {
         const index = this.projects.indexOf(project);
 
         if (index >= 0) {

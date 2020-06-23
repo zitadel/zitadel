@@ -24,7 +24,7 @@ func generateNewClientSecret(pwGenerator crypto.Generator) (string, *crypto.Cryp
 	cryptoValue, stringSecret, err := crypto.NewCode(pwGenerator)
 	if err != nil {
 		logging.Log("APP-UpnTI").OnError(err).Error("unable to create client secret")
-		return "", nil, errors.ThrowInternal(err, "APP-gH2Wl", "unable to create password")
+		return "", nil, errors.ThrowInternal(err, "APP-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
 	}
 	return stringSecret, cryptoValue, nil
 }

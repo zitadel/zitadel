@@ -158,7 +158,8 @@
         },
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
-            "REQUIRED": "Das Feld ist leer"
+            "REQUIRED": "Das Feld ist leer",
+            "MINLENGTH":"Das Password muss mindestens {{minLength}} Zeichen lang sein!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -176,7 +177,7 @@
         "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
-        "ADDACCOUNT":"Neuen Account hinzufügen"
+        "ADDACCOUNT":"mit einem anderen Account anmelden"
     },
     "ORG": {
         "PAGES": {
@@ -184,7 +185,7 @@
             "LISTDESCRIPTION":"Wählen Sie die Organisation für den neuen Kontext aus!",
             "ACTIVE":"AKTIV",
             "CREATE":"Organisation erstellen",
-            "ORGDETAIL_TITLE":"Geben Sie den Namen und die Domain für die neue Organisatino ein",
+            "ORGDETAIL_TITLE":"Geben Sie den Namen und die Domain für die neue Organisation ein",
             "ORGDOMAIN_TITLE":"Organisations Domain Verifikation",
             "ORGDOMAIN_VERIFICATION":"Stellen Sie Ihre Webdomain bereit und überprüfen Sie deren Besitz indem sie eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken Sie zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
             "ORGDOMAIN_VERIFICATION_SKIP":"Sie können die Überprüfung vorerst überspringen und Ihre Organisation weiter erstellen. Um Ihre Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
@@ -192,10 +193,18 @@
             "DOWNLOAD_FILE":"File download",
             "SELECTORGTOOLTIP":"Wähle diese Organisation"
         },
+        "DOMAINS": {
+            "TITLE":"Domains",
+            "DESCRIPTION":"Konfigurieren Sie Ihre Domains mit denen sich Ihre Nutzer einloggen können."
+        },
         "STATE": {
             "0": "nicht definiert",
             "1": "aktiv",
             "2": "inaktiv"
+        },
+        "MEMBER": {
+            "TITLE":"Organisations Manager verwalten",
+            "DESCRIPTION":"Definieren Sie hier die Accounts, die Operationen auf ihrer Organisationen vornehmen dürfen."
         },
         "POLICY": {
             "TITLE":"Richtlinen festlegen",
@@ -204,7 +213,11 @@
                 "TITLE":"Passwort Komplexität",
                 "DESCRIPTION":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
                 "TITLECREATE":"Kennwortkomplexitätsrichtlinie erstellen",
-                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen"
+                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
+                "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol und eine Nummer beinhalten!",
+                "SYMBOLERROR":"Das Password muss ein Symbol beinhalten!",
+                "NUMBERERROR":"Das Password muss eine Nummer beinhalten!",
+                "PATTERNERROR":"Das vorgeschriebene Muster ist falsch!"
             },
             "PWD_AGE": {
                 "TITLE":"Passwort Maximaldauer",
@@ -275,7 +288,8 @@
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Geben Sie den Namen ein",
-            "ROLE": "Rolle"
+            "ROLE": "Rolle",
+            "NOITEMS": "Keine Projekte"
         },
         "STATE": {
             "TITLE":"Status",
@@ -291,8 +305,8 @@
         },
         "NAME": "Name",
         "MEMBER": {
-            "TITLE": "Mitwirkende",
-            "TITLEDESC":"Mitwirkende können Änderungen an dieser Entität vornehmen",
+            "TITLE": "Manager",
+            "TITLEDESC":"Manager können Änderungen an dieser Entität vornehmen",
             "DESCRIPTION":"Hier finden Sie alle Mitwirkenden dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
@@ -474,6 +488,10 @@
             "org.changed":"Org editiert",
             "org.member.added":"Organisation Member erstellt",
             "org.member.removed":"Organisation Member gelöscht",
+            "org.domain.added":"Org Domain hinzugefügt",
+            "org.domain.verified":"Org Domain verifiziert",
+            "org.domain.primary.set":"Primäre domain gesetzt",
+            "org.iam.policy.added":"IAM Policy hinzugefügt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
             "project.deactivated":"Projekt deaktiviert",
@@ -481,7 +499,17 @@
             "project.member.removed":"Projekt Member gelöscht",
             "project.role.added":"Rolle erstellt",
             "project.role.removed":"Rolle gelöscht",
+            "project.application.added":"App hinzugefügt",
+            "project.application.config.oidc.added":"OIDC config hinzugefügt",
+            "user.added":"User hinzugefügt",
+            "user.initialization.code.added":"Init code hinzugefügt",
+            "user.phone.code.added":"User phone code hinzugefügt",
+            "user.phone.code.sent":"User phone code gesendet",
+            "user.initialization.code.sent":"Init code gesendet",
             "user.email.verification.sended": "User email verifiziert",
+            "user.email.code.added":"Email code hinzugefügt",
+            "user.email.code.sent":"Email code gesendet",
+            "user.email.verified":"Email verifiziert",
             "user.phone.verificationsended":"User phone verifikation gesendet",
             "user.phone.code":"User phone code erstellt",
             "user.initialization.verification.sended":"User mail verifikation gesendet",
@@ -496,9 +524,17 @@
             "skipped.init.mfa.user":"User MFA init überspungen",
             "user.email.password.request.sended":"User Email Password Anfrage gesended",
             "user.password.set.requested":"Password Anfrage",
-            "user.phone.verification.sended":"User Nummer verifikation gesended",
+            "user.phone.verification.sended":"User Nummer verifikation gesendet",
+            "user.phone.changed":"User phone geändert",
+            "user.phone.verified":"User phone verifiziert",
             "updated.user.profile":"User Profil update",
-            "user.email.init.sended":"User Email init sended"
+            "user.email.init.sended":"User Email init sended",
+            "user.password.changed":"Password changed",
+            "user.initialization.check.succeeded":"Init check erfolgreich",
+            "user.password.check.succeeded":"Password check erfolgreich",
+            "user.mfa.init.skipped":"MFA init übersprungen",
+            "user.mfa.otp.added":"MFA OTP hinzugefügt",
+            "user.mfa.otp.verified":"MFA OTP verifiziert"
         }
     }
 }

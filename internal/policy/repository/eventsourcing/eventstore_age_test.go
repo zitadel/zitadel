@@ -91,18 +91,6 @@ func TestCreatePasswordAgePolicy(t *testing.T) {
 				policy: &model.PasswordAgePolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name"},
 			},
 		},
-		{
-			name: "create policy no name",
-			args: args{
-				es:     GetMockPasswordAgePolicyNoEvents(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
-				policy: &model.PasswordAgePolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -147,18 +135,6 @@ func TestUpdatePasswordAgePolicy(t *testing.T) {
 			},
 			res: res{
 				policy: &model.PasswordAgePolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew"},
-			},
-		},
-		{
-			name: "update policy no name",
-			args: args{
-				es:  GetMockPasswordAgePolicy(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
-				new: &model.PasswordAgePolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: ""},
-			},
-			res: res{
-				wantErr: true,
-				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{

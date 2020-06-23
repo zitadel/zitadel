@@ -105,6 +105,8 @@ jobs:
     - run: cat internal/login/statik/statik.go
     - run: ./build/notification/generate-static.sh
     - run: cat internal/notification/statik/statik.go
+    - run: ./build/zitadel/generate-static.sh
+    - run: cat internal/statik/statik.go
     - run: CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o zitadel-${{ matrix.goos }}-${{ matrix.goarch }} cmd/zitadel/main.go
     - uses: actions/upload-artifact@v1
       with:

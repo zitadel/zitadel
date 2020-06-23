@@ -1,11 +1,15 @@
 package grpc
 
 import (
+	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func userFromModel(user *usr_model.User) *User {
@@ -57,7 +61,6 @@ func userCreateToModel(u *CreateUserRequest) *usr_model.User {
 			FirstName:         u.FirstName,
 			LastName:          u.LastName,
 			NickName:          u.NickName,
-			DisplayName:       u.DisplayName,
 			PreferredLanguage: preferredLanguage,
 			Gender:            genderToModel(u.Gender),
 		},
@@ -156,6 +159,30 @@ func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	}
 }
 
+func profileViewFromModel(profile *usr_model.Profile) *UserProfileView {
+	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
+	logging.Log("GRPC-sk8sk").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
+	logging.Log("GRPC-s30Ks'").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserProfileView{
+		Id:                 profile.AggregateID,
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		Sequence:           profile.Sequence,
+		UserName:           profile.UserName,
+		FirstName:          profile.FirstName,
+		LastName:           profile.LastName,
+		DisplayName:        profile.DisplayName,
+		NickName:           profile.NickName,
+		PreferredLanguage:  profile.PreferredLanguage.String(),
+		Gender:             genderFromModel(profile.Gender),
+		LoginNames:         profile.LoginNames,
+		PreferredLoginName: profile.PreferredLoginName,
+	}
+}
+
 func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-d8k2s").OnError(err).Debug("language malformed")
@@ -165,7 +192,6 @@ func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
-		DisplayName:       u.DisplayName,
 		PreferredLanguage: preferredLanguage,
 		Gender:            genderToModel(u.Gender),
 	}
@@ -179,6 +205,23 @@ func emailFromModel(email *usr_model.Email) *UserEmail {
 	logging.Log("GRPC-s0dkw").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserEmail{
+		Id:              email.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        email.Sequence,
+		Email:           email.EmailAddress,
+		IsEmailVerified: email.IsEmailVerified,
+	}
+}
+
+func emailViewFromModel(email *usr_model.Email) *UserEmailView {
+	creationDate, err := ptypes.TimestampProto(email.CreationDate)
+	logging.Log("GRPC-sKefs").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
+	logging.Log("GRPC-0isjD").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserEmailView{
 		Id:              email.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -213,6 +256,22 @@ func phoneFromModel(phone *usr_model.Phone) *UserPhone {
 	}
 }
 
+func phoneViewFromModel(phone *usr_model.Phone) *UserPhoneView {
+	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
+	logging.Log("GRPC-6gSj").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
+	logging.Log("GRPC-lKs8f").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserPhoneView{
+		Id:              phone.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        phone.Sequence,
+		Phone:           phone.PhoneNumber,
+		IsPhoneVerified: phone.IsPhoneVerified,
+	}
+}
 func updatePhoneToModel(e *UpdateUserPhoneRequest) *usr_model.Phone {
 	return &usr_model.Phone{
 		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
@@ -229,6 +288,26 @@ func addressFromModel(address *usr_model.Address) *UserAddress {
 	logging.Log("GRPC-si9ws").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserAddress{
+		Id:            address.AggregateID,
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Sequence:      address.Sequence,
+		Country:       address.Country,
+		StreetAddress: address.StreetAddress,
+		Region:        address.Region,
+		PostalCode:    address.PostalCode,
+		Locality:      address.Locality,
+	}
+}
+
+func addressViewFromModel(address *usr_model.Address) *UserAddressView {
+	creationDate, err := ptypes.TimestampProto(address.CreationDate)
+	logging.Log("GRPC-67stC").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
+	logging.Log("GRPC-0jSfs").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserAddressView{
 		Id:            address.AggregateID,
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
@@ -283,27 +362,32 @@ func userViewFromModel(user *usr_model.UserView) *UserView {
 	logging.Log("GRPC-dl9ws").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserView{
-		Id:              user.ID,
-		State:           userStateFromModel(user.State),
-		CreationDate:    creationDate,
-		ChangeDate:      changeDate,
-		LastLogin:       lastLogin,
-		PasswordChanged: passwordChanged,
-		Sequence:        user.Sequence,
-		ResourceOwner:   user.ResourceOwner,
-		UserName:        user.UserName,
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
-		NickName:        user.NickName,
-		Email:           user.Email,
-		IsEmailVerified: user.IsEmailVerified,
-		Phone:           user.Phone,
-		IsPhoneVerified: user.IsPhoneVerified,
-		Country:         user.Country,
-		Locality:        user.Locality,
-		Region:          user.Region,
-		PostalCode:      user.PostalCode,
-		StreetAddress:   user.StreetAddress,
+		Id:                 user.ID,
+		State:              userStateFromModel(user.State),
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		LastLogin:          lastLogin,
+		PasswordChanged:    passwordChanged,
+		UserName:           user.UserName,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		DisplayName:        user.DisplayName,
+		NickName:           user.NickName,
+		PreferredLanguage:  user.PreferredLanguage,
+		Gender:             genderFromModel(user.Gender),
+		Email:              user.Email,
+		IsEmailVerified:    user.IsEmailVerified,
+		Phone:              user.Phone,
+		IsPhoneVerified:    user.IsPhoneVerified,
+		Country:            user.Country,
+		Locality:           user.Locality,
+		PostalCode:         user.PostalCode,
+		Region:             user.Region,
+		StreetAddress:      user.StreetAddress,
+		Sequence:           user.Sequence,
+		ResourceOwner:      user.ResourceOwner,
+		LoginNames:         user.LoginNames,
+		PreferredLoginName: user.PreferredLoginName,
 	}
 }
 
@@ -396,4 +480,32 @@ func mfaStateFromModel(state usr_model.MfaState) MFAState {
 	default:
 		return MFAState_MFASTATE_UNSPECIFIED
 	}
+}
+
+func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: userChangesToMgtAPI(response),
+	}
+}
+
+func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		b, err := json.Marshal(change.Data)
+		data := &structpb.Struct{}
+		err = protojson.Unmarshal(b, data)
+		if err != nil {
+		}
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+		}
+	}
+
+	return result
 }

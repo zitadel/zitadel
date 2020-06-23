@@ -46,12 +46,12 @@ func (s *Server) GRPCPort() string {
 	return s.port
 }
 
-func (s *Server) GRPCServer() (*grpc.Server, error) {
+func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error) {
 	gs := grpc.NewServer(
 		middleware.TracingStatsServer("/Healthz", "/Ready", "/Validate"),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				middleware.ErrorHandler(),
+				middleware.ErrorHandler(defaults.DefaultLanguage),
 				ManagementService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),
 		),

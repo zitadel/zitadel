@@ -10,10 +10,7 @@ import {
     ApplicationSearchRequest,
     ApplicationSearchResponse,
     ApplicationUpdate,
-    GrantedProject,
-    GrantedProjectSearchQuery,
     GrantedProjectSearchRequest,
-    GrantedProjectSearchResponse,
     OIDCApplicationCreate,
     OIDCConfig,
     OIDCConfigUpdate,
@@ -30,6 +27,7 @@ import {
     ProjectGrantSearchRequest,
     ProjectGrantSearchResponse,
     ProjectGrantUpdate,
+    ProjectGrantView,
     ProjectID,
     ProjectMemberAdd,
     ProjectMemberChange,
@@ -42,8 +40,12 @@ import {
     ProjectRoleSearchQuery,
     ProjectRoleSearchRequest,
     ProjectRoleSearchResponse,
+    ProjectSearchQuery,
+    ProjectSearchRequest,
+    ProjectSearchResponse,
     ProjectUpdateRequest,
     ProjectUserGrantSearchRequest,
+    ProjectView,
     UserGrant,
     UserGrantCreate,
     UserGrantSearchQuery,
@@ -73,8 +75,23 @@ export class ProjectService {
         return responseMapper(response);
     }
 
+    public async SearchProjects(
+        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectSearchResponse> {
+        const req = new ProjectSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchProjects,
+            req,
+            f => f,
+        );
+    }
+
     public async SearchGrantedProjects(
-        limit: number, offset: number, queryList?: GrantedProjectSearchQuery[]): Promise<GrantedProjectSearchResponse> {
+        limit: number, offset: number, queryList?: ProjectSearchQuery[]): Promise<ProjectGrantSearchResponse> {
         const req = new GrantedProjectSearchRequest();
         req.setLimit(limit);
         req.setOffset(offset);
@@ -88,22 +105,7 @@ export class ProjectService {
         );
     }
 
-    // public async SearchGrantedProjects(
-    //     limit: number, offset: number, queryList?: GrantedProjectSearchQuery[]): Promise<GrantedProjectSearchResponse> {
-    //     const req = new GrantedProjectSearchRequest();
-    //     req.setLimit(limit);
-    //     req.setOffset(offset);
-    //     if (queryList) {
-    //         req.setQueriesList(queryList);
-    //     }
-    //     return await this.request(
-    //         c => c.search,
-    //         req,
-    //         f => f,
-    //     );
-    // }
-
-    public async GetProjectById(projectId: string): Promise<Project> {
+    public async GetProjectById(projectId: string): Promise<ProjectView> {
         const req = new ProjectID();
         req.setId(projectId);
         return await this.request(
@@ -113,12 +115,12 @@ export class ProjectService {
         );
     }
 
-    public async GetGrantedProjectGrantByID(projectId: string, id: string): Promise<GrantedProject> {
+    public async GetGrantedProjectByID(projectId: string, id: string): Promise<ProjectGrantView> {
         const req = new ProjectGrantID();
         req.setId(id);
         req.setProjectId(projectId);
         return await this.request(
-            c => c.getGrantedProjectGrantByID,
+            c => c.getGrantedProjectByID,
             req,
             f => f,
         );
@@ -134,10 +136,10 @@ export class ProjectService {
         );
     }
 
-    public async UpdateProject(project: Project.AsObject): Promise<Project> {
+    public async UpdateProject(id: string, name: string): Promise<Project> {
         const req = new ProjectUpdateRequest();
-        req.setName(project.name);
-        req.setId(project.id);
+        req.setName(name);
+        req.setId(id);
         return await this.request(
             c => c.updateProject,
             req,
@@ -344,7 +346,9 @@ export class ProjectService {
     public async AddProjectRole(role: ProjectRoleAdd.AsObject): Promise<Empty> {
         const req = new ProjectRoleAdd();
         req.setId(role.id);
-        req.setDisplayName(role.displayName);
+        if (role.displayName) {
+            req.setDisplayName(role.displayName);
+        }
         req.setKey(role.key);
         req.setGroup(role.group);
         return await this.request(

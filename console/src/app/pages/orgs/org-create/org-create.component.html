@@ -47,6 +47,13 @@
                 <div class="content">
                     <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
                     <mat-form-field class="formfield">
+                      <mat-label>{{ 'USER.PROFILE.USERNAME' | translate }}</mat-label>
+                      <input matInput formControlName="userName" required />
+                      <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
+                        {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                      </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.PROFILE.EMAIL' | translate }}</mat-label>
                         <input matInput formControlName="email" required />
                         <mat-error *ngIf="email?.invalid && email?.errors?.required">
@@ -71,13 +78,6 @@
                         <mat-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</mat-label>
                         <input matInput formControlName="nickName" />
                         <mat-error *ngIf="nickName?.invalid && nickName?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.DISPLAYNAME' | translate }}</mat-label>
-                        <input matInput formControlName="displayName" />
-                        <mat-error *ngIf="displayName?.invalid && displayName?.errors?.required">
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
                     </mat-form-field>
@@ -115,7 +115,10 @@
                             type="password" />
                         <mat-error *ngIf="password?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
-                        <mat-error *ngIf="password?.errors?.pattern">{{ 'USER.VALIDATION.INVALIDPATTERN' | translate }}
+                        <mat-error *ngIf="password?.errors?.pattern">{{ policy | passwordPattern | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.minlength">
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:policy }}
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field class="formfield">
@@ -124,6 +127,11 @@
                             type="password" />
                         <mat-error *ngIf="confirmPassword?.errors?.required">
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.pattern">{{ policy | passwordPattern | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.minlength">
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:policy }}
                         </mat-error>
                     </mat-form-field>
 

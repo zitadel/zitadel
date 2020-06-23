@@ -3,6 +3,8 @@ package grpc
 import (
 	"github.com/caos/logging"
 	admin_model "github.com/caos/zitadel/internal/admin/model"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
@@ -18,8 +20,8 @@ func setUpRequestToModel(setUp *OrgSetUpRequest) *admin_model.SetupOrg {
 
 func orgCreateRequestToModel(org *CreateOrgRequest) *org_model.Org {
 	return &org_model.Org{
-		Domain: org.Domain,
-		Name:   org.Name,
+		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
+		Name:    org.Name,
 	}
 }
 
@@ -30,7 +32,6 @@ func userCreateRequestToModel(user *CreateUserRequest) *usr_model.User {
 	return &usr_model.User{
 		Profile: &usr_model.Profile{
 			UserName:          user.UserName,
-			DisplayName:       user.DisplayName,
 			FirstName:         user.FirstName,
 			LastName:          user.LastName,
 			NickName:          user.NickName,
@@ -82,7 +83,6 @@ func orgFromModel(org *org_model.Org) *Org {
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
 	return &Org{
-		Domain:       org.Domain,
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.AggregateID,
@@ -99,7 +99,6 @@ func orgViewFromModel(org *org_model.OrgView) *Org {
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
 	return &Org{
-		Domain:       org.Domain,
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.ID,
@@ -194,5 +193,86 @@ func userStateFromModel(state usr_model.UserState) UserState {
 		return UserState_USERSTATE_LOCKED
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
+	}
+}
+
+func orgSearchRequestToModel(req *OrgSearchRequest) *org_model.OrgSearchRequest {
+	return &org_model.OrgSearchRequest{
+		Limit:         req.Limit,
+		Asc:           req.Asc,
+		Offset:        req.Offset,
+		Queries:       orgQueriesToModel(req.Queries),
+		SortingColumn: orgQueryKeyToModel(req.SortingColumn),
+	}
+}
+
+func orgQueriesToModel(queries []*OrgSearchQuery) []*org_model.OrgSearchQuery {
+	modelQueries := make([]*org_model.OrgSearchQuery, len(queries))
+
+	for i, query := range queries {
+		modelQueries[i] = orgQueryToModel(query)
+	}
+
+	return modelQueries
+}
+
+func orgQueryToModel(query *OrgSearchQuery) *org_model.OrgSearchQuery {
+	return &org_model.OrgSearchQuery{
+		Key:    orgQueryKeyToModel(query.Key),
+		Value:  query.Value,
+		Method: orgQueryMethodToModel(query.Method),
+	}
+}
+
+func orgQueryKeyToModel(key OrgSearchKey) org_model.OrgSearchKey {
+	switch key {
+	case OrgSearchKey_ORGSEARCHKEY_DOMAIN:
+		return org_model.ORGSEARCHKEY_ORG_DOMAIN
+	case OrgSearchKey_ORGSEARCHKEY_ORG_NAME:
+		return org_model.ORGSEARCHKEY_ORG_NAME
+	case OrgSearchKey_ORGSEARCHKEY_STATE:
+		return org_model.ORGSEARCHKEY_STATE
+	default:
+		return org_model.ORGSEARCHKEY_UNSPECIFIED
+	}
+}
+
+func orgQueryMethodToModel(method OrgSearchMethod) model.SearchMethod {
+	switch method {
+	case OrgSearchMethod_ORGSEARCHMETHOD_CONTAINS:
+		return model.SEARCHMETHOD_CONTAINS
+	case OrgSearchMethod_ORGSEARCHMETHOD_EQUALS:
+		return model.SEARCHMETHOD_EQUALS
+	case OrgSearchMethod_ORGSEARCHMETHOD_STARTS_WITH:
+		return model.SEARCHMETHOD_STARTS_WITH
+	default:
+		return 0
+	}
+}
+
+func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *OrgIamPolicy {
+	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
+	logging.Log("GRPC-ush36").OnError(err).Debug("unable to get timestamp from time")
+
+	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
+	logging.Log("GRPC-Ps9fW").OnError(err).Debug("unable to get timestamp from time")
+
+	return &OrgIamPolicy{
+		OrgId:                 policy.AggregateID,
+		Description:           policy.Description,
+		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
+		Default:               policy.Default,
+		CreationDate:          creationDate,
+		ChangeDate:            changeDate,
+	}
+}
+
+func orgIamPolicyRequestToModel(policy *OrgIamPolicyRequest) *org_model.OrgIamPolicy {
+	return &org_model.OrgIamPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: policy.OrgId,
+		},
+		Description:           policy.Description,
+		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
 	}
 }

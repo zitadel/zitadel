@@ -25,16 +25,13 @@ func (es *PolicyEventstore) GetPasswordLockoutPolicy(ctx context.Context, id str
 }
 
 func (es *PolicyEventstore) CreatePasswordLockoutPolicy(ctx context.Context, policy *pol_model.PasswordLockoutPolicy) (*pol_model.PasswordLockoutPolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Description is required")
-	}
 	ctxData := auth.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordLockoutPolicy(ctx, ctxData.OrgID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
 	if existingPolicy != nil && existingPolicy.Sequence > 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Policy allready exists")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-yDJ5I", "Errors.Policy.AlreadyExists")
 	}
 
 	id, err := es.idGenerator.Next()
@@ -56,9 +53,6 @@ func (es *PolicyEventstore) CreatePasswordLockoutPolicy(ctx context.Context, pol
 }
 
 func (es *PolicyEventstore) UpdatePasswordLockoutPolicy(ctx context.Context, policy *pol_model.PasswordLockoutPolicy) (*pol_model.PasswordLockoutPolicy, error) {
-	if !policy.IsValid() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Description is required")
-	}
 	ctxData := auth.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordLockoutPolicy(ctx, ctxData.OrgID)
 	if err != nil {

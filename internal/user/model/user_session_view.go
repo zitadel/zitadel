@@ -15,6 +15,8 @@ type UserSessionView struct {
 	UserAgentID                 string
 	UserID                      string
 	UserName                    string
+	LoginName                   string
+	DisplayName                 string
 	PasswordVerification        time.Time
 	MfaSoftwareVerification     time.Time
 	MfaSoftwareVerificationType req_model.MfaType
@@ -44,7 +46,7 @@ const (
 type UserSessionSearchQuery struct {
 	Key    UserSessionSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type UserSessionSearchResponse struct {
