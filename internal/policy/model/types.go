@@ -3,6 +3,9 @@ package model
 import "github.com/caos/zitadel/internal/eventstore/models"
 
 const (
+	//default
+	DefaultPolicy = "0"
+
 	// complexity
 	PasswordComplexityPolicyAggregate models.AggregateType = "policy.password.complexity"
 

@@ -14,8 +14,8 @@ import (
 func KeyByIDAndType(db *gorm.DB, table, keyID string, private bool) (*model.KeyView, error) {
 	key := new(model.KeyView)
 	query := view.PrepareGetByQuery(table,
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_ID, Method: global_model.SearchMethodEquals, Value: keyID},
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SearchMethodEquals, Value: private},
+		model.KeySearchQuery{Key: key_model.KeySearchKeyID, Method: global_model.SearchMethodEquals, Value: keyID},
+		model.KeySearchQuery{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: private},
 	)
 	err := query(db, key)
 	return key, err
@@ -24,9 +24,9 @@ func KeyByIDAndType(db *gorm.DB, table, keyID string, private bool) (*model.KeyV
 func GetSigningKey(db *gorm.DB, table string) (*model.KeyView, error) {
 	key := new(model.KeyView)
 	query := view.PrepareGetByQuery(table,
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SearchMethodEquals, Value: true},
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_USAGE, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
-		model.KeySearchQuery{Key: key_model.KEYSEARCHKEY_EXPIRY, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
+		model.KeySearchQuery{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: true},
+		model.KeySearchQuery{Key: key_model.KeySearchKeyUsage, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+		model.KeySearchQuery{Key: key_model.KeySearchKeyExpiry, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
 	)
 	err := query(db, key)
 	return key, err
@@ -37,9 +37,9 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 	query := view.PrepareSearchQuery(table,
 		model.KeySearchRequest{
 			Queries: []*key_model.KeySearchQuery{
-				{Key: key_model.KEYSEARCHKEY_PRIVATE, Method: global_model.SearchMethodEquals, Value: false},
-				{Key: key_model.KEYSEARCHKEY_USAGE, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
-				{Key: key_model.KEYSEARCHKEY_EXPIRY, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
+				{Key: key_model.KeySearchKeyPrivate, Method: global_model.SearchMethodEquals, Value: false},
+				{Key: key_model.KeySearchKeyUsage, Method: global_model.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+				{Key: key_model.KeySearchKeyExpiry, Method: global_model.SearchMethodGreaterThan, Value: time.Now().UTC()},
 			},
 		},
 	)
@@ -58,13 +58,13 @@ func PutKeys(db *gorm.DB, table string, privateKey, publicKey *model.KeyView) er
 
 func DeleteKey(db *gorm.DB, table, keyID string, private bool) error {
 	delete := view.PrepareDeleteByKeys(table,
-		view.Key{Key: model.KeySearchKey(key_model.KEYSEARCHKEY_ID), Value: keyID},
-		view.Key{Key: model.KeySearchKey(key_model.KEYSEARCHKEY_PRIVATE), Value: private},
+		view.Key{Key: model.KeySearchKey(key_model.KeySearchKeyID), Value: keyID},
+		view.Key{Key: model.KeySearchKey(key_model.KeySearchKeyPrivate), Value: private},
 	)
 	return delete(db)
 }
 
 func DeleteKeyPair(db *gorm.DB, table, keyID string) error {
-	delete := view.PrepareDeleteByKey(table, model.KeySearchKey(key_model.KEYSEARCHKEY_ID), keyID)
+	delete := view.PrepareDeleteByKey(table, model.KeySearchKey(key_model.KeySearchKeyID), keyID)
 	return delete(db)
 }
