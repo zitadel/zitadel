@@ -51,7 +51,12 @@
             "DESCRIPTION": "Here you can create new users or edit data that has already been entered.",
             "DETAIL": "Detail",
             "CREATE": "Create",
-            "MY": "My Informations"
+            "MY": "My Informations",
+            "LOGINNAMES":"Login names",
+            "LOGINNAMESDESC":"You can log into zitadel with these names",
+            "COPY":"Copy to clipboard",
+            "COPIED":"Copied to clipboard!",
+            "NOUSER":"No User"
         },
         "MFA": {
             "TITLE": "Multifactor Authentication",
@@ -177,7 +182,7 @@
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"Login with another account"
+        "ADDACCOUNT":"log in with another account"
     },
     "ORG": {
         "PAGES": {
@@ -290,7 +295,8 @@
             "CREATE": "Create project",
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
-            "NOITEMS": "No projects"
+            "NOITEMS": "No projects",
+            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
         },
         "STATE": {
             "TITLE":"State",

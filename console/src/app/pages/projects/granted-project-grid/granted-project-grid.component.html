@@ -28,8 +28,6 @@
             }}</span>
             <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
             <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span>
-            <span class="description">{{'PROJECT.TYPE.TITLE' | translate}}:
-                {{'PROJECT.TYPE.'+ProjectType.PROJECTTYPE_GRANTED | translate}}</span>
             <span *ngIf="item.changeDate" class="created">created on
                 {{
                         dateFromTimestamp(item.creationDate) | date: 'EEE dd. MMM, HH:mm'

@@ -9,13 +9,13 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     ApplicationSearchResponse,
-    Project,
     ProjectMember,
     ProjectMemberSearchResponse,
     ProjectRole,
     ProjectRoleSearchResponse,
     ProjectState,
     ProjectType,
+    ProjectView,
 } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -29,7 +29,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: Project.AsObject;
+    public project!: ProjectView.AsObject;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -105,7 +105,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     }
 
     public saveProject(): void {
-        this.projectService.UpdateProject(this.project as Project.AsObject).then(() => {
+        this.projectService.UpdateProject(this.project.projectId, this.project.name).then(() => {
             this.toast.showInfo('Project updated');
         }).catch(error => {
             this.toast.showInfo(error.message);

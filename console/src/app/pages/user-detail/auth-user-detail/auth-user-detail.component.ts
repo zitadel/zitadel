@@ -3,10 +3,9 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { Gender, UserAddress, UserEmail, UserPhone, UserProfile } from 'src/app/proto/generated/auth_pb';
+import { Gender, UserAddress, UserEmail, UserPhone, UserProfile, UserView } from 'src/app/proto/generated/auth_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -33,7 +32,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
     styleUrls: ['./auth-user-detail.component.scss'],
 })
 export class AuthUserDetailComponent implements OnDestroy {
-    public profile!: UserProfile.AsObject;
+    public user!: UserView.AsObject;
     public email: UserEmail.AsObject = { email: '' } as any;
     public phone: UserPhone.AsObject = { phone: '' } as any;
     public address: UserAddress.AsObject = { id: '' } as any;
@@ -50,11 +49,11 @@ export class AuthUserDetailComponent implements OnDestroy {
     public loading: boolean = false;
 
     public policy!: PasswordComplexityPolicy.AsObject;
+    public copied: string = '';
 
     constructor(
         public translate: TranslateService,
         private toast: ToastService,
-        private mgmtUserService: MgmtUserService,
         private userService: AuthUserService,
         private fb: FormBuilder,
         private dialog: MatDialog,
@@ -63,6 +62,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
+            console.log(this.policy);
             if (this.policy.minLength) {
                 validators.push(Validators.minLength(this.policy.minLength));
             }
@@ -76,8 +76,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 validators.push(Validators.pattern(/[0-9]/g));
             }
             if (this.policy.hasSymbol) {
-                // All characters that are not a digit or an English letter \W or a whitespace \S
-                validators.push(Validators.pattern(/[\W\S]/));
+                validators.push(Validators.pattern(/[^a-z0-9]/gi));
             }
 
             this.passwordForm = this.fb.group({
@@ -86,11 +85,12 @@ export class AuthUserDetailComponent implements OnDestroy {
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         }).catch(error => {
-            console.log('no password complexity policy defined!');
+            this.toast.showError(error.message);
+            console.error(error.message);
             this.passwordForm = this.fb.group({
                 currentPassword: ['', []],
-                newPassword: ['', []],
-                confirmPassword: ['', [passwordConfirmValidator]],
+                newPassword: ['', validators],
+                confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         });
 
@@ -116,18 +116,24 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public saveProfile(profileData: UserProfile.AsObject): void {
         console.log(profileData);
-        this.profile.firstName = profileData.firstName;
-        this.profile.lastName = profileData.lastName;
-        this.profile.nickName = profileData.nickName;
-        this.profile.displayName = profileData.displayName;
-        this.profile.gender = profileData.gender;
-        this.profile.preferredLanguage = profileData.preferredLanguage;
-        console.log(this.profile);
+        this.user.firstName = profileData.firstName;
+        this.user.lastName = profileData.lastName;
+        this.user.nickName = profileData.nickName;
+        this.user.displayName = profileData.displayName;
+        this.user.gender = profileData.gender;
+        this.user.preferredLanguage = profileData.preferredLanguage;
+        console.log(this.user);
         this.userService
-            .SaveMyUserProfile(this.profile as UserProfile.AsObject)
+            .SaveMyUserProfile(
+                this.user.firstName,
+                this.user.lastName,
+                this.user.nickName,
+                this.user.preferredLanguage,
+                this.user.gender,
+            )
             .then((data: UserProfile) => {
                 this.toast.showInfo('Saved Profile');
-                this.profile = data.toObject();
+                this.user = Object.assign(this.user, data.toObject());
             })
             .catch(data => {
                 this.toast.showError(data.message);
@@ -214,7 +220,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public savePhone(): void {
         this.phoneEditState = false;
         if (!this.phone.id) {
-            this.phone.id = this.profile.id;
+            this.phone.id = this.user.id;
         }
         this.userService
             .SaveMyUserPhone(this.phone).then((data: UserPhone) => {
@@ -265,12 +271,35 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     private async getData(): Promise<void> {
-        this.profile = (await this.userService.GetMyUserProfile()).toObject();
+        this.userService.GetMyUser().then(user => {
+            console.log(user.toObject());
+            this.user = user.toObject();
+        }).catch(err => {
+            console.error(err);
+        });
+
         this.email = (await this.userService.GetMyUserEmail()).toObject();
         this.phone = (await this.userService.GetMyUserPhone()).toObject();
         this.address = (await this.userService.GetMyUserAddress()).toObject();
 
-        console.log(this.profile);
         this.addressForm.patchValue(this.address);
+    }
+
+    public copytoclipboard(value: string): void {
+        const selBox = document.createElement('textarea');
+        selBox.style.position = 'fixed';
+        selBox.style.left = '0';
+        selBox.style.top = '0';
+        selBox.style.opacity = '0';
+        selBox.value = value;
+        document.body.appendChild(selBox);
+        selBox.focus();
+        selBox.select();
+        document.execCommand('copy');
+        document.body.removeChild(selBox);
+        this.copied = value;
+        setTimeout(() => {
+            this.copied = '';
+        }, 3000);
     }
 }

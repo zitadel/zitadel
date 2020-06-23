@@ -1,11 +1,13 @@
-<app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.MANAGE_DESCRIPTION' | translate}}">
+<app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}">
+    <div class="col">
+        <div class="row" *ngFor="let mfa of mfaSubject | async">
+            <span>{{'USER.MFA.TYPE.'+ mfa.type | translate}}</span>
+            <span>{{'USER.MFA.STATE.'+ mfa.state | translate}}</span>
+        </div>
+    </div>
     <div class="table-wrapper">
         <div class="spinner-container" *ngIf="loading$ | async">
             <mat-spinner diameter="50"></mat-spinner>
-        </div>
-
-        <div class="col">
-            <div class="row"></div>
         </div>
     </div>
 </app-card>

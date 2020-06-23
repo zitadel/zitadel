@@ -87,7 +87,7 @@ export class OrgContributorsComponent implements OnInit {
 
     public showDetail(): void {
         if (this.org?.state === OrgState.ORGSTATE_ACTIVE) {
-            this.router.navigate(['orgs', this.org.id, 'members']);
+            this.router.navigate(['org/members']);
         }
     }
 }

@@ -51,7 +51,12 @@
             "DESCRIPTION": "Hier können Sie neue User anlegen sowie bereits erfasste Userdaten bearbeiten, activieren oder deaktivieren",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
-            "MY": "Meine Informationen"
+            "MY": "Meine Informationen",
+            "LOGINNAMES":"Loginnamen",
+            "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
+            "COPY":"In die Zwischenablage kopieren",
+            "COPIED":"In die Zwischenablage kopiert!",
+            "NOUSER":"Kein User"
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
@@ -215,7 +220,7 @@
                 "TITLECREATE":"Kennwortkomplexitätsrichtlinie erstellen",
                 "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
                 "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol und eine Nummer beinhalten!",
-                "SYMBOLERROR":"Das Password msus ein Symbol beinhalten!",
+                "SYMBOLERROR":"Das Password muss ein Symbol beinhalten!",
                 "NUMBERERROR":"Das Password muss eine Nummer beinhalten!",
                 "PATTERNERROR":"Das vorgeschriebene Muster ist falsch!"
             },
@@ -289,7 +294,8 @@
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Geben Sie den Namen ein",
             "ROLE": "Rolle",
-            "NOITEMS": "Keine Projekte"
+            "NOITEMS": "Keine Projekte",
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!"
         },
         "STATE": {
             "TITLE":"Status",
@@ -500,7 +506,7 @@
             "project.role.added":"Rolle erstellt",
             "project.role.removed":"Rolle gelöscht",
             "project.application.added":"App hinzugefügt",
-            "project.application.config.oidc.added":"OIDC config hinzugefügt",   
+            "project.application.config.oidc.added":"OIDC config hinzugefügt",
             "user.added":"User hinzugefügt",
             "user.initialization.code.added":"Init code hinzugefügt",
             "user.phone.code.added":"User phone code hinzugefügt",
@@ -508,8 +514,8 @@
             "user.initialization.code.sent":"Init code gesendet",
             "user.email.verification.sended": "User email verifiziert",
             "user.email.code.added":"Email code hinzugefügt",
-            "user.email.code.sent":"Email code gesendet",   
-            "user.email.verified":"Email verifiziert",         
+            "user.email.code.sent":"Email code gesendet",
+            "user.email.verified":"Email verifiziert",
             "user.phone.verificationsended":"User phone verifikation gesendet",
             "user.phone.code":"User phone code erstellt",
             "user.initialization.verification.sended":"User mail verifikation gesendet",

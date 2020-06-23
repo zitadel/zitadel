@@ -93,8 +93,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 validators.push(Validators.pattern(/[0-9]/g));
             }
             if (this.policy.hasSymbol) {
-                // All characters that are not a digit or an English letter \W or a whitespace \S
-                validators.push(Validators.pattern(/[\W\S]/));
+                validators.push(Validators.pattern(/[^a-z0-9]/gi));
             }
 
             this.passwordForm = this.fb.group({
@@ -161,7 +160,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this.user.preferredLanguage = profileData.preferredLanguage;
         console.log(this.user);
         this.mgmtUserService
-            .SaveUserProfile(this.user)
+            .SaveUserProfile(
+                this.user.id,
+                this.user.firstName,
+                this.user.lastName,
+                this.user.nickName,
+                this.user.preferredLanguage,
+                this.user.gender)
             .then((data: UserProfile) => {
                 this.toast.showInfo('Saved Profile');
                 this.user = Object.assign(this.user, data.toObject());

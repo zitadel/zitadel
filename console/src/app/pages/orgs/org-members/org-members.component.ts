@@ -3,7 +3,6 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { Org, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
@@ -31,15 +30,12 @@ export class OrgMembersComponent implements AfterViewInit {
 
     constructor(private orgService: OrgService,
         private dialog: MatDialog,
-        private toast: ToastService,
-        private route: ActivatedRoute) {
-        this.route.params.subscribe(params => {
-            this.orgService.GetOrgById(params.orgid).then(org => {
-                this.org = org.toObject();
-                console.log(this.org);
-                this.dataSource = new ProjectMembersDataSource(this.orgService);
-                this.dataSource.loadMembers(0, 25, 'asc');
-            });
+        private toast: ToastService) {
+        this.orgService.GetMyOrg().then(org => {
+            this.org = org.toObject();
+            console.log(this.org);
+            this.dataSource = new ProjectMembersDataSource(this.orgService);
+            this.dataSource.loadMembers(0, 25, 'asc');
         });
     }
 

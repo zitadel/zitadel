@@ -1,7 +1,7 @@
 <div class="max-width-container">
     <div class="container">
         <div class="left">
-            <a *ngIf="project" [routerLink]="[ '/projects', project.id]" mat-icon-button>
+            <a *ngIf="project" [routerLink]="[ '/projects', project.projectId]" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
         </div>
@@ -23,14 +23,16 @@
                     </ng-container>
                 </div>
                 <span class="fill-space"></span>
-                <ng-template appHasRole [appHasRole]="['project.member.delete:'+project.id,'project.member.delete']">
+                <ng-template appHasRole
+                    [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
                     <button (click)="removeProjectMemberSelection()"
                         matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button
                         *ngIf="selection.hasValue()">
                         <mat-icon>remove_circle</mat-icon>
                     </button>
                 </ng-template>
-                <ng-template appHasRole [appHasRole]="['project.member.write:'+project.id,'project.member.write']">
+                <ng-template appHasRole
+                    [appHasRole]="['project.member.write:'+project.projectId,'project.member.write']">
                     <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()"
                         color="primary" mat-raised-button>
                         <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}

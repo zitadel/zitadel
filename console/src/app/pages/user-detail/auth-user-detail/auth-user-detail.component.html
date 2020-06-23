@@ -4,12 +4,25 @@
 
     <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
-    <span *ngIf="!loading && !profile">No user</span>
+    <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
-    <div class="col" *ngIf="profile">
+    <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
+        description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
+        <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
+            <span>{{login}}</span>
+            <button color="primary" [disabled]="copied == login"
+                [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                (click)="copytoclipboard(login)" mat-icon-button>
+                <i *ngIf="copied != login" class="las la-clipboard"></i>
+                <i *ngIf="copied == login" class="las la-clipboard-check"></i>
+            </button>
+        </div>
+    </app-card>
+
+    <div class="col" *ngIf="user">
         <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
             description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
-            <app-detail-form [genders]="genders" [languages]="languages" [profile]="profile"
+            <app-detail-form [genders]="genders" [languages]="languages" [profile]="user"
                 (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
             </app-detail-form>
         </app-card>
@@ -19,7 +32,7 @@
         </app-card>
     </div>
 
-    <app-card *ngIf="profile" title="{{'USER.PASSWORD.TITLE' | translate}}"
+    <app-card *ngIf="user" title="{{'USER.PASSWORD.TITLE' | translate}}"
         description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">
         <form *ngIf="passwordForm" [formGroup]="passwordForm" (ngSubmit)="setPassword()">
             <div class="content">
@@ -65,7 +78,7 @@
         </form>
     </app-card>
 
-    <app-card *ngIf="profile" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
+    <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
         description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
         <div class="method-col">
             <div class="method-row">
@@ -148,9 +161,9 @@
         </div>
     </app-card>
 
-    <app-auth-user-mfa *ngIf="profile" [profile]="profile"></app-auth-user-mfa>
+    <app-auth-user-mfa *ngIf="user"></app-auth-user-mfa>
 
-    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="profile">
+    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="user">
         <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
             <div class="content">
                 <mat-form-field class="formfield">

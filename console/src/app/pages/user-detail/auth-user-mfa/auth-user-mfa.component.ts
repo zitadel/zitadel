@@ -1,10 +1,8 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MfaOtpResponse, MFAState, MfaType, MultiFactor } from 'src/app/proto/generated/auth_pb';
-import { UserProfile } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
-import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
@@ -15,18 +13,15 @@ import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
     styleUrls: ['./auth-user-mfa.component.scss'],
 })
 export class AuthUserMfaComponent implements OnInit, OnDestroy {
-    @Input() private profile!: UserProfile.AsObject;
     public mfaSubject: BehaviorSubject<MultiFactor.AsObject[]> = new BehaviorSubject<MultiFactor.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
     public MfaType: any = MfaType;
     public MFAState: any = MFAState;
-    constructor(private userService: AuthUserService, private mgmtUserService: MgmtUserService,
-        private toast: ToastService, private dialog: MatDialog) { }
+    constructor(private userService: AuthUserService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
-        console.log(this.profile);
         this.getOTP();
     }
 
@@ -58,8 +53,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public getOTP(): void {
-        console.log('otp');
-        this.mgmtUserService.getUserMfas(this.profile.id).then(mfas => {
+        this.userService.GetMyMfas().then(mfas => {
             this.mfaSubject.next(mfas.toObject().mfasList);
             console.log(mfas.toObject());
         }).catch(error => {

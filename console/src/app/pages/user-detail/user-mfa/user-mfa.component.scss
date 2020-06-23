@@ -1,80 +1,18 @@
 
-.table-header-row {
+.col {
     display: flex;
-    align-items: center;
-  
-    .col {
-        display: flex;
-        flex-direction: column;
-        .desc {
-            font-size: .8rem;
-            color: #81868a;
-        }
-        .count {
-            font-size: 2rem;
-        }
-    }
-  
-    .fill-space {
-        flex: 1;
-    }
-  
-    .icon-button {
-        margin-right: .5rem;
-    }
-  
-    .add-button {
-        border-radius: .5rem;
-    }
-  }
-  
-  .table-wrapper {
-    overflow: auto;
+    flex-direction: column;
+    border-bottom: 1px solid #ffffff20;
+    margin-bottom: 1rem;
 
-    .spinner-container {
+    .row {
         display: flex;
+        justify-content: space-between;
+        padding: .5rem 0;
         align-items: center;
-        justify-content: center;
-    }
-    
-    table, mat-paginator {
-        width: 100%;
 
-        td, th {
-            &:first-child {
-                padding-left: 0;
-                padding-right: 1rem;
-            }
-
-            &:last-child {
-                padding-right: 0;
-            }
-        }
-
-        .data-row {
-            cursor: pointer;
-            &:hover {
-                background-color: #ffffff05;
-            }
-        }
-
-        .selection {
-            width: 50px;
-            max-width: 50px;
-        }
-    }
-}
-
-.add-row {
-    display: flex;
-    margin: -.5rem;
-
-    button {
-        border-radius: .5rem;
-        margin: .5rem;
-
-        mat-icon {
-            margin-right: .5rem;
+        span {
+            flex: 1;
         }
     }
 }

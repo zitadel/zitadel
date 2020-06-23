@@ -66,12 +66,10 @@ export class OrgService {
         );
     }
 
-    public async GetOrgById(orgId: string): Promise<Org> {
-        const req: OrgID = new OrgID();
-        req.setId(orgId);
+    public async GetMyOrg(): Promise<Org> {
         return await this.request(
-            c => c.getOrgByID,
-            req,
+            c => c.getMyOrg,
+            new Empty(),
             f => f,
         );
     }
@@ -156,22 +154,19 @@ export class OrgService {
         );
     }
 
-    public async DeactivateOrg(id: string): Promise<Org> {
-        const req = new OrgID();
-        req.setId(id);
+    public async DeactivateMyOrg(): Promise<Org> {
         return await this.request(
-            c => c.deactivateOrg,
-            req,
+            c => c.deactivateMyOrg,
+            new Empty(),
             f => f,
         );
     }
 
-    public async ReactivateOrg(id: string): Promise<Org> {
+    public async ReactivateMyOrg(): Promise<Org> {
         const req = new OrgID();
-        req.setId(id);
         return await this.request(
-            c => c.reactivateOrg,
-            req,
+            c => c.reactivateMyOrg,
+            new Empty(),
             f => f,
         );
     }
@@ -257,11 +252,9 @@ export class OrgService {
     }
 
     public async GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
-        const req = new Empty();
-
         return await this.request(
             c => c.getPasswordComplexityPolicy,
-            req,
+            new Empty(),
             f => f,
         );
     }
