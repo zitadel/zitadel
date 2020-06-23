@@ -18,14 +18,14 @@ const routes: Routes = [
         loadChildren: () => import('./org-create/org-create.module').then(m => m.OrgCreateModule),
     },
     {
-        path: ':id/policy/:policytype/create',
+        path: 'policy/:policytype/create',
         component: PasswordPolicyComponent,
         data: {
             action: PolicyComponentAction.CREATE,
         },
     },
     {
-        path: ':id/policy/:policytype',
+        path: 'policy/:policytype',
         component: PasswordPolicyComponent,
         data: {
             action: PolicyComponentAction.MODIFY,
@@ -33,7 +33,7 @@ const routes: Routes = [
         loadChildren: () => import('./password-policy/password-policy.module').then(m => m.PasswordPolicyModule),
     },
     {
-        path: ':orgid/members',
+        path: 'members',
         loadChildren: () => import('./org-members/org-members.module').then(m => m.OrgMembersModule),
     },
     {
