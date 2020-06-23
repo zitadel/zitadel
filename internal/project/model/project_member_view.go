@@ -41,7 +41,7 @@ const (
 type ProjectMemberSearchQuery struct {
 	Key    ProjectMemberSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type ProjectMemberSearchResponse struct {

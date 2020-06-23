@@ -1,0 +1,110 @@
+Errors:
+  Internal: Es ist ein interner Fehler aufgetreten
+  NoChangesFound: Keine Änderungen gefunden
+  User:
+    NotFound: Benutzer konnte nicht gefunden werden
+    UserIDMissing: User ID fehlt
+    OrgIamPolicyNil: Organisations Policy ist leer
+    EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
+    Invalid: Benutzerdaten sind ungültig
+    DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
+    AlreadyInactive: Benutzer ist bereits deaktiviert
+    NotInactive: Benutzer ist nicht inaktiv
+    ShouldBeActiveOrInitial: Benutzer ist nicht aktiv oder initialisiert
+    NotLocked: Benutzer ist nicht gesperrt
+    NoChanges: Keine Änderungen gefunden
+    InitCodeNotFound: Kein Initialisierungs Code gefunden
+    ProfileNotFound: Profil nicht gefunden
+    ProfileInvalid: Profildaten sind ungültig
+    EmailNotFound: Email nicht gefunden
+    EmailInvalid: Email ist ungültig
+    EmailAlreadyVerified: Email ist bereits verifiziert
+    PhoneNotFound: Telfonnummer nicht gefunden
+    PhoneInvalid: Telefonnummer ist ungültig
+    PhoneAlreadyVerified: Telefonnummer bereits verifiziert
+    AddressNotFound: Addresse nicht gefunden
+    Code:
+      Empty: Code ist leer
+      NotFound: Code konnte nicht gefunden werden
+      Expired: Code ist abgelaufen
+      GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
+    Password:
+      NotFound: Password nicht gefunden
+      Empty: Passwort ist leer
+      Invalid: Passwort ungültig
+    PasswordComplexityPolicy:
+      NotFound: Passwort Policy konnte nicht gefunden werden
+      MinLength: Passwort ist zu kurz
+      HasLower: Passwort beinhaltet keinen Kleinbuchstaben
+      HasUpper: Passwort beinhaltet keinen Grossbuchstaben
+      HasNumber: Passwort beinhaltet keine Nummer
+      HasSymbol: Passwort beinhaltet kein Symbol
+    Mfa:
+      Otp:
+        AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
+        NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
+        NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
+        InvalidCode: Code ist ungültig
+  Org:
+    Invalid: Organisation ist ungültig
+    AlreadyDeactivated: Organisation ist bereits deaktiviert
+    AlreadyActive: Organisation ist bereits aktiv
+    Empty: Organisation ist leer
+    NotFound: Organisation konnte nicht gefunden werden
+    InvalidDomain: Domäne ist ungültig
+    DomainMissing: Domäne fehlt
+    DomainNotOnOrg: Domäne fehlt auf Organisation
+    MemberIDMissing: Member ID fehlt
+    MemberNotFound: Organisations Member konnte nicht gefunden werden
+    InvalidMember: Organisations Member ist ungültig
+    UserIDMissing: User ID fehlt
+    PolicyAlreadyExists: Policy existiert bereits
+    PolicyNotExisting: Policy existiert nicht
+  Project:
+    ProjectIDMissing: Project Id fehlt
+    AlreadyExists: Project existiert bereits auf der Organisation
+    OrgNotExisting: Organisation existiert nicht
+    UserNotExisting: User existiert nicht
+    CouldNotGenerateClientSecret: Client Secret konnte nicht generiert werden
+    Invalid: Projekt ist ungültig
+    NotActive: Projekt ist nicht aktiv
+    NotInactive: Projekt ist nicht deaktiviert
+    UserIDMissing: User ID fehlt
+    MemberNotFound: Member konnte nicht gefunden werden
+    MemberInvalid: Member ist ungültig
+    MemberAlreadyExists: Member existiert bereits
+    MemberNotExisting: Member existiert nicht
+    MinimumOneRoleNeeded: Es muss mindestend eine Rolle hinzugefügt werden
+    RoleAlreadyExists: Rolle existiert bereits
+    RoleInvalid: Rolle ist ungültig
+    RoleNotExisting: Rolle existiert nicht
+    IDMissing: ID fehlt
+    AppNotFound: Applikation nicht gefunden
+    AppInvalid: Applikation ist ungültig
+    AppNotExisting: Applikation exisitert nicht
+    OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+    AppIsNotOIDC: Applikation ist nicht vom Typ OIDC
+    RequiredFieldsMissing: Benötigte Felder fehlen
+    GrantNotFound: Grant konnte nicht gefunden werden
+    GrantInvalid: Projekt Grant ist ungültig
+    GrantAlreadyExists: Projekt Grant existiert bereits
+    GrantNotExists: Projekt Grant existiert nicht
+    GrantHasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
+    UserIDMisisng: User ID fehlt
+  Iam:
+    MemberInvalid: Member ist ungültig
+    MemberAlreadyExisting: Member existiert bereits
+    MemberNotExisting: Member existiert nicht
+    IDMissing: Id fehlt
+    GlobalOrgMissing: Globale Organisation fehlt
+    IamProjectIDMisisng: Iam Project ID fehlt
+  Policy:
+    AlreadyExists: Policy existiert bereits
+  UserGrant:
+    NotFound: Benutzer Berechtigung konnte nicht gefunden werden
+    Invalid: Benutzer Berechtigung ist ungültig
+    IDMissing: Id fehlt
+    NotActive: Benutzer Berechtigung ist nicht aktiv
+    NotInactive: Benutzer Berechtigung ist nicht deaktiviert
+  Changes:
+    NotFound: Es konnte kein Änderungsverlauf gefunden werden

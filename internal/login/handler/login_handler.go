@@ -10,7 +10,7 @@ const (
 )
 
 type loginData struct {
-	UserName string `schema:"username"`
+	LoginName string `schema:"loginName"`
 }
 
 func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,7 @@ func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) handleUsername(w http.ResponseWriter, r *http.Request) {
+func (l *Login) handleLoginName(w http.ResponseWriter, r *http.Request) {
 	authSession, err := l.getAuthRequest(r)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
@@ -35,14 +35,14 @@ func (l *Login) handleUsername(w http.ResponseWriter, r *http.Request) {
 	l.renderLogin(w, r, authSession, nil)
 }
 
-func (l *Login) handleUsernameCheck(w http.ResponseWriter, r *http.Request) {
+func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(loginData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.CheckUsername(r.Context(), authReq.ID, data.UserName)
+	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, data.LoginName)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -56,8 +56,8 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authReq, "Login", errType, errMessage),
-		UserName: authReq.UserName,
+		baseData:  l.getBaseData(r, authReq, "Login", errType, errMessage),
+		LoginName: authReq.LoginName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, nil)
 }

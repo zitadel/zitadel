@@ -2,12 +2,14 @@ package oidc
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/id"
@@ -17,6 +19,7 @@ type OPHandlerConfig struct {
 	OPConfig              *op.Config
 	StorageConfig         StorageConfig
 	UserAgentCookieConfig *http_utils.UserAgentCookieConfig
+	Cache                 *middleware.CacheConfig
 	Endpoints             *EndpointConfig
 }
 
@@ -51,6 +54,12 @@ type OPStorage struct {
 func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository) op.OpenIDProvider {
 	cookieHandler, err := http_utils.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator)
 	logging.Log("OIDC-sd4fd").OnError(err).Panic("cannot user agent handler")
+	cache, err := middleware.DefaultCacheInterceptor(config.Endpoints.Keys.Path, config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
+	nextHandler := func(handlerFunc http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			cache(http_utils.CopyHeadersToContext(handlerFunc))
+		}
+	}
 	provider, err := op.NewDefaultOP(
 		ctx,
 		config.OPConfig,
@@ -58,7 +67,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Re
 		op.WithHttpInterceptor(
 			UserAgentCookieHandler(
 				cookieHandler,
-				http_utils.CopyHeadersToContext,
+				nextHandler,
 			),
 		),
 		op.WithCustomAuthEndpoint(op.NewEndpointWithURL(config.Endpoints.Auth.Path, config.Endpoints.Auth.URL)),

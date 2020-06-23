@@ -62,7 +62,17 @@ service AuthService {
   }
 
   //User
-  rpc GetMyUserProfile(google.protobuf.Empty) returns (UserProfile) {
+  rpc GetMyUser(google.protobuf.Empty) returns (UserView) {
+    option (google.api.http) = {
+      get: "/users/me"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc GetMyUserProfile(google.protobuf.Empty) returns (UserProfileView) {
     option (google.api.http) = {
       get: "/users/me/profile"
     };
@@ -83,7 +93,7 @@ service AuthService {
     };
   }
 
-  rpc GetMyUserEmail(google.protobuf.Empty) returns (UserEmail) {
+  rpc GetMyUserEmail(google.protobuf.Empty) returns (UserEmailView) {
     option (google.api.http) = {
       get: "/users/me/email"
     };
@@ -126,7 +136,7 @@ service AuthService {
     };
   }
 
-  rpc GetMyUserPhone(google.protobuf.Empty) returns (UserPhone) {
+  rpc GetMyUserPhone(google.protobuf.Empty) returns (UserPhoneView) {
     option (google.api.http) = {
       get: "/users/me/phone"
     };
@@ -169,7 +179,7 @@ service AuthService {
     };
   }
 
-  rpc GetMyUserAddress(google.protobuf.Empty) returns (UserAddress) {
+  rpc GetMyUserAddress(google.protobuf.Empty) returns (UserAddressView) {
     option (google.api.http) = {
       get: "/users/me/address"
     };
@@ -274,6 +284,16 @@ service AuthService {
       permission: "authenticated"
     };
   }
+
+  rpc GetMyProjectPermissions(google.protobuf.Empty) returns (MyPermissions) {
+    option (google.api.http) = {
+      get: "/permissions/me"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
 }
 
 message UserSessionViews {
@@ -286,6 +306,8 @@ message UserSessionView {
   string user_id = 4;
   string user_name = 5;
   uint64 sequence = 6;
+  string login_name = 7;
+  string display_name = 8;
 }
 
 enum UserSessionState {
@@ -300,36 +322,37 @@ enum OIDCResponseType {
   OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
 }
 
-message User {
+message UserView {
   string id = 1;
   UserState state = 2;
   google.protobuf.Timestamp creation_date = 3;
-  google.protobuf.Timestamp activation_date = 4;
-  google.protobuf.Timestamp change_date = 5;
-  google.protobuf.Timestamp last_login = 6;
-  google.protobuf.Timestamp password_changed = 7;
-  string user_name = 8;
-  string first_name = 9;
-  string last_name = 10;
+  google.protobuf.Timestamp change_date = 4;
+  google.protobuf.Timestamp last_login = 5;
+  google.protobuf.Timestamp password_changed = 6;
+  string user_name = 7;
+  string first_name = 8;
+  string last_name = 9;
+  string display_name = 10;
   string nick_name = 11;
-  string display_name = 12;
-  string preferred_language = 13;
-  Gender gender = 14;
-  string email = 15;
-  bool is_email_verified = 16;
-  string phone = 17;
-  bool is_phone_verified = 18;
-  string country = 19;
-  string locality = 20;
-  string postal_code = 21;
-  string region = 22;
-  string street_address = 23;
-  bool password_change_required = 24;
-  uint64 sequence = 25;
+  string preferred_language = 12;
+  Gender gender = 13;
+  string email = 14;
+  bool is_email_verified = 15;
+  string phone = 16;
+  bool is_phone_verified = 17;
+  string country = 18;
+  string locality = 19;
+  string postal_code = 20;
+  string region = 21;
+  string street_address = 22;
+  uint64 sequence = 23;
+  string resource_owner = 24;
+  repeated string login_names = 25;
+  string preferred_login_name = 26;
 }
 
 enum UserState {
-  USERSTATE_UNSPECIEFIED = 0;
+  USERSTATE_UNSPECIFIED = 0;
   USERSTATE_ACTIVE = 1;
   USERSTATE_INACTIVE = 2;
   USERSTATE_DELETED = 3;
@@ -359,16 +382,40 @@ message UserProfile {
   google.protobuf.Timestamp change_date = 11;
 }
 
+message UserProfileView {
+  string id = 1;
+  string user_name = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string nick_name = 5;
+  string display_name = 6;
+  string preferred_language = 7;
+  Gender gender = 8;
+  uint64 sequence = 9;
+  google.protobuf.Timestamp creation_date = 10;
+  google.protobuf.Timestamp change_date = 11;
+  repeated string login_names = 12;
+  string preferred_login_name = 13;
+}
+
 message UpdateUserProfileRequest {
   string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
   string nick_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string display_name = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string preferred_language = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  Gender gender = 6;
+  string preferred_language = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  Gender gender = 5;
 }
 
 message UserEmail {
+  string id = 1;
+  string email = 2;
+  bool isEmailVerified = 3;
+  uint64 sequence = 4;
+  google.protobuf.Timestamp creation_date = 5;
+  google.protobuf.Timestamp change_date = 6;
+}
+
+message UserEmailView {
   string id = 1;
   string email = 2;
   bool isEmailVerified = 3;
@@ -399,6 +446,15 @@ message UserPhone {
   google.protobuf.Timestamp change_date = 6;
 }
 
+message UserPhoneView {
+  string id = 1;
+  string phone = 2;
+  bool is_phone_verified = 3;
+  uint64 sequence = 4;
+  google.protobuf.Timestamp creation_date = 5;
+  google.protobuf.Timestamp change_date = 6;
+}
+
 message UpdateUserPhoneRequest {
   string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 20}];
 }
@@ -408,6 +464,18 @@ message VerifyUserPhoneRequest {
 }
 
 message UserAddress {
+  string id = 1;
+  string country = 2;
+  string locality = 3;
+  string postal_code = 4;
+  string region = 5;
+  string street_address = 6;
+  uint64 sequence = 7;
+  google.protobuf.Timestamp creation_date = 8;
+  google.protobuf.Timestamp change_date = 9;
+}
+
+message UserAddressView {
   string id = 1;
   string country = 2;
   string locality = 3;

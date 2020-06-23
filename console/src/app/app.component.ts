@@ -1,5 +1,5 @@
 import { animate, group, query, style, transition, trigger } from '@angular/animations';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Component, HostBinding, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
@@ -119,7 +119,7 @@ export class AppComponent implements OnDestroy {
     @ViewChild('drawer')
     public drawer!: MatDrawer;
     public isHandset$: Observable<boolean> = this.breakpointObserver
-        .observe(Breakpoints.Handset)
+        .observe('(max-width: 599px)')
         .pipe(map(result => {
             return result.matches;
         }));
@@ -188,11 +188,6 @@ export class AppComponent implements OnDestroy {
         this.matIconRegistry.addSvgIcon(
             'mdi_radar',
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/radar.svg'),
-        );
-
-        this.matIconRegistry.addSvgIcon(
-            'mdi_account_circle_outline',
-            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/account-circle-outline.svg'),
         );
 
         this.matIconRegistry.addSvgIcon(

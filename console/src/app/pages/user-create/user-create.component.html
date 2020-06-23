@@ -52,13 +52,6 @@
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
                     </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.DISPLAYNAME' | translate }}</mat-label>
-                        <input matInput formControlName="displayName" />
-                        <mat-error *ngIf="displayName?.invalid && displayName?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
 
                     <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
 

@@ -8,13 +8,15 @@ import (
 type Profile struct {
 	es_models.ObjectRoot
 
-	UserName          string
-	FirstName         string
-	LastName          string
-	NickName          string
-	DisplayName       string
-	PreferredLanguage language.Tag
-	Gender            Gender
+	UserName           string
+	FirstName          string
+	LastName           string
+	NickName           string
+	DisplayName        string
+	PreferredLanguage  language.Tag
+	Gender             Gender
+	PreferredLoginName string
+	LoginNames         []string
 }
 
 func (p *Profile) IsValid() bool {

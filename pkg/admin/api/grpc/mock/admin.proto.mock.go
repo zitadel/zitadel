@@ -37,6 +37,46 @@ func (m *MockAdminServiceClient) EXPECT() *MockAdminServiceClientMockRecorder {
 	return m.recorder
 }
 
+// CreateOrgIamPolicy mocks base method
+func (m *MockAdminServiceClient) CreateOrgIamPolicy(arg0 context.Context, arg1 *grpc.OrgIamPolicyRequest, arg2 ...grpc0.CallOption) (*grpc.OrgIamPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateOrgIamPolicy", varargs...)
+	ret0, _ := ret[0].(*grpc.OrgIamPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrgIamPolicy indicates an expected call of CreateOrgIamPolicy
+func (mr *MockAdminServiceClientMockRecorder) CreateOrgIamPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).CreateOrgIamPolicy), varargs...)
+}
+
+// DeleteOrgIamPolicy mocks base method
+func (m *MockAdminServiceClient) DeleteOrgIamPolicy(arg0 context.Context, arg1 *grpc.OrgIamPolicyID, arg2 ...grpc0.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteOrgIamPolicy", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteOrgIamPolicy indicates an expected call of DeleteOrgIamPolicy
+func (mr *MockAdminServiceClientMockRecorder) DeleteOrgIamPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).DeleteOrgIamPolicy), varargs...)
+}
+
 // GetOrgByID mocks base method
 func (m *MockAdminServiceClient) GetOrgByID(arg0 context.Context, arg1 *grpc.OrgID, arg2 ...grpc0.CallOption) (*grpc.Org, error) {
 	m.ctrl.T.Helper()
@@ -55,6 +95,26 @@ func (mr *MockAdminServiceClientMockRecorder) GetOrgByID(arg0, arg1 interface{},
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgByID", reflect.TypeOf((*MockAdminServiceClient)(nil).GetOrgByID), varargs...)
+}
+
+// GetOrgIamPolicy mocks base method
+func (m *MockAdminServiceClient) GetOrgIamPolicy(arg0 context.Context, arg1 *grpc.OrgIamPolicyID, arg2 ...grpc0.CallOption) (*grpc.OrgIamPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetOrgIamPolicy", varargs...)
+	ret0, _ := ret[0].(*grpc.OrgIamPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrgIamPolicy indicates an expected call of GetOrgIamPolicy
+func (mr *MockAdminServiceClientMockRecorder) GetOrgIamPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).GetOrgIamPolicy), varargs...)
 }
 
 // Healthz mocks base method
@@ -155,6 +215,26 @@ func (mr *MockAdminServiceClientMockRecorder) SetUpOrg(arg0, arg1 interface{}, a
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUpOrg", reflect.TypeOf((*MockAdminServiceClient)(nil).SetUpOrg), varargs...)
+}
+
+// UpdateOrgIamPolicy mocks base method
+func (m *MockAdminServiceClient) UpdateOrgIamPolicy(arg0 context.Context, arg1 *grpc.OrgIamPolicyRequest, arg2 ...grpc0.CallOption) (*grpc.OrgIamPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateOrgIamPolicy", varargs...)
+	ret0, _ := ret[0].(*grpc.OrgIamPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateOrgIamPolicy indicates an expected call of UpdateOrgIamPolicy
+func (mr *MockAdminServiceClientMockRecorder) UpdateOrgIamPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrgIamPolicy", reflect.TypeOf((*MockAdminServiceClient)(nil).UpdateOrgIamPolicy), varargs...)
 }
 
 // Validate mocks base method

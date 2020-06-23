@@ -1,4 +1,5 @@
 SystemDefaults:
+  DefaultLanguage: 'de'
   UserVerificationKey:
     EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
   SecretGenerators:
@@ -63,6 +64,9 @@ SystemDefaults:
       Description: Standard lockout policy
       MaxAttempts: 5
       ShowLockOutFailures: true
+    OrgIam:
+      Description: Standard org policy
+      UserLoginMustBeDomain: true
   IamID: 'IAM'
   SetUp:
     GlobalOrg: 'Global'
@@ -71,6 +75,7 @@ SystemDefaults:
       - Name: 'Global'
         Domain: 'global.caos.ch'
         Default: true
+        OrgIamPolicy: true
         Users:
           - FirstName: 'Global Org'
             LastName: 'Administrator'
@@ -84,7 +89,7 @@ SystemDefaults:
         Users:
           - FirstName: 'Zitadel'
             LastName: 'Administrator'
-            UserName: 'zitadel-admin@caos.ch'
+            UserName: 'zitadel-admin'
             Email: 'zitadel-admin@caos.ch'
             Password: 'Password1!'
         Owners:
@@ -112,7 +117,7 @@ SystemDefaults:
   Notifications:
     DebugMode: $DEBUG_MODE
     Endpoints:
-      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}'
+      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}'
       PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
       VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
     Providers:

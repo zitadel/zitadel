@@ -8,7 +8,8 @@
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="accent" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let user of users" (click)="selectAccount(user.userName)">
-            <mat-icon class="small-avatar" svgIcon="mdi_account_circle_outline"></mat-icon>
+            <i class="small-avatar las la-user-circle"></i>
+
             <div class="col">
                 <span class="title">{{user.userName}}</span>
                 <span class="email">{{'USER.STATE.'+user.authState | translate}}</span>

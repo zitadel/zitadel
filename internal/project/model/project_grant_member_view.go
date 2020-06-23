@@ -42,7 +42,7 @@ const (
 type ProjectGrantMemberSearchQuery struct {
 	Key    ProjectGrantMemberSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type ProjectGrantMemberSearchResponse struct {

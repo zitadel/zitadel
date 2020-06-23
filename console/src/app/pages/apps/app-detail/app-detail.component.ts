@@ -17,6 +17,8 @@ import {
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
+import { GrpcService } from 'src/app/services/grpc.service';
+import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -72,6 +74,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public RedirectType: any = RedirectType;
 
+    public isZitadel: boolean = false;
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -80,6 +84,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
+        private grpcService: GrpcService,
+        private orgService: OrgService,
     ) {
         this.appNameForm = this.fb.group({
             state: ['', []],
@@ -104,16 +110,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     private async getData({ projectid, id }: Params): Promise<void> {
         this.projectId = projectid;
+        this.orgService.GetIam().then(iam => {
+            this.isZitadel = iam.toObject().iamProjectId === this.projectId;
+        });
+
+
         this.projectService.GetApplicationById(projectid, id).then(app => {
             this.app = app.toObject();
             this.appNameForm.patchValue(this.app);
+            console.log(this.grpcService.clientid, this.app.oidcConfig?.clientId);
+
             if (this.app.state !== AppState.APPSTATE_ACTIVE) {
                 this.appNameForm.controls['name'].disable();
                 this.appForm.disable();
             } else {
                 this.appNameForm.controls['name'].enable();
                 this.appForm.enable();
-                this.clientId?.disable();
             }
             if (this.app.oidcConfig?.redirectUrisList) {
                 this.redirectUrisList = this.app.oidcConfig.redirectUrisList;

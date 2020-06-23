@@ -24,6 +24,7 @@ export ZITADEL_USER_VERIFICATION_KEY=UserVerificationKey_1
 export ZITADEL_OTP_VERIFICATION_KEY=OTPVerificationKey_1
 export ZITADEL_OIDC_KEYS_ID=OIDCKey_1
 export ZITADEL_COOKIE_KEY=CookieKey_1
+export ZITADEL_CSRF_KEY=CookieKey_1
 
 # Notifications
 export DEBUG_MODE=TRUE
@@ -47,5 +48,15 @@ export ZITADEL_CONSOLE=http://localhost:4200
 export CAOS_OIDC_DEV=true
 export ZITADEL_COOKIE_DOMAIN=localhost
 
+#CSRF
+export ZITADEL_CSRF_DEV=true
+
+#CACHE
+export ZITADEL_CACHE_MAXAGE=12h
+export ZITADEL_CACHE_SHARED_MAXAGE=168h
+
 #Console
 export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/
+
+#Org
+export ZITADEL_DEFAULT_DOMAIN=zitadel.ch

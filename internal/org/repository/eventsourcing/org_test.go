@@ -79,7 +79,7 @@ func Test_isReservedValidation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validate := isReservedValidation(tt.args.aggregate, tt.args.eventType)
+			validate := isEventValidation(tt.args.aggregate, tt.args.eventType)
 
 			err := validate(tt.args.Events...)
 
@@ -142,7 +142,7 @@ func Test_uniqueNameAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := uniqueNameAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgName)
+			got, err := reservedUniqueNameAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgName)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
@@ -198,7 +198,7 @@ func Test_uniqueDomainAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := uniqueDomainAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgDomain)
+			got, err := reservedUniqueDomainAggregate(tt.args.ctx, tt.args.aggCreator, "", tt.args.orgDomain)
 			if tt.res.isErr == nil && err != nil {
 				t.Errorf("no error expected got: %v", err)
 			}
@@ -425,47 +425,18 @@ func TestOrgUpdateAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
-					Name:   "coas",
+					Name: "coas",
 				},
 				updated: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
-					Name:   "caos",
+					Name: "caos",
 				},
 			},
 			res: res{
-				aggregateCount: 2,
-				isErr:          nil,
-			},
-		},
-		{
-			name: "domain changed",
-			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
-				aggCreator: es_models.NewAggregateCreator("test"),
-				existing: &model.Org{
-					ObjectRoot: es_models.ObjectRoot{
-						AggregateID: "sdaf",
-						Sequence:    5,
-					},
-					Domain: "caos.swiss",
-					Name:   "caos",
-				},
-				updated: &model.Org{
-					ObjectRoot: es_models.ObjectRoot{
-						AggregateID: "sdaf",
-						Sequence:    5,
-					},
-					Domain: "caos.ch",
-					Name:   "caos",
-				},
-			},
-			res: res{
-				aggregateCount: 2,
+				aggregateCount: 3,
 				isErr:          nil,
 			},
 		},
@@ -523,17 +494,16 @@ func TestOrgCreatedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
-					Name:   "caos",
+					Name: "caos",
 				},
 			},
 			res: res{
-				aggregateCount: 3,
+				aggregateCount: 2,
 				isErr:          nil,
 			},
 		},
 		{
-			name: "no domain error",
+			name: "org with domain successful",
 			args: args{
 				ctx:        auth.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
@@ -543,11 +513,14 @@ func TestOrgCreatedAggregates(t *testing.T) {
 						Sequence:    5,
 					},
 					Name: "caos",
+					Domains: []*model.OrgDomain{&model.OrgDomain{
+						Domain: "caos.ch",
+					}},
 				},
 			},
 			res: res{
 				aggregateCount: 2,
-				isErr:          errors.IsPreconditionFailed,
+				isErr:          nil,
 			},
 		},
 		{
@@ -560,7 +533,6 @@ func TestOrgCreatedAggregates(t *testing.T) {
 						AggregateID: "sdaf",
 						Sequence:    5,
 					},
-					Domain: "caos.ch",
 				},
 			},
 			res: res{
@@ -580,6 +552,273 @@ func TestOrgCreatedAggregates(t *testing.T) {
 			}
 			if tt.res.isErr == nil && len(got) != tt.res.aggregateCount {
 				t.Errorf("OrgUpdateAggregates() aggregate count = %d, wanted count %d", len(got), tt.res.aggregateCount)
+			}
+		})
+	}
+}
+
+func TestOrgDomainAddedAggregates(t *testing.T) {
+	type res struct {
+		eventCount int
+		eventType  es_models.EventType
+		isErr      func(error) bool
+	}
+	type args struct {
+		ctx        context.Context
+		aggCreator *es_models.AggregateCreator
+		org        *model.Org
+		domain     *model.OrgDomain
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no domain error",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain successful",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+				org: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "sdaf",
+						Sequence:    5,
+					},
+				},
+				domain: &model.OrgDomain{
+					Domain: "caos.ch",
+				},
+			},
+			res: res{
+				eventCount: 1,
+				eventType:  model.OrgDomainAdded,
+				isErr:      nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg := OrgDomainAddedAggregate(tt.args.aggCreator, tt.args.org, tt.args.domain)
+			got, err := agg(tt.args.ctx)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got %T: %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+
+			if tt.res.isErr == nil && got.Events[0].Type != tt.res.eventType {
+				t.Errorf("OrgDomainAddedAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
+			}
+			if tt.res.isErr == nil && len(got.Events) != tt.res.eventCount {
+				t.Errorf("OrgDomainAddedAggregate() event count = %v, wanted count %v", len(got.Events), tt.res.eventCount)
+			}
+		})
+	}
+}
+
+func TestOrgDomainVerifiedAggregates(t *testing.T) {
+	type res struct {
+		aggregateCount int
+		isErr          func(error) bool
+	}
+	type args struct {
+		ctx        context.Context
+		aggCreator *es_models.AggregateCreator
+		org        *model.Org
+		domain     *model.OrgDomain
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no domain error",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain successful",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+				org: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "sdaf",
+						Sequence:    5,
+					},
+				},
+				domain: &model.OrgDomain{
+					Domain: "caos.ch",
+				},
+			},
+			res: res{
+				aggregateCount: 2,
+				isErr:          nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg := OrgDomainVerifiedAggregate(tt.args.aggCreator, tt.args.org, tt.args.domain)
+			got, err := agg(tt.args.ctx)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got %T: %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			if tt.res.isErr == nil && len(got) != tt.res.aggregateCount {
+				t.Errorf("OrgDomainVerifiedAggregate() aggregate count = %d, wanted count %d", len(got), tt.res.aggregateCount)
+			}
+		})
+	}
+}
+
+func TestOrgDomainSetPrimaryAggregates(t *testing.T) {
+	type res struct {
+		eventsCount int
+		eventType   es_models.EventType
+		isErr       func(error) bool
+	}
+	type args struct {
+		ctx        context.Context
+		aggCreator *es_models.AggregateCreator
+		org        *model.Org
+		domain     *model.OrgDomain
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no domain error",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+			},
+			res: res{
+				isErr: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain successful",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+				org: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "sdaf",
+						Sequence:    5,
+					},
+				},
+				domain: &model.OrgDomain{
+					Domain: "caos.ch",
+				},
+			},
+			res: res{
+				eventsCount: 1,
+				eventType:   model.OrgDomainPrimarySet,
+				isErr:       nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg := OrgDomainSetPrimaryAggregate(tt.args.aggCreator, tt.args.org, tt.args.domain)
+			got, err := agg(tt.args.ctx)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got %T: %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			if tt.res.isErr == nil && got.Events[0].Type != tt.res.eventType {
+				t.Errorf("OrgDomainSetPrimaryAggregate() event type = %v, wanted count %v", got.Events[0].Type, tt.res.eventType)
+			}
+			if tt.res.isErr == nil && len(got.Events) != tt.res.eventsCount {
+				t.Errorf("OrgDomainSetPrimaryAggregate() event count = %d, wanted count %d", len(got.Events), tt.res.eventsCount)
+			}
+		})
+	}
+}
+
+func TestOrgDomainRemovedAggregates(t *testing.T) {
+	type res struct {
+		aggregateCount int
+		isErr          func(error) bool
+	}
+	type args struct {
+		ctx        context.Context
+		aggCreator *es_models.AggregateCreator
+		org        *model.Org
+		domain     *model.OrgDomain
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no domain error",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+			},
+			res: res{
+				aggregateCount: 0,
+				isErr:          errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "domain successful",
+			args: args{
+				ctx:        auth.NewMockContext("org", "user"),
+				aggCreator: es_models.NewAggregateCreator("test"),
+				org: &model.Org{
+					ObjectRoot: es_models.ObjectRoot{
+						AggregateID: "sdaf",
+						Sequence:    5,
+					},
+				},
+				domain: &model.OrgDomain{
+					Domain: "caos.ch",
+				},
+			},
+			res: res{
+				aggregateCount: 2,
+				isErr:          nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := OrgDomainRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.org, tt.args.domain)
+			if tt.res.isErr == nil && err != nil {
+				t.Errorf("no error expected got %T: %v", err, err)
+			}
+			if tt.res.isErr != nil && !tt.res.isErr(err) {
+				t.Errorf("wrong error got %T: %v", err, err)
+			}
+			if tt.res.isErr == nil && len(got) != tt.res.aggregateCount {
+				t.Errorf("OrgDomainRemovedAggregate() aggregate count = %d, wanted count %d", len(got), tt.res.aggregateCount)
 			}
 		})
 	}

@@ -3,6 +3,7 @@ package view
 import (
 	"github.com/caos/zitadel/internal/org/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view"
 )
 
@@ -10,15 +11,15 @@ const (
 	orgTable = "auth.orgs"
 )
 
-func (v *View) OrgByID(orgID string) (*org_view.OrgView, error) {
+func (v *View) OrgByID(orgID string) (*org_model.OrgView, error) {
 	return org_view.OrgByID(v.Db, orgTable, orgID)
 }
 
-func (v *View) SearchOrgs(req *model.OrgSearchRequest) ([]*org_view.OrgView, int, error) {
+func (v *View) SearchOrgs(req *model.OrgSearchRequest) ([]*org_model.OrgView, int, error) {
 	return org_view.SearchOrgs(v.Db, orgTable, req)
 }
 
-func (v *View) PutOrg(org *org_view.OrgView) error {
+func (v *View) PutOrg(org *org_model.OrgView) error {
 	err := org_view.PutOrg(v.Db, orgTable, org)
 	if err != nil {
 		return err

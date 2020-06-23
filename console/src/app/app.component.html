@@ -18,7 +18,7 @@
 
     <mat-menu #menu="matMenu">
         <mat-progress-bar *ngIf="orgLoading" color="accent" mode="indeterminate"></mat-progress-bar>
-        <button class="show-all" mat-menu-item [routerLink]="[ '/orgs' ]">Show all organizations</button>
+        <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">Show all organizations</button>
 
         <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id" *ngFor="let temporg of orgs"
             mat-menu-item (click)="setActiveOrg(temporg)">
@@ -27,7 +27,7 @@
         </button>
 
         <ng-template appHasRole [appHasRole]="['iam.write']">
-            <button mat-menu-item [routerLink]="[ '/orgs/create' ]">
+            <button mat-menu-item [routerLink]="[ '/org/create' ]">
                 <mat-icon class="avatar">add</mat-icon>
                 {{'MENU.NEWORG' | translate}}
             </button>
@@ -63,8 +63,7 @@
                     <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                 </a>
 
-                <a *ngIf="showOrgSection && org?.id" class="nav-item" [routerLinkActive]="['active']"
-                    [routerLink]="[ '/orgs', org.id]">
+                <a *ngIf="showOrgSection" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
                     <i class="icon las la-archway"></i>
                     <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
                 </a>

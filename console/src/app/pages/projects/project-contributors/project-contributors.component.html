@@ -5,15 +5,10 @@
         <div class="img-list">
             <ng-container *ngIf="totalResult < 10; else compact">
                 <ng-container *ngFor="let member of membersSubject | async">
-                    <!-- <img (click)="showDetail()" *ngIf="member.imageURL; else render" class="avatar-img"
-                        [src]="member.imageURL" matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}"
-                        alt="editor avatar" />
-                    <ng-template #render> -->
                     <div (click)="showDetail()" class="avatar-circle"
                         matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
-                        <mat-icon>face</mat-icon>
+                        <i class="avatar las la-user-circle"></i>
                     </div>
-                    <!-- </ng-template> -->
                 </ng-container>
             </ng-container>
             <ng-template #compact>

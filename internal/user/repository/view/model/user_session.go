@@ -27,7 +27,9 @@ type UserSessionView struct {
 	State                       int32     `json:"-" gorm:"column:state"`
 	UserAgentID                 string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
 	UserID                      string    `json:"userID" gorm:"column:user_id;primary_key"`
-	UserName                    string    `json:"userName" gorm:"column:user_name"`
+	UserName                    string    `json:"-" gorm:"column:user_name"`
+	LoginName                   string    `json:"-" gorm:"column:login_name"`
+	DisplayName                 string    `json:"-" gorm:"column:user_display_name"`
 	PasswordVerification        time.Time `json:"-" gorm:"column:password_verification"`
 	MfaSoftwareVerification     time.Time `json:"-" gorm:"column:mfa_software_verification"`
 	MfaSoftwareVerificationType int32     `json:"-" gorm:"column:mfa_software_verification_type"`
@@ -54,6 +56,8 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		UserAgentID:                 userSession.UserAgentID,
 		UserID:                      userSession.UserID,
 		UserName:                    userSession.UserName,
+		LoginName:                   userSession.LoginName,
+		DisplayName:                 userSession.DisplayName,
 		PasswordVerification:        userSession.PasswordVerification,
 		MfaSoftwareVerification:     userSession.MfaSoftwareVerification,
 		MfaSoftwareVerificationType: req_model.MfaType(userSession.MfaSoftwareVerificationType),
@@ -72,20 +76,25 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 }
 
 func (v *UserSessionView) AppendEvent(event *models.Event) {
+	v.Sequence = event.Sequence
 	v.ChangeDate = event.CreationDate
 	switch event.Type {
 	case es_model.UserPasswordCheckSucceeded:
 		v.PasswordVerification = event.CreationDate
+		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.UserPasswordCheckFailed,
 		es_model.UserPasswordChanged:
 		v.PasswordVerification = time.Time{}
 	case es_model.MfaOtpCheckSucceeded:
 		v.MfaSoftwareVerification = event.CreationDate
 		v.MfaSoftwareVerificationType = int32(req_model.MfaTypeOTP)
+		v.State = int32(req_model.UserSessionStateActive)
 	case es_model.MfaOtpCheckFailed,
 		es_model.MfaOtpRemoved:
 		v.MfaSoftwareVerification = time.Time{}
-	case es_model.SignedOut:
+	case es_model.SignedOut,
+		es_model.UserLocked,
+		es_model.UserDeactivated:
 		v.PasswordVerification = time.Time{}
 		v.MfaSoftwareVerification = time.Time{}
 		v.State = int32(req_model.UserSessionStateTerminated)

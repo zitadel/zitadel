@@ -7,10 +7,13 @@ import (
 	"github.com/caos/zitadel/internal/notification/providers/email"
 	"github.com/caos/zitadel/internal/notification/providers/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	pol "github.com/caos/zitadel/internal/policy"
+	"golang.org/x/text/language"
 )
 
 type SystemDefaults struct {
+	DefaultLanguage       language.Tag
 	SecretGenerators      SecretGenerators
 	UserVerificationKey   *crypto.KeyConfig
 	Multifactors          MultifactorConfig
@@ -50,6 +53,7 @@ type DefaultPolicies struct {
 	Age        pol.PasswordAgePolicyDefault
 	Complexity pol.PasswordComplexityPolicyDefault
 	Lockout    pol.PasswordLockoutPolicyDefault
+	OrgIam     org_model.OrgIamPolicy
 }
 
 type Notifications struct {

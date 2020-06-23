@@ -6,17 +6,32 @@
 
 <form action="{{ userSelectionUrl }}" method="POST">
 
+    {{ .CSRF }}
+
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="actions">
-        {{ range $user := .Users }}
-        {{ $sessionState := (t (printf "UserSelection.SessionState%v" $user.UserSessionState)) }}
-        <button type="submit" name="userID" value="{{$user.UserID}}" class="primary">
-            <span class="username">{{$user.UserName}}</span>
-            <span class="sessionstate">({{$sessionState}})</span>
-        </button>
+        {{ if .Users }}
+        <div class="user-selection-list">
+            {{ range $user := .Users }}
+            {{ $sessionState := (printf "sessionstate-%v" $user.UserSessionState) }}
+            <button type="submit" name="userID" value="{{$user.UserID}}" class="clean user-selection">
+                <div>
+                    <div class="profile-image"></div>
+                    <div class="sessionstate {{$sessionState}}"></div>
+                </div>
+                <div class="names">
+                    <div class="displayname">{{$user.DisplayName}}</div>
+                    <div class="loginname">{{$user.LoginName}}</div>
+                </div>
+            </button>
+            {{ end }}
+        </div>
         {{ end }}
-        <button type="submit" name="userID" value="0" class="primary">{{t "UserSelection.OtherUser"}}</button>
+        <button type="submit" name="userID" value="0" class="clean other-user">
+            <div class="other-user-image"></div>
+            <div>{{t "UserSelection.OtherUser"}}</div>
+        </button>
     </div>
 </form>
 

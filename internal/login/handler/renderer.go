@@ -3,6 +3,11 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"html/template"
+
+	"github.com/gorilla/csrf"
+
+	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
@@ -58,11 +63,11 @@ func CreateRenderer(staticDir http.FileSystem, cookieName string, defaultLanguag
 		"registerUrl": func(id string) string {
 			return fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id)
 		},
-		"usernameUrl": func() string {
-			return EndpointUsername
+		"loginNameUrl": func() string {
+			return EndpointLoginName
 		},
-		"usernameChangeUrl": func(id string) string {
-			return fmt.Sprintf("%s?%s=%s", EndpointUsername, queryAuthRequestID, id)
+		"loginNameChangeUrl": func(id string) string {
+			return fmt.Sprintf("%s?%s=%s", EndpointLoginName, queryAuthRequestID, id)
 		},
 		"userSelectionUrl": func() string {
 			return EndpointUserSelection
@@ -163,7 +168,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *model.MfaPromptStep:
 		l.renderMfaPrompt(w, r, authReq, step, err)
 	case *model.InitUserStep:
-		l.renderInitUser(w, r, authReq, "", "", nil)
+		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
@@ -189,6 +194,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		Theme:     l.getTheme(r),
 		ThemeMode: l.getThemeMode(r),
 		AuthReqID: getRequestID(authReq, r),
+		CSRF:      csrf.TemplateField(r),
+		Nonce:     middleware.GetNonce(r),
 	}
 }
 
@@ -217,6 +224,19 @@ func getRequestID(authReq *model.AuthRequest, r *http.Request) string {
 	return r.FormValue(queryAuthRequestID)
 }
 
+func (l *Login) csrfErrorHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := csrf.FailureReason(r)
+		l.renderInternalError(w, r, nil, err)
+	})
+}
+
+func (l *Login) cspErrorHandler(err error) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		l.renderInternalError(w, r, nil, err)
+	})
+}
+
 type baseData struct {
 	errorData
 	Lang      string
@@ -224,6 +244,8 @@ type baseData struct {
 	Theme     string
 	ThemeMode string
 	AuthReqID string
+	CSRF      template.HTML
+	Nonce     string
 }
 
 type errorData struct {
@@ -233,7 +255,7 @@ type errorData struct {
 
 type userData struct {
 	baseData
-	UserName            string
+	LoginName           string
 	PasswordChecked     string
 	MfaProviders        []model.MfaType
 	SelectedMfaProvider model.MfaType
@@ -246,22 +268,22 @@ type userSelectionData struct {
 
 type mfaData struct {
 	baseData
-	UserName     string
+	LoginName    string
 	MfaProviders []model.MfaType
 	MfaRequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
-	UserName string
-	MfaType  model.MfaType
+	LoginName string
+	MfaType   model.MfaType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
-	UserName string
-	MfaType  model.MfaType
+	LoginName string
+	MfaType   model.MfaType
 }
 
 type otpData struct {

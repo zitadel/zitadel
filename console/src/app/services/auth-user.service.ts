@@ -21,6 +21,7 @@ import {
     UserPhone,
     UserProfile,
     UserSessionViews,
+    UserView,
     VerifyMfaOtp,
     VerifyUserPhoneRequest,
 } from '../proto/generated/auth_pb';
@@ -61,6 +62,14 @@ export class AuthUserService {
         );
     }
 
+    public async GetMyUser(): Promise<UserView> {
+        return await this.request(
+            c => c.getMyUser,
+            new Empty(),
+            f => f,
+        );
+    }
+
     public async GetMyMfas(): Promise<MultiFactors> {
         return await this.request(
             c => c.getMyMfas,
@@ -88,14 +97,14 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserProfile(profile: UserProfile.AsObject): Promise<UserProfile> {
+    public async SaveMyUserProfile(profile: UserView.AsObject): Promise<UserProfile> {
         const req = new UpdateUserProfileRequest();
         req.setFirstName(profile.firstName);
         req.setLastName(profile.lastName);
         req.setNickName(profile.nickName);
-        req.setDisplayName(profile.displayName);
         req.setPreferredLanguage(profile.preferredLanguage);
         req.setGender(profile.gender);
+        console.log(req.toObject());
         return await this.request(
             c => c.updateMyUserProfile,
             req,
@@ -264,7 +273,12 @@ export class AuthUserService {
 
             return this.GetMyzitadelPermissions().pipe(
                 switchMap(response => {
-                    const userRoles = response.toObject().permissionsList;
+                    let userRoles = [];
+                    if (response.toObject().permissionsList) {
+                        userRoles = response.toObject().permissionsList;
+                    } else {
+                        userRoles = ['user.resourceowner'];
+                    }
                     this._roleCache = userRoles;
                     return of(this.hasRoles(userRoles, roles, each));
                 }),
