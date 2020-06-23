@@ -2594,38 +2594,3 @@ message ProjectGrantUserGrantSearchRequest {
     uint64 limit = 3;
     repeated UserGrantSearchQuery queries = 4;
 }
-
-message AuthGrantSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    AuthGrantSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];
-    bool asc = 4;
-    repeated AuthGrantSearchQuery queries = 5;
-}
-
-message AuthGrantSearchQuery {
-    AuthGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
-    SearchMethod method = 2 [(validate.rules).enum = {in: [0]}];
-    string value = 3;
-}
-
-enum AuthGrantSearchKey {
-    AUTHGRANTSEARCHKEY_UNSPECIFIED = 0;
-    AUTHGRANTSEARCHKEY_ORG_ID = 1;
-    AUTHGRANTSEARCHKEY_PROJECT_ID = 2;
-    AUTHGRANTSEARCHKEY_USER_ID = 3;
-}
-
-message AuthGrantSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated AuthGrant result = 4;
-}
-
-message AuthGrant {
-    string orgId = 1;
-    string projectId = 2;
-    string userId = 3;
-    repeated string roles = 4;
-}
