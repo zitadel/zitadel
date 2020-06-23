@@ -313,9 +313,10 @@ export class ProjectService {
         );
     }
 
-    public async RegenerateOIDCClientSecret(id: string): Promise<any> {
+    public async RegenerateOIDCClientSecret(id: string, projectId: string): Promise<any> {
         const req = new ApplicationID();
         req.setId(id);
+        req.setProjectId(projectId);
         return await this.request(
             c => c.regenerateOIDCClientSecret,
             req,

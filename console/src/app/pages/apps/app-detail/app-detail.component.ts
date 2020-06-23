@@ -235,7 +235,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateOIDCClientSecret(): void {
-        this.projectService.RegenerateOIDCClientSecret(this.app.id).then((data: OIDCConfig) => {
+        console.log(this.app.id, this.projectId);
+        this.projectService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: OIDCConfig) => {
             console.log(data.toObject());
             this.toast.showInfo('OIDC Secret Regenerated');
             this.dialog.open(AppSecretDialogComponent, {

@@ -252,11 +252,9 @@ export class OrgService {
     }
 
     public async GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
-        const req = new Empty();
-
         return await this.request(
             c => c.getPasswordComplexityPolicy,
-            req,
+            new Empty(),
             f => f,
         );
     }

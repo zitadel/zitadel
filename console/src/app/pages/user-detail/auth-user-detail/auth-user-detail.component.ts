@@ -49,7 +49,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public loading: boolean = false;
 
     public policy!: PasswordComplexityPolicy.AsObject;
-    public copied: boolean = false;
+    public copied: string = '';
 
     constructor(
         public translate: TranslateService,
@@ -62,6 +62,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
+            console.log(this.policy);
             if (this.policy.minLength) {
                 validators.push(Validators.minLength(this.policy.minLength));
             }
@@ -84,11 +85,12 @@ export class AuthUserDetailComponent implements OnDestroy {
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         }).catch(error => {
-            console.log('no password complexity policy defined!');
+            this.toast.showError(error.message);
+            console.error(error.message);
             this.passwordForm = this.fb.group({
                 currentPassword: ['', []],
-                newPassword: ['', []],
-                confirmPassword: ['', [passwordConfirmValidator]],
+                newPassword: ['', validators],
+                confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         });
 
@@ -295,9 +297,9 @@ export class AuthUserDetailComponent implements OnDestroy {
         selBox.select();
         document.execCommand('copy');
         document.body.removeChild(selBox);
-        this.copied = true;
+        this.copied = value;
         setTimeout(() => {
-            this.copied = false;
+            this.copied = '';
         }, 3000);
     }
 }

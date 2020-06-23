@@ -10,11 +10,11 @@
         description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
         <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
             <span>{{login}}</span>
-            <button color="primary" [disabled]="copied"
-                [matTooltip]="(!copied ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+            <button color="primary" [disabled]="copied == login"
+                [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
                 (click)="copytoclipboard(login)" mat-icon-button>
-                <i *ngIf="!copied" class="las la-clipboard"></i>
-                <i *ngIf="copied" class="las la-clipboard-check"></i>
+                <i *ngIf="copied != login" class="las la-clipboard"></i>
+                <i *ngIf="copied == login" class="las la-clipboard-check"></i>
             </button>
         </div>
     </app-card>
