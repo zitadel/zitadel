@@ -17,7 +17,11 @@
         border-radius: .5rem;
         display: flex;
         flex-direction: column;
-
+        .editor {
+            color: #81868a;
+            font-size: 12px;
+            align-self: flex-end;
+        }
         .seq {
             color: #81868a;
             font-size: 12px;
