@@ -92,26 +92,16 @@ func request_ManagementService_GetUserByID_0(ctx context.Context, marshaler runt
 
 }
 
+var (
+	filter_ManagementService_GetUserByEmailGlobal_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
 func request_ManagementService_GetUserByEmailGlobal_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UserEmailID
+	var protoReq Email
 	var metadata runtime.ServerMetadata
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["email"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "email")
-	}
-
-	protoReq.Email, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "email", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_GetUserByEmailGlobal_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetUserByEmailGlobal(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1111,30 +1101,12 @@ func request_ManagementService_GetOrgByID_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_ManagementService_GetOrgByDomainGlobal_0 = &utilities.DoubleArray{Encoding: map[string]int{"domain": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_ManagementService_GetOrgByDomainGlobal_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
 func request_ManagementService_GetOrgByDomainGlobal_0(ctx context.Context, marshaler runtime.Marshaler, client ManagementServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq OrgDomain
+	var protoReq Domain
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["domain"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "domain")
-	}
-
-	protoReq.Domain, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "domain", err)
-	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagementService_GetOrgByDomainGlobal_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -6178,7 +6150,7 @@ var (
 
 	pattern_ManagementService_GetUserByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, ""))
 
-	pattern_ManagementService_GetUserByEmailGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"global", "users", "email"}, ""))
+	pattern_ManagementService_GetUserByEmailGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"global", "users", "_byemail"}, ""))
 
 	pattern_ManagementService_SearchUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "_search"}, ""))
 
@@ -6256,7 +6228,7 @@ var (
 
 	pattern_ManagementService_GetOrgByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"orgs", "id"}, ""))
 
-	pattern_ManagementService_GetOrgByDomainGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"global", "orgs", "domain"}, ""))
+	pattern_ManagementService_GetOrgByDomainGlobal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"global", "orgs", "_bydomain"}, ""))
 
 	pattern_ManagementService_DeactivateOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "id", "_deactivate"}, ""))
 

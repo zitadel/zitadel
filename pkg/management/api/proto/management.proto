@@ -73,9 +73,9 @@ service ManagementService {
         };
     }
 
-    rpc GetUserByEmailGlobal(UserEmailID) returns (UserView) {
+    rpc GetUserByEmailGlobal(Email) returns (UserView) {
         option (google.api.http) = {
-            get: "/global/users/email/{email}"
+            get: "/global/users/_byemail"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -495,9 +495,9 @@ service ManagementService {
         };
     }
 
-    rpc GetOrgByDomainGlobal(OrgDomain) returns (OrgView) {
+    rpc GetOrgByDomainGlobal(Domain) returns (OrgView) {
         option (google.api.http) = {
-            get: "/global/orgs/domain/{domain}"
+            get: "/global/orgs/_bydomain"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1374,7 +1374,7 @@ message UserID {
     string id = 1;
 }
 
-message UserEmailID {
+message Email {
     string email = 1;
 }
 
@@ -1824,6 +1824,10 @@ enum OrgState {
     ORGSTATE_UNSPECIFIED = 0;
     ORGSTATE_ACTIVE = 1;
     ORGSTATE_INACTIVE = 2;
+}
+
+message Domain {
+    string domain = 1;
 }
 
 message OrgDomains {

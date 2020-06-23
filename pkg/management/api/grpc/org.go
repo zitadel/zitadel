@@ -13,7 +13,7 @@ func (s *Server) GetOrgByID(ctx context.Context, orgID *OrgID) (*OrgView, error)
 	return orgViewFromModel(org), nil
 }
 
-func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *OrgDomain) (*OrgView, error) {
+func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *Domain) (*OrgView, error) {
 	org, err := s.org.OrgByDomainGlobal(ctx, in.Domain)
 	if err != nil {
 		return nil, err

@@ -17,7 +17,7 @@ func (s *Server) GetUserByID(ctx context.Context, id *UserID) (*UserView, error)
 	return userViewFromModel(user), nil
 }
 
-func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *UserEmailID) (*UserView, error) {
+func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *Email) (*UserView, error) {
 	user, err := s.user.GetGlobalUserByEmail(ctx, email.Email)
 	if err != nil {
 		return nil, err

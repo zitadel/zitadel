@@ -46,7 +46,7 @@
         ]
       }
     },
-    "/global/orgs/domain/{domain}": {
+    "/global/orgs/_bydomain": {
       "get": {
         "operationId": "GetOrgByDomainGlobal",
         "responses": {
@@ -60,50 +60,9 @@
         "parameters": [
           {
             "name": "domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "org_id",
             "in": "query",
             "required": false,
             "type": "string"
-          },
-          {
-            "name": "creation_date",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "change_date",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "date-time"
-          },
-          {
-            "name": "verified",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "primary",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "sequence",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "uint64"
           }
         ],
         "tags": [
@@ -111,7 +70,7 @@
         ]
       }
     },
-    "/global/users/email/{email}": {
+    "/global/users/_byemail": {
       "get": {
         "operationId": "GetUserByEmailGlobal",
         "responses": {
@@ -125,8 +84,8 @@
         "parameters": [
           {
             "name": "email",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
