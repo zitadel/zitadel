@@ -1,3 +1,7 @@
+<app-granted-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
+    [items]="grantedProjectList">
+</app-granted-project-grid>
+
 <div *ngIf="!grid" class="view-toggle">
     <button (click)="grid = true" mat-icon-button>
         <i matTooltip="show grid view" class="las la-th-large"></i>
@@ -27,9 +31,6 @@
                 <mat-icon svgIcon="mdi_light_on"></mat-icon>
             </button>
         </div>
-        <a class="add-button" [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
-            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-        </a>
     </div>
     <div class="table-wrapper">
         <div class="spinner-container" *ngIf="(loading$ | async) || (loading$ | async)">

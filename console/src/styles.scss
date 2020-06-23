@@ -129,6 +129,12 @@ $light-theme: mat-light-theme($light-primary, $light-accent, $light-warn);
 
 $dark-theme: mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
+
+$custom-typography: mat-typography-config(
+    $font-family: 'Rubik'
+);
+@include mat-core($custom-typography);
+
 // default theme
 @include component-themes($dark-theme);
 @include angular-material-theme($dark-theme);

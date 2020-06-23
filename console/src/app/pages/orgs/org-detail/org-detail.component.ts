@@ -83,6 +83,10 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         console.log(domain);
         this.orgService.RemoveMyOrgDomain(domain).then(() => {
             this.toast.showInfo('Removed');
+            const index = this.domains.findIndex(d => d.domain === domain);
+            if (index > -1) {
+                this.domains.splice(index, 1);
+            }
         }).catch(error => {
             this.toast.showError(error.message);
         });
