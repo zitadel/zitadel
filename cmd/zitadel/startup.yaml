@@ -205,9 +205,12 @@ Admin:
 Console:
   Port: 50050
   EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
-  Cache:
-    MaxAge: $ZITADEL_CACHE_MAXAGE
-    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+  ShortCache:
+    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
+    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
+  LongCache:
+      MaxAge: $ZITADEL_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
   CSPDomain: $ZITADEL_DEFAULT_DOMAIN
 
 
