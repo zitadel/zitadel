@@ -48,6 +48,7 @@
     },
     "/global/orgs/_bydomain": {
       "get": {
+        "summary": "search a organisation by its domain overall organisations",
         "operationId": "GetOrgByDomainGlobal",
         "responses": {
           "200": {
@@ -72,6 +73,7 @@
     },
     "/global/users/_byemail": {
       "get": {
+        "summary": "GetUserByEmailGlobal returns User, global search is overall organisations",
         "operationId": "GetUserByEmailGlobal",
         "responses": {
           "200": {
@@ -96,7 +98,7 @@
     },
     "/grantedprojects/_search": {
       "post": {
-        "summary": "GRANTED_PROJECT_GRANTS",
+        "summary": "returns all projects my organisation got granted from another organisation",
         "operationId": "SearchGrantedProjects",
         "responses": {
           "200": {
@@ -123,6 +125,7 @@
     },
     "/grantedprojects/{project_id}/grants/{id}": {
       "get": {
+        "summary": "returns a project my organisation got granted from another organisation",
         "operationId": "GetGrantedProjectByID",
         "responses": {
           "200": {
@@ -170,7 +173,7 @@
     },
     "/iam": {
       "get": {
-        "summary": "IAM",
+        "summary": "GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)",
         "operationId": "GetIam",
         "responses": {
           "200": {
@@ -180,6 +183,74 @@
             }
           }
         },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me": {
+      "get": {
+        "operationId": "GetMyOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgView"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/_deactivate": {
+      "put": {
+        "operationId": "DeactivateMyOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Org"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/_reactivate": {
+      "put": {
+        "operationId": "ReactivateMyOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Org"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
         "tags": [
           "ManagementService"
         ]
@@ -263,7 +334,6 @@
     },
     "/orgs/me/iampolicy": {
       "get": {
-        "summary": "ORG_IAM_POLICY",
         "operationId": "GetMyOrgIamPolicy",
         "responses": {
           "200": {
@@ -386,7 +456,6 @@
     },
     "/orgs/members/roles": {
       "get": {
-        "summary": "ORG_MEMBERS",
         "operationId": "GetOrgMemberRoles",
         "responses": {
           "200": {
@@ -401,97 +470,9 @@
         ]
       }
     },
-    "/orgs/{id}": {
-      "get": {
-        "summary": "ORG",
-        "operationId": "GetOrgByID",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1OrgView"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{id}/_deactivate": {
-      "put": {
-        "operationId": "DeactivateOrg",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Org"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OrgID"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{id}/_reactivate": {
-      "put": {
-        "operationId": "ReactivateOrg",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Org"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OrgID"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/orgs/{id}/changes": {
       "get": {
+        "summary": "OrgChanges returns the event stream of the org object",
         "operationId": "OrgChanges",
         "responses": {
           "200": {
@@ -536,7 +517,7 @@
     },
     "/policies/passwords/age": {
       "get": {
-        "summary": "PASSWORD_AGE_POLICY",
+        "summary": "returns default if nothing other set on organisation",
         "operationId": "GetPasswordAgePolicy",
         "responses": {
           "200": {
@@ -623,7 +604,7 @@
     },
     "/policies/passwords/complexity": {
       "get": {
-        "summary": "PASSWORD_COMPLEXITY_POLICY",
+        "summary": "returns default policy if nothing other set on organisation",
         "operationId": "GetPasswordComplexityPolicy",
         "responses": {
           "200": {
@@ -710,7 +691,7 @@
     },
     "/policies/passwords/lockout": {
       "get": {
-        "summary": "PASSWORD_LOCKOUT_POLICY",
+        "summary": "returns default if nothing other set on organisation",
         "operationId": "GetPasswordLockoutPolicy",
         "responses": {
           "200": {
@@ -797,7 +778,7 @@
     },
     "/projectgrants/{project_grant_id}/users/grants/_search": {
       "post": {
-        "summary": "PROJECT_GRANT_USER_GRANT",
+        "summary": "search user grants based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "SearchProjectGrantUserGrants",
         "responses": {
           "200": {
@@ -830,6 +811,7 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants": {
       "post": {
+        "summary": "create user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "CreateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -868,6 +850,7 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}": {
       "get": {
+        "summary": "get user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ProjectGrantUserGrantByID",
         "responses": {
           "200": {
@@ -902,6 +885,7 @@
         ]
       },
       "put": {
+        "summary": "update user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "UpdateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -946,6 +930,7 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_deactivate": {
       "put": {
+        "summary": "deactivate user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "DeactivateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -990,6 +975,7 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_reactivate": {
       "put": {
+        "summary": "reactivate user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ReactivateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -1060,7 +1046,6 @@
     },
     "/projects/_search": {
       "post": {
-        "summary": "PROJECTS",
         "operationId": "SearchProjects",
         "responses": {
           "200": {
@@ -1087,7 +1072,6 @@
     },
     "/projects/grants/members/roles": {
       "get": {
-        "summary": "PROJECT_GRANT_MEMBER",
         "operationId": "GetProjectGrantMemberRoles",
         "responses": {
           "200": {
@@ -1104,7 +1088,6 @@
     },
     "/projects/members/roles": {
       "get": {
-        "summary": "PROJECT_MEMBERS",
         "operationId": "GetProjectMemberRoles",
         "responses": {
           "200": {
@@ -1239,6 +1222,7 @@
     },
     "/projects/{id}/applications/{sec_id}/changes": {
       "get": {
+        "summary": "ApplicationChanges returns the event stream of the application object",
         "operationId": "ApplicationChanges",
         "responses": {
           "200": {
@@ -1283,6 +1267,7 @@
     },
     "/projects/{id}/changes": {
       "get": {
+        "summary": "ProjectChanges returns the event stream of the project object",
         "operationId": "ProjectChanges",
         "responses": {
           "200": {
@@ -1457,6 +1442,7 @@
     },
     "/projects/{id}/roles/_bulk": {
       "post": {
+        "summary": "add a list of project roles in one request",
         "operationId": "BulkAddProjectRole",
         "responses": {
           "200": {
@@ -1556,7 +1542,6 @@
     },
     "/projects/{project_id}/applications/_search": {
       "post": {
-        "summary": "APPLICATIONS",
         "operationId": "SearchApplications",
         "responses": {
           "200": {
@@ -1867,7 +1852,6 @@
     },
     "/projects/{project_id}/grants/_search": {
       "post": {
-        "summary": "PROJECT_GRANT",
         "operationId": "SearchProjectGrants",
         "responses": {
           "200": {
@@ -2082,6 +2066,7 @@
         ]
       },
       "delete": {
+        "summary": "RemoveProjectGrant removes project grant and all user grants for this project grant",
         "operationId": "RemoveProjectGrant",
         "responses": {
           "200": {
@@ -2288,7 +2273,6 @@
     },
     "/projects/{project_id}/roles/_search": {
       "post": {
-        "summary": "PROJECT_ROLES",
         "operationId": "SearchProjectRoles",
         "responses": {
           "200": {
@@ -2321,7 +2305,7 @@
     },
     "/projects/{project_id}/users/grants/_search": {
       "post": {
-        "summary": "PROJECT_USER_GRANT",
+        "summary": "search user grants based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "SearchProjectUserGrants",
         "responses": {
           "200": {
@@ -2354,6 +2338,7 @@
     },
     "/projects/{project_id}/users/{user_id}/grants": {
       "post": {
+        "summary": "create user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "CreateProjectUserGrant",
         "responses": {
           "200": {
@@ -2392,6 +2377,7 @@
     },
     "/projects/{project_id}/users/{user_id}/grants/{id}": {
       "get": {
+        "summary": "get user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ProjectUserGrantByID",
         "responses": {
           "200": {
@@ -2426,6 +2412,7 @@
         ]
       },
       "put": {
+        "summary": "update user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "UpdateProjectUserGrant",
         "responses": {
           "200": {
@@ -2470,6 +2457,7 @@
     },
     "/projects/{project_id}/users/{user_id}/grants/{id}/_deactivate": {
       "put": {
+        "summary": "deactivate user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "DeactivateProjectUserGrant",
         "responses": {
           "200": {
@@ -2514,6 +2502,7 @@
     },
     "/projects/{project_id}/users/{user_id}/grants/{id}/_reactivate": {
       "put": {
+        "summary": "reactivate user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ReactivateProjectUserGrant",
         "responses": {
           "200": {
@@ -2574,6 +2563,7 @@
     },
     "/usergrants/_bulk": {
       "post": {
+        "summary": "add a list of user grants in one request",
         "operationId": "BulkCreateUserGrant",
         "responses": {
           "200": {
@@ -2598,6 +2588,7 @@
         ]
       },
       "put": {
+        "summary": "update a list of user grants in one request",
         "operationId": "BulkUpdateUserGrant",
         "responses": {
           "200": {
@@ -2680,6 +2671,7 @@
     },
     "/users/_search": {
       "post": {
+        "summary": "Limit should always be set, there is a default limit set by the service",
         "operationId": "SearchUsers",
         "responses": {
           "200": {
@@ -2706,7 +2698,6 @@
     },
     "/users/grants/_search": {
       "post": {
-        "summary": "USER_GRANT",
         "operationId": "SearchUserGrants",
         "responses": {
           "200": {
@@ -2733,7 +2724,6 @@
     },
     "/users/{id}": {
       "get": {
-        "summary": "USER",
         "operationId": "GetUserByID",
         "responses": {
           "200": {
@@ -2874,72 +2864,6 @@
         ]
       }
     },
-    "/users/{id}/_sendsetpwnotify": {
-      "post": {
-        "summary": "PASSWORD\nSends an Notification (Email/SMS) with a password reset Link",
-        "operationId": "SendSetPasswordNotification",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1SetPasswordNotificationRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/users/{id}/_setinitialpw": {
-      "post": {
-        "summary": "A Manager is only allowed to set an initial password, on the next login the user has to change his password",
-        "operationId": "SetInitialPassword",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/users/{id}/_unlock": {
       "put": {
         "operationId": "UnlockUser",
@@ -2974,7 +2898,6 @@
     },
     "/users/{id}/address": {
       "get": {
-        "summary": "USER_ADDRESS",
         "operationId": "GetUserAddress",
         "responses": {
           "200": {
@@ -3029,6 +2952,7 @@
     },
     "/users/{id}/changes": {
       "get": {
+        "summary": "UserChanges returns the event stream of the user object",
         "operationId": "UserChanges",
         "responses": {
           "200": {
@@ -3073,7 +2997,6 @@
     },
     "/users/{id}/email": {
       "get": {
-        "summary": "USER_EMAIL",
         "operationId": "GetUserEmail",
         "responses": {
           "200": {
@@ -3160,7 +3083,6 @@
     },
     "/users/{id}/mfas": {
       "get": {
-        "summary": "MFA",
         "operationId": "GetUserMfas",
         "responses": {
           "200": {
@@ -3183,9 +3105,74 @@
         ]
       }
     },
+    "/users/{id}/password/_initialize": {
+      "post": {
+        "summary": "A Manager is only allowed to set an initial password, on the next login the user has to change his password",
+        "operationId": "SetInitialPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{id}/password/_sendsetnotification": {
+      "post": {
+        "summary": "Sends an Notification (Email/SMS) with a password reset Link",
+        "operationId": "SendSetPasswordNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SetPasswordNotificationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/users/{id}/phone": {
       "get": {
-        "summary": "USER_PHONE",
         "operationId": "GetUserPhone",
         "responses": {
           "200": {
@@ -3272,7 +3259,6 @@
     },
     "/users/{id}/profile": {
       "get": {
-        "summary": "USER_PROFILE",
         "operationId": "GetUserProfile",
         "responses": {
           "200": {
@@ -3529,6 +3515,7 @@
     },
     "/usersgrants/_bulk": {
       "delete": {
+        "summary": "remove a list of user grants in one request",
         "operationId": "BulkRemoveUserGrant",
         "responses": {
           "200": {
@@ -4434,14 +4421,6 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
-        }
-      }
-    },
-    "v1OrgID": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
         }
       }
     },

@@ -215,7 +215,7 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetOrgByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrg": utils_auth.Option{
 		Permission: "org.read",
 		CheckParam: "",
 	},
@@ -225,12 +225,12 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateOrg": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateMyOrg": utils_auth.Option{
 		Permission: "org.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateOrg": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateMyOrg": utils_auth.Option{
 		Permission: "org.write",
 		CheckParam: "",
 	},
