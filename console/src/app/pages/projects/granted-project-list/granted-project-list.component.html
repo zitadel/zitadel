@@ -1,7 +1,3 @@
-<app-granted-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
-    [items]="grantedProjectList" (newClicked)="addProject()">
-</app-granted-project-grid>
-
 <div *ngIf="!grid" class="view-toggle">
     <button (click)="grid = true" mat-icon-button>
         <i matTooltip="show grid view" class="las la-th-large"></i>
