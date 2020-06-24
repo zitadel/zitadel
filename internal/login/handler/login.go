@@ -10,12 +10,11 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
-
 	_ "github.com/caos/zitadel/internal/login/statik"
 )
 
@@ -119,9 +118,9 @@ func (l *Login) Listen(ctx context.Context) {
 }
 
 func setContext(ctx context.Context, resourceOwner string) context.Context {
-	data := auth.CtxData{
+	data := authz.CtxData{
 		UserID: login,
 		OrgID:  resourceOwner,
 	}
-	return auth.SetCtxData(ctx, data)
+	return authz.SetCtxData(ctx, data)
 }

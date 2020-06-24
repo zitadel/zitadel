@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/eventstore/models"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 func userViewFromModel(user *usr_model.UserView) *UserView {
@@ -105,7 +106,7 @@ func updateProfileToModel(ctx context.Context, u *UpdateUserProfileRequest) *usr
 	logging.Log("GRPC-lk73L").OnError(err).Debug("language malformed")
 
 	return &usr_model.Profile{
-		ObjectRoot:        models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
+		ObjectRoot:        models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
@@ -150,7 +151,7 @@ func emailViewFromModel(email *usr_model.Email) *UserEmailView {
 
 func updateEmailToModel(ctx context.Context, e *UpdateUserEmailRequest) *usr_model.Email {
 	return &usr_model.Email{
-		ObjectRoot:   models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
+		ObjectRoot:   models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		EmailAddress: e.Email,
 	}
 }
@@ -191,7 +192,7 @@ func phoneViewFromModel(phone *usr_model.Phone) *UserPhoneView {
 
 func updatePhoneToModel(ctx context.Context, e *UpdateUserPhoneRequest) *usr_model.Phone {
 	return &usr_model.Phone{
-		ObjectRoot:  models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
+		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		PhoneNumber: e.Phone,
 	}
 }
@@ -238,7 +239,7 @@ func addressViewFromModel(address *usr_model.Address) *UserAddressView {
 
 func updateAddressToModel(ctx context.Context, address *UpdateUserAddressRequest) *usr_model.Address {
 	return &usr_model.Address{
-		ObjectRoot:    models.ObjectRoot{AggregateID: auth.GetCtxData(ctx).UserID},
+		ObjectRoot:    models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		Country:       address.Country,
 		StreetAddress: address.StreetAddress,
 		Region:        address.Region,

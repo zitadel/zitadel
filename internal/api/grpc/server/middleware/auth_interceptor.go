@@ -7,17 +7,17 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/caos/zitadel/internal/api"
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 )
 
-func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Config, authMethods auth.MethodMapping) grpc.UnaryServerInterceptor {
+func AuthorizationInterceptor(verifier authz.TokenVerifier, authConfig *authz.Config, authMethods authz.MethodMapping) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		return authorize(ctx, req, info, handler, verifier, authConfig, authMethods)
 	}
 }
 
-func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier auth.TokenVerifier, authConfig *auth.Config, authMethods auth.MethodMapping) (interface{}, error) {
+func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.TokenVerifier, authConfig *authz.Config, authMethods authz.MethodMapping) (interface{}, error) {
 	authOpt, needsToken := authMethods[info.FullMethod]
 	if !needsToken {
 		return handler(ctx, req)
@@ -30,7 +30,7 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 
 	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
 
-	ctx, err := auth.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)
+	ctx, err := authz.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)
 	if err != nil {
 		return nil, err
 	}

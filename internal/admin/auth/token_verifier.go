@@ -2,7 +2,8 @@ package auth
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 )
 
@@ -27,7 +28,7 @@ func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string) (st
 	return userID, clientID, agentID, err
 }
 
-func (v *TokenVerifier) ResolveGrant(ctx context.Context) (*auth.Grant, error) {
+func (v *TokenVerifier) ResolveGrant(ctx context.Context) (*authz.Grant, error) {
 	return v.authZRepo.ResolveGrants(ctx)
 }
 

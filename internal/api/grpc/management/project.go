@@ -6,7 +6,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/internal/api"
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/pkg/management/grpc"
 )
@@ -104,7 +104,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, in *grpc.ProjectRoleRemo
 
 func (s *Server) SearchProjectRoles(ctx context.Context, in *grpc.ProjectRoleSearchRequest) (*grpc.ProjectRoleSearchResponse, error) {
 	request := projectRoleSearchRequestsToModel(in)
-	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	request.AppendProjectQuery(in.ProjectId)
 	response, err := s.project.SearchProjectRoles(ctx, request)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
@@ -34,7 +34,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (op.Clie
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) error {
-	ctx = auth.SetCtxData(ctx, auth.CtxData{
+	ctx = authz.SetCtxData(ctx, authz.CtxData{
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})

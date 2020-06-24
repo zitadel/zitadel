@@ -5,7 +5,7 @@ package grpc
 import (
 	"google.golang.org/grpc"
 
-	utils_auth "github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
@@ -13,579 +13,579 @@ import (
  * ManagementService
  */
 
-var ManagementService_AuthMethods = utils_auth.MethodMapping{
+var ManagementService_AuthMethods = authz.MethodMapping{
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetIam": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetIam": authz.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserByID": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserByEmailGlobal": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserByEmailGlobal": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchUsers": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchUsers": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/IsUserUnique": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/IsUserUnique": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateUser": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreateUser": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateUser": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateUser": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateUser": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateUser": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/LockUser": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/LockUser": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UnlockUser": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UnlockUser": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeleteUser": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeleteUser": authz.Option{
 		Permission: "user.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UserChanges": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UserChanges": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ApplicationChanges": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ApplicationChanges": authz.Option{
 		Permission: "project.app.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/OrgChanges": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/OrgChanges": authz.Option{
 		Permission: "org.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ProjectChanges": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ProjectChanges": authz.Option{
 		Permission: "project.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserProfile": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserProfile": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserProfile": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserProfile": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserEmail": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserEmail": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeUserEmail": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeUserEmail": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ResendEmailVerificationMail": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ResendEmailVerificationMail": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserPhone": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserPhone": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeUserPhone": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeUserPhone": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ResendPhoneVerificationCode": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ResendPhoneVerificationCode": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserAddress": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserAddress": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserAddress": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserAddress": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetUserMfas": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetUserMfas": authz.Option{
 		Permission: "user.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SendSetPasswordNotification": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SendSetPasswordNotification": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SetInitialPassword": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SetInitialPassword": authz.Option{
 		Permission: "user.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": authz.Option{
 		Permission: "policy.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordComplexityPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordComplexityPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordComplexityPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordComplexityPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordComplexityPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordComplexityPolicy": authz.Option{
 		Permission: "policy.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordAgePolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordAgePolicy": authz.Option{
 		Permission: "policy.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordAgePolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordAgePolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordAgePolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordAgePolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordAgePolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordAgePolicy": authz.Option{
 		Permission: "policy.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordLockoutPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordLockoutPolicy": authz.Option{
 		Permission: "policy.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordLockoutPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordLockoutPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordLockoutPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdatePasswordLockoutPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordLockoutPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeletePasswordLockoutPolicy": authz.Option{
 		Permission: "policy.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrg": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrg": authz.Option{
 		Permission: "org.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetOrgByDomainGlobal": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetOrgByDomainGlobal": authz.Option{
 		Permission: "org.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateMyOrg": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateMyOrg": authz.Option{
 		Permission: "org.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateMyOrg": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateMyOrg": authz.Option{
 		Permission: "org.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgDomains": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgDomains": authz.Option{
 		Permission: "org.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgDomain": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgDomain": authz.Option{
 		Permission: "org.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgDomain": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgDomain": authz.Option{
 		Permission: "org.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrgIamPolicy": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetMyOrgIamPolicy": authz.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetOrgMemberRoles": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetOrgMemberRoles": authz.Option{
 		Permission: "org.member.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/AddMyOrgMember": authz.Option{
 		Permission: "org.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeMyOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeMyOrgMember": authz.Option{
 		Permission: "org.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgMember": authz.Option{
 		Permission: "org.member.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgMembers": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchMyOrgMembers": authz.Option{
 		Permission: "org.member.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjects": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjects": authz.Option{
 		Permission: "project.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ProjectByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ProjectByID": authz.Option{
 		Permission: "project.read",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateProject": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreateProject": authz.Option{
 		Permission: "project.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateProject": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateProject": authz.Option{
 		Permission: "project.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProject": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProject": authz.Option{
 		Permission: "project.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProject": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProject": authz.Option{
 		Permission: "project.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": authz.Option{
 		Permission: "project.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID": authz.Option{
 		Permission: "project.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetProjectMemberRoles": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetProjectMemberRoles": authz.Option{
 		Permission: "project.member.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectMembers": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectMembers": authz.Option{
 		Permission: "project.member.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/AddProjectMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/AddProjectMember": authz.Option{
 		Permission: "project.member.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeProjectMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeProjectMember": authz.Option{
 		Permission: "project.member.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectMember": authz.Option{
 		Permission: "project.member.delete",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectRoles": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectRoles": authz.Option{
 		Permission: "project.role.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/AddProjectRole": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/AddProjectRole": authz.Option{
 		Permission: "project.role.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/BulkAddProjectRole": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/BulkAddProjectRole": authz.Option{
 		Permission: "project.role.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeProjectRole": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeProjectRole": authz.Option{
 		Permission: "project.role.write",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectRole": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectRole": authz.Option{
 		Permission: "project.role.delete",
 		CheckParam: "Id",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchApplications": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchApplications": authz.Option{
 		Permission: "project.app.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ApplicationByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ApplicationByID": authz.Option{
 		Permission: "project.app.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateOIDCApplication": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreateOIDCApplication": authz.Option{
 		Permission: "project.app.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateApplication": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateApplication": authz.Option{
 		Permission: "project.app.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateApplication": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateApplication": authz.Option{
 		Permission: "project.app.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateApplication": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateApplication": authz.Option{
 		Permission: "project.app.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveApplication": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveApplication": authz.Option{
 		Permission: "project.app.delete",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateApplicationOIDCConfig": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateApplicationOIDCConfig": authz.Option{
 		Permission: "project.app.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RegenerateOIDCClientSecret": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RegenerateOIDCClientSecret": authz.Option{
 		Permission: "project.app.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectGrants": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectGrants": authz.Option{
 		Permission: "project.grant.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ProjectGrantByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ProjectGrantByID": authz.Option{
 		Permission: "project.grant.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateProjectGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreateProjectGrant": authz.Option{
 		Permission: "project.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateProjectGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateProjectGrant": authz.Option{
 		Permission: "project.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProjectGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProjectGrant": authz.Option{
 		Permission: "project.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProjectGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProjectGrant": authz.Option{
 		Permission: "project.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectGrant": authz.Option{
 		Permission: "project.grant.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/GetProjectGrantMemberRoles": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/GetProjectGrantMemberRoles": authz.Option{
 		Permission: "project.grant.member.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectGrantMembers": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectGrantMembers": authz.Option{
 		Permission: "project.grant.member.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/AddProjectGrantMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/AddProjectGrantMember": authz.Option{
 		Permission: "project.grant.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ChangeProjectGrantMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ChangeProjectGrantMember": authz.Option{
 		Permission: "project.grant.member.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectGrantMember": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveProjectGrantMember": authz.Option{
 		Permission: "project.grant.member.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchUserGrants": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchUserGrants": authz.Option{
 		Permission: "user.grant.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UserGrantByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UserGrantByID": authz.Option{
 		Permission: "user.grant.read",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreateUserGrant": authz.Option{
 		Permission: "user.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserGrant": authz.Option{
 		Permission: "user.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateUserGrant": authz.Option{
 		Permission: "user.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateUserGrant": authz.Option{
 		Permission: "user.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/RemoveUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveUserGrant": authz.Option{
 		Permission: "user.grant.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/BulkCreateUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/BulkCreateUserGrant": authz.Option{
 		Permission: "user.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/BulkUpdateUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/BulkUpdateUserGrant": authz.Option{
 		Permission: "user.grant.write",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/BulkRemoveUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/BulkRemoveUserGrant": authz.Option{
 		Permission: "user.grant.delete",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectUserGrants": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectUserGrants": authz.Option{
 		Permission: "project.user.grant.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ProjectUserGrantByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ProjectUserGrantByID": authz.Option{
 		Permission: "project.user.grant.read",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateProjectUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreateProjectUserGrant": authz.Option{
 		Permission: "project.user.grant.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateProjectUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateProjectUserGrant": authz.Option{
 		Permission: "project.user.grant.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProjectUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProjectUserGrant": authz.Option{
 		Permission: "project.user.grant.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProjectUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProjectUserGrant": authz.Option{
 		Permission: "project.user.grant.write",
 		CheckParam: "ProjectId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectGrantUserGrants": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectGrantUserGrants": authz.Option{
 		Permission: "project.grant.user.grant.read",
 		CheckParam: "ProjectGrantId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ProjectGrantUserGrantByID": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ProjectGrantUserGrantByID": authz.Option{
 		Permission: "project.grant.user.grant.read",
 		CheckParam: "ProjectGrantId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateProjectGrantUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/CreateProjectGrantUserGrant": authz.Option{
 		Permission: "project.grant.user.grant.write",
 		CheckParam: "ProjectGrantId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateProjectGrantUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateProjectGrantUserGrant": authz.Option{
 		Permission: "project.grant.user.grant.write",
 		CheckParam: "ProjectGrantId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProjectGrantUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/DeactivateProjectGrantUserGrant": authz.Option{
 		Permission: "project.grant.user.grant.write",
 		CheckParam: "ProjectGrantId",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProjectGrantUserGrant": utils_auth.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/ReactivateProjectGrantUserGrant": authz.Option{
 		Permission: "project.grant.user.grant.write",
 		CheckParam: "ProjectGrantId",
 	},
 }
 
-func ManagementService_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.Config) grpc.UnaryServerInterceptor {
+func ManagementService_Authorization_Interceptor(verifier authz.TokenVerifier, authConf *authz.Config) grpc.UnaryServerInterceptor {
 	return middleware.AuthorizationInterceptor(verifier, authConf, ManagementService_AuthMethods)
 }

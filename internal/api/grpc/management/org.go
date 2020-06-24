@@ -5,12 +5,12 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/management/grpc"
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, _ *empty.Empty) (*grpc.OrgView, error) {
-	org, err := s.org.OrgByID(ctx, auth.GetCtxData(ctx).OrgID)
+	org, err := s.org.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, in *grpc.Domain) (*gr
 }
 
 func (s *Server) DeactivateMyOrg(ctx context.Context, _ *empty.Empty) (*grpc.Org, error) {
-	org, err := s.org.DeactivateOrg(ctx, auth.GetCtxData(ctx).OrgID)
+	org, err := s.org.DeactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (s *Server) DeactivateMyOrg(ctx context.Context, _ *empty.Empty) (*grpc.Org
 }
 
 func (s *Server) ReactivateMyOrg(ctx context.Context, _ *empty.Empty) (*grpc.Org, error) {
-	org, err := s.org.ReactivateOrg(ctx, auth.GetCtxData(ctx).OrgID)
+	org, err := s.org.ReactivateOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

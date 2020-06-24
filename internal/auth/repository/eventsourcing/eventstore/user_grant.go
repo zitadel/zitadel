@@ -2,7 +2,8 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -17,13 +18,13 @@ type UserGrantRepo struct {
 	SearchLimit uint64
 	View        *view.View
 	IamID       string
-	Auth        auth.Config
+	Auth        authz.Config
 	AuthZRepo   *authz_repo.EsRepository
 }
 
 func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Method: global_model.SearchMethodEquals, Value: auth.GetCtxData(ctx).UserID})
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).UserID})
 	grants, count, err := repo.View.SearchUserGrants(request)
 	if err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 
 func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	ctxData := auth.GetCtxData(ctx)
+	ctxData := authz.GetCtxData(ctx)
 	if ctxData.ProjectID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "APP-7lqva", "Could not get ProjectID")
 	}
@@ -71,7 +72,7 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	}
 	permissions := &grant_model.Permissions{Permissions: []string{}}
 	for _, role := range grant.Roles {
-		roleName, ctxID := auth.SplitPermission(role)
+		roleName, ctxID := authz.SplitPermission(role)
 		for _, mapping := range repo.Auth.RolePermissionMappings {
 			if mapping.Role == roleName {
 				permissions.AppendPermissions(ctxID, mapping.Permissions...)
@@ -82,7 +83,7 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 }
 
 func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]string, error) {
-	ctxData := auth.GetCtxData(ctx)
+	ctxData := authz.GetCtxData(ctx)
 	usergrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, ctxData.ProjectID, ctxData.UserID)
 	if err != nil {
 		return nil, err
@@ -113,7 +114,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
 	grantSearch := &grant_model.UserGrantSearchRequest{
 		Queries: []*grant_model.UserGrantSearchQuery{
-			&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyResourceOwner, Method: global_model.SearchMethodEquals, Value: repo.IamID},
+			{Key: grant_model.UserGrantSearchKeyResourceOwner, Method: global_model.SearchMethodEquals, Value: repo.IamID},
 		}}
 	result, err := repo.SearchMyUserGrants(ctx, grantSearch)
 	if err != nil {
@@ -147,15 +148,15 @@ func orgRespToOrgResp(orgs []*org_view_model.OrgView, count int) *grant_model.Pr
 	return resp
 }
 
-func mergeOrgAndAdminGrant(ctxData auth.CtxData, orgGrant, iamAdminGrant *model.UserGrantView) (grant *auth.Grant) {
+func mergeOrgAndAdminGrant(ctxData authz.CtxData, orgGrant, iamAdminGrant *model.UserGrantView) (grant *authz.Grant) {
 	if orgGrant != nil {
 		roles := orgGrant.RoleKeys
 		if iamAdminGrant != nil {
 			roles = addIamAdminRoles(roles, iamAdminGrant.RoleKeys)
 		}
-		grant = &auth.Grant{OrgID: orgGrant.ResourceOwner, Roles: roles}
+		grant = &authz.Grant{OrgID: orgGrant.ResourceOwner, Roles: roles}
 	} else if iamAdminGrant != nil {
-		grant = &auth.Grant{
+		grant = &authz.Grant{
 			OrgID: ctxData.OrgID,
 			Roles: iamAdminGrant.RoleKeys,
 		}
@@ -167,7 +168,7 @@ func addIamAdminRoles(orgRoles, iamAdminRoles []string) []string {
 	result := make([]string, 0)
 	result = append(result, iamAdminRoles...)
 	for _, role := range orgRoles {
-		if !auth.ExistsPerm(result, role) {
+		if !authz.ExistsPerm(result, role) {
 			result = append(result, role)
 		}
 	}

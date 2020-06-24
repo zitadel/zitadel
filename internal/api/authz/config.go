@@ -1,4 +1,4 @@
-package auth
+package authz
 
 type Config struct {
 	RolePermissionMappings []RoleMapping

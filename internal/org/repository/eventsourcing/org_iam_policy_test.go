@@ -2,11 +2,12 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+	"testing"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"testing"
 )
 
 func TestOrgIamPolicyAddedAggregates(t *testing.T) {
@@ -29,7 +30,7 @@ func TestOrgIamPolicyAddedAggregates(t *testing.T) {
 		{
 			name: "no policy error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 			},
 			res: res{
@@ -39,7 +40,7 @@ func TestOrgIamPolicyAddedAggregates(t *testing.T) {
 		{
 			name: "policy successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -99,7 +100,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 		{
 			name: "no policy error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 			},
 			res: res{
@@ -109,7 +110,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 		{
 			name: "policy successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -135,7 +136,7 @@ func TestOrgIamPolicyChangedAggregates(t *testing.T) {
 		{
 			name: "policy no changes",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -196,7 +197,7 @@ func TestOrgIamPolicyRemovedAggregates(t *testing.T) {
 		{
 			name: "policy successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{

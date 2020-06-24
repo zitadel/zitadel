@@ -8,12 +8,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 )
 
 var (
-	mockMethods = auth.MethodMapping{
-		"need.authentication": auth.Option{
+	mockMethods = authz.MethodMapping{
+		"need.authentication": authz.Option{
 			Permission: "authenticated",
 		},
 	}
@@ -24,7 +24,7 @@ type verifierMock struct{}
 func (v *verifierMock) VerifyAccessToken(ctx context.Context, token string) (string, string, string, error) {
 	return "", "", "", nil
 }
-func (v *verifierMock) ResolveGrant(ctx context.Context) (*auth.Grant, error) {
+func (v *verifierMock) ResolveGrant(ctx context.Context) (*authz.Grant, error) {
 	return nil, nil
 }
 func (v *verifierMock) GetProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
@@ -37,9 +37,9 @@ func Test_authorize(t *testing.T) {
 		req         interface{}
 		info        *grpc.UnaryServerInfo
 		handler     grpc.UnaryHandler
-		verifier    auth.TokenVerifier
-		authConfig  *auth.Config
-		authMethods auth.MethodMapping
+		verifier    authz.TokenVerifier
+		authConfig  *authz.Config
+		authMethods authz.MethodMapping
 	}
 	tests := []struct {
 		name    string

@@ -2,24 +2,22 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
-	"strings"
-
-	"github.com/caos/zitadel/internal/api/auth"
-	global_model "github.com/caos/zitadel/internal/model"
-
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/project/repository/view/model"
-
+	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/project/repository/view/model"
+	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
 
 type ProjectRepo struct {
@@ -59,9 +57,9 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 
-	permissions := auth.GetPermissionsFromCtx(ctx)
-	if !auth.HasGlobalPermission(permissions) {
-		ids := auth.GetPermissionCtxIDs(permissions)
+	permissions := authz.GetPermissionsFromCtx(ctx)
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetPermissionCtxIDs(permissions)
 		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
 	}
 

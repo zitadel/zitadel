@@ -2,11 +2,12 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+	"testing"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	"testing"
 )
 
 func TestSetUpStartedAggregate(t *testing.T) {
@@ -28,7 +29,7 @@ func TestSetUpStartedAggregate(t *testing.T) {
 		{
 			name: "setupstarted aggregate ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				iam:        &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -40,7 +41,7 @@ func TestSetUpStartedAggregate(t *testing.T) {
 		{
 			name: "iam nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				iam:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -87,7 +88,7 @@ func TestSetUpDoneAggregate(t *testing.T) {
 		{
 			name: "setup done aggregate ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -99,7 +100,7 @@ func TestSetUpDoneAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -147,7 +148,7 @@ func TestGlobalOrgAggregate(t *testing.T) {
 		{
 			name: "global org set aggregate ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				orgID:      "orgID",
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -160,7 +161,7 @@ func TestGlobalOrgAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				orgID:      "orgID",
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -172,7 +173,7 @@ func TestGlobalOrgAggregate(t *testing.T) {
 		{
 			name: "global org empty",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -218,7 +219,7 @@ func TestIamProjectAggregate(t *testing.T) {
 		{
 			name: "iam project id set aggregate ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				projectID:  "projectID",
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -231,7 +232,7 @@ func TestIamProjectAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				projectID:  "projectID",
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -243,7 +244,7 @@ func TestIamProjectAggregate(t *testing.T) {
 		{
 			name: "project id empty",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -289,7 +290,7 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 		{
 			name: "iammember added ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				new:        &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -302,7 +303,7 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -315,7 +316,7 @@ func TestIamMemberAddedAggregate(t *testing.T) {
 		{
 			name: "member nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -368,7 +369,7 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 		{
 			name: "iammember changed ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				new:        &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -381,7 +382,7 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -395,7 +396,7 @@ func TestIamMemberChangedAggregate(t *testing.T) {
 		{
 			name: "member nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -449,7 +450,7 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 		{
 			name: "iammember removed ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				new:        &model.IamMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -462,7 +463,7 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 		{
 			name: "existing iam nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -476,7 +477,7 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 		{
 			name: "member nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/project/model"
@@ -96,7 +96,7 @@ func TestCreateProject(t *testing.T) {
 			name: "create project, ok",
 			args: args{
 				es:      GetMockManipulateProject(ctrl),
-				ctx:     auth.NewMockContext("orgID", "userID"),
+				ctx:     authz.NewMockContext("orgID", "userID"),
 				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name"},
 			},
 			res: res{
@@ -107,7 +107,7 @@ func TestCreateProject(t *testing.T) {
 			name: "create project no name",
 			args: args{
 				es:      GetMockManipulateProject(ctrl),
-				ctx:     auth.NewMockContext("orgID", "userID"),
+				ctx:     authz.NewMockContext("orgID", "userID"),
 				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -154,7 +154,7 @@ func TestUpdateProject(t *testing.T) {
 			name: "update project, ok",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				new: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew"},
 			},
 			res: res{
@@ -165,7 +165,7 @@ func TestUpdateProject(t *testing.T) {
 			name: "update project no name",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				new: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: ""},
 			},
 			res: res{
@@ -177,7 +177,7 @@ func TestUpdateProject(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				new: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew"},
 			},
 			res: res{
@@ -225,7 +225,7 @@ func TestDeactivateProject(t *testing.T) {
 			name: "deactivate project, ok",
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
+				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
@@ -236,7 +236,7 @@ func TestDeactivateProject(t *testing.T) {
 			name: "deactivate project with inactive state",
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
+				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateInactive},
 			},
 			res: res{
@@ -248,7 +248,7 @@ func TestDeactivateProject(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
+				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
@@ -296,7 +296,7 @@ func TestReactivateProject(t *testing.T) {
 			name: "reactivate project, ok",
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
+				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateInactive},
 			},
 			res: res{
@@ -307,7 +307,7 @@ func TestReactivateProject(t *testing.T) {
 			name: "reactivate project with inactive state",
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
+				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
@@ -319,7 +319,7 @@ func TestReactivateProject(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
-				ctx:      auth.NewMockContext("orgID", "userID"),
+				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
@@ -436,7 +436,7 @@ func TestAddProjectMember(t *testing.T) {
 			name: "add project member, ok",
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -447,7 +447,7 @@ func TestAddProjectMember(t *testing.T) {
 			name: "no userid",
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -459,7 +459,7 @@ func TestAddProjectMember(t *testing.T) {
 			name: "no roles",
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
@@ -471,7 +471,7 @@ func TestAddProjectMember(t *testing.T) {
 			name: "member already existing",
 			args: args{
 				es:     GetMockManipulateProjectWithMember(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -483,7 +483,7 @@ func TestAddProjectMember(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:     GetMockManipulateProjectNoEvents(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -533,7 +533,7 @@ func TestChangeProjectMember(t *testing.T) {
 			name: "add project member, ok",
 			args: args{
 				es:     GetMockManipulateProjectWithMember(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -544,7 +544,7 @@ func TestChangeProjectMember(t *testing.T) {
 			name: "no userid",
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -556,7 +556,7 @@ func TestChangeProjectMember(t *testing.T) {
 			name: "no roles",
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
@@ -568,7 +568,7 @@ func TestChangeProjectMember(t *testing.T) {
 			name: "member not existing",
 			args: args{
 				es:     GetMockManipulateProject(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -580,7 +580,7 @@ func TestChangeProjectMember(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:     GetMockManipulateProjectNoEvents(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -631,7 +631,7 @@ func TestRemoveProjectMember(t *testing.T) {
 			name: "remove project member, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithMember(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name:       "Name",
@@ -647,7 +647,7 @@ func TestRemoveProjectMember(t *testing.T) {
 			name: "no userid",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name:       "Name",
@@ -664,7 +664,7 @@ func TestRemoveProjectMember(t *testing.T) {
 			name: "member not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Project{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name:       "Name",
@@ -680,7 +680,7 @@ func TestRemoveProjectMember(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:     GetMockManipulateProjectNoEvents(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -724,7 +724,7 @@ func TestAddProjectRole(t *testing.T) {
 			name: "add project role, ok",
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
@@ -735,7 +735,7 @@ func TestAddProjectRole(t *testing.T) {
 			name: "no key",
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
@@ -747,7 +747,7 @@ func TestAddProjectRole(t *testing.T) {
 			name: "role already existing",
 			args: args{
 				es:    GetMockManipulateProjectWithRole(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
@@ -759,7 +759,7 @@ func TestAddProjectRole(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:    GetMockManipulateProjectNoEvents(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				roles: []*model.ProjectRole{&model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"}},
 			},
 			res: res{
@@ -806,7 +806,7 @@ func TestChangeProjectRole(t *testing.T) {
 			name: "change project role, ok",
 			args: args{
 				es:   GetMockManipulateProjectWithRole(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayNameChanged", Group: "Group"},
 			},
 			res: res{
@@ -817,7 +817,7 @@ func TestChangeProjectRole(t *testing.T) {
 			name: "no key",
 			args: args{
 				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
 			},
 			res: res{
@@ -829,7 +829,7 @@ func TestChangeProjectRole(t *testing.T) {
 			name: "role not existing",
 			args: args{
 				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
 			},
 			res: res{
@@ -841,7 +841,7 @@ func TestChangeProjectRole(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:   GetMockManipulateProjectNoEvents(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
 			},
 			res: res{
@@ -890,7 +890,7 @@ func TestRemoveProjectRole(t *testing.T) {
 			name: "remove project role, ok",
 			args: args{
 				es:   GetMockManipulateProjectWithRole(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key"},
 			},
 		},
@@ -898,7 +898,7 @@ func TestRemoveProjectRole(t *testing.T) {
 			name: "no key",
 			args: args{
 				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, DisplayName: "DisplayName", Group: "Group"},
 			},
 			res: res{
@@ -910,7 +910,7 @@ func TestRemoveProjectRole(t *testing.T) {
 			name: "role not existing",
 			args: args{
 				es:   GetMockManipulateProject(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
 			},
 			res: res{
@@ -922,7 +922,7 @@ func TestRemoveProjectRole(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:   GetMockManipulateProjectNoEvents(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				role: &model.ProjectRole{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Key: "Key", DisplayName: "DisplayName", Group: "Group"},
 			},
 			res: res{
@@ -1036,7 +1036,7 @@ func TestAddApplication(t *testing.T) {
 			name: "add app, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithPw(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1060,7 +1060,7 @@ func TestAddApplication(t *testing.T) {
 			name: "invalid app",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -1072,7 +1072,7 @@ func TestAddApplication(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1132,7 +1132,7 @@ func TestChangeApp(t *testing.T) {
 			name: "change app, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "NameChanged",
@@ -1153,7 +1153,7 @@ func TestChangeApp(t *testing.T) {
 			name: "invalid app",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 				},
@@ -1167,7 +1167,7 @@ func TestChangeApp(t *testing.T) {
 			name: "app not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1186,7 +1186,7 @@ func TestChangeApp(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1242,7 +1242,7 @@ func TestRemoveApp(t *testing.T) {
 			name: "remove app, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 				},
@@ -1252,7 +1252,7 @@ func TestRemoveApp(t *testing.T) {
 			name: "no appID",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -1264,7 +1264,7 @@ func TestRemoveApp(t *testing.T) {
 			name: "app not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 				},
@@ -1278,7 +1278,7 @@ func TestRemoveApp(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 				},
@@ -1324,7 +1324,7 @@ func TestDeactivateApp(t *testing.T) {
 			name: "deactivate, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1346,7 +1346,7 @@ func TestDeactivateApp(t *testing.T) {
 			name: "no app id",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -1358,7 +1358,7 @@ func TestDeactivateApp(t *testing.T) {
 			name: "app not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1377,7 +1377,7 @@ func TestDeactivateApp(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1434,7 +1434,7 @@ func TestReactivateApp(t *testing.T) {
 			name: "reactivate, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1456,7 +1456,7 @@ func TestReactivateApp(t *testing.T) {
 			name: "no app id",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -1468,7 +1468,7 @@ func TestReactivateApp(t *testing.T) {
 			name: "app not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1487,7 +1487,7 @@ func TestReactivateApp(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				app: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
@@ -1544,7 +1544,7 @@ func TestChangeOIDCConfig(t *testing.T) {
 			name: "change oidc config, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
@@ -1565,7 +1565,7 @@ func TestChangeOIDCConfig(t *testing.T) {
 			name: "invalid config",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
@@ -1581,7 +1581,7 @@ func TestChangeOIDCConfig(t *testing.T) {
 			name: "app is not oidc",
 			args: args{
 				es:  GetMockManipulateProjectWithSAMLApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
@@ -1598,7 +1598,7 @@ func TestChangeOIDCConfig(t *testing.T) {
 			name: "app not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
@@ -1615,7 +1615,7 @@ func TestChangeOIDCConfig(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
@@ -1670,7 +1670,7 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 			name: "change oidc config secret, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithOIDCApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:      "AppID",
@@ -1689,7 +1689,7 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 			name: "no appID",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:      "AppID",
@@ -1704,7 +1704,7 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 			name: "app is not oidc",
 			args: args{
 				es:  GetMockManipulateProjectWithSAMLApp(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:      "AppID",
@@ -1719,7 +1719,7 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 			name: "app not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:      "AppID",
@@ -1734,7 +1734,7 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				config: &model.OIDCConfig{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:      "AppID",
@@ -1858,7 +1858,7 @@ func TestAddProjectGrant(t *testing.T) {
 			name: "add grant, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithRole(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
@@ -1877,7 +1877,7 @@ func TestAddProjectGrant(t *testing.T) {
 			name: "invalid grant",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -1891,7 +1891,7 @@ func TestAddProjectGrant(t *testing.T) {
 			name: "grant for org already exists",
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
@@ -1906,7 +1906,7 @@ func TestAddProjectGrant(t *testing.T) {
 			name: "role not existing on project",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
@@ -1922,7 +1922,7 @@ func TestAddProjectGrant(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID:      "GrantID",
 					GrantedOrgID: "GrantedOrgID",
@@ -1969,7 +1969,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			name: "remove app, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -1979,7 +1979,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			name: "no grantID",
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
@@ -1991,7 +1991,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			name: "grant not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2005,7 +2005,7 @@ func TestRemoveProjectGrant(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2051,7 +2051,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			name: "deactivate, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2067,7 +2067,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			name: "no grant id",
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
@@ -2079,7 +2079,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			name: "grant not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2093,7 +2093,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2145,7 +2145,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			name: "reactivate, ok",
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2161,7 +2161,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			name: "no grant id",
 			args: args{
 				es:    GetMockManipulateProject(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
@@ -2173,7 +2173,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			name: "grant not existing",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2187,7 +2187,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 				},
@@ -2309,7 +2309,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 			name: "add project grant member",
 			args: args{
 				es:  GetMockManipulateProjectWithGrantExistingRole(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2328,7 +2328,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 			name: "invalid member",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					Roles: []string{"Role"},
 				},
@@ -2342,7 +2342,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2358,7 +2358,7 @@ func TestAddProjectGrantMember(t *testing.T) {
 			name: "member already existing",
 			args: args{
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2409,7 +2409,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			name: "change project grant member",
 			args: args{
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2428,7 +2428,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			name: "invalid member",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					Roles: []string{"Role"},
 				},
@@ -2442,7 +2442,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2458,7 +2458,7 @@ func TestChangeProjectGrantMember(t *testing.T) {
 			name: "user not member of grant",
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2508,7 +2508,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			name: "remove project grant member",
 			args: args{
 				es:  GetMockManipulateProjectWithGrantMember(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2520,7 +2520,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			name: "invalid member",
 			args: args{
 				es:  GetMockManipulateProject(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					Roles: []string{"Role"},
 				},
@@ -2534,7 +2534,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			name: "existing project not found",
 			args: args{
 				es:  GetMockManipulateProjectNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
@@ -2550,7 +2550,7 @@ func TestRemoveProjectGrantMember(t *testing.T) {
 			name: "user not member of grant",
 			args: args{
 				es:  GetMockManipulateProjectWithGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				member: &model.ProjectGrantMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
 					UserID:  "UserID",
