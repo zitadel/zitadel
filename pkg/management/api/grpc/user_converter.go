@@ -504,6 +504,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,
 			Data:       data,
+			Editor:     change.Modifier,
 		}
 	}
 
