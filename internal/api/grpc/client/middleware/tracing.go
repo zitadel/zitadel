@@ -16,7 +16,16 @@ import (
 type GRPCMethod string
 
 func TracingStatsClient(ignoredMethods ...GRPCMethod) grpc.DialOption {
-	return grpc.WithStatsHandler(&tracingClientHandler{ignoredMethods, ocgrpc.ClientHandler{StartOptions: trace.StartOptions{Sampler: tracing.Sampler(), SpanKind: trace.SpanKindClient}}})
+	return grpc.WithStatsHandler(
+		&tracingClientHandler{
+			ignoredMethods,
+			ocgrpc.ClientHandler{
+				StartOptions: trace.StartOptions{
+					Sampler:  tracing.Sampler(),
+					SpanKind: trace.SpanKindClient},
+			},
+		},
+	)
 }
 
 func DefaultTracingStatsClient() grpc.DialOption {

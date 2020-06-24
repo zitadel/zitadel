@@ -2,12 +2,14 @@ package server
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"net"
 
 	"github.com/caos/logging"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
+	"github.com/caos/zitadel/internal/api"
+	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	"github.com/caos/zitadel/internal/api/http"
 )
 
@@ -16,30 +18,38 @@ const (
 )
 
 type Server interface {
-	GRPCPort() string
-	GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error)
+	Gateway
+	RegisterServer(*grpc.Server)
+	AuthInterceptor() grpc.UnaryServerInterceptor
+	//GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error) TODO: remove
 }
 
-func StartServer(ctx context.Context, s Server, defaults systemdefaults.SystemDefaults) {
-	port := grpcPort(s.GRPCPort())
-	listener := http.CreateListener(port)
-	server := createGrpcServer(s, defaults)
-	serveServer(ctx, server, listener, port)
+func CreateServer(servers []Server) *grpc.Server {
+	authInterceptors := make([]grpc.UnaryServerInterceptor, len(servers))
+	for i, server := range servers {
+		authInterceptors[i] = server.AuthInterceptor()
+	}
+	return grpc.NewServer(
+		middleware.TracingStatsServer(api.Healthz, api.Readiness, api.Validation),
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(
+				middleware.ErrorHandler(language.German),
+				grpc_middleware.ChainUnaryServer(
+					authInterceptors...,
+				),
+			),
+		),
+	)
 }
 
-func createGrpcServer(s Server, defaults systemdefaults.SystemDefaults) *grpc.Server {
-	grpcServer, err := s.GRPCServer(defaults)
-	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to create grpc server")
-	return grpcServer
-}
-
-func serveServer(ctx context.Context, server *grpc.Server, listener net.Listener, port string) {
+func Serve(ctx context.Context, server *grpc.Server, port string) {
 	go func() {
 		<-ctx.Done()
 		server.GracefulStop()
 	}()
 
 	go func() {
+		listener := http.CreateListener(port)
 		err := server.Serve(listener)
 		logging.Log("SERVE-Ga3e94").OnError(err).Panic("grpc server serve failed")
 	}()

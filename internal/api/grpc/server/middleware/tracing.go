@@ -9,13 +9,28 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
 
+	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/tracing"
 )
 
 type GRPCMethod string
 
 func TracingStatsServer(ignoredMethods ...GRPCMethod) grpc.ServerOption {
-	return grpc.StatsHandler(&tracingServerHandler{ignoredMethods, ocgrpc.ServerHandler{StartOptions: trace.StartOptions{Sampler: tracing.Sampler(), SpanKind: trace.SpanKindServer}}})
+	return grpc.StatsHandler(
+		&tracingServerHandler{
+			ignoredMethods,
+			ocgrpc.ServerHandler{
+				StartOptions: trace.StartOptions{
+					Sampler:  tracing.Sampler(),
+					SpanKind: trace.SpanKindServer,
+				},
+			},
+		},
+	)
+}
+
+func DefaultTracingStatsServer() grpc.ServerOption {
+	return TracingStatsServer(api.Healthz, api.Readiness, api.Validation)
 }
 
 type tracingServerHandler struct {

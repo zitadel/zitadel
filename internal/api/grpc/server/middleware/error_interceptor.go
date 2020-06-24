@@ -13,7 +13,7 @@ import (
 	_ "github.com/caos/zitadel/internal/statik"
 )
 
-func ErrorHandler(defaultLanguage language.Tag) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func ErrorHandler(defaultLanguage language.Tag) grpc.UnaryServerInterceptor {
 	dir, err := fs.NewWithNamespace("zitadel")
 	logging.Log("ERROR-7usEW").OnError(err).Panic("unable to get zitadel namespace")
 
@@ -23,7 +23,11 @@ func ErrorHandler(defaultLanguage language.Tag) func(ctx context.Context, req in
 	}
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		resp, err := handler(ctx, req)
-		return resp, grpc_util.CaosToGRPCError(err, ctx, i18n)
+		return toGRPCError(ctx, req, handler, i18n)
 	}
+}
+
+func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler, i18n *i18n.Translator) (interface{}, error) {
+	resp, err := handler(ctx, req)
+	return resp, grpc_util.CaosToGRPCError(ctx, err, i18n)
 }

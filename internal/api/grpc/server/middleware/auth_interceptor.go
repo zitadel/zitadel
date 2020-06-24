@@ -11,28 +11,29 @@ import (
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 )
 
-func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Config, authMethods auth.MethodMapping) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func AuthorizationInterceptor(verifier auth.TokenVerifier, authConfig *auth.Config, authMethods auth.MethodMapping) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		authOpt, needsToken := authMethods[info.FullMethod]
-		if !needsToken {
-			return handler(ctx, req)
-		}
+		return authorize(ctx, req, info, handler, verifier, authConfig, authMethods)
+	}
+}
 
-		authToken := ""
-		//TODO: Remove check internal as soon as authentification is implemented
-		if !auth.CheckInternal(ctx) {
-			authToken = grpc_util.GetAuthorizationHeader(ctx)
-			if authToken == "" {
-				return nil, status.Error(codes.Unauthenticated, "auth header missing")
-			}
-		}
-		orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
-
-		ctx, err := auth.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)
-		if err != nil {
-			return nil, err
-		}
-
+func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier auth.TokenVerifier, authConfig *auth.Config, authMethods auth.MethodMapping) (interface{}, error) {
+	authOpt, needsToken := authMethods[info.FullMethod]
+	if !needsToken {
 		return handler(ctx, req)
 	}
+
+	authToken := grpc_util.GetAuthorizationHeader(ctx)
+	if authToken == "" {
+		return nil, status.Error(codes.Unauthenticated, "auth header missing")
+	}
+
+	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+
+	ctx, err := auth.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler(ctx, req)
 }

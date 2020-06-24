@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func CaosToGRPCError(err error, ctx context.Context, translator *i18n.Translator) error {
+func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator) error {
 	if err == nil {
 		return nil
 	}
@@ -29,7 +29,7 @@ func Extract(err error) (c codes.Code, msg string, ok bool) {
 		return codes.AlreadyExists, caosErr.GetMessage(), true
 	case *caos_errs.DeadlineExceededError:
 		return codes.DeadlineExceeded, caosErr.GetMessage(), true
-	case caos_errs.InternalError:
+	case *caos_errs.InternalError:
 		return codes.Internal, caosErr.GetMessage(), true
 	case *caos_errs.InvalidArgumentError:
 		return codes.InvalidArgument, caosErr.GetMessage(), true
