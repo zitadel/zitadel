@@ -4,7 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/org/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -27,11 +27,11 @@ func (v *View) PutOrg(org *org_model.OrgView) error {
 	return v.ProcessedOrgSequence(org.Sequence)
 }
 
-func (v *View) GetLatestOrgFailedEvent(sequence uint64) (*view.FailedEvent, error) {
+func (v *View) GetLatestOrgFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(orgTable, sequence)
 }
 
-func (v *View) ProcessedOrgFailedEvent(failedEvent *view.FailedEvent) error {
+func (v *View) ProcessedOrgFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }
 

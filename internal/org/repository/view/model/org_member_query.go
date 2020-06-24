@@ -3,7 +3,7 @@ package model
 import (
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type OrgMemberSearchRequest proj_model.OrgMemberSearchRequest
@@ -18,7 +18,7 @@ func (req OrgMemberSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req OrgMemberSearchRequest) GetSortingColumn() view.ColumnKey {
+func (req OrgMemberSearchRequest) GetSortingColumn() repository.ColumnKey {
 	if req.SortingColumn == proj_model.OrgMemberSearchKeyUnspecified {
 		return nil
 	}
@@ -29,15 +29,15 @@ func (req OrgMemberSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req OrgMemberSearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, len(req.Queries))
+func (req OrgMemberSearchRequest) GetQueries() []repository.SearchQuery {
+	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
 		result[i] = OrgMemberSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req OrgMemberSearchQuery) GetKey() view.ColumnKey {
+func (req OrgMemberSearchQuery) GetKey() repository.ColumnKey {
 	return OrgMemberSearchKey(req.Key)
 }
 

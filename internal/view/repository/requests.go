@@ -1,4 +1,4 @@
-package view
+package repository
 
 import (
 	"errors"
@@ -101,6 +101,18 @@ func PrepareDeleteByObject(table string, object interface{}) func(db *gorm.DB) e
 			Error
 		if err != nil {
 			return caos_errs.ThrowInternal(err, "VIEW-lso9w", "could not delete object")
+		}
+		return nil
+	}
+}
+
+func PrepareTruncate(table string) func(db *gorm.DB) error {
+	return func(db *gorm.DB) error {
+		err := db.
+			Exec("TRUNCATE " + table).
+			Error
+		if err != nil {
+			return caos_errs.ThrowInternal(err, "VIEW-lso9w", "could not truncate table")
 		}
 		return nil
 	}

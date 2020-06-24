@@ -4,7 +4,7 @@ import (
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -55,10 +55,10 @@ func (v *View) ProcessedProjectGrantSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(grantedProjectTable, eventSequence)
 }
 
-func (v *View) GetLatestProjectGrantFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestProjectGrantFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(grantedProjectTable, sequence)
 }
 
-func (v *View) ProcessedProjectGrantFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedProjectGrantFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

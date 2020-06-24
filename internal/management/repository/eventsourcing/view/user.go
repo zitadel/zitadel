@@ -4,7 +4,7 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -62,10 +62,10 @@ func (v *View) ProcessedUserSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(userTable, eventSequence)
 }
 
-func (v *View) GetLatestUserFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestUserFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(userTable, sequence)
 }
 
-func (v *View) ProcessedUserFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedUserFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

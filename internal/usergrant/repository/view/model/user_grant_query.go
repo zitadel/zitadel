@@ -3,7 +3,7 @@ package model
 import (
 	global_model "github.com/caos/zitadel/internal/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type UserGrantSearchRequest grant_model.UserGrantSearchRequest
@@ -18,7 +18,7 @@ func (req UserGrantSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req UserGrantSearchRequest) GetSortingColumn() view.ColumnKey {
+func (req UserGrantSearchRequest) GetSortingColumn() repository.ColumnKey {
 	if req.SortingColumn == grant_model.UserGrantSearchKeyUnspecified {
 		return nil
 	}
@@ -29,15 +29,15 @@ func (req UserGrantSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req UserGrantSearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, len(req.Queries))
+func (req UserGrantSearchRequest) GetQueries() []repository.SearchQuery {
+	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
 		result[i] = UserGrantSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req UserGrantSearchQuery) GetKey() view.ColumnKey {
+func (req UserGrantSearchQuery) GetKey() repository.ColumnKey {
 	return UserGrantSearchKey(req.Key)
 }
 
