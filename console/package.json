@@ -10,7 +10,8 @@
     "test": "ng test",
     "lint": "ng lint && stylelint './projects/**/*.scss' --syntax scss",
     "e2e": "ng e2e",
-    "proto": "./etc/generate-grpc.sh || echo 'could not generate grpc'"
+    "proto": "./etc/generate-grpc.sh || echo 'could not generate grpc'",
+    "postinstall": "../build/console/enerate-grpc.sh"
   },
   "private": true,
   "dependencies": {
