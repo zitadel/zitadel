@@ -302,7 +302,7 @@ func genderToModel(gender Gender) usr_model.Gender {
 func mfaStateFromModel(state usr_model.MfaState) MFAState {
 	switch state {
 	case usr_model.MfaStateReady:
-		return MFAState_MFASTATE_NOT_READY
+		return MFAState_MFASTATE_READY
 	case usr_model.MfaStateNotReady:
 		return MFAState_MFASTATE_NOT_READY
 	default:
