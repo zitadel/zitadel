@@ -360,8 +360,8 @@ func (es *ProjectEventstore) RemoveProjectRole(ctx context.Context, role *proj_m
 	return nil
 }
 
-func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
-	query := ChangesQuery(id, lastSequence)
+func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
+	query := ChangesQuery(id, lastSequence, limit, sortAscending)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -416,11 +416,16 @@ func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, last
 	return changes, nil
 }
 
-func ChangesQuery(projID string, latestSequence uint64) *es_models.SearchQuery {
+func ChangesQuery(projID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
-		AggregateTypeFilter(model.ProjectAggregate).
-		LatestSequenceFilter(latestSequence).
-		AggregateIDFilter(projID)
+		AggregateTypeFilter(model.ProjectAggregate)
+	if !sortAscending {
+		query.OrderDesc()
+	}
+
+	query.LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(projID).
+		SetLimit(limit)
 	return query
 }
 
@@ -533,8 +538,8 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	return nil
 }
 
-func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
-	query := ChangesQuery(id, lastSequence)
+func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
+	query := ChangesQuery(id, lastSequence, limit, sortAscending)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {

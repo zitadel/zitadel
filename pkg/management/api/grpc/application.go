@@ -73,7 +73,7 @@ func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *Application
 }
 
 func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	response, err := s.project.ApplicationChanges(ctx, changesRequest.Id, changesRequest.SecId, 0, 0)
+	response, err := s.project.ApplicationChanges(ctx, changesRequest.Id, changesRequest.SecId, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err
 	}

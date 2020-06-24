@@ -83,7 +83,7 @@ func templatesAuth_method_mappingGoTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/auth_method_mapping.go.tmpl", size: 1013, mode: os.FileMode(420), modTime: time.Unix(1585815980, 0)}
+	info := bindataFileInfo{name: "templates/auth_method_mapping.go.tmpl", size: 1013, mode: os.FileMode(420), modTime: time.Unix(1587570988, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -182,7 +182,6 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
-
 var _bintree = &bintree{nil, map[string]*bintree{
 	"templates": &bintree{nil, map[string]*bintree{
 		"auth_method_mapping.go.tmpl": &bintree{templatesAuth_method_mappingGoTmpl, map[string]*bintree{}},
@@ -235,3 +234,4 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
+

@@ -2624,7 +2624,7 @@ func TestChangesProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProjectChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.ProjectChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit, false)
 
 			project := &model.Project{}
 			if result != nil && len(result.Changes) > 0 {
@@ -2694,7 +2694,7 @@ func TestChangesApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ApplicationChanges(nil, tt.args.id, tt.args.secId, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.ApplicationChanges(nil, tt.args.id, tt.args.secId, tt.args.lastSequence, tt.args.limit, false)
 
 			app := &model.Application{}
 			if result != nil && len(result.Changes) > 0 {

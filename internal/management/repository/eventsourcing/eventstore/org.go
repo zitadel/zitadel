@@ -2,10 +2,11 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	global_model "github.com/caos/zitadel/internal/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	"strings"
 
 	"github.com/caos/zitadel/internal/errors"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
@@ -77,8 +78,8 @@ func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string)
 	return repo.OrgEventstore.RemoveOrgDomain(ctx, d)
 }
 
-func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
-	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit)
+func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
+	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
