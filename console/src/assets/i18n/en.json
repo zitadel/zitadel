@@ -52,7 +52,7 @@
             "DETAIL": "Detail",
             "CREATE": "Create",
             "MY": "My Informations",
-            "LOGINNAMES":"Methods to access your profile",
+            "LOGINNAMES":"Loginnames",
             "LOGINNAMESDESC":"You can log into zitadel with these names",
             "COPY":"Copy to clipboard",
             "COPIED":"Copied to clipboard!",
