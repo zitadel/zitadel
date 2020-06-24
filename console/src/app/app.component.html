@@ -35,7 +35,10 @@
     </mat-menu>
     <span class="fill-space"></span>
 
-    <div matTooltip="IAM user" class="iamreadwrite"></div>
+    <ng-template appHasRole [appHasRole]="['iam.write']">
+        <div matTooltip="IAM Administrator" class="iamreadwrite"></div>
+    </ng-template>
+
     <div (clickOutside)="closeAccountCard()" class="icon-container">
         <div class="avatar-wrapper dontcloseonclick" (click)="showAccount = !showAccount">
             <div class="avatar-circle dontcloseonclick" [ngClass]="{'active': showAccount}">
