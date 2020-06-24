@@ -2,13 +2,13 @@ package model
 
 import (
 	global_model "github.com/caos/zitadel/internal/model"
-	proj_model "github.com/caos/zitadel/internal/org/model"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/view"
 )
 
-type OrgMemberSearchRequest proj_model.OrgMemberSearchRequest
-type OrgMemberSearchQuery proj_model.OrgMemberSearchQuery
-type OrgMemberSearchKey proj_model.OrgMemberSearchKey
+type OrgMemberSearchRequest org_model.OrgMemberSearchRequest
+type OrgMemberSearchQuery org_model.OrgMemberSearchQuery
+type OrgMemberSearchKey org_model.OrgMemberSearchKey
 
 func (req OrgMemberSearchRequest) GetLimit() uint64 {
 	return req.Limit
@@ -19,7 +19,7 @@ func (req OrgMemberSearchRequest) GetOffset() uint64 {
 }
 
 func (req OrgMemberSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == proj_model.OrgMemberSearchKeyUnspecified {
+	if req.SortingColumn == org_model.OrgMemberSearchKeyUnspecified {
 		return nil
 	}
 	return OrgMemberSearchKey(req.SortingColumn)
@@ -50,18 +50,18 @@ func (req OrgMemberSearchQuery) GetValue() interface{} {
 }
 
 func (key OrgMemberSearchKey) ToColumnName() string {
-	switch proj_model.OrgMemberSearchKey(key) {
-	case proj_model.OrgMemberSearchKeyEmail:
+	switch org_model.OrgMemberSearchKey(key) {
+	case org_model.OrgMemberSearchKeyEmail:
 		return OrgMemberKeyEmail
-	case proj_model.OrgMemberSearchKeyFirstName:
+	case org_model.OrgMemberSearchKeyFirstName:
 		return OrgMemberKeyFirstName
-	case proj_model.OrgMemberSearchKeyLastName:
+	case org_model.OrgMemberSearchKeyLastName:
 		return OrgMemberKeyLastName
-	case proj_model.OrgMemberSearchKeyUserName:
+	case org_model.OrgMemberSearchKeyUserName:
 		return OrgMemberKeyUserName
-	case proj_model.OrgMemberSearchKeyUserID:
+	case org_model.OrgMemberSearchKeyUserID:
 		return OrgMemberKeyUserID
-	case proj_model.OrgMemberSearchKeyOrgID:
+	case org_model.OrgMemberSearchKeyOrgID:
 		return OrgMemberKeyOrgID
 	default:
 		return ""

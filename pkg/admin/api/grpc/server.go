@@ -17,6 +17,7 @@ var _ AdminServiceServer = (*Server)(nil)
 type Server struct {
 	port     string
 	org      repository.OrgRepository
+	iam      repository.IamRepository
 	verifier auth.TokenVerifier
 	authZ    auth.Config
 	repo     repository.Repository
@@ -26,6 +27,7 @@ func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository
 	return &Server{
 		port:     conf.Port,
 		org:      repo,
+		iam:      repo,
 		repo:     repo,
 		authZ:    authZ,
 		verifier: admin_auth.Start(authZRepo),

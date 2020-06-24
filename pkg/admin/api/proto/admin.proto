@@ -141,6 +141,59 @@ service AdminService {
             permission: "iam.policy.delete"
         };
     }
+
+    rpc GetIamMemberRoles(google.protobuf.Empty) returns (IamMemberRoles) {
+        option (google.api.http) = {
+            get: "/members/roles"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.read"
+        };
+    }
+
+    rpc AddIamMember(AddIamMemberRequest) returns (IamMember) {
+        option (google.api.http) = {
+            post: "/members"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.write"
+        };
+    }
+
+    rpc ChangeIamMember(ChangeIamMemberRequest) returns (IamMember) {
+        option (google.api.http) = {
+            put: "/members/{user_id}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.write"
+        };
+    }
+
+    rpc RemoveIamMember(RemoveIamMemberRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/members/{user_id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.delete"
+        };
+    }
+
+    rpc SearchIamMembers(IamMemberSearchRequest) returns (IamMemberSearchResponse) {
+        option (google.api.http) = {
+            post: "/members/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.member.read"
+        };
+    }
 }
 
 message OrgID {
@@ -298,4 +351,83 @@ message OrgIamPolicyRequest {
 
 message OrgIamPolicyID {
     string org_id = 1;
+}
+
+message IamMemberRoles {
+    repeated string roles = 1;
+}
+
+message IamMember {
+    string user_id = 1;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
+}
+
+message AddIamMemberRequest {
+    string user_id = 1;
+    repeated string roles = 2;
+}
+
+message ChangeIamMemberRequest {
+    string user_id = 1;
+    repeated string roles = 2;
+}
+
+message RemoveIamMemberRequest {
+    string user_id = 1;
+}
+
+message IamMemberSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated IamMemberView result = 4;
+}
+
+message IamMemberView {
+    string user_id = 1;
+    repeated string roles = 2;
+    google.protobuf.Timestamp change_date = 3;
+    google.protobuf.Timestamp creation_date = 4;
+    uint64 sequence = 5;
+    string user_name = 6;
+    string email = 7;
+    string first_name = 8;
+    string last_name = 9;
+}
+
+message IamMemberSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated IamMemberSearchQuery queries = 3;
+}
+
+message IamMemberSearchQuery {
+    IamMemberSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum IamMemberSearchKey {
+    IAMMEMBERSEARCHKEY_UNSPECIFIED = 0;
+    IAMMEMBERSEARCHKEY_FIRST_NAME = 1;
+    IAMMEMBERSEARCHKEY_LAST_NAME = 2;
+    IAMMEMBERSEARCHKEY_EMAIL = 3;
+    IAMMEMBERSEARCHKEY_USER_ID = 4;
+}
+
+enum SearchMethod {
+    SEARCHMETHOD_EQUALS = 0;
+    SEARCHMETHOD_STARTS_WITH = 1;
+    SEARCHMETHOD_CONTAINS = 2;
+    SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
+    SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
+    SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
+    SEARCHMETHOD_NOT_EQUALS = 6;
+    SEARCHMETHOD_GREATER_THAN = 7;
+    SEARCHMETHOD_LESS_THAN = 8;
+    SEARCHMETHOD_IS_ONE_OF = 9;
+    SEARCHMETHOD_LIST_CONTAINS = 10;
 }
