@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
-
-	"github.com/caos/zitadel/internal/errors"
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *empty.Empty) (*UserView, error) {
@@ -49,7 +47,11 @@ func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*UserAdd
 }
 
 func (s *Server) GetMyMfas(ctx context.Context, _ *empty.Empty) (*MultiFactors, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-vkl9i", "Not implemented")
+	mfas, err := s.repo.MyUserMfas(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &MultiFactors{Mfas: mfasFromModel(mfas)}, nil
 }
 
 func (s *Server) UpdateMyUserProfile(ctx context.Context, request *UpdateUserProfileRequest) (*UserProfile, error) {

@@ -309,3 +309,29 @@ func mfaStateFromModel(state usr_model.MfaState) MFAState {
 		return MFAState_MFASTATE_UNSPECIFIED
 	}
 }
+
+func mfasFromModel(mfas []*usr_model.MultiFactor) []*MultiFactor {
+	converted := make([]*MultiFactor, len(mfas))
+	for i, mfa := range mfas {
+		converted[i] = mfaFromModel(mfa)
+	}
+	return converted
+}
+
+func mfaFromModel(mfa *usr_model.MultiFactor) *MultiFactor {
+	return &MultiFactor{
+		State: mfaStateFromModel(mfa.State),
+		Type:  mfaTypeFromModel(mfa.Type),
+	}
+}
+
+func mfaTypeFromModel(mfatype usr_model.MfaType) MfaType {
+	switch mfatype {
+	case usr_model.MfaTypeOTP:
+		return MfaType_MFATYPE_OTP
+	case usr_model.MfaTypeSMS:
+		return MfaType_MFATYPE_SMS
+	default:
+		return MfaType_MFATYPE_UNSPECIFIED
+	}
+}
