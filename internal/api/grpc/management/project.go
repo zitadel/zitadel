@@ -1,13 +1,13 @@
-package grpc
+package management
 
 import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/pkg/management/grpc"
 )
 
@@ -42,7 +42,7 @@ func (s *Server) ReactivateProject(ctx context.Context, in *grpc.ProjectID) (*gr
 
 func (s *Server) SearchProjects(ctx context.Context, in *grpc.ProjectSearchRequest) (*grpc.ProjectSearchResponse, error) {
 	request := projectSearchRequestsToModel(in)
-	request.AppendMyResourceOwnerQuery(grpc_util.GetHeader(ctx, api.ZitadelOrgID))
+	request.AppendMyResourceOwnerQuery(grpc_util.GetHeader(ctx, http.ZitadelOrgID))
 	response, err := s.project.SearchProjects(ctx, request)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (s *Server) ProjectByID(ctx context.Context, id *grpc.ProjectID) (*grpc.Pro
 
 func (s *Server) SearchGrantedProjects(ctx context.Context, in *grpc.GrantedProjectSearchRequest) (*grpc.ProjectGrantSearchResponse, error) {
 	request := grantedProjectSearchRequestsToModel(in)
-	request.AppendMyOrgQuery(grpc_util.GetHeader(ctx, api.ZitadelOrgID))
+	request.AppendMyOrgQuery(grpc_util.GetHeader(ctx, http.ZitadelOrgID))
 	response, err := s.project.SearchProjectGrants(ctx, request)
 	if err != nil {
 		return nil, err

@@ -5,19 +5,19 @@ import (
 
 	"github.com/rs/cors"
 
-	"github.com/caos/zitadel/internal/api"
+	http2 "github.com/caos/zitadel/internal/api/http"
 )
 
 var (
 	DefaultCORSOptions = cors.Options{
 		AllowCredentials: true,
 		AllowedHeaders: []string{
-			api.Origin,
-			api.ContentType,
-			api.Accept,
-			api.AcceptLanguage,
-			api.Authorization,
-			api.ZitadelOrgID,
+			http2.Origin,
+			http2.ContentType,
+			http2.Accept,
+			http2.AcceptLanguage,
+			http2.Authorization,
+			http2.ZitadelOrgID,
 		},
 		AllowedMethods: []string{
 			http.MethodOptions,
@@ -29,7 +29,7 @@ var (
 			http.MethodDelete,
 		},
 		ExposedHeaders: []string{
-			api.Location,
+			http2.Location,
 		},
 		AllowedOrigins: []string{
 			"http://localhost:*",

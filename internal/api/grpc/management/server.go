@@ -1,11 +1,14 @@
-package grpc
+package management
 
 import (
+	"context"
+	"errors"
+
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -17,7 +20,6 @@ import (
 var _ mgmt_grpc.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
-	port           string
 	project        repository.ProjectRepository
 	policy         repository.PolicyRepository
 	org            repository.OrgRepository
@@ -29,9 +31,8 @@ type Server struct {
 	systemDefaults systemdefaults.SystemDefaults
 }
 
-func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository, authZ authz.Config, sd systemdefaults.SystemDefaults, repo repository.Repository) *Server {
+func CreateServer(authZRepo *authz_repo.EsRepository, authZ authz.Config, sd systemdefaults.SystemDefaults, repo repository.Repository) *Server {
 	return &Server{
-		port:           conf.Port,
 		project:        repo,
 		policy:         repo,
 		org:            repo,
@@ -42,10 +43,6 @@ func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository
 		verifier:       mgmt_auth.Start(authZRepo),
 		systemDefaults: sd,
 	}
-}
-
-func (s *Server) GRPCPort() string {
-	return s.port
 }
 
 func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error) {
@@ -60,4 +57,26 @@ func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Serve
 	)
 	mgmt_grpc.RegisterManagementServiceServer(gs, s)
 	return gs, nil
+}
+
+func (s *Server) RegisterServer(grpcServer *grpc.Server) {
+	mgmt_grpc.RegisterManagementServiceServer(grpcServer, s)
+}
+
+func (s *Server) AuthInterceptor() grpc.UnaryServerInterceptor {
+	return mgmt_grpc.ManagementService_Authorization_Interceptor(nil, nil)
+}
+
+func (s *Server) RegisterGateway() server.GatewayFunc {
+	return mgmt_grpc.RegisterManagementServiceHandlerFromEndpoint
+}
+
+func (s *Server) GatewayPathPrefix() string {
+	return "/mgmt/v1"
+}
+
+func (s *Server) Validations() map[string]server.ValidationFunction {
+	return map[string]server.ValidationFunction{
+		"Test": func(_ context.Context) error { return errors.New("Test") },
+	}
 }

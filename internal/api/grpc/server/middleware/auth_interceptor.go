@@ -2,13 +2,14 @@ package middleware
 
 import (
 	"context"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/http"
 )
 
 func AuthorizationInterceptor(verifier authz.TokenVerifier, authConfig *authz.Config, authMethods authz.MethodMapping) grpc.UnaryServerInterceptor {
@@ -28,7 +29,7 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 		return nil, status.Error(codes.Unauthenticated, "auth header missing")
 	}
 
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
 
 	ctx, err := authz.CheckUserAuthorization(ctx, req, authToken, orgID, verifier, authConfig, authOpt)
 	if err != nil {

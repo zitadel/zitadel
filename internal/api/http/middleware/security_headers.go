@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	"github.com/caos/zitadel/internal/api"
+	http2 "github.com/caos/zitadel/internal/api/http"
 )
 
 type key int
@@ -63,13 +63,13 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r = saveContext(r, nonceKey, nonce)
 	}
 	headers := w.Header()
-	headers.Set(api.ContentSecurityPolicy, h.csp.Value(nonce))
-	headers.Set(api.XXSSProtection, "1; mode=block")
-	headers.Set(api.StrictTransportSecurity, "max-age=31536000; includeSubDomains")
-	headers.Set(api.XFrameOptions, "DENY")
-	headers.Set(api.XContentTypeOptions, "nosniff")
-	headers.Set(api.ReferrerPolicy, "same-origin")
-	headers.Set(api.FeaturePolicy, "payment 'none'")
+	headers.Set(http2.ContentSecurityPolicy, h.csp.Value(nonce))
+	headers.Set(http2.XXSSProtection, "1; mode=block")
+	headers.Set(http2.StrictTransportSecurity, "max-age=31536000; includeSubDomains")
+	headers.Set(http2.XFrameOptions, "DENY")
+	headers.Set(http2.XContentTypeOptions, "nosniff")
+	headers.Set(http2.ReferrerPolicy, "same-origin")
+	headers.Set(http2.FeaturePolicy, "payment 'none'")
 	//PLANNED: add expect-ct
 
 	h.handler.ServeHTTP(w, r)

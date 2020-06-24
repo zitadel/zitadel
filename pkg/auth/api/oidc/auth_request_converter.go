@@ -9,7 +9,6 @@ import (
 	"github.com/caos/oidc/pkg/op"
 	"golang.org/x/text/language"
 
-	api_utils "github.com/caos/zitadel/internal/api"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
@@ -143,10 +142,10 @@ func HttpHeadersFromContext(ctx context.Context) (userAgent, acceptLang string) 
 	if !ok {
 		return
 	}
-	if agents, ok := ctxHeaders[api_utils.UserAgent]; ok {
+	if agents, ok := ctxHeaders[http_utils.UserAgentHeader]; ok {
 		userAgent = agents[0]
 	}
-	if langs, ok := ctxHeaders[api_utils.AcceptLanguage]; ok {
+	if langs, ok := ctxHeaders[http_utils.AcceptLanguage]; ok {
 		acceptLang = langs[0]
 	}
 	return userAgent, acceptLang

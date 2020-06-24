@@ -1,10 +1,10 @@
-package grpc
+package management
 
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/management/grpc"
 
@@ -29,7 +29,7 @@ func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *grpc.Email) (*
 
 func (s *Server) SearchUsers(ctx context.Context, in *grpc.UserSearchRequest) (*grpc.UserSearchResponse, error) {
 	request := userSearchRequestsToModel(in)
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
 	request.AppendMyOrgQuery(orgID)
 	response, err := s.user.SearchUsers(ctx, request)
 	if err != nil {

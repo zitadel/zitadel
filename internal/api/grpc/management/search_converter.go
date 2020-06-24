@@ -1,4 +1,4 @@
-package grpc
+package management
 
 import (
 	"github.com/caos/zitadel/internal/model"

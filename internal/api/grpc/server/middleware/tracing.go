@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
 
-	"github.com/caos/zitadel/internal/api"
+	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/tracing"
 )
 
@@ -30,7 +30,7 @@ func TracingStatsServer(ignoredMethods ...GRPCMethod) grpc.ServerOption {
 }
 
 func DefaultTracingStatsServer() grpc.ServerOption {
-	return TracingStatsServer(api.Healthz, api.Readiness, api.Validation)
+	return TracingStatsServer(http.Healthz, http.Readiness, http.Validation)
 }
 
 type tracingServerHandler struct {

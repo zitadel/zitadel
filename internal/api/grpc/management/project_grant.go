@@ -1,18 +1,18 @@
-package grpc
+package management
 
 import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/caos/zitadel/internal/api"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/pkg/management/grpc"
 )
 
 func (s *Server) SearchProjectGrants(ctx context.Context, in *grpc.ProjectGrantSearchRequest) (*grpc.ProjectGrantSearchResponse, error) {
 	request := projectGrantSearchRequestsToModel(in)
-	orgID := grpc_util.GetHeader(ctx, api.ZitadelOrgID)
+	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
 	request.AppendMyResourceOwnerQuery(orgID)
 	request.AppendNotMyOrgQuery(orgID)
 	response, err := s.project.SearchProjectGrants(ctx, request)

@@ -10,6 +10,13 @@ Log:
   Formatter:
     Format: text
 
+API:
+  GRPC:
+    ServerPort: 50010
+    GatewayPort: 50011
+    CustomHeaders:
+      - x-zitadel-
+
 Mgmt:
   API:
     GRPC:

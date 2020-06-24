@@ -8,7 +8,6 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
-	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	"github.com/caos/zitadel/internal/api/http"
 )
@@ -30,7 +29,7 @@ func CreateServer(servers []Server) *grpc.Server {
 		authInterceptors[i] = server.AuthInterceptor()
 	}
 	return grpc.NewServer(
-		middleware.TracingStatsServer(api.Healthz, api.Readiness, api.Validation),
+		middleware.TracingStatsServer(http.Healthz, http.Readiness, http.Validation),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(language.German),

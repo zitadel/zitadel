@@ -5,7 +5,7 @@ package grpc
 import (
 	"google.golang.org/grpc"
 
-	utils_auth "github.com/caos/zitadel/internal/api/auth"
+	utils_auth "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 

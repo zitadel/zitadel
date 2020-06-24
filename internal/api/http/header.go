@@ -5,8 +5,30 @@ import (
 	"net"
 	"net/http"
 	"strings"
+)
 
-	"github.com/caos/zitadel/internal/api"
+const (
+	Authorization   = "authorization"
+	Accept          = "accept"
+	AcceptLanguage  = "accept-language"
+	CacheControl    = "cache-control"
+	ContentType     = "content-type"
+	Expires         = "expires"
+	Location        = "location"
+	Origin          = "origin"
+	Pragma          = "pragma"
+	UserAgentHeader = "user-agent"
+	ForwardedFor    = "x-forwarded-for"
+
+	ContentSecurityPolicy   = "content-security-policy"
+	XXSSProtection          = "x-xss-protection"
+	StrictTransportSecurity = "strict-transport-security"
+	XFrameOptions           = "x-frame-options"
+	XContentTypeOptions     = "x-content-type-options"
+	ReferrerPolicy          = "referrer-policy"
+	FeaturePolicy           = "feature-policy"
+
+	ZitadelOrgID = "x-zitadel-orgid"
 )
 
 type key int
@@ -35,7 +57,7 @@ func RemoteIPFromCtx(ctx context.Context) string {
 	if !ok {
 		return RemoteAddrFromCtx(ctx)
 	}
-	forwarded, ok := ForwardedFor(ctxHeaders)
+	forwarded, ok := GetForwardedFor(ctxHeaders)
 	if ok {
 		return forwarded
 	}
@@ -47,15 +69,15 @@ func RemoteIPFromRequest(r *http.Request) net.IP {
 }
 
 func RemoteIPStringFromRequest(r *http.Request) string {
-	ip, ok := ForwardedFor(r.Header)
+	ip, ok := GetForwardedFor(r.Header)
 	if ok {
 		return ip
 	}
 	return r.RemoteAddr
 }
 
-func ForwardedFor(headers http.Header) (string, bool) {
-	forwarded, ok := headers[api.ForwardedFor]
+func GetForwardedFor(headers http.Header) (string, bool) {
+	forwarded, ok := headers[ForwardedFor]
 	if ok {
 		ip := strings.Split(forwarded[0], ", ")[0]
 		if ip != "" {
