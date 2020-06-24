@@ -11,7 +11,7 @@
     "lint": "ng lint && stylelint './projects/**/*.scss' --syntax scss",
     "e2e": "ng e2e",
     "proto": "./etc/generate-grpc.sh || echo 'could not generate grpc'",
-    "postinstall": "../build/console/enerate-grpc.sh"
+    "postinstall": "../build/console/generate-grpc.sh"
   },
   "private": true,
   "dependencies": {
