@@ -164,7 +164,8 @@
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
             "REQUIRED": "Das Feld ist leer",
-            "MINLENGTH":"Das Password muss mindestens {{minLength}} Zeichen lang sein!"
+            "MINLENGTH":"Das Password muss mindestens {{minLength}} Zeichen lang sein!",
+            "NOEMAIL":"Username darf keine email sein!"
         },
         "STATE": {
             "0":"unbekannt",

@@ -6,6 +6,20 @@
 
     <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
+    <div class="col" *ngIf="user">
+        <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
+            description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
+            <app-detail-form [genders]="genders" [languages]="languages" [profile]="user"
+                (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
+            </app-detail-form>
+        </app-card>
+
+        <app-card title="Theme" class="theme-card">
+            <app-theme-setting></app-theme-setting>
+        </app-card>
+    </div>
+
+
     <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
         description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
         <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
@@ -19,18 +33,6 @@
         </div>
     </app-card>
 
-    <div class="col" *ngIf="user">
-        <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
-            description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
-            <app-detail-form [genders]="genders" [languages]="languages" [profile]="user"
-                (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
-            </app-detail-form>
-        </app-card>
-
-        <app-card title="Theme" class="theme-card">
-            <app-theme-setting></app-theme-setting>
-        </app-card>
-    </div>
 
     <app-card *ngIf="user" title="{{'USER.PASSWORD.TITLE' | translate}}"
         description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">

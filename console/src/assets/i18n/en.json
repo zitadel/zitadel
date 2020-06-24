@@ -164,7 +164,8 @@
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
             "REQUIRED": "The input field is empty",
-            "MINLENGTH":"The password has to be at least {{minLength}} characters long!"
+            "MINLENGTH":"The password has to be at least {{minLength}} characters long!",
+            "NOEMAIL":"Username can not be an email"
         },
         "STATE": {
             "0":"unbekannt",

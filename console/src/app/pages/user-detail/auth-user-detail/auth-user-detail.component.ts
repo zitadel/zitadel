@@ -51,6 +51,8 @@ export class AuthUserDetailComponent implements OnDestroy {
     public policy!: PasswordComplexityPolicy.AsObject;
     public copied: string = '';
 
+    public userLoginMustBeDomain: boolean = false;
+
     constructor(
         public translate: TranslateService,
         private toast: ToastService,

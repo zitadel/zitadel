@@ -12,6 +12,7 @@ import {
     OrgDomainSearchQuery,
     OrgDomainSearchRequest,
     OrgDomainSearchResponse,
+    OrgIamPolicy,
     OrgID,
     OrgMemberRoles,
     OrgMemberSearchRequest,
@@ -197,6 +198,14 @@ export class OrgService {
     }
 
     // Policy
+
+    public async GetMyOrgIamPolicy(): Promise<OrgIamPolicy> {
+        return await this.request(
+            c => c.getMyOrgIamPolicy,
+            new Empty(),
+            f => f,
+        );
+    }
 
     public async GetPasswordAgePolicy(): Promise<PasswordAgePolicy> {
         const req = new Empty();
