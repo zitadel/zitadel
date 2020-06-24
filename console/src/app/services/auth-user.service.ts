@@ -297,6 +297,7 @@ export class AuthUserService {
                         userRoles = ['user.resourceowner'];
                     }
                     this._roleCache = userRoles;
+                    console.log(roles);
                     return of(this.hasRoles(userRoles, roles, each));
                 }),
             );

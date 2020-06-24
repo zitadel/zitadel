@@ -24,6 +24,7 @@ const routes: Routes = [
             action: PolicyComponentAction.CREATE,
         },
     },
+    /// TODO: add roleguard for iam policy
     {
         path: 'policy/:policytype',
         component: PasswordPolicyComponent,

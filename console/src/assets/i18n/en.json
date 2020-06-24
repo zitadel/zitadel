@@ -241,6 +241,12 @@
                 "TITLECREATE":"Create Password Lockout Policy",
                 "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to install this extention if you want to show retries or set a max try number."
             },
+            "IAM_POLICY": {
+                "TITLE":"IAM Access Preferences",
+                "DESCRIPTION":"Define access properties of your users",
+                "TITLECREATE":"Set IAM Access preferences",
+                "DESCRIPTIONCREATE":"Emails as username is not allowed for enabled UserLoginMustBeDomain"
+            },
             "BTN_INSTALL":"Install",
             "BTN_EDIT":"Modify",
             "DATA": {
@@ -253,7 +259,8 @@
                 "SHOWLOCKOUTFAILURES":"show lockout failures",
                 "MAXATTEMPTS":"Max Attempts",
                 "EXPIREWARNDAYS":"Expiration Warning after day",
-                "MAXAGEDAYS":"Max Age in days"
+                "MAXAGEDAYS":"Max Age in days",
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Uninstall Policy"
         }

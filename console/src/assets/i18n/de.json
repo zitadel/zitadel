@@ -241,6 +241,12 @@
                 "TITLECREATE":"Kennwortsperrrichtlinie festlegen",
                 "DESCRIPTIONCREATE":"Kennwortwiederholungen sind im Standardmodus unendlich. Sie müssen diese Erweiterung installieren, wenn Sie Wiederholungsversuche anzeigen oder eine maximale Versuchsnummer festlegen möchten."
             },
+            "IAM_POLICY": {
+                "TITLE":"IAM Zugangseinstellungen",
+                "DESCRIPTION":"Definieren Sie Zugangseistellungen für Nutzer",
+                "TITLECREATE":"IAM Zugangseinstellungen festlegen",
+                "DESCRIPTIONCREATE":"Emails als Benutzername sind nicht erlaubt wenn UserLoginMustBeDomain gesetzt ist."
+            },
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -253,7 +259,8 @@
                 "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
                 "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
                 "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
-                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen"
+                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Richtlinie entfernen"
         }

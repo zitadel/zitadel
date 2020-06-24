@@ -1,8 +1,17 @@
 import { Injectable } from '@angular/core';
+import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Metadata } from 'grpc-web';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
-import { CreateOrgRequest, CreateUserRequest, OrgSetUpRequest, OrgSetUpResponse } from '../proto/generated/admin_pb';
+import {
+    CreateOrgRequest,
+    CreateUserRequest,
+    OrgIamPolicy,
+    OrgIamPolicyID,
+    OrgIamPolicyRequest,
+    OrgSetUpRequest,
+    OrgSetUpResponse,
+} from '../proto/generated/admin_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
 
@@ -38,6 +47,62 @@ export class AdminService {
 
         return await this.request(
             c => c.setUpOrg,
+            req,
+            f => f,
+        );
+    }
+
+    public async GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
+        const req = new OrgIamPolicyID();
+        req.setOrgId(orgId);
+
+        return await this.request(
+            c => c.getOrgIamPolicy,
+            req,
+            f => f,
+        );
+    }
+
+    public async CreateOrgIamPolicy(
+        orgId: string,
+        description: string,
+        userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
+        const req = new OrgIamPolicyRequest();
+        req.setOrgId(orgId);
+        req.setDescription(description);
+        req.setUserLoginMustBeDomain(userLoginMustBeDomain);
+
+        return await this.request(
+            c => c.createOrgIamPolicy,
+            req,
+            f => f,
+        );
+    }
+
+
+    public async UpdateOrgIamPolicy(
+        orgId: string,
+        description: string,
+        userLoginMustBeDomain: boolean): Promise<OrgIamPolicy> {
+        const req = new OrgIamPolicyRequest();
+        req.setOrgId(orgId);
+        req.setDescription(description);
+        req.setUserLoginMustBeDomain(userLoginMustBeDomain);
+
+        return await this.request(
+            c => c.updateOrgIamPolicy,
+            req,
+            f => f,
+        );
+    }
+
+    public async deleteOrgIamPolicy(
+        orgId: string,
+    ): Promise<Empty> {
+        const req = new OrgIamPolicyID();
+        req.setOrgId(orgId);
+        return await this.request(
+            c => c.deleteOrgIamPolicy,
             req,
             f => f,
         );
