@@ -4,6 +4,7 @@
             <span>{{'USER.MFA.TYPE.'+ mfa.type | translate}}</span>
             <span>{{'USER.MFA.STATE.'+ mfa.state | translate}}</span>
         </div>
+        <p class="row" *ngIf="error">{{error}}</p>
     </div>
     <div class="table-wrapper">
         <div class="spinner-container" *ngIf="loading$ | async">

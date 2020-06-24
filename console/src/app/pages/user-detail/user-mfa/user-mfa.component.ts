@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MFAState, MfaType, MultiFactor, UserView } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 
 export interface MFAItem {
@@ -23,11 +22,11 @@ export class UserMfaComponent implements OnInit, OnDestroy {
 
     public MfaType: any = MfaType;
     public MFAState: any = MFAState;
-    constructor(private mgmtUserService: MgmtUserService,
-        private toast: ToastService) { }
+
+    public error: string = '';
+    constructor(private mgmtUserService: MgmtUserService) { }
 
     public ngOnInit(): void {
-        console.log(this.user);
         this.getOTP();
     }
 
@@ -37,31 +36,12 @@ export class UserMfaComponent implements OnInit, OnDestroy {
     }
 
     public getOTP(): void {
-        console.log('otp', this.user);
         this.mgmtUserService.getUserMfas(this.user.id).then(mfas => {
             this.mfaSubject.next(mfas.toObject().mfasList);
-            console.log(mfas.toObject());
+            this.error = '';
         }).catch(error => {
             console.error(error);
-            this.toast.showError(error.message);
+            this.error = error.message;
         });
     }
-
-    // public deleteMFA(type: MfaType): void {
-    //     if (type === MfaType.MFATYPE_OTP) {
-    //         this.userService.RemoveMfaOTP().then(() => {
-    //             this.toast.showInfo('OTP Deleted');
-
-    //             const index = this.mfaSubject.value.findIndex(mfa => mfa.type === type);
-    //             if (index > -1) {
-    //                 const newValues = this.mfaSubject.value;
-    //                 newValues.splice(index, 1);
-    //                 this.mfaSubject.next(newValues);
-    //             }
-
-    //         }).catch(error => {
-    //             this.toast.showError(error.message);
-    //         });
-    //     }
-    // }
 }

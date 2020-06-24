@@ -10,6 +10,7 @@ import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
@@ -22,7 +23,12 @@ function passwordConfirmValidator(c: AbstractControl): any {
         return;
     }
     if (pwd.value !== cpwd.value) {
-        return { invalid: true, notequal: 'Password is not equal' };
+        return {
+            invalid: true,
+            notequal: {
+                valid: false,
+            },
+        };
     }
 }
 
@@ -51,6 +57,8 @@ export class AuthUserDetailComponent implements OnDestroy {
     public policy!: PasswordComplexityPolicy.AsObject;
     public copied: string = '';
 
+    public userLoginMustBeDomain: boolean = false;
+
     constructor(
         public translate: TranslateService,
         private toast: ToastService,
@@ -67,16 +75,16 @@ export class AuthUserDetailComponent implements OnDestroy {
                 validators.push(Validators.minLength(this.policy.minLength));
             }
             if (this.policy.hasLowercase) {
-                validators.push(Validators.pattern(/[a-z]/g));
+                validators.push(lowerCaseValidator);
             }
             if (this.policy.hasUppercase) {
-                validators.push(Validators.pattern(/[A-Z]/g));
+                validators.push(upperCaseValidator);
             }
             if (this.policy.hasNumber) {
-                validators.push(Validators.pattern(/[0-9]/g));
+                validators.push(numberValidator);
             }
             if (this.policy.hasSymbol) {
-                validators.push(Validators.pattern(/[^a-z0-9]/gi));
+                validators.push(symbolValidator);
             }
 
             this.passwordForm = this.fb.group({
@@ -84,6 +92,11 @@ export class AuthUserDetailComponent implements OnDestroy {
                 newPassword: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
+
+            this.passwordForm.controls['newPassword'].valueChanges.subscribe(() => {
+                console.log(this.passwordForm.controls['newPassword'].errors);
+            });
+
         }).catch(error => {
             this.toast.showError(error.message);
             console.error(error.message);
