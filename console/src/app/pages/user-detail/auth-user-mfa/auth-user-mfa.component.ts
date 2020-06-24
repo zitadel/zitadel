@@ -19,6 +19,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public MfaType: any = MfaType;
     public MFAState: any = MFAState;
+
+    public error: string = '';
     constructor(private userService: AuthUserService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
@@ -55,10 +57,9 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     public getOTP(): void {
         this.userService.GetMyMfas().then(mfas => {
             this.mfaSubject.next(mfas.toObject().mfasList);
-            console.log(mfas.toObject());
         }).catch(error => {
             console.error(error);
-            this.toast.showError(error.message);
+            this.error = error.message;
         });
     }
 

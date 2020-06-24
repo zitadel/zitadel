@@ -292,9 +292,9 @@
     "PROJECT": {
         "PAGES": {
             "TITLE": "Projekt",
-            "DESCRIPTION": "Hier können Sie wichtige Einstellungen prüfen und die Daten einsehen, mit denen das der Dienst konfiguriert worden ist",
+            "DESCRIPTION": "Hier können Sie wichtige Einstellungen prüfen und die Daten einsehen, mit denen der Dienst konfiguriert worden ist",
             "LIST": "Projekte",
-            "LISTDESCRIPTION":"Hier finden Sie alle Projekte, für die Sie Aktionen anzeigen oder ausführen dürfen. Wenn Sie kein Projekt finden können, wenden Sie sich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+            "LISTDESCRIPTION":"Hier finden Sie alle Projekte, für die Sie Aktionen anzeigen oder ausführen dürfen. Wenn Sie Ihr Projekt nicht finden können, wenden Sie sich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Geben Sie den Namen ein",
