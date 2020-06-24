@@ -74,10 +74,10 @@
                     <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
                     <input autocomplete="off" name="password repeating" type="password" matInput
                         formControlName="confirmPassword" />
+
                     <mat-error *ngIf="confirmPassword?.errors?.required">
                         {{ 'USER.VALIDATION.REQUIRED' | translate }}
                     </mat-error>
-
                     <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
                         {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
                     </mat-error>
