@@ -11,9 +11,9 @@ import (
 func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.ProjectRoleView, error) {
 	role := new(model.ProjectRoleView)
 
-	projectIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS}
-	grantIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_ORGID, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
-	keyQuery := model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_KEY, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
+	projectIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
+	grantIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
+	keyQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: orgID, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, projectIDQuery, grantIDQuery, keyQuery)
 	err := query(db, role)
 	return role, err
@@ -22,9 +22,9 @@ func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.
 func ResourceOwnerProjectRolesByKey(db *gorm.DB, table, projectID, resourceOwner, key string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_RESOURCEOWNER, Value: resourceOwner, Method: global_model.SEARCHMETHOD_EQUALS},
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_KEY, Value: key, Method: global_model.SEARCHMETHOD_EQUALS},
+		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
+		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)
@@ -37,8 +37,8 @@ func ResourceOwnerProjectRolesByKey(db *gorm.DB, table, projectID, resourceOwner
 func ResourceOwnerProjectRoles(db *gorm.DB, table, projectID, resourceOwner string) ([]*model.ProjectRoleView, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	queries := []*proj_model.ProjectRoleSearchQuery{
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_PROJECTID, Value: projectID, Method: global_model.SEARCHMETHOD_EQUALS},
-		&proj_model.ProjectRoleSearchQuery{Key: proj_model.PROJECTROLESEARCHKEY_RESOURCEOWNER, Value: resourceOwner, Method: global_model.SEARCHMETHOD_EQUALS},
+		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		&proj_model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyResourceOwner, Value: resourceOwner, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Queries: queries})
 	_, err := query(db, &roles)

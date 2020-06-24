@@ -10,8 +10,8 @@ import (
 
 func OrgDomainByOrgIDAndDomain(db *gorm.DB, table, orgID, domain string) (*model.OrgDomainView, error) {
 	domainView := new(model.OrgDomainView)
-	orgIDQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_ORG_ID, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
-	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_DOMAIN, Value: domain, Method: global_model.SEARCHMETHOD_EQUALS}
+	orgIDQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
+	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyDomain, Value: domain, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, orgIDQuery, domainQuery)
 	err := query(db, domainView)
 	return domainView, err
@@ -19,8 +19,8 @@ func OrgDomainByOrgIDAndDomain(db *gorm.DB, table, orgID, domain string) (*model
 
 func VerifiedOrgDomain(db *gorm.DB, table, domain string) (*model.OrgDomainView, error) {
 	domainView := new(model.OrgDomainView)
-	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_DOMAIN, Value: domain, Method: global_model.SEARCHMETHOD_EQUALS}
-	verifiedQuery := &model.OrgDomainSearchQuery{Key: org_model.ORGDOMAINSEARCHKEY_VERIFIED, Value: true, Method: global_model.SEARCHMETHOD_EQUALS}
+	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyDomain, Value: domain, Method: global_model.SearchMethodEquals}
+	verifiedQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyVerified, Value: true, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, domainQuery, verifiedQuery)
 	err := query(db, domainView)
 	return domainView, err
@@ -40,9 +40,9 @@ func OrgDomainsByOrgID(db *gorm.DB, table string, orgID string) ([]*model.OrgDom
 	domains := make([]*model.OrgDomainView, 0)
 	queries := []*org_model.OrgDomainSearchQuery{
 		{
-			Key:    org_model.ORGDOMAINSEARCHKEY_ORG_ID,
+			Key:    org_model.OrgDomainSearchKeyOrgID,
 			Value:  orgID,
-			Method: global_model.SEARCHMETHOD_EQUALS,
+			Method: global_model.SearchMethodEquals,
 		},
 	}
 	query := view.PrepareSearchQuery(table, model.OrgDomainSearchRequest{Queries: queries})
@@ -60,8 +60,8 @@ func PutOrgDomain(db *gorm.DB, table string, role *model.OrgDomainView) error {
 
 func DeleteOrgDomain(db *gorm.DB, table, orgID, domain string) error {
 	delete := view.PrepareDeleteByKeys(table,
-		view.Key{Key: model.OrgDomainSearchKey(org_model.ORGDOMAINSEARCHKEY_DOMAIN), Value: domain},
-		view.Key{Key: model.OrgDomainSearchKey(org_model.ORGDOMAINSEARCHKEY_ORG_ID), Value: orgID},
+		view.Key{Key: model.OrgDomainSearchKey(org_model.OrgDomainSearchKeyDomain), Value: domain},
+		view.Key{Key: model.OrgDomainSearchKey(org_model.OrgDomainSearchKeyOrgID), Value: orgID},
 	)
 	return delete(db)
 }

@@ -17,15 +17,15 @@ type currentSequence struct {
 type SequenceSearchKey int32
 
 const (
-	SEQUENCESEARCHKEY_UNDEFINED SequenceSearchKey = iota
-	SEQUENCESEARCHKEY_VIEW_NAME
+	SequenceSearchKeyUndefined SequenceSearchKey = iota
+	SequenceSearchKeyViewName
 )
 
 type sequenceSearchKey SequenceSearchKey
 
 func (key sequenceSearchKey) ToColumnName() string {
 	switch SequenceSearchKey(key) {
-	case SEQUENCESEARCHKEY_VIEW_NAME:
+	case SequenceSearchKeyViewName:
 		return "view_name"
 	default:
 		return ""
@@ -44,7 +44,7 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) e
 
 func LatestSequence(db *gorm.DB, table, viewName string) (uint64, error) {
 	sequence := new(actualSequece)
-	query := PrepareGetByKey(table, sequenceSearchKey(SEQUENCESEARCHKEY_VIEW_NAME), viewName)
+	query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
 	err := query(db, sequence)
 
 	if err == nil {

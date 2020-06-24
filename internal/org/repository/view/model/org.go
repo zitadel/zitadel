@@ -69,16 +69,16 @@ func (o *OrgView) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case model.OrgAdded:
 		o.CreationDate = event.CreationDate
-		o.State = int32(org_model.ORGSTATE_ACTIVE)
+		o.State = int32(org_model.OrgStateActive)
 		o.setRootData(event)
 		err = o.SetData(event)
 	case model.OrgChanged:
 		o.setRootData(event)
 		err = o.SetData(event)
 	case model.OrgDeactivated:
-		o.State = int32(org_model.ORGSTATE_INACTIVE)
+		o.State = int32(org_model.OrgStateInactive)
 	case model.OrgReactivated:
-		o.State = int32(org_model.ORGSTATE_ACTIVE)
+		o.State = int32(org_model.OrgStateActive)
 	}
 	return err
 }

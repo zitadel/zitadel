@@ -95,7 +95,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 			logging.Log("SPOOL-FTKwH").WithField("view", s.ViewModel()).Debug("context canceled")
 			return nil
 		default:
-			if err := s.Process(event); err != nil {
+			if err := s.Reduce(event); err != nil {
 				return s.OnError(event, err)
 			}
 		}

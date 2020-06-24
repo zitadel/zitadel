@@ -72,12 +72,12 @@ func (g *UserGrant) AppendEvent(event *es_models.Event) error {
 		UserGrantCascadeChanged:
 		return g.setData(event)
 	case UserGrantDeactivated:
-		g.appendGrantStateEvent(model.USERGRANTSTATE_INACTIVE)
+		g.appendGrantStateEvent(model.UserGrantStateInactive)
 	case UserGrantReactivated:
-		g.appendGrantStateEvent(model.USERGRANTSTATE_ACTIVE)
+		g.appendGrantStateEvent(model.UserGrantStateActive)
 	case UserGrantRemoved,
 		UserGrantCascadeRemoved:
-		g.appendGrantStateEvent(model.USERGRANTSTATE_REMOVED)
+		g.appendGrantStateEvent(model.UserGrantStateRemoved)
 	}
 	return nil
 }

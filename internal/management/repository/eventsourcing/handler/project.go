@@ -36,7 +36,7 @@ func (p *Project) EventQuery() (*models.SearchQuery, error) {
 	return proj_event.ProjectQuery(sequence), nil
 }
 
-func (p *Project) Process(event *models.Event) (err error) {
+func (p *Project) Reduce(event *models.Event) (err error) {
 	project := new(view_model.ProjectView)
 	switch event.Type {
 	case es_model.ProjectAdded:

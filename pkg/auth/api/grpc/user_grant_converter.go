@@ -31,11 +31,11 @@ func userGrantSearchQueryToModel(query *UserGrantSearchQuery) *grant_model.UserG
 func userGrantSearchKeyToModel(key UserGrantSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
 	case UserGrantSearchKey_UserGrantSearchKey_ORG_ID:
-		return grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER
+		return grant_model.UserGrantSearchKeyResourceOwner
 	case UserGrantSearchKey_UserGrantSearchKey_PROJECT_ID:
-		return grant_model.USERGRANTSEARCHKEY_PROJECT_ID
+		return grant_model.UserGrantSearchKeyProjectID
 	default:
-		return grant_model.USERGRANTSEARCHKEY_UNSPECIFIED
+		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 
@@ -44,7 +44,7 @@ func myProjectOrgSearchRequestRequestsToModel(request *MyProjectOrgSearchRequest
 		Offset:        request.Offset,
 		Limit:         request.Limit,
 		Asc:           request.Asc,
-		SortingColumn: grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER,
+		SortingColumn: grant_model.UserGrantSearchKeyResourceOwner,
 		Queries:       myProjectOrgSearchQueriesToModel(request.Queries),
 	}
 }
@@ -68,9 +68,9 @@ func myProjectOrgSearchQueryToModel(query *MyProjectOrgSearchQuery) *grant_model
 func myProjectOrgSearchKeyToModel(key MyProjectOrgSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
 	case MyProjectOrgSearchKey_MYPROJECTORGSEARCHKEY_ORG_NAME:
-		return grant_model.USERGRANTSEARCHKEY_ORG_NAME
+		return grant_model.UserGrantSearchKeyOrgName
 	default:
-		return grant_model.USERGRANTSEARCHKEY_UNSPECIFIED
+		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 

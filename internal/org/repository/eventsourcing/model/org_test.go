@@ -26,7 +26,7 @@ func TestOrgFromEvents(t *testing.T) {
 				},
 				org: &Org{Name: "OrgName"},
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgName"},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive), Name: "OrgName"},
 		},
 		{
 			name: "org from events, nil org",
@@ -36,7 +36,7 @@ func TestOrgFromEvents(t *testing.T) {
 				},
 				org: nil,
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE)},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -69,7 +69,7 @@ func TestAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgAdded},
 				org:   &Org{Name: "OrgName"},
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgName"},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive), Name: "OrgName"},
 		},
 		{
 			name: "append change event",
@@ -77,28 +77,28 @@ func TestAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgChanged, Data: []byte(`{"name": "OrgName}`)},
 				org:   &Org{Name: "OrgNameChanged"},
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE), Name: "OrgNameChanged"},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive), Name: "OrgNameChanged"},
 		},
 		{
 			name: "append deactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgDeactivated},
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_INACTIVE)},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgReactivated},
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE)},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive)},
 		},
 		{
 			name: "append added domain event",
 			args: args{
 				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgDomainAdded},
 			},
-			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.ORGSTATE_ACTIVE)},
+			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive)},
 		},
 	}
 	for _, tt := range tests {

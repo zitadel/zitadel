@@ -19,7 +19,7 @@ func (req UserSearchRequest) GetOffset() uint64 {
 }
 
 func (req UserSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == usr_model.USERSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == usr_model.UserSearchKeyUnspecified {
 		return nil
 	}
 	return UserSearchKey(req.SortingColumn)
@@ -51,25 +51,25 @@ func (req UserSearchQuery) GetValue() interface{} {
 
 func (key UserSearchKey) ToColumnName() string {
 	switch usr_model.UserSearchKey(key) {
-	case usr_model.USERSEARCHKEY_USER_ID:
+	case usr_model.UserSearchKeyUserID:
 		return UserKeyUserID
-	case usr_model.USERSEARCHKEY_USER_NAME:
+	case usr_model.UserSearchKeyUserName:
 		return UserKeyUserName
-	case usr_model.USERSEARCHKEY_FIRST_NAME:
+	case usr_model.UserSearchKeyFirstName:
 		return UserKeyFirstName
-	case usr_model.USERSEARCHKEY_LAST_NAME:
+	case usr_model.UserSearchKeyLastName:
 		return UserKeyLastName
-	case usr_model.USERSEARCHKEY_DISPLAY_NAME:
+	case usr_model.UserSearchKeyDisplayName:
 		return UserKeyDisplayName
-	case usr_model.USERSEARCHKEY_NICK_NAME:
+	case usr_model.UserSearchKeyNickName:
 		return UserKeyNickName
-	case usr_model.USERSEARCHKEY_EMAIL:
+	case usr_model.UserSearchKeyEmail:
 		return UserKeyEmail
-	case usr_model.USERSEARCHKEY_STATE:
+	case usr_model.UserSearchKeyState:
 		return UserKeyState
-	case usr_model.USERSEARCHKEY_RESOURCEOWNER:
+	case usr_model.UserSearchKeyResourceOwner:
 		return UserKeyResourceOwner
-	case usr_model.USERSEARCHKEY_LOGIN_NAMES:
+	case usr_model.UserSearchKeyLoginNames:
 		return UserKeyLoginNames
 	default:
 		return ""

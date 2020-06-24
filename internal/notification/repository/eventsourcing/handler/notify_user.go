@@ -36,7 +36,7 @@ func (p *NotifyUser) EventQuery() (*models.SearchQuery, error) {
 	return eventsourcing.UserQuery(sequence), nil
 }
 
-func (p *NotifyUser) Process(event *models.Event) (err error) {
+func (p *NotifyUser) Reduce(event *models.Event) (err error) {
 	user := new(view_model.NotifyUser)
 	switch event.Type {
 	case es_model.UserAdded,

@@ -11,8 +11,8 @@ import (
 func ProjectGrantMemberByIDs(db *gorm.DB, table, grantID, userID string) (*model.ProjectGrantMemberView, error) {
 	role := new(model.ProjectGrantMemberView)
 
-	grantIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.PROJECTGRANTMEMBERSEARCHKEY_GRANT_ID, Value: grantID, Method: global_model.SEARCHMETHOD_EQUALS}
-	userIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.PROJECTGRANTMEMBERSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS}
+	grantIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyGrantID, Value: grantID, Method: global_model.SearchMethodEquals}
+	userIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, grantIDQuery, userIDQuery)
 	err := query(db, role)
 	return role, err
@@ -31,7 +31,7 @@ func SearchProjectGrantMembers(db *gorm.DB, table string, req *proj_model.Projec
 func ProjectGrantMembersByUserID(db *gorm.DB, table, userID string) ([]*model.ProjectGrantMemberView, error) {
 	members := make([]*model.ProjectGrantMemberView, 0)
 	queries := []*proj_model.ProjectGrantMemberSearchQuery{
-		&proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.PROJECTGRANTMEMBERSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS},
+		&proj_model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
 	}
 	query := view.PrepareSearchQuery(table, model.ProjectGrantMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)

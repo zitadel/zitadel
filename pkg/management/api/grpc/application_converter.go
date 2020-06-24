@@ -31,7 +31,7 @@ func appFromModel(app *proj_model.Application) *Application {
 }
 
 func appConfigFromModel(app *proj_model.Application) isApplication_AppConfig {
-	if app.Type == proj_model.APPTYPE_OIDC {
+	if app.Type == proj_model.AppTypeOIDC {
 		return &Application_OidcConfig{
 			OidcConfig: oidcConfigFromModel(app.OIDCConfig),
 		}
@@ -70,7 +70,7 @@ func oidcAppCreateToModel(app *OIDCApplicationCreate) *proj_model.Application {
 			AggregateID: app.ProjectId,
 		},
 		Name: app.Name,
-		Type: proj_model.APPTYPE_OIDC,
+		Type: proj_model.AppTypeOIDC,
 		OIDCConfig: &proj_model.OIDCConfig{
 			RedirectUris:           app.RedirectUris,
 			ResponseTypes:          oidcResponseTypesToModel(app.ResponseTypes),
@@ -120,7 +120,7 @@ func applicationSearchQueriesToModel(projectID string, queries []*ApplicationSea
 	for i, q := range queries {
 		converted[i] = applicationSearchQueryToModel(q)
 	}
-	converted[len(queries)] = &proj_model.ApplicationSearchQuery{Key: proj_model.APPLICATIONSEARCHKEY_PROJECT_ID, Method: model.SEARCHMETHOD_EQUALS, Value: projectID}
+	converted[len(queries)] = &proj_model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID}
 
 	return converted
 }
@@ -133,12 +133,12 @@ func applicationSearchQueryToModel(query *ApplicationSearchQuery) *proj_model.Ap
 	}
 }
 
-func applicationSearchKeyToModel(key ApplicationSearchKey) proj_model.ApplicationSearchKey {
+func applicationSearchKeyToModel(key ApplicationSearchKey) proj_model.AppSearchKey {
 	switch key {
 	case ApplicationSearchKey_APPLICATIONSEARCHKEY_APP_NAME:
-		return proj_model.APPLICATIONSEARCHKEY_NAME
+		return proj_model.AppSearchKeyName
 	default:
-		return proj_model.APPLICATIONSEARCHKEY_UNSPECIFIED
+		return proj_model.AppSearchKeyUnspecified
 	}
 }
 
@@ -184,9 +184,9 @@ func applicationViewFromModel(application *proj_model.ApplicationView) *Applicat
 
 func appStateFromModel(state proj_model.AppState) AppState {
 	switch state {
-	case proj_model.APPSTATE_ACTIVE:
+	case proj_model.AppStateActive:
 		return AppState_APPSTATE_ACTIVE
-	case proj_model.APPSTATE_INACTIVE:
+	case proj_model.AppStateInactive:
 		return AppState_APPSTATE_INACTIVE
 	default:
 		return AppState_APPSTATE_UNSPECIFIED
@@ -195,18 +195,18 @@ func appStateFromModel(state proj_model.AppState) AppState {
 
 func oidcResponseTypesToModel(responseTypes []OIDCResponseType) []proj_model.OIDCResponseType {
 	if responseTypes == nil || len(responseTypes) == 0 {
-		return []proj_model.OIDCResponseType{proj_model.OIDCRESPONSETYPE_CODE}
+		return []proj_model.OIDCResponseType{proj_model.OIDCResponseTypeCode}
 	}
 	oidcResponseTypes := make([]proj_model.OIDCResponseType, len(responseTypes))
 
 	for i, responseType := range responseTypes {
 		switch responseType {
 		case OIDCResponseType_OIDCRESPONSETYPE_CODE:
-			oidcResponseTypes[i] = proj_model.OIDCRESPONSETYPE_CODE
+			oidcResponseTypes[i] = proj_model.OIDCResponseTypeCode
 		case OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN:
-			oidcResponseTypes[i] = proj_model.OIDCRESPONSETYPE_ID_TOKEN
+			oidcResponseTypes[i] = proj_model.OIDCResponseTypeIDToken
 		case OIDCResponseType_OIDCRESPONSETYPE_TOKEN:
-			oidcResponseTypes[i] = proj_model.OIDCRESPONSETYPE_TOKEN
+			oidcResponseTypes[i] = proj_model.OIDCResponseTypeToken
 		}
 	}
 
@@ -218,11 +218,11 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []O
 
 	for i, responseType := range responseTypes {
 		switch responseType {
-		case proj_model.OIDCRESPONSETYPE_CODE:
+		case proj_model.OIDCResponseTypeCode:
 			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_CODE
-		case proj_model.OIDCRESPONSETYPE_ID_TOKEN:
+		case proj_model.OIDCResponseTypeIDToken:
 			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN
-		case proj_model.OIDCRESPONSETYPE_TOKEN:
+		case proj_model.OIDCResponseTypeToken:
 			oidcResponseTypes[i] = OIDCResponseType_OIDCRESPONSETYPE_TOKEN
 		}
 	}
@@ -232,18 +232,18 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []O
 
 func oidcGrantTypesToModel(grantTypes []OIDCGrantType) []proj_model.OIDCGrantType {
 	if grantTypes == nil || len(grantTypes) == 0 {
-		return []proj_model.OIDCGrantType{proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE}
+		return []proj_model.OIDCGrantType{proj_model.OIDCGrantTypeAuthorizationCode}
 	}
 	oidcGrantTypes := make([]proj_model.OIDCGrantType, len(grantTypes))
 
 	for i, grantType := range grantTypes {
 		switch grantType {
 		case OIDCGrantType_OIDCGRANTTYPE_AUTHORIZATION_CODE:
-			oidcGrantTypes[i] = proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE
+			oidcGrantTypes[i] = proj_model.OIDCGrantTypeAuthorizationCode
 		case OIDCGrantType_OIDCGRANTTYPE_IMPLICIT:
-			oidcGrantTypes[i] = proj_model.OIDCGRANTTYPE_IMPLICIT
+			oidcGrantTypes[i] = proj_model.OIDCGrantTypeImplicit
 		case OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN:
-			oidcGrantTypes[i] = proj_model.OIDCGRANTTYPE_REFRESH_TOKEN
+			oidcGrantTypes[i] = proj_model.OIDCGrantTypeRefreshToken
 		}
 	}
 	return oidcGrantTypes
@@ -254,11 +254,11 @@ func oidcGrantTypesFromModel(grantTypes []proj_model.OIDCGrantType) []OIDCGrantT
 
 	for i, grantType := range grantTypes {
 		switch grantType {
-		case proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE:
+		case proj_model.OIDCGrantTypeAuthorizationCode:
 			oidcGrantTypes[i] = OIDCGrantType_OIDCGRANTTYPE_AUTHORIZATION_CODE
-		case proj_model.OIDCGRANTTYPE_IMPLICIT:
+		case proj_model.OIDCGrantTypeImplicit:
 			oidcGrantTypes[i] = OIDCGrantType_OIDCGRANTTYPE_IMPLICIT
-		case proj_model.OIDCGRANTTYPE_REFRESH_TOKEN:
+		case proj_model.OIDCGrantTypeRefreshToken:
 			oidcGrantTypes[i] = OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN
 		}
 	}
@@ -268,22 +268,22 @@ func oidcGrantTypesFromModel(grantTypes []proj_model.OIDCGrantType) []OIDCGrantT
 func oidcApplicationTypeToModel(appType OIDCApplicationType) proj_model.OIDCApplicationType {
 	switch appType {
 	case OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB:
-		return proj_model.OIDCAPPLICATIONTYPE_WEB
+		return proj_model.OIDCApplicationTypeWeb
 	case OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT:
-		return proj_model.OIDCAPPLICATIONTYPE_USER_AGENT
+		return proj_model.OIDCApplicationTypeUserAgent
 	case OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE:
-		return proj_model.OIDCAPPLICATIONTYPE_NATIVE
+		return proj_model.OIDCApplicationTypeNative
 	}
-	return proj_model.OIDCAPPLICATIONTYPE_WEB
+	return proj_model.OIDCApplicationTypeWeb
 }
 
 func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) OIDCApplicationType {
 	switch appType {
-	case proj_model.OIDCAPPLICATIONTYPE_WEB:
+	case proj_model.OIDCApplicationTypeWeb:
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
-	case proj_model.OIDCAPPLICATIONTYPE_USER_AGENT:
+	case proj_model.OIDCApplicationTypeUserAgent:
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT
-	case proj_model.OIDCAPPLICATIONTYPE_NATIVE:
+	case proj_model.OIDCApplicationTypeNative:
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE
 	default:
 		return OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
@@ -293,23 +293,23 @@ func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) OIDCAp
 func oidcAuthMethodTypeToModel(authType OIDCAuthMethodType) proj_model.OIDCAuthMethodType {
 	switch authType {
 	case OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC:
-		return proj_model.OIDCAUTHMETHODTYPE_BASIC
+		return proj_model.OIDCAuthMethodTypeBasic
 	case OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST:
-		return proj_model.OIDCAUTHMETHODTYPE_POST
+		return proj_model.OIDCAuthMethodTypePost
 	case OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
-		return proj_model.OIDCAUTHMETHODTYPE_NONE
+		return proj_model.OIDCAuthMethodTypeNone
 	default:
-		return proj_model.OIDCAUTHMETHODTYPE_BASIC
+		return proj_model.OIDCAuthMethodTypeBasic
 	}
 }
 
 func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) OIDCAuthMethodType {
 	switch authType {
-	case proj_model.OIDCAUTHMETHODTYPE_BASIC:
+	case proj_model.OIDCAuthMethodTypeBasic:
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
-	case proj_model.OIDCAUTHMETHODTYPE_POST:
+	case proj_model.OIDCAuthMethodTypePost:
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
-	case proj_model.OIDCAUTHMETHODTYPE_NONE:
+	case proj_model.OIDCAuthMethodTypeNone:
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
 	default:
 		return OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC

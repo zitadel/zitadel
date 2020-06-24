@@ -72,15 +72,15 @@ func projectGrantMemberSearchQueryToModel(query *ProjectGrantMemberSearchQuery) 
 func projectGrantMemberSearchKeyToModel(key ProjectGrantMemberSearchKey) proj_model.ProjectGrantMemberSearchKey {
 	switch key {
 	case ProjectGrantMemberSearchKey_PROJECTGRANTMEMBERSEARCHKEY_EMAIL:
-		return proj_model.PROJECTGRANTMEMBERSEARCHKEY_EMAIL
+		return proj_model.ProjectGrantMemberSearchKeyEmail
 	case ProjectGrantMemberSearchKey_PROJECTGRANTMEMBERSEARCHKEY_FIRST_NAME:
-		return proj_model.PROJECTGRANTMEMBERSEARCHKEY_FIRST_NAME
+		return proj_model.ProjectGrantMemberSearchKeyFirstName
 	case ProjectGrantMemberSearchKey_PROJECTGRANTMEMBERSEARCHKEY_LAST_NAME:
-		return proj_model.PROJECTGRANTMEMBERSEARCHKEY_LAST_NAME
+		return proj_model.ProjectGrantMemberSearchKeyLastName
 	case ProjectGrantMemberSearchKey_PROJECTGRANTMEMBERSEARCHKEY_USER_NAME:
-		return proj_model.PROJECTGRANTMEMBERSEARCHKEY_USER_NAME
+		return proj_model.ProjectGrantMemberSearchKeyUserName
 	default:
-		return proj_model.PROJECTGRANTMEMBERSEARCHKEY_UNSPECIFIED
+		return proj_model.ProjectGrantMemberSearchKeyUnspecified
 	}
 }
 

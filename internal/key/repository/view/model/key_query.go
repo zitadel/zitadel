@@ -19,7 +19,7 @@ func (req KeySearchRequest) GetOffset() uint64 {
 }
 
 func (req KeySearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == key_model.KEYSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == key_model.KeySearchKeyUnspecified {
 		return nil
 	}
 	return KeySearchKey(req.SortingColumn)
@@ -51,13 +51,13 @@ func (req KeySearchQuery) GetValue() interface{} {
 
 func (key KeySearchKey) ToColumnName() string {
 	switch key_model.KeySearchKey(key) {
-	case key_model.KEYSEARCHKEY_ID:
+	case key_model.KeySearchKeyID:
 		return KeyKeyID
-	case key_model.KEYSEARCHKEY_PRIVATE:
+	case key_model.KeySearchKeyPrivate:
 		return KeyPrivate
-	case key_model.KEYSEARCHKEY_USAGE:
+	case key_model.KeySearchKeyUsage:
 		return KeyUsage
-	case key_model.KEYSEARCHKEY_EXPIRY:
+	case key_model.KeySearchKeyExpiry:
 		return KeyExpiry
 	default:
 		return ""

@@ -226,10 +226,10 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew", State: model.PROJECTSTATE_INACTIVE},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew", State: model.ProjectStateInactive},
 			},
 		},
 		{
@@ -237,7 +237,7 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_INACTIVE},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateInactive},
 			},
 			res: res{
 				wantErr: true,
@@ -249,7 +249,7 @@ func TestDeactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
 				wantErr: true,
@@ -297,10 +297,10 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateInactiveProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_INACTIVE},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateInactive},
 			},
 			res: res{
-				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew", State: model.PROJECTSTATE_ACTIVE},
+				project: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "NameNew", State: model.ProjectStateActive},
 			},
 		},
 		{
@@ -308,7 +308,7 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProject(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
 				wantErr: true,
@@ -320,7 +320,7 @@ func TestReactivateProject(t *testing.T) {
 			args: args{
 				es:       GetMockManipulateProjectNoEvents(ctrl),
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.PROJECTSTATE_ACTIVE},
+				existing: &model.Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Name: "Name", State: model.ProjectStateActive},
 			},
 			res: res{
 				wantErr: true,
@@ -1041,8 +1041,8 @@ func TestAddApplication(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1050,8 +1050,8 @@ func TestAddApplication(t *testing.T) {
 				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name: "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1077,8 +1077,8 @@ func TestAddApplication(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1143,8 +1143,8 @@ func TestChangeApp(t *testing.T) {
 					AppID: "AppID",
 					Name:  "NameChanged",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1172,8 +1172,8 @@ func TestChangeApp(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1191,8 +1191,8 @@ func TestChangeApp(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1334,10 +1334,10 @@ func TestDeactivateApp(t *testing.T) {
 				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
-					State: model.APPSTATE_INACTIVE,
+					State: model.AppStateInactive,
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1363,8 +1363,8 @@ func TestDeactivateApp(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1382,8 +1382,8 @@ func TestDeactivateApp(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1444,10 +1444,10 @@ func TestReactivateApp(t *testing.T) {
 				result: &model.Application{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					AppID: "AppID",
 					Name:  "Name",
-					State: model.APPSTATE_ACTIVE,
+					State: model.AppStateActive,
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1473,8 +1473,8 @@ func TestReactivateApp(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1492,8 +1492,8 @@ func TestReactivateApp(t *testing.T) {
 					AppID: "AppID",
 					Name:  "Name",
 					OIDCConfig: &model.OIDCConfig{
-						ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_CODE},
-						GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_AUTHORIZATION_CODE},
+						ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeCode},
+						GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeAuthorizationCode},
 					},
 				},
 			},
@@ -1548,16 +1548,16 @@ func TestChangeOIDCConfig(t *testing.T) {
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
-					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeImplicit},
 				},
 			},
 			res: res{
 				result: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
-					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeImplicit},
 				},
 			},
 		},
@@ -1569,7 +1569,7 @@ func TestChangeOIDCConfig(t *testing.T) {
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
+					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
 				},
 			},
 			res: res{
@@ -1585,8 +1585,8 @@ func TestChangeOIDCConfig(t *testing.T) {
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
-					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeImplicit},
 				},
 			},
 			res: res{
@@ -1602,8 +1602,8 @@ func TestChangeOIDCConfig(t *testing.T) {
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
-					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeImplicit},
 				},
 			},
 			res: res{
@@ -1619,8 +1619,8 @@ func TestChangeOIDCConfig(t *testing.T) {
 				config: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
-					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeImplicit},
 				},
 			},
 			res: res{
@@ -1680,8 +1680,8 @@ func TestChangeOIDCConfigSecret(t *testing.T) {
 				result: &model.OIDCConfig{
 					ObjectRoot:    es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
 					AppID:         "AppID",
-					ResponseTypes: []model.OIDCResponseType{model.OIDCRESPONSETYPE_ID_TOKEN},
-					GrantTypes:    []model.OIDCGrantType{model.OIDCGRANTTYPE_IMPLICIT},
+					ResponseTypes: []model.OIDCResponseType{model.OIDCResponseTypeIDToken},
+					GrantTypes:    []model.OIDCGrantType{model.OIDCGrantTypeImplicit},
 				},
 			},
 		},
@@ -2059,7 +2059,7 @@ func TestDeactivateProjectGrant(t *testing.T) {
 			res: res{
 				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
-					State:   model.PROJECTGRANTSTATE_INACTIVE,
+					State:   model.ProjectGrantStateInactive,
 				},
 			},
 		},
@@ -2153,7 +2153,7 @@ func TestReactivateProjectGrant(t *testing.T) {
 			res: res{
 				result: &model.ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1},
 					GrantID: "GrantID",
-					State:   model.PROJECTGRANTSTATE_ACTIVE,
+					State:   model.ProjectGrantStateActive,
 				},
 			},
 		},

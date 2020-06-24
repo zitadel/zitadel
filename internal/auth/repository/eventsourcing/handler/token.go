@@ -44,7 +44,7 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (u *Token) Process(event *models.Event) (err error) {
+func (u *Token) Reduce(event *models.Event) (err error) {
 	switch event.Type {
 	case user_es_model.SignedOut:
 		id, err := agentIDFromSession(event)

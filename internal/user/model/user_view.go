@@ -55,17 +55,17 @@ type UserSearchRequest struct {
 type UserSearchKey int32
 
 const (
-	USERSEARCHKEY_UNSPECIFIED UserSearchKey = iota
-	USERSEARCHKEY_USER_ID
-	USERSEARCHKEY_USER_NAME
-	USERSEARCHKEY_FIRST_NAME
-	USERSEARCHKEY_LAST_NAME
-	USERSEARCHKEY_NICK_NAME
-	USERSEARCHKEY_DISPLAY_NAME
-	USERSEARCHKEY_EMAIL
-	USERSEARCHKEY_STATE
-	USERSEARCHKEY_RESOURCEOWNER
-	USERSEARCHKEY_LOGIN_NAMES
+	UserSearchKeyUnspecified UserSearchKey = iota
+	UserSearchKeyUserID
+	UserSearchKeyUserName
+	UserSearchKeyFirstName
+	UserSearchKeyLastName
+	UserSearchKeyNickName
+	UserSearchKeyDisplayName
+	UserSearchKeyEmail
+	UserSearchKeyState
+	UserSearchKeyResourceOwner
+	UserSearchKeyLoginNames
 )
 
 type UserSearchQuery struct {
@@ -88,7 +88,7 @@ func (r *UserSearchRequest) EnsureLimit(limit uint64) {
 }
 
 func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserSearchQuery{Key: USERSEARCHKEY_RESOURCEOWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
 
 func (u *UserView) MfaTypesSetupPossible(level req_model.MfaLevel) []req_model.MfaType {
@@ -97,7 +97,7 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MfaLevel) []req_model.M
 	default:
 		fallthrough
 	case req_model.MfaLevelSoftware:
-		if u.OTPState != MFASTATE_READY {
+		if u.OTPState != MfaStateReady {
 			types = append(types, req_model.MfaTypeOTP)
 		}
 		//PLANNED: add sms
@@ -114,7 +114,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MfaLevel) []req_model.MfaType
 	default:
 		fallthrough
 	case req_model.MfaLevelSoftware:
-		if u.OTPState == MFASTATE_READY {
+		if u.OTPState == MfaStateReady {
 			types = append(types, req_model.MfaTypeOTP)
 		}
 		//PLANNED: add sms

@@ -19,7 +19,7 @@ func (req OrgDomainSearchRequest) GetOffset() uint64 {
 }
 
 func (req OrgDomainSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == org_model.ORGDOMAINSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == org_model.OrgDomainSearchKeyUnspecified {
 		return nil
 	}
 	return OrgDomainSearchKey(req.SortingColumn)
@@ -51,13 +51,13 @@ func (req OrgDomainSearchQuery) GetValue() interface{} {
 
 func (key OrgDomainSearchKey) ToColumnName() string {
 	switch org_model.OrgDomainSearchKey(key) {
-	case org_model.ORGDOMAINSEARCHKEY_DOMAIN:
+	case org_model.OrgDomainSearchKeyDomain:
 		return OrgDomainKeyDomain
-	case org_model.ORGDOMAINSEARCHKEY_ORG_ID:
+	case org_model.OrgDomainSearchKeyOrgID:
 		return OrgDomainKeyOrgID
-	case org_model.ORGDOMAINSEARCHKEY_VERIFIED:
+	case org_model.OrgDomainSearchKeyVerified:
 		return OrgDomainKeyVerified
-	case org_model.ORGDOMAINSEARCHKEY_PRIMARY:
+	case org_model.OrgDomainSearchKeyPrimary:
 		return OrgDomainKeyPrimary
 	default:
 		return ""

@@ -29,13 +29,13 @@ type ProjectMemberSearchRequest struct {
 type ProjectMemberSearchKey int32
 
 const (
-	PROJECTMEMBERSEARCHKEY_UNSPECIFIED ProjectMemberSearchKey = iota
-	PROJECTMEMBERSEARCHKEY_USER_NAME
-	PROJECTMEMBERSEARCHKEY_EMAIL
-	PROJECTMEMBERSEARCHKEY_FIRST_NAME
-	PROJECTMEMBERSEARCHKEY_LAST_NAME
-	PROJECTMEMBERSEARCHKEY_PROJECT_ID
-	PROJECTMEMBERSEARCHKEY_USER_ID
+	ProjectMemberSearchKeyUnspecified ProjectMemberSearchKey = iota
+	ProjectMemberSearchKeyUserName
+	ProjectMemberSearchKeyEmail
+	ProjectMemberSearchKeyFirstName
+	ProjectMemberSearchKeyLastName
+	ProjectMemberSearchKeyProjectID
+	ProjectMemberSearchKeyUserID
 )
 
 type ProjectMemberSearchQuery struct {
@@ -57,5 +57,5 @@ func (r *ProjectMemberSearchRequest) EnsureLimit(limit uint64) {
 	}
 }
 func (r *ProjectMemberSearchRequest) AppendProjectQuery(projectID string) {
-	r.Queries = append(r.Queries, &ProjectMemberSearchQuery{Key: PROJECTMEMBERSEARCHKEY_PROJECT_ID, Method: model.SEARCHMETHOD_EQUALS, Value: projectID})
+	r.Queries = append(r.Queries, &ProjectMemberSearchQuery{Key: ProjectMemberSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID})
 }

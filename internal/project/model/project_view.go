@@ -26,10 +26,10 @@ type ProjectViewSearchRequest struct {
 type ProjectViewSearchKey int32
 
 const (
-	PROJECTSEARCHKEY_UNSPECIFIED ProjectViewSearchKey = iota
-	PROJECTSEARCHKEY_NAME
-	PROJECTSEARCHKEY_PROJECTID
-	PROJECTSEARCHKEY_RESOURCE_OWNER
+	ProjectViewSearchKeyUnspecified ProjectViewSearchKey = iota
+	ProjectViewSearchKeyName
+	ProjectViewSearchKeyProjectID
+	ProjectViewSearchKeyResourceOwner
 )
 
 type ProjectViewSearchQuery struct {
@@ -46,7 +46,7 @@ type ProjectViewSearchResponse struct {
 }
 
 func (r *ProjectViewSearchRequest) AppendMyResourceOwnerQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectViewSearchQuery{Key: PROJECTSEARCHKEY_RESOURCE_OWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectViewSearchQuery{Key: ProjectViewSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
 
 func (r *ProjectViewSearchRequest) EnsureLimit(limit uint64) {

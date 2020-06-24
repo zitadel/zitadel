@@ -11,8 +11,8 @@ import (
 func OrgMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.OrgMemberView, error) {
 	member := new(model.OrgMemberView)
 
-	orgIDQuery := &model.OrgMemberSearchQuery{Key: org_model.ORGMEMBERSEARCHKEY_ORG_ID, Value: orgID, Method: global_model.SEARCHMETHOD_EQUALS}
-	userIDQuery := &model.OrgMemberSearchQuery{Key: org_model.ORGMEMBERSEARCHKEY_USER_ID, Value: userID, Method: global_model.SEARCHMETHOD_EQUALS}
+	orgIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
+	userIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := view.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
 	err := query(db, member)
 	return member, err
@@ -31,9 +31,9 @@ func OrgMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.OrgM
 	members := make([]*model.OrgMemberView, 0)
 	queries := []*org_model.OrgMemberSearchQuery{
 		{
-			Key:    org_model.ORGMEMBERSEARCHKEY_USER_ID,
+			Key:    org_model.OrgMemberSearchKeyUserID,
 			Value:  userID,
-			Method: global_model.SEARCHMETHOD_EQUALS,
+			Method: global_model.SearchMethodEquals,
 		},
 	}
 	query := view.PrepareSearchQuery(table, model.OrgMemberSearchRequest{Queries: queries})

@@ -16,6 +16,6 @@ type OrgIamPolicy struct {
 type PolicyState int32
 
 const (
-	POLICYSTATE_ACTIVE PolicyState = iota
-	POLICYSTATE_REMOVED
+	PolicyStateActive PolicyState = iota
+	PolicyStateRemoved
 )

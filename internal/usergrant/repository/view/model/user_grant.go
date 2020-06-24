@@ -95,16 +95,16 @@ func (g *UserGrantView) AppendEvent(event *models.Event) (err error) {
 	g.Sequence = event.Sequence
 	switch event.Type {
 	case es_model.UserGrantAdded:
-		g.State = int32(model.USERGRANTSTATE_ACTIVE)
+		g.State = int32(model.UserGrantStateActive)
 		g.CreationDate = event.CreationDate
 		g.setRootData(event)
 		err = g.setData(event)
 	case es_model.UserGrantChanged, es_model.UserGrantCascadeChanged:
 		err = g.setData(event)
 	case es_model.UserGrantDeactivated:
-		g.State = int32(model.USERGRANTSTATE_INACTIVE)
+		g.State = int32(model.UserGrantStateInactive)
 	case es_model.UserGrantReactivated:
-		g.State = int32(model.USERGRANTSTATE_ACTIVE)
+		g.State = int32(model.UserGrantStateActive)
 	}
 	return err
 }

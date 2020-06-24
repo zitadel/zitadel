@@ -8,7 +8,7 @@ import (
 
 type ApplicationSearchRequest proj_model.ApplicationSearchRequest
 type ApplicationSearchQuery proj_model.ApplicationSearchQuery
-type ApplicationSearchKey proj_model.ApplicationSearchKey
+type ApplicationSearchKey proj_model.AppSearchKey
 
 func (req ApplicationSearchRequest) GetLimit() uint64 {
 	return req.Limit
@@ -19,7 +19,7 @@ func (req ApplicationSearchRequest) GetOffset() uint64 {
 }
 
 func (req ApplicationSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == proj_model.APPLICATIONSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == proj_model.AppSearchKeyUnspecified {
 		return nil
 	}
 	return ApplicationSearchKey(req.SortingColumn)
@@ -50,14 +50,14 @@ func (req ApplicationSearchQuery) GetValue() interface{} {
 }
 
 func (key ApplicationSearchKey) ToColumnName() string {
-	switch proj_model.ApplicationSearchKey(key) {
-	case proj_model.APPLICATIONSEARCHKEY_APP_ID:
+	switch proj_model.AppSearchKey(key) {
+	case proj_model.AppSearchKeyAppID:
 		return ApplicationKeyID
-	case proj_model.APPLICATIONSEARCHKEY_NAME:
+	case proj_model.AppSearchKeyName:
 		return ApplicationKeyName
-	case proj_model.APPLICATIONSEARCHKEY_PROJECT_ID:
+	case proj_model.AppSearchKeyProjectID:
 		return ApplicationKeyProjectID
-	case proj_model.APPLICATIONSEARCHKEY_OIDC_CLIENT_ID:
+	case proj_model.AppSearchKeyOIDCClientID:
 		return ApplicationKeyOIDCClientID
 	default:
 		return ""

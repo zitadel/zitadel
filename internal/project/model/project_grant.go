@@ -22,16 +22,16 @@ type ProjectGrantIDs struct {
 type ProjectGrantState int32
 
 const (
-	PROJECTGRANTSTATE_ACTIVE ProjectGrantState = iota
-	PROJECTGRANTSTATE_INACTIVE
+	ProjectGrantStateActive ProjectGrantState = iota
+	ProjectGrantStateInactive
 )
 
 func NewProjectGrant(projectID, grantID string) *ProjectGrant {
-	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, GrantID: grantID, State: PROJECTGRANTSTATE_ACTIVE}
+	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, GrantID: grantID, State: ProjectGrantStateActive}
 }
 
 func (p *ProjectGrant) IsActive() bool {
-	return p.State == PROJECTGRANTSTATE_ACTIVE
+	return p.State == ProjectGrantStateActive
 }
 
 func (p *ProjectGrant) IsValid() bool {

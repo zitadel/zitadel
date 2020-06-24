@@ -65,47 +65,47 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	}
 
 	switch method {
-	case model.SEARCHMETHOD_EQUALS:
+	case model.SearchMethodEquals:
 		query = query.Where(""+column+" = ?", value)
-	case model.SEARCHMETHOD_EQUALS_IGNORE_CASE:
+	case model.SearchMethodEqualsIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-idu8e", "Equal ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") = LOWER(?)", valueText)
-	case model.SEARCHMETHOD_STARTS_WITH:
+	case model.SearchMethodStartsWith:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-idu8e", "Starts with only possible for strings")
 		}
 		query = query.Where(column+" LIKE ?", valueText+"%")
-	case model.SEARCHMETHOD_STARTS_WITH_IGNORE_CASE:
+	case model.SearchMethodStartsWithIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eidus", "Starts with ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", valueText+"%")
-	case model.SEARCHMETHOD_CONTAINS:
+	case model.SearchMethodContains:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-3ids", "Contains with only possible for strings")
 		}
 		query = query.Where(column+" LIKE ?", "%"+valueText+"%")
-	case model.SEARCHMETHOD_CONTAINS_IGNORE_CASE:
+	case model.SearchMethodContainsIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-eid73", "Contains with ignore case only possible for strings")
 		}
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText+"%")
-	case model.SEARCHMETHOD_NOT_EQUALS:
+	case model.SearchMethodNotEquals:
 		query = query.Where(""+column+" <> ?", value)
-	case model.SEARCHMETHOD_GREATER_THAN:
+	case model.SearchMethodGreaterThan:
 		query = query.Where(column+" > ?", value)
-	case model.SEARCHMETHOD_LESS_THAN:
+	case model.SearchMethodLessThan:
 		query = query.Where(column+" < ?", value)
-	case model.SEARCHMETHOD_IS_ONE_OF:
+	case model.SearchMethodIsOneOf:
 		query = query.Where(column+" IN (?)", value)
-	case model.SEARCHMETHOD_LIST_CONTAINS:
+	case model.SearchMethodListContains:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-Psois", "list contains only possible for strings")

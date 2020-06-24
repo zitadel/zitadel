@@ -19,7 +19,7 @@ func (req OrgMemberSearchRequest) GetOffset() uint64 {
 }
 
 func (req OrgMemberSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == proj_model.ORGMEMBERSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == proj_model.OrgMemberSearchKeyUnspecified {
 		return nil
 	}
 	return OrgMemberSearchKey(req.SortingColumn)
@@ -51,17 +51,17 @@ func (req OrgMemberSearchQuery) GetValue() interface{} {
 
 func (key OrgMemberSearchKey) ToColumnName() string {
 	switch proj_model.OrgMemberSearchKey(key) {
-	case proj_model.ORGMEMBERSEARCHKEY_EMAIL:
+	case proj_model.OrgMemberSearchKeyEmail:
 		return OrgMemberKeyEmail
-	case proj_model.ORGMEMBERSEARCHKEY_FIRST_NAME:
+	case proj_model.OrgMemberSearchKeyFirstName:
 		return OrgMemberKeyFirstName
-	case proj_model.ORGMEMBERSEARCHKEY_LAST_NAME:
+	case proj_model.OrgMemberSearchKeyLastName:
 		return OrgMemberKeyLastName
-	case proj_model.ORGMEMBERSEARCHKEY_USER_NAME:
+	case proj_model.OrgMemberSearchKeyUserName:
 		return OrgMemberKeyUserName
-	case proj_model.ORGMEMBERSEARCHKEY_USER_ID:
+	case proj_model.OrgMemberSearchKeyUserID:
 		return OrgMemberKeyUserID
-	case proj_model.ORGMEMBERSEARCHKEY_ORG_ID:
+	case proj_model.OrgMemberSearchKeyOrgID:
 		return OrgMemberKeyOrgID
 	default:
 		return ""

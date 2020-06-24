@@ -32,16 +32,16 @@ type OrgChange struct {
 type OrgState int32
 
 const (
-	ORGSTATE_ACTIVE OrgState = iota
-	ORGSTATE_INACTIVE
+	OrgStateActive OrgState = iota
+	OrgStateInactive
 )
 
 func NewOrg(id string) *Org {
-	return &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: ORGSTATE_ACTIVE}
+	return &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: OrgStateActive}
 }
 
 func (o *Org) IsActive() bool {
-	return o.State == ORGSTATE_ACTIVE
+	return o.State == OrgStateActive
 }
 
 func (o *Org) IsValid() bool {

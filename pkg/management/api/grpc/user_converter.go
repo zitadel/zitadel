@@ -119,21 +119,21 @@ func userSearchQueryToModel(query *UserSearchQuery) *usr_model.UserSearchQuery {
 func userSearchKeyToModel(key UserSearchKey) usr_model.UserSearchKey {
 	switch key {
 	case UserSearchKey_USERSEARCHKEY_USER_NAME:
-		return usr_model.USERSEARCHKEY_USER_NAME
+		return usr_model.UserSearchKeyUserName
 	case UserSearchKey_USERSEARCHKEY_FIRST_NAME:
-		return usr_model.USERSEARCHKEY_FIRST_NAME
+		return usr_model.UserSearchKeyFirstName
 	case UserSearchKey_USERSEARCHKEY_LAST_NAME:
-		return usr_model.USERSEARCHKEY_LAST_NAME
+		return usr_model.UserSearchKeyLastName
 	case UserSearchKey_USERSEARCHKEY_NICK_NAME:
-		return usr_model.USERSEARCHKEY_NICK_NAME
+		return usr_model.UserSearchKeyNickName
 	case UserSearchKey_USERSEARCHKEY_DISPLAY_NAME:
-		return usr_model.USERSEARCHKEY_DISPLAY_NAME
+		return usr_model.UserSearchKeyDisplayName
 	case UserSearchKey_USERSEARCHKEY_EMAIL:
-		return usr_model.USERSEARCHKEY_EMAIL
+		return usr_model.UserSearchKeyEmail
 	case UserSearchKey_USERSEARCHKEY_STATE:
-		return usr_model.USERSEARCHKEY_STATE
+		return usr_model.UserSearchKeyState
 	default:
-		return usr_model.USERSEARCHKEY_UNSPECIFIED
+		return usr_model.UserSearchKeyUnspecified
 	}
 }
 
@@ -409,25 +409,25 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *MultiFactor {
 func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
 	switch state {
 	case NotificationType_NOTIFICATIONTYPE_EMAIL:
-		return usr_model.NOTIFICATIONTYPE_EMAIL
+		return usr_model.NotificationTypeEmail
 	case NotificationType_NOTIFICATIONTYPE_SMS:
-		return usr_model.NOTIFICATIONTYPE_SMS
+		return usr_model.NotificationTypeSms
 	default:
-		return usr_model.NOTIFICATIONTYPE_EMAIL
+		return usr_model.NotificationTypeEmail
 	}
 }
 
 func userStateFromModel(state usr_model.UserState) UserState {
 	switch state {
-	case usr_model.USERSTATE_ACTIVE:
+	case usr_model.UserStateActive:
 		return UserState_USERSTATE_ACTIVE
-	case usr_model.USERSTATE_INACTIVE:
+	case usr_model.UserStateInactive:
 		return UserState_USERSTATE_INACTIVE
-	case usr_model.USERSTATE_LOCKED:
+	case usr_model.UserStateLocked:
 		return UserState_USERSTATE_LOCKED
-	case usr_model.USERSTATE_INITIAL:
+	case usr_model.UserStateInitial:
 		return UserState_USERSTATE_INITIAL
-	case usr_model.USERSTATE_SUSPEND:
+	case usr_model.UserStateSuspend:
 		return UserState_USERSTATE_SUSPEND
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
@@ -436,11 +436,11 @@ func userStateFromModel(state usr_model.UserState) UserState {
 
 func genderFromModel(gender usr_model.Gender) Gender {
 	switch gender {
-	case usr_model.GENDER_FEMALE:
+	case usr_model.GenderFemale:
 		return Gender_GENDER_FEMALE
-	case usr_model.GENDER_MALE:
+	case usr_model.GenderMale:
 		return Gender_GENDER_MALE
-	case usr_model.GENDER_DIVERSE:
+	case usr_model.GenderDiverse:
 		return Gender_GENDER_DIVERSE
 	default:
 		return Gender_GENDER_UNSPECIFIED
@@ -450,21 +450,21 @@ func genderFromModel(gender usr_model.Gender) Gender {
 func genderToModel(gender Gender) usr_model.Gender {
 	switch gender {
 	case Gender_GENDER_FEMALE:
-		return usr_model.GENDER_FEMALE
+		return usr_model.GenderFemale
 	case Gender_GENDER_MALE:
-		return usr_model.GENDER_MALE
+		return usr_model.GenderMale
 	case Gender_GENDER_DIVERSE:
-		return usr_model.GENDER_DIVERSE
+		return usr_model.GenderDiverse
 	default:
-		return usr_model.GENDER_UNDEFINED
+		return usr_model.GenderUnspecified
 	}
 }
 
-func mfaTypeFromModel(mfatype usr_model.MFAType) MfaType {
+func mfaTypeFromModel(mfatype usr_model.MfaType) MfaType {
 	switch mfatype {
-	case usr_model.MFATYPE_OTP:
+	case usr_model.MfaTypeOTP:
 		return MfaType_MFATYPE_OTP
-	case usr_model.MFATYPE_SMS:
+	case usr_model.MfaTypeSMS:
 		return MfaType_MFATYPE_SMS
 	default:
 		return MfaType_MFATYPE_UNSPECIFIED
@@ -473,9 +473,9 @@ func mfaTypeFromModel(mfatype usr_model.MFAType) MfaType {
 
 func mfaStateFromModel(state usr_model.MfaState) MFAState {
 	switch state {
-	case usr_model.MFASTATE_READY:
+	case usr_model.MfaStateReady:
 		return MFAState_MFASTATE_READY
-	case usr_model.MFASTATE_NOTREADY:
+	case usr_model.MfaStateNotReady:
 		return MFAState_MFASTATE_NOT_READY
 	default:
 		return MFAState_MFASTATE_UNSPECIFIED

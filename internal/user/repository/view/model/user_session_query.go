@@ -19,7 +19,7 @@ func (req UserSessionSearchRequest) GetOffset() uint64 {
 }
 
 func (req UserSessionSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == usr_model.USERSESSIONSEARCHKEY_UNSPECIFIED {
+	if req.SortingColumn == usr_model.UserSessionSearchKeyUnspecified {
 		return nil
 	}
 	return UserSessionSearchKey(req.SortingColumn)
@@ -51,13 +51,13 @@ func (req UserSessionSearchQuery) GetValue() interface{} {
 
 func (key UserSessionSearchKey) ToColumnName() string {
 	switch usr_model.UserSessionSearchKey(key) {
-	case usr_model.USERSESSIONSEARCHKEY_USER_AGENT_ID:
+	case usr_model.UserSessionSearchKeyUserAgentID:
 		return UserSessionKeyUserAgentID
-	case usr_model.USERSESSIONSEARCHKEY_USER_ID:
+	case usr_model.UserSessionSearchKeyUserID:
 		return UserSessionKeyUserID
-	case usr_model.USERSESSIONSEARCHKEY_STATE:
+	case usr_model.UserSessionSearchKeyState:
 		return UserSessionKeyState
-	case usr_model.USERSESSIONSEARCHKEY_RESOURCEOWNER:
+	case usr_model.UserSessionSearchKeyResourceOwner:
 		return UserSessionKeyResourceOwner
 	default:
 		return ""

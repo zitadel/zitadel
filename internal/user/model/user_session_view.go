@@ -36,11 +36,11 @@ type UserSessionSearchRequest struct {
 type UserSessionSearchKey int32
 
 const (
-	USERSESSIONSEARCHKEY_UNSPECIFIED UserSessionSearchKey = iota
-	USERSESSIONSEARCHKEY_USER_AGENT_ID
-	USERSESSIONSEARCHKEY_USER_ID
-	USERSESSIONSEARCHKEY_STATE
-	USERSESSIONSEARCHKEY_RESOURCEOWNER
+	UserSessionSearchKeyUnspecified UserSessionSearchKey = iota
+	UserSessionSearchKeyUserAgentID
+	UserSessionSearchKeyUserID
+	UserSessionSearchKeyState
+	UserSessionSearchKeyResourceOwner
 )
 
 type UserSessionSearchQuery struct {

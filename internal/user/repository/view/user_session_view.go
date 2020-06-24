@@ -12,13 +12,13 @@ import (
 func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSessionView, error) {
 	userSession := new(model.UserSessionView)
 	userAgentQuery := model.UserSessionSearchQuery{
-		Key:    usr_model.USERSESSIONSEARCHKEY_USER_AGENT_ID,
-		Method: global_model.SEARCHMETHOD_EQUALS,
+		Key:    usr_model.UserSessionSearchKeyUserAgentID,
+		Method: global_model.SearchMethodEquals,
 		Value:  agentID,
 	}
 	userQuery := model.UserSessionSearchQuery{
-		Key:    usr_model.USERSESSIONSEARCHKEY_USER_ID,
-		Method: global_model.SEARCHMETHOD_EQUALS,
+		Key:    usr_model.UserSessionSearchKeyUserID,
+		Method: global_model.SearchMethodEquals,
 		Value:  userID,
 	}
 	query := view.PrepareGetByQuery(table, userAgentQuery, userQuery)
@@ -29,8 +29,8 @@ func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSe
 func UserSessionsByUserID(db *gorm.DB, table, userID string) ([]*model.UserSessionView, error) {
 	userSessions := make([]*model.UserSessionView, 0)
 	userAgentQuery := &usr_model.UserSessionSearchQuery{
-		Key:    usr_model.USERSESSIONSEARCHKEY_USER_ID,
-		Method: global_model.SEARCHMETHOD_EQUALS,
+		Key:    usr_model.UserSessionSearchKeyUserID,
+		Method: global_model.SearchMethodEquals,
 		Value:  userID,
 	}
 	query := view.PrepareSearchQuery(table, model.UserSessionSearchRequest{
@@ -43,8 +43,8 @@ func UserSessionsByUserID(db *gorm.DB, table, userID string) ([]*model.UserSessi
 func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSessionView, error) {
 	userSessions := make([]*model.UserSessionView, 0)
 	userAgentQuery := &usr_model.UserSessionSearchQuery{
-		Key:    usr_model.USERSESSIONSEARCHKEY_USER_AGENT_ID,
-		Method: global_model.SEARCHMETHOD_EQUALS,
+		Key:    usr_model.UserSessionSearchKeyUserAgentID,
+		Method: global_model.SearchMethodEquals,
 		Value:  agentID,
 	}
 	query := view.PrepareSearchQuery(table, model.UserSessionSearchRequest{
@@ -60,6 +60,6 @@ func PutUserSession(db *gorm.DB, table string, session *model.UserSessionView) e
 }
 
 func DeleteUserSessions(db *gorm.DB, table, userID string) error {
-	delete := view.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.USERSESSIONSEARCHKEY_USER_ID), userID)
+	delete := view.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), userID)
 	return delete(db)
 }

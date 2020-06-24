@@ -12,7 +12,7 @@ import (
 
 func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_ID), userID)
+	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserID), userID)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
@@ -22,7 +22,7 @@ func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 
 func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_NAME), userName)
+	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso9s", "Errors.User.NotFound")
@@ -33,8 +33,8 @@ func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error
 func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, error) {
 	user := new(model.UserView)
 	loginNameQuery := &model.UserSearchQuery{
-		Key:    usr_model.USERSEARCHKEY_LOGIN_NAMES,
-		Method: global_model.SEARCHMETHOD_LIST_CONTAINS,
+		Key:    usr_model.UserSearchKeyLoginNames,
+		Method: global_model.SearchMethodListContains,
 		Value:  loginName,
 	}
 	query := view.PrepareGetByQuery(table, loginNameQuery)
@@ -45,8 +45,8 @@ func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, err
 func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
 	users := make([]*model.UserView, 0)
 	orgIDQuery := &usr_model.UserSearchQuery{
-		Key:    usr_model.USERSEARCHKEY_RESOURCEOWNER,
-		Method: global_model.SEARCHMETHOD_EQUALS,
+		Key:    usr_model.UserSearchKeyResourceOwner,
+		Method: global_model.SearchMethodEquals,
 		Value:  orgID,
 	}
 	query := view.PrepareSearchQuery(table, model.UserSearchRequest{
@@ -68,7 +68,7 @@ func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([
 
 func GetGlobalUserByEmail(db *gorm.DB, table, email string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_EMAIL), email)
+	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-8uWer", "Errors.User.NotFound")
@@ -78,7 +78,7 @@ func GetGlobalUserByEmail(db *gorm.DB, table, email string) (*model.UserView, er
 
 func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_EMAIL), email)
+	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
 	err := query(db, user)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return false, err
@@ -86,7 +86,7 @@ func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	if user != nil {
 		return false, nil
 	}
-	query = view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_NAME), email)
+	query = view.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), email)
 	err = query(db, user)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return false, err
@@ -99,10 +99,10 @@ func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, erro
 	if err != nil {
 		return nil, err
 	}
-	if user.OTPState == int32(usr_model.MFASTATE_UNSPECIFIED) {
+	if user.OTPState == int32(usr_model.MfaStateUnspecified) {
 		return []*usr_model.MultiFactor{}, nil
 	}
-	return []*usr_model.MultiFactor{&usr_model.MultiFactor{Type: usr_model.MFATYPE_OTP, State: usr_model.MfaState(user.OTPState)}}, nil
+	return []*usr_model.MultiFactor{&usr_model.MultiFactor{Type: usr_model.MfaTypeOTP, State: usr_model.MfaState(user.OTPState)}}, nil
 }
 
 func PutUser(db *gorm.DB, table string, project *model.UserView) error {
@@ -111,6 +111,6 @@ func PutUser(db *gorm.DB, table string, project *model.UserView) error {
 }
 
 func DeleteUser(db *gorm.DB, table, userID string) error {
-	delete := view.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_ID), userID)
+	delete := view.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserID), userID)
 	return delete(db)
 }

@@ -35,7 +35,7 @@ func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (d *OrgDomain) Process(event *models.Event) (err error) {
+func (d *OrgDomain) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case model.OrgAggregate:
 		err = d.processOrgDomain(event)

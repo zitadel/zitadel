@@ -30,20 +30,20 @@ type ApplicationChange struct {
 type AppState int32
 
 const (
-	APPSTATE_ACTIVE AppState = iota
-	APPSTATE_INACTIVE
+	AppStateActive AppState = iota
+	AppStateInactive
 )
 
 type AppType int32
 
 const (
-	APPTYPE_UNDEFINED AppType = iota
-	APPTYPE_OIDC
-	APPTYPE_SAML
+	AppTypeUnspecified AppType = iota
+	AppTypeOIDC
+	AppTypeSAML
 )
 
 func NewApplication(projectID, appID string) *Application {
-	return &Application{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, AppID: appID, State: APPSTATE_ACTIVE}
+	return &Application{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, AppID: appID, State: AppStateActive}
 }
 
 func (a *Application) IsValid(includeConfig bool) bool {
@@ -53,7 +53,7 @@ func (a *Application) IsValid(includeConfig bool) bool {
 	if !includeConfig {
 		return true
 	}
-	if a.Type == APPTYPE_OIDC && !a.OIDCConfig.IsValid() {
+	if a.Type == AppTypeOIDC && !a.OIDCConfig.IsValid() {
 		return false
 	}
 	return true

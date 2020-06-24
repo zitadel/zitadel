@@ -80,7 +80,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 		return nil, err
 	}
 	project.AggregateID = id
-	project.State = proj_model.PROJECTSTATE_ACTIVE
+	project.State = proj_model.ProjectStateActive
 	repoProject := model.ProjectFromModel(project)
 	member := &model.ProjectMember{
 		UserID: auth.GetCtxData(ctx).UserID,
@@ -658,7 +658,7 @@ func (es *ProjectEventstore) ChangeOIDCConfig(ctx context.Context, config *proj_
 	if _, app = existing.GetApp(config.AppID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dkso8", "Errors.Project.AppNoExisting")
 	}
-	if app.Type != proj_model.APPTYPE_OIDC {
+	if app.Type != proj_model.AppTypeOIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-98uje", "Errors.Project.AppIsNotOIDC")
 	}
 	repoProject := model.ProjectFromModel(existing)
@@ -688,7 +688,7 @@ func (es *ProjectEventstore) ChangeOIDCConfigSecret(ctx context.Context, project
 	if _, app = existing.GetApp(appID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9odi4", "Errors.Project.AppNotExisting")
 	}
-	if app.Type != proj_model.APPTYPE_OIDC {
+	if app.Type != proj_model.AppTypeOIDC {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-dile4", "Errors.Project.AppIsNotOIDC")
 	}
 	repoProject := model.ProjectFromModel(existing)
@@ -726,7 +726,7 @@ func (es *ProjectEventstore) VerifyOIDCClientSecret(ctx context.Context, project
 	if _, app = existing.GetApp(appID); app == nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-D6hba", "Errors.Project.AppNoExisting")
 	}
-	if app.Type != proj_model.APPTYPE_OIDC {
+	if app.Type != proj_model.AppTypeOIDC {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-huywq", "Errors.Project.AppIsNotOIDC")
 	}
 

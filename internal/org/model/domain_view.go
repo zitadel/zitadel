@@ -25,11 +25,11 @@ type OrgDomainSearchRequest struct {
 type OrgDomainSearchKey int32
 
 const (
-	ORGDOMAINSEARCHKEY_UNSPECIFIED OrgDomainSearchKey = iota
-	ORGDOMAINSEARCHKEY_DOMAIN
-	ORGDOMAINSEARCHKEY_ORG_ID
-	ORGDOMAINSEARCHKEY_VERIFIED
-	ORGDOMAINSEARCHKEY_PRIMARY
+	OrgDomainSearchKeyUnspecified OrgDomainSearchKey = iota
+	OrgDomainSearchKeyDomain
+	OrgDomainSearchKeyOrgID
+	OrgDomainSearchKeyVerified
+	OrgDomainSearchKeyPrimary
 )
 
 type OrgDomainSearchQuery struct {

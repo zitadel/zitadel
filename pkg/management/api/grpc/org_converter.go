@@ -52,9 +52,9 @@ func orgViewFromModel(org *org_model.OrgView) *OrgView {
 
 func orgStateFromModel(state org_model.OrgState) OrgState {
 	switch state {
-	case org_model.ORGSTATE_ACTIVE:
+	case org_model.OrgStateActive:
 		return OrgState_ORGSTATE_ACTIVE
-	case org_model.ORGSTATE_INACTIVE:
+	case org_model.OrgStateInactive:
 		return OrgState_ORGSTATE_INACTIVE
 	default:
 		return OrgState_ORGSTATE_UNSPECIFIED
@@ -128,9 +128,9 @@ func orgDomainSearchQueryToModel(query *OrgDomainSearchQuery) *org_model.OrgDoma
 func orgDomainSearchKeyToModel(key OrgDomainSearchKey) org_model.OrgDomainSearchKey {
 	switch key {
 	case OrgDomainSearchKey_ORGDOMAINSEARCHKEY_DOMAIN:
-		return org_model.ORGDOMAINSEARCHKEY_DOMAIN
+		return org_model.OrgDomainSearchKeyDomain
 	default:
-		return org_model.ORGDOMAINSEARCHKEY_UNSPECIFIED
+		return org_model.OrgDomainSearchKeyUnspecified
 	}
 }
 
