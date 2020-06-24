@@ -19,6 +19,7 @@ export enum ChangeType {
 export class ChangesComponent implements OnInit {
     @Input() public changeType: ChangeType = ChangeType.USER;
     @Input() public id: string = '';
+    @Input() public sortDirectionAsc: boolean = true;
     public errorMessage: string = '';
 
     // Source data
@@ -74,7 +75,6 @@ export class ChangesComponent implements OnInit {
                 break;
             case ChangeType.ORG: more = this.mgmtUserService.OrgChanges(this.id, 10, cursor);
                 break;
-
         }
 
         this.mapAndUpdate(more);
@@ -84,8 +84,8 @@ export class ChangesComponent implements OnInit {
     private getCursor(): number {
         const current = this._data.value;
         if (current.length) {
-            // return true ? current[0].sequence :
-            return current[current.length - 1].sequence;
+            return !this.sortDirectionAsc ? current[0].sequence :
+                current[current.length - 1].sequence;
         }
         return 0;
     }

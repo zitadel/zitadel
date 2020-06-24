@@ -502,6 +502,7 @@
             "org.domain.added":"Org Domain hinzugefügt",
             "org.domain.verified":"Org Domain verifiziert",
             "org.domain.primary.set":"Primäre domain gesetzt",
+            "org.domain.removed":"Org domain entfernt",
             "org.iam.policy.added":"IAM Policy hinzugefügt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
@@ -545,7 +546,8 @@
             "user.password.check.succeeded":"Password check erfolgreich",
             "user.mfa.init.skipped":"MFA init übersprungen",
             "user.mfa.otp.added":"MFA OTP hinzugefügt",
-            "user.mfa.otp.verified":"MFA OTP verifiziert"
+            "user.mfa.otp.verified":"MFA OTP verifiziert",
+            "user.selfregistered":"selbst registriert"
         }
     }
 }
