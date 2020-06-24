@@ -33,32 +33,55 @@
             </card-actions>
             <form *ngIf="passwordForm" autocomplete="new-password" [formGroup]="passwordForm"
                 (ngSubmit)="setInitialPassword()">
-                <!-- {{USERSTATE_INITIAL}} -->
                 <div class="content center">
                     <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
                         <input autocomplete="off" name="password" matInput formControlName="password" type="password" />
-                        <mat-error *ngIf="password?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
+
+                        <mat-error *ngIf="password?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.symbolValidator">
+                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.numberValidator">
+                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.upperCaseValidator">
+                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.lowerCaseValidator">
+                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
                         </mat-error>
                         <mat-error *ngIf="password?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate: policy }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.pattern">{{ policy | passwordPattern | translate }}
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:password?.errors?.minlength }}
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
                         <input autocomplete="off" name="passwordRepeat" matInput formControlName="confirmPassword"
                             type="password" />
+
                         <mat-error *ngIf="confirmPassword?.errors?.required">
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
+                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.numberValidator">
+                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.notequal">
+                            {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.upperCaseValidator">
+                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.lowerCaseValidator">
+                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
+                        </mat-error>
                         <mat-error *ngIf="confirmPassword?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate: policy }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.pattern">{{ policy | passwordPattern | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.notequal">{{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:confirmPassword?.errors?.minlength }}
                         </mat-error>
                     </mat-form-field>
                 </div>

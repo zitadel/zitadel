@@ -52,7 +52,7 @@
             "DETAIL": "Detail",
             "CREATE": "Create",
             "MY": "My Informations",
-            "LOGINNAMES":"Login names",
+            "LOGINNAMES":"Methods to access your profile",
             "LOGINNAMESDESC":"You can log into zitadel with these names",
             "COPY":"Copy to clipboard",
             "COPIED":"Copied to clipboard!",
@@ -164,8 +164,12 @@
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
             "REQUIRED": "The input field is empty",
-            "MINLENGTH":"The password has to be at least {{minLength}} characters long!",
-            "NOEMAIL":"Username can not be an email"
+            "MINLENGTH":"The password has to be at least {{requiredLength}} characters long!",
+            "NOEMAIL":"Username can not be an email",
+            "UPPERCASEMISSING":"An uppercase character is needed!",
+            "LOWERCASEMISSING":"A lowercase character is needed!",
+            "SYMBOLERROR":"The password must include a symbol!",
+            "NUMBERERROR":"The password must include a number!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -224,7 +228,6 @@
                 "SYMBOLERROR":"The password must include a symbol!",
                 "NUMBERERROR":"The password must include a number!",
                 "PATTERNERROR":"The required pattern is not fulfilled!"
-
             },
             "PWD_AGE": {
                 "TITLE":"Password Age",

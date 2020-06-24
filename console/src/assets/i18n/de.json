@@ -52,7 +52,7 @@
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
             "MY": "Meine Informationen",
-            "LOGINNAMES":"Loginnamen",
+            "LOGINNAMES":"Zugangsmethoden",
             "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
             "COPY":"In die Zwischenablage kopieren",
             "COPIED":"In die Zwischenablage kopiert!",
@@ -164,8 +164,12 @@
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
             "REQUIRED": "Das Feld ist leer",
-            "MINLENGTH":"Das Password muss mindestens {{minLength}} Zeichen lang sein!",
-            "NOEMAIL":"Username darf keine email sein!"
+            "MINLENGTH":"Das Password muss mindestens {{requiredLength}} Zeichen lang sein!",
+            "NOEMAIL":"Username darf keine email sein!",
+            "UPPERCASEMISSING":"Password muss einen Großbuchstaben beinhalten",
+            "LOWERCASEMISSING":"Password muss einen Kleinbuchstaben beinhalten",
+            "SYMBOLERROR":"Das Password muss ein Symbol beinhalten!",
+            "NUMBERERROR":"Das Password muss eine Nummer beinhalten!"
         },
         "STATE": {
             "0":"unbekannt",

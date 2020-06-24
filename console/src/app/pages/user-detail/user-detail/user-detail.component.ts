@@ -23,6 +23,7 @@ import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
@@ -84,16 +85,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 validators.push(Validators.minLength(this.policy.minLength));
             }
             if (this.policy.hasLowercase) {
-                validators.push(Validators.pattern(/[a-z]/g));
+                validators.push(lowerCaseValidator);
             }
             if (this.policy.hasUppercase) {
-                validators.push(Validators.pattern(/[A-Z]/g));
+                validators.push(upperCaseValidator);
             }
             if (this.policy.hasNumber) {
-                validators.push(Validators.pattern(/[0-9]/g));
+                validators.push(numberValidator);
             }
             if (this.policy.hasSymbol) {
-                validators.push(Validators.pattern(/[^a-z0-9]/gi));
+                validators.push(symbolValidator);
             }
 
             this.passwordForm = this.fb.group({
