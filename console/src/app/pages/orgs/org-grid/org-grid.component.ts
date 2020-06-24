@@ -1,7 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Org } from 'src/app/proto/generated/auth_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -48,10 +47,5 @@ export class OrgGridComponent {
 
     public routeToOrg(item: Org.AsObject): void {
         this.router.navigate(['/orgs', item.id]);
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 }

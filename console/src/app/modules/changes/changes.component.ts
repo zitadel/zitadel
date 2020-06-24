@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, scan, take, tap } from 'rxjs/operators';
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
@@ -125,10 +124,5 @@ export class ChangesComponent implements OnInit {
             }),
             take(1),
         ).subscribe();
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 }

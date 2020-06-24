@@ -3,7 +3,7 @@
 <div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)">
     <li class="item change-item-back" *ngFor="let event of data | async">
         <span class="seq">
-            {{dateFromTimestamp(event.changeDate) | localizedDate: 'EEE dd. MMM, HH:mm'}}
+            {{event.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
         </span>
         <span class="editor">{{event.editor}}</span>
         <span class="desc">{{'CHANGES.EVENTS.'+event.eventType | translate}}</span>

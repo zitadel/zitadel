@@ -5,7 +5,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ProjectGrantView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -97,11 +96,6 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
             this.toast.showError(error.message);
             this.loadingSubject.next(false);
         });
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 
     public reactivateSelectedProjects(): void {

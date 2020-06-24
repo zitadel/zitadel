@@ -2,7 +2,6 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { ProjectGrantView, ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -56,10 +55,5 @@ export class GrantedProjectGridComponent {
 
     public addItem(): void {
         this.newClicked.emit(true);
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 }

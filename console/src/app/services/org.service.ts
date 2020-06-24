@@ -207,6 +207,33 @@ export class OrgService {
         );
     }
 
+    public async CreateMyOrgIamPolicy(
+        description: string,
+        maxAgeDays: number,
+        expireWarnDays: number,
+    ): Promise<PasswordAgePolicy> {
+        const req = new PasswordAgePolicyCreate();
+        req.setDescription(description);
+        req.setMaxAgeDays(maxAgeDays);
+        req.setExpireWarnDays(expireWarnDays);
+
+        return await this.request(
+            c => c.createPasswordAgePolicy,
+            req,
+            f => f,
+        );
+    }
+
+    public async DeleteMyOrgIamPolicy(id: string): Promise<Empty> {
+        const req = new PasswordAgePolicyID();
+        req.setId(id);
+        return await this.request(
+            c => c.deletePasswordAgePolicy,
+            req,
+            f => f,
+        );
+    }
+
     public async GetPasswordAgePolicy(): Promise<PasswordAgePolicy> {
         const req = new Empty();
 
