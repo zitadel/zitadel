@@ -4,7 +4,7 @@ import (
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -63,10 +63,10 @@ func (v *View) ProcessedUserGrantSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(userGrantTable, eventSequence)
 }
 
-func (v *View) GetLatestUserGrantFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestUserGrantFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(userGrantTable, sequence)
 }
 
-func (v *View) ProcessedUserGrantFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedUserGrantFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

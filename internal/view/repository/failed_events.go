@@ -1,9 +1,11 @@
-package view
+package repository
 
 import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/model"
+	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/jinzhu/gorm"
+	"strings"
 )
 
 const (
@@ -57,6 +59,25 @@ func (key failedEventSearchKey) ToColumnName() string {
 	}
 }
 
+func FailedEventFromModel(failedEvent *view_model.FailedEvent) *FailedEvent {
+	return &FailedEvent{
+		ViewName:       failedEvent.Database + "." + failedEvent.ViewName,
+		FailureCount:   failedEvent.FailureCount,
+		FailedSequence: failedEvent.FailedSequence,
+		ErrMsg:         failedEvent.ErrMsg,
+	}
+}
+func FailedEventToModel(failedEvent *FailedEvent) *view_model.FailedEvent {
+	dbView := strings.Split(failedEvent.ViewName, ".")
+	return &view_model.FailedEvent{
+		Database:       dbView[0],
+		ViewName:       dbView[1],
+		FailureCount:   failedEvent.FailureCount,
+		FailedSequence: failedEvent.FailedSequence,
+		ErrMsg:         failedEvent.ErrMsg,
+	}
+}
+
 func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error {
 	save := PrepareSave(table)
 	err := save(db, failedEvent)
@@ -65,6 +86,14 @@ func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error 
 		return errors.ThrowInternal(err, "VIEW-5kOhP", "unable to updated failed events")
 	}
 	return nil
+}
+
+func RemoveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error {
+	delete := PrepareDeleteByKeys(table,
+		Key{Key: failedEventSearchKey(FailedEventKeyViewName), Value: failedEvent.ViewName},
+		Key{Key: failedEventSearchKey(FailedEventKeyFailedSequence), Value: failedEvent.FailedSequence},
+	)
+	return delete(db)
 }
 
 func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*FailedEvent, error) {
@@ -89,4 +118,14 @@ func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*F
 	}
 	return nil, errors.ThrowInternalf(err, "VIEW-9LyCB", "unable to get failed events of %s", viewName)
 
+}
+
+func AllFailedEvents(db *gorm.DB, table string) ([]*FailedEvent, error) {
+	failedEvents := make([]*FailedEvent, 0)
+	query := PrepareSearchQuery(table, GeneralSearchRequest{})
+	_, err := query(db, &failedEvents)
+	if err != nil {
+		return nil, err
+	}
+	return failedEvents, nil
 }

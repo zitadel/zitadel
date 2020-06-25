@@ -9,8 +9,8 @@ type IamMember struct {
 	Roles  []string
 }
 
-func NewIamMember(projectID, userID string) *IamMember {
-	return &IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, UserID: userID}
+func NewIamMember(iamID, userID string) *IamMember {
+	return &IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: iamID}, UserID: userID}
 }
 
 func (i *IamMember) IsValid() bool {

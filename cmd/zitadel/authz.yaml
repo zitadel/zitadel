@@ -4,6 +4,12 @@ InternalAuthZ:
       Permissions:
         - "iam.read"
         - "iam.write"
+        - "iam.policy.read"
+        - "iam.policy.write"
+        - "iam.policy.delete"
+        - "iam.member.read"
+        - "iam.member.write"
+        - "iam.member.delete"
         - "org.read"
         - "org.write"
         - "org.member.read"
@@ -36,9 +42,6 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
-        - "iam.policy.read"
-        - "iam.policy.write"
-        - "iam.policy.delete"
     - Role: 'ORG_OWNER'
       Permissions:
         - "org.read"

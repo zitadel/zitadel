@@ -1,7 +1,7 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -9,9 +9,9 @@ const (
 )
 
 func (v *View) saveCurrentSequence(viewName string, sequence uint64) error {
-	return view.SaveCurrentSequence(v.Db, sequencesTable, viewName, sequence)
+	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, sequence)
 }
 
 func (v *View) latestSequence(viewName string) (uint64, error) {
-	return view.LatestSequence(v.Db, sequencesTable, viewName)
+	return repository.LatestSequence(v.Db, sequencesTable, viewName)
 }

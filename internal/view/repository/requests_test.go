@@ -1,4 +1,4 @@
-package view
+package repository
 
 import (
 	caos_errs "github.com/caos/zitadel/internal/errors"

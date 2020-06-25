@@ -3,7 +3,7 @@ package view
 import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -38,10 +38,10 @@ func (v *View) ProcessedNotifyUserSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(notifyUserTable, eventSequence)
 }
 
-func (v *View) GetLatestNotifyUserFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestNotifyUserFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(notifyUserTable, sequence)
 }
 
-func (v *View) ProcessedNotifyUserFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedNotifyUserFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }
