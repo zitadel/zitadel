@@ -4,15 +4,15 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-import { OrgContributorsComponent } from './org-contributors.component';
+import { IamContributorsComponent } from './iam-contributors.component';
 
 describe('OrgContributorsComponent', () => {
-    let component: OrgContributorsComponent;
-    let fixture: ComponentFixture<OrgContributorsComponent>;
+    let component: IamContributorsComponent;
+    let fixture: ComponentFixture<IamContributorsComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [OrgContributorsComponent],
+            declarations: [IamContributorsComponent],
             imports: [
                 NoopAnimationsModule,
                 MatPaginatorModule,
@@ -23,7 +23,7 @@ describe('OrgContributorsComponent', () => {
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(OrgContributorsComponent);
+        fixture = TestBed.createComponent(IamContributorsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

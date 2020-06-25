@@ -6,6 +6,9 @@ import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb'
 import {
     CreateOrgRequest,
     CreateUserRequest,
+    IamMemberSearchQuery,
+    IamMemberSearchRequest,
+    IamMemberSearchResponse,
     OrgIamPolicy,
     OrgIamPolicyID,
     OrgIamPolicyRequest,
@@ -52,17 +55,23 @@ export class AdminService {
         );
     }
 
-    // public async deleteOrgIamPolicy(
-    //     orgId: string,
-    // ): Promise<Empty> {
-    //     const req = new OrgIamPolicyID();
-    //     req.setOrgId(orgId);
-    //     return await this.request(
-    //         c => c.,
-    //         req,
-    //         f => f,
-    //     );
-    // }
+    public async SearchIamMembers(
+        limit: number,
+        offset: number,
+        queryList?: IamMemberSearchQuery[],
+    ): Promise<IamMemberSearchResponse> {
+        const req = new IamMemberSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchIamMembers,
+            req,
+            f => f,
+        );
+    }
 
     public async GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyID();

@@ -1,8 +1,9 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { ProjectMember, ProjectMemberSearchResponse } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { IamMemberSearchResponse } from 'src/app/proto/generated/admin_pb';
+import { ProjectMember } from 'src/app/proto/generated/management_pb';
+import { AdminService } from 'src/app/services/admin.service';
 
 /**
  * Data source for the ProjectMembers view. This class should
@@ -15,7 +16,7 @@ export class IamMembersDataSource extends DataSource<ProjectMember.AsObject> {
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-    constructor(private orgService: OrgService) {
+    constructor(private adminService: AdminService) {
         super();
     }
 
@@ -25,8 +26,8 @@ export class IamMembersDataSource extends DataSource<ProjectMember.AsObject> {
 
         this.loadingSubject.next(true);
         // TODO
-        const promise: Promise<ProjectMemberSearchResponse> =
-            this.orgService.SearchMyOrgMembers(pageSize, offset);
+        const promise: Promise<IamMemberSearchResponse> =
+            this.adminService.SearchIamMembers(pageSize, offset);
         if (promise) {
             from(promise).pipe(
                 map(resp => {
