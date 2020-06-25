@@ -28,14 +28,14 @@
                         item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
-            <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span>
+            <!-- <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span> -->
+
             <span *ngIf="item.changeDate" class="created">created on
                 {{
                         item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="fill-space"></span>
             <div class="icons">
-                <mat-icon class="icon">apps</mat-icon>
             </div>
         </div>
         <button [matMenuTriggerFor]="editMenu" class="edit-button" mat-icon-button>
@@ -56,8 +56,10 @@
 
     <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
 
-    <div class="add-project-button card" (click)="addItem()">
-        <mat-icon class="icon">add</mat-icon>
-        <span>Add new project</span>
-    </div>
+    <ng-template appHasRole [appHasRole]="['project.write']">
+        <div class="add-project-button card" (click)="addItem()">
+            <mat-icon class="icon">add</mat-icon>
+            <span>Add new project</span>
+        </div>
+    </ng-template>
 </div>

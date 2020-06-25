@@ -51,17 +51,20 @@
             </div>
         </ng-template>
 
-        <div class="item">
-            <div class="top">
-                <h2> <i class="icon las la-archway"></i>
-                    {{'HOME.PROTECTION'| translate}}</h2>
-                <p>{{'HOME.PROTECTION_DESC'| translate}}</p>
+        <ng-template appHasRole [appHasRole]="['org.read']">
+            <div class="item">
+                <div class="top">
+                    <h2> <i class="icon las la-archway"></i>
+                        {{'HOME.PROTECTION'| translate}}</h2>
+                    <p>{{'HOME.PROTECTION_DESC'| translate}}</p>
+                </div>
+                <span class="fill-space"></span>
+                <div class="footer">
+                    <a color="accent" mat-button
+                        [routerLink]="['/users/me']">{{'HOME.PROTECTION_BUTTON' | translate}}</a>
+                </div>
             </div>
-            <span class="fill-space"></span>
-            <div class="footer">
-                <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.PROTECTION_BUTTON' | translate}}</a>
-            </div>
-        </div>
+        </ng-template>
 
         <ng-template appHasRole [appHasRole]="['user.read']">
             <div class="item">

@@ -232,7 +232,7 @@
         },
         "POLICY": {
             "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged solutions that save you time and ensure security",
+            "DESCRIPTION":"Pre-packaged solutions that to ensure security of your data",
             "PWD_COMPLEXITY": {
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
@@ -261,7 +261,7 @@
                 "TITLECREATE":"Set IAM Access preferences",
                 "DESCRIPTIONCREATE":"Emails as username is not allowed for enabled UserLoginMustBeDomain"
             },
-            "BTN_INSTALL":"Install",
+            "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
                 "DESCRIPTION":"Description",
