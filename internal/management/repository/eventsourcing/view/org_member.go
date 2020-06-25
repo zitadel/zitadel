@@ -4,7 +4,7 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -47,10 +47,10 @@ func (v *View) ProcessedOrgMemberSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(orgMemberTable, eventSequence)
 }
 
-func (v *View) GetLatestOrgMemberFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestOrgMemberFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(orgMemberTable, sequence)
 }
 
-func (v *View) ProcessedOrgMemberFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedOrgMemberFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

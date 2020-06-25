@@ -3,7 +3,7 @@ package model
 import (
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type ProjectGrantSearchRequest proj_model.ProjectGrantViewSearchRequest
@@ -18,7 +18,7 @@ func (req ProjectGrantSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req ProjectGrantSearchRequest) GetSortingColumn() view.ColumnKey {
+func (req ProjectGrantSearchRequest) GetSortingColumn() repository.ColumnKey {
 	if req.SortingColumn == proj_model.GrantedProjectSearchKeyUnspecified {
 		return nil
 	}
@@ -29,15 +29,15 @@ func (req ProjectGrantSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req ProjectGrantSearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, len(req.Queries))
+func (req ProjectGrantSearchRequest) GetQueries() []repository.SearchQuery {
+	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
 		result[i] = ProjectGrantSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req ProjectGrantSearchQuery) GetKey() view.ColumnKey {
+func (req ProjectGrantSearchQuery) GetKey() repository.ColumnKey {
 	return ProjectGrantSearchKey(req.Key)
 }
 

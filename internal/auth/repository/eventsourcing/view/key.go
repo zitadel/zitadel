@@ -4,7 +4,7 @@ import (
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/key/repository/view"
 	"github.com/caos/zitadel/internal/key/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -63,10 +63,10 @@ func (v *View) ProcessedKeySequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(keyTable, eventSequence)
 }
 
-func (v *View) GetLatestKeyFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestKeyFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(keyTable, sequence)
 }
 
-func (v *View) ProcessedKeyFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedKeyFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

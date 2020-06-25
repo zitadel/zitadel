@@ -54,6 +54,26 @@ var AdminService_AuthMethods = utils_auth.MethodMapping{
 		Permission: "iam.policy.delete",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetViews": utils_auth.Option{
+		Permission: "iam.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/ClearView": utils_auth.Option{
+		Permission: "iam.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/GetFailedEvents": utils_auth.Option{
+		Permission: "iam.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveFailedEvent": utils_auth.Option{
+		Permission: "iam.write",
+		CheckParam: "",
+	},
 }
 
 func AdminService_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.Config) grpc.UnaryServerInterceptor {
