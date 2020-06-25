@@ -4,7 +4,7 @@ import (
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 )
 
@@ -13,14 +13,14 @@ func OrgMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.OrgMemberV
 
 	orgIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
 	userIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
-	query := view.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
+	query := repository.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
 	err := query(db, member)
 	return member, err
 }
 
 func SearchOrgMembers(db *gorm.DB, table string, req *org_model.OrgMemberSearchRequest) ([]*model.OrgMemberView, int, error) {
 	members := make([]*model.OrgMemberView, 0)
-	query := view.PrepareSearchQuery(table, model.OrgMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+	query := repository.PrepareSearchQuery(table, model.OrgMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &members)
 	if err != nil {
 		return nil, 0, err
@@ -36,7 +36,7 @@ func OrgMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.OrgM
 			Method: global_model.SearchMethodEquals,
 		},
 	}
-	query := view.PrepareSearchQuery(table, model.OrgMemberSearchRequest{Queries: queries})
+	query := repository.PrepareSearchQuery(table, model.OrgMemberSearchRequest{Queries: queries})
 	_, err := query(db, &members)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func OrgMembersByUserID(db *gorm.DB, table string, userID string) ([]*model.OrgM
 }
 
 func PutOrgMember(db *gorm.DB, table string, role *model.OrgMemberView) error {
-	save := view.PrepareSave(table)
+	save := repository.PrepareSave(table)
 	return save(db, role)
 }
 
@@ -54,6 +54,6 @@ func DeleteOrgMember(db *gorm.DB, table, orgID, userID string) error {
 	if err != nil {
 		return err
 	}
-	delete := view.PrepareDeleteByObject(table, member)
+	delete := repository.PrepareDeleteByObject(table, member)
 	return delete(db)
 }

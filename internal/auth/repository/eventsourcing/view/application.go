@@ -2,13 +2,13 @@ package view
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/view/repository"
 
 	"github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
 )
 
 const (
@@ -47,11 +47,11 @@ func (v *View) ProcessedApplicationSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(applicationTable, eventSequence)
 }
 
-func (v *View) GetLatestApplicationFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestApplicationFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(applicationTable, sequence)
 }
 
-func (v *View) ProcessedApplicationFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedApplicationFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }
 

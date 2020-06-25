@@ -1,4 +1,4 @@
-package view
+package repository
 
 import (
 	"fmt"

@@ -18,6 +18,7 @@ type Server struct {
 	port     string
 	org      repository.OrgRepository
 	iam      repository.IamRepository
+	administrator repository.AdministratorRepository
 	verifier auth.TokenVerifier
 	authZ    auth.Config
 	repo     repository.Repository
@@ -28,6 +29,7 @@ func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository
 		port:     conf.Port,
 		org:      repo,
 		iam:      repo,
+		administrator: repo,
 		repo:     repo,
 		authZ:    authZ,
 		verifier: admin_auth.Start(authZRepo),

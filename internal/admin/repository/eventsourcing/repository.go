@@ -32,6 +32,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.OrgRepo
 	eventstore.IamRepository
+	eventstore.AdministratorRepo
 }
 
 func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -103,6 +104,9 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, r
 			SystemDefaults: systemDefaults,
 			SearchLimit:    conf.SearchLimit,
 			Roles:          roles,
+		},
+		AdministratorRepo: eventstore.AdministratorRepo{
+			View: view,
 		},
 	}, nil
 }
