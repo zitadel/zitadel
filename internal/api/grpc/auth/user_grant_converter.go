@@ -1,10 +1,11 @@
-package grpc
+package auth
 
 import (
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	"github.com/caos/zitadel/pkg/auth/grpc"
 )
 
-func userGrantSearchRequestsToModel(request *UserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+func userGrantSearchRequestsToModel(request *grpc.UserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
 	return &grant_model.UserGrantSearchRequest{
 		Offset:  request.Offset,
 		Limit:   request.Limit,
@@ -12,7 +13,7 @@ func userGrantSearchRequestsToModel(request *UserGrantSearchRequest) *grant_mode
 	}
 }
 
-func userGrantSearchQueriesToModel(queries []*UserGrantSearchQuery) []*grant_model.UserGrantSearchQuery {
+func userGrantSearchQueriesToModel(queries []*grpc.UserGrantSearchQuery) []*grant_model.UserGrantSearchQuery {
 	converted := make([]*grant_model.UserGrantSearchQuery, len(queries))
 	for i, q := range queries {
 		converted[i] = userGrantSearchQueryToModel(q)
@@ -20,7 +21,7 @@ func userGrantSearchQueriesToModel(queries []*UserGrantSearchQuery) []*grant_mod
 	return converted
 }
 
-func userGrantSearchQueryToModel(query *UserGrantSearchQuery) *grant_model.UserGrantSearchQuery {
+func userGrantSearchQueryToModel(query *grpc.UserGrantSearchQuery) *grant_model.UserGrantSearchQuery {
 	return &grant_model.UserGrantSearchQuery{
 		Key:    userGrantSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
@@ -28,18 +29,18 @@ func userGrantSearchQueryToModel(query *UserGrantSearchQuery) *grant_model.UserG
 	}
 }
 
-func userGrantSearchKeyToModel(key UserGrantSearchKey) grant_model.UserGrantSearchKey {
+func userGrantSearchKeyToModel(key grpc.UserGrantSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
-	case UserGrantSearchKey_UserGrantSearchKey_ORG_ID:
+	case grpc.UserGrantSearchKey_UserGrantSearchKey_ORG_ID:
 		return grant_model.UserGrantSearchKeyResourceOwner
-	case UserGrantSearchKey_UserGrantSearchKey_PROJECT_ID:
+	case grpc.UserGrantSearchKey_UserGrantSearchKey_PROJECT_ID:
 		return grant_model.UserGrantSearchKeyProjectID
 	default:
 		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 
-func myProjectOrgSearchRequestRequestsToModel(request *MyProjectOrgSearchRequest) *grant_model.UserGrantSearchRequest {
+func myProjectOrgSearchRequestRequestsToModel(request *grpc.MyProjectOrgSearchRequest) *grant_model.UserGrantSearchRequest {
 	return &grant_model.UserGrantSearchRequest{
 		Offset:        request.Offset,
 		Limit:         request.Limit,
@@ -49,7 +50,7 @@ func myProjectOrgSearchRequestRequestsToModel(request *MyProjectOrgSearchRequest
 	}
 }
 
-func myProjectOrgSearchQueriesToModel(queries []*MyProjectOrgSearchQuery) []*grant_model.UserGrantSearchQuery {
+func myProjectOrgSearchQueriesToModel(queries []*grpc.MyProjectOrgSearchQuery) []*grant_model.UserGrantSearchQuery {
 	converted := make([]*grant_model.UserGrantSearchQuery, len(queries))
 	for i, q := range queries {
 		converted[i] = myProjectOrgSearchQueryToModel(q)
@@ -57,7 +58,7 @@ func myProjectOrgSearchQueriesToModel(queries []*MyProjectOrgSearchQuery) []*gra
 	return converted
 }
 
-func myProjectOrgSearchQueryToModel(query *MyProjectOrgSearchQuery) *grant_model.UserGrantSearchQuery {
+func myProjectOrgSearchQueryToModel(query *grpc.MyProjectOrgSearchQuery) *grant_model.UserGrantSearchQuery {
 	return &grant_model.UserGrantSearchQuery{
 		Key:    myProjectOrgSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
@@ -65,17 +66,17 @@ func myProjectOrgSearchQueryToModel(query *MyProjectOrgSearchQuery) *grant_model
 	}
 }
 
-func myProjectOrgSearchKeyToModel(key MyProjectOrgSearchKey) grant_model.UserGrantSearchKey {
+func myProjectOrgSearchKeyToModel(key grpc.MyProjectOrgSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
-	case MyProjectOrgSearchKey_MYPROJECTORGSEARCHKEY_ORG_NAME:
+	case grpc.MyProjectOrgSearchKey_MYPROJECTORGSEARCHKEY_ORG_NAME:
 		return grant_model.UserGrantSearchKeyOrgName
 	default:
 		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 
-func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchResponse) *UserGrantSearchResponse {
-	return &UserGrantSearchResponse{
+func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchResponse) *grpc.UserGrantSearchResponse {
+	return &grpc.UserGrantSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
@@ -83,16 +84,16 @@ func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchRespo
 	}
 }
 
-func userGrantViewsFromModel(users []*grant_model.UserGrantView) []*UserGrantView {
-	converted := make([]*UserGrantView, len(users))
+func userGrantViewsFromModel(users []*grant_model.UserGrantView) []*grpc.UserGrantView {
+	converted := make([]*grpc.UserGrantView, len(users))
 	for i, user := range users {
 		converted[i] = userGrantViewFromModel(user)
 	}
 	return converted
 }
 
-func userGrantViewFromModel(grant *grant_model.UserGrantView) *UserGrantView {
-	return &UserGrantView{
+func userGrantViewFromModel(grant *grant_model.UserGrantView) *grpc.UserGrantView {
+	return &grpc.UserGrantView{
 		UserId:    grant.UserID,
 		OrgId:     grant.ResourceOwner,
 		OrgName:   grant.OrgName,
@@ -101,8 +102,8 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *UserGrantView {
 	}
 }
 
-func projectOrgSearchResponseFromModel(response *grant_model.ProjectOrgSearchResponse) *MyProjectOrgSearchResponse {
-	return &MyProjectOrgSearchResponse{
+func projectOrgSearchResponseFromModel(response *grant_model.ProjectOrgSearchResponse) *grpc.MyProjectOrgSearchResponse {
+	return &grpc.MyProjectOrgSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
@@ -110,16 +111,16 @@ func projectOrgSearchResponseFromModel(response *grant_model.ProjectOrgSearchRes
 	}
 }
 
-func projectOrgsFromModel(projectOrgs []*grant_model.Org) []*Org {
-	converted := make([]*Org, len(projectOrgs))
+func projectOrgsFromModel(projectOrgs []*grant_model.Org) []*grpc.Org {
+	converted := make([]*grpc.Org, len(projectOrgs))
 	for i, org := range projectOrgs {
 		converted[i] = projectOrgFromModel(org)
 	}
 	return converted
 }
 
-func projectOrgFromModel(org *grant_model.Org) *Org {
-	return &Org{
+func projectOrgFromModel(org *grant_model.Org) *grpc.Org {
+	return &grpc.Org{
 		Id:   org.OrgID,
 		Name: org.OrgName,
 	}

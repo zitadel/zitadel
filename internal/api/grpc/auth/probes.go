@@ -1,10 +1,12 @@
-package grpc
+package auth
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/errors"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	pb_struct "github.com/golang/protobuf/ptypes/struct"
+
+	"github.com/caos/zitadel/internal/errors"
 )
 
 func (s *Server) Healthz(_ context.Context, e *empty.Empty) (*empty.Empty, error) {

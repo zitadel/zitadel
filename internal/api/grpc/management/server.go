@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	mgmt_auth "github.com/caos/zitadel/internal/management/auth"
 	"github.com/caos/zitadel/internal/management/repository"
+	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	mgmt_grpc "github.com/caos/zitadel/pkg/management/grpc"
 )
 
@@ -29,6 +30,10 @@ type Server struct {
 	verifier       *mgmt_auth.TokenVerifier
 	authZ          authz.Config
 	systemDefaults systemdefaults.SystemDefaults
+}
+
+type Config struct {
+	Repository eventsourcing.Config
 }
 
 func CreateServer(authZRepo *authz_repo.EsRepository, authZ authz.Config, sd systemdefaults.SystemDefaults, repo repository.Repository) *Server {

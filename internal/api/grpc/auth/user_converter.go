@@ -1,4 +1,4 @@
-package grpc
+package auth
 
 import (
 	"context"
@@ -10,9 +10,10 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/pkg/auth/grpc"
 )
 
-func userViewFromModel(user *usr_model.UserView) *UserView {
+func userViewFromModel(user *usr_model.UserView) *grpc.UserView {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-sd32g").OnError(err).Debug("unable to parse timestamp")
 
@@ -25,7 +26,7 @@ func userViewFromModel(user *usr_model.UserView) *UserView {
 	passwordChanged, err := ptypes.TimestampProto(user.PasswordChanged)
 	logging.Log("GRPC-fgQFT").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserView{
+	return &grpc.UserView{
 		Id:                 user.ID,
 		State:              userStateFromModel(user.State),
 		CreationDate:       creationDate,
@@ -55,14 +56,14 @@ func userViewFromModel(user *usr_model.UserView) *UserView {
 	}
 }
 
-func profileFromModel(profile *usr_model.Profile) *UserProfile {
+func profileFromModel(profile *usr_model.Profile) *grpc.UserProfile {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
 	logging.Log("GRPC-56t5s").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
 	logging.Log("GRPC-K58ds").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserProfile{
+	return &grpc.UserProfile{
 		Id:                profile.AggregateID,
 		CreationDate:      creationDate,
 		ChangeDate:        changeDate,
@@ -77,14 +78,14 @@ func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	}
 }
 
-func profileViewFromModel(profile *usr_model.Profile) *UserProfileView {
+func profileViewFromModel(profile *usr_model.Profile) *grpc.UserProfileView {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
 	logging.Log("GRPC-s9iKs").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
 	logging.Log("GRPC-9sujE").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserProfileView{
+	return &grpc.UserProfileView{
 		Id:                 profile.AggregateID,
 		CreationDate:       creationDate,
 		ChangeDate:         changeDate,
@@ -101,7 +102,7 @@ func profileViewFromModel(profile *usr_model.Profile) *UserProfileView {
 	}
 }
 
-func updateProfileToModel(ctx context.Context, u *UpdateUserProfileRequest) *usr_model.Profile {
+func updateProfileToModel(ctx context.Context, u *grpc.UpdateUserProfileRequest) *usr_model.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-lk73L").OnError(err).Debug("language malformed")
 
@@ -115,14 +116,14 @@ func updateProfileToModel(ctx context.Context, u *UpdateUserProfileRequest) *usr
 	}
 }
 
-func emailFromModel(email *usr_model.Email) *UserEmail {
+func emailFromModel(email *usr_model.Email) *grpc.UserEmail {
 	creationDate, err := ptypes.TimestampProto(email.CreationDate)
 	logging.Log("GRPC-sdoi3").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
 	logging.Log("GRPC-klJK3").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserEmail{
+	return &grpc.UserEmail{
 		Id:              email.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -132,14 +133,14 @@ func emailFromModel(email *usr_model.Email) *UserEmail {
 	}
 }
 
-func emailViewFromModel(email *usr_model.Email) *UserEmailView {
+func emailViewFromModel(email *usr_model.Email) *grpc.UserEmailView {
 	creationDate, err := ptypes.TimestampProto(email.CreationDate)
 	logging.Log("GRPC-LSp8s").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
 	logging.Log("GRPC-6szJe").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserEmailView{
+	return &grpc.UserEmailView{
 		Id:              email.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -149,21 +150,21 @@ func emailViewFromModel(email *usr_model.Email) *UserEmailView {
 	}
 }
 
-func updateEmailToModel(ctx context.Context, e *UpdateUserEmailRequest) *usr_model.Email {
+func updateEmailToModel(ctx context.Context, e *grpc.UpdateUserEmailRequest) *usr_model.Email {
 	return &usr_model.Email{
 		ObjectRoot:   models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		EmailAddress: e.Email,
 	}
 }
 
-func phoneFromModel(phone *usr_model.Phone) *UserPhone {
+func phoneFromModel(phone *usr_model.Phone) *grpc.UserPhone {
 	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
 	logging.Log("GRPC-kjn5J").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
 	logging.Log("GRPC-LKA9S").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserPhone{
+	return &grpc.UserPhone{
 		Id:              phone.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -173,14 +174,14 @@ func phoneFromModel(phone *usr_model.Phone) *UserPhone {
 	}
 }
 
-func phoneViewFromModel(phone *usr_model.Phone) *UserPhoneView {
+func phoneViewFromModel(phone *usr_model.Phone) *grpc.UserPhoneView {
 	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
 	logging.Log("GRPC-s5zJS").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
 	logging.Log("GRPC-s9kLe").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserPhoneView{
+	return &grpc.UserPhoneView{
 		Id:              phone.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -190,21 +191,21 @@ func phoneViewFromModel(phone *usr_model.Phone) *UserPhoneView {
 	}
 }
 
-func updatePhoneToModel(ctx context.Context, e *UpdateUserPhoneRequest) *usr_model.Phone {
+func updatePhoneToModel(ctx context.Context, e *grpc.UpdateUserPhoneRequest) *usr_model.Phone {
 	return &usr_model.Phone{
 		ObjectRoot:  models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		PhoneNumber: e.Phone,
 	}
 }
 
-func addressFromModel(address *usr_model.Address) *UserAddress {
+func addressFromModel(address *usr_model.Address) *grpc.UserAddress {
 	creationDate, err := ptypes.TimestampProto(address.CreationDate)
 	logging.Log("GRPC-65FRs").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
 	logging.Log("GRPC-aslk4").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserAddress{
+	return &grpc.UserAddress{
 		Id:            address.AggregateID,
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
@@ -217,14 +218,14 @@ func addressFromModel(address *usr_model.Address) *UserAddress {
 	}
 }
 
-func addressViewFromModel(address *usr_model.Address) *UserAddressView {
+func addressViewFromModel(address *usr_model.Address) *grpc.UserAddressView {
 	creationDate, err := ptypes.TimestampProto(address.CreationDate)
 	logging.Log("GRPC-sk4fS").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
 	logging.Log("GRPC-9siEs").OnError(err).Debug("unable to parse timestamp")
 
-	return &UserAddressView{
+	return &grpc.UserAddressView{
 		Id:            address.AggregateID,
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
@@ -237,7 +238,7 @@ func addressViewFromModel(address *usr_model.Address) *UserAddressView {
 	}
 }
 
-func updateAddressToModel(ctx context.Context, address *UpdateUserAddressRequest) *usr_model.Address {
+func updateAddressToModel(ctx context.Context, address *grpc.UpdateUserAddressRequest) *usr_model.Address {
 	return &usr_model.Address{
 		ObjectRoot:    models.ObjectRoot{AggregateID: authz.GetCtxData(ctx).UserID},
 		Country:       address.Country,
@@ -248,8 +249,8 @@ func updateAddressToModel(ctx context.Context, address *UpdateUserAddressRequest
 	}
 }
 
-func otpFromModel(otp *usr_model.OTP) *MfaOtpResponse {
-	return &MfaOtpResponse{
+func otpFromModel(otp *usr_model.OTP) *grpc.MfaOtpResponse {
+	return &grpc.MfaOtpResponse{
 		UserId: otp.AggregateID,
 		Url:    otp.Url,
 		Secret: otp.SecretString,
@@ -257,56 +258,56 @@ func otpFromModel(otp *usr_model.OTP) *MfaOtpResponse {
 	}
 }
 
-func userStateFromModel(state usr_model.UserState) UserState {
+func userStateFromModel(state usr_model.UserState) grpc.UserState {
 	switch state {
 	case usr_model.UserStateActive:
-		return UserState_USERSTATE_ACTIVE
+		return grpc.UserState_USERSTATE_ACTIVE
 	case usr_model.UserStateInactive:
-		return UserState_USERSTATE_INACTIVE
+		return grpc.UserState_USERSTATE_INACTIVE
 	case usr_model.UserStateLocked:
-		return UserState_USERSTATE_LOCKED
+		return grpc.UserState_USERSTATE_LOCKED
 	case usr_model.UserStateInitial:
-		return UserState_USERSTATE_INITIAL
+		return grpc.UserState_USERSTATE_INITIAL
 	case usr_model.UserStateSuspend:
-		return UserState_USERSTATE_SUSPEND
+		return grpc.UserState_USERSTATE_SUSPEND
 	default:
-		return UserState_USERSTATE_UNSPECIFIED
+		return grpc.UserState_USERSTATE_UNSPECIFIED
 	}
 }
 
-func genderFromModel(gender usr_model.Gender) Gender {
+func genderFromModel(gender usr_model.Gender) grpc.Gender {
 	switch gender {
 	case usr_model.GenderFemale:
-		return Gender_GENDER_FEMALE
+		return grpc.Gender_GENDER_FEMALE
 	case usr_model.GenderMale:
-		return Gender_GENDER_MALE
+		return grpc.Gender_GENDER_MALE
 	case usr_model.GenderDiverse:
-		return Gender_GENDER_DIVERSE
+		return grpc.Gender_GENDER_DIVERSE
 	default:
-		return Gender_GENDER_UNSPECIFIED
+		return grpc.Gender_GENDER_UNSPECIFIED
 	}
 }
 
-func genderToModel(gender Gender) usr_model.Gender {
+func genderToModel(gender grpc.Gender) usr_model.Gender {
 	switch gender {
-	case Gender_GENDER_FEMALE:
+	case grpc.Gender_GENDER_FEMALE:
 		return usr_model.GenderFemale
-	case Gender_GENDER_MALE:
+	case grpc.Gender_GENDER_MALE:
 		return usr_model.GenderMale
-	case Gender_GENDER_DIVERSE:
+	case grpc.Gender_GENDER_DIVERSE:
 		return usr_model.GenderDiverse
 	default:
 		return usr_model.GenderUnspecified
 	}
 }
 
-func mfaStateFromModel(state usr_model.MfaState) MFAState {
+func mfaStateFromModel(state usr_model.MfaState) grpc.MFAState {
 	switch state {
 	case usr_model.MfaStateReady:
-		return MFAState_MFASTATE_NOT_READY
+		return grpc.MFAState_MFASTATE_NOT_READY
 	case usr_model.MfaStateNotReady:
-		return MFAState_MFASTATE_NOT_READY
+		return grpc.MFAState_MFASTATE_NOT_READY
 	default:
-		return MFAState_MFASTATE_UNSPECIFIED
+		return grpc.MFAState_MFASTATE_UNSPECIFIED
 	}
 }
