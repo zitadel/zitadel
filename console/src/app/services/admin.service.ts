@@ -8,6 +8,7 @@ import {
     CreateOrgRequest,
     CreateUserRequest,
     IamMember,
+    IamMemberRoles,
     IamMemberSearchQuery,
     IamMemberSearchRequest,
     IamMemberSearchResponse,
@@ -54,6 +55,14 @@ export class AdminService {
         return await this.request(
             c => c.setUpOrg,
             req,
+            f => f,
+        );
+    }
+
+    public async GetIamMemberRoles(): Promise<IamMemberRoles> {
+        return await this.request(
+            c => c.getIamMemberRoles,
+            new Empty(),
             f => f,
         );
     }

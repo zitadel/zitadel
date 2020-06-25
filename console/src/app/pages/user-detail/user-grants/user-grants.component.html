@@ -11,9 +11,9 @@
     </div>
     <span class="fill-space"></span>
     <ng-template appHasRole [appHasRole]="['user.grant.delete:'+userId,'user.grant.delete']">
-        <button matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button
+        <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button
             *ngIf="selection.hasValue()">
-            <mat-icon>delete_outline</mat-icon>
+            <i class="las la-trash"></i>
         </button>
     </ng-template>
     <ng-template appHasRole [appHasRole]="['user.grant.write:'+userId,'user.grant.write']">

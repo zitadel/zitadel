@@ -61,7 +61,7 @@ export class IamContributorsComponent implements OnInit {
     public openAddMember(): void {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
-                creationType: CreationType.ORG,
+                creationType: CreationType.IAM,
             },
             width: '400px',
         });

@@ -20,7 +20,7 @@
             <ng-template appHasRole [appHasRole]="['org.member.delete:'+org.id,'org.member.delete']">
                 <button (click)="removeProjectMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
                     class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
-                    <mat-icon>remove_circle</mat-icon>
+                    <i class="las la-trash"></i>
                 </button>
             </ng-template>
             <ng-template appHasRole [appHasRole]="['org.member.write:'+org.id,'org.member.write']">

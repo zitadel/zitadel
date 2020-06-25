@@ -193,11 +193,11 @@
     "IAM": {
         "DETAIL": {
             "TITLE":"Identity and Access Management",
-            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, manage managers and define global policies."
+            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, elect managers and define global policies."
         },
         "MEMBER": {
-            "TITLE":"IAM Manager",
-            "DESCRIPTION":"IAM Manager"
+            "TITLE":"Managers",
+            "DESCRIPTION":"Managers can add and edit organizations and make changes to their corresponding projects and apps"
         }
     },
     "ORG": {
@@ -450,7 +450,7 @@
         "en": "English"
     },
     "MEMBER":{
-        "ADD":"Add a contributor"
+        "ADD":"Add a manager"
     },
     "ROLES": {
         "ORG_OWNER": "Org Owner",

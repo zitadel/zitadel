@@ -12,7 +12,7 @@
     <span class="fill-space"></span>
     <!-- <button [disabled]="disabled" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button"
         mat-icon-button *ngIf="selection.hasValue()">
-        <mat-icon>delete_outline</mat-icon>
+        <i class="las la-trash"></i>
     </button> -->
     <ng-template appHasRole [appHasRole]="['project.app.write']">
         <a [disabled]="disabled" class="add-button" [routerLink]="[ '/projects', projectId, 'apps', 'create']"

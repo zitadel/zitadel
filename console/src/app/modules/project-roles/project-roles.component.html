@@ -11,9 +11,10 @@
     </div>
     <span class="fill-space"></span>
     <ng-template appHasRole [appHasRole]="['project.role.delete']">
-        <button [disabled]="disabled" matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" class="icon-button"
-            (click)="deleteSelectedRoles()" mat-icon-button *ngIf="selection.hasValue() && actionsVisible">
-            <mat-icon>delete_outline</mat-icon>
+        <button color="warn" [disabled]="disabled" matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}"
+            class="icon-button" (click)="deleteSelectedRoles()" mat-icon-button
+            *ngIf="selection.hasValue() && actionsVisible">
+            <i class="las la-trash"></i>
         </button>
     </ng-template>
     <ng-template appHasRole [appHasRole]="['project.role.write:' + projectId, 'project.role.write']">

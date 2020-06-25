@@ -335,7 +335,7 @@
         "MEMBER": {
             "TITLE": "Manager",
             "TITLEDESC":"Manager können Änderungen an dieser Entität vornehmen",
-            "DESCRIPTION":"Hier finden Sie alle Mitwirkenden dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
+            "DESCRIPTION":"Hier finden Sie alle Manager dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
@@ -449,7 +449,7 @@
         "en": "Englisch"
     },
     "MEMBER":{
-        "ADD":"Mitwirkenden hinzufügen"
+        "ADD":"Manager hinzufügen"
     },
     "ROLES": {
         "ORG_OWNER": "Org Owner",

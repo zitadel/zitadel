@@ -14,8 +14,8 @@
     </div>
     <span class="fill-space"></span>
     <button (click)="removeProjectMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
-        class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
-        <mat-icon>remove_circle</mat-icon>
+        class="icon-button" color="warn" mat-icon-button *ngIf="selection.hasValue()">
+        <i class="las la-trash"></i>
     </button>
     <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
         mat-raised-button>
