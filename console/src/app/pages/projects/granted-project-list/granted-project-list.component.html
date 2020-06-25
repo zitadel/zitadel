@@ -1,5 +1,5 @@
 <app-granted-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
-    [items]="grantedProjectList" (newClicked)="addProject()">
+    [items]="grantedProjectList">
 </app-granted-project-grid>
 
 <div *ngIf="!grid" class="view-toggle">
@@ -31,9 +31,6 @@
                 <mat-icon svgIcon="mdi_light_on"></mat-icon>
             </button>
         </div>
-        <a class="add-button" [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
-            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-        </a>
     </div>
     <div class="table-wrapper">
         <div class="spinner-container" *ngIf="(loading$ | async) || (loading$ | async)">
@@ -75,13 +72,6 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.STATE' | translate }} </th>
                 <td mat-cell *matCellDef="let project"><span
                         *ngIf="project.state">{{'PROJECT.STATE.'+project.state | translate}}</span></td>
-            </ng-container>
-
-            <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.TYPE' | translate }} </th>
-                <td mat-cell *matCellDef="let project">
-                    <span *ngIf="project.type !== undefined">{{'PROJECT.TYPE.'+project.type | translate}}</span>
-                </td>
             </ng-container>
 
             <ng-container matColumnDef="creationDate">

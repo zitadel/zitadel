@@ -10,9 +10,13 @@ type Config struct {
 	API        api.Config
 }
 
+//func Start(ctx context.Context, config Config, authZRepo *authz_repo.EsRepository, authZ auth.Config, systemDefaults sd.SystemDefaults) {
+//	roles := make([]string, len(authZ.RolePermissionMappings))
+//	for i, role := range authZ.RolePermissionMappings {
+//		roles[i] = role.Role
+//	}
 //
-//func Start(ctx context.Context, config Config, authZRepo *authz_repo.EsRepository, authZ authz.Config, systemDefaults sd.SystemDefaults) {
-//	repo, err := eventsourcing.Start(ctx, config.Repository, systemDefaults)
+//	repo, err := eventsourcing.Start(ctx, config.Repository, systemDefaults, roles)
 //	logging.Log("MAIN-9uBxp").OnError(err).Panic("unable to start app")
 //
 //	api.Start(ctx, config.API, authZRepo, authZ, systemDefaults, repo)

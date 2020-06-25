@@ -32,7 +32,7 @@ const routes: Routes = [
         },
     },
     {
-        path: 'orgs',
+        path: 'org',
         loadChildren: () => import('./pages/orgs/orgs.module').then(m => m.OrgsModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {

@@ -16,20 +16,24 @@ import (
 var _ AdminServiceServer = (*Server)(nil)
 
 type Server struct {
-	port     string
-	org      repository.OrgRepository
-	verifier authz.TokenVerifier
-	authZ    authz.Config
-	repo     repository.Repository
+	port          string
+	org           repository.OrgRepository
+	verifier      authz.TokenVerifier
+	authZ         authz.Config
+	iam           repository.IamRepository
+	administrator repository.AdministratorRepository
+	repo          repository.Repository
 }
 
 func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository, authZ authz.Config, repo repository.Repository) *Server {
 	return &Server{
-		port:     conf.Port,
-		org:      repo,
-		repo:     repo,
-		authZ:    authZ,
-		verifier: admin_auth.Start(authZRepo),
+		port:          conf.Port,
+		org:           repo,
+		iam:           repo,
+		administrator: repo,
+		repo:          repo,
+		authZ:         authZ,
+		verifier:      admin_auth.Start(authZRepo),
 	}
 }
 

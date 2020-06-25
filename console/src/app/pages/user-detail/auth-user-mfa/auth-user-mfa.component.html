@@ -7,6 +7,7 @@
                 <mat-icon>delete_outline</mat-icon>
             </button>
         </div>
+        <p class="row" *ngIf="error">{{error}}</p>
     </div>
     <div class="add-row">
         <button (click)="addOTP()" mat-stroked-button color="primary" matTooltip="{{'ACTIONS.NEW' | translate}}">

@@ -304,10 +304,36 @@ func genderToModel(gender grpc.Gender) usr_model.Gender {
 func mfaStateFromModel(state usr_model.MfaState) grpc.MFAState {
 	switch state {
 	case usr_model.MfaStateReady:
-		return grpc.MFAState_MFASTATE_NOT_READY
+		return grpc.MFAState_MFASTATE_READY
 	case usr_model.MfaStateNotReady:
 		return grpc.MFAState_MFASTATE_NOT_READY
 	default:
 		return grpc.MFAState_MFASTATE_UNSPECIFIED
+	}
+}
+
+func mfasFromModel(mfas []*usr_model.MultiFactor) []*grpc.MultiFactor {
+	converted := make([]*grpc.MultiFactor, len(mfas))
+	for i, mfa := range mfas {
+		converted[i] = mfaFromModel(mfa)
+	}
+	return converted
+}
+
+func mfaFromModel(mfa *usr_model.MultiFactor) *grpc.MultiFactor {
+	return &grpc.MultiFactor{
+		State: mfaStateFromModel(mfa.State),
+		Type:  mfaTypeFromModel(mfa.Type),
+	}
+}
+
+func mfaTypeFromModel(mfatype usr_model.MfaType) grpc.MfaType {
+	switch mfatype {
+	case usr_model.MfaTypeOTP:
+		return grpc.MfaType_MFATYPE_OTP
+	case usr_model.MfaTypeSMS:
+		return grpc.MfaType_MFATYPE_SMS
+	default:
+		return grpc.MfaType_MFATYPE_UNSPECIFIED
 	}
 }

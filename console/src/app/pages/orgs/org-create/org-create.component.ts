@@ -9,6 +9,8 @@ import { AdminService } from 'src/app/services/admin.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../user-detail/validators';
+
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
         return;
@@ -20,7 +22,12 @@ function passwordConfirmValidator(c: AbstractControl): any {
         return;
     }
     if (pwd.value !== cpwd.value) {
-        return { invalid: true };
+        return {
+            invalid: true,
+            notequal: {
+                valid: false,
+            },
+        };
     }
 }
 
@@ -69,20 +76,20 @@ export class OrgCreateComponent {
                 validators.push(Validators.minLength(this.policy.minLength));
             }
             if (this.policy.hasLowercase) {
-                validators.push(Validators.pattern(/[a-z]/g));
+                validators.push(lowerCaseValidator);
             }
             if (this.policy.hasUppercase) {
-                validators.push(Validators.pattern(/[A-Z]/g));
+                validators.push(upperCaseValidator);
             }
             if (this.policy.hasNumber) {
-                validators.push(Validators.pattern(/[0-9]/g));
+                validators.push(numberValidator);
             }
             if (this.policy.hasSymbol) {
-                // All characters that are not a digit or an English letter \W or a whitespace \S
-                validators.push(Validators.pattern(/[\W\S]/));
+                validators.push(symbolValidator);
             }
 
             this.userForm = this.fb.group({
+                userName: ['', [Validators.required]],
                 firstName: ['', [Validators.required]],
                 lastName: ['', [Validators.required]],
                 email: ['', [Validators.required]],
@@ -96,6 +103,7 @@ export class OrgCreateComponent {
             console.log('no password complexity policy defined!');
             console.error(error);
             this.userForm = this.fb.group({
+                userName: ['', [Validators.required]],
                 firstName: ['', [Validators.required]],
                 lastName: ['', [Validators.required]],
                 email: ['', [Validators.required]],
@@ -117,6 +125,7 @@ export class OrgCreateComponent {
         createOrgRequest.setDomain(this.domain?.value);
 
         const registerUserRequest: CreateUserRequest = new CreateUserRequest();
+        registerUserRequest.setUserName(this.userName?.value);
         registerUserRequest.setEmail(this.email?.value);
         registerUserRequest.setFirstName(this.firstName?.value);
         registerUserRequest.setLastName(this.lastName?.value);
@@ -151,6 +160,9 @@ export class OrgCreateComponent {
         return this.orgForm.get('domain');
     }
 
+    public get userName(): AbstractControl | null {
+        return this.userForm.get('userName');
+    }
 
     public get firstName(): AbstractControl | null {
         return this.userForm.get('firstName');

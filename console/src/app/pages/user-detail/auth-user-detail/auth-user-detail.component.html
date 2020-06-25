@@ -4,12 +4,12 @@
 
     <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
-    <span *ngIf="!loading && !profile">No user</span>
+    <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
-    <div class="col" *ngIf="profile">
+    <div class="col" *ngIf="user">
         <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
             description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
-            <app-detail-form [genders]="genders" [languages]="languages" [profile]="profile"
+            <app-detail-form [genders]="genders" [languages]="languages" [profile]="user"
                 (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
             </app-detail-form>
         </app-card>
@@ -19,7 +19,22 @@
         </app-card>
     </div>
 
-    <app-card *ngIf="profile" title="{{'USER.PASSWORD.TITLE' | translate}}"
+
+    <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
+        description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
+        <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
+            <span>{{login}}</span>
+            <button color="primary" [disabled]="copied == login"
+                [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                (click)="copytoclipboard(login)" mat-icon-button>
+                <i *ngIf="copied != login" class="las la-clipboard"></i>
+                <i *ngIf="copied == login" class="las la-clipboard-check"></i>
+            </button>
+        </div>
+    </app-card>
+
+
+    <app-card *ngIf="user" title="{{'USER.PASSWORD.TITLE' | translate}}"
         description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">
         <form *ngIf="passwordForm" [formGroup]="passwordForm" (ngSubmit)="setPassword()">
             <div class="content">
@@ -34,27 +49,52 @@
                     <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
                     <input autocomplete="off" name="new password" type="password" matInput
                         formControlName="newPassword" />
-                    <mat-error *ngIf="newPassword?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
+
+                    <mat-error *ngIf="newPassword?.errors?.required">
+                        {{ 'USER.VALIDATION.REQUIRED' | translate }}
                     </mat-error>
-                    <mat-error *ngIf="newPassword?.errors?.pattern">{{ policy | passwordPattern | translate }}
+                    <mat-error *ngIf="newPassword?.errors?.symbolValidator">
+                        {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="newPassword?.errors?.numberValidator">
+                        {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="newPassword?.errors?.upperCaseValidator">
+                        {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="newPassword?.errors?.lowerCaseValidator">
+                        {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
                     </mat-error>
                     <mat-error *ngIf="newPassword?.errors?.minlength">
-                        {{ 'USER.VALIDATION.MINLENGTH' | translate:policy }}
+                        {{ 'USER.VALIDATION.MINLENGTH' | translate:newPassword?.errors?.minlength }}
                     </mat-error>
+
                 </mat-form-field>
                 <mat-form-field class="formfield">
                     <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
                     <input autocomplete="off" name="password repeating" type="password" matInput
                         formControlName="confirmPassword" />
-                    <mat-error *ngIf="confirmPassword?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
+
+                    <mat-error *ngIf="confirmPassword?.errors?.required">
+                        {{ 'USER.VALIDATION.REQUIRED' | translate }}
                     </mat-error>
-                    <mat-error *ngIf="confirmPassword?.errors?.pattern">
-                        {{ policy | passwordPattern | translate }}
+                    <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
+                        {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="confirmPassword?.errors?.numberValidator">
+                        {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="confirmPassword?.errors?.notequal">
+                        {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="confirmPassword?.errors?.upperCaseValidator">
+                        {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="confirmPassword?.errors?.lowerCaseValidator">
+                        {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
                     </mat-error>
                     <mat-error *ngIf="confirmPassword?.errors?.minlength">
-                        {{ 'USER.VALIDATION.MINLENGTH' | translate:policy }}
-                    </mat-error>
-                    <mat-error *ngIf="confirmPassword?.errors?.notequal">{{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                        {{ 'USER.VALIDATION.MINLENGTH' | translate:confirmPassword?.errors?.minlength }}
                     </mat-error>
                 </mat-form-field>
             </div>
@@ -65,7 +105,7 @@
         </form>
     </app-card>
 
-    <app-card *ngIf="profile" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
+    <app-card *ngIf="user" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
         description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
         <div class="method-col">
             <div class="method-row">
@@ -148,9 +188,9 @@
         </div>
     </app-card>
 
-    <app-auth-user-mfa *ngIf="profile" [profile]="profile"></app-auth-user-mfa>
+    <app-auth-user-mfa *ngIf="user"></app-auth-user-mfa>
 
-    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="profile">
+    <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="user">
         <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
             <div class="content">
                 <mat-form-field class="formfield">

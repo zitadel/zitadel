@@ -7,6 +7,8 @@ import {
     ChangeRequest,
     Changes,
     CreateUserRequest,
+    Email,
+    Gender,
     MultiFactors,
     NotificationType,
     PasswordRequest,
@@ -22,7 +24,6 @@ import {
     User,
     UserAddress,
     UserEmail,
-    UserEmailID,
     UserGrant,
     UserGrantCreate,
     UserGrantSearchQuery,
@@ -113,14 +114,31 @@ export class MgmtUserService {
         );
     }
 
-    public async SaveUserProfile(profile: UserProfile.AsObject): Promise<UserProfile> {
+    public async SaveUserProfile(
+        id: string,
+        firstName?: string,
+        lastName?: string,
+        nickName?: string,
+        preferredLanguage?: string,
+        gender?: Gender,
+    ): Promise<UserProfile> {
         const req = new UpdateUserProfileRequest();
-        req.setId(profile.id);
-        req.setFirstName(profile.firstName);
-        req.setLastName(profile.lastName);
-        req.setNickName(profile.nickName);
-        req.setPreferredLanguage(profile.preferredLanguage);
-        req.setGender(profile.gender);
+        req.setId(id);
+        if (firstName) {
+            req.setFirstName(firstName);
+        }
+        if (lastName) {
+            req.setLastName(lastName);
+        }
+        if (nickName) {
+            req.setNickName(nickName);
+        }
+        if (gender) {
+            req.setGender(gender);
+        }
+        if (preferredLanguage) {
+            req.setPreferredLanguage(preferredLanguage);
+        }
         return await this.request(
             c => c.updateUserProfile,
             req,
@@ -322,7 +340,7 @@ export class MgmtUserService {
     }
 
     public async GetUserByEmailGlobal(email: string): Promise<User> {
-        const req = new UserEmailID();
+        const req = new Email();
         req.setEmail(email);
         return await this.request(
             c => c.getUserByEmailGlobal,

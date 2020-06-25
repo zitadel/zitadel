@@ -215,6 +215,13 @@ export class AuthServiceClient {
                response: MyPermissions) => void
   ): grpcWeb.ClientReadableStream<MyPermissions>;
 
+  getMyProjectPermissions(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: MyPermissions) => void
+  ): grpcWeb.ClientReadableStream<MyPermissions>;
+
 }
 
 export class AuthServicePromiseClient {
@@ -343,6 +350,11 @@ export class AuthServicePromiseClient {
   ): Promise<MyProjectOrgSearchResponse>;
 
   getMyZitadelPermissions(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<MyPermissions>;
+
+  getMyProjectPermissions(
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
   ): Promise<MyPermissions>;

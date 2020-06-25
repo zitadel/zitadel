@@ -51,7 +51,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
         this.formGroup = new FormGroup({
             key: new FormControl('', [Validators.required]),
             displayName: new FormControl(''),
-            group: new FormControl('', [Validators.required]),
+            group: new FormControl(''),
         });
 
         this.formArray = new FormArray([this.formGroup]);

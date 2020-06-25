@@ -29,6 +29,30 @@ h1 {
     color: #81868a;
     margin-bottom: 2rem;
   }
+
+  .login-name-row {
+        display: flex;
+        align-items: center;
+
+        button {
+            transition: opacity .15s ease-in-out;
+            visibility: hidden;
+            opacity: 0;
+
+            &[disabled] {
+                visibility: visible;
+                color: white;
+                opacity: 1;
+            }
+        }
+
+        &:hover {
+            button {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+  }
   
   .content {
     display: flex;
@@ -119,6 +143,7 @@ h1 {
     flex-wrap: wrap;
     align-items: stretch;
     margin: -.5rem;
+
     app-card {
         flex: 1;
         margin: .5rem

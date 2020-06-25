@@ -51,7 +51,12 @@
             "DESCRIPTION": "Hier können Sie neue User anlegen sowie bereits erfasste Userdaten bearbeiten, activieren oder deaktivieren",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
-            "MY": "Meine Informationen"
+            "MY": "Meine Informationen",
+            "LOGINNAMES":"Loginnamen",
+            "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
+            "COPY":"In die Zwischenablage kopieren",
+            "COPIED":"In die Zwischenablage kopiert!",
+            "NOUSER":"Kein User"
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
@@ -159,7 +164,12 @@
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
             "REQUIRED": "Das Feld ist leer",
-            "MINLENGTH":"Das Password muss mindestens {{minLength}} Zeichen lang sein!"
+            "MINLENGTH":"Das Password muss mindestens {{requiredLength}} Zeichen lang sein!",
+            "NOEMAIL":"Username darf keine email sein!",
+            "UPPERCASEMISSING":"Password muss einen Großbuchstaben beinhalten",
+            "LOWERCASEMISSING":"Password muss einen Kleinbuchstaben beinhalten",
+            "SYMBOLERROR":"Das Password muss ein Symbol beinhalten!",
+            "NUMBERERROR":"Das Password muss eine Nummer beinhalten!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -215,7 +225,7 @@
                 "TITLECREATE":"Kennwortkomplexitätsrichtlinie erstellen",
                 "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
                 "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol und eine Nummer beinhalten!",
-                "SYMBOLERROR":"Das Password msus ein Symbol beinhalten!",
+                "SYMBOLERROR":"Das Password muss ein Symbol beinhalten!",
                 "NUMBERERROR":"Das Password muss eine Nummer beinhalten!",
                 "PATTERNERROR":"Das vorgeschriebene Muster ist falsch!"
             },
@@ -282,14 +292,15 @@
     "PROJECT": {
         "PAGES": {
             "TITLE": "Projekt",
-            "DESCRIPTION": "Hier können Sie wichtige Einstellungen prüfen und die Daten einsehen, mit denen das der Dienst konfiguriert worden ist",
+            "DESCRIPTION": "Hier können Sie wichtige Einstellungen prüfen und die Daten einsehen, mit denen der Dienst konfiguriert worden ist",
             "LIST": "Projekte",
-            "LISTDESCRIPTION":"Hier finden Sie alle Projekte, für die Sie Aktionen anzeigen oder ausführen dürfen. Wenn Sie kein Projekt finden können, wenden Sie sich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+            "LISTDESCRIPTION":"Hier finden Sie alle Projekte, für die Sie Aktionen anzeigen oder ausführen dürfen. Wenn Sie Ihr Projekt nicht finden können, wenden Sie sich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
             "CREATE_DESC": "Geben Sie den Namen ein",
             "ROLE": "Rolle",
-            "NOITEMS": "Keine Projekte"
+            "NOITEMS": "Keine Projekte",
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!"
         },
         "STATE": {
             "TITLE":"Status",
@@ -500,7 +511,7 @@
             "project.role.added":"Rolle erstellt",
             "project.role.removed":"Rolle gelöscht",
             "project.application.added":"App hinzugefügt",
-            "project.application.config.oidc.added":"OIDC config hinzugefügt",   
+            "project.application.config.oidc.added":"OIDC config hinzugefügt",
             "user.added":"User hinzugefügt",
             "user.initialization.code.added":"Init code hinzugefügt",
             "user.phone.code.added":"User phone code hinzugefügt",
@@ -508,8 +519,8 @@
             "user.initialization.code.sent":"Init code gesendet",
             "user.email.verification.sended": "User email verifiziert",
             "user.email.code.added":"Email code hinzugefügt",
-            "user.email.code.sent":"Email code gesendet",   
-            "user.email.verified":"Email verifiziert",         
+            "user.email.code.sent":"Email code gesendet",
+            "user.email.verified":"Email verifiziert",
             "user.phone.verificationsended":"User phone verifikation gesendet",
             "user.phone.code":"User phone code erstellt",
             "user.initialization.verification.sended":"User mail verifikation gesendet",

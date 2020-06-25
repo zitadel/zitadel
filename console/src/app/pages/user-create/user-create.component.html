@@ -13,7 +13,7 @@
                 <p class="desc">{{ 'USER.CREATE.DESCRIPTION' | translate }}</p>
             </div>
 
-            <form [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
+            <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
                 <!-- <h2>{{ 'USER.PAGES.CREATE' | translate}}</h2> -->
                 <div class="content">
                     <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
@@ -29,6 +29,9 @@
                         <input matInput formControlName="userName" required />
                         <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
+                            {{ 'USER.VALIDATION.NOEMAIL' | translate }}
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field class="formfield">

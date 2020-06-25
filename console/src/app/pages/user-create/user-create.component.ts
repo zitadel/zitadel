@@ -4,7 +4,26 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CreateUserRequest, Gender, User } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+function noEmailValidator(c: AbstractControl): any {
+    const EMAIL_REGEXP: RegExp = /^((?!@).)*$/gm;
+    if (!c.parent || !c) {
+        return;
+    }
+    const username = c.parent.get('userName');
+
+    if (!username) {
+        return;
+    }
+
+    return EMAIL_REGEXP.test(username.value) ? null : {
+        noEmailValidator: {
+            valid: false,
+        },
+    };
+}
 
 @Component({
     selector: 'app-user-create',
@@ -19,12 +38,35 @@ export class UserCreateComponent implements OnDestroy {
 
     private sub: Subscription = new Subscription();
 
-    constructor(private router: Router, private toast: ToastService, public userService: MgmtUserService,
-        private fb: FormBuilder) {
+    public userLoginMustBeDomain: boolean = false;
 
+    constructor(
+        private router: Router,
+        private toast: ToastService,
+        public userService: MgmtUserService,
+        private fb: FormBuilder,
+        private orgService: OrgService,
+    ) {
+        this.orgService.GetMyOrgIamPolicy().then((iampolicy) => {
+            this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
+            console.log(this.userLoginMustBeDomain);
+            this.initForm();
+        }).catch(error => {
+            console.error(error);
+            this.initForm();
+        });
+    }
+
+    private initForm(): void {
         this.userForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
-            userName: ['', [Validators.required, Validators.minLength(2)]],
+            userName: ['',
+                [
+                    Validators.required,
+                    Validators.minLength(2),
+                    this.userLoginMustBeDomain ? noEmailValidator : Validators.email,
+                ],
+            ],
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             nickName: [''],

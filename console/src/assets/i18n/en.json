@@ -51,7 +51,12 @@
             "DESCRIPTION": "Here you can create new users or edit data that has already been entered.",
             "DETAIL": "Detail",
             "CREATE": "Create",
-            "MY": "My Informations"
+            "MY": "My Informations",
+            "LOGINNAMES":"Loginnames",
+            "LOGINNAMESDESC":"You can log into zitadel with these names",
+            "COPY":"Copy to clipboard",
+            "COPIED":"Copied to clipboard!",
+            "NOUSER":"No User"
         },
         "MFA": {
             "TITLE": "Multifactor Authentication",
@@ -159,7 +164,12 @@
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
             "REQUIRED": "The input field is empty",
-            "MINLENGTH":"The password has to be at least {{minLength}} characters long!"
+            "MINLENGTH":"The password has to be at least {{requiredLength}} characters long!",
+            "NOEMAIL":"Username can not be an email",
+            "UPPERCASEMISSING":"An uppercase character is needed!",
+            "LOWERCASEMISSING":"A lowercase character is needed!",
+            "SYMBOLERROR":"The password must include a symbol!",
+            "NUMBERERROR":"The password must include a number!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -177,7 +187,7 @@
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"Login with another account"
+        "ADDACCOUNT":"log in with another account"
     },
     "ORG": {
         "PAGES": {
@@ -218,7 +228,6 @@
                 "SYMBOLERROR":"The password must include a symbol!",
                 "NUMBERERROR":"The password must include a number!",
                 "PATTERNERROR":"The required pattern is not fulfilled!"
-
             },
             "PWD_AGE": {
                 "TITLE":"Password Age",
@@ -290,7 +299,8 @@
             "CREATE": "Create project",
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
-            "NOITEMS": "No projects"
+            "NOITEMS": "No projects",
+            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
         },
         "STATE": {
             "TITLE":"State",
