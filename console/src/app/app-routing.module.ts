@@ -32,6 +32,14 @@ const routes: Routes = [
         },
     },
     {
+        path: 'iam',
+        loadChildren: () => import('./pages/iam/iam.module').then(m => m.IamModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['iam.read'],
+        },
+    },
+    {
         path: 'org',
         loadChildren: () => import('./pages/orgs/orgs.module').then(m => m.OrgsModule),
         canActivate: [AuthGuard, RoleGuard],

@@ -1,0 +1,95 @@
+<div class="max-width-container">
+    <div class="container">
+        <div class="head">
+            <h1>{{ 'IAM.MEMBER.TITLE' | translate }}</h1>
+            <p class="desc">{{ 'IAM.MEMBER.DESCRIPTION' | translate }}</p>
+        </div>
+
+        <div class="table-header-row" *ngIf="org">
+            <div class="col">
+                <ng-container *ngIf="!selection.hasValue()">
+                    <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
+                    <span class="count">{{dataSource?.membersSubject.value.length}}</span>
+                </ng-container>
+                <ng-container *ngIf="selection.hasValue()">
+                    <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
+                    <span class="count">{{selection?.selected?.length}}</span>
+                </ng-container>
+            </div>
+            <span class="fill-space"></span>
+            <ng-template appHasRole [appHasRole]="['org.member.delete:'+org.id,'org.member.delete']">
+                <button (click)="removeProjectMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
+                    class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
+                    <mat-icon>remove_circle</mat-icon>
+                </button>
+            </ng-template>
+            <ng-template appHasRole [appHasRole]="['org.member.write:'+org.id,'org.member.write']">
+                <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
+                    mat-raised-button>
+                    <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+                </a>
+            </ng-template>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="spinner-container" *ngIf="dataSource?.loading$ | async">
+                <mat-spinner diameter="50"></mat-spinner>
+            </div>
+            <table mat-table class="background-style full-width-table" aria-label="Elements" [dataSource]="dataSource">
+                <ng-container matColumnDef="select">
+                    <th class="selection" mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()">
+                        </mat-checkbox>
+                    </th>
+                    <td class="selection" mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="firstname">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.FIRSTNAME' | translate }} </th>
+                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                        {{member.firstName}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="lastname">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LASTNAME' | translate }} </th>
+                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                        {{member.lastName}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="username">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERNAME' | translate }} </th>
+                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                        {{member.userName}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.EMAIL' | translate }} </th>
+                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                        {{member.email}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="roles">
+                    <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
+                    <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
+                        <span class="role app-label" *ngFor="let role of member.rolesList; index as i">
+                            {{ 'ROLES.'+role | translate }}</span>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;">
+                </tr>
+            </table>
+
+            <mat-paginator class="background-style" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

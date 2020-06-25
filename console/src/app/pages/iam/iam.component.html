@@ -1,0 +1,25 @@
+<app-meta-layout>
+    <div class="enlarged-container">
+        <h1>{{'IAM.DETAIL.TITLE'}}</h1>
+        <p class="sub">{{'IAM.DETAIL.DESCRIPTION' | translate}}
+        </p>
+        <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
+            description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
+        </app-card>
+    </div>
+
+    <metainfo class="side">
+        <div class="details">
+
+        </div>
+
+        <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+            <mat-tab label="Details">
+                <!-- <app-org-contributors *ngIf="org" [org]="org">
+                </app-org-contributors> -->
+            </mat-tab>
+            <mat-tab label="{{ 'CHANGES.ORG.TITLE' | translate }}" class="flex-col">
+            </mat-tab>
+        </mat-tab-group>
+    </metainfo>
+</app-meta-layout>

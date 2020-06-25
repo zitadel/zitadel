@@ -18,6 +18,7 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
+        "IAM":"IAM",
         "ORGANIZATION": "Organisation",
         "PROJECT": "Projekte",
         "USER": "Benutzer",
@@ -188,6 +189,11 @@
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
         "ADDACCOUNT":"mit einem anderen Account anmelden"
+    },
+    "IAM": {
+        "MEMBER": {
+            "TITLE":"IAM Members"
+        }
     },
     "ORG": {
         "PAGES": {

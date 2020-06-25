@@ -18,6 +18,7 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
+        "IAM":"IAM",
         "ORGANIZATION": "Organization",
         "PROJECT": "Projects",
         "USER": "Users",
@@ -188,6 +189,12 @@
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"log in with another account"
+    },
+    "IAM": {
+        "MEMBER": {
+            "TITLE":"IAM Manager",
+            "DESCRIPTION":"IAM Manager"
+        }
     },
     "ORG": {
         "PAGES": {

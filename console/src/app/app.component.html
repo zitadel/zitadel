@@ -66,6 +66,11 @@
                     <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                 </a>
 
+                <a *ngIf="iamreadwrite" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
+                    <i class="icon las la-gem"></i>
+                    <span class="label">{{'MENU.IAM' | translate}}</span>
+                </a>
+
                 <a *ngIf="showOrgSection" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
                     <i class="icon las la-archway"></i>
                     <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
