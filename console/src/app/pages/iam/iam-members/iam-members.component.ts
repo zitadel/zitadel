@@ -6,7 +6,7 @@ import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { Org, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { IamMembersDataSource } from './iam-members-datasource';
@@ -28,15 +28,12 @@ export class IamMembersComponent implements AfterViewInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
-    constructor(private orgService: OrgService,
+    constructor(private adminService: AdminService,
         private dialog: MatDialog,
         private toast: ToastService) {
-        this.orgService.GetMyOrg().then(org => {
-            this.org = org.toObject();
-            console.log(this.org);
-            this.dataSource = new IamMembersDataSource(this.orgService);
-            this.dataSource.loadMembers(0, 25, 'asc');
-        });
+
+        this.dataSource = new IamMembersDataSource(this.adminService);
+        this.dataSource.loadMembers(0, 25, 'asc');
     }
 
     public ngAfterViewInit(): void {
@@ -45,7 +42,6 @@ export class IamMembersComponent implements AfterViewInit {
                 tap(() => this.loadMembersPage()),
             )
             .subscribe();
-
     }
 
     private loadMembersPage(): void {
@@ -57,7 +53,7 @@ export class IamMembersComponent implements AfterViewInit {
 
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
+            return this.adminService.RemoveIamMember(member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
                 this.toast.showError(error.message);
@@ -66,7 +62,7 @@ export class IamMembersComponent implements AfterViewInit {
     }
 
     public removeMember(member: ProjectMember.AsObject): void {
-        this.orgService.RemoveMyOrgMember(member.userId).then(() => {
+        this.adminService.RemoveIamMember(member.userId).then(() => {
             this.toast.showInfo('Member removed successfully');
         }).catch(error => {
             this.toast.showError(error.message);
@@ -100,7 +96,7 @@ export class IamMembersComponent implements AfterViewInit {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.orgService.AddMyOrgMember(user.id, roles);
+                        return this.adminService.AddIamMember(user.id, roles);
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {

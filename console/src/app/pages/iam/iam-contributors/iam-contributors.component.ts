@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { OrgMember, OrgMemberView, OrgState, User } from 'src/app/proto/generated/management_pb';
-import { OrgService } from 'src/app/services/org.service';
+import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import {
@@ -33,7 +33,7 @@ export class IamContributorsComponent implements OnInit {
         = new BehaviorSubject<OrgMemberView.AsObject[]>([]);
 
     public OrgState: any = OrgState;
-    constructor(private orgService: OrgService, private dialog: MatDialog,
+    constructor(private adminService: AdminService, private dialog: MatDialog,
         private toast: ToastService,
         private router: Router) { }
 
@@ -45,7 +45,7 @@ export class IamContributorsComponent implements OnInit {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        from(this.orgService.SearchMyOrgMembers(pageSize, offset)).pipe(
+        from(this.adminService.SearchIamMembers(pageSize, offset)).pipe(
             map(resp => {
                 this.totalResult = resp.toObject().totalResult;
                 return resp.toObject().resultList;
@@ -73,7 +73,7 @@ export class IamContributorsComponent implements OnInit {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.orgService.AddMyOrgMember(user.id, roles);
+                        return this.adminService.AddIamMember(user.id, roles);
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
@@ -85,6 +85,6 @@ export class IamContributorsComponent implements OnInit {
     }
 
     public showDetail(): void {
-        this.router.navigate(['org/members']);
+        this.router.navigate(['iam/members']);
     }
 }

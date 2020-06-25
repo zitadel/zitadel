@@ -4,8 +4,10 @@ import { Metadata } from 'grpc-web';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
 import {
+    AddIamMemberRequest,
     CreateOrgRequest,
     CreateUserRequest,
+    IamMember,
     IamMemberSearchQuery,
     IamMemberSearchRequest,
     IamMemberSearchResponse,
@@ -14,6 +16,7 @@ import {
     OrgIamPolicyRequest,
     OrgSetUpRequest,
     OrgSetUpResponse,
+    RemoveIamMemberRequest,
 } from '../proto/generated/admin_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -72,6 +75,35 @@ export class AdminService {
             f => f,
         );
     }
+
+    public async RemoveIamMember(
+        userId: string,
+    ): Promise<Empty> {
+        const req = new RemoveIamMemberRequest();
+        req.setUserId(userId);
+
+        return await this.request(
+            c => c.removeIamMember,
+            req,
+            f => f,
+        );
+    }
+
+    public async AddIamMember(
+        userId: string,
+        rolesList: string[],
+    ): Promise<IamMember> {
+        const req = new AddIamMemberRequest();
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+
+        return await this.request(
+            c => c.addIamMember,
+            req,
+            f => f,
+        );
+    }
+
 
     public async GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyID();

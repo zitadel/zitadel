@@ -8,6 +8,10 @@ const routes: Routes = [
         path: '',
         component: IamComponent,
     },
+    {
+        path: 'members',
+        loadChildren: () => import('./iam-members/iam-members.module').then(m => m.IamMembersModule),
+    },
 ];
 
 @NgModule({
