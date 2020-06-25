@@ -55,6 +55,31 @@ var AdminService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.admin.api.v1.AdminService/GetIamMemberRoles": utils_auth.Option{
+		Permission: "iam.member.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/AddIamMember": utils_auth.Option{
+		Permission: "iam.member.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/ChangeIamMember": utils_auth.Option{
+		Permission: "iam.member.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveIamMember": utils_auth.Option{
+		Permission: "iam.member.delete",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/SearchIamMembers": utils_auth.Option{
+		Permission: "iam.member.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.admin.api.v1.AdminService/GetViews": utils_auth.Option{
 		Permission: "iam.read",
 		CheckParam: "",
