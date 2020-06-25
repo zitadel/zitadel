@@ -931,7 +931,7 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model
 	if existing.IsOTPReady() {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
 	}
-	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: userID})
+	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: existing.Email.EmailAddress})
 	if err != nil {
 		return nil, err
 	}
