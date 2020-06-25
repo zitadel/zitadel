@@ -12,8 +12,8 @@
     <span class="fill-space"></span>
     <ng-template appHasRole [appHasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']">
         <button [disabled]="disabled" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue()">
-            <mat-icon>delete_outline</mat-icon>
+            mat-icon-button *ngIf="selection.hasValue()" color="warn">
+            <i class="las la-trash"></i>
         </button>
     </ng-template>
     <ng-template appHasRole [appHasRole]="['project.grant.member.write:'+projectId,'project.grant.member.write']">
@@ -59,13 +59,13 @@
         <ng-container matColumnDef="creationDate">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CREATIONDATE' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                {{dateFromTimestamp(grant.creationDate) | date: 'dd. MMM, HH:mm' }} </td>
+                {{grant.creationDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
         </ng-container>
 
         <ng-container matColumnDef="changeDate">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                {{dateFromTimestamp(grant.changeDate) | date: 'dd. MMM, HH:mm' }} </td>
+                {{grant.changeDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
 
         </ng-container>
 

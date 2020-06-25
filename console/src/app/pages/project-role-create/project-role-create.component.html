@@ -29,8 +29,9 @@
                     <mat-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</mat-label>
                     <input matInput formControlName="group" />
                 </mat-form-field>
-                <button mat-icon-button (click)="removeEntry(i)" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
-                    <mat-icon>remove_circle</mat-icon>
+                <button mat-icon-button (click)="removeEntry(i)" color="warn"
+                    matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
+                    <i class="las la-trash"></i>
                 </button>
             </ng-container>
         </div>

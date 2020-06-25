@@ -3,11 +3,13 @@ import { NgModule } from '@angular/core';
 import { MomentModule } from 'ngx-moment';
 
 import { LocalizedDatePipe } from './localized-date.pipe';
+import { TimestampToDatePipe } from './timestamp-to-date.pipe';
 
 
 @NgModule({
     declarations: [
         LocalizedDatePipe,
+        TimestampToDatePipe,
     ],
     imports: [
         CommonModule,
@@ -15,6 +17,7 @@ import { LocalizedDatePipe } from './localized-date.pipe';
     ],
     exports: [
         LocalizedDatePipe,
+        TimestampToDatePipe,
     ],
 })
 export class PipesModule { }

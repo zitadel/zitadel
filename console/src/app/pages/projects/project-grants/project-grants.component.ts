@@ -4,7 +4,6 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { tap } from 'rxjs/operators';
 import { ProjectGrant, ProjectMemberView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -130,10 +129,5 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
         }).catch(error => {
             this.toast.showInfo(error.message);
         });
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 }

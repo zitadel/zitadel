@@ -964,5 +964,725 @@ proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.deleteOrgIam
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.admin.api.v1.IamMemberRoles>}
+ */
+const methodDescriptor_AdminService_GetIamMemberRoles = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/GetIamMemberRoles',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.caos.zitadel.admin.api.v1.IamMemberRoles,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMemberRoles.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.admin.api.v1.IamMemberRoles>}
+ */
+const methodInfo_AdminService_GetIamMemberRoles = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.IamMemberRoles,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMemberRoles.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.IamMemberRoles)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.IamMemberRoles>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.getIamMemberRoles =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetIamMemberRoles',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetIamMemberRoles,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.IamMemberRoles>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.getIamMemberRoles =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetIamMemberRoles',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetIamMemberRoles);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.AddIamMemberRequest,
+ *   !proto.caos.zitadel.admin.api.v1.IamMember>}
+ */
+const methodDescriptor_AdminService_AddIamMember = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/AddIamMember',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.AddIamMemberRequest,
+  proto.caos.zitadel.admin.api.v1.IamMember,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.AddIamMemberRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMember.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.AddIamMemberRequest,
+ *   !proto.caos.zitadel.admin.api.v1.IamMember>}
+ */
+const methodInfo_AdminService_AddIamMember = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.IamMember,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.AddIamMemberRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMember.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.AddIamMemberRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.IamMember)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.IamMember>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.addIamMember =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/AddIamMember',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_AddIamMember,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.AddIamMemberRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.IamMember>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.addIamMember =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/AddIamMember',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_AddIamMember);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.ChangeIamMemberRequest,
+ *   !proto.caos.zitadel.admin.api.v1.IamMember>}
+ */
+const methodDescriptor_AdminService_ChangeIamMember = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/ChangeIamMember',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.ChangeIamMemberRequest,
+  proto.caos.zitadel.admin.api.v1.IamMember,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.ChangeIamMemberRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMember.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.ChangeIamMemberRequest,
+ *   !proto.caos.zitadel.admin.api.v1.IamMember>}
+ */
+const methodInfo_AdminService_ChangeIamMember = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.IamMember,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.ChangeIamMemberRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMember.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.ChangeIamMemberRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.IamMember)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.IamMember>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.changeIamMember =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/ChangeIamMember',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_ChangeIamMember,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.ChangeIamMemberRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.IamMember>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.changeIamMember =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/ChangeIamMember',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_ChangeIamMember);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.RemoveIamMemberRequest,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_AdminService_RemoveIamMember = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/RemoveIamMember',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.RemoveIamMemberRequest,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.RemoveIamMemberRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.RemoveIamMemberRequest,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodInfo_AdminService_RemoveIamMember = new grpc.web.AbstractClientBase.MethodInfo(
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.RemoveIamMemberRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.RemoveIamMemberRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.removeIamMember =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/RemoveIamMember',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_RemoveIamMember,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.RemoveIamMemberRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.removeIamMember =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/RemoveIamMember',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_RemoveIamMember);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.IamMemberSearchRequest,
+ *   !proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse>}
+ */
+const methodDescriptor_AdminService_SearchIamMembers = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/SearchIamMembers',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.IamMemberSearchRequest,
+  proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.IamMemberSearchRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.IamMemberSearchRequest,
+ *   !proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse>}
+ */
+const methodInfo_AdminService_SearchIamMembers = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.IamMemberSearchRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.IamMemberSearchRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.searchIamMembers =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/SearchIamMembers',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_SearchIamMembers,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.IamMemberSearchRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.IamMemberSearchResponse>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.searchIamMembers =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/SearchIamMembers',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_SearchIamMembers);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.admin.api.v1.Views>}
+ */
+const methodDescriptor_AdminService_GetViews = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/GetViews',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.caos.zitadel.admin.api.v1.Views,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.Views.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.admin.api.v1.Views>}
+ */
+const methodInfo_AdminService_GetViews = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.Views,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.Views.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.Views)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.Views>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.getViews =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetViews',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetViews,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.Views>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.getViews =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetViews',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetViews);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.ViewID,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_AdminService_ClearView = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/ClearView',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.ViewID,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.ViewID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.ViewID,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodInfo_AdminService_ClearView = new grpc.web.AbstractClientBase.MethodInfo(
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.ViewID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.ViewID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.clearView =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/ClearView',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_ClearView,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.ViewID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.clearView =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/ClearView',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_ClearView);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.admin.api.v1.FailedEvents>}
+ */
+const methodDescriptor_AdminService_GetFailedEvents = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/GetFailedEvents',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.caos.zitadel.admin.api.v1.FailedEvents,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.FailedEvents.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.admin.api.v1.FailedEvents>}
+ */
+const methodInfo_AdminService_GetFailedEvents = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.admin.api.v1.FailedEvents,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.admin.api.v1.FailedEvents.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.admin.api.v1.FailedEvents)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.admin.api.v1.FailedEvents>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.getFailedEvents =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetFailedEvents',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetFailedEvents,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.admin.api.v1.FailedEvents>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.getFailedEvents =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/GetFailedEvents',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_GetFailedEvents);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.admin.api.v1.FailedEventID,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_AdminService_RemoveFailedEvent = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.admin.api.v1.AdminService/RemoveFailedEvent',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.admin.api.v1.FailedEventID,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.FailedEventID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.admin.api.v1.FailedEventID,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodInfo_AdminService_RemoveFailedEvent = new grpc.web.AbstractClientBase.MethodInfo(
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.admin.api.v1.FailedEventID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.FailedEventID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.admin.api.v1.AdminServiceClient.prototype.removeFailedEvent =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/RemoveFailedEvent',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_RemoveFailedEvent,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.admin.api.v1.FailedEventID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.admin.api.v1.AdminServicePromiseClient.prototype.removeFailedEvent =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.admin.api.v1.AdminService/RemoveFailedEvent',
+      request,
+      metadata || {},
+      methodDescriptor_AdminService_RemoveFailedEvent);
+};
+
+
 module.exports = proto.caos.zitadel.admin.api.v1;
 

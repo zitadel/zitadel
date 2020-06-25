@@ -3,8 +3,15 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { PasswordAgePolicy, PasswordComplexityPolicy, PasswordLockoutPolicy } from 'src/app/proto/generated/management_pb';
+import {
+    OrgIamPolicy,
+    PasswordAgePolicy,
+    PasswordComplexityPolicy,
+    PasswordLockoutPolicy,
+} from 'src/app/proto/generated/management_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { OrgService } from 'src/app/services/org.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 export enum PolicyComponentAction {
@@ -16,6 +23,7 @@ export enum PolicyComponentType {
     LOCKOUT = 'lockout',
     AGE = 'age',
     COMPLEXITY = 'complexity',
+    IAM_POLICY = 'iam_policy',
 }
 
 @Component({
@@ -24,13 +32,15 @@ export enum PolicyComponentType {
     styleUrls: ['./password-policy.component.scss'],
 })
 export class PasswordPolicyComponent implements OnInit, OnDestroy {
-    public orgId: string = '';
     titleSub: BehaviorSubject<string> = new BehaviorSubject('');
     descSub: BehaviorSubject<string> = new BehaviorSubject('');
 
     componentAction: PolicyComponentAction = PolicyComponentAction.CREATE;
 
-    policyData!: PasswordLockoutPolicy.AsObject | PasswordAgePolicy.AsObject | PasswordComplexityPolicy.AsObject;
+    policyData!: PasswordLockoutPolicy.AsObject |
+        PasswordAgePolicy.AsObject |
+        PasswordComplexityPolicy.AsObject |
+        OrgIamPolicy.AsObject;
     policyType: PolicyComponentType = PolicyComponentType.COMPLEXITY;
 
     public PolicyComponentType: any = PolicyComponentType;
@@ -60,19 +70,25 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
         maxAgeDays: 90,
     };
 
+    public iamData: any = {
+        description: '',
+        userLoginMustBeDomain: false,
+    };
+
     private sub: Subscription = new Subscription();
 
     constructor(
         private route: ActivatedRoute,
+        private adminService: AdminService,
         private orgService: OrgService,
         private router: Router,
         private toast: ToastService,
+        private sessionStorage: StorageService,
     ) {
         this.sub = this.route.data.pipe(switchMap(data => {
             this.componentAction = data.action;
             return this.route.params;
         })).subscribe(params => {
-            this.orgId = params.id;
             this.policyType = params.policytype;
 
             switch (params.policytype) {
@@ -88,6 +104,10 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     this.titleSub.next('ORG.POLICY.PWD_COMPLEXITY.TITLECREATE');
                     this.descSub.next('ORG.POLICY.PWD_COMPLEXITY.DESCRIPTIONCREATE');
                     break;
+                case PolicyComponentType.IAM_POLICY:
+                    this.titleSub.next('ORG.POLICY.IAM_POLICY.TITLECREATE');
+                    this.descSub.next('ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE');
+                    break;
             }
 
             if (this.componentAction === PolicyComponentAction.MODIFY) {
@@ -101,6 +121,10 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                             break;
                         case PolicyComponentType.COMPLEXITY:
                             this.complexityData = data.toObject();
+                            break;
+                        case PolicyComponentType.IAM_POLICY:
+                            this.iamData = data.toObject();
+                            console.log(this.iamData);
                             break;
                     }
                 });
@@ -129,6 +153,10 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                 this.titleSub.next('ORG.POLICY.PWD_COMPLEXITY.TITLE');
                 this.descSub.next('ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION');
                 return this.orgService.GetPasswordComplexityPolicy();
+            case PolicyComponentType.IAM_POLICY:
+                this.titleSub.next('ORG.POLICY.IAM_POLICY.TITLECREATE');
+                this.descSub.next('ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE');
+                return this.orgService.GetMyOrgIamPolicy();
         }
     }
 
@@ -189,7 +217,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         this.lockoutData.maxAttempts,
                         this.lockoutData.showLockOutFailures,
                     ).then(() => {
-                        this.router.navigate(['orgs', this.orgId]);
+                        this.router.navigate(['org']);
                     }).catch(error => {
                         this.toast.showError(error.message);
                     });
@@ -201,7 +229,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
                     ).then(() => {
-                        this.router.navigate(['orgs', this.orgId]);
+                        this.router.navigate(['org']);
                     }).catch(error => {
                         this.toast.showError(error.message);
                     });
@@ -217,10 +245,26 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
                     ).then(() => {
-                        this.router.navigate(['orgs', this.orgId]);
+                        this.router.navigate(['org']);
                     }).catch(error => {
                         this.toast.showError(error.message);
                     });
+                    break;
+
+                case PolicyComponentType.IAM_POLICY:
+                    console.log(this.complexityData);
+                    const orgId = this.sessionStorage.getItem('organization');
+                    if (orgId) {
+                        this.adminService.CreateOrgIamPolicy(
+                            orgId,
+                            this.complexityData.description,
+                            this.complexityData.userLoginMustBeDomain,
+                        ).then(() => {
+                            this.router.navigate(['org']);
+                        }).catch(error => {
+                            this.toast.showError(error.message);
+                        });
+                    }
                     break;
             }
         } else if (this.componentAction === PolicyComponentAction.MODIFY) {
@@ -231,7 +275,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         this.lockoutData.maxAttempts,
                         this.lockoutData.showLockOutFailures,
                     ).then(() => {
-                        this.router.navigate(['orgs', this.orgId]);
+                        this.router.navigate(['org']);
                     }).catch(error => {
                         this.toast.showError(error.message);
                     });
@@ -243,7 +287,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         this.ageData.maxAgeDays,
                         this.ageData.expireWarnDays,
                     ).then(() => {
-                        this.router.navigate(['orgs', this.orgId]);
+                        this.router.navigate(['org']);
                     }).catch(error => {
                         this.toast.showError(error.message);
                     });
@@ -259,10 +303,26 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         this.complexityData.hasSymbol,
                         this.complexityData.minLength,
                     ).then(() => {
-                        this.router.navigate(['orgs', this.orgId]);
+                        this.router.navigate(['org']);
                     }).catch(error => {
                         this.toast.showError(error.message);
                     });
+                    break;
+
+                case PolicyComponentType.IAM_POLICY:
+                    console.log(this.complexityData);
+                    const orgId = this.sessionStorage.getItem('organization');
+                    if (orgId) {
+                        this.adminService.UpdateOrgIamPolicy(
+                            orgId,
+                            this.complexityData.description,
+                            this.complexityData.userLoginMustBeDomain,
+                        ).then(() => {
+                            this.router.navigate(['org']);
+                        }).catch(error => {
+                            this.toast.showError(error.message);
+                        });
+                    }
                     break;
             }
         }

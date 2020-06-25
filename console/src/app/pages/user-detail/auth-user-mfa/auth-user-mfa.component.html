@@ -3,8 +3,9 @@
         <div class="row" *ngFor="let mfa of mfaSubject | async">
             <span>{{'USER.MFA.TYPE.'+ mfa.type | translate}}</span>
             <span>{{'USER.MFA.STATE.'+ mfa.state | translate}}</span>
-            <button mat-icon-button (click)="deleteMFA(mfa.type)" matTooltip="{{'ACTIONS.DELETE' | translate}}">
-                <mat-icon>delete_outline</mat-icon>
+            <button mat-icon-button (click)="deleteMFA(mfa.type)" color="warn"
+                matTooltip="{{'ACTIONS.DELETE' | translate}}">
+                <i class="las la-trash"></i>
             </button>
         </div>
         <p class="row" *ngIf="error">{{error}}</p>

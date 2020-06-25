@@ -167,8 +167,8 @@
                         <button (click)="phoneEditState = true" mat-icon-button>
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button *ngIf="phone?.phone" (click)="deletePhone()" mat-icon-button>
-                            <mat-icon>delete_outline</mat-icon>
+                        <button color="warn" *ngIf="phone?.phone" (click)="deletePhone()" mat-icon-button>
+                            <i class="las la-trash"></i>
                         </button>
                     </div>
                 </ng-container>

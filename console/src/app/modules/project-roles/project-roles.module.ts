@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { ProjectRolesComponent } from './project-roles.component';
 
@@ -27,6 +28,7 @@ import { ProjectRolesComponent } from './project-roles.component';
         MatCheckboxModule,
         RouterModule,
         MatTooltipModule,
+        PipesModule,
         TranslateModule,
         MatMenuModule,
     ],

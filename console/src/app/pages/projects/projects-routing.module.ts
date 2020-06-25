@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from 'src/app/guards/auth.guard';
+import { RoleGuard } from 'src/app/guards/role.guard';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
@@ -14,6 +16,10 @@ const routes: Routes = [
     {
         path: 'create',
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['project.write'],
+        },
     },
     {
         path: ':id/grant/:grantId',

@@ -1,0 +1,24 @@
+<div class="groups">
+    <span class="header">{{ 'IAM.MEMBER.TITLE' | translate }}</span>
+    <span class="sub-header">{{ 'IAM.MEMBER.DESCRIPTION' | translate }}</span>
+    <div class="people">
+        <div class="img-list">
+            <ng-container *ngIf="totalResult < 10; else compact">
+                <ng-container *ngFor="let member of membersSubject | async">
+                    <div (click)="showDetail()" class="avatar-circle"
+                        matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
+                        <i class="avatar las la-user-circle"></i>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #compact>
+                <div (click)="showDetail()" class="avatar-circle" matTooltip="Click to show detail">
+                    <span>{{totalResult}}</span>
+                </div>
+            </ng-template>
+            <button class="add-img" (click)="openAddMember()" mat-icon-button aria-label="Edit contributors">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

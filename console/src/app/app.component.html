@@ -35,7 +35,10 @@
     </mat-menu>
     <span class="fill-space"></span>
 
-    <div matTooltip="IAM user" class="iamreadwrite"></div>
+    <ng-template appHasRole [appHasRole]="['iam.write']">
+        <div matTooltip="IAM Administrator" class="iamreadwrite"></div>
+    </ng-template>
+
     <div (clickOutside)="closeAccountCard()" class="icon-container">
         <div class="avatar-wrapper dontcloseonclick" (click)="showAccount = !showAccount">
             <div class="avatar-circle dontcloseonclick" [ngClass]="{'active': showAccount}">
@@ -61,6 +64,11 @@
                     [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/user/me']">
                     <i class="icon las la-user-circle"></i>
                     <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
+                </a>
+
+                <a *ngIf="iamreadwrite" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
+                    <i class="icon las la-gem"></i>
+                    <span class="label">{{'MENU.IAM' | translate}}</span>
                 </a>
 
                 <a *ngIf="showOrgSection" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">

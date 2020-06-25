@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProjectRole, User } from 'src/app/proto/generated/management_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -8,6 +9,7 @@ export enum CreationType {
     PROJECT_OWNED = 0,
     PROJECT_GRANTED = 1,
     ORG = 2,
+    IAM = 3,
 }
 @Component({
     selector: 'app-member-create-dialog',
@@ -23,6 +25,7 @@ export class MemberCreateDialogComponent {
     public memberRoleOptions: string[] = [];
     constructor(
         private projectService: ProjectService,
+        private adminService: AdminService,
         public dialogRef: MatDialogRef<MemberCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         toastService: ToastService,
@@ -38,6 +41,13 @@ export class MemberCreateDialogComponent {
             });
         } else if (this.creationType === CreationType.PROJECT_OWNED) {
             this.projectService.GetProjectMemberRoles().then(resp => {
+                this.memberRoleOptions = resp.toObject().rolesList;
+                console.log(this.memberRoleOptions);
+            }).catch(error => {
+                toastService.showError(error.message);
+            });
+        } else if (this.creationType === CreationType.IAM) {
+            this.adminService.GetIamMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
                 console.log(this.memberRoleOptions);
             }).catch(error => {

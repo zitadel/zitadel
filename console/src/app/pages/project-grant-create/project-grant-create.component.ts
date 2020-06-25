@@ -1,7 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Subscription } from 'rxjs';
 import { Org, ProjectRole } from 'src/app/proto/generated/management_pb';
 import { AuthService } from 'src/app/services/auth.service';
@@ -74,12 +73,6 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
                 this.toast.showError(error.message);
                 console.log(error);
             });
-    }
-
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 
     public selectRoles(roles: ProjectRole.AsObject[]): void {

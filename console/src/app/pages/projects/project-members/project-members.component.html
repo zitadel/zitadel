@@ -25,10 +25,10 @@
                 <span class="fill-space"></span>
                 <ng-template appHasRole
                     [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
-                    <button (click)="removeProjectMemberSelection()"
+                    <button (click)="removeProjectMemberSelection()" color="warn"
                         matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button
                         *ngIf="selection.hasValue()">
-                        <mat-icon>remove_circle</mat-icon>
+                        <i class="las la-trash"></i>
                     </button>
                 </ng-template>
                 <ng-template appHasRole

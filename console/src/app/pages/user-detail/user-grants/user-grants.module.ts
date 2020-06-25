@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { UserGrantsComponent } from './user-grants.component';
 
@@ -31,6 +32,7 @@ import { UserGrantsComponent } from './user-grants.component';
         MatCheckboxModule,
         MatTooltipModule,
         TranslateModule,
+        PipesModule,
     ],
     exports: [
         UserGrantsComponent,

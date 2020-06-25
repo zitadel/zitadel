@@ -14,10 +14,14 @@
         "PROJECTS_BUTTON": "Project Overview",
         "USERS": "Total control and monitorability",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
-        "USERS_BUTTON": "Show users"
+        "USERS_BUTTON": "Show users",
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Add new organizations or elect managers to do it for you.",
+        "IAM_BUTTON": "Manage Zitadel"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
+        "IAM":"IAM",
         "ORGANIZATION": "Organization",
         "PROJECT": "Projects",
         "USER": "Users",
@@ -189,6 +193,16 @@
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"log in with another account"
     },
+    "IAM": {
+        "DETAIL": {
+            "TITLE":"Identity and Access Management",
+            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, elect managers and define global policies."
+        },
+        "MEMBER": {
+            "TITLE":"Managers",
+            "DESCRIPTION":"Managers can add and edit organizations and make changes to their corresponding projects and apps"
+        }
+    },
     "ORG": {
         "PAGES": {
             "LIST": "Organizations",
@@ -218,7 +232,7 @@
         },
         "POLICY": {
             "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged solutions that save you time and ensure security",
+            "DESCRIPTION":"Pre-packaged solutions that to ensure security of your data",
             "PWD_COMPLEXITY": {
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
@@ -241,7 +255,13 @@
                 "TITLECREATE":"Create Password Lockout Policy",
                 "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to install this extention if you want to show retries or set a max try number."
             },
-            "BTN_INSTALL":"Install",
+            "IAM_POLICY": {
+                "TITLE":"IAM Access Preferences",
+                "DESCRIPTION":"Define access properties of your users",
+                "TITLECREATE":"Set IAM Access preferences",
+                "DESCRIPTIONCREATE":"Emails as username is not allowed for enabled UserLoginMustBeDomain"
+            },
+            "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
                 "DESCRIPTION":"Description",
@@ -253,7 +273,8 @@
                 "SHOWLOCKOUTFAILURES":"show lockout failures",
                 "MAXATTEMPTS":"Max Attempts",
                 "EXPIREWARNDAYS":"Expiration Warning after day",
-                "MAXAGEDAYS":"Max Age in days"
+                "MAXAGEDAYS":"Max Age in days",
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Uninstall Policy"
         }
@@ -432,7 +453,7 @@
         "en": "English"
     },
     "MEMBER":{
-        "ADD":"Add a contributor"
+        "ADD":"Add a manager"
     },
     "ROLES": {
         "ORG_OWNER": "Org Owner",
@@ -495,23 +516,24 @@
             "DESCRIPTION":"Here you can see the latest events that have affected a userchange"
         },
         "EVENTS": {
-            "org.added": "Org created",
-            "org.changed":"Org edited",
-            "org.member.added":"Org Member created",
-            "org.member.removed":"Org Member deleted",
-            "org.domain.added":"Org Domain added",
-            "org.domain.verified":"Org Domain verified",
-            "org.domain.primary.set":"Primary domain set",
-            "org.iam.policy.added":"IAM Policy added",
-            "project.added": "Project created",
-            "project.changed":"Project edited",
-            "project.deactivated":"Project deactivated",
-            "project.member.added":"Project Member created",
-            "project.member.removed":"Project Member deleted",
-            "project.role.added":"Role created",
-            "project.role.removed":"Role deleted",
-            "project.application.added":"App added",
-            "project.application.config.oidc.added":"OIDC config added",  
+            "org.added": "created",
+            "org.changed":"changed",
+            "org.member.added":"member created",
+            "org.member.removed":"member deleted",
+            "org.domain.added":"domain added",
+            "org.domain.verified":"domain verified",
+            "org.domain.primary.set":"set primary domain",
+            "org.domain.removed":"domain removed",
+            "org.iam.policy.added":"IAM policy added",
+            "project.added": "added",
+            "project.changed":"changed",
+            "project.deactivated":"deactivated",
+            "project.member.added":"added member",
+            "project.member.removed":"member deleted",
+            "project.role.added":"created role",
+            "project.role.removed":"deleted role",
+            "project.application.added":"added app",
+            "project.application.config.oidc.added":"added OIDC config",  
             "user.added":"User added",
             "user.initialization.code.added":"Init code added",
             "user.phone.code.added":"Phone code added",
@@ -545,7 +567,8 @@
             "user.password.check.succeeded":"Password check succeeded",
             "user.mfa.init.skipped":"MFA init skipped",
             "user.mfa.otp.added":"MFA OTP added",
-            "user.mfa.otp.verified":"MFA OTP verified"
+            "user.mfa.otp.verified":"MFA OTP verified",
+            "user.selfregistered":"self registered"
         }
     }
 }

@@ -25,6 +25,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { SearchUserAutocompleteModule } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { ProjectRolesModule } from '../../modules/project-roles/project-roles.module';
@@ -95,6 +96,7 @@ import { ProjectsComponent } from './projects.component';
         CardModule,
         MatTooltipModule,
         MatSortModule,
+        PipesModule,
         OrgContributorsModule,
         TranslateModule.forChild({
             loader: {

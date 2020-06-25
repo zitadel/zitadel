@@ -39,14 +39,20 @@
             <input matInput type="text" [formControl]="globalEmailControl" />
         </mat-form-field>
 
-        <button mat-icon-button (click)="getGlobalUser()">
-            <mat-icon>search</mat-icon>
+        <button color="primary" mat-icon-button (click)="getGlobalUser()">
+            <i class="las la-search"></i>
         </button>
     </div>
 
-    <p *ngIf="target == UserTarget.EXTERNAL && users.length > 0">{{'USER.SEARCH.FOUND' | translate}}: <span
-            *ngFor="let user of users; index as i">{{user.email}} <mat-icon class="sm-dlt" (click)="users.splice(i, 1)">
-                remove_circle</mat-icon></span></p>
+    <div *ngIf="target == UserTarget.EXTERNAL && users.length > 0">
+        <span class="found-label">{{'USER.SEARCH.FOUND' | translate}}:</span>
+        <div class="found-user-row" *ngFor="let user of users; index as i">
+            <span>{{user.email}}</span>
+            <button mat-icon-button>
+                <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
+            </button>
+        </div>
+    </div>
 
     <p class="target-desc">{{(target == UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
         <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>

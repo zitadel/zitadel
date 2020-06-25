@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, scan, take, tap } from 'rxjs/operators';
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
@@ -19,6 +18,7 @@ export enum ChangeType {
 export class ChangesComponent implements OnInit {
     @Input() public changeType: ChangeType = ChangeType.USER;
     @Input() public id: string = '';
+    @Input() public sortDirectionAsc: boolean = true;
     public errorMessage: string = '';
 
     // Source data
@@ -74,7 +74,6 @@ export class ChangesComponent implements OnInit {
                 break;
             case ChangeType.ORG: more = this.mgmtUserService.OrgChanges(this.id, 10, cursor);
                 break;
-
         }
 
         this.mapAndUpdate(more);
@@ -84,8 +83,8 @@ export class ChangesComponent implements OnInit {
     private getCursor(): number {
         const current = this._data.value;
         if (current.length) {
-            // return true ? current[0].sequence :
-            return current[current.length - 1].sequence;
+            return !this.sortDirectionAsc ? current[0].sequence :
+                current[current.length - 1].sequence;
         }
         return 0;
     }
@@ -125,10 +124,5 @@ export class ChangesComponent implements OnInit {
             }),
             take(1),
         ).subscribe();
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 }

@@ -9,6 +9,14 @@ import * as protoc$gen$swagger_options_annotations_pb from './protoc-gen-swagger
 import * as authoption_options_pb from './authoption/options_pb';
 
 import {
+  AddIamMemberRequest,
+  ChangeIamMemberRequest,
+  FailedEventID,
+  FailedEvents,
+  IamMember,
+  IamMemberRoles,
+  IamMemberSearchRequest,
+  IamMemberSearchResponse,
   Org,
   OrgID,
   OrgIamPolicy,
@@ -18,8 +26,11 @@ import {
   OrgSearchResponse,
   OrgSetUpRequest,
   OrgSetUpResponse,
+  RemoveIamMemberRequest,
   UniqueOrgRequest,
-  UniqueOrgResponse} from './admin_pb';
+  UniqueOrgResponse,
+  ViewID,
+  Views} from './admin_pb';
 
 export class AdminServiceClient {
   constructor (hostname: string,
@@ -103,6 +114,69 @@ export class AdminServiceClient {
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
+  getIamMemberRoles(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: IamMemberRoles) => void
+  ): grpcWeb.ClientReadableStream<IamMemberRoles>;
+
+  addIamMember(
+    request: AddIamMemberRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: IamMember) => void
+  ): grpcWeb.ClientReadableStream<IamMember>;
+
+  changeIamMember(
+    request: ChangeIamMemberRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: IamMember) => void
+  ): grpcWeb.ClientReadableStream<IamMember>;
+
+  removeIamMember(
+    request: RemoveIamMemberRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  searchIamMembers(
+    request: IamMemberSearchRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: IamMemberSearchResponse) => void
+  ): grpcWeb.ClientReadableStream<IamMemberSearchResponse>;
+
+  getViews(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: Views) => void
+  ): grpcWeb.ClientReadableStream<Views>;
+
+  clearView(
+    request: ViewID,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  getFailedEvents(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: FailedEvents) => void
+  ): grpcWeb.ClientReadableStream<FailedEvents>;
+
+  removeFailedEvent(
+    request: FailedEventID,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
 }
 
 export class AdminServicePromiseClient {
@@ -162,6 +236,51 @@ export class AdminServicePromiseClient {
 
   deleteOrgIamPolicy(
     request: OrgIamPolicyID,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
+  getIamMemberRoles(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<IamMemberRoles>;
+
+  addIamMember(
+    request: AddIamMemberRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<IamMember>;
+
+  changeIamMember(
+    request: ChangeIamMemberRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<IamMember>;
+
+  removeIamMember(
+    request: RemoveIamMemberRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
+  searchIamMembers(
+    request: IamMemberSearchRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<IamMemberSearchResponse>;
+
+  getViews(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<Views>;
+
+  clearView(
+    request: ViewID,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
+  getFailedEvents(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<FailedEvents>;
+
+  removeFailedEvent(
+    request: FailedEventID,
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
 

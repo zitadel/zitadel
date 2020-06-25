@@ -76,6 +76,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public saveNewOrgDomain(): void {
         this.orgService.AddMyOrgDomain(this.newDomain).then(domain => {
             this.domains.push(domain.toObject());
+            this.newDomain = '';
         });
     }
 

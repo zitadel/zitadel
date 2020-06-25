@@ -26,7 +26,7 @@
         <div class="card org" *ngIf="org">
             <p>{{org?.name}}</p>
             <span *ngIf="org.creationDate">created:
-                {{dateFromTimestamp(org.creationDate) | date: 'EEE dd. MMM, HH:mm'}}</span>
+                {{org.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'}}</span>
         </div>
     </ng-container>
 
