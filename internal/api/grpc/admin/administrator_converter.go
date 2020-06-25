@@ -1,11 +1,12 @@
-package grpc
+package admin
 
 import (
 	view_model "github.com/caos/zitadel/internal/view/model"
+	"github.com/caos/zitadel/pkg/admin/grpc"
 )
 
-func viewsFromModel(views []*view_model.View) []*View {
-	result := make([]*View, len(views))
+func viewsFromModel(views []*view_model.View) []*grpc.View {
+	result := make([]*grpc.View, len(views))
 	for i, view := range views {
 		result[i] = viewFromModel(view)
 	}
@@ -13,8 +14,8 @@ func viewsFromModel(views []*view_model.View) []*View {
 	return result
 }
 
-func failedEventsFromModel(failedEvents []*view_model.FailedEvent) []*FailedEvent {
-	result := make([]*FailedEvent, len(failedEvents))
+func failedEventsFromModel(failedEvents []*view_model.FailedEvent) []*grpc.FailedEvent {
+	result := make([]*grpc.FailedEvent, len(failedEvents))
 	for i, view := range failedEvents {
 		result[i] = failedEventFromModel(view)
 	}
@@ -22,16 +23,16 @@ func failedEventsFromModel(failedEvents []*view_model.FailedEvent) []*FailedEven
 	return result
 }
 
-func viewFromModel(view *view_model.View) *View {
-	return &View{
+func viewFromModel(view *view_model.View) *grpc.View {
+	return &grpc.View{
 		Database: view.Database,
 		ViewName: view.ViewName,
 		Sequence: view.CurrentSequence,
 	}
 }
 
-func failedEventFromModel(failedEvent *view_model.FailedEvent) *FailedEvent {
-	return &FailedEvent{
+func failedEventFromModel(failedEvent *view_model.FailedEvent) *grpc.FailedEvent {
+	return &grpc.FailedEvent{
 		Database:       failedEvent.Database,
 		ViewName:       failedEvent.ViewName,
 		FailedSequence: failedEvent.FailedSequence,
