@@ -191,6 +191,10 @@
         "ADDACCOUNT":"log in with another account"
     },
     "IAM": {
+        "DETAIL": {
+            "TITLE":"Identity and Access Management",
+            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, manage managers and define global policies."
+        },
         "MEMBER": {
             "TITLE":"IAM Manager",
             "DESCRIPTION":"IAM Manager"

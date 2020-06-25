@@ -52,6 +52,18 @@ export class AdminService {
         );
     }
 
+    // public async deleteOrgIamPolicy(
+    //     orgId: string,
+    // ): Promise<Empty> {
+    //     const req = new OrgIamPolicyID();
+    //     req.setOrgId(orgId);
+    //     return await this.request(
+    //         c => c.,
+    //         req,
+    //         f => f,
+    //     );
+    // }
+
     public async GetOrgIamPolicy(orgId: string): Promise<OrgIamPolicy> {
         const req = new OrgIamPolicyID();
         req.setOrgId(orgId);
@@ -78,7 +90,6 @@ export class AdminService {
             f => f,
         );
     }
-
 
     public async UpdateOrgIamPolicy(
         orgId: string,

@@ -19,6 +19,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 
+import { IamContributorsModule } from './iam-contributors/iam-contributors.module';
 import { IamMembersComponent } from './iam-members/iam-members.component';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamComponent } from './iam.component';
@@ -49,6 +50,7 @@ import { IamComponent } from './iam.component';
         FormsModule,
         TranslateModule,
         MatDialogModule,
+        IamContributorsModule,
     ],
     schemas: [NO_ERRORS_SCHEMA],
 })
