@@ -1361,6 +1361,7 @@ message ChangeRequest {
     string sec_id = 2;
     uint64 limit= 3;
     uint64 sequence_offset = 4;
+    bool asc = 5;
 }
 
 message Changes {

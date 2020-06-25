@@ -1077,7 +1077,7 @@ func TestChangesOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.OrgChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.OrgChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit, false)
 
 			org := &model.Org{}
 			if result != nil && len(result.Changes) > 0 {

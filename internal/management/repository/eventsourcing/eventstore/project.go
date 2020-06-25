@@ -2,6 +2,8 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -10,7 +12,6 @@ import (
 	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
-	"strings"
 
 	"github.com/caos/zitadel/internal/api/auth"
 	global_model "github.com/caos/zitadel/internal/model"
@@ -184,8 +185,8 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_m
 	}, nil
 }
 
-func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*proj_model.ProjectChanges, error) {
-	changes, err := repo.ProjectEvents.ProjectChanges(ctx, id, lastSequence, limit)
+func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
+	changes, err := repo.ProjectEvents.ProjectChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
@@ -235,8 +236,8 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	}, nil
 }
 
-func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64) (*proj_model.ApplicationChanges, error) {
-	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit)
+func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
+	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}

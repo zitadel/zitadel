@@ -289,6 +289,7 @@ func projectChangesToMgtAPI(changes *proj_model.ProjectChanges) (_ []*Change) {
 			ChangeDate: change.ChangeDate,
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,
+			Editor:     change.Modifier,
 			Data:       data,
 		}
 	}

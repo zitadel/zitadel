@@ -279,8 +279,8 @@ func (es *UserEventstore) UnlockUser(ctx context.Context, id string) (*usr_model
 	return model.UserToModel(repoExisting), nil
 }
 
-func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*usr_model.UserChanges, error) {
-	query := ChangesQuery(id, lastSequence)
+func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
+	query := ChangesQuery(id, lastSequence, limit, sortAscending)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -325,11 +325,16 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 	return changes, nil
 }
 
-func ChangesQuery(userID string, latestSequence uint64) *es_models.SearchQuery {
+func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
-		AggregateTypeFilter(model.UserAggregate).
-		LatestSequenceFilter(latestSequence).
-		AggregateIDFilter(userID)
+		AggregateTypeFilter(model.UserAggregate)
+	if !sortAscending {
+		query.OrderDesc() //TODO: configure from param
+	}
+
+	query.LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(userID).
+		SetLimit(limit)
 	return query
 }
 

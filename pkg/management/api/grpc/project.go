@@ -112,7 +112,7 @@ func (s *Server) SearchProjectRoles(ctx context.Context, in *ProjectRoleSearchRe
 }
 
 func (s *Server) ProjectChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	response, err := s.project.ProjectChanges(ctx, changesRequest.Id, 0, 0)
+	response, err := s.project.ProjectChanges(ctx, changesRequest.Id, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err
 	}
