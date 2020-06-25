@@ -55,6 +55,7 @@ func Test_Extract(t *testing.T) {
 		args    args
 		wantC   codes.Code
 		wantMsg string
+		wantID  string
 		wantOk  bool
 	}{
 		{
@@ -62,6 +63,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowAlreadyExists(nil, "id", "already exists")},
 			codes.AlreadyExists,
 			"already exists",
+			"id",
 			true,
 		},
 		{
@@ -69,6 +71,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowDeadlineExceeded(nil, "id", "deadline exceeded")},
 			codes.DeadlineExceeded,
 			"deadline exceeded",
+			"id",
 			true,
 		},
 		{
@@ -76,6 +79,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowInternal(nil, "id", "internal error")},
 			codes.Internal,
 			"internal error",
+			"id",
 			true,
 		},
 		{
@@ -83,6 +87,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowInvalidArgument(nil, "id", "invalid argument")},
 			codes.InvalidArgument,
 			"invalid argument",
+			"id",
 			true,
 		},
 		{
@@ -90,6 +95,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowNotFound(nil, "id", "not found")},
 			codes.NotFound,
 			"not found",
+			"id",
 			true,
 		},
 		{
@@ -97,6 +103,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowPermissionDenied(nil, "id", "permission denied")},
 			codes.PermissionDenied,
 			"permission denied",
+			"id",
 			true,
 		},
 		{
@@ -104,6 +111,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowPreconditionFailed(nil, "id", "precondition failed")},
 			codes.FailedPrecondition,
 			"precondition failed",
+			"id",
 			true,
 		},
 		{
@@ -111,6 +119,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowUnauthenticated(nil, "id", "unauthenticated")},
 			codes.Unauthenticated,
 			"unauthenticated",
+			"id",
 			true,
 		},
 		{
@@ -118,6 +127,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowUnavailable(nil, "id", "unavailable")},
 			codes.Unavailable,
 			"unavailable",
+			"id",
 			true,
 		},
 		{
@@ -125,6 +135,7 @@ func Test_Extract(t *testing.T) {
 			args{caos_errs.ThrowUnimplemented(nil, "id", "unimplemented")},
 			codes.Unimplemented,
 			"unimplemented",
+			"id",
 			true,
 		},
 		{
@@ -132,17 +143,21 @@ func Test_Extract(t *testing.T) {
 			args{errors.New("unknown")},
 			codes.Unknown,
 			"unknown",
+			"",
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotC, gotMsg, gotOk := Extract(tt.args.err)
+			gotC, gotMsg, gotID, gotOk := Extract(tt.args.err)
 			if gotC != tt.wantC {
 				t.Errorf("extract() gotC = %v, want %v", gotC, tt.wantC)
 			}
 			if gotMsg != tt.wantMsg {
 				t.Errorf("extract() gotMsg = %v, want %v", gotMsg, tt.wantMsg)
+			}
+			if gotID != tt.wantID {
+				t.Errorf("extract() gotID = %v, want %v", gotID, tt.wantID)
 			}
 			if gotOk != tt.wantOk {
 				t.Errorf("extract() gotOk = %v, want %v", gotOk, tt.wantOk)
