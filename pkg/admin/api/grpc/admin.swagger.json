@@ -19,6 +19,59 @@
     "application/grpc"
   ],
   "paths": {
+    "/failedevents": {
+      "get": {
+        "operationId": "GetFailedEvents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FailedEvents"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/failedevents/{database}/{view_name}/{failed_sequence}": {
+      "delete": {
+        "operationId": "RemoveFailedEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "database",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "view_name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "failed_sequence",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/healthz": {
       "get": {
         "summary": "Healthz returns status OK as soon as the service started",
@@ -31,6 +84,128 @@
             }
           }
         },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/members": {
+      "post": {
+        "operationId": "AddIamMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMember"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddIamMemberRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/members/_search": {
+      "post": {
+        "operationId": "SearchIamMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMemberSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IamMemberSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/members/roles": {
+      "get": {
+        "operationId": "GetIamMemberRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMemberRoles"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/members/{user_id}": {
+      "delete": {
+        "operationId": "RemoveIamMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "ChangeIamMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMember"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangeIamMemberRequest"
+            }
+          }
+        ],
         "tags": [
           "AdminService"
         ]
@@ -274,7 +449,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "type": "object"
+              "$ref": "#/definitions/protobufStruct"
             }
           }
         },
@@ -282,9 +457,68 @@
           "AdminService"
         ]
       }
+    },
+    "/views": {
+      "get": {
+        "operationId": "GetViews",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Views"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/views/{database}/{view_name}": {
+      "post": {
+        "operationId": "ClearView",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "database",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "view_name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
     }
   },
   "definitions": {
+    "protobufListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Repeated field of dynamically typed values."
+        }
+      },
+      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+    },
     "protobufNullValue": {
       "type": "string",
       "enum": [
@@ -292,6 +526,79 @@
       ],
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "protobufStruct": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Unordered map of dynamically typed values."
+        }
+      },
+      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
+    },
+    "protobufValue": {
+      "type": "object",
+      "properties": {
+        "null_value": {
+          "$ref": "#/definitions/protobufNullValue",
+          "description": "Represents a null value."
+        },
+        "number_value": {
+          "type": "number",
+          "format": "double",
+          "description": "Represents a double value."
+        },
+        "string_value": {
+          "type": "string",
+          "description": "Represents a string value."
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Represents a boolean value."
+        },
+        "struct_value": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Represents a structured value."
+        },
+        "list_value": {
+          "$ref": "#/definitions/protobufListValue",
+          "description": "Represents a repeated `Value`."
+        }
+      },
+      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
+    "v1AddIamMemberRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ChangeIamMemberRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "v1CreateOrgRequest": {
       "type": "object",
@@ -359,6 +666,39 @@
         }
       }
     },
+    "v1FailedEvent": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "type": "string"
+        },
+        "view_name": {
+          "type": "string"
+        },
+        "failed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "failure_count": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "error_message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1FailedEvents": {
+      "type": "object",
+      "properties": {
+        "failed_events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1FailedEvent"
+          }
+        }
+      }
+    },
     "v1Gender": {
       "type": "string",
       "enum": [
@@ -368,6 +708,148 @@
         "GENDER_DIVERSE"
       ],
       "default": "GENDER_UNSPECIFIED"
+    },
+    "v1IamMember": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1IamMemberRoles": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1IamMemberSearchKey": {
+      "type": "string",
+      "enum": [
+        "IAMMEMBERSEARCHKEY_UNSPECIFIED",
+        "IAMMEMBERSEARCHKEY_FIRST_NAME",
+        "IAMMEMBERSEARCHKEY_LAST_NAME",
+        "IAMMEMBERSEARCHKEY_EMAIL",
+        "IAMMEMBERSEARCHKEY_USER_ID"
+      ],
+      "default": "IAMMEMBERSEARCHKEY_UNSPECIFIED"
+    },
+    "v1IamMemberSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1IamMemberSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IamMemberSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IamMemberSearchQuery"
+          }
+        }
+      }
+    },
+    "v1IamMemberSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IamMemberView"
+          }
+        }
+      }
+    },
+    "v1IamMemberView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        }
+      }
     },
     "v1Org": {
       "type": "object",
@@ -553,6 +1035,23 @@
       ],
       "default": "ORGSTATE_UNSPECIFIED"
     },
+    "v1SearchMethod": {
+      "type": "string",
+      "enum": [
+        "SEARCHMETHOD_EQUALS",
+        "SEARCHMETHOD_STARTS_WITH",
+        "SEARCHMETHOD_CONTAINS",
+        "SEARCHMETHOD_EQUALS_IGNORE_CASE",
+        "SEARCHMETHOD_STARTS_WITH_IGNORE_CASE",
+        "SEARCHMETHOD_CONTAINS_IGNORE_CASE",
+        "SEARCHMETHOD_NOT_EQUALS",
+        "SEARCHMETHOD_GREATER_THAN",
+        "SEARCHMETHOD_LESS_THAN",
+        "SEARCHMETHOD_IS_ONE_OF",
+        "SEARCHMETHOD_LIST_CONTAINS"
+      ],
+      "default": "SEARCHMETHOD_EQUALS"
+    },
     "v1UniqueOrgResponse": {
       "type": "object",
       "properties": {
@@ -647,6 +1146,32 @@
         "USERSTATE_INITIAL"
       ],
       "default": "USERSTATE_UNSPECIFIED"
+    },
+    "v1View": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "type": "string"
+        },
+        "view_name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1Views": {
+      "type": "object",
+      "properties": {
+        "views": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1View"
+          }
+        }
+      }
     }
   }
 }

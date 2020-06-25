@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/handler"
 	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 
 	"github.com/caos/logging"
@@ -30,9 +31,11 @@ type Config struct {
 type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.OrgRepo
+	eventstore.IamRepository
+	eventstore.AdministratorRepo
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -83,7 +86,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 	err = setup.StartSetup(systemDefaults, eventstoreRepos).Execute(ctx)
 	logging.Log("SERVE-djs3R").OnError(err).Panic("failed to execute setup")
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, handler.EventstoreRepos{UserEvents: user})
 
 	return &EsRepository{
 		spooler: spool,
@@ -94,6 +97,16 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults) (
 			PolicyEventstore: policy,
 			View:             view,
 			SearchLimit:      conf.SearchLimit,
+		},
+		IamRepository: eventstore.IamRepository{
+			IamEventstore:  iam,
+			View:           view,
+			SystemDefaults: systemDefaults,
+			SearchLimit:    conf.SearchLimit,
+			Roles:          roles,
+		},
+		AdministratorRepo: eventstore.AdministratorRepo{
+			View: view,
 		},
 	}, nil
 }

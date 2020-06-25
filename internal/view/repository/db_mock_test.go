@@ -1,4 +1,4 @@
-package view
+package repository
 
 import (
 	"database/sql/driver"
@@ -28,6 +28,7 @@ var (
 	}
 	expectedRemoveByObject           = `DELETE FROM "%s" WHERE "%s"."%s" = \$1`
 	expectedRemoveByObjectMultiplePK = `DELETE FROM "%s" WHERE "%s"."%s" = \$1 AND "%s"."%s" = \$2`
+	expectedTruncate                 = `TRUNCATE %s;`
 	expectedSearch                   = `SELECT \* FROM "%s" OFFSET 0`
 	expectedSearchCount              = `SELECT count\(\*\) FROM "%s"`
 	expectedSearchLimit              = `SELECT \* FROM "%s" LIMIT %v OFFSET 0`
@@ -289,6 +290,20 @@ func (db *dbMock) expectRemoveErr(table, key, value string, err error) *dbMock {
 	return db
 }
 
+func (db *dbMock) expectTruncate(table string) *dbMock {
+	query := fmt.Sprintf(expectedTruncate, table)
+	db.mock.ExpectExec(query).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	return db
+}
+func (db *dbMock) expectTruncateErr(table string, err error) *dbMock {
+	query := fmt.Sprintf(expectedTruncate, table)
+	db.mock.ExpectExec(query).
+		WillReturnError(err)
+
+	return db
+}
 func (db *dbMock) expectGetSearchRequestNoParams(table string, resultAmount, total int) *dbMock {
 	query := fmt.Sprintf(expectedSearch, table)
 	queryCount := fmt.Sprintf(expectedSearchCount, table)

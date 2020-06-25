@@ -4,7 +4,7 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -54,10 +54,10 @@ func (v *View) ProcessedOrgDomainSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(orgDomainTable, eventSequence)
 }
 
-func (v *View) GetLatestOrgDomainFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestOrgDomainFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(orgDomainTable, sequence)
 }
 
-func (v *View) ProcessedOrgDomainFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedOrgDomainFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }
