@@ -14,7 +14,10 @@
         "PROJECTS_BUTTON": "Projekt Übersicht",
         "USERS": "Totale Kontrolle und Überwachbarkeit",
         "USERS_DESC": "Überwachen Sie Ihr Rollenkonzept in Echtzeit. Ergreifen Sie sofort Maßnahmen.",
-        "USERS_BUTTON": "Benutzer anzeigen"
+        "USERS_BUTTON": "Benutzer anzeigen",
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Fügen Sie neue Organisationen hinzu oder editieren Sie Ihre IAM Manager",
+        "IAM_BUTTON": "Zitadel verwalten"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",

@@ -14,7 +14,10 @@
         "PROJECTS_BUTTON": "Project Overview",
         "USERS": "Total control and monitorability",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
-        "USERS_BUTTON": "Show users"
+        "USERS_BUTTON": "Show users",
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Add new organizations or elect managers to do it for you.",
+        "IAM_BUTTON": "Manage Zitadel"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
