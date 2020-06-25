@@ -3,7 +3,7 @@ package model
 import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	global_model "github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type IamMemberSearchRequest iam_model.IamMemberSearchRequest
@@ -18,7 +18,7 @@ func (req IamMemberSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req IamMemberSearchRequest) GetSortingColumn() view.ColumnKey {
+func (req IamMemberSearchRequest) GetSortingColumn() repository.ColumnKey {
 	if req.SortingColumn == iam_model.IamMemberSearchKeyUnspecified {
 		return nil
 	}
@@ -29,15 +29,15 @@ func (req IamMemberSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req IamMemberSearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, len(req.Queries))
+func (req IamMemberSearchRequest) GetQueries() []repository.SearchQuery {
+	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
 		result[i] = IamMemberSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req IamMemberSearchQuery) GetKey() view.ColumnKey {
+func (req IamMemberSearchQuery) GetKey() repository.ColumnKey {
 	return IamMemberSearchKey(req.Key)
 }
 

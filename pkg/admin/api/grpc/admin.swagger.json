@@ -89,6 +89,128 @@
         ]
       }
     },
+    "/members": {
+      "post": {
+        "operationId": "AddIamMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMember"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddIamMemberRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/members/_search": {
+      "post": {
+        "operationId": "SearchIamMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMemberSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IamMemberSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/members/roles": {
+      "get": {
+        "operationId": "GetIamMemberRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMemberRoles"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/members/{user_id}": {
+      "delete": {
+        "operationId": "RemoveIamMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "operationId": "ChangeIamMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IamMember"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangeIamMemberRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/orgs/_isunique": {
       "get": {
         "summary": "ORG",
@@ -450,6 +572,34 @@
       },
       "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
     },
+    "v1AddIamMemberRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ChangeIamMemberRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "v1CreateOrgRequest": {
       "type": "object",
       "properties": {
@@ -558,6 +708,148 @@
         "GENDER_DIVERSE"
       ],
       "default": "GENDER_UNSPECIFIED"
+    },
+    "v1IamMember": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1IamMemberRoles": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1IamMemberSearchKey": {
+      "type": "string",
+      "enum": [
+        "IAMMEMBERSEARCHKEY_UNSPECIFIED",
+        "IAMMEMBERSEARCHKEY_FIRST_NAME",
+        "IAMMEMBERSEARCHKEY_LAST_NAME",
+        "IAMMEMBERSEARCHKEY_EMAIL",
+        "IAMMEMBERSEARCHKEY_USER_ID"
+      ],
+      "default": "IAMMEMBERSEARCHKEY_UNSPECIFIED"
+    },
+    "v1IamMemberSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1IamMemberSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IamMemberSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IamMemberSearchQuery"
+          }
+        }
+      }
+    },
+    "v1IamMemberSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IamMemberView"
+          }
+        }
+      }
+    },
+    "v1IamMemberView": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        }
+      }
     },
     "v1Org": {
       "type": "object",
@@ -742,6 +1034,23 @@
         "ORGSTATE_INACTIVE"
       ],
       "default": "ORGSTATE_UNSPECIFIED"
+    },
+    "v1SearchMethod": {
+      "type": "string",
+      "enum": [
+        "SEARCHMETHOD_EQUALS",
+        "SEARCHMETHOD_STARTS_WITH",
+        "SEARCHMETHOD_CONTAINS",
+        "SEARCHMETHOD_EQUALS_IGNORE_CASE",
+        "SEARCHMETHOD_STARTS_WITH_IGNORE_CASE",
+        "SEARCHMETHOD_CONTAINS_IGNORE_CASE",
+        "SEARCHMETHOD_NOT_EQUALS",
+        "SEARCHMETHOD_GREATER_THAN",
+        "SEARCHMETHOD_LESS_THAN",
+        "SEARCHMETHOD_IS_ONE_OF",
+        "SEARCHMETHOD_LIST_CONTAINS"
+      ],
+      "default": "SEARCHMETHOD_EQUALS"
     },
     "v1UniqueOrgResponse": {
       "type": "object",

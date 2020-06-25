@@ -4,7 +4,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	global_view "github.com/caos/zitadel/internal/view/repository"
 )
 
 const (

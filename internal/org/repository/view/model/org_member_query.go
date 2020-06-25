@@ -3,7 +3,6 @@ package model
 import (
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/view"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 

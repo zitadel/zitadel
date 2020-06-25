@@ -47,6 +47,6 @@ func Extract(err error) (c codes.Code, msg, id string, ok bool) {
 	case *caos_errs.UnimplementedError:
 		return codes.Unimplemented, caosErr.GetMessage(), caosErr.GetID(), true
 	default:
-		return codes.Unknown, err.Error(), false
+		return codes.Unknown, err.Error(), "", false
 	}
 }
