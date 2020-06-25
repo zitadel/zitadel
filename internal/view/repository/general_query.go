@@ -49,8 +49,5 @@ func (req GeneralSearchQuery) GetValue() interface{} {
 }
 
 func (key GeneralSearchKey) ToColumnName() string {
-	switch model.GeneralSearchKey(key) {
-	default:
-		return ""
-	}
+	return ""
 }
