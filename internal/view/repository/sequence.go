@@ -84,9 +84,5 @@ func ClearView(db *gorm.DB, truncateView, sequenceTable string) error {
 	if err != nil {
 		return err
 	}
-	err = SaveCurrentSequence(db, sequenceTable, truncateView, 0)
-	if err != nil {
-		return err
-	}
-	return nil
+	return SaveCurrentSequence(db, sequenceTable, truncateView, 0)
 }
