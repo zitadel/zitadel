@@ -344,7 +344,8 @@
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
             "EMAIL": "Email",
-            "ROLES": "Rollen"
+            "ROLES": "Rollen",
+            "USERID":"User Id"
         },
         "GRANT": {
             "TITLE": "Grants",
@@ -503,6 +504,7 @@
     },
     "CHANGES": {
         "LISTTITLE":"Letzte Änderungen",
+        "BOTTOM":"Ende",
         "ORG": {
             "TITLE":"Aktivität",
             "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die die Organisation betreffen"

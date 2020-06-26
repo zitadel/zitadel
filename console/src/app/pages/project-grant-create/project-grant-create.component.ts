@@ -42,15 +42,19 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
         this.routeSubscription.unsubscribe();
     }
 
-    public searchOrg(domain: any): void {
-        this.orgService.getOrgByDomainGlobal(domain.value).then((ret) => {
+    public searchOrg(domain: string): void {
+        console.log(domain);
+        this.orgService.getOrgByDomainGlobal(domain).then((ret) => {
             const tmp = ret.toObject();
+            console.log(ret.toObject());
             this.authService.GetActiveOrg().then((org) => {
+                console.log(org);
                 if (tmp !== org) {
                     this.org = tmp;
                 }
             });
             this.org = ret.toObject();
+            console.log(this.org);
         }).catch(error => {
             this.toast.showError(error.message);
         });

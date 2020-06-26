@@ -59,7 +59,7 @@
                         <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                     </a>
 
-                    <div class="divider"><span></span></div>
+                    <div *ngIf="authService.authenticationChanged | async" class="divider"><span></span></div>
 
                     <a *ngIf="iamreadwrite" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
                         <i class="icon las la-gem"></i>
@@ -71,7 +71,7 @@
                         <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
                     </a>
 
-                    <div class="divider"><span></span></div>
+                    <div *ngIf="showOrgSection" class="divider"><span></span></div>
 
                     <a *ngIf="showProjectSection" class="nav-item" [routerLinkActive]="['active']"
                         [routerLink]="[ '/projects']">
@@ -85,7 +85,7 @@
                         <span class="label">{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
                     </a>
 
-                    <div class="divider"><span></span></div>
+                    <div *ngIf="showProjectSection" class="divider"><span></span></div>
 
                     <a *ngIf="showUserSection" class="nav-item" [routerLinkActive]="['active']"
                         [routerLink]="[ '/users']" [routerLinkActiveOptions]="{ exact: true }">

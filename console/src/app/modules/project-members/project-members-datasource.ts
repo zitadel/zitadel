@@ -42,6 +42,7 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
                 finalize(() => this.loadingSubject.next(false)),
             ).subscribe(members => {
                 this.membersSubject.next(members);
+                console.log(members);
             });
         }
     }

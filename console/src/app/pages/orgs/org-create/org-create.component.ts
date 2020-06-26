@@ -68,7 +68,7 @@ export class OrgCreateComponent {
 
         this.orgForm = this.fb.group({
             name: ['', [Validators.required]],
-            domain: ['', [Validators.required]],
+            domain: [''],
         });
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
