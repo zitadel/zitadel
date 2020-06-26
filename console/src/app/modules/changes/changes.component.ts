@@ -118,7 +118,7 @@ export class ChangesComponent implements OnInit {
                 catchError(err => {
                     console.error(err);
                     this._loading.next(false);
-                    this.errorMessage = decodeURI(err.message);
+                    this.errorMessage = err.message;
                     this.bottom = true;
                     return of([]);
                 }),

@@ -3377,7 +3377,8 @@ proto.caos.zitadel.management.api.v1.ChangeRequest.toObject = function(includeIn
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     secId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     limit: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    sequenceOffset: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    sequenceOffset: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    asc: jspb.Message.getFieldWithDefault(msg, 5, false)
   };
 
   if (includeInstance) {
@@ -3429,6 +3430,10 @@ proto.caos.zitadel.management.api.v1.ChangeRequest.deserializeBinaryFromReader =
     case 4:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setSequenceOffset(value);
+      break;
+    case 5:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setAsc(value);
       break;
     default:
       reader.skipField();
@@ -3484,6 +3489,13 @@ proto.caos.zitadel.management.api.v1.ChangeRequest.serializeBinaryToWriter = fun
   if (f !== 0) {
     writer.writeUint64(
       4,
+      f
+    );
+  }
+  f = message.getAsc();
+  if (f) {
+    writer.writeBool(
+      5,
       f
     );
   }
@@ -3547,6 +3559,23 @@ proto.caos.zitadel.management.api.v1.ChangeRequest.prototype.getSequenceOffset =
 /** @param {number} value */
 proto.caos.zitadel.management.api.v1.ChangeRequest.prototype.setSequenceOffset = function(value) {
   jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional bool asc = 5;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.caos.zitadel.management.api.v1.ChangeRequest.prototype.getAsc = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 5, false));
+};
+
+
+/** @param {boolean} value */
+proto.caos.zitadel.management.api.v1.ChangeRequest.prototype.setAsc = function(value) {
+  jspb.Message.setProto3BooleanField(this, 5, value);
 };
 
 
