@@ -344,7 +344,8 @@
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
             "EMAIL": "Email",
-            "ROLES": "Rollen"
+            "ROLES": "Rollen",
+            "USERID":"User Id"
         },
         "GRANT": {
             "TITLE": "Grants",

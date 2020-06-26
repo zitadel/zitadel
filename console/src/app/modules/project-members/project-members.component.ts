@@ -1,13 +1,15 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { ProjectMember, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectType, ProjectView, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
 import { ProjectMembersDataSource } from './project-members-datasource';
 
 @Component({
@@ -25,9 +27,11 @@ export class ProjectMembersComponent implements AfterViewInit {
     public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
+    public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
 
-    constructor(private projectService: ProjectService,
+    constructor(
+        private projectService: ProjectService,
+        private dialog: MatDialog,
         private toast: ToastService,
         private route: ActivatedRoute) {
         this.route.params.subscribe(params => {
@@ -88,33 +92,29 @@ export class ProjectMembersComponent implements AfterViewInit {
     }
 
     public openAddMember(): void {
+        const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
+            data: {
+                creationType: CreationType.PROJECT_OWNED,
+                projectId: this.project.projectId,
+            },
+            width: '400px',
+        });
 
-        // TODO
-        // const dialogRef = this.dialog.open(ProjectMemberCreateDialogComponent, {
-        //     data: {
-        //         creationType: this.project.type ===
-        //             ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED :
-        //             ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED : undefined,
-        //         projectId: this.project.id,
-        //     },
-        //     width: '400px',
-        // });
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                const users: User.AsObject[] = resp.users;
+                const roles: string[] = resp.roles;
 
-        // dialogRef.afterClosed().subscribe(resp => {
-        //     if (resp) {
-        //         const users: User.AsObject[] = resp.users;
-        //         const roles: string[] = resp.roles;
-
-        //         if (users && users.length && roles && roles.length) {
-        //             Promise.all(users.map(user => {
-        //                 return this.projectService.AddProjectMember(this.project.id, user.id, roles);
-        //             })).then(() => {
-        //                 this.toast.showError('members added');
-        //             }).catch(error => {
-        //                 this.toast.showError(error.message);
-        //             });
-        //         }
-        //     }
-        // });
+                if (users && users.length && roles && roles.length) {
+                    Promise.all(users.map(user => {
+                        return this.projectService.AddProjectMember(this.project.projectId, user.id, roles);
+                    })).then(() => {
+                        this.toast.showError('members added');
+                    }).catch(error => {
+                        this.toast.showError(error.message);
+                    });
+                }
+            }
+        });
     }
 }

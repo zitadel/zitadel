@@ -90,7 +90,7 @@
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
                     </mat-form-field>
-                    <mat-form-field class="formfield">
+                    <!-- <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.ADDRESS.STREET' | translate }}</mat-label>
                         <input matInput formControlName="streetAddress" />
                         <mat-error *ngIf="streetAddress?.invalid && streetAddress?.errors?.required">
@@ -124,7 +124,7 @@
                         <mat-error *ngIf="country?.invalid && country?.errors?.required">
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
-                    </mat-form-field>
+                    </mat-form-field> -->
                 </div>
                 <div class="btn-container">
                     <button color="accent" [disabled]="userForm.invalid" type="submit"

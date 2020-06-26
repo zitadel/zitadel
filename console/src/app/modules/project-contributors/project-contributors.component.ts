@@ -56,6 +56,7 @@ export class ProjectContributorsComponent implements OnInit {
                 finalize(() => this.loadingSubject.next(false)),
             ).subscribe(members => {
                 this.membersSubject.next(members);
+                console.log(members);
             });
         }
     }
