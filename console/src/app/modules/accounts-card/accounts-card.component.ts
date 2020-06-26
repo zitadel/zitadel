@@ -39,6 +39,7 @@ export class AccountsCardComponent implements OnInit {
     }
 
     public closeCard(element: HTMLElement): void {
+        console.log(element.classList);
         if (!element.classList.contains('dontcloseonclick')) {
             this.close.emit();
         }

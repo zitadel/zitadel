@@ -47,6 +47,8 @@ export class AuthService {
                 return from(this.userService.GetMyUserProfile()).pipe(map(userprofile => userprofile.toObject()));
             }),
         );
+
+        this.user.subscribe(console.log);
     }
 
     public get authenticated(): boolean {

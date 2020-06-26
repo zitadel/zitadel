@@ -26,7 +26,8 @@
         "PROJECT": "Projekte",
         "USER": "Benutzer",
         "LOGOUT": "abmelden",
-        "NEWORG":"Neue Organisation"
+        "NEWORG":"Neue Organisation",
+        "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!"
     },
     "ACTIONS": {
         "SAVE": "speichern",

@@ -47,4 +47,9 @@
         @include mat-elevation(3);
         background: $primary-dark !important;
     }
+
+    .admin-line {
+        background: $primary-color;
+        color: white;
+    }
 }

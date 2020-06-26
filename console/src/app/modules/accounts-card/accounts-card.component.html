@@ -1,12 +1,13 @@
 <div class="card" appOutsideClick (clickOutside)="closeCard($event)">
-    <mat-icon class="avatar">account_circle</mat-icon>
+    <i class="avatar las la-user-circle"></i>
+
     <span class="u-name">{{profile?.firstName}} {{profile?.lastName}}</span>
     <span class="u-email">{{profile?.userName}}</span>
     <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
-    <button color="accent" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
+    <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
     <div class="l-accounts">
-        <mat-progress-bar *ngIf="loadingUsers" color="accent" mode="indeterminate"></mat-progress-bar>
+        <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let user of users" (click)="selectAccount(user.userName)">
             <i class="small-avatar las la-user-circle"></i>
 
@@ -29,5 +30,5 @@
         </a>
     </div>
 
-    <button color="accent" (click)="logout()" mat-stroked-button>logout everywhere</button>
+    <button color="primary" (click)="logout()" mat-stroked-button>logout everywhere</button>
 </div>

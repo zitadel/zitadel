@@ -26,7 +26,8 @@
         "PROJECT": "Projects",
         "USER": "Users",
         "LOGOUT": "Log out",
-        "NEWORG":"New Organization"
+        "NEWORG":"New Organization",
+        "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!"
     },
     "ACTIONS": {
         "SAVE": "Save",
