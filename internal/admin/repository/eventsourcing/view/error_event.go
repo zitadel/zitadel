@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	errTable = "admin_api.failed_event"
+	errTable = "admin_api.failed_events"
 )
 
 func (v *View) saveFailedEvent(failedEvent *repository.FailedEvent) error {
@@ -13,7 +13,7 @@ func (v *View) saveFailedEvent(failedEvent *repository.FailedEvent) error {
 }
 
 func (v *View) RemoveFailedEvent(database string, failedEvent *repository.FailedEvent) error {
-	return repository.RemoveFailedEvent(v.Db, database+".failed_event", failedEvent)
+	return repository.RemoveFailedEvent(v.Db, database+".failed_events", failedEvent)
 }
 
 func (v *View) latestFailedEvent(viewName string, sequence uint64) (*repository.FailedEvent, error) {
@@ -21,5 +21,5 @@ func (v *View) latestFailedEvent(viewName string, sequence uint64) (*repository.
 }
 
 func (v *View) AllFailedEvents(db string) ([]*repository.FailedEvent, error) {
-	return repository.AllFailedEvents(v.Db, db+".failed_event")
+	return repository.AllFailedEvents(v.Db, db+".failed_events")
 }
