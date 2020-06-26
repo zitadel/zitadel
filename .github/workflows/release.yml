@@ -48,6 +48,10 @@ jobs:
         working-directory: ./console
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - run: cd .. && go mod download
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
