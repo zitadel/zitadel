@@ -3,7 +3,7 @@
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-        "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
+        "SECURITYANDPRIVACY_DESC": "Verwalten Sie ihre Informationen und Sicherheitseinstellungen.",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
         "PROTECTION": "Organisationsrichtlinien",
         "PROTECTION_DESC": "Verwalten Sie Ihre Organisationsrichtlinien. Entdecken Sie einige vorgefertigte Lösungen, die Ihnen Zeit sparen und Sicherheit gewährleisten.",
@@ -14,13 +14,13 @@
         "USERS": "Totale Kontrolle und Überwachbarkeit",
         "USERS_DESC": "Überwachen Sie Ihr Rollenkonzept in Echtzeit. Ergreifen Sie sofort Maßnahmen.",
         "USERS_BUTTON": "Benutzer anzeigen",
-        "IAM": "Identity and Access Management",
-        "IAM_DESC": "Fügen Sie neue Organisationen hinzu oder editieren Sie Ihre IAM Manager",
-        "IAM_BUTTON": "ZITADEL verwalten"
+        "ADMIN": "Identity and Access Management",
+        "ADMIN_DESC": "Fügen Sie neue Organisationen hinzu oder editieren Sie Ihre IAM Manager",
+        "ADMIN_BUTTON": "ZITADEL verwalten"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
-        "IAM":"Administration",
+        "ADMIN":"Administration",
         "ORGANIZATION": "Organisation",
         "PROJECT": "Projekte",
         "USER": "Benutzer",
@@ -28,30 +28,30 @@
         "NEWORG":"Neue Organisation"
     },
     "ACTIONS": {
-        "SAVE": "speichern",
-        "NEW": "neu",
-        "CREATE": "erstellen",
-        "CONTINUE": "weiter",
-        "BACK": "zurück",
-        "CLOSE": "schliessen",
+        "SAVE": "Speichern",
+        "NEW": "Neu",
+        "CREATE": "Erstellen",
+        "CONTINUE": "Weiter",
+        "BACK": "Zurück",
+        "CLOSE": "Schliessen",
         "INFO": "Info",
         "OK": "Ok",
-        "VIEW": "öffnen",
-        "DELETE": "löschen",
-        "REMOVE":"entfernen",
-        "VERIFY":"verifizieren",
-        "FINISH":"abschliessen"
+        "VIEW": "Öffnen",
+        "DELETE": "Löschen",
+        "REMOVE":"Entfernen",
+        "VERIFY":"Verifizieren",
+        "FINISH":"Abschliessen"
     },
     "ERRORS": {
-        "REQUIRED": "Das Feld ist notwendig!"
+        "REQUIRED": "Bitte füllen Sie alle benötigten Felder aus!"
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
-        "DESCRIPTION": "Verwalten Sie ihre persönlichen Informationen",
+        "DESCRIPTION": "Verwalten Sie ihre persönlichen Informationen und Sicherheits Einstellungen",
         "PAGES": {
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
-            "DESCRIPTION": "Hier können Sie neue User anlegen sowie bereits erfasste Userdaten bearbeiten, activieren oder deaktivieren",
+            "DESCRIPTION": "Erfassen und Verwalten sie Benutzer in Ihrer Organisation",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
             "MY": "Meine Informationen",
@@ -63,11 +63,11 @@
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
-            "DESCRIPTION": "Fügen Sie einen zweiten Faktor hinzu um optimale Sicherheit zu gewährleisten!",
-            "MANAGE_DESCRIPTION": "Managen Sie die Zweifaktormethoden von dem jeweilgen Nutzer",
+            "DESCRIPTION": "Fügen Sie einen zusätzlichen Faktor hinzu um Ihren User optimal zu schützen.",
+            "MANAGE_DESCRIPTION": "Verwalten Sie die Multifaktor Merkmale Ihrer Benutzer.",
             "OTP": "OTP konfigurieren",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
-            "OTP_DIALOG_DESCRIPTION": "Scannen Sie den OTP code mit einer Authenticatorapp und geben Sie den erhaltenen Code unten ein!",
+            "OTP_DIALOG_DESCRIPTION": "Scannen Sie den QR Code mit einer Authenticator-App und verifizieren Sie den erhaltenen Code um OTP zu aktivieren.",
             "TYPE": {
                 "0":"Keine MFA definiert",
                 "1":"SMS",
@@ -75,22 +75,22 @@
             },
             "STATE": {
                 "0": "Kein Status",
-                "1":"Nicht bereit",
-                "2":"Bereit",
-                "3":"gelöscht"
+                "1": "Nicht bereit",
+                "2": "Bereit",
+                "3": "Gelöscht"
             }
         },
         "CREATE": {
-            "TITLE": "Create User",
-            "DESCRIPTION": "Geben Sie die erforderlichen Daten unten ein!",
+            "TITLE": "Neuen Benutzer erstellen",
+            "DESCRIPTION": "Geben Sie die erforderlichen Daten unten ein.",
             "NAMEANDEMAILSECTION":"Name und Email",
             "GENDERLANGSECTION":"Geschlecht und Sprache",
-            "ADDRESSANDPHONESECTION":"Addresse und Erreichbarkeit",
-            "PASSWORDSECTION":"Vordefiniertes Passwort setzen"
+            "PHONESECTION":"Telefonnummer",
+            "PASSWORDSECTION":"Setzen Sie ein initiales Passwort."
         },
         "CODEDIALOG": {
-            "TITLE":"Nummer verifizieren",
-            "DESCRIPTION":"Geben Sie ihren erhaltenen Code ein!",
+            "TITLE":"Telefonnummer verifizieren",
+            "DESCRIPTION":"Geben Sie ihren erhaltenen Code ein um die Nummer zu bestätigen.",
             "CODE":"Code"
         },
         "DATA": {
@@ -100,14 +100,13 @@
             "STATE2": "inaktiv",
             "STATE3": "gelöscht",
             "STATE4": "gesperrt",
-            "STATE5": "supend",
-            "STATE6": "initial"
+            "STATE5": "suspendiert",
+            "STATE6": "initiiert"
         },
         "PROFILE": {
             "TITLE": "Profil",
             "EMAIL": "Email",
-            "PHONE": "Phonenumber",
-            "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+            "PHONE": "Telefonnummer",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
@@ -124,48 +123,40 @@
             "CONFIRM": "Neues Passwort Wiederholung",
             "RESET": "Reset",
             "SET":"Password setzen",
-            "RESENDNOTIFICATION": "Ànderung mitteilen",
-            "REQUIRED": "Das Feld ist notwendig!",
+            "RESENDNOTIFICATION": "Passwort Reset Link senden.",
+            "REQUIRED": "Bitte prüfen Sie das alle notwendigen Felder befüllt sind.",
             "MINLENGTHERROR":"Passwort muss mindestens {{value}} lang sein",
             "NOTEQUAL":"Das Password muss übereinstimmen!"
         },
         "EMAIL": "Email",
         "PHONE": "Telefonnummer",
         "LOGINMETHODS": {
-            "TITLE": "Methoden zur Prüfung Ihrer Identität",
-            "DESCRIPTION": "Damit können wir bei der Anmeldung Ihre Identität bestätigen oder Sie kontaktieren, falls in Ihrem Konto verdächtige Aktivitäten festgestellt werden",
+            "TITLE": "Kontakt Informationen",
+            "DESCRIPTION": "Die Kontakt Informationen werden benötigt um Ihnen wichtige Informationen wie Passwort Reset Email zu senden.",
             "EMAIL": {
                 "TITLE": "Email",
-                "VALID": "validiert",
+                "VALID": "Validiert",
                 "RESEND": "Verifikationsmail versenden"
             },
             "PHONE": {
                 "TITLE": "Telefon",
-                "VALID": "validiert",
+                "VALID": "Validiert",
                 "RESEND": "Verifikationsnachricht versenden"
             },
             "RESENDCODE": "Code senden",
             "ENTERCODE":"Verifizieren",
             "ENTERCODE_DESC":"Code verifizieren"
         },
-        "ADDRESS": {
-            "TITLE": "Adresse",
-            "STREET": "Strasse/Nr",
-            "LOCALITY": "Ort",
-            "POSTAL_CODE": "Postleitzahl",
-            "REGION": "Kanton",
-            "COUNTRY": "Land"
-        },
         "GRANTS": {
-            "TITLE": "Grants",
+            "TITLE": "Benutzer Grants",
             "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden.",
             "CREATE": {
-                "TITLE": "User Grant erstellen",
+                "TITLE": "Benutzer Grant erstellen",
                 "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
             }
         },
         "VALIDATION": {
-            "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
+            "INVALIDPATTERN": "## TODO - Replace with Password Policy text - TODO ##",
             "REQUIRED": "Das Feld ist leer",
             "MINLENGTH":"Das Password muss mindestens {{requiredLength}} Zeichen lang sein!",
             "NOEMAIL":"Username darf keine email sein!",
