@@ -3,14 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 
+import { OwnedProjectDetailComponent } from '../projects/owned-project-detail/owned-project-detail.component';
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
-import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
-import { ProjectsComponent } from './projects.component';
+import { GrantedProjectsComponent } from './granted-projects.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: ProjectsComponent,
+        component: GrantedProjectsComponent,
         data: { animation: 'HomePage' },
     },
     {
@@ -56,4 +56,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class ProjectsRoutingModule { }
+export class GrantedProjectsRoutingModule { }
