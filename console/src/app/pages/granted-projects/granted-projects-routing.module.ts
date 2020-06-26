@@ -30,11 +30,6 @@ const routes: Routes = [
         loadChildren: () => import('../../modules/project-members/project-members.module').then(m => m.ProjectMembersModule),
     },
     {
-        path: ':projectid/apps',
-        data: { animation: 'AddPage' },
-        loadChildren: () => import('../apps/apps.module').then(m => m.AppsModule),
-    },
-    {
         path: ':projectid/roles/create',
         loadChildren: () => import('../project-role-create/project-role-create.module').then(m => m.ProjectRoleCreateModule),
 

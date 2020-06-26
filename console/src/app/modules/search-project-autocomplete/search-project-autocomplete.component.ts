@@ -48,7 +48,6 @@ export class SearchProjectAutocompleteComponent {
                 }),
                 // finalize(() => this.isLoading = false),
             ).subscribe((projects) => {
-                console.log(projects.toObject().resultList);
                 this.isLoading = false;
                 this.filteredProjects = projects.toObject().resultList;
             });

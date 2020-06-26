@@ -99,16 +99,13 @@ export class ChangesComponent implements OnInit {
         // Map snapshot with doc ref (needed for cursor)
         return from(col).pipe(
             tap((res: Changes) => {
-                console.log('more changes');
                 let values = res.toObject().changesList;
                 // If prepending, reverse the batch order
                 values = false ? values.reverse() : values;
 
                 // update source with new values, done loading
                 this._data.next(values);
-                console.log(values);
 
-                // console.log(values);
                 this._loading.next(false);
 
                 // no more values, mark done

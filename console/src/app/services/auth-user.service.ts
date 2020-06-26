@@ -121,7 +121,6 @@ export class AuthUserService {
         if (preferredLanguage) {
             req.setPreferredLanguage(preferredLanguage);
         }
-        console.log(req.toObject());
         return await this.request(
             c => c.updateMyUserProfile,
             req,
@@ -297,7 +296,6 @@ export class AuthUserService {
                         userRoles = ['user.resourceowner'];
                     }
                     this._roleCache = userRoles;
-                    console.log(roles);
                     return of(this.hasRoles(userRoles, roles, each));
                 }),
             );

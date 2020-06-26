@@ -90,7 +90,6 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
             this.totalResult = res.toObject().totalResult;
             this.dataSource.data = this.grantedProjectList;
             this.loadingSubject.next(false);
-            console.log(this.grantedProjectList);
         }).catch(error => {
             console.error(error);
             this.toast.showError(error.message);

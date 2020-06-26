@@ -15,7 +15,6 @@ export class AvatarComponent implements OnInit {
 
     ngOnInit(): void {
         if (!this.credentials) {
-            console.log(this.name);
             const split: string[] = this.name.split(' ');
             this.credentials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : '');
         }

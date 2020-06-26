@@ -101,7 +101,6 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
-                console.log(resp);
                 const users: User.AsObject[] = resp.users;
                 const roles: string[] = resp.roles;
 

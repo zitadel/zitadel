@@ -33,7 +33,6 @@ export class OrgMembersComponent implements AfterViewInit {
         private toast: ToastService) {
         this.orgService.GetMyOrg().then(org => {
             this.org = org.toObject();
-            console.log(this.org);
             this.dataSource = new ProjectMembersDataSource(this.orgService);
             this.dataSource.loadMembers(0, 25, 'asc');
         });

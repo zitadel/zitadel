@@ -80,7 +80,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
         this.expandedElement = this.expandedElement === grant ? null : grant;
         this.projectService.SearchProjectGrantMembers(this.projectId, grant.id, 10, 0).then(ret => {
             this.selectedGrantMembers = ret.toObject().resultList;
-            console.log(this.selectedGrantMembers);
         });
     }
 
@@ -94,13 +93,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
                 roleKeysList: grant.roleKeysList,
             },
             width: '400px',
-        });
-
-        console.log({
-            orgId: grant.grantedOrgId,
-            grantId: grant.id,
-            projectId: grant.projectId,
-            roleKeysList: grant.roleKeysList,
         });
 
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {

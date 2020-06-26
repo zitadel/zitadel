@@ -70,7 +70,6 @@ export class AuthUserDetailComponent implements OnDestroy {
         const validators: Validators[] = [Validators.required];
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
-            console.log(this.policy);
             if (this.policy.minLength) {
                 validators.push(Validators.minLength(this.policy.minLength));
             }
@@ -92,11 +91,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 newPassword: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
-
-            this.passwordForm.controls['newPassword'].valueChanges.subscribe(() => {
-                console.log(this.passwordForm.controls['newPassword'].errors);
-            });
-
         }).catch(error => {
             this.toast.showError(error.message);
             console.error(error.message);
@@ -128,14 +122,12 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public saveProfile(profileData: UserProfile.AsObject): void {
-        console.log(profileData);
         this.user.firstName = profileData.firstName;
         this.user.lastName = profileData.lastName;
         this.user.nickName = profileData.nickName;
         this.user.displayName = profileData.displayName;
         this.user.gender = profileData.gender;
         this.user.preferredLanguage = profileData.preferredLanguage;
-        console.log(this.user);
         this.userService
             .SaveMyUserProfile(
                 this.user.firstName,
@@ -196,7 +188,6 @@ export class AuthUserDetailComponent implements OnDestroy {
 
         dialogRef.afterClosed().subscribe(code => {
             if (code) {
-                console.log(code);
                 this.userService.VerifyMyUserPhone(code).then(() => {
                     this.toast.showInfo('Verified Phone');
                 }).catch(error => {
@@ -220,9 +211,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public resendPhoneVerification(): void {
-        console.log('resendverification');
         this.userService.ResendPhoneVerification().then((data: any) => {
-            console.log(data);
             this.toast.showInfo('Phoneverification was successfully sent!');
             this.email = data.toObject();
         }).catch(data => {
@@ -285,7 +274,6 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     private async getData(): Promise<void> {
         this.userService.GetMyUser().then(user => {
-            console.log(user.toObject());
             this.user = user.toObject();
         }).catch(err => {
             console.error(err);

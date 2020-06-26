@@ -47,8 +47,6 @@ export class AuthService {
                 return from(this.userService.GetMyUserProfile()).pipe(map(userprofile => userprofile.toObject()));
             }),
         );
-
-        this.user.subscribe(console.log);
     }
 
     public get authenticated(): boolean {
@@ -67,8 +65,6 @@ export class AuthService {
         this.config.issuer = config?.issuer || this.grpcService.issuer;
         this.config.clientId = config?.clientId || this.grpcService.clientid;
         this.config.customQueryParams = config?.customQueryParams;
-        console.log(this.config);
-
         this.oauthService.configure(this.config);
         // this.oauthService.setupAutomaticSilentRefresh();
         this.oauthService.strictDiscoveryDocumentValidation = false;

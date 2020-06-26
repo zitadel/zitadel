@@ -102,7 +102,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         }).catch(error => {
-            console.log('no password complexity policy defined!');
             this.passwordForm = this.fb.group({
                 password: ['', []],
                 confirmPassword: ['', [passwordConfirmValidator]],
@@ -159,7 +158,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this.user.displayName = profileData.displayName;
         this.user.gender = profileData.gender;
         this.user.preferredLanguage = profileData.preferredLanguage;
-        console.log(this.user);
         this.mgmtUserService
             .SaveUserProfile(
                 this.user.id,
@@ -178,7 +176,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
 
     public resendVerification(): void {
-        console.log('resendverification');
         this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('Email was successfully sent!');
         }).catch(data => {
@@ -287,7 +284,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     private async getData({ id }: Params): Promise<void> {
         this.isMgmt = true;
         this.mgmtUserService.GetUserByID(id).then(user => {
-            console.log(user.toObject());
             this.user = user.toObject();
         }).catch(err => {
             console.error(err);

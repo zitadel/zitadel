@@ -85,7 +85,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         if (this.projectId) {
             this.projectService.GetProjectById(id).then(proj => {
                 this.project = proj.toObject();
-                console.log(this.project);
             }).catch(error => {
                 this.toast.showError(error.message);
             });
