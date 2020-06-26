@@ -26,6 +26,7 @@ import { HasRoleModule } from '../../directives/has-role/has-role.module';
 import { CardModule } from '../../modules/card/card.module';
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { MetaLayoutModule } from '../../modules/meta-layout/meta-layout.module';
+import { ProjectContributorsModule } from '../../modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from '../../modules/project-roles/project-roles.module';
 import { SearchUserAutocompleteModule } from '../../modules/search-user-autocomplete/search-user-autocomplete.module';
 import { PipesModule } from '../../pipes/pipes.module';
@@ -45,6 +46,7 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
     imports: [
         CommonModule,
         GrantedProjectsRoutingModule,
+        ProjectContributorsModule,
         FormsModule,
         TranslateModule,
         ReactiveFormsModule,
