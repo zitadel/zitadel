@@ -25,10 +25,13 @@ const (
 
 type Renderer struct {
 	*renderer.Renderer
+	pathPrefix string
 }
 
-func CreateRenderer(staticDir http.FileSystem, cookieName string, defaultLanguage language.Tag) *Renderer {
-	r := new(Renderer)
+func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName string, defaultLanguage language.Tag) *Renderer {
+	r := &Renderer{
+		pathPrefix: pathPrefix,
+	}
 	tmplMapping := map[string]string{
 		tmplError:              "error.html",
 		tmplLogin:              "login.html",
@@ -52,55 +55,55 @@ func CreateRenderer(staticDir http.FileSystem, cookieName string, defaultLanguag
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
-			return path.Join(EndpointResources, file)
+			return path.Join(r.pathPrefix, EndpointResources, file)
 		},
 		"resourceThemeUrl": func(file, theme string) string {
-			return path.Join(EndpointResources, "themes", theme, file)
+			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
 		},
 		"loginUrl": func() string {
-			return EndpointLogin
+			return path.Join(r.pathPrefix, EndpointLogin)
 		},
 		"registerUrl": func(id string) string {
-			return fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id)
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id))
 		},
 		"loginNameUrl": func() string {
-			return EndpointLoginName
+			return path.Join(r.pathPrefix, EndpointLoginName)
 		},
 		"loginNameChangeUrl": func(id string) string {
-			return fmt.Sprintf("%s?%s=%s", EndpointLoginName, queryAuthRequestID, id)
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointLoginName, queryAuthRequestID, id))
 		},
 		"userSelectionUrl": func() string {
-			return EndpointUserSelection
+			return path.Join(r.pathPrefix, EndpointUserSelection)
 		},
 		"passwordResetUrl": func(id string) string {
-			return fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id)
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id))
 		},
 		"passwordUrl": func() string {
-			return EndpointPassword
+			return path.Join(r.pathPrefix, EndpointPassword)
 		},
 		"mfaVerifyUrl": func() string {
-			return EndpointMfaVerify
+			return path.Join(r.pathPrefix, EndpointMfaVerify)
 		},
 		"mfaPromptUrl": func() string {
-			return EndpointMfaPrompt
+			return path.Join(r.pathPrefix, EndpointMfaPrompt)
 		},
 		"mfaInitVerifyUrl": func() string {
-			return EndpointMfaInitVerify
+			return path.Join(r.pathPrefix, EndpointMfaInitVerify)
 		},
 		"mailVerificationUrl": func() string {
-			return EndpointMailVerification
+			return path.Join(r.pathPrefix, EndpointMailVerification)
 		},
 		"initPasswordUrl": func() string {
-			return EndpointInitPassword
+			return path.Join(r.pathPrefix, EndpointInitPassword)
 		},
 		"initUserUrl": func() string {
-			return EndpointInitUser
+			return path.Join(r.pathPrefix, EndpointInitUser)
 		},
 		"changePasswordUrl": func() string {
-			return EndpointChangePassword
+			return path.Join(r.pathPrefix, EndpointChangePassword)
 		},
 		"registrationUrl": func() string {
-			return EndpointRegister
+			return path.Join(r.pathPrefix, EndpointRegister)
 		},
 		"selectedLanguage": func(l string) bool {
 			return false

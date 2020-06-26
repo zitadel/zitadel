@@ -3,7 +3,6 @@ package admin
 import (
 	"google.golang.org/grpc"
 
-	admin_auth "github.com/caos/zitadel/internal/admin/auth"
 	"github.com/caos/zitadel/internal/admin/repository"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -12,12 +11,16 @@ import (
 	admin_grpc "github.com/caos/zitadel/pkg/admin/grpc"
 )
 
+const (
+	adminName = "Admin-API"
+)
+
 var _ admin_grpc.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
-	port          string
-	org           repository.OrgRepository
-	verifier      authz.TokenVerifier
+	port string
+	org  repository.OrgRepository
+	//verifier      authz.TokenVerifier
 	authZ         authz.Config
 	iam           repository.IamRepository
 	administrator repository.AdministratorRepository
@@ -35,7 +38,7 @@ func CreateServer(authZRepo *authz_repo.EsRepository, authZ authz.Config, repo r
 		administrator: repo,
 		repo:          repo,
 		authZ:         authZ,
-		verifier:      admin_auth.Start(authZRepo),
+		//verifier:      admin_auth.Start(authZRepo),
 	}
 }
 
@@ -43,8 +46,20 @@ func (s *Server) RegisterServer(grpcServer *grpc.Server) {
 	admin_grpc.RegisterAdminServiceServer(grpcServer, s)
 }
 
-func (s *Server) AuthInterceptor() grpc.UnaryServerInterceptor {
-	return admin_grpc.AdminService_Authorization_Interceptor(nil, nil)
+//func (s *Server) AuthInterceptor() grpc.UnaryServerInterceptor {
+//	return admin_grpc.AdminService_Authorization_Interceptor(nil, nil)
+//}
+
+func (s *Server) AppName() string {
+	return adminName
+}
+
+func (s *Server) MethodPrefix() string {
+	return admin_grpc.AdminService_MethodPrefix
+}
+
+func (s *Server) AuthMethods() authz.MethodMapping {
+	return admin_grpc.AdminService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.GatewayFunc {

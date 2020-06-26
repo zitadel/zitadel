@@ -8,6 +8,7 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	"github.com/caos/zitadel/internal/api/http"
 )
@@ -19,22 +20,25 @@ const (
 type Server interface {
 	Gateway
 	RegisterServer(*grpc.Server)
-	AuthInterceptor() grpc.UnaryServerInterceptor
+	//AuthInterceptor() grpc.UnaryServerInterceptor
 	//GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error) TODO: remove
+	AppName() string
+	MethodPrefix() string
+	AuthMethods() authz.MethodMapping
 }
 
-func CreateServer(servers []Server) *grpc.Server {
-	authInterceptors := make([]grpc.UnaryServerInterceptor, len(servers))
-	for i, server := range servers {
-		authInterceptors[i] = server.AuthInterceptor()
-	}
+func CreateServer(servers []Server, verifier *authz.TokenVerifier2, authConfig authz.Config) *grpc.Server {
+	//authInterceptors := make([]grpc.UnaryServerInterceptor, len(servers))
+	//for i, server := range servers {
+	//	authInterceptors[i] = server.AuthInterceptor()
+	//}
 	return grpc.NewServer(
 		middleware.TracingStatsServer(http.Healthz, http.Readiness, http.Validation),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(language.German),
 				grpc_middleware.ChainUnaryServer(
-					authInterceptors...,
+					middleware.AuthorizationInterceptor(verifier, authConfig),
 				),
 			),
 		),

@@ -29,7 +29,6 @@ type Login struct {
 }
 
 type Config struct {
-	Port                string
 	OidcAuthCallbackURL string
 	ZitadelURL          string
 	LanguageCookieName  string
@@ -48,9 +47,8 @@ const (
 	login = "LOGIN"
 )
 
-func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRepository) {
+func CreateLogin(config Config, authRepo *eventsourcing.EsRepository, prefix string) *Login {
 	login := &Login{
-		endpoint:            config.Port,
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
 		zitadelURL:          config.ZitadelURL,
 		authRepo:            authRepo,
@@ -64,9 +62,9 @@ func StartLogin(ctx context.Context, config Config, authRepo *eventsourcing.EsRe
 	logging.Log("CONFI-BHq2a").OnError(err).Panic("unable to create cacheInterceptor")
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 	login.router = CreateRouter(login, statikFS, csrf, cache, security)
-	login.renderer = CreateRenderer(statikFS, config.LanguageCookieName, config.DefaultLanguage)
+	login.renderer = CreateRenderer(prefix, statikFS, config.LanguageCookieName, config.DefaultLanguage)
 	login.parser = form.NewParser()
-	login.Listen(ctx)
+	return login
 }
 
 func csp() *middleware.CSP {
@@ -87,6 +85,10 @@ func csrfInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler)
 		csrf.CookieName(config.CookieName),
 		csrf.ErrorHandler(errorHandler),
 	), nil
+}
+
+func (l *Login) Handler() http.Handler {
+	return l.router
 }
 
 func (l *Login) Listen(ctx context.Context) {

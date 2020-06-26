@@ -3,7 +3,7 @@ package auth
 import (
 	"google.golang.org/grpc"
 
-	auth_util "github.com/caos/zitadel/internal/api/authz"
+	authz "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/auth/auth"
 	"github.com/caos/zitadel/internal/auth/repository"
@@ -14,17 +14,21 @@ import (
 
 var _ auth_grpc.AuthServiceServer = (*Server)(nil)
 
+const (
+	authName = "Auth-API"
+)
+
 type Server struct {
 	repo     repository.Repository
 	verifier *auth.TokenVerifier
-	authZ    auth_util.Config
+	authZ    authz.Config
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(authZRepo *authz_repo.EsRepository, authZ auth_util.Config, authRepo repository.Repository) *Server {
+func CreateServer(authZRepo *authz_repo.EsRepository, authZ authz.Config, authRepo repository.Repository) *Server {
 	return &Server{
 		repo:     authRepo,
 		authZ:    authZ,
@@ -36,8 +40,21 @@ func (s *Server) RegisterServer(grpcServer *grpc.Server) {
 	auth_grpc.RegisterAuthServiceServer(grpcServer, s)
 }
 
-func (s *Server) AuthInterceptor() grpc.UnaryServerInterceptor {
-	return auth_grpc.AuthService_Authorization_Interceptor(nil, nil)
+//
+//func (s *Server) AuthInterceptor() grpc.UnaryServerInterceptor {
+//	return auth_grpc.AuthService_Authorization_Interceptor(nil, nil)
+//}
+
+func (s *Server) AppName() string {
+	return authName
+}
+
+func (s *Server) MethodPrefix() string {
+	return auth_grpc.AuthService_MethodPrefix
+}
+
+func (s *Server) AuthMethods() authz.MethodMapping {
+	return auth_grpc.AuthService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.GatewayFunc {

@@ -3,15 +3,14 @@
 package grpc
 
 import (
-	"google.golang.org/grpc"
-
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
 /**
  * AuthService
  */
+
+const AuthService_MethodPrefix = "caos.zitadel.auth.api.v1.AuthService"
 
 var AuthService_AuthMethods = authz.MethodMapping{
 
@@ -129,8 +128,4 @@ var AuthService_AuthMethods = authz.MethodMapping{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
-}
-
-func AuthService_Authorization_Interceptor(verifier authz.TokenVerifier, authConf *authz.Config) grpc.UnaryServerInterceptor {
-	return middleware.AuthorizationInterceptor(verifier, authConf, AuthService_AuthMethods)
 }

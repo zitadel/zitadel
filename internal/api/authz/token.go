@@ -11,10 +11,10 @@ const (
 	BearerPrefix = "Bearer "
 )
 
-func verifyAccessToken(ctx context.Context, token string, t TokenVerifier) (string, string, string, error) {
+func verifyAccessToken(ctx context.Context, token string, t *TokenVerifier2, method string) (string, string, string, error) {
 	parts := strings.Split(token, BearerPrefix)
 	if len(parts) != 2 {
 		return "", "", "", errors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
 	}
-	return t.VerifyAccessToken(ctx, parts[1])
+	return t.VerifyAccessToken(ctx, parts[1], method)
 }

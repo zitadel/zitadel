@@ -16,6 +16,8 @@ import (
  * {{$s.Name}}
  */
 
+const {{$s.Name}}_MethodPrefix = "{{$.File.Package}}.{{$s.Name}}"
+
 var {{$s.Name}}_AuthMethods = authz.MethodMapping {
     {{ range $m := $s.Method}}
         {{ $mAuthOpt := option $m.Options "caos.zitadel.utils.v1.auth_option" }}
@@ -26,10 +28,6 @@ var {{$s.Name}}_AuthMethods = authz.MethodMapping {
             },
         {{end}}
     {{ end}}
-}
-
-func {{$s.Name}}_Authorization_Interceptor(verifier authz.TokenVerifier, authConf *authz.Config) grpc.UnaryServerInterceptor {
-    return middleware.AuthorizationInterceptor(verifier, authConf, {{$s.Name}}_AuthMethods)
 }
 
 {{ end }}

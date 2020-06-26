@@ -18,6 +18,10 @@ import (
 	mgmt_grpc "github.com/caos/zitadel/pkg/management/grpc"
 )
 
+const (
+	mgmtName = "Management-API"
+)
+
 var _ mgmt_grpc.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
@@ -56,7 +60,7 @@ func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Serve
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(defaults.DefaultLanguage),
-				mgmt_grpc.ManagementService_Authorization_Interceptor(s.verifier, &s.authZ),
+				//mgmt_grpc.ManagementService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),
 		),
 	)
@@ -68,8 +72,20 @@ func (s *Server) RegisterServer(grpcServer *grpc.Server) {
 	mgmt_grpc.RegisterManagementServiceServer(grpcServer, s)
 }
 
-func (s *Server) AuthInterceptor() grpc.UnaryServerInterceptor {
-	return mgmt_grpc.ManagementService_Authorization_Interceptor(nil, nil)
+//func (s *Server) AuthInterceptor() grpc.UnaryServerInterceptor {
+//	return mgmt_grpc.ManagementService_Authorization_Interceptor(nil, nil)
+//}
+
+func (s *Server) AppName() string {
+	return mgmtName
+}
+
+func (s *Server) MethodPrefix() string {
+	return mgmt_grpc.ManagementService_MethodPrefix
+}
+
+func (s *Server) AuthMethods() authz.MethodMapping {
+	return mgmt_grpc.ManagementService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.GatewayFunc {

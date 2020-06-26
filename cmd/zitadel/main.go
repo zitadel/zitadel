@@ -4,33 +4,38 @@ import (
 	"context"
 	"flag"
 
+	"github.com/caos/logging"
+
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
-	management2 "github.com/caos/zitadel/internal/api/grpc/management"
+	internal_authz "github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/grpc/admin"
+	"github.com/caos/zitadel/internal/api/grpc/auth"
+	"github.com/caos/zitadel/internal/api/grpc/management"
+	"github.com/caos/zitadel/internal/api/oidc"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/authz"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/login"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
-
-	"github.com/caos/logging"
-
-	internal_authz "github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/config"
 	"github.com/caos/zitadel/internal/notification"
 	tracing "github.com/caos/zitadel/internal/tracing/config"
-	"github.com/caos/zitadel/pkg/admin"
-	"github.com/caos/zitadel/pkg/auth"
+	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/pkg/console"
 )
 
 type Config struct {
 	API api.Config
+	UI  ui.Config
 
-	Mgmt         management2.Config
-	Auth         auth.Config
-	Login        login.Config
+	Admin        admin_es.Config
+	Mgmt         mgmt_es.Config
+	Auth         auth_es.Config
 	AuthZ        authz.Config
-	Admin        admin.Config
+	OIDC         oidc.OPHandlerConfig
+	Login        login.Config
 	Console      console.Config
 	Notification notification.Config
 
@@ -40,16 +45,19 @@ type Config struct {
 	SystemDefaults sd.SystemDefaults
 }
 
+var (
+	configPaths         = config.NewArrayFlags("authz.yaml", "startup.yaml", "system-defaults.yaml")
+	adminEnabled        = flag.Bool("admin", true, "enable admin api")
+	managementEnabled   = flag.Bool("management", true, "enable management api")
+	authEnabled         = flag.Bool("auth", true, "enable auth api")
+	oidcEnabled         = flag.Bool("oidc", true, "enable oidc api")
+	loginEnabled        = flag.Bool("login", true, "enable login ui")
+	consoleEnabled      = flag.Bool("console", true, "enable console ui")
+	notificationEnabled = flag.Bool("notification", true, "enable notification handler")
+)
+
 func main() {
-	configPaths := config.NewArrayFlags("authz.yaml", "startup.yaml", "system-defaults.yaml")
 	flag.Var(configPaths, "config-files", "paths to the config files")
-	managementEnabled := flag.Bool("management", true, "enable management api")
-	authEnabled := flag.Bool("auth", true, "enable auth api")
-	oidcEnabled := flag.Bool("oidc", true, "enable oidc api")
-	//loginEnabled := flag.Bool("login", true, "enable login ui")
-	adminEnabled := flag.Bool("admin", true, "enable admin api")
-	//consoleEnabled := flag.Bool("console", true, "enable console ui")
-	notificationEnabled := flag.Bool("notification", true, "enable notification handler")
 	flag.Parse()
 
 	conf := new(Config)
@@ -59,32 +67,54 @@ func main() {
 	ctx := context.Background()
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
-
 	var authRepo *auth_es.EsRepository
-	if *authEnabled || *oidcEnabled {
+	if *authEnabled || *oidcEnabled || *loginEnabled {
 		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, authZRepo)
-		logging.Log("API-9oRw6").OnError(err).Fatal("error starting auth repo")
+		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
-	api.Start(ctx, conf.API, conf.InternalAuthZ, authZRepo, conf.SystemDefaults, authRepo, *adminEnabled, *managementEnabled, *authEnabled, *oidcEnabled)
 
-	//var authRepo *eventsourcing.EsRepository
-	//if *authEnabled || *loginEnabled {
-	//	authRepo, err = eventsourcing.Start(conf.Auth.Repository, conf.InternalAuthZ, conf.SystemDefaults, authZRepo)
-	//	logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
-	//}
-	//if *authEnabled {
-	//	auth.Start(ctx, conf.Auth, authZRepo, conf.InternalAuthZ, conf.SystemDefaults, authRepo)
-	//}
-	//if *loginEnabled {
-	//	login.Start(ctx, conf.Login, conf.SystemDefaults, authRepo)
-	//}
+	startAPI(ctx, conf, authZRepo, authRepo)
+	startUI(ctx, conf, authRepo)
+
 	if *notificationEnabled {
 		notification.Start(ctx, conf.Notification, conf.SystemDefaults)
 	}
-	//if *consoleEnabled {
-	//	err = console.Start(ctx, conf.Console)
-	//	logging.Log("MAIN-3Dfuc").OnError(err).Fatal("error starting console ui")
-	//}
+
 	<-ctx.Done()
 	logging.Log("MAIN-s8d2h").Info("stopping zitadel")
+}
+
+func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) {
+	uis := ui.Create(conf.UI)
+	if *loginEnabled {
+		uis.RegisterHandler(ui.LoginHandler, login.Start(conf.Login, authRepo, ui.LoginHandler).Handler())
+	}
+	//uis.RegisterHandler()
+	uis.Start(ctx)
+}
+
+func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository) {
+	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo)
+	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
+	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
+		roles[i] = role.Role
+	}
+	if *adminEnabled {
+		adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
+		logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
+		apis.RegisterServer(ctx, admin.CreateServer(authZRepo, conf.InternalAuthZ, adminRepo))
+	}
+	if *managementEnabled {
+		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles)
+		logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
+		apis.RegisterServer(ctx, management.CreateServer(authZRepo, conf.InternalAuthZ, conf.SystemDefaults, managementRepo))
+	}
+	if *authEnabled {
+		apis.RegisterServer(ctx, auth.CreateServer(authZRepo, conf.InternalAuthZ, authRepo))
+	}
+	if *oidcEnabled {
+		op := oidc.NewProvider(ctx, conf.OIDC, authRepo)
+		apis.RegisterHandler("/oauth/v2", op.HttpHandler().Handler)
+	}
+	apis.Start(ctx)
 }

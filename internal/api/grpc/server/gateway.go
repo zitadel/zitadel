@@ -76,7 +76,7 @@ func CreateGatewayHandler(config grpc_util.Config) *GatewayHandler {
 	return &GatewayHandler{
 		mux:           http.NewServeMux(),
 		serverPort:    config.ServerPort,
-		gatewayPort:   config.ServerPort,
+		gatewayPort:   config.GatewayPort,
 		customHeaders: config.CustomHeaders,
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-func getUserMethodPermissions(ctx context.Context, t TokenVerifier, requiredPerm string, authConfig *Config) (context.Context, []string, error) {
+func getUserMethodPermissions(ctx context.Context, t *TokenVerifier2, requiredPerm string, authConfig Config) (context.Context, []string, error) {
 	ctxData := GetCtxData(ctx)
 	if ctxData.IsZero() {
 		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")
@@ -19,7 +19,7 @@ func getUserMethodPermissions(ctx context.Context, t TokenVerifier, requiredPerm
 	return context.WithValue(ctx, permissionsKey, permissions), permissions, nil
 }
 
-func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig *Config) []string {
+func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) []string {
 	resolvedPermissions := make([]string, 0)
 	for _, role := range grant.Roles {
 		resolvedPermissions = mapRoleToPerm(requiredPerm, role, authConfig, resolvedPermissions)
@@ -28,7 +28,7 @@ func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig *Config
 	return resolvedPermissions
 }
 
-func mapRoleToPerm(requiredPerm, actualRole string, authConfig *Config, resolvedPermissions []string) []string {
+func mapRoleToPerm(requiredPerm, actualRole string, authConfig Config, resolvedPermissions []string) []string {
 	roleName, roleContextID := SplitPermission(actualRole)
 	perms := authConfig.getPermissionsFromRole(roleName)
 
