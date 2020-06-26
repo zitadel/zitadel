@@ -19,7 +19,6 @@ export class ChangesComponent implements OnInit {
     @Input() public changeType: ChangeType = ChangeType.USER;
     @Input() public id: string = '';
     @Input() public sortDirectionAsc: boolean = true;
-    public errorMessage: string = '';
     public bottom: boolean = false;
 
     // Source data
@@ -118,7 +117,6 @@ export class ChangesComponent implements OnInit {
                 catchError(err => {
                     console.error(err);
                     this._loading.next(false);
-                    this.errorMessage = err.message;
                     this.bottom = true;
                     return of([]);
                 }),
