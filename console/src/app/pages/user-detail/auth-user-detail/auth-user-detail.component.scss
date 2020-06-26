@@ -82,60 +82,59 @@ h1 {
   }
   
 .method-col {
-  display: flex;
-  flex-direction: column;
-  margin: -.5rem;
-
-  .method-row {
     display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    padding: .5rem;
-    border-bottom: 1px solid #ffffff20;
-    flex-wrap: wrap;
+    flex-direction: column;
+    margin: -.5rem;
 
-    .label, .name {
-      margin-right: 1rem;
+    .method-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        padding: .5rem;
+        border-bottom: 1px solid #ffffff20;
+        flex-wrap: wrap;
+
+        .label, .name {
+        margin-right: 1rem;
+        }
+
+        .actions {
+            flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        }
+
+        .label {
+            flex: 1;
+            font-size: .9rem;
+            color: #818a8a;
+        }
+
+        mat-icon {
+            margin-right: .5rem;
+        }
+
+        .submit-button {
+            border-radius: .5rem;
+        }
+
+        .verify {
+            text-decoration: none;
+            font-size: .8rem;
+            color: #81868a;
+            border-radius: .5rem;
+            cursor: pointer;
+            word-wrap: none;
+            white-space: nowrap;
+            margin-right: 1rem;
+
+            &:hover {
+                color: white;
+                text-decoration: underline;
+            }
+        }
     }
-
-    .actions {
-        flex: 1;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    .label {
-    flex: 1;
-      font-size: .9rem;
-      color: #818a8a;
-      text-transform: uppercase;
-    }
-
-    mat-icon {
-      margin-right: .5rem;
-    }
-
-    .submit-button {
-      border-radius: .5rem;
-    }
-
-    .verify {
-      text-decoration: none;
-      font-size: .8rem;
-      color: #81868a;
-      border-radius: .5rem;
-      cursor: pointer;
-      word-wrap: none;
-      white-space: nowrap;
-      margin-right: 1rem;
-
-      &:hover {
-          color: white;
-          text-decoration: underline;
-      }
-    }
-  }
 }
 
 .col {

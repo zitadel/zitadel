@@ -34,7 +34,9 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-                "lodash"
+                "@angular/common/locales/de",
+                "src/app/proto/generated/*.js",
+                "src/app/proto/generated/**/*.js"
              ]
           },
           "configurations": {

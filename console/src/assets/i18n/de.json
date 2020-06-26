@@ -2,7 +2,6 @@
     "APP_NAME": "zitadel",
     "HOME": {
         "TITLE": "zitadel",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
         "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",

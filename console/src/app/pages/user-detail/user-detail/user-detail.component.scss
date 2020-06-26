@@ -74,21 +74,20 @@
         flex-wrap: wrap;
     
         .label, .name {
-          margin-right: 1rem;
+            margin-right: 1rem;
         }
     
         .actions {
             flex: 1;
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
         }
     
         .label {
-        flex: 1;
-          font-size: .9rem;
-          color: #818a8a;
-          text-transform: uppercase;
+            flex: 1;
+            font-size: .9rem;
+            color: #818a8a;
         }
     
         mat-icon {
