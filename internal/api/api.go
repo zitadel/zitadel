@@ -31,7 +31,7 @@ type Config struct {
 type API struct {
 	grpcServer     *grpc.Server
 	gatewayHandler *server.GatewayHandler
-	verifier       *authz.TokenVerifier2
+	verifier       *authz.TokenVerifier
 	serverPort     string
 }
 

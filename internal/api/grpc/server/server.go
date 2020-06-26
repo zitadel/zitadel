@@ -27,7 +27,7 @@ type Server interface {
 	AuthMethods() authz.MethodMapping
 }
 
-func CreateServer(servers []Server, verifier *authz.TokenVerifier2, authConfig authz.Config) *grpc.Server {
+func CreateServer(servers []Server, verifier *authz.TokenVerifier, authConfig authz.Config) *grpc.Server {
 	//authInterceptors := make([]grpc.UnaryServerInterceptor, len(servers))
 	//for i, server := range servers {
 	//	authInterceptors[i] = server.AuthInterceptor()

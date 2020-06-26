@@ -13,7 +13,7 @@ const (
 	authenticated = "authenticated"
 )
 
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier2, authConfig Config, requiredAuthOption Option, method string) (context.Context, error) {
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (context.Context, error) {
 	ctx, err := VerifyTokenAndWriteCtxData(ctx, token, orgID, verifier, method)
 	if err != nil {
 		return nil, err

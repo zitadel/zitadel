@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-func getUserMethodPermissions(ctx context.Context, t *TokenVerifier2, requiredPerm string, authConfig Config) (context.Context, []string, error) {
+func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPerm string, authConfig Config) (context.Context, []string, error) {
 	ctxData := GetCtxData(ctx)
 	if ctxData.IsZero() {
 		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")

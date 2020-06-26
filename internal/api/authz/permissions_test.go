@@ -42,7 +42,7 @@ func equalStringArray(a, b []string) bool {
 func Test_GetUserMethodPermissions(t *testing.T) {
 	type args struct {
 		ctx          context.Context
-		verifier     TokenVerifier
+		verifier     TokenVerifierOld
 		requiredPerm string
 		authConfig   *Config
 	}

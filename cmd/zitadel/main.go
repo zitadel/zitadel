@@ -102,15 +102,15 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 	if *adminEnabled {
 		adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, roles)
 		logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
-		apis.RegisterServer(ctx, admin.CreateServer(authZRepo, conf.InternalAuthZ, adminRepo))
+		apis.RegisterServer(ctx, admin.CreateServer(adminRepo))
 	}
 	if *managementEnabled {
 		managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles)
 		logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
-		apis.RegisterServer(ctx, management.CreateServer(authZRepo, conf.InternalAuthZ, conf.SystemDefaults, managementRepo))
+		apis.RegisterServer(ctx, management.CreateServer(managementRepo, conf.SystemDefaults))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(authZRepo, conf.InternalAuthZ, authRepo))
+		apis.RegisterServer(ctx, auth.CreateServer(authRepo))
 	}
 	if *oidcEnabled {
 		op := oidc.NewProvider(ctx, conf.OIDC, authRepo)

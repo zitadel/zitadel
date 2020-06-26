@@ -37,7 +37,7 @@ func Test_authorize(t *testing.T) {
 		req         interface{}
 		info        *grpc.UnaryServerInfo
 		handler     grpc.UnaryHandler
-		verifier    authz.TokenVerifier
+		verifier    authz.TokenVerifierOld
 		authConfig  *authz.Config
 		authMethods authz.MethodMapping
 	}

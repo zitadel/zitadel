@@ -12,13 +12,13 @@ import (
 	"github.com/caos/zitadel/internal/api/http"
 )
 
-func AuthorizationInterceptor(verifier *authz.TokenVerifier2, authConfig authz.Config) grpc.UnaryServerInterceptor {
+func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Config) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		return authorize(ctx, req, info, handler, verifier, authConfig)
 	}
 }
 
-func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier *authz.TokenVerifier2, authConfig authz.Config) (interface{}, error) {
+func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier *authz.TokenVerifier, authConfig authz.Config) (interface{}, error) {
 	authOpt, needsToken := verifier.CheckAuthMethod(info.FullMethod)
 	if !needsToken {
 		return handler(ctx, req)
