@@ -3,20 +3,20 @@
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Data protection and personalization",
-        "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",
-        "SECURITYANDPRIVACY_BUTTON": "Personalize data",
+        "SECURITYANDPRIVACY_DESC": "Manage your Information and Security settings",
+        "SECURITYANDPRIVACY_BUTTON": "Personalize Information and Security",
         "PROTECTION": "Organizational Policies",
         "PROTECTION_DESC": "Manage your organizational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
         "PROTECTION_BUTTON": "Explore",
-        "PROJECTS": "Full scalability and adaptability",
-        "PROJECTS_DESC": "Authorize others to use your own projects or define custom roles on eligible projects",
+        "PROJECTS": "Create and Manage your Applications with Projects",
+        "PROJECTS_DESC": "Authorize others to use your own projects or define custom roles on eligible projects.",
         "PROJECTS_BUTTON": "Project Overview",
         "USERS": "Total control and monitorability",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
         "USERS_BUTTON": "Show users",
         "IAM": "Identity and Access Management",
-        "IAM_DESC": "Add new organizations and define people who help you organize your organizations.",
-        "IAM_BUTTON": "Manage Zitadel"
+        "IAM_DESC": "Add new organizations and define people who help you organize your system.",
+        "IAM_BUTTON": "Manage ZITADEL"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
@@ -183,10 +183,10 @@
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"log in with another account"
     },
-    "IAM": {
+    "Administation": {
         "DETAIL": {
-            "TITLE":"Identity and Access Management",
-            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, elect managers and define global policies."
+            "TITLE":"Identity and Access Management Administration",
+            "DESCRIPTION":"This site is shows ZITADEL Management preferences. You can make changes to views, elect managers and define global policies."
         },
         "MEMBER": {
             "TITLE":"Managers",
@@ -311,7 +311,7 @@
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
             "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
+            "ZITADELPROJECT":"This belongs to ZITADEL project. If you change something, ZITADEL may not behave as intended!"
         },
         "STATE": {
             "TITLE":"State",
@@ -328,7 +328,7 @@
         "NAME": "Name",
         "MEMBER": {
             "TITLE": "Managers",
-            "TITLEDESC":"Managers can make changes on this very entity, based on their given role in zitadel.",
+            "TITLEDESC":"Managers can make changes on this very entity, based on their given role in ZITADEL.",
             "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage persisting ones.",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",

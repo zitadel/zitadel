@@ -16,7 +16,7 @@
         "USERS_BUTTON": "Benutzer anzeigen",
         "IAM": "Identity and Access Management",
         "IAM_DESC": "Fügen Sie neue Organisationen hinzu oder editieren Sie Ihre IAM Manager",
-        "IAM_BUTTON": "Zitadel verwalten"
+        "IAM_BUTTON": "ZITADEL verwalten"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
@@ -195,7 +195,7 @@
     "IAM": {
         "DETAIL": {
             "TITLE":"Identity and Access Management",
-            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, manage managers and define global policies."
+            "DESCRIPTION":"This site is shows ZITADEL Management preferences. You can make changes to views, manage managers and define global policies."
         }, 
         "MEMBER": {
             "TITLE":"IAM Members"
@@ -319,7 +319,7 @@
             "CREATE_DESC": "Geben Sie den Namen ein",
             "ROLE": "Rolle",
             "NOITEMS": "Keine Projekte",
-            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!"
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn Sie etwas ändern, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt!"
         },
         "STATE": {
             "TITLE":"Status",
