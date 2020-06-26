@@ -1,5 +1,7 @@
 <div class="card" appOutsideClick (clickOutside)="closeCard($event)">
-    <i class="avatar las la-user-circle"></i>
+    <app-avatar *ngIf="profile && (profile.displayName || (profile.firstName && profile.lastName))" class="avatar"
+        [name]="profile.displayName ? profile.displayName : (profile.firstName + ' '+ profile.lastName)" [size]="80">
+    </app-avatar>
 
     <span class="u-name">{{profile?.firstName}} {{profile?.lastName}}</span>
     <span class="u-email">{{profile?.userName}}</span>

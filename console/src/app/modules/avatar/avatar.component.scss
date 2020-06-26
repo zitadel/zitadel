@@ -8,9 +8,8 @@
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
-    font-size: 1rem;
 
-    &:hover, &.active {
+    &.active:hover  {
         border: 2px solid #81868a;
     }
 }

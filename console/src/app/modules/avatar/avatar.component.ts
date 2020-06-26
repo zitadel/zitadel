@@ -8,7 +8,8 @@ import { Component, Input, OnInit } from '@angular/core';
 export class AvatarComponent implements OnInit {
     @Input() name: string = '';
     @Input() credentials: string = '';
-    @Input() size: string = '1.5rem';
+    @Input() size: number = 24;
+    @Input() fontSize: number = 16;
     @Input() active: boolean = false;
     constructor() { }
 
@@ -17,6 +18,10 @@ export class AvatarComponent implements OnInit {
             console.log(this.name);
             const split: string[] = this.name.split(' ');
             this.credentials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : '');
+        }
+
+        if (this.size > 50) {
+            this.fontSize = 32;
         }
     }
 }

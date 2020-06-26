@@ -39,7 +39,7 @@
         <div (clickOutside)="closeAccountCard()" class="icon-container">
             <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
                 class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
-                [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" size="38px">
+                [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" [size]="38">
             </app-avatar>
             <app-accounts-card @accounts class="a_card  mat-elevation-z5" *ngIf="showAccount"
                 (close)="showAccount = false" [profile]="profile" [iamuser]="iamreadwrite">
