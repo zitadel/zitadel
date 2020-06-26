@@ -24,6 +24,7 @@
         "IAM":"IAM",
         "ORGANIZATION": "Organization",
         "PROJECT": "Projects",
+        "GRANTEDPROJECT":"Granted Projects",
         "USER": "Users",
         "LOGOUT": "Log out",
         "NEWORG":"New Organization",

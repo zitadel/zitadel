@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { NgModule, NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -36,9 +36,11 @@ import { GrantedProjectDetailComponent } from './granted-project-detail/granted-
 import { GrantedProjectGridComponent } from './granted-project-grid/granted-project-grid.component';
 import { GrantedProjectListComponent } from './granted-project-list/granted-project-list.component';
 import { GrantedProjectsRoutingModule } from './granted-projects-routing.module';
+import { GrantedProjectsComponent } from './granted-projects.component';
 
 @NgModule({
     declarations: [
+        GrantedProjectsComponent,
         GrantedProjectListComponent,
         GrantedProjectGridComponent,
         GrantedProjectDetailComponent,
@@ -84,5 +86,6 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
             },
         }),
     ],
+    schemas: [NO_ERRORS_SCHEMA],
 })
 export class GrantedProjectsModule { }

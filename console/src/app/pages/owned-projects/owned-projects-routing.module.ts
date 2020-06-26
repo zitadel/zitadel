@@ -3,14 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 
-import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
-import { ProjectsComponent } from './projects.component';
+import { OwnedProjectsComponent } from './owned-projects.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: ProjectsComponent,
+        component: OwnedProjectsComponent,
         data: { animation: 'HomePage' },
     },
     {
@@ -22,18 +21,13 @@ const routes: Routes = [
         },
     },
     {
-        path: ':id/grant/:grantId',
-        component: GrantedProjectDetailComponent,
-        data: { animation: 'HomePage' },
-    },
-    {
         path: ':id',
         component: OwnedProjectDetailComponent,
         data: { animation: 'HomePage' },
     },
     {
         path: ':projectid/members',
-        loadChildren: () => import('../projects/project-members/project-members.module').then(m => m.ProjectMembersModule),
+        loadChildren: () => import('../../modules/project-members/project-members.module').then(m => m.ProjectMembersModule),
     },
     {
         path: ':projectid/apps',

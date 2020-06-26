@@ -24,6 +24,7 @@
         "IAM":"IAM",
         "ORGANIZATION": "Organisation",
         "PROJECT": "Projekte",
+        "GRANTEDPROJECT":"Berechtigte Projekte",
         "USER": "Benutzer",
         "LOGOUT": "abmelden",
         "NEWORG":"Neue Organisation",

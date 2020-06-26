@@ -3,9 +3,9 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-projects',
-    templateUrl: './projects.component.html',
-    styleUrls: ['./projects.component.scss'],
+    selector: 'app-granted-projects',
+    templateUrl: './granted-projects.component.html',
+    styleUrls: ['./granted-projects.component.scss'],
 })
 export class GrantedProjectsComponent implements OnInit, OnDestroy {
     // public projectId: string = '';

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -36,12 +36,24 @@ import { OwnedProjectDetailComponent } from './owned-project-detail/owned-projec
 import { OwnedProjectGridComponent } from './owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
 import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
+import { OwnedProjectsComponent } from './owned-projects.component';
+import { ProjectApplicationGridComponent } from './project-application-grid/project-application-grid.component';
+import { ProjectApplicationsComponent } from './project-applications/project-applications.component';
+import {
+    ProjectGrantMembersCreateDialogComponent,
+} from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
+import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
     declarations: [
+        OwnedProjectsComponent,
         OwnedProjectListComponent,
         OwnedProjectGridComponent,
         OwnedProjectDetailComponent,
+        ProjectApplicationGridComponent,
+        ProjectApplicationsComponent,
+        ProjectGrantsComponent,
+        ProjectGrantMembersCreateDialogComponent,
     ],
     imports: [
         CommonModule,
@@ -84,5 +96,6 @@ import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
             },
         }),
     ],
+    schemas: [NO_ERRORS_SCHEMA],
 })
 export class OwnedProjectsModule { }

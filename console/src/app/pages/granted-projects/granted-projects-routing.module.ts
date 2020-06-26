@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 
-import { OwnedProjectDetailComponent } from '../projects/owned-project-detail/owned-project-detail.component';
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { GrantedProjectsComponent } from './granted-projects.component';
 
@@ -27,13 +26,8 @@ const routes: Routes = [
         data: { animation: 'HomePage' },
     },
     {
-        path: ':id',
-        component: OwnedProjectDetailComponent,
-        data: { animation: 'HomePage' },
-    },
-    {
         path: ':projectid/members',
-        loadChildren: () => import('./project-members/project-members.module').then(m => m.ProjectMembersModule),
+        loadChildren: () => import('../../modules/project-members/project-members.module').then(m => m.ProjectMembersModule),
     },
     {
         path: ':projectid/apps',
