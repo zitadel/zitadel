@@ -10,6 +10,7 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 
@@ -28,6 +29,7 @@ type ProjectRepo struct {
 	SearchLimit     uint64
 	ProjectEvents   *proj_event.ProjectEventstore
 	UserGrantEvents *usr_grant_event.UserGrantEventStore
+	UserEvents      *usr_event.UserEventstore
 	View            *view.View
 	Roles           []string
 }
@@ -190,6 +192,13 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 	if err != nil {
 		return nil, err
 	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
 	return changes, nil
 }
 
@@ -240,6 +249,13 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
 	}
 	return changes, nil
 }

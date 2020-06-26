@@ -299,7 +299,7 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 		change := &usr_model.UserChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 
