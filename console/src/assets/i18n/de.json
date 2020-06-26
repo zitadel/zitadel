@@ -1,8 +1,7 @@
 {
-    "APP_NAME": "zitadel",
+    "APP_NAME": "ZITADEL",
     "HOME": {
-        "TITLE": "zitadel",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+        "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
         "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
@@ -21,7 +20,7 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
-        "IAM":"IAM",
+        "IAM":"Administration",
         "ORGANIZATION": "Organisation",
         "PROJECT": "Projekte",
         "USER": "Benutzer",
@@ -31,24 +30,24 @@
     "ACTIONS": {
         "SAVE": "speichern",
         "NEW": "neu",
-        "CREATE": "create",
-        "CONTINUE": "Weiter",
+        "CREATE": "erstellen",
+        "CONTINUE": "weiter",
         "BACK": "zurück",
         "CLOSE": "schliessen",
         "INFO": "Info",
         "OK": "Ok",
-        "VIEW": "Ansehen",
+        "VIEW": "öffnen",
         "DELETE": "löschen",
         "REMOVE":"entfernen",
-        "VERIFY":"Verifizieren",
-        "FINISH":"Abschliessen"
+        "VERIFY":"verifizieren",
+        "FINISH":"abschliessen"
     },
     "ERRORS": {
         "REQUIRED": "Das Feld ist notwendig!"
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+        "DESCRIPTION": "Verwalten Sie ihre persönlichen Informationen",
         "PAGES": {
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
@@ -119,7 +118,7 @@
         },
         "PASSWORD": {
             "TITLE": "Passwort",
-            "DESCRIPTION": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
+            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
             "OLD": "Aktuelles Passwort",
             "NEW": "Neues Passwort",
             "CONFIRM": "Neues Passwort Wiederholung",

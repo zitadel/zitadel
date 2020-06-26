@@ -1,8 +1,7 @@
 {
-    "APP_NAME": "zitadel",
+    "APP_NAME": "ZITADEL",
     "HOME": {
-        "TITLE": "zitadel",
-        "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
+        "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Data protection and personalization",
         "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",
         "SECURITYANDPRIVACY_BUTTON": "Personalize data",
@@ -16,17 +15,17 @@
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
         "USERS_BUTTON": "Show users",
         "IAM": "Identity and Access Management",
-        "IAM_DESC": "Add new organizations or elect managers to do it for you.",
+        "IAM_DESC": "Add new organizations and define people who help you organize your organizations.",
         "IAM_BUTTON": "Manage Zitadel"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
-        "IAM":"IAM",
+        "ADMINISTRATION":"Administration",
         "ORGANIZATION": "Organization",
         "PROJECT": "Projects",
         "USER": "Users",
         "LOGOUT": "Log out",
-        "NEWORG":"New Organization"
+        "NEWORG":"Create Organization"
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -44,20 +43,20 @@
         "FINISH":"Finish"
     },
     "ERRORS": {
-        "REQUIRED": "The field is necessary"
+        "REQUIRED": "Some required fields are missing!"
     },
     "USER": {
         "TITLE": "Personal Information",
-        "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
+        "DESCRIPTION": "Manage your Information and Security settings.",
         "PAGES": {
             "LIST": "Users",
             "TITLE": "User",
-            "DESCRIPTION": "Here you can create new users or edit data that has already been entered.",
+            "DESCRIPTION": "Create new user in your organization and manage existing ones.",
             "DETAIL": "Detail",
             "CREATE": "Create",
             "MY": "My Informations",
             "LOGINNAMES":"Loginnames",
-            "LOGINNAMESDESC":"You can log into zitadel with these names",
+            "LOGINNAMESDESC":"These are your Login Names.",
             "COPY":"Copy to clipboard",
             "COPIED":"Copied to clipboard!",
             "NOUSER":"No User"
@@ -70,28 +69,28 @@
             "OTP_DIALOG_TITLE": "Add OTP",
             "OTP_DIALOG_DESCRIPTION": "Scan the OTP code with an authenticator app and enter the code below!",
             "TYPE": {
-                "0":"No mfa defined",
-                "1":"SMS",
-                "2":"OTP"
+                "0": "No MFA defined",
+                "1": "SMS",
+                "2": "OTP"
             },
             "STATE": {
                 "0": "No State",
-                "1":"Not Ready",
-                "2":"Ready",
-                "3":"Deleted"
+                "1": "Not Ready",
+                "2": "Ready",
+                "3": "Deleted"
             }
         },
         "CREATE": {
-            "TITLE": "Create User",
-            "DESCRIPTION": "Insert some information about the user below and submit!",
+            "TITLE": "Create a new User",
+            "DESCRIPTION": "Please provide the necesary information for the new user",
             "NAMEANDEMAILSECTION":"Name and Email",
             "GENDERLANGSECTION":"Gender and Language",
-            "ADDRESSANDPHONESECTION":"Address and reachability",
-            "PASSWORDSECTION":"Vordefiniertes Passwort setzen"
+            "PHONESECTION":"Phone",
+            "PASSWORDSECTION":"Predefined Password"
         },
         "CODEDIALOG": {
-            "TITLE":"Verify number",
-            "DESCRIPTION":"Enter your code here!",
+            "TITLE":"Verify Phone Number",
+            "DESCRIPTION":"Enter the code you recieved by message here",
             "CODE":"Code"
         },
         "DATA": {
@@ -108,7 +107,6 @@
             "TITLE": "Profile",
             "EMAIL": "Email",
             "PHONE": "Phonenumber",
-            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
@@ -119,22 +117,22 @@
         },
         "PASSWORD": {
             "TITLE": "Password",
-            "DESCRIPTION": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
+            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
             "OLD": "Current Password",
             "NEW": "New Password",
-            "CONFIRM": "Password Confirmation",
-            "RESET": "Reset",
-            "SET":"Set Password",
-            "RESENDNOTIFICATION": "Notify Change",
-            "REQUIRED": "The field is empty",
+            "CONFIRM": "Confirm new Password",
+            "RESET": "Reset current Password",
+            "SET":"Set new Password",
+            "RESENDNOTIFICATION": "Resend Password Reset Link",
+            "REQUIRED": "Some required fields are missing!",
             "MINLENGTHERROR":"Password has to be at least {{value}} characters long",
-            "NOTEQUAL":"The password is not equal!"
+            "NOTEQUAL":"The password provided is not equal!"
         },
         "EMAIL": "Email",
         "PHONE": "Phonenumber",
-        "LOGINMETHODS": {
-            "TITLE": "Methods to check your identity",
-            "DESCRIPTION": "This allows us to confirm your identity when you register or to contact you if suspicious activity is detected in your account",
+        "CONTACTMETHODS": {
+            "TITLE": "Contact Information",
+            "DESCRIPTION": "The provided information is used to send important information, like password reset Emails to you.",
             "EMAIL": {
                 "TITLE": "Email",
                 "VALID": "validated",
@@ -145,28 +143,20 @@
                 "VALID": "validated",
                 "RESEND": "Resend verification message"
             },
-            "RESENDCODE": "Code senden",
+            "RESENDCODE": "Resend Code",
             "ENTERCODE":"Verify",
             "ENTERCODE_DESC":"Verify number"
         },
-        "ADDRESS": {
-            "TITLE": "Address",
-            "STREET": "Street/No",
-            "LOCALITY": "Place",
-            "POSTAL_CODE": "Postal Code",
-            "REGION": "Region",
-            "COUNTRY": "Country"
-        },
         "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Define the operations and rights that are made available to the user",
+            "TITLE": "User Grants",
+            "DESCRIPTION": "Give this user control of certain projects",
             "CREATE": {
                 "TITLE": "Create User Grant",
                 "DESCRIPTION": "Search for the organization, the project and the corresponding project roles!"
             }
         },
         "VALIDATION": {
-            "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
+            "INVALIDPATTERN": "## TODO - Replace with Password Policy text - TODO ##",
             "REQUIRED": "The input field is empty",
             "MINLENGTH":"The password has to be at least {{requiredLength}} characters long!",
             "NOEMAIL":"Username can not be an email",
@@ -176,9 +166,9 @@
             "NUMBERERROR":"The password must include a number!"
         },
         "STATE": {
-            "0":"unbekannt",
-            "1":"aktiv",
-            "2":"abgelaufen"
+            "0":"unknown",
+            "1":"active",
+            "2":"expired"
         },
         "SEARCH":{
             "FOUND":"found"
