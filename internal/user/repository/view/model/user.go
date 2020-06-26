@@ -251,6 +251,9 @@ func (u *UserView) ComputeObject() {
 			u.State = int32(model.UserStateInitial)
 		}
 	}
+	if u.OTPState != int32(model.MfaStateReady) {
+		u.MfaMaxSetUp = int32(req_model.MfaLevelNotSetUp)
+	}
 	if u.OTPState == int32(model.MfaStateReady) {
 		u.MfaMaxSetUp = int32(req_model.MfaLevelSoftware)
 	}
