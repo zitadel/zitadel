@@ -2,6 +2,8 @@
 
 set -eux
 
+GOPATH=${GOPATH:-/home/runner/go} 
+
 GEN_PATH=${GOPATH}/src/github.com/caos/zitadel/console/src/app/proto/generated
 
 echo "Remove old files"

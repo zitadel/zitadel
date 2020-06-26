@@ -12,9 +12,9 @@ jobs:
 
   angular-test: # will be added later on
     runs-on: ubuntu-18.04
-    defaults:
-      run:
-        working-directory: ./console
+    # defaults:
+    #   run:
+    #     working-directory: ./console
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2-beta
@@ -23,7 +23,9 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: pwd && cd .. && ls -la
+    - run: go mod download
+    - run: ./build/console/generate-grpc.sh
+    - run: ls -la src/github.com/caos/zitadel/console/src/app/proto/generated
     #- run: npm ci
     #- run: npm test 
     #- run: echo "replace me with real test"
