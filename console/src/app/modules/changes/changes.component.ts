@@ -20,6 +20,7 @@ export class ChangesComponent implements OnInit {
     @Input() public id: string = '';
     @Input() public sortDirectionAsc: boolean = true;
     public errorMessage: string = '';
+    public bottom: boolean = false;
 
     // Source data
     private _done: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -93,33 +94,36 @@ export class ChangesComponent implements OnInit {
     private mapAndUpdate(col: Promise<Changes>): any {
         if (this._done.value || this._loading.value) { return; }
 
-        // loading
-        this._loading.next(true);
-
         // Map snapshot with doc ref (needed for cursor)
-        return from(col).pipe(
-            tap((res: Changes) => {
-                let values = res.toObject().changesList;
-                // If prepending, reverse the batch order
-                values = false ? values.reverse() : values;
+        if (!this.bottom) {
+            // loading
+            this._loading.next(true);
 
-                // update source with new values, done loading
-                this._data.next(values);
+            return from(col).pipe(
+                tap((res: Changes) => {
+                    let values = res.toObject().changesList;
+                    // If prepending, reverse the batch order
+                    values = false ? values.reverse() : values;
 
-                this._loading.next(false);
+                    // update source with new values, done loading
+                    this._data.next(values);
 
-                // no more values, mark done
-                if (!values.length) {
-                    this._done.next(true);
-                }
-            }),
-            catchError(err => {
-                console.error(err);
-                this._loading.next(false);
-                this.errorMessage = err.message;
-                return of([]);
-            }),
-            take(1),
-        ).subscribe();
+                    this._loading.next(false);
+
+                    // no more values, mark done
+                    if (!values.length) {
+                        this._done.next(true);
+                    }
+                }),
+                catchError(err => {
+                    console.error(err);
+                    this._loading.next(false);
+                    this.errorMessage = decodeURI(err.message);
+                    this.bottom = true;
+                    return of([]);
+                }),
+                take(1),
+            ).subscribe();
+        }
     }
 }

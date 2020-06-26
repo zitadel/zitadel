@@ -10,7 +10,6 @@ import {
     Gender,
     NotificationType,
     PasswordComplexityPolicy,
-    UserAddress,
     UserEmail,
     UserPhone,
     UserProfile,
@@ -47,14 +46,12 @@ function passwordConfirmValidator(c: AbstractControl): any {
 })
 export class UserDetailComponent implements OnInit, OnDestroy {
     public user!: UserView.AsObject;
-    // public email: UserEmail.AsObject = { email: '' } as any;
-    // public phone: UserPhone.AsObject = { phone: '' } as any;
-    public address: UserAddress.AsObject = { id: '' } as any;
+    // public address: UserAddress.AsObject = { id: '' } as any;
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
     public passwordForm!: FormGroup;
-    public addressForm!: FormGroup;
+    // public addressForm!: FormGroup;
 
     public isMgmt: boolean = false;
     private subscription: Subscription = new Subscription();
@@ -108,13 +105,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             });
         });
 
-        this.addressForm = this.fb.group({
-            streetAddress: [''],
-            postalCode: [''],
-            locality: [''],
-            region: [''],
-            country: [''],
-        });
+        // this.addressForm = this.fb.group({
+        //     streetAddress: [''],
+        //     postalCode: [''],
+        //     locality: [''],
+        //     region: [''],
+        //     country: [''],
+        // });
     }
 
     public ngOnInit(): void {
@@ -234,45 +231,45 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             });
     }
 
-    public saveAddress(): void {
-        if (!this.address.id) {
-            this.address.id = this.user.id;
-        }
+    // public saveAddress(): void {
+    //     if (!this.address.id) {
+    //         this.address.id = this.user.id;
+    //     }
 
-        this.address.streetAddress = this.streetAddress?.value;
-        this.address.postalCode = this.postalCode?.value;
-        this.address.locality = this.locality?.value;
-        this.address.region = this.region?.value;
-        this.address.country = this.country?.value;
+    //     this.address.streetAddress = this.streetAddress?.value;
+    //     this.address.postalCode = this.postalCode?.value;
+    //     this.address.locality = this.locality?.value;
+    //     this.address.region = this.region?.value;
+    //     this.address.country = this.country?.value;
 
-        this.mgmtUserService
-            .SaveUserAddress(this.address as UserAddress.AsObject).then((data: UserAddress) => {
-                this.toast.showInfo('Saved Address');
-                this.address = data.toObject();
-            }).catch(data => {
-                this.toast.showError(data.message);
-            });
-    }
+    //     this.mgmtUserService
+    //         .SaveUserAddress(this.address as UserAddress.AsObject).then((data: UserAddress) => {
+    //             this.toast.showInfo('Saved Address');
+    //             this.address = data.toObject();
+    //         }).catch(data => {
+    //             this.toast.showError(data.message);
+    //         });
+    // }
 
     public navigateBack(): void {
         this._location.back();
     }
 
-    public get streetAddress(): AbstractControl | null {
-        return this.addressForm.get('streetAddress');
-    }
-    public get postalCode(): AbstractControl | null {
-        return this.addressForm.get('postalCode');
-    }
-    public get locality(): AbstractControl | null {
-        return this.addressForm.get('locality');
-    }
-    public get region(): AbstractControl | null {
-        return this.addressForm.get('region');
-    }
-    public get country(): AbstractControl | null {
-        return this.addressForm.get('country');
-    }
+    // public get streetAddress(): AbstractControl | null {
+    //     return this.addressForm.get('streetAddress');
+    // }
+    // public get postalCode(): AbstractControl | null {
+    //     return this.addressForm.get('postalCode');
+    // }
+    // public get locality(): AbstractControl | null {
+    //     return this.addressForm.get('locality');
+    // }
+    // public get region(): AbstractControl | null {
+    //     return this.addressForm.get('region');
+    // }
+    // public get country(): AbstractControl | null {
+    //     return this.addressForm.get('country');
+    // }
 
     public get password(): AbstractControl | null {
         return this.passwordForm.get('password');
@@ -288,10 +285,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         }).catch(err => {
             console.error(err);
         });
-        // this.profile = (await this.mgmtUserService.GetUserProfile(id)).toObject();
-        // this.email = (await this.mgmtUserService.GetUserEmail(id)).toObject();
-        // this.phone = (await this.mgmtUserService.GetUserPhone(id)).toObject();
-        this.address = (await this.mgmtUserService.GetUserAddress(id)).toObject();
-        this.addressForm.patchValue(this.address);
+        // this.address = (await this.mgmtUserService.GetUserAddress(id)).toObject();
+        // this.addressForm.patchValue(this.address);
     }
 }

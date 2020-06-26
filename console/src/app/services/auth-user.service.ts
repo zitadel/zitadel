@@ -144,9 +144,9 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserEmail(email: UserEmail.AsObject): Promise<UserEmail> {
+    public async SaveMyUserEmail(email: string): Promise<UserEmail> {
         const req = new UpdateUserEmailRequest();
-        req.setEmail(email.email);
+        req.setEmail(email);
         return await this.request(
             c => c.changeMyUserEmail,
             req,
@@ -184,9 +184,9 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserPhone(phone: UserPhone.AsObject): Promise<UserPhone> {
+    public async SaveMyUserPhone(phone: string): Promise<UserPhone> {
         const req = new UpdateUserPhoneRequest();
-        req.setPhone(phone.phone);
+        req.setPhone(phone);
         return await this.request(
             c => c.changeMyUserPhone,
             req,

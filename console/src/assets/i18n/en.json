@@ -570,6 +570,7 @@
             "user.mfa.init.skipped":"MFA init skipped",
             "user.mfa.otp.added":"MFA OTP added",
             "user.mfa.otp.verified":"MFA OTP verified",
+            "user.mfa.otp.removed":"MFA OTP removed",
             "user.selfregistered":"self registered"
         }
     }
