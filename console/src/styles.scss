@@ -188,26 +188,35 @@ body {
     "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
+
 .max-width-container {
-  max-width: 1350px;
-  padding: 0 1.5rem;
-  padding-top: 4rem;
-  padding-left: 4rem;
-
-  @media only screen and (min-width: 1024px) {
-    max-width: 1120px;
-  }
-
-  @media only screen and (min-width: 899px) {
-    max-width: 899px;
-  }
-}
-
-.enlarged-container {
+    max-width: 1350px;
     padding: 0 1.5rem;
     padding-top: 4rem;
     padding-left: 4rem;
-}
+  
+    @media only screen and (min-width: 1024px) {
+      max-width: 1120px;
+    }
+  
+    @media only screen and (min-width: 899px) {
+      max-width: 899px;
+    }
+  
+    @media only screen and (max-width: 500px) {
+      padding-left: 1.5rem;
+    }
+  }
+  
+  .enlarged-container {
+      padding: 0 1.5rem;
+      padding-top: 4rem;
+      padding-left: 4rem;
+  
+      @media only screen and (max-width: 500px) {
+          padding-left: 1.5rem;
+      }
+  }
 
 .mat-dialog-container {
   border-radius: 0.5rem;
