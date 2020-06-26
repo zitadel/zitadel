@@ -4,13 +4,12 @@ import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
-import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
-import { ProjectsComponent } from './projects.component';
+import { GrantedProjectsComponent } from './granted-projects.component';
 
 const routes: Routes = [
     {
         path: '',
-        component: ProjectsComponent,
+        component: GrantedProjectsComponent,
         data: { animation: 'HomePage' },
     },
     {
@@ -27,18 +26,8 @@ const routes: Routes = [
         data: { animation: 'HomePage' },
     },
     {
-        path: ':id',
-        component: OwnedProjectDetailComponent,
-        data: { animation: 'HomePage' },
-    },
-    {
         path: ':projectid/members',
-        loadChildren: () => import('./project-members/project-members.module').then(m => m.ProjectMembersModule),
-    },
-    {
-        path: ':projectid/apps',
-        data: { animation: 'AddPage' },
-        loadChildren: () => import('../apps/apps.module').then(m => m.AppsModule),
+        loadChildren: () => import('../../modules/project-members/project-members.module').then(m => m.ProjectMembersModule),
     },
     {
         path: ':projectid/roles/create',
@@ -56,4 +45,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class ProjectsRoutingModule { }
+export class GrantedProjectsRoutingModule { }

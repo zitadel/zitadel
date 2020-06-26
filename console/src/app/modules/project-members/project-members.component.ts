@@ -33,7 +33,6 @@ export class ProjectMembersComponent implements AfterViewInit {
         this.route.params.subscribe(params => {
             this.projectService.GetProjectById(params.projectid).then(project => {
                 this.project = project.toObject();
-                console.log(this.project);
                 this.dataSource = new ProjectMembersDataSource(this.projectService);
                 this.dataSource.loadMembers(this.project, this.projectType, 0, 25, 'asc');
             });

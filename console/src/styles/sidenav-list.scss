@@ -2,7 +2,9 @@
 
 @mixin sidenav-list-theme($theme) {
     $primary: map-get($theme, primary);
+    $accent: map-get($theme, accent);
     $primary-color: mat-color($primary, 500);
+    $accent-color: mat-color($accent, 500);
     $primary-dark: mat-color($primary, A900);
 
     .mat-menu-item {
@@ -46,5 +48,30 @@
     .root-header {
         @include mat-elevation(3);
         background: $primary-dark !important;
+    }
+
+    .admin-line {
+        background: $accent-color;
+        color: white;
+
+        // &::after {
+        //     content: '';
+        //     position: absolute;
+        //     width: 0;
+        //     bottom: 0;
+        //     right: 0;
+        //     border-bottom: 20px solid $primary-dark;
+        //     border-left: 20px solid transparent;
+        // }
+
+        &::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            bottom: 0;
+            left: 0;
+            border-bottom: 20px solid $primary-dark;
+            border-right: 20px solid transparent;
+        }
     }
 }

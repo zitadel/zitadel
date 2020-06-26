@@ -25,6 +25,7 @@ import { AppComponent } from './app.component';
 import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
+import { AvatarModule } from './modules/avatar/avatar.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
@@ -102,6 +103,7 @@ export const authConfig: AuthConfig = {
         MatToolbarModule,
         MatMenuModule,
         MatSnackBarModule,
+        AvatarModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ],
     providers: [

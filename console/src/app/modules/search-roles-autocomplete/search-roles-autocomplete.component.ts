@@ -48,11 +48,9 @@ export class SearchRolesAutocompleteComponent {
                     return from(this.projectService.SearchProjectRoles(this.projectId, 10, 0, [query]));
                 }),
             ).subscribe((roles) => {
-                console.log(roles.toObject().resultList);
                 this.isLoading = false;
                 this.filteredRoles = roles.toObject().resultList;
             }, error => {
-                console.log(error);
                 this.isLoading = false;
             });
     }

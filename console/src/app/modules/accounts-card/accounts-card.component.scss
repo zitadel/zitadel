@@ -10,10 +10,6 @@
     padding: 1rem 0;
 
     .avatar {
-        height: 80px;
-        width: 80px;
-        border-radius: 50%;
-        line-height: 80px;
         font-size: 80px;
         margin-bottom: 1rem;
     }
@@ -30,9 +26,6 @@
 
     .iamuser {
         font-size: 1rem;
-        background: -webkit-linear-gradient(rgb(240,140,53), rgb(233, 60, 231));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
     }
 
     button {

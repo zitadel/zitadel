@@ -56,7 +56,6 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     ) { }
 
     public ngOnInit(): void {
-        console.log('asdf');
         this.getData(10, 0);
     }
 
@@ -85,14 +84,12 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
     }
 
     private async getData(limit: number, offset: number): Promise<void> {
-        console.log('getprojects');
         this.loadingSubject.next(true);
         this.projectService.SearchProjects(limit, offset).then(res => {
             this.ownedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
             this.dataSource.data = this.ownedProjectList;
             this.loadingSubject.next(false);
-            console.log(this.ownedProjectList);
         }).catch(error => {
             console.error(error);
             this.toast.showError(error.message);

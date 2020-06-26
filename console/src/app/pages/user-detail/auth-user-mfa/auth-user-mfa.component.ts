@@ -35,7 +35,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     public addOTP(): void {
         this.userService.AddMfaOTP().then((otpresp) => {
             const otp: MfaOtpResponse.AsObject = otpresp.toObject();
-            console.log(otp);
             const dialogRef = this.dialog.open(DialogOtpComponent, {
                 data: otp.url,
                 width: '400px',
@@ -44,7 +43,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
             dialogRef.afterClosed().subscribe((code) => {
                 if (code) {
                     this.userService.VerifyMfaOTP(code).then((res) => {
-                        console.log(res.toObject());
                         // TODO: show state
                     });
                 }

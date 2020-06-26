@@ -31,13 +31,6 @@
 	.fill-space {
 		flex: 1;
     }
-    
-    .iamreadwrite {
-        height: 8px;
-        width: 8px;
-        border-radius: 50%;
-        background: linear-gradient(to bottom right, rgb(240,140,53), rgb(233, 60, 231));
-    }
 
 	.icon-container {
 		display: flex;
@@ -51,44 +44,16 @@
 			font-family: 'ailerons', sans-serif;
 		}
 
-		.avatar-wrapper {
-			display: flex;
-            align-items: center;
+        .avatar {
+            display: block;
+            margin: auto;
+            cursor: pointer;
+        }
 
-            .avatar-circle {
-                height: 30px;
-                width: 30px;
-                font-size: 30px;
-                background-color: transparent;
-                border-radius: 50%;
-                animation: background-color .2s ease-in;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-left: .5rem;
-
-                .avatar {
-                    display: block;
-                    margin: auto auto;
-                    height: 30px;
-                    width: 30px;
-                    line-height: 30px;
-                    font-size: 30px;
-                    border-radius: 50%;
-                    text-align: center;
-                }
-                
-                &:hover, &.active {
-                    cursor: pointer;
-                    background-color: #ffffff20;
-                }
-            }
-
-			.name {
-				font-size: 1rem;
-				font-weight: 400;
-			}
-		}
+        .name {
+            font-size: 1rem;
+            font-weight: 400;
+        }
 
 		.a_card {
 			position: absolute;
@@ -97,6 +62,12 @@
 			overflow: hidden;
 		}
 	}
+}
+
+.admin-line {
+    font-size: 12px;
+    padding: 4px 2rem;
+    position: relative;
 }
 
 .main-container {
@@ -239,4 +210,11 @@
             text-decoration: underline;
         }
     }
+}
+
+.divider {
+    display: block;
+    background-color: #ffffff10;
+    height: 1px;
+    margin: .5rem 0;
 }

@@ -15,10 +15,7 @@ import {
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    CreationType,
-    MemberCreateDialogComponent,
-} from '../../../modules/add-member-dialog/member-create-dialog.component';
+import { CreationType, MemberCreateDialogComponent } from '../../modules/add-member-dialog/member-create-dialog.component';
 
 @Component({
     selector: 'app-project-contributors',
@@ -43,7 +40,6 @@ export class ProjectContributorsComponent implements OnInit {
         private router: Router) { }
 
     public ngOnInit(): void {
-        console.log('project grant members');
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
             this.projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(this.project.projectId, 100, 0) :
@@ -59,7 +55,6 @@ export class ProjectContributorsComponent implements OnInit {
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false)),
             ).subscribe(members => {
-                console.log(members);
                 this.membersSubject.next(members);
             });
         }

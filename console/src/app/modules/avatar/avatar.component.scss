@@ -1,0 +1,15 @@
+:host {
+    display: block;
+}
+
+.avatar-circle {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+
+    &.active:hover  {
+        border: 2px solid #81868a;
+    }
+}

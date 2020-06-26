@@ -100,7 +100,6 @@ export class OrgCreateComponent {
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         }).catch(error => {
-            console.log('no password complexity policy defined!');
             console.error(error);
             this.userForm = this.fb.group({
                 userName: ['', [Validators.required]],

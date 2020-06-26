@@ -34,7 +34,6 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false)),
             ).subscribe(members => {
-                console.log(members);
                 this.membersSubject.next(members);
             });
 

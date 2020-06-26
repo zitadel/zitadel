@@ -9,27 +9,27 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     Application,
     ApplicationSearchResponse,
+    ProjectGrantView,
     ProjectMember,
     ProjectMemberSearchResponse,
     ProjectRole,
     ProjectRoleSearchResponse,
     ProjectState,
     ProjectType,
-    ProjectView,
 } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-owned-project-detail',
-    templateUrl: './owned-project-detail.component.html',
-    styleUrls: ['./owned-project-detail.component.scss'],
-
+    selector: 'app-granted-project-detail',
+    templateUrl: './granted-project-detail.component.html',
+    styleUrls: ['./granted-project-detail.component.scss'],
 })
-export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
+export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     public projectId: string = '';
-    public project!: ProjectView.AsObject;
+    public grantId: string = '';
+    public project!: ProjectGrantView.AsObject;
 
     public pageSizeRoles: number = 10;
     public roleDataSource: MatTableDataSource<ProjectRole.AsObject> = new MatTableDataSource<ProjectRole.AsObject>();
@@ -75,49 +75,24 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         this.subscription?.unsubscribe();
     }
 
-    private async getData({ id }: Params): Promise<void> {
+    private async getData({ id, grantId }: Params): Promise<void> {
         this.projectId = id;
+        this.grantId = grantId;
 
         this.orgService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
-        if (this.projectId) {
-            this.projectService.GetProjectById(id).then(proj => {
+        if (this.projectId && this.grantId) {
+            this.projectService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
-                console.log(this.project);
             }).catch(error => {
                 this.toast.showError(error.message);
             });
         }
-    }
-
-    public changeState(newState: ProjectState): void {
-        if (newState === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.projectService.ReactivateProject(this.projectId).then(() => {
-                this.toast.showInfo('Reactivated Project');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
-        } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
-            this.toast.showInfo('You cant update this project.');
-        }
-    }
-
-    public saveProject(): void {
-        this.projectService.UpdateProject(this.project.projectId, this.project.name).then(() => {
-            this.toast.showInfo('Project updated');
-        }).catch(error => {
-            this.toast.showInfo(error.message);
-        });
     }
 
     public navigateBack(): void {
         this._location.back();
-    }
-
-    public updateName(): void {
-        this.saveProject();
-        this.editstate = false;
     }
 }

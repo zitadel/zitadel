@@ -2,9 +2,9 @@
 
 @mixin changes-theme($theme) {
     $primary: map-get($theme, primary);
-    $primary-dark: mat-color($primary, A900);
+    $primary-dark: mat-color($primary, A600);
     
     .change-item-back {
-        background-color: lighten($primary-dark, 5%);
+        background-color: rgba($primary-dark, 0.05);
     }
 }

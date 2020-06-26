@@ -11,8 +11,16 @@ const routes: Routes = [
         canActivate: [AuthGuard],
     },
     {
+        path: 'granted-projects',
+        loadChildren: () => import('./pages/granted-projects/granted-projects.module').then(m => m.GrantedProjectsModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['project.read'],
+        },
+    },
+    {
         path: 'projects',
-        loadChildren: () => import('./pages/projects/projects.module').then(m => m.ProjectsModule),
+        loadChildren: () => import('./pages/owned-projects/owned-projects.module').then(m => m.OwnedProjectsModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['project.read'],

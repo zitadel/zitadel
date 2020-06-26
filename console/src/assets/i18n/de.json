@@ -2,7 +2,6 @@
     "APP_NAME": "zitadel",
     "HOME": {
         "TITLE": "zitadel",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
         "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
@@ -24,9 +23,11 @@
         "IAM":"IAM",
         "ORGANIZATION": "Organisation",
         "PROJECT": "Projekte",
+        "GRANTEDPROJECT":"Berechtigte Projekte",
         "USER": "Benutzer",
         "LOGOUT": "abmelden",
-        "NEWORG":"Neue Organisation"
+        "NEWORG":"Neue Organisation",
+        "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!"
     },
     "ACTIONS": {
         "SAVE": "speichern",
@@ -567,6 +568,7 @@
             "user.mfa.init.skipped":"MFA init übersprungen",
             "user.mfa.otp.added":"MFA OTP hinzugefügt",
             "user.mfa.otp.verified":"MFA OTP verifiziert",
+            "user.mfa.otp.removed":"MFA OTP entfernt",
             "user.selfregistered":"selbst registriert"
         }
     }

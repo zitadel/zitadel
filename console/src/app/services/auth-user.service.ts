@@ -121,7 +121,6 @@ export class AuthUserService {
         if (preferredLanguage) {
             req.setPreferredLanguage(preferredLanguage);
         }
-        console.log(req.toObject());
         return await this.request(
             c => c.updateMyUserProfile,
             req,
@@ -145,9 +144,9 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserEmail(email: UserEmail.AsObject): Promise<UserEmail> {
+    public async SaveMyUserEmail(email: string): Promise<UserEmail> {
         const req = new UpdateUserEmailRequest();
-        req.setEmail(email.email);
+        req.setEmail(email);
         return await this.request(
             c => c.changeMyUserEmail,
             req,
@@ -185,9 +184,9 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserPhone(phone: UserPhone.AsObject): Promise<UserPhone> {
+    public async SaveMyUserPhone(phone: string): Promise<UserPhone> {
         const req = new UpdateUserPhoneRequest();
-        req.setPhone(phone.phone);
+        req.setPhone(phone);
         return await this.request(
             c => c.changeMyUserPhone,
             req,
@@ -297,7 +296,6 @@ export class AuthUserService {
                         userRoles = ['user.resourceowner'];
                     }
                     this._roleCache = userRoles;
-                    console.log(roles);
                     return of(this.hasRoles(userRoles, roles, each));
                 }),
             );

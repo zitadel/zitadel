@@ -3,11 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-projects',
-    templateUrl: './projects.component.html',
-    styleUrls: ['./projects.component.scss'],
+    selector: 'app-owned-projects',
+    templateUrl: './owned-projects.component.html',
+    styleUrls: ['./owned-projects.component.scss'],
 })
-export class ProjectsComponent implements OnInit, OnDestroy {
+export class OwnedProjectsComponent implements OnInit, OnDestroy {
     // public projectId: string = '';
     // public grantId: string = '';
     private sub: Subscription = new Subscription();
