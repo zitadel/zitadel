@@ -23,7 +23,7 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: export GOPATH=$HOME/go
+    - run: echo $GOPATH
     - run: npm ci
     #- run: npm test 
     - run: echo "replace me with real test"
