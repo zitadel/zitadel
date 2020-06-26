@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/model"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/jinzhu/gorm"
-	"strings"
 )
 
 const (
@@ -83,7 +84,7 @@ func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error 
 	err := save(db, failedEvent)
 
 	if err != nil {
-		return errors.ThrowInternal(err, "VIEW-5kOhP", "unable to updated failed events")
+		return errors.ThrowInternal(err, "VIEW-34Zop", "unable to updated failed events")
 	}
 	return nil
 }
