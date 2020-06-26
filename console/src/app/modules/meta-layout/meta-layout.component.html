@@ -3,7 +3,7 @@
         <ng-content></ng-content>
     </div>
     <div class="meta" [ngClass]="{'hidden': hidden}">
-        <button (click)="hidden = !hidden" color="accent" class="hide" mat-icon-button><i
+        <button (click)="hidden = !hidden" color="primary" class="hide" mat-icon-button><i
                 class="las la-arrow-right"></i></button>
         <ng-content class="meta-content" select="metainfo"></ng-content>
     </div>

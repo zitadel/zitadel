@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 
 import { MemberCreateDialogModule } from '../../../modules/add-member-dialog/member-create-dialog.module';
 import { IamContributorsComponent } from './iam-contributors.component';
@@ -30,6 +31,7 @@ import { IamContributorsComponent } from './iam-contributors.component';
         MatPaginatorModule,
         MatIconModule,
         RouterModule,
+        AvatarModule,
         MatProgressSpinnerModule,
         MatCheckboxModule,
         MatTooltipModule,
