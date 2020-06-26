@@ -28,6 +28,8 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
     - run: go mod download
+    - run: ls /home/runner/go/src/github.com/caos/zitadel/pkg/auth/api/proto/
+    - run: ls /home/runner/go/src/github.com/caos/
     - run: ./build/console/generate-grpc.sh
     - run: ls -la src/github.com/caos/zitadel/console/src/app/proto/generated
     #- run: npm ci
