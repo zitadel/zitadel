@@ -12,26 +12,20 @@ mkdir -p $GEN_PATH
 
 echo "Generate grpc"
 
-
-mkdir -p ./validate/validate
-touch ./validate/validate.proto
-
-mkdir -p ./grpc-ecosystem/grpc-gateway
-touch ./grpc-ecosystem/grpc-gateway/validate.proto
-
-mkdir -p ./protoc-gen-swagger/options
-touch ./protoc-gen-swagger/options/annotations.proto
-
 protoc \
   -I=/usr/local/include \
-  -I=${GOPATH}/src/github.com/caos/zitadel/pkg/management/grpc/proto \
+  -I=${GOPATH}/src/github.com/caos/zitadel/pkg/management/api/proto \
+  -I=${GOPATH}/src/github.com/caos/zitadel/pkg/auth/api/proto \
+  -I=${GOPATH}/src/github.com/caos/zitadel/pkg/admin/api/proto \
   -I=${GOPATH}/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption \
   -I=${GOPATH}/src/github.com/caos/zitadel/console/node_modules/google-proto-files \
-  -I=. \
+  -I=${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate \
+  -I=${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
-  ${GOPATH}/src/github.com/caos/zitadel/pkg/management/grpc/proto/*.proto \
-
+  ${GOPATH}/src/github.com/caos/zitadel/pkg/management/api/proto/*.proto \
+  ${GOPATH}/src/github.com/caos/zitadel/pkg/admin/api/proto/*.proto \
+  ${GOPATH}/src/github.com/caos/zitadel/pkg/auth/api/proto/*.proto
 
 echo "Generate annotations js file (compatibility)"
 
