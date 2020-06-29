@@ -630,13 +630,18 @@ func MfaOTPRemoveAggregate(aggCreator *es_models.AggregateCreator, existing *mod
 	}
 }
 
-func SignOutAggregate(aggCreator *es_models.AggregateCreator, existing *model.User, agentID string) func(ctx context.Context) (*es_models.Aggregate, error) {
-	return func(ctx context.Context) (*es_models.Aggregate, error) {
-		agg, err := UserAggregateOverwriteContext(ctx, aggCreator, existing, existing.ResourceOwner, existing.AggregateID)
-		if err != nil {
-			return nil, err
+func SignOutAggregates(aggCreator *es_models.AggregateCreator, existingUsers []*model.User, agentID string) func(ctx context.Context) ([]*es_models.Aggregate, error) {
+	return func(ctx context.Context) ([]*es_models.Aggregate, error) {
+		aggregates := make([]*es_models.Aggregate, len(existingUsers))
+		for i, existing := range existingUsers {
+			agg, err := UserAggregateOverwriteContext(ctx, aggCreator, existing, existing.ResourceOwner, existing.AggregateID)
+			if err != nil {
+				return nil, err
+			}
+			agg.AppendEvent(model.SignedOut, map[string]interface{}{"userAgentID": agentID})
+			aggregates[i] = agg
 		}
-		return agg.AppendEvent(model.SignedOut, map[string]interface{}{"userAgentID": agentID})
+		return aggregates, nil
 	}
 }
 
