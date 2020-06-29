@@ -2604,7 +2604,7 @@ func TestChangesProject(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.ProjectChanges{Changes: []*model.ProjectChange{&model.ProjectChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &model.ProjectChanges{Changes: []*model.ProjectChange{&model.ProjectChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				project: &model.Project{Name: "MusterProject"},
 			},
 		},
@@ -2673,7 +2673,7 @@ func TestChangesApplication(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.ApplicationChanges{Changes: []*model.ApplicationChange{&model.ApplicationChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &model.ApplicationChanges{Changes: []*model.ApplicationChange{&model.ApplicationChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				app:     &model.Application{Name: "MusterApp", AppID: "AppId", Type: 3},
 			},
 		},

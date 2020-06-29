@@ -1057,7 +1057,7 @@ func TestChangesOrg(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &org_model.OrgChanges{Changes: []*org_model.OrgChange{&org_model.OrgChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &org_model.OrgChanges{Changes: []*org_model.OrgChange{&org_model.OrgChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				org:     &model.Org{Name: "MusterOrg"},
 			},
 		},

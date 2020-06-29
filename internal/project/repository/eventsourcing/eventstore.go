@@ -380,7 +380,7 @@ func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, last
 		change := &proj_model.ProjectChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 
@@ -558,7 +558,7 @@ func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, 
 		change := &proj_model.ApplicationChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 		appendChanges := true

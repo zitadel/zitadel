@@ -299,7 +299,7 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 		change := &usr_model.UserChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 
@@ -1049,17 +1049,24 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) SignOut(ctx context.Context, agentID, userID string) error {
-	user, err := es.UserByID(ctx, userID)
-	if err != nil {
-		return err
-	}
-	repoUser := model.UserFromModel(user)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, SignOutAggregate(es.AggregateCreator(), repoUser, agentID))
-	if err != nil {
-		return err
+func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {
+	users := make([]*model.User, len(userIDs))
+	for i, id := range userIDs {
+		user, err := es.UserByID(ctx, id)
+		if err != nil {
+			return err
+		}
+		users[i] = model.UserFromModel(user)
 	}
 
-	es.userCache.cacheUser(repoUser)
+	aggFunc := SignOutAggregates(es.AggregateCreator(), users, agentID)
+	aggregates, err := aggFunc(ctx)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
+	if err != nil {
+		return err
+	}
 	return nil
 }

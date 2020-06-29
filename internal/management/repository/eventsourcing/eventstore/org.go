@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/auth"
@@ -17,8 +18,9 @@ import (
 type OrgRepository struct {
 	SearchLimit uint64
 	*org_es.OrgEventstore
-	View  *mgmt_view.View
-	Roles []string
+	UserEvents *usr_es.UserEventstore
+	View       *mgmt_view.View
+	Roles      []string
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -82,6 +84,13 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
 	}
 	return changes, nil
 }
