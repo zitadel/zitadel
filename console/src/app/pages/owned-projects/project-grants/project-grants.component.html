@@ -78,7 +78,7 @@
         <ng-container matColumnDef="show">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                <a [routerLink]="['grant', grant.id]" mat-raised-button
+                <a [routerLink]="['/projects',grant.projectId,'grant', grant.id]" mat-raised-button
                     class="button-show">{{'PROJECT.GRANT.SHOWDETAIL' | translate}}</a> </td>
         </ng-container>
 

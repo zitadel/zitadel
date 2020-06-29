@@ -13,6 +13,9 @@
         </div>
 
         <app-card>
+            <h1>{{ 'PROJECT.MEMBER.TITLE' | translate }}</h1>
+            <p class="desc">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</p>
+
             <app-project-grant-members *ngIf="project && project.projectId && project.id"
                 [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel" [project]="project">
             </app-project-grant-members>

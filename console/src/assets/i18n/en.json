@@ -363,6 +363,10 @@
                 "SEL_ORG_BUTTON": "Search Organization",
                 "FOR_ORG":"The grant is created for:"
             },
+            "DETAIL": {
+                "TITLE":"Granted Organization Managers",
+                "DESC":"These are the Managers of the granted organization"
+            },
             "SHOWDETAIL":"Show Details",
             "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",

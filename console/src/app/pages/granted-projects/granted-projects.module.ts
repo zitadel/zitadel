@@ -20,6 +20,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { ProjectGrantMembersModule } from 'src/app/modules/project-grant-members/project-grant-members.module';
 
 import { HttpLoaderFactory } from '../../app.module';
 import { HasRoleModule } from '../../directives/has-role/has-role.module';
@@ -47,6 +48,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
     ],
     imports: [
         CommonModule,
+        ProjectGrantMembersModule,
         GrantedProjectsRoutingModule,
         ProjectContributorsModule,
         FormsModule,

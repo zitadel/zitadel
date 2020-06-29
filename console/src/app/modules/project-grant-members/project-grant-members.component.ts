@@ -8,10 +8,7 @@ import { ProjectMember, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    CreationType,
-    MemberCreateDialogComponent,
-} from '../../../modules/add-member-dialog/member-create-dialog.component';
+import { CreationType, MemberCreateDialogComponent } from '../../modules/add-member-dialog/member-create-dialog.component';
 import { ProjectGrantMembersDataSource } from './project-grant-members-datasource';
 
 @Component({

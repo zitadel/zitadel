@@ -1,0 +1,128 @@
+.container {
+    display: flex;
+    padding-bottom: 3rem;
+
+    .left {
+        width: 100px;
+        display: flex;
+        padding: 1rem;
+        justify-content: center;
+
+        a {
+            margin-top: .2rem;
+        }
+    }
+
+    .right {
+        flex: 1;
+        padding-top: 1rem;
+
+        .head {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ffffff20;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+          
+            a {
+                display: block;
+            }
+          
+            h1 {
+                font-size: 1.2rem;
+            }
+          
+            .desc {
+                width: 100%;
+                display: block;
+                font-size: .9rem;
+                color: #81868a;
+            }
+        }
+    }
+}
+
+.table-header-row {
+  display: flex;
+  align-items: center;
+
+  .col {
+      display: flex;
+      flex-direction: column;
+      .desc {
+          font-size: .8rem;
+          color: #81868a;
+      }
+      .count {
+          font-size: 2rem;
+      }
+  }
+
+  .fill-space {
+      flex: 1;
+  }
+
+  .icon-button {
+      margin-right: .5rem;
+      border-radius: .5rem;
+
+      i {
+          margin-left: .5rem;
+      }
+  }
+
+  .add-button {
+      border-radius: .5rem;
+  }
+}
+
+.table-wrapper {
+    overflow: auto;
+
+    .spinner-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    table, mat-paginator {
+        width: 100%;
+
+        td, th {
+            padding: .5rem;
+            &:first-child {
+                padding-left: 0;
+                padding-right: 1rem;
+            }
+
+            &:last-child {
+                padding-right: 0;
+            }
+        }
+
+        .action {
+            width: 40px;
+        }
+
+        .data-row {
+            &:hover {
+                background-color: #ffffff05;
+            }
+        }
+
+        .selection {
+            width: 50px;
+            max-width: 50px;
+        }
+
+        .role {
+            display: inline-block;
+            margin: .25rem;
+        }
+    }
+}
+
+.pointer {
+    outline: none;
+    cursor: pointer;
+}

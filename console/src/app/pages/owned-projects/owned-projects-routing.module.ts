@@ -45,7 +45,7 @@ const routes: Routes = [
             .then(m => m.ProjectGrantCreateModule),
     },
     {
-        path: 'grant/:grantid',
+        path: ':projectid/grant/:grantid',
         loadChildren: () => import('./grant/grant.module')
             .then(m => m.GrantModule),
     },

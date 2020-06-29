@@ -362,6 +362,10 @@
                 "SEL_ORG_BUTTON": "Suche Organisation",
                 "FOR_ORG":"The grant wird erstellt für:"
             },
+            "DETAIL": {
+                "TITLE":"Berechtigte Manager der Organisation",
+                "DESC":"Dies sind die berechtigten Zugänge für die Organisation"
+            },
             "SHOWDETAIL":"Zeige Details",
             "MEMBERS":"Managers",
             "PROJECTNAME":"Projekt Name",
