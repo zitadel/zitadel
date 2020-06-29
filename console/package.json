@@ -35,7 +35,7 @@
     "google-proto-files": "^2.1.0",
     "google-protobuf": "^3.12.2",
     "grpc": "^1.24.3",
-    "grpc-web": "^1.1.0",
+    "grpc-web": "^1.2.0",
     "ngx-moment": "^4.0.1",
     "moment": "^2.27.0",
     "prettier-stylelint": "^0.4.2",
