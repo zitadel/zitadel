@@ -363,6 +363,7 @@
                 "SEL_ORG_BUTTON": "Search Organization",
                 "FOR_ORG":"The grant is created for:"
             },
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",

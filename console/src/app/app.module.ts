@@ -57,11 +57,10 @@ const stateHandlerFn = (stateHandler: StatehandlerService) => {
     };
 };
 
-export const authConfig: AuthConfig = {
+export let authConfig = {
     redirectUri: window.location.origin + '/auth/callback',
     scope: 'openid profile email', // offline_access
     responseType: 'code',
-    // showDebugInformation: true,
     oidc: true,
     postLogoutRedirectUri: window.location.origin + '/signedout',
 };
@@ -152,4 +151,9 @@ export const authConfig: AuthConfig = {
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+
+    constructor() {
+        console.log(window.location.href);
+    }
+}

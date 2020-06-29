@@ -84,11 +84,10 @@
                         [appHasRole]="['project.grant.member.read:' + projectId,'project.grant.member.read']">
                         <div class="right">
                             <div class="title-row">
-                                <span class="mem-title">Members</span>
+                                <span class="mem-title">{{'PROJECT.GRANT.MEMBERS' | translate}}</span>
                                 <ng-template appHasRole
                                     [appHasRole]="['project.grant.member.write:' + projectId, 'project.grant.member.write']">
-                                    <button [disabled]="disabled || element?.roleKeysList?.length === 0"
-                                        matTooltip="disabled or no roles defined" mat-icon-button
+                                    <button [disabled]="disabled || element?.roleKeysList?.length === 0" mat-icon-button
                                         (click)="addProjectGrantMember(element)">
                                         <mat-icon>add</mat-icon>
                                     </button>
