@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -36,9 +37,24 @@ type ProjectRepo struct {
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
 	project, err := repo.View.ProjectByID(id)
-	if err != nil {
+	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
+
+	events, err := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
+	if err != nil {
+		logging.Log("EVENT-V9x1V").WithError(err).Debug("error retrieving new events")
+		return model.ProjectToModel(project), nil
+	}
+
+	viewProject := *project
+	for _, event := range events {
+		err := project.AppendEvent(event)
+		if err != nil {
+			return model.ProjectToModel(&viewProject), nil
+		}
+	}
+
 	return model.ProjectToModel(project), nil
 }
 
