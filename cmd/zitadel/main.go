@@ -89,7 +89,11 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) 
 	if *loginEnabled {
 		uis.RegisterHandler(ui.LoginHandler, login.Start(conf.Login, authRepo, ui.LoginHandler).Handler())
 	}
-	//uis.RegisterHandler()
+	if *consoleEnabled {
+		consoleHandler, err := console.Start(conf.Console)
+		logging.Log("API-AGD1f").OnError(err).Fatal("error starting console")
+		uis.RegisterHandler(ui.ConsoleHandler, consoleHandler)
+	}
 	uis.Start(ctx)
 }
 

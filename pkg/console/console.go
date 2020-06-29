@@ -1,7 +1,6 @@
 package console
 
 import (
-	"context"
 	"net/http"
 	"os"
 	"path"
@@ -51,10 +50,10 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(ctx context.Context, config Config) error {
+func Start(config Config) (http.Handler, error) {
 	statikFS, err := fs.NewWithNamespace("console")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	envDir := envDefaultDir
 	if config.EnvOverwriteDir != "" {
@@ -67,9 +66,10 @@ func Start(ctx context.Context, config Config) error {
 		config.LongCache.SharedMaxAge.Duration,
 	)
 	security := middleware.SecurityHeaders(csp(config.CSPDomain), nil)
-	http.Handle("/", cache(security(http.FileServer(&spaHandler{statikFS}))))
-	http.Handle(envRequestPath, cache(security(http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))))
-	return http.ListenAndServe(":"+config.Port, nil)
+	handler := &http.ServeMux{}
+	handler.Handle("/", cache(security(http.FileServer(&spaHandler{statikFS}))))
+	handler.Handle(envRequestPath, cache(security(http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))))
+	return handler, nil
 }
 
 func csp(zitadelDomain string) *middleware.CSP {

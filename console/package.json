@@ -6,7 +6,7 @@
     "prestart": "npm run proto",
     "start": "ng serve",
     "build": "ng build",
-    "prodbuild": "ng build --prod",
+    "prodbuild": "ng build --prod --base-href /console/",
     "test": "ng test",
     "lint": "ng lint && stylelint './projects/**/*.scss' --syntax scss",
     "e2e": "ng e2e",
