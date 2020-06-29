@@ -38,7 +38,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     public selectedGrantMembers: ProjectMemberView.AsObject[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'grantedOrgName', 'grantedOrgDomain', 'creationDate', 'changeDate', 'roleNamesList'];
+    public displayedColumns: string[] = ['select', 'grantedOrgName', 'grantedOrgDomain', 'creationDate', 'changeDate', 'roleNamesList', 'show'];
 
     constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
 

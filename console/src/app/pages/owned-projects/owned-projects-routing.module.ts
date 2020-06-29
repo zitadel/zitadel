@@ -44,6 +44,11 @@ const routes: Routes = [
         loadChildren: () => import('../project-grant-create/project-grant-create.module')
             .then(m => m.ProjectGrantCreateModule),
     },
+    {
+        path: 'grant/:grantid',
+        loadChildren: () => import('./grant/grant.module')
+            .then(m => m.GrantModule),
+    },
 ];
 
 @NgModule({

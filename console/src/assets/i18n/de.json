@@ -362,6 +362,7 @@
                 "SEL_ORG_BUTTON": "Suche Organisation",
                 "FOR_ORG":"The grant wird erstellt für:"
             },
+            "SHOWDETAIL":"Zeige Details",
             "MEMBERS":"Managers",
             "PROJECTNAME":"Projekt Name",
             "GRANTEDORG": "Granted Organization",
