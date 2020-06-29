@@ -94,11 +94,20 @@
                                     </button>
                                 </ng-template>
                             </div>
+
                             <div class="mem-description"
                                 *ngIf="selectedGrantMembers && selectedGrantMembers.length > 0">
-                                <span *ngFor="let mem of selectedGrantMembers">{{mem.firstName}} {{mem.lastName}}
-                                    {{mem.email}} |
-                                    <span *ngFor="let role of mem.rolesList">{{role}} </span></span>
+                                <!-- <span *ngFor="let role of mem.rolesList">{{role}} </span> -->
+
+                                <div class="img-list">
+                                    <ng-container *ngFor="let member of selectedGrantMembers">
+                                        <app-avatar matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}"
+                                            *ngIf="member && (member.displayName || (member.firstName && member.lastName))"
+                                            class="avatar" [name]="member.displayName ? member.displayName : (member.firstName + ' '+
+                                            member.lastName)" [size]="32">
+                                        </app-avatar>
+                                    </ng-container>
+                                </div>
                             </div>
                         </div>
                     </ng-template>

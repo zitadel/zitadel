@@ -359,7 +359,8 @@
                 "ORG_TITLE":"Organisation",
                 "ORG_DESCRIPTION":"Sie sind im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
                 "ORG_DESCRIPTION_DESC":"Wechseln Sie den Context um die Organisation zu wechseln!",
-                "SEL_ORG_BUTTON": "Suche Organisation"
+                "SEL_ORG_BUTTON": "Suche Organisation",
+                "FOR_ORG":"The grant wird erstellt für:"
             },
             "PROJECTNAME":"Projekt Name",
             "GRANTEDORG": "Granted Organization",

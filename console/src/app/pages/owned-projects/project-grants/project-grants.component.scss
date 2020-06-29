@@ -103,14 +103,42 @@
                 }
 
                 .mem-description {
-                    border: 2px solid #81868a;
-                    background-color: #212224;
-                    border-radius: .5rem;
-                    padding: 1rem;
-                    margin: .5rem 0;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
+                    padding-bottom: 1rem;
+
+                    .img-list {
+                        width: 100%;
+                        margin-top: 0.5rem;
+                        margin-left: 1rem;
+                        margin-bottom: 1rem;
+                        display: flex;
+                        align-items: center;
+                  
+                        .avatar {
+                          float: left;
+                          margin: 0 8px 0 -15px;
+                          height: 32px;
+                          width: 32px;
+                          border-radius: 50%;
+                          box-shadow: 0 5px 5px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.5);
+                        }
+                
+                        .add-img {
+                            float: left;
+                            margin: 0 8px 0 -15px;
+                        }
+             
+                        .avatar-circle {
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background-color: indianred;
+                        }
+                  
+                        .margin-neg {
+                          margin-left: -1rem;
+                        }
+                    }
                 }
             }
         }

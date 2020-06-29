@@ -29,7 +29,7 @@
         display: flex;
         align-items: center;
   
-        .avatar-img, .avatar-circle {
+        .avatar-circle {
           float: left;
           margin: 0 8px 0 -15px;
           height: 32px;
@@ -41,18 +41,6 @@
         .add-img {
             float: left;
             margin: 0 8px 0 -15px;
-        }
-
-        .avatar-img {
-            &:before {
-                content: '';
-                display: block;
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                height: 32px;
-                width: 32px;
-            }
         }
 
         .avatar-circle {

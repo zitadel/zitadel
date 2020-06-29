@@ -360,7 +360,8 @@
                 "ORG_TITLE":"Organization",
                 "ORG_DESCRIPTION":"You are about to grant a user on the organization {{name}}",
                 "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user of another organization",
-                "SEL_ORG_BUTTON": "Search Organization"
+                "SEL_ORG_BUTTON": "Search Organization",
+                "FOR_ORG":"The grant is created for:"
             },
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organization",

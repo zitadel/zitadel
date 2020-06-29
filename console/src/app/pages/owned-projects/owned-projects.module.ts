@@ -20,6 +20,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 
 import { HttpLoaderFactory } from '../../app.module';
 import { HasRoleModule } from '../../directives/has-role/has-role.module';
@@ -61,6 +62,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         ProjectContributorsModule,
         FormsModule,
         TranslateModule,
+        AvatarModule,
         ReactiveFormsModule,
         HasRoleModule,
         MatTableModule,
