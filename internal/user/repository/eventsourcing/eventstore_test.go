@@ -3291,7 +3291,7 @@ func TestChangesUser(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.UserChanges{Changes: []*model.UserChange{&model.UserChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &model.UserChanges{Changes: []*model.UserChange{&model.UserChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				user:    &model.Profile{FirstName: "Hans", LastName: "Muster", UserName: "HansMuster"},
 			},
 		},

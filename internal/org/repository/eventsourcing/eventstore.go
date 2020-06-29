@@ -215,7 +215,7 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence
 		change := &org_model.OrgChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 
