@@ -258,7 +258,7 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 
 func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
 	if roles == nil || len(roles) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.Project.MinimumOneRoleNeeded")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-uOJAs", "Errors.Project.MinimumOneRoleNeeded")
 	}
 	for _, role := range roles {
 		if !role.IsValid() {
