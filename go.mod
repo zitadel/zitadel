@@ -19,7 +19,7 @@ require (
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.6.2
 	github.com/cockroachdb/cockroach-go v0.0.0-20200504194139-73ffeee90b62
-	github.com/envoyproxy/protoc-gen-validate v0.1.0
+	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/mock v1.4.3
@@ -55,7 +55,7 @@ require (
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
 	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20200512001501-aaeff5de670a
+	golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375
 	google.golang.org/api v0.24.0 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/grpc v1.29.1
