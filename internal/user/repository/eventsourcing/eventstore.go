@@ -1051,8 +1051,8 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 
 func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {
 	users := make([]*model.User, len(userIDs))
-	for i, ID := range userIDs {
-		user, err := es.UserByID(ctx, ID)
+	for i, id := range userIDs {
+		user, err := es.UserByID(ctx, id)
 		if err != nil {
 			return err
 		}
