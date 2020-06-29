@@ -83,19 +83,19 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
         });
     }
 
-    // TODO
-    public addProjectGrantMember(grant: ProjectGrant.AsObject): void {
+    public async addProjectGrantMember(grant: ProjectGrant.AsObject): Promise<void> {
+        const keysList = (await this.projectService.GetProjectGrantMemberRoles()).toObject();
+        console.log(keysList);
+
         const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
             data: {
-                orgId: grant.grantedOrgId,
-                grantId: grant.id,
-                projectId: grant.projectId,
-                roleKeysList: grant.roleKeysList,
+                roleKeysList: keysList.rolesList,
             },
             width: '400px',
         });
 
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
+            console.log(dataToAdd);
             if (dataToAdd) {
                 dataToAdd.userIds.forEach((userid: string) => {
                     this.projectService.AddProjectGrantMember(
@@ -114,7 +114,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
         });
     }
 
-    // TODO
     public removeProjectGrantMember(grantId: string, userId: string): void {
         this.projectService.RemoveProjectGrantMember(this.projectId, grantId, userId).then(() => {
             this.toast.showInfo('Project Grant Member successfully removed');

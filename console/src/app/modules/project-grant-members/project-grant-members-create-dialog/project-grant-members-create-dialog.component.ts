@@ -20,9 +20,7 @@ export class ProjectGrantMembersCreateDialogComponent {
     constructor(
         public dialogRef: MatDialogRef<ProjectGrantMembersCreateDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-    ) {
-        this.roleKeyList = data.roleKeyList || [];
-    }
+    ) { }
 
     public selectUsers(users: User.AsObject[]): void {
         this.userIds = users.map(user => user.id);

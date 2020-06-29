@@ -4,12 +4,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectType } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import {
     ProjectGrantMembersCreateDialogComponent,
+    ProjectGrantMembersCreateDialogExportType,
 } from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrantMembersDataSource } from './project-grant-members-datasource';
 
@@ -96,6 +97,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     public async openAddMember(): Promise<any> {
         const keysList = (await this.projectService.GetProjectGrantMemberRoles()).toObject();
         console.log(keysList);
+
         const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
             data: {
                 roleKeysList: keysList.rolesList,
@@ -103,21 +105,22 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
             width: '400px',
         });
 
-        dialogRef.afterClosed().subscribe(resp => {
-            if (resp) {
-                const users: User.AsObject[] = resp.users;
-                const roles: string[] = resp.roles;
-
-                if (users && users.length && roles && roles.length) {
-                    Promise.all(users.map(user => {
-                        return this.projectService.AddProjectGrantMember(this.projectId,
-                            this.grantId, user.id, roles);
-                    })).then(() => {
-                        this.toast.showError('members added');
+        dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
+            console.log(dataToAdd);
+            if (dataToAdd) {
+                dataToAdd.userIds.forEach((userid: string) => {
+                    this.projectService.AddProjectGrantMember(
+                        this.projectId,
+                        this.grantId,
+                        userid,
+                        dataToAdd.rolesKeyList,
+                    ).then(() => {
+                        this.toast.showInfo('Project Grant Member successfully added!');
                     }).catch(error => {
                         this.toast.showError(error.message);
                     });
-                }
+                });
+
             }
         });
     }
