@@ -13,6 +13,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { ProjectGrantMembersModule } from 'src/app/modules/project-grant-members/project-grant-members.module';
 
 import { GrantRoutingModule } from './grant-routing.module';
 import { GrantComponent } from './grant.component';
@@ -23,6 +24,7 @@ import { GrantComponent } from './grant.component';
     imports: [
         CommonModule,
         GrantRoutingModule,
+        ProjectGrantMembersModule,
         MatAutocompleteModule,
         HasRoleModule,
         MatChipsModule,

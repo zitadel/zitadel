@@ -76,10 +76,11 @@
         </ng-container>
 
         <ng-container matColumnDef="show">
-            <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
+            <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.SHOWDETAIL' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                <a [routerLink]="['/projects',grant.projectId,'grant', grant.id]" mat-raised-button
-                    class="button-show">{{'PROJECT.GRANT.SHOWDETAIL' | translate}}</a> </td>
+                <a [routerLink]="['/projects',grant.projectId,'grant', grant.id]" color="primary"
+                    matTooltip="{{ 'PROJECT.GRANT.SHOWDETAIL' | translate }}" mat-icon-button class="button-show"><i
+                        class="las la-arrow-right"></i></a> </td>
         </ng-container>
 
         <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->

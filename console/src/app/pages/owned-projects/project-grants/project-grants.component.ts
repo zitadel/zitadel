@@ -5,14 +5,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
+import {
+    ProjectGrantMembersCreateDialogComponent,
+    ProjectGrantMembersCreateDialogExportType,
+} from 'src/app/modules/project-grant-members/project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrant, ProjectMemberView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    ProjectGrantMembersCreateDialogComponent,
-    ProjectGrantMembersCreateDialogExportType,
-} from '../project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrantsDataSource } from './project-grants-datasource';
 
 @Component({
@@ -97,7 +97,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
 
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
             if (dataToAdd) {
-                dataToAdd.userIds.forEach(userid => {
+                dataToAdd.userIds.forEach((userid: string) => {
                     this.projectService.AddProjectGrantMember(
                         this.projectId,
                         grant.id,
