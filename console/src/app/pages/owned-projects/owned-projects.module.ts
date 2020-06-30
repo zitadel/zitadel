@@ -22,6 +22,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { ProjectGrantMembersModule } from 'src/app/modules/project-grant-members/project-grant-members.module';
+import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 
 import { HttpLoaderFactory } from '../../app.module';
 import { HasRoleModule } from '../../directives/has-role/has-role.module';
@@ -56,6 +57,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
     imports: [
         CommonModule,
         OwnedProjectsRoutingModule,
+        UserGrantsModule,
         ProjectContributorsModule,
         ProjectGrantMembersModule,
         FormsModule,

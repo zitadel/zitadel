@@ -22,6 +22,10 @@ const routes: Routes = [
         path: ':id/grant-create',
         loadChildren: () => import('../user-grant-create/user-grant-create.module').then(m => m.UserGrantCreateModule),
     },
+    {
+        path: ':id/grant/:grantid',
+        loadChildren: () => import('./user-grant/user-grant.module').then(m => m.UserGrantModule),
+    },
 ];
 
 @NgModule({

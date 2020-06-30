@@ -205,8 +205,8 @@
             </form>
         </app-card> -->
 
-        <app-card *ngIf="user?.id" title="{{ 'USER.GRANTS.TITLE' | translate }}"
-            description="{{'USER.GRANTS.DESCRIPTION' | translate }}">
+        <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
+            description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <app-user-grants [userId]="user?.id"></app-user-grants>
         </app-card>
     </div>

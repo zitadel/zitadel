@@ -158,14 +158,6 @@
             "REGION": "Kanton",
             "COUNTRY": "Land"
         },
-        "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden.",
-            "CREATE": {
-                "TITLE": "User Grant erstellen",
-                "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
-            }
-        },
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
             "REQUIRED": "Das Feld ist leer",
@@ -507,7 +499,19 @@
     "GRANTS": {
         "DELETE":"Grant löschen",
         "ADD":"Grant erstellen",
-        "ADD_BTN":"Neu"
+        "ADD_BTN":"Neu",
+        "PROJECT": {
+            "TITLE": "Authorisierung",
+            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+        },
+        "USER": {
+            "TITLE": "Authorisierung",
+            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+        },
+        "CREATE": {
+            "TITLE": "Authorisierung erstellen",
+            "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Letzte Änderungen",

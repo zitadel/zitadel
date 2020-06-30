@@ -3,7 +3,7 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, UserGrant } from 'src/app/proto/generated/management_pb';
+import { ProjectGrant, UserGrant, UserGrantSearchKey } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
 import { UserGrantsDataSource } from './user-grants-datasource';
@@ -14,7 +14,8 @@ import { UserGrantsDataSource } from './user-grants-datasource';
     styleUrls: ['./user-grants.component.scss'],
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
-    @Input() userId: string = '';
+    @Input() filterValue: string = '';
+    @Input() filter: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID;
     public grants: UserGrant.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;
@@ -27,7 +28,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public ngOnInit(): void {
         this.dataSource = new UserGrantsDataSource(this.userService);
-        this.dataSource.loadGrants(this.userId, 0, 25);
+        this.dataSource.loadGrants(this.filter, this.filterValue, 0, 25);
     }
 
     public ngAfterViewInit(): void {
@@ -36,12 +37,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                 tap(() => this.loadGrantsPage()),
             )
             .subscribe();
-
     }
 
     private loadGrantsPage(): void {
         this.dataSource.loadGrants(
-            this.userId,
+            this.filter,
+            this.filterValue,
             this.paginator.pageIndex,
             this.paginator.pageSize,
         );
