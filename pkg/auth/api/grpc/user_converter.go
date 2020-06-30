@@ -356,7 +356,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
 		if err == nil {
 			data = new(structpb.Struct)
 			err = protojson.Unmarshal(changedData, data)
-			logging.Log("GRPC-a7F54").OnError(err).Debug("unable to marshal changed data to struct")
+			logging.Log("GRPC-0kRsY").OnError(err).Debug("unable to marshal changed data to struct")
 		}
 
 		result[i] = &Change{
