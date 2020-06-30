@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -182,6 +183,7 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 	return func(events ...*es_models.Event) error {
 		existsOrg := false
 		existsUser := false
+		existsProject := false
 		project := new(proj_es_model.Project)
 		for _, event := range events {
 			switch event.AggregateType {
@@ -200,6 +202,7 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 					existsOrg = false
 				}
 			case proj_es_model.ProjectAggregate:
+				switch event.Type {
 				project.AppendEvent(event)
 			}
 		}
@@ -216,7 +219,11 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 	}
 }
 
+//TODO: rethink this function i know it's ugly.
 func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) error {
+	if grant.ProjectID != project.AggregateID{
+		return errors.ThrowInvalidArgument(nil, "EVENT-ixlMx", "project doesn't exist")
+	}
 	if project.State == int32(proj_model.ProjectStateRemoved) {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Lxp0s", "project doesn't exist")
 	}
