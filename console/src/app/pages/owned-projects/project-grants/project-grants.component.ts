@@ -38,7 +38,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     public selectedGrantMembers: ProjectMemberView.AsObject[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'grantedOrgName', 'grantedOrgDomain', 'creationDate', 'changeDate', 'roleNamesList', 'show'];
+    public displayedColumns: string[] = ['select', 'grantedOrgName', 'grantedOrgDomain', 'creationDate', 'changeDate', 'roleNamesList'];
 
     constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
 
@@ -76,13 +76,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
             this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
     }
 
-    public setExpandableRow(grant: ProjectGrant.AsObject): void {
-        this.expandedElement = this.expandedElement === grant ? null : grant;
-        this.projectService.SearchProjectGrantMembers(this.projectId, grant.id, 10, 0).then(ret => {
-            this.selectedGrantMembers = ret.toObject().resultList;
-        });
-    }
-
     public async addProjectGrantMember(grant: ProjectGrant.AsObject): Promise<void> {
         const keysList = (await this.projectService.GetProjectGrantMemberRoles()).toObject();
         console.log(keysList);
@@ -111,14 +104,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
                 });
 
             }
-        });
-    }
-
-    public removeProjectGrantMember(grantId: string, userId: string): void {
-        this.projectService.RemoveProjectGrantMember(this.projectId, grantId, userId).then(() => {
-            this.toast.showInfo('Project Grant Member successfully removed');
-        }).catch(error => {
-            this.toast.showInfo(error.message);
         });
     }
 }

@@ -65,99 +65,12 @@
             }
         }
 
+        tr {
+            outline: none;
+        }
+
         tr.detail-row {
             height: 0;
-
-        }
-
-        tr {
-            .element-row:not(.expanded-row):hover {
-                background: whitesmoke;
-            }
-            
-            .element-row:not(.expanded-row):active {
-                background: #efefef;
-            }
-        }
-
-        .button-show {
-            border-radius: .5rem;
-        }
-        
-        .element-row td {
-            border-bottom-width: 0;
-        }
-        
-        .element-detail {
-            overflow: hidden;
-            display: flex;
-           
-            .right {
-                display: flex;
-                flex-direction: column;
-
-                .title-row {
-                    display: flex;
-                    align-items: center;
-
-                    .mem-title {
-                        font-size: .8rem;
-                        color: #8795a1;
-                    }
-                }
-
-                .mem-description {
-                    padding-bottom: 1rem;
-
-                    .img-list {
-                        width: 100%;
-                        margin-top: 0.5rem;
-                        margin-left: 1rem;
-                        margin-bottom: 1rem;
-                        display: flex;
-                        align-items: center;
-                  
-                        .avatar {
-                          float: left;
-                          margin: 0 8px 0 -15px;
-                          height: 32px;
-                          width: 32px;
-                          border-radius: 50%;
-                        }
-                
-                        .add-img {
-                            float: left;
-                            margin: 0 8px 0 -15px;
-                        }
-             
-                        .avatar-circle {
-                            cursor: pointer;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            background-color: indianred;
-                        }
-                  
-                        .margin-neg {
-                          margin-left: -1rem;
-                        }
-                    }
-                }
-            }
-        }
-        
-        .element-symbol {
-            font-weight: bold;
-            font-size: 40px;
-            line-height: normal;
-        }
-        
-        .element-description {
-            padding: 16px;
-        }
-        
-        .element-description-attribution {
-            opacity: 0.5;
         }
 
         .selection {
