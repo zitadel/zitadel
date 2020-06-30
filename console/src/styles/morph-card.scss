@@ -24,9 +24,5 @@
             background: $accent-color;
             box-shadow:  5px 5px 20px rgba($color: black, $alpha: 0.5), -5px -5px 20px rgba($color: $secondary-dark, $alpha: 1);
         }
-
-        // &:hover {
-        //     @include mat-elevation(5);
-        // }
     }
 }

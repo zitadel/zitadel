@@ -196,23 +196,6 @@
     }
 }
 
-.footer {
-    padding: 1rem;
-    a {
-        cursor: pointer;
-        text-decoration: none;
-        color: #81868a;
-        font-size: .8rem;
-        display: block;
-        margin-bottom: 1px;
-        font-weight: 300;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-}
-
 .divider {
     display: block;
     background-color: #ffffff10;

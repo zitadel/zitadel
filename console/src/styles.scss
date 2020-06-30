@@ -33,7 +33,7 @@ $caos-dark-brand: (
     A400: #38649d,
     A500: #666666,
     A600: #ffffff,
-    A700: #81868a,
+    A700: #8795a1,
     A800: #2d2e30,
     A900: #212224,
     contrast: (
@@ -71,23 +71,23 @@ $caos-light-brand: (
     A400: mat-color($mat-grey, A400),
     A500:#333333,
     A600: #000000,
-    A700: #dadce0,
+    A700: #8795a1,
     A800: #fafafa,
     A900: #fafafa,
     contrast: (
-        50: $black-87-opacity,
-        100: $black-87-opacity,
-        200: $black-87-opacity,
-        300: $black-87-opacity,
-        400: $black-87-opacity,
+        50: #3d4852,
+        100: #3d4852,
+        200: #3d4852,
+        300: #3d4852,
+        400: #3d4852,
         500: white,
         600: white,
         700: white,
         800: white,
         900: white,
-        A100: $black-87-opacity,
-        A200: $black-87-opacity,
-        A400: $black-87-opacity,
+        A100: #3d4852,
+        A200: #3d4852,
+        A400: #3d4852,
         A700: white,
     )
 );
@@ -96,7 +96,7 @@ $caos-light-brand: (
 // hue. Available color palettes: https://material.io/design/color/
 
 $light-primary: mat-palette($caos-light-brand);
-$light-accent: mat-palette($mat-cyan);
+$light-accent: mat-palette($mat-pink);
 $light-warn: mat-palette($mat-red);
 
 $dark-primary: mat-palette($caos-dark-brand);
@@ -121,11 +121,7 @@ $custom-typography: mat-typography-config(
     @include angular-material-theme($light-theme);
     color: #202124;
 
-    .crescent {
-        background-color:white !important;
-    }
-
-	.side, .main-container {
+	.crescent, .side, .main-container {
 		background-color: white;
     }
 }
@@ -134,11 +130,7 @@ $custom-typography: mat-typography-config(
     @include component-themes($dark-theme);
     @include angular-material-theme($dark-theme);
 
-    .crescent {
-        background-color: #212224;
-    }
-
-	mat-card, .side, .main-container {
+	.crescent, .side, .main-container {
 		background-color: #212224;
     }
     

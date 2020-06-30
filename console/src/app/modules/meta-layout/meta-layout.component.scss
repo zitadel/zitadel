@@ -17,7 +17,6 @@
     .meta {
         position: relative;
         flex: 1 0 300px;
-        background: linear-gradient(to bottom right, #4072b410 20%,transparent 50%);
 
 		@media only screen and (min-width: 1500px) {
 			flex-basis: 400px;
@@ -33,7 +32,6 @@
         &.hidden {
             flex: 0 0 0 !important;
             width: 0;
-            background: linear-gradient(to bottom right, #4072b450,transparent 50%);
 
             .hide {
                 transform: rotate(180deg);
@@ -48,9 +46,6 @@
             top: 0;
             left: 0;
             height: 50%;
-            border-left: 2px solid #4072b4;
-            -webkit-border-image: -webkit-gradient(linear, left top, left bottom, from(#4072b4), to(#212224), color-stop(01, #212224)) 50 21;
-            border-image: -webkit-gradient(linear, left top, left bottom, from(#4072b4), to(#212224), color-stop(01, #212224)) 50 21;
         }
 
         .hide {
@@ -75,12 +70,4 @@
             }
         }
     }
-    
-
-	// @media only screen and (max-width: 700px) {
-    //     flex-direction: column;
-    //     .main-content, .meta {
-    //         overflow-y: visible;
-    //     }
-    // }
 }
