@@ -15,16 +15,20 @@ type testVerifier struct {
 	grant *Grant
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token string) (string, string, string, error) {
-	return "userID", "clientID", "agentID", nil
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, error) {
+	return "userID", "agentID", nil
 }
 
-func (v *testVerifier) ResolveGrant(ctx context.Context) (*Grant, error) {
+func (v *testVerifier) ResolveGrants(ctx context.Context) (*Grant, error) {
 	return v.grant, nil
 }
 
-func (v *testVerifier) GetProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
+func (v *testVerifier) ProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
 	return "", nil
+}
+
+func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, error) {
+	return "clientID", nil
 }
 
 func equalStringArray(a, b []string) bool {
@@ -42,9 +46,9 @@ func equalStringArray(a, b []string) bool {
 func Test_GetUserMethodPermissions(t *testing.T) {
 	type args struct {
 		ctx          context.Context
-		verifier     TokenVerifierOld
+		verifier     *TokenVerifier
 		requiredPerm string
-		authConfig   *Config
+		authConfig   Config
 	}
 	tests := []struct {
 		name    string
@@ -57,16 +61,17 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "Empty Context",
 			args: args{
 				ctx: getTestCtx("", ""),
-				verifier: &testVerifier{grant: &Grant{
-					Roles: []string{"ORG_OWNER"}}},
+				verifier: Start(&testVerifier{grant: &Grant{
+					Roles: []string{"ORG_OWNER"},
+				}}),
 				requiredPerm: "project.read",
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -81,15 +86,15 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "No Grants",
 			args: args{
 				ctx:          getTestCtx("", ""),
-				verifier:     &testVerifier{grant: &Grant{}},
+				verifier:     Start(&testVerifier{grant: &Grant{}}),
 				requiredPerm: "project.read",
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -102,16 +107,17 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "Get Permissions",
 			args: args{
 				ctx: getTestCtx("userID", "orgID"),
-				verifier: &testVerifier{grant: &Grant{
-					Roles: []string{"ORG_OWNER"}}},
+				verifier: Start(&testVerifier{grant: &Grant{
+					Roles: []string{"ORG_OWNER"},
+				}}),
 				requiredPerm: "project.read",
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -144,7 +150,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 	type args struct {
 		requiredPerm string
 		grant        *Grant
-		authConfig   *Config
+		authConfig   Config
 	}
 	tests := []struct {
 		name   string
@@ -156,13 +162,13 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			args: args{
 				requiredPerm: "project.read",
 				grant:        &Grant{Roles: []string{"ORG_OWNER"}},
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -176,13 +182,13 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			args: args{
 				requiredPerm: "project.write",
 				grant:        &Grant{Roles: []string{"ORG_OWNER"}},
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -196,13 +202,13 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			args: args{
 				requiredPerm: "project.read",
 				grant:        &Grant{Roles: []string{"ORG_OWNER", "IAM_OWNER"}},
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -216,13 +222,13 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 			args: args{
 				requiredPerm: "project.read",
 				grant:        &Grant{Roles: []string{"ORG_OWNER", "PROJECT_OWNER:1"}},
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "PROJECT_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -246,7 +252,7 @@ func Test_MapRoleToPerm(t *testing.T) {
 	type args struct {
 		requiredPerm        string
 		actualRole          string
-		authConfig          *Config
+		authConfig          Config
 		resolvedPermissions []string
 	}
 	tests := []struct {
@@ -259,13 +265,13 @@ func Test_MapRoleToPerm(t *testing.T) {
 			args: args{
 				requiredPerm: "project.read",
 				actualRole:   "ORG_OWNER",
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -280,13 +286,13 @@ func Test_MapRoleToPerm(t *testing.T) {
 			args: args{
 				requiredPerm: "project.read",
 				actualRole:   "ORG_OWNER",
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "IAM_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -301,13 +307,13 @@ func Test_MapRoleToPerm(t *testing.T) {
 			args: args{
 				requiredPerm: "project.read",
 				actualRole:   "PROJECT_OWNER:1",
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "PROJECT_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},
@@ -322,13 +328,13 @@ func Test_MapRoleToPerm(t *testing.T) {
 			args: args{
 				requiredPerm: "project.read",
 				actualRole:   "PROJECT_OWNER:1",
-				authConfig: &Config{
+				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
-						RoleMapping{
+						{
 							Role:        "PROJECT_OWNER",
 							Permissions: []string{"project.read"},
 						},
-						RoleMapping{
+						{
 							Role:        "ORG_OWNER",
 							Permissions: []string{"org.read", "project.read"},
 						},

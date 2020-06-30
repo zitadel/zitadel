@@ -21,13 +21,16 @@ var (
 
 type verifierMock struct{}
 
-func (v *verifierMock) VerifyAccessToken(ctx context.Context, token string) (string, string, string, error) {
-	return "", "", "", nil
+func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, error) {
+	return "", "", nil
 }
-func (v *verifierMock) ResolveGrant(ctx context.Context) (*authz.Grant, error) {
+func (v *verifierMock) ResolveGrants(ctx context.Context) (*authz.Grant, error) {
 	return nil, nil
 }
-func (v *verifierMock) GetProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
+func (v *verifierMock) ProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
+	return "", nil
+}
+func (v *verifierMock) VerifierClientID(ctx context.Context, appName string) (string, error) {
 	return "", nil
 }
 
@@ -37,8 +40,8 @@ func Test_authorize(t *testing.T) {
 		req         interface{}
 		info        *grpc.UnaryServerInfo
 		handler     grpc.UnaryHandler
-		verifier    authz.TokenVerifierOld
-		authConfig  *authz.Config
+		verifier    *authz.TokenVerifier
+		authConfig  authz.Config
 		authMethods authz.MethodMapping
 	}
 	tests := []struct {
@@ -50,12 +53,15 @@ func Test_authorize(t *testing.T) {
 		{
 			"no token needed ok",
 			args{
-				ctx:         context.Background(),
-				req:         &mockReq{},
-				info:        mockInfo("no.token.needed"),
-				handler:     emptyMockHandler,
-				verifier:    nil,
-				authConfig:  nil,
+				ctx:     context.Background(),
+				req:     &mockReq{},
+				info:    mockInfo("/no/token/needed"),
+				handler: emptyMockHandler,
+				verifier: func() *authz.TokenVerifier {
+					verifier := authz.Start(&verifierMock{})
+					verifier.RegisterServer("need", "need", authz.MethodMapping{})
+					return verifier
+				}(),
 				authMethods: mockMethods,
 			},
 			&mockReq{},
@@ -64,12 +70,16 @@ func Test_authorize(t *testing.T) {
 		{
 			"auth header missing error",
 			args{
-				ctx:         context.Background(),
-				req:         &mockReq{},
-				info:        mockInfo("need.authentication"),
-				handler:     emptyMockHandler,
-				verifier:    nil,
-				authConfig:  nil,
+				ctx:     context.Background(),
+				req:     &mockReq{},
+				info:    mockInfo("/need/authentication"),
+				handler: emptyMockHandler,
+				verifier: func() *authz.TokenVerifier {
+					verifier := authz.Start(&verifierMock{})
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
+					return verifier
+				}(),
+				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
 			nil,
@@ -78,12 +88,16 @@ func Test_authorize(t *testing.T) {
 		{
 			"unauthorized error",
 			args{
-				ctx:         metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "wrong")),
-				req:         &mockReq{},
-				info:        mockInfo("need.authentication"),
-				handler:     emptyMockHandler,
-				verifier:    nil,
-				authConfig:  nil,
+				ctx:     metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "wrong")),
+				req:     &mockReq{},
+				info:    mockInfo("/need/authentication"),
+				handler: emptyMockHandler,
+				verifier: func() *authz.TokenVerifier {
+					verifier := authz.Start(&verifierMock{})
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
+					return verifier
+				}(),
+				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
 			nil,
@@ -92,12 +106,16 @@ func Test_authorize(t *testing.T) {
 		{
 			"authorized ok",
 			args{
-				ctx:         metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "Bearer token")),
-				req:         &mockReq{},
-				info:        mockInfo("need.authentication"),
-				handler:     emptyMockHandler,
-				verifier:    &verifierMock{},
-				authConfig:  nil,
+				ctx:     metadata.NewIncomingContext(context.Background(), metadata.Pairs("authorization", "Bearer token")),
+				req:     &mockReq{},
+				info:    mockInfo("/need/authentication"),
+				handler: emptyMockHandler,
+				verifier: func() *authz.TokenVerifier {
+					verifier := authz.Start(&verifierMock{})
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
+					return verifier
+				}(),
+				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
 			&mockReq{},
@@ -106,7 +124,7 @@ func Test_authorize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier, tt.args.authConfig, tt.args.authMethods)
+			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier, tt.args.authConfig)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("authorize() error = %v, wantErr %v", err, tt.wantErr)
 				return
