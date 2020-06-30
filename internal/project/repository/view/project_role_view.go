@@ -13,7 +13,7 @@ func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.
 
 	projectIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
 	grantIDQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
-	keyQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: orgID, Method: global_model.SearchMethodEquals}
+	keyQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, projectIDQuery, grantIDQuery, keyQuery)
 	err := query(db, role)
 	return role, err
