@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
+import { ProjectType } from 'src/app/proto/generated/management_pb';
 
 import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
 import { OwnedProjectsComponent } from './owned-projects.component';
@@ -26,7 +27,10 @@ const routes: Routes = [
         data: { animation: 'HomePage' },
     },
     {
-        path: ':projectid/:type/members',
+        path: ':projectid/members',
+        data: {
+            type: ProjectType.PROJECTTYPE_OWNED,
+        },
         loadChildren: () => import('../../modules/project-members/project-members.module').then(m => m.ProjectMembersModule),
     },
     {

@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 import { ProjectMember, ProjectType, ProjectView, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -34,23 +34,22 @@ export class ProjectMembersComponent implements AfterViewInit {
         private dialog: MatDialog,
         private toast: ToastService,
         private route: ActivatedRoute) {
-        this.route.params.subscribe(params => {
-            console.log(params);
-            switch (params.type) {
-                case 'owned':
-                    this.projectType = ProjectType.PROJECTTYPE_OWNED;
-                    break;
-                case 'granted':
-                    this.projectType = ProjectType.PROJECTTYPE_GRANTED;
-                    break;
-            }
-            console.log(this.projectType);
-            this.projectService.GetProjectById(params.projectid).then(project => {
-                this.project = project.toObject();
-                this.dataSource = new ProjectMembersDataSource(this.projectService);
-                this.dataSource.loadMembers(this.project, this.projectType, 0, 25, 'asc');
+        this.route.data.pipe(take(1)).subscribe(data => {
+            this.projectType = data.type;
+            console.log(data);
+
+            this.route.params.subscribe(params => {
+                console.log(params);
+
+                console.log(this.projectType);
+                this.projectService.GetProjectById(params.projectid).then(project => {
+                    this.project = project.toObject();
+                    this.dataSource = new ProjectMembersDataSource(this.projectService);
+                    this.dataSource.loadMembers(this.project, this.projectType, 0, 25, 'asc');
+                });
             });
         });
+
     }
 
     public ngAfterViewInit(): void {
