@@ -360,10 +360,12 @@
                 "DESC":"These are the Managers of the granted organization"
             },
             "SHOWDETAIL":"Show Details",
+            "USER":"User",
             "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
             "ROLENAMESLIST": "Roles"

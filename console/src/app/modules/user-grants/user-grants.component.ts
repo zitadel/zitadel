@@ -27,7 +27,10 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @Input() allowDelete: boolean = false;
     constructor(private userService: MgmtUserService) { }
 
-    public displayedColumns: string[] = ['select', 'orgId', 'projectId', 'creationDate', 'changeDate', 'roleNamesList'];
+    public displayedColumns: string[] = ['select',
+        'user',
+        'org',
+        'projectId', 'creationDate', 'changeDate', 'roleNamesList'];
 
     public ngOnInit(): void {
         this.dataSource = new UserGrantsDataSource(this.userService);

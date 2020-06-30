@@ -10,18 +10,14 @@
         </ng-container>
     </div>
     <span class="fill-space"></span>
-    <!-- <ng-template appHasRole [appHasRole]="['user.grant.delete:'+userId,'user.grant.delete']"> -->
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button
         *ngIf="selection.hasValue() && allowDelete">
         <i class="las la-trash"></i>
     </button>
-    <!-- </ng-template> -->
-    <!-- <ng-template appHasRole [appHasRole]="['user.grant.write:'+userId,'user.grant.write']"> -->
     <a *ngIf="allowCreate" matTooltip="{{'GRANTS.ADD' | translate}}" color="primary" class="add-button" color="primary"
         mat-raised-button [routerLink]="['grant-create']">
         <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
     </a>
-    <!-- </ng-template> -->
 </div>
 
 <div class="table-wrapper">
@@ -40,14 +36,24 @@
             <td class="selection" mat-cell *matCellDef="let row">
                 <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                     (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                    <app-avatar *ngIf="row && (row?.displayName || (row.firstName && row.lastName))" class="avatar"
+                        [name]="row.displayName ? row.displayName : (row.firstName + ' '+ row.lastName)" [size]="32">
+                    </app-avatar>
                 </mat-checkbox>
             </td>
         </ng-container>
 
-        <ng-container matColumnDef="orgId">
+
+        <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }} </th>
+            <td class="pointer" mat-cell *matCellDef="let grant">
+                {{grant?.firstName}} {{grant?.lastName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="org">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                {{grant.orgDomain}} </td>
+                {{grant.orgDomain}} {{grant.orgName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="projectId">

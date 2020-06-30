@@ -359,10 +359,12 @@
                 "DESC":"Dies sind die berechtigten Zugänge für die Organisation"
             },
             "SHOWDETAIL":"Zeige Details",
+            "USER":"Benutzer",
             "MEMBERS":"Managers",
             "PROJECTNAME":"Projekt Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
             "ROLENAMESLIST": "Rollen"

@@ -13,6 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 
+import { AvatarModule } from '../avatar/avatar.module';
 import { UserGrantsComponent } from './user-grants.component';
 
 
@@ -22,6 +23,7 @@ import { UserGrantsComponent } from './user-grants.component';
     imports: [
         CommonModule,
         FormsModule,
+        AvatarModule,
         MatButtonModule,
         HasRoleModule,
         MatTableModule,

@@ -42,9 +42,12 @@
         background-color: #2d2e30;
 
         td, th {
+            padding-left: .5rem;
+            padding-right: .5rem;
+
             &:first-child {
                 padding-left: 0;
-                padding-right: 1rem;
+                padding-right: .5rem;
             }
 
             &:last-child {
