@@ -1,0 +1,56 @@
+<div class="view-toggle">
+    <div class="anim-list" @list *ngIf="selection.selected.length > 0">
+        <!-- <ng-template appHasRole [appHasRole]="['project.write']">
+            <button (click)="deactivateProjects(selection.selected)" @animate
+                matTooltip="{{'PROJECT.TABLE.DEACTIVATE' | translate}}" class="left-button" mat-icon-button>
+                <i class="las la-toggle-off"></i>
+            </button>
+            <button @animate (click)="reactivateProjects(selection.selected)" class="left-button"
+                matTooltip="{{'PROJECT.TABLE.ACTIVATE' | translate}}" mat-icon-button>
+                <i class="las la-toggle-on"></i>
+            </button>
+        </ng-template> -->
+    </div>
+    <button [disabled]="selection.selected.length > 0" (click)="changedView.emit(true)" mat-icon-button>
+        <i class="show list view las la-th-list"></i>
+    </button>
+</div>
+<div class="container">
+    <mat-progress-bar *ngIf="loading" class="spinner" color="accent" mode="indeterminate"></mat-progress-bar>
+    <div class="item card" *ngFor="let item of items; index as i" (click)="selectItem(item, $event)"
+        [ngClass]="{ selected: selection.isSelected(item), inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
+        <mat-icon matTooltip="select item" (click)="selection.toggle(item)" class="selection-icon">
+            check_circle</mat-icon>
+        <div class="text-part">
+            <span *ngIf="item.changeDate" class="top">last modified on
+                {{
+                        item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+            }}</span>
+            <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
+            <span class="description" *ngIf="item.grantedOrgName">{{item.grantedOrgName}}</span>
+            <!-- <span class="description" *ngIf="item.state">{{'PROJECT.STATE.'+item.state | translate}}</span> -->
+            <span *ngIf="item.changeDate" class="created">created on
+                {{
+                        item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+            }}</span>
+            <span class="fill-space"></span>
+            <div class="icons">
+            </div>
+        </div>
+        <button [matMenuTriggerFor]="editMenu" class="edit-button" mat-icon-button>
+            <mat-icon>more_vert</mat-icon>
+        </button>
+
+        <mat-menu #editMenu="matMenu">
+            <ng-template matMenuContent>
+                <button (click)="selectItem(item)" mat-menu-item>
+                    {{'ACTIONS.VIEW' | translate}}
+                </button>
+                <button (click)="selection.toggle(item)" mat-menu-item>
+                    {{'ACTIONS.INFO' | translate}}
+                </button>
+            </ng-template>
+        </mat-menu>
+    </div>
+    <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
+</div>

@@ -4,13 +4,28 @@
         <ng-template #lighttheme>
             <img src="./assets/images/zitadel-logo-oneline-lightdesign.svg" />
         </ng-template>
-        <p>{{'HOME.DESCRIPTION' | translate}}</p>
     </div>
 
     <div class="container">
+        <ng-template appHasRole [appHasRole]="['iam.write']">
+            <div class="item">
+                <div class="top">
+                    <h2>
+                        <i class="icon las la-gem"></i>
+                        {{'HOME.IAM'| translate}}</h2>
+                    <p>{{'HOME.IAM_DESC'| translate}}</p>
+                </div>
+                <span class="fill-space"></span>
+                <div class="footer">
+                    <a color="accent" mat-button [routerLink]="['/iam']">{{'HOME.IAM_BUTTON' | translate}}</a>
+                </div>
+            </div>
+        </ng-template>
+
         <div class="item">
             <div class="top">
-                <h2>{{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
+                <h2> <i class="icon las la-user-circle"></i>
+                    {{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
                 <p>{{'HOME.SECURITYANDPRIVACY_DESC'| translate}}</p>
             </div>
             <span class="fill-space"></span>
@@ -19,35 +34,50 @@
                     [routerLink]="['/users/me']">{{'HOME.SECURITYANDPRIVACY_BUTTON' | translate}}</a>
             </div>
         </div>
-        <div class="item">
-            <div class="top">
-                <h2>{{'HOME.PROJECTS'| translate}}</h2>
-                <p>{{'HOME.PROJECTS_DESC'| translate}}</p>
+
+        <ng-template appHasRole [appHasRole]="['project.read']">
+            <div class="item">
+                <div class="top">
+                    <h2>
+                        <i class="icon las la-layer-group"></i>
+                        {{'HOME.PROJECTS'| translate}}</h2>
+                    <p>{{'HOME.PROJECTS_DESC'| translate}}</p>
+                </div>
+                <span class="fill-space"></span>
+                <div class="footer">
+                    <a color="accent" mat-button [routerLink]="['/projects']">{{'HOME.PROJECTS_BUTTON' | translate}}</a>
+                </div>
             </div>
-            <span class="fill-space"></span>
-            <div class="footer">
-                <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.PROJECTS_BUTTON' | translate}}</a>
+        </ng-template>
+
+        <ng-template appHasRole [appHasRole]="['org.read']">
+            <div class="item">
+                <div class="top">
+                    <h2> <i class="icon las la-archway"></i>
+                        {{'HOME.PROTECTION'| translate}}</h2>
+                    <p>{{'HOME.PROTECTION_DESC'| translate}}</p>
+                </div>
+                <span class="fill-space"></span>
+                <div class="footer">
+                    <a color="accent" mat-button
+                        [routerLink]="['/users/me']">{{'HOME.PROTECTION_BUTTON' | translate}}</a>
+                </div>
             </div>
-        </div>
-        <div class="item">
-            <div class="top">
-                <h2>{{'HOME.PROTECTION'| translate}}</h2>
-                <p>{{'HOME.PROTECTION_DESC'| translate}}</p>
+        </ng-template>
+
+        <ng-template appHasRole [appHasRole]="['user.read']">
+            <div class="item">
+                <div class="top">
+                    <h2>
+                        <i class="las la-crosshairs"></i>
+                        {{'HOME.USERS'| translate}}</h2>
+                    <p>{{'HOME.USERS_DESC'| translate}}</p>
+                </div>
+                <span class="fill-space"></span>
+                <div class="footer">
+                    <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.USERS_BUTTON' | translate}}</a>
+                </div>
             </div>
-            <span class="fill-space"></span>
-            <div class="footer">
-                <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.PROTECTION_BUTTON' | translate}}</a>
-            </div>
-        </div>
-        <div class="item">
-            <div class="top">
-                <h2>{{'HOME.USERS'| translate}}</h2>
-                <p>{{'HOME.USERS_DESC'| translate}}</p>
-            </div>
-            <span class="fill-space"></span>
-            <div class="footer">
-                <a color="accent" mat-button [routerLink]="['/users/me']">{{'HOME.USERS_BUTTON' | translate}}</a>
-            </div>
-        </div>
+        </ng-template>
     </div>
 </div>

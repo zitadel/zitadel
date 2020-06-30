@@ -2,7 +2,6 @@
     "APP_NAME": "zitadel",
     "HOME": {
         "TITLE": "zitadel",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
         "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
@@ -14,15 +13,21 @@
         "PROJECTS_BUTTON": "Projekt Übersicht",
         "USERS": "Totale Kontrolle und Überwachbarkeit",
         "USERS_DESC": "Überwachen Sie Ihr Rollenkonzept in Echtzeit. Ergreifen Sie sofort Maßnahmen.",
-        "USERS_BUTTON": "Benutzer anzeigen"
+        "USERS_BUTTON": "Benutzer anzeigen",
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Fügen Sie neue Organisationen hinzu oder editieren Sie Ihre IAM Manager",
+        "IAM_BUTTON": "Zitadel verwalten"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
+        "IAM":"IAM",
         "ORGANIZATION": "Organisation",
         "PROJECT": "Projekte",
+        "GRANTEDPROJECT":"Berechtigte Projekte",
         "USER": "Benutzer",
         "LOGOUT": "abmelden",
-        "NEWORG":"Neue Organisation"
+        "NEWORG":"Neue Organisation",
+        "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!"
     },
     "ACTIONS": {
         "SAVE": "speichern",
@@ -189,6 +194,15 @@
         "EDITACCOUNT":"Account bearbeiten",
         "ADDACCOUNT":"mit einem anderen Account anmelden"
     },
+    "IAM": {
+        "DETAIL": {
+            "TITLE":"Identity and Access Management",
+            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, manage managers and define global policies."
+        }, 
+        "MEMBER": {
+            "TITLE":"IAM Members"
+        }
+    },
     "ORG": {
         "PAGES": {
             "LIST": "Organisationen",
@@ -241,6 +255,12 @@
                 "TITLECREATE":"Kennwortsperrrichtlinie festlegen",
                 "DESCRIPTIONCREATE":"Kennwortwiederholungen sind im Standardmodus unendlich. Sie müssen diese Erweiterung installieren, wenn Sie Wiederholungsversuche anzeigen oder eine maximale Versuchsnummer festlegen möchten."
             },
+            "IAM_POLICY": {
+                "TITLE":"IAM Zugangseinstellungen",
+                "DESCRIPTION":"Definieren Sie Zugangseistellungen für Nutzer",
+                "TITLECREATE":"IAM Zugangseinstellungen festlegen",
+                "DESCRIPTIONCREATE":"Emails als Benutzername sind nicht erlaubt wenn UserLoginMustBeDomain gesetzt ist."
+            },
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -253,7 +273,8 @@
                 "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
                 "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
                 "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
-                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen"
+                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Richtlinie entfernen"
         }
@@ -318,12 +339,13 @@
         "MEMBER": {
             "TITLE": "Manager",
             "TITLEDESC":"Manager können Änderungen an dieser Entität vornehmen",
-            "DESCRIPTION":"Hier finden Sie alle Mitwirkenden dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
+            "DESCRIPTION":"Hier finden Sie alle Manager dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
             "EMAIL": "Email",
-            "ROLES": "Rollen"
+            "ROLES": "Rollen",
+            "USERID":"User Id"
         },
         "GRANT": {
             "TITLE": "Grants",
@@ -432,7 +454,7 @@
         "en": "Englisch"
     },
     "MEMBER":{
-        "ADD":"Mitwirkenden hinzufügen"
+        "ADD":"Manager hinzufügen"
     },
     "ROLES": {
         "ORG_OWNER": "Org Owner",
@@ -482,6 +504,7 @@
     },
     "CHANGES": {
         "LISTTITLE":"Letzte Änderungen",
+        "BOTTOM":"Ende",
         "ORG": {
             "TITLE":"Aktivität",
             "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die die Organisation betreffen"
@@ -502,6 +525,7 @@
             "org.domain.added":"Org Domain hinzugefügt",
             "org.domain.verified":"Org Domain verifiziert",
             "org.domain.primary.set":"Primäre domain gesetzt",
+            "org.domain.removed":"Org domain entfernt",
             "org.iam.policy.added":"IAM Policy hinzugefügt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
@@ -545,7 +569,9 @@
             "user.password.check.succeeded":"Password check erfolgreich",
             "user.mfa.init.skipped":"MFA init übersprungen",
             "user.mfa.otp.added":"MFA OTP hinzugefügt",
-            "user.mfa.otp.verified":"MFA OTP verifiziert"
+            "user.mfa.otp.verified":"MFA OTP verifiziert",
+            "user.mfa.otp.removed":"MFA OTP entfernt",
+            "user.selfregistered":"selbst registriert"
         }
     }
 }

@@ -67,8 +67,6 @@ export class AuthService {
         this.config.redirectUri = config?.redirectUri || this.grpcService.redirectUri;
         this.config.postLogoutRedirectUri = config?.postLogoutRedirectUri || this.grpcService.postLogoutRedirectUri;
         this.config.customQueryParams = config?.customQueryParams;
-        console.log(this.config);
-
         this.oauthService.configure(this.config);
         // this.oauthService.setupAutomaticSilentRefresh();
         this.oauthService.strictDiscoveryDocumentValidation = false;

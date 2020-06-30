@@ -228,8 +228,16 @@ func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password st
 	return repo.UserEvents.SetPassword(ctx, policy, userID, code, password)
 }
 
-func (repo *UserRepo) SignOut(ctx context.Context, agentID, userID string) error {
-	return repo.UserEvents.SignOut(ctx, agentID, userID)
+func (repo *UserRepo) SignOut(ctx context.Context, agentID string) error {
+	userSessions, err := repo.View.UserSessionsByAgentID(agentID)
+	if err != nil {
+		return err
+	}
+	userIDs := make([]string, len(userSessions))
+	for i, session := range userSessions {
+		userIDs[i] = session.UserID
+	}
+	return repo.UserEvents.SignOut(ctx, agentID, userIDs)
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView, error) {

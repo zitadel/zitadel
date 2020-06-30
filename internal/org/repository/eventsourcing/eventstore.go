@@ -3,8 +3,9 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"log"
+
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
@@ -194,8 +195,8 @@ func (es *OrgEventstore) RemoveOrgDomain(ctx context.Context, domain *org_model.
 	return nil
 }
 
-func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
-	query := ChangesQuery(id, lastSequence)
+func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
+	query := ChangesQuery(id, lastSequence, limit, sortAscending)
 
 	events, err := es.Eventstore.FilterEvents(context.Background(), query)
 	if err != nil {
@@ -214,7 +215,7 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence
 		change := &org_model.OrgChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 
@@ -240,11 +241,17 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence
 	return changes, nil
 }
 
-func ChangesQuery(orgID string, latestSequence uint64) *es_models.SearchQuery {
+func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
 	query := es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate).
-		LatestSequenceFilter(latestSequence).
-		AggregateIDFilter(orgID)
+		AggregateTypeFilter(model.OrgAggregate)
+
+	if !sortAscending {
+		query.OrderDesc() //TODO: configure from param
+	}
+
+	query.LatestSequenceFilter(latestSequence).
+		AggregateIDFilter(orgID).
+		SetLimit(limit)
 	return query
 }
 

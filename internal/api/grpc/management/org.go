@@ -63,7 +63,7 @@ func (s *Server) RemoveMyOrgDomain(ctx context.Context, in *grpc.RemoveOrgDomain
 }
 
 func (s *Server) OrgChanges(ctx context.Context, changesRequest *grpc.ChangeRequest) (*grpc.Changes, error) {
-	response, err := s.org.OrgChanges(ctx, changesRequest.Id, 0, 0)
+	response, err := s.org.OrgChanges(ctx, changesRequest.Id, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err
 	}

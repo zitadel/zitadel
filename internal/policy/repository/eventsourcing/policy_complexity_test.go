@@ -32,7 +32,7 @@ func TestPasswordComplexityPolicyQuery(t *testing.T) {
 				sequence:      0,
 			},
 			res: res{
-				filterLen: 3,
+				filterLen: 2,
 			},
 		},
 		{

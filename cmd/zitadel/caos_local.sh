@@ -3,7 +3,7 @@ BASEDIR=$(dirname "$0")
 gopass sync --store zitadel-secrets
 
 # Tracing
-gopass zitadel-secrets/zitadel/developer/default/zitadel-svc-account-eventstore-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
+gopass zitadel-secrets/zitadel/developer/default/zitadel-svc-account-zitadel-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
 export GOOGLE_APPLICATION_CREDENTIALS="$BASEDIR/local_svc-account-tracing.json"
 
 export ZITADEL_TRACING_PROJECT_ID=caos-citadel-test

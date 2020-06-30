@@ -3,7 +3,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Org } from 'src/app/proto/generated/auth_pb';
-import { Project, ProjectRole, UserGrant } from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, UserGrant } from 'src/app/proto/generated/management_pb';
 import { AuthService } from 'src/app/services/auth.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -32,13 +32,11 @@ export class UserGrantCreateComponent implements OnDestroy {
         private route: ActivatedRoute,
     ) {
         this.subscription = this.route.params.subscribe(({ id }: Params) => {
-            console.log(id);
             this.userId = id;
         });
 
         this.authService.GetActiveOrg().then(org => {
             this.org = org;
-            console.log(org);
         });
     }
 
@@ -52,16 +50,14 @@ export class UserGrantCreateComponent implements OnDestroy {
             this.userId,
             this.rolesList,
         ).then((data: UserGrant) => {
-            console.log(data);
             this.close();
         }).catch(error => {
             this.toast.showError(error.message);
         });
     }
 
-    public selectProject(project: Project.AsObject): void {
-        this.projectId = project.id;
-        console.log(project);
+    public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
+        this.projectId = project.id ? project.id : project.projectId ? project.projectId : undefined;
     }
 
     public selectRoles(roles: ProjectRole.AsObject[]): void {

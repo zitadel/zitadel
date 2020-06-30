@@ -34,3 +34,13 @@
     cursor: pointer;
     font-size: .8rem;
 }
+
+.found-user-row {
+    display: flex;
+    align-items: center;
+}
+
+.found-label {
+    font-size: .9rem;
+    color: #81868a;
+}

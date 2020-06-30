@@ -35,7 +35,6 @@ export class GrpcService {
 
                     this.issuer = data.issuer;
                     if (data.clientid) {
-                        console.log(data.clientid);
                         this.clientid = data.clientid;
                         this.redirectUri = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + "auth/callback";
                         this.postLogoutRedirectUri = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + "signedout";

@@ -39,7 +39,7 @@ func (s *Server) SearchUsers(ctx context.Context, in *grpc.UserSearchRequest) (*
 }
 
 func (s *Server) UserChanges(ctx context.Context, changesRequest *grpc.ChangeRequest) (*grpc.Changes, error) {
-	response, err := s.user.UserChanges(ctx, changesRequest.Id, 0, 0)
+	response, err := s.user.UserChanges(ctx, changesRequest.Id, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err
 	}

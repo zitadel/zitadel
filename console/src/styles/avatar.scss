@@ -1,0 +1,19 @@
+@import '~@angular/material/theming';
+
+@mixin avatar-theme($theme) {
+    $accent: map-get($theme, accent);
+    $background: map-get($theme, background);
+    $background-color: mat-color($background, card);
+    $primary: map-get($theme, primary);
+    $primary-color: mat-color($primary, 500);
+    $primary-dark: mat-color($primary, A800);
+    $border-color: mat-color($primary, A700);
+    $border-selected-color: mat-color($primary, A600);
+
+    .avatar-circle {
+        background-color: $primary-color;
+        box-sizing: border-box;
+        outline: none;
+        color: white;
+    }
+}

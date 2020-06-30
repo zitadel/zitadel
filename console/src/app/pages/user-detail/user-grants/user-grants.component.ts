@@ -2,7 +2,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { tap } from 'rxjs/operators';
 import { ProjectGrant, UserGrant } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
@@ -58,10 +57,5 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         this.isAllSelected() ?
             this.selection.clear() :
             this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 }

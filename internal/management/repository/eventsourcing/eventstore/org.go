@@ -11,13 +11,15 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
+	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
 type OrgRepository struct {
 	SearchLimit uint64
 	*org_es.OrgEventstore
-	View  *mgmt_view.View
-	Roles []string
+	UserEvents *usr_es.UserEventstore
+	View       *mgmt_view.View
+	Roles      []string
 }
 
 func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
@@ -77,10 +79,17 @@ func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string)
 	return repo.OrgEventstore.RemoveOrgDomain(ctx, d)
 }
 
-func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*org_model.OrgChanges, error) {
-	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit)
+func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
+	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
 	}
 	return changes, nil
 }

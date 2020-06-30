@@ -27,7 +27,7 @@ type ProjectRepository interface {
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
 	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
-	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*model.ProjectChanges, error)
+	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ProjectChanges, error)
 	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 
 	ApplicationByID(ctx context.Context, appID string) (*model.ApplicationView, error)
@@ -39,7 +39,7 @@ type ProjectRepository interface {
 	ChangeOIDCConfig(ctx context.Context, config *model.OIDCConfig) (*model.OIDCConfig, error)
 	ChangeOIDConfigSecret(ctx context.Context, projectID, appID string) (*model.OIDCConfig, error)
 	SearchApplications(ctx context.Context, request *model.ApplicationSearchRequest) (*model.ApplicationSearchResponse, error)
-	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64) (*model.ApplicationChanges, error)
+	ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ApplicationChanges, error)
 
 	ProjectGrantByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
 	AddProjectGrant(ctx context.Context, grant *model.ProjectGrant) (*model.ProjectGrant, error)

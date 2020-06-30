@@ -52,6 +52,9 @@ export class ChangeRequest extends jspb.Message {
   getSequenceOffset(): number;
   setSequenceOffset(value: number): void;
 
+  getAsc(): boolean;
+  setAsc(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ChangeRequest.AsObject;
   static toObject(includeInstance: boolean, msg: ChangeRequest): ChangeRequest.AsObject;
@@ -66,6 +69,7 @@ export namespace ChangeRequest {
     secId: string,
     limit: number,
     sequenceOffset: number,
+    asc: boolean,
   }
 }
 

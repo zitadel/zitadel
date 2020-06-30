@@ -1,5 +1,4 @@
 <app-meta-layout>
-
     <div *ngIf="user" class="max-width-container">
         <div class="head">
             <a (click)="navigateBack()" mat-icon-button>
@@ -153,8 +152,8 @@
                             <button (click)="phoneEditState = true" mat-icon-button>
                                 <mat-icon>edit</mat-icon>
                             </button>
-                            <button *ngIf="user?.phone" (click)="deletePhone()" mat-icon-button>
-                                <mat-icon>delete_outline</mat-icon>
+                            <button *ngIf="user?.phone" (click)="deletePhone()" color="warn" mat-icon-button>
+                                <i class="las la-trash"></i>
                             </button>
                         </div>
                     </ng-container>
@@ -176,7 +175,7 @@
 
         <app-user-mfa *ngIf="user" [user]="user"></app-user-mfa>
 
-        <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}">
+        <!-- <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}">
             <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
                 <div class="content">
                     <mat-form-field class="formfield">
@@ -204,7 +203,7 @@
                     <button type="submit" color="primary" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                 </div>
             </form>
-        </app-card>
+        </app-card> -->
 
         <app-card *ngIf="user?.id" title="{{ 'USER.GRANTS.TITLE' | translate }}"
             description="{{'USER.GRANTS.DESCRIPTION' | translate }}">

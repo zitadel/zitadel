@@ -25,6 +25,7 @@ import {AppComponent} from './app.component';
 import {HasRoleModule} from './directives/has-role/has-role.module';
 import {OutsideClickModule} from './directives/outside-click/outside-click.module';
 import {AccountsCardModule} from './modules/accounts-card/accounts-card.module';
+import {AvatarModule } from './modules/avatar/avatar.module';
 import {SignedoutComponent} from './pages/signedout/signedout.component';
 import {AuthUserService} from './services/auth-user.service';
 import {AuthService} from './services/auth.service';
@@ -48,108 +49,108 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 }
 
 const appInitializerFn = (grpcServ: GrpcService) => {
-  return () => {
-    return grpcServ.loadAppEnvironment();
-  };
+    return () => {
+        return grpcServ.loadAppEnvironment();
+    };
 };
 
 const stateHandlerFn = (stateHandler: StatehandlerService) => {
-  return () => {
-    return stateHandler.initStateHandler();
-  };
+    return () => {
+        return stateHandler.initStateHandler();
+    };
 };
 
 const authConfig: AuthConfig = {
-  scope: 'openid profile email', // offline_access
-  responseType: 'code',
-  // showDebugInformation: true,
-  oidc: true,
+    scope: 'openid profile email', // offline_access
+    responseType: 'code',
+    // showDebugInformation: true,
+    oidc: true,
 };
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SignedoutComponent,
-  ],
-  imports: [
-    AppRoutingModule,
-    CommonModule,
-    BrowserModule,
-    OverlayModule,
-    OAuthModule.forRoot({
-      resourceServer: {
-        allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
-        sendAccessToken: true,
-      },
-    }),
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-    }),
-    AccountsCardModule,
-    HasRoleModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTooltipModule,
-    MatSidenavModule,
-    MatCardModule,
-    OutsideClickModule,
-    MatProgressBarModule,
-    MatToolbarModule,
-    MatMenuModule,
-    MatSnackBarModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
-  ],
-  providers: [
-    ThemeService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: appInitializerFn,
-      multi: true,
-      deps: [GrpcService],
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: stateHandlerFn,
-      multi: true,
-      deps: [StatehandlerService],
-    },
-    {
-      provide: AuthConfig,
-      useValue: authConfig,
-    },
-    {
-      provide: StatehandlerProcessorService,
-      useClass: StatehandlerProcessorServiceImpl,
-    },
-    {
-      provide: StatehandlerService,
-      useClass: StatehandlerServiceImpl,
-    },
-    {
-      provide: OAuthStorage,
-      useClass: StorageService,
-    },
-    {
-      provide: GRPC_INTERCEPTORS,
-      multi: true,
-      useClass: GrpcAuthInterceptor,
-    },
-    {
-      provide: GRPC_INTERCEPTORS,
-      multi: true,
-      useClass: GrpcOrgInterceptor,
-    },
-    GrpcService,
-    AuthService,
-    AuthUserService,
-  ],
-  bootstrap: [AppComponent],
+    declarations: [
+        AppComponent,
+        SignedoutComponent,
+    ],
+    imports: [
+        AppRoutingModule,
+        CommonModule,
+        BrowserModule,
+        OverlayModule,
+        OAuthModule.forRoot({
+            resourceServer: {
+                allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
+                sendAccessToken: true,
+            },
+        }),
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient],
+            },
+        }),
+        AccountsCardModule,
+        HasRoleModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTooltipModule,
+        MatSidenavModule,
+        MatCardModule,
+        OutsideClickModule,
+        MatProgressBarModule,
+        MatToolbarModule,
+        MatMenuModule,
+        MatSnackBarModule,
+        AvatarModule,
+        ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    ],
+    providers: [
+        ThemeService,
+        {
+            provide: APP_INITIALIZER,
+            useFactory: appInitializerFn,
+            multi: true,
+            deps: [GrpcService],
+        },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: stateHandlerFn,
+            multi: true,
+            deps: [StatehandlerService],
+        },
+        {
+            provide: AuthConfig,
+            useValue: authConfig,
+        },
+        {
+            provide: StatehandlerProcessorService,
+            useClass: StatehandlerProcessorServiceImpl,
+        },
+        {
+            provide: StatehandlerService,
+            useClass: StatehandlerServiceImpl,
+        },
+        {
+            provide: OAuthStorage,
+            useClass: StorageService,
+        },
+        {
+            provide: GRPC_INTERCEPTORS,
+            multi: true,
+            useClass: GrpcAuthInterceptor,
+        },
+        {
+            provide: GRPC_INTERCEPTORS,
+            multi: true,
+            useClass: GrpcOrgInterceptor,
+        },
+        GrpcService,
+        AuthService,
+        AuthUserService,
+    ],
+    bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule { }

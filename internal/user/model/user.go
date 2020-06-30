@@ -33,11 +33,12 @@ type UserChanges struct {
 }
 
 type UserChange struct {
-	ChangeDate *timestamp.Timestamp `json:"changeDate,omitempty"`
-	EventType  string               `json:"eventType,omitempty"`
-	Sequence   uint64               `json:"sequence,omitempty"`
-	Modifier   string               `json:"modifierUser,omitempty"`
-	Data       interface{}          `json:"data,omitempty"`
+	ChangeDate   *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType    string               `json:"eventType,omitempty"`
+	Sequence     uint64               `json:"sequence,omitempty"`
+	ModifierId   string               `json:"modifierUser,omitempty"`
+	ModifierName string               `json:"-"`
+	Data         interface{}          `json:"data,omitempty"`
 }
 
 type InitUserCode struct {

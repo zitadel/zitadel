@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, scan, take, tap } from 'rxjs/operators';
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
@@ -19,7 +18,8 @@ export enum ChangeType {
 export class ChangesComponent implements OnInit {
     @Input() public changeType: ChangeType = ChangeType.USER;
     @Input() public id: string = '';
-    public errorMessage: string = '';
+    @Input() public sortDirectionAsc: boolean = true;
+    public bottom: boolean = false;
 
     // Source data
     private _done: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -74,7 +74,6 @@ export class ChangesComponent implements OnInit {
                 break;
             case ChangeType.ORG: more = this.mgmtUserService.OrgChanges(this.id, 10, cursor);
                 break;
-
         }
 
         this.mapAndUpdate(more);
@@ -84,8 +83,8 @@ export class ChangesComponent implements OnInit {
     private getCursor(): number {
         const current = this._data.value;
         if (current.length) {
-            // return true ? current[0].sequence :
-            return current[current.length - 1].sequence;
+            return !this.sortDirectionAsc ? current[0].sequence :
+                current[current.length - 1].sequence;
         }
         return 0;
     }
@@ -94,41 +93,35 @@ export class ChangesComponent implements OnInit {
     private mapAndUpdate(col: Promise<Changes>): any {
         if (this._done.value || this._loading.value) { return; }
 
-        // loading
-        this._loading.next(true);
-
         // Map snapshot with doc ref (needed for cursor)
-        return from(col).pipe(
-            tap((res: Changes) => {
-                console.log('more changes');
-                let values = res.toObject().changesList;
-                // If prepending, reverse the batch order
-                values = false ? values.reverse() : values;
+        if (!this.bottom) {
+            // loading
+            this._loading.next(true);
 
-                // update source with new values, done loading
-                this._data.next(values);
-                console.log(values);
+            return from(col).pipe(
+                tap((res: Changes) => {
+                    let values = res.toObject().changesList;
+                    // If prepending, reverse the batch order
+                    values = false ? values.reverse() : values;
 
-                // console.log(values);
-                this._loading.next(false);
+                    // update source with new values, done loading
+                    this._data.next(values);
 
-                // no more values, mark done
-                if (!values.length) {
-                    this._done.next(true);
-                }
-            }),
-            catchError(err => {
-                console.error(err);
-                this._loading.next(false);
-                this.errorMessage = err.message;
-                return of([]);
-            }),
-            take(1),
-        ).subscribe();
-    }
+                    this._loading.next(false);
 
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
+                    // no more values, mark done
+                    if (!values.length) {
+                        this._done.next(true);
+                    }
+                }),
+                catchError(err => {
+                    console.error(err);
+                    this._loading.next(false);
+                    this.bottom = true;
+                    return of([]);
+                }),
+                take(1),
+            ).subscribe();
+        }
     }
 }

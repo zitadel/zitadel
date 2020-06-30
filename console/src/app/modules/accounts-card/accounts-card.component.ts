@@ -60,7 +60,7 @@ export class AccountsCardComponent implements OnInit {
     }
 
     public logout(): void {
-        this.router.navigate(['/']);
+        this.authService.signout();
         this.close.emit();
     }
 }

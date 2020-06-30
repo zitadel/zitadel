@@ -30,8 +30,7 @@ func orgCreateRequestToModel(org *grpc.CreateOrgRequest) *org_model.Org {
 func userCreateRequestToModel(user *grpc.CreateUserRequest) *usr_model.User {
 	preferredLanguage, err := language.Parse(user.PreferredLanguage)
 	logging.Log("GRPC-30hwz").OnError(err).Debug("unable to parse language")
-
-	return &usr_model.User{
+	result := &usr_model.User{
 		Profile: &usr_model.Profile{
 			UserName:          user.UserName,
 			FirstName:         user.FirstName,
@@ -47,10 +46,6 @@ func userCreateRequestToModel(user *grpc.CreateUserRequest) *usr_model.User {
 			EmailAddress:    user.Email,
 			IsEmailVerified: user.IsEmailVerified,
 		},
-		Phone: &usr_model.Phone{
-			IsPhoneVerified: user.IsPhoneVerified,
-			PhoneNumber:     user.Phone,
-		},
 		Address: &usr_model.Address{
 			Country:       user.Country,
 			Locality:      user.Locality,
@@ -59,6 +54,10 @@ func userCreateRequestToModel(user *grpc.CreateUserRequest) *usr_model.User {
 			StreetAddress: user.StreetAddress,
 		},
 	}
+	if user.Phone != "" {
+		result.Phone = &usr_model.Phone{PhoneNumber: user.Phone, IsPhoneVerified: user.IsPhoneVerified}
+	}
+	return result
 }
 
 func setUpOrgResponseFromModel(setUp *admin_model.SetupOrg) *grpc.OrgSetUpResponse {

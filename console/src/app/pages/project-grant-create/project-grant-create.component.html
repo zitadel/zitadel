@@ -11,7 +11,7 @@
     <ng-container *ngIf="currentCreateStep === 1">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</h1>
 
-        <form (ngSubmit)="searchOrg(domain)">
+        <form (ngSubmit)="searchOrg(domain.value)">
             <mat-form-field class="org-domain">
                 <mat-label>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</mat-label>
                 <input #domain matInput />
@@ -26,7 +26,7 @@
         <div class="card org" *ngIf="org">
             <p>{{org?.name}}</p>
             <span *ngIf="org.creationDate">created:
-                {{dateFromTimestamp(org.creationDate) | date: 'EEE dd. MMM, HH:mm'}}</span>
+                {{org.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'}}</span>
         </div>
     </ng-container>
 

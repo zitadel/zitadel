@@ -274,7 +274,6 @@ export class AppComponent implements OnDestroy {
         this.translate.setDefaultLang('en');
 
         this.authService.user.subscribe(userprofile => {
-            console.log(userprofile);
             this.profile = userprofile;
             const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
             this.translate.use(lang);
@@ -287,3 +286,4 @@ export class AppComponent implements OnDestroy {
         this.router.navigate(['/']);
     }
 }
+

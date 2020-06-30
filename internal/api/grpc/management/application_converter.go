@@ -339,6 +339,8 @@ func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*grpc.Chang
 			ChangeDate: change.ChangeDate,
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,
+			Editor:     change.ModifierName,
+			EditorId:   change.ModifierId,
 			Data:       data,
 		}
 	}

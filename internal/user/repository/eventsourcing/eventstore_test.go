@@ -3290,7 +3290,7 @@ func TestChangesUser(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.UserChanges{Changes: []*model.UserChange{{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &model.UserChanges{Changes: []*model.UserChange{{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				user:    &model.Profile{FirstName: "Hans", LastName: "Muster", UserName: "HansMuster"},
 			},
 		},
@@ -3310,7 +3310,7 @@ func TestChangesUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.UserChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.UserChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit, false)
 
 			user := &model.Profile{}
 			if result != nil && len(result.Changes) > 0 {

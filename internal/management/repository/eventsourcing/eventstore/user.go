@@ -99,10 +99,17 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	}, nil
 }
 
-func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64) (*usr_model.UserChanges, error) {
-	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit)
+func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
+	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
 	}
 	return changes, nil
 }

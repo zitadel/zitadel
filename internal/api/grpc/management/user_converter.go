@@ -506,6 +506,8 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*grpc.Change) {
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,
 			Data:       data,
+			EditorId:   change.ModifierId,
+			Editor:     change.ModifierName,
 		}
 	}
 
