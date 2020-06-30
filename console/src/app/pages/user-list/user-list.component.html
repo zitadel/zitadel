@@ -40,9 +40,14 @@
                         [indeterminate]="selection.hasValue() && !isAllSelected()">
                     </mat-checkbox>
                 </th>
-                <td mat-cell *matCellDef="let row">
+                <td mat-cell *matCellDef="let user">
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()"
-                        (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                        (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
+                        <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
+                            class="small-avatar"
+                            [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)"
+                            [size]="32">
+                        </app-avatar>
                     </mat-checkbox>
                 </td>
             </ng-container>

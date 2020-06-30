@@ -192,7 +192,7 @@
         "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
-        "ADDACCOUNT":"mit einem anderen Account anmelden"
+        "ADDACCOUNT":"Account hinzufügen"
     },
     "IAM": {
         "DETAIL": {
