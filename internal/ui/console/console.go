@@ -10,7 +10,7 @@ import (
 	"github.com/rakyll/statik/fs"
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
-	_ "github.com/caos/zitadel/pkg/console/statik"
+	_ "github.com/caos/zitadel/internal/ui/console/statik"
 )
 
 type Config struct {

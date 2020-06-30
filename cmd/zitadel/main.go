@@ -23,7 +23,7 @@ import (
 	"github.com/caos/zitadel/internal/notification"
 	tracing "github.com/caos/zitadel/internal/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
-	"github.com/caos/zitadel/pkg/console"
+	"github.com/caos/zitadel/internal/ui/console"
 )
 
 type Config struct {
