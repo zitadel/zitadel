@@ -12,15 +12,15 @@
             </div>
         </div>
 
-        <app-card>
-            <h1>{{ 'PROJECT.MEMBER.TITLE' | translate }}</h1>
-            <p class="desc">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</p>
-
-            <app-project-grant-members *ngIf="project && project.projectId && project.id"
-                [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
-                [projectId]="project.projectId" [grantId]="project.id">
-            </app-project-grant-members>
+        <!-- <ng-template appHasRole [appHasRole]="['project.grant.user.grant.read']"> -->
+        <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
+            description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
+            <app-user-grants [filter]="userGrantSearchKey" [filterValue]="project.projectId"
+                [allowCreate]="['project.grant.user.grant.write'] | hasRole"
+                [allowDelete]="['project.grant.user.grant.delete'] | hasRole">
+            </app-user-grants>
         </app-card>
+        <!-- </ng-template> -->
     </div>
     <metainfo class="side">
         <div class="details">

@@ -35,6 +35,16 @@ export class ProjectMembersComponent implements AfterViewInit {
         private toast: ToastService,
         private route: ActivatedRoute) {
         this.route.params.subscribe(params => {
+            console.log(params);
+            switch (params.type) {
+                case 'owned':
+                    this.projectType = ProjectType.PROJECTTYPE_OWNED;
+                    break;
+                case 'granted':
+                    this.projectType = ProjectType.PROJECTTYPE_GRANTED;
+                    break;
+            }
+            console.log(this.projectType);
             this.projectService.GetProjectById(params.projectid).then(project => {
                 this.project = project.toObject();
                 this.dataSource = new ProjectMembersDataSource(this.projectService);

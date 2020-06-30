@@ -26,7 +26,7 @@ const routes: Routes = [
         data: { animation: 'HomePage' },
     },
     {
-        path: ':projectid/members',
+        path: ':projectid/:type/members',
         loadChildren: () => import('../../modules/project-members/project-members.module').then(m => m.ProjectMembersModule),
     },
     {

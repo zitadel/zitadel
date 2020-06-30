@@ -34,6 +34,8 @@ export class ProjectContributorsComponent implements OnInit {
     public ProjectState: any = ProjectState;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
+    public ProjectType: any = ProjectType;
+
     constructor(private projectService: ProjectService,
         private dialog: MatDialog,
         private toast: ToastService,
@@ -90,7 +92,11 @@ export class ProjectContributorsComponent implements OnInit {
 
     public showDetail(): void {
         if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.router.navigate(['projects', this.project.projectId, 'members']);
+            if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+                this.router.navigate(['projects', this.project.projectId, 'granted', 'members']);
+            } else if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+                this.router.navigate(['projects', this.project.projectId, 'owned', 'members']);
+            }
         }
     }
 }
