@@ -11,10 +11,10 @@
         .meta {
             position: relative;
             flex: 1 0 300px;
-            background: linear-gradient(to bottom right,rgba($lighter-color, .1) 20%,transparent 50%);
+            background: linear-gradient(to bottom right,rgba($lighter-color, .05) 20%,transparent 50%);
 
             &.hidden {
-                background: linear-gradient(to bottom right, rgba($lighter-color, .1),transparent 50%);
+                background: linear-gradient(to bottom right, rgba($lighter-color, .05),transparent 50%);
             }
     
             &:after {

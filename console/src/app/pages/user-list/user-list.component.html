@@ -44,7 +44,7 @@
                     <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
                         <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
-                            class="small-avatar"
+                            class="avatar"
                             [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)"
                             [size]="32">
                         </app-avatar>

@@ -17,12 +17,11 @@
         width: 80px;
         margin: 1rem;
         border-radius: 16px;
+        border: 1px solid $accent-color;
         background: $primary-dark;
-        box-shadow:  5px 5px 20px rgba($color: black, $alpha: 0.5), -5px -5px 20px rgba($color: $secondary-dark, $alpha: 1);
 
         &.add {
             background: $accent-color;
-            box-shadow:  5px 5px 20px rgba($color: black, $alpha: 0.5), -5px -5px 20px rgba($color: $secondary-dark, $alpha: 1);
         }
     }
 }

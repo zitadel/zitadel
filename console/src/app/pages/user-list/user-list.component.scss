@@ -61,6 +61,19 @@ h1 {
             }
         }
 
+        tr {
+            .avatar {
+                filter: grayscale(100%);
+                transition: filter .1s ease-in-out;
+            }
+    
+            &:hover {
+                .avatar {
+                    filter: none;
+                }
+            }
+        }
+
         .data-row {
             cursor: pointer;
             &:hover {
