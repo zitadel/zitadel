@@ -22,6 +22,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public selection: SelectionModel<UserGrant.AsObject> = new SelectionModel<UserGrant.AsObject>(true, []);
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectGrant.AsObject>;
+
+    @Input() allowCreate: boolean = false;
+    @Input() allowDelete: boolean = false;
     constructor(private userService: MgmtUserService) { }
 
     public displayedColumns: string[] = ['select', 'orgId', 'projectId', 'creationDate', 'changeDate', 'roleNamesList'];

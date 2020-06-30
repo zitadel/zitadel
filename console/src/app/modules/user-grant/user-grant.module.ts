@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpLoaderFactory } from 'src/app/app.module';
 
-import { UserGrantRoutingModule } from '../user-grant/user-grant-routing.module';
+import { UserGrantRoutingModule } from './user-grant-routing.module';
 import { UserGrantComponent } from './user-grant.component';
 
 @NgModule({

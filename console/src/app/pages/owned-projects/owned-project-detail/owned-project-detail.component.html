@@ -77,7 +77,9 @@
 
                 <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                     description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
-                    <app-user-grants [filter]="userGrantSearchKey" [filterValue]="project.projectId"></app-user-grants>
+                    <app-user-grants [filter]="userGrantSearchKey" [filterValue]="project.projectId"
+                        [allowCreate]="['user.grant.write'] | hasRole" [allowDelete]="['user.grant.delete'] | hasRole">
+                    </app-user-grants>
                 </app-card>
             </ng-container>
         </ng-container>

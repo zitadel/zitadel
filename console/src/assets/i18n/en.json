@@ -512,6 +512,10 @@
         "CREATE": {
             "TITLE": "Create authorization",
             "DESCRIPTION": "Search for the orgnanization, the project and the corresponding roles."
+        },
+        "DETAIL": {
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":""
         }
     },
     "CHANGES": {

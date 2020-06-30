@@ -511,6 +511,10 @@
         "CREATE": {
             "TITLE": "Authorisierung erstellen",
             "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
+        },
+        "DETAIL": {
+            "TITLE":"Authorisierung Detail",
+            "DESCRIPTION":""
         }
     },
     "CHANGES": {

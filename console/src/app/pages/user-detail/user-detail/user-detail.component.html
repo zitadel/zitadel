@@ -207,7 +207,7 @@
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user?.id"></app-user-grants>
+            <app-user-grants [filterValue]="user?.id"></app-user-grants>
         </app-card>
     </div>
 
