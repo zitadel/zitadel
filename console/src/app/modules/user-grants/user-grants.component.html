@@ -15,7 +15,7 @@
         <i class="las la-trash"></i>
     </button>
     <a *ngIf="allowCreate" matTooltip="{{'GRANTS.ADD' | translate}}" color="primary" class="add-button" color="primary"
-        mat-raised-button [routerLink]="['grant-create']">
+        mat-raised-button [routerLink]="['/grant-create', {filter: filter, filterValue: filterValue}]">
         <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
     </a>
 </div>
@@ -82,8 +82,8 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row [routerLink]="['grant', row.id]" *matRowDef="let row; columns: displayedColumns;"
-            class="element-row">
+        <tr mat-row [routerLink]="['/user',row.userId, 'grant', row.id]"
+            *matRowDef="let row; columns: displayedColumns;" class="element-row">
         </tr>
     </table>
 

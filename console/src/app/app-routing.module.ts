@@ -56,7 +56,7 @@ const routes: Routes = [
         },
     },
     {
-        path: ':id/grant-create',
+        path: 'grant-create',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
             .then(m => m.UserGrantCreateModule),
     },

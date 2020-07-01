@@ -47,7 +47,7 @@ export class SearchProjectAutocompleteComponent {
                     const query = new ProjectSearchQuery();
                     query.setKey(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
                     query.setValue(value);
-                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
+                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
                     return merge(
                         from(this.projectService.SearchGrantedProjects(10, 0, [query])),
                         from(this.projectService.SearchProjects(10, 0, [query])),

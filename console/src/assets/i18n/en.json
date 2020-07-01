@@ -351,7 +351,7 @@
                 "TITLE": "Create Member Grant",
                 "SEL_USERS": "Select the users you wish to grant",
                 "SEL_PROJECT": "Search for a project",
-                "SEL_ROLES": "Select the roles you want be be added to the grant",
+                "SEL_ROLES": "Select the roles you want to be added to the grant",
                 "SEL_ORG": "Search for the domain",
                 "ORG_TITLE":"Organization",
                 "ORG_DESCRIPTION":"You are about to grant a user on the organization {{name}}",
