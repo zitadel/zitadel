@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"strings"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -14,8 +17,6 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"strings"
-	"time"
 )
 
 type UserGrant struct {
@@ -223,6 +224,6 @@ func (u *UserGrant) setIamProjectID() error {
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-8is4s", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.LogWithFields("SPOOL-VcVoJ", "id", event.AggregateID).WithError(err).Warn("something went wrong in user grant handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserGrantFailedEvent, u.view.ProcessedUserGrantFailedEvent, u.view.ProcessedUserGrantSequence, u.errorCountUntilSkip)
 }

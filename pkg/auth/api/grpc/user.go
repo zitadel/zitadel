@@ -128,3 +128,11 @@ func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Emp
 	s.repo.RemoveMyMfaOTP(ctx)
 	return &empty.Empty{}, err
 }
+
+func (s *Server) GetMyUserChanges(ctx context.Context, request *ChangesRequest) (*Changes, error) {
+	changes, err := s.repo.MyUserChanges(ctx, request.SequenceOffset, request.Limit, request.Asc)
+	if err != nil {
+		return nil, err
+	}
+	return userChangesToResponse(changes, request.GetSequenceOffset(), request.GetLimit()), nil
+}
