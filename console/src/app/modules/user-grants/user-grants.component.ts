@@ -87,10 +87,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getRoleOptions(projectId: string): void {
-        console.log(projectId);
-
         this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.roleOptions = resp.toObject().resultList;
+            console.log(this.roleOptions);
         });
     }
 

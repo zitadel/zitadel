@@ -91,7 +91,7 @@
                         <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowCreate == false"
                             (selectionChange)="updateRoles(grant, $event)">
                             <mat-option *ngFor="let role of roleOptions" [value]="role.key">
-                                {{ role.displayName }}
+                                {{ role.displayName }} {{role.key}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
