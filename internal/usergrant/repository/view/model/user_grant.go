@@ -30,6 +30,7 @@ type UserGrantView struct {
 	UserName      string         `json:"-" gorm:"column:user_name"`
 	FirstName     string         `json:"-" gorm:"column:first_name"`
 	LastName      string         `json:"-" gorm:"column:last_name"`
+	DisplayName   string         `json:"-" gorm:"column:display_name"`
 	Email         string         `json:"-" gorm:"column:email"`
 	ProjectName   string         `json:"-" gorm:"column:project_name"`
 	OrgName       string         `json:"-" gorm:"column:org_name"`
@@ -54,6 +55,7 @@ func UserGrantFromModel(grant *model.UserGrantView) *UserGrantView {
 		UserName:      grant.UserName,
 		FirstName:     grant.FirstName,
 		LastName:      grant.LastName,
+		DisplayName:   grant.DisplayName,
 		Email:         grant.Email,
 		ProjectName:   grant.ProjectName,
 		OrgName:       grant.OrgName,
@@ -74,6 +76,7 @@ func UserGrantToModel(grant *UserGrantView) *model.UserGrantView {
 		UserName:      grant.UserName,
 		FirstName:     grant.FirstName,
 		LastName:      grant.LastName,
+		DisplayName:   grant.DisplayName,
 		Email:         grant.Email,
 		ProjectName:   grant.ProjectName,
 		OrgName:       grant.OrgName,
