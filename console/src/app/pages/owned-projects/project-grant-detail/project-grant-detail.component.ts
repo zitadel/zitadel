@@ -4,11 +4,11 @@ import { ProjectType } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 
 @Component({
-    selector: 'app-grant',
-    templateUrl: './grant.component.html',
-    styleUrls: ['./grant.component.scss'],
+    selector: 'app-project-grant-detail',
+    templateUrl: './project-grant-detail.component.html',
+    styleUrls: ['./project-grant-detail.component.scss'],
 })
-export class GrantComponent {
+export class ProjectGrantDetailComponent {
     public projectid: string = '';
     public grantid: string = '';
 

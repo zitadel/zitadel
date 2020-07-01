@@ -9,7 +9,7 @@ import { ProjectService } from 'src/app/services/project.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class GrantDataSource extends DataSource<ProjectMemberView.AsObject> {
+export class ProjectGrantDetailDataSource extends DataSource<ProjectMemberView.AsObject> {
     public totalResult: number = 0;
     public membersSubject: BehaviorSubject<ProjectMemberView.AsObject[]>
         = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);

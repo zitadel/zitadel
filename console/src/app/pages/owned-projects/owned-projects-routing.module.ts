@@ -50,8 +50,8 @@ const routes: Routes = [
     },
     {
         path: ':projectid/grant/:grantid',
-        loadChildren: () => import('./grant/grant.module')
-            .then(m => m.GrantModule),
+        loadChildren: () => import('./project-grant-detail/project-grant-detail.module')
+            .then(m => m.ProjectGrantDetailModule),
     },
 ];
 

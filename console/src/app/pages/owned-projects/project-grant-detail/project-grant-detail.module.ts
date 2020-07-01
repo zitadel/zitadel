@@ -15,15 +15,15 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ProjectGrantMembersModule } from 'src/app/modules/project-grant-members/project-grant-members.module';
 
-import { GrantRoutingModule } from './grant-routing.module';
-import { GrantComponent } from './grant.component';
+import { ProjectGrantDetailRoutingModule } from './project-grant-detail-routing.module';
+import { ProjectGrantDetailComponent } from './project-grant-detail.component';
 
 
 @NgModule({
-    declarations: [GrantComponent],
+    declarations: [ProjectGrantDetailComponent],
     imports: [
         CommonModule,
-        GrantRoutingModule,
+        ProjectGrantDetailRoutingModule,
         ProjectGrantMembersModule,
         MatAutocompleteModule,
         HasRoleModule,
@@ -41,4 +41,4 @@ import { GrantComponent } from './grant.component';
         TranslateModule,
     ],
 })
-export class GrantModule { }
+export class ProjectGrantDetailModule { }
