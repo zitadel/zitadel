@@ -356,7 +356,7 @@
             },
             "DETAIL": {
                 "TITLE":"Berechtigte Manager der Organisation",
-                "DESC":"Dies sind die berechtigten Zugänge für die Organisation"
+                "DESC":"Dies sind die Manager der berechtigten Organisation. Wählen Sie die Benutzer, die Zugriff zum editieren der jeweiligen Zugänge erhalten."
             },
             "SHOWDETAIL":"Zeige Details",
             "USER":"Benutzer",

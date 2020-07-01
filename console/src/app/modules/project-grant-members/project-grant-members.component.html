@@ -68,7 +68,7 @@
         <ng-container matColumnDef="roles">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
             <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
-                <span class="role" *ngFor="let role of member.rolesList; index as i">
+                <span class="role app-label" *ngFor="let role of member.rolesList; index as i">
                     {{ 'ROLES.'+role | translate }}</span>
             </td>
         </ng-container>

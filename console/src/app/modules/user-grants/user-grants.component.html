@@ -78,7 +78,7 @@
         <ng-container matColumnDef="roleNamesList">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                <span class="role" *ngFor="let role of grant.roleKeysList">{{role}}</span> </td>
+                <span class="role app-label" *ngFor="let role of grant.roleKeysList">{{role}}</span> </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

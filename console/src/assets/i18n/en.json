@@ -356,8 +356,8 @@
                 "FOR_ORG":"The grant is created for:"
             },
             "DETAIL": {
-                "TITLE":"Granted Organization Managers",
-                "DESC":"These are the Managers of the granted organization"
+                "TITLE":"Managers of the granted organization",
+                "DESC":"These are the Managers of the granted organization. You can select which users are allowed to maintain control of the project."
             },
             "SHOWDETAIL":"Show Details",
             "USER":"User",
