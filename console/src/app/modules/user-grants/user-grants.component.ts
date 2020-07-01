@@ -1,10 +1,13 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, UserGrant, UserGrantSearchKey } from 'src/app/proto/generated/management_pb';
+import { ProjectGrant, ProjectRoleView, UserGrant, UserGrantSearchKey } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+import { ProjectService } from 'src/app/services/project.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 import { UserGrantsDataSource } from './user-grants-datasource';
 
@@ -25,7 +28,14 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     @Input() allowCreate: boolean = false;
     @Input() allowDelete: boolean = false;
-    constructor(private userService: MgmtUserService) { }
+
+    public roleOptions: ProjectRoleView.AsObject[] = [];
+
+    constructor(
+        private userService: MgmtUserService,
+        private projectService: ProjectService,
+        private toast: ToastService,
+    ) { }
 
     public displayedColumns: string[] = ['select',
         'user',
@@ -35,6 +45,10 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public ngOnInit(): void {
         this.dataSource = new UserGrantsDataSource(this.userService);
         this.dataSource.loadGrants(this.filter, this.filterValue, 0, 25);
+
+        if (this.filter === UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID) {
+            this.getRoleOptions(this.filterValue);
+        }
     }
 
     public ngAfterViewInit(): void {
@@ -64,5 +78,30 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         this.isAllSelected() ?
             this.selection.clear() :
             this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
+    }
+
+    public loadRoleOptions(projectId: string): void {
+        if (this.filter === UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID) {
+            this.getRoleOptions(projectId);
+        }
+    }
+
+    public getRoleOptions(projectId: string): void {
+        console.log(projectId);
+
+        this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
+            this.roleOptions = resp.toObject().resultList;
+        });
+    }
+
+    updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
+        console.log(grant, selectionChange.value);
+        this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
+            .then((newmember: UserGrant) => {
+                console.log(newmember.toObject());
+                this.toast.showInfo('Grant updated!');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
     }
 }

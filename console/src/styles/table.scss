@@ -23,4 +23,10 @@
         background-color: #8795a1;
         padding: .5rem 1rem;
     }
+
+    td {
+        .mat-form-field-wrapper {
+            padding-bottom: 0;
+        }
+    }
 }

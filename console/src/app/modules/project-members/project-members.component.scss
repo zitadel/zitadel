@@ -109,19 +109,10 @@
             width: 50px;
             max-width: 50px;
         }
-
-        .role {
-            display: inline-block;
-            margin: .25rem;
-        }
     }
 }
 
 .pointer {
     outline: none;
     cursor: pointer;
-}
-
-.form-field .mat-form-field-wrapper {
-    padding-bottom: 0 !important;
 }
