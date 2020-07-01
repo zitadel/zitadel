@@ -85,6 +85,7 @@ export class UserGrantCreateComponent implements OnDestroy {
     }
 
     public selectUser(user: User.AsObject): void {
+        console.log(user);
         this.userId = user.id;
     }
 

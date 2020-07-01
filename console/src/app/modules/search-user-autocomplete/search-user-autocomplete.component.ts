@@ -117,11 +117,11 @@ export class SearchUserAutocompleteComponent {
                     this.users = [this.filteredUsers[index]];
                 }
                 this.selectionChanged.emit(this.users);
+
+                this.usernameInput.nativeElement.value = '';
+                this.myControl.setValue(null);
             }
         }
-
-        this.usernameInput.nativeElement.value = '';
-        this.myControl.setValue(null);
     }
 
     public changeTarget(): void {
