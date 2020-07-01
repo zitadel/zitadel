@@ -30,7 +30,7 @@ type UserGrantView struct {
 	UserName      string         `json:"-" gorm:"column:user_name"`
 	FirstName     string         `json:"-" gorm:"column:first_name"`
 	LastName      string         `json:"-" gorm:"column:last_name"`
-	DisplayName   string         `json:"-" grom:"column:display_name"`
+	DisplayName   string         `json:"-" gorm:"column:display_name"`
 	Email         string         `json:"-" gorm:"column:email"`
 	ProjectName   string         `json:"-" gorm:"column:project_name"`
 	OrgName       string         `json:"-" gorm:"column:org_name"`
