@@ -162,7 +162,7 @@ func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_mode
 	grant.UserName = user.UserName
 	grant.FirstName = user.FirstName
 	grant.LastName = user.LastName
-	grant.DispalyName = user.DisplayName
+	grant.DisplayName = user.DisplayName
 	grant.Email = user.EmailAddress
 }
 
