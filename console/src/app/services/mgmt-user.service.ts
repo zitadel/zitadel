@@ -426,8 +426,8 @@ export class MgmtUserService {
 
     public async UpdateUserGrant(
         id: string,
-        roleKeysList: string[],
         userId: string,
+        roleKeysList: string[],
     ): Promise<UserGrant> {
         const req = new UserGrantUpdate();
         req.setId(id);
