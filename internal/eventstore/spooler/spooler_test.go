@@ -380,7 +380,7 @@ func TestHandleError(t *testing.T) {
 					return &repository.FailedEvent{
 						ErrMsg:         "blub",
 						FailedSequence: s - 1,
-						FailureCount:   6,
+						FailureCount:   5,
 						ViewName:       "super.table",
 					}, nil
 				},
