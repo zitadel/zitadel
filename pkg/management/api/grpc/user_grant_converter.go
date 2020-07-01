@@ -169,6 +169,7 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *UserGrantView {
 		UserId:        grant.UserID,
 		ProjectId:     grant.ProjectID,
 		OrgId:         grant.ResourceOwner,
+		DisplayName:   grant.DisplayName,
 	}
 }
 

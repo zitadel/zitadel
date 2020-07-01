@@ -2554,6 +2554,7 @@ message UserGrantView {
     string project_name = 15;
     uint64 sequence = 16;
     string resource_owner = 17;
+    string display_name = 18;
 }
 
 
