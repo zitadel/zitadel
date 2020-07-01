@@ -13,7 +13,7 @@ type PolicyCache struct {
 
 func StartCache(conf *config.CacheConfig) (*PolicyCache, error) {
 	policyCache, err := conf.Config.NewCache()
-	logging.Log("EVENT-vDneN").OnError(err).Panic("unable to create policy cache")
+	logging.Log("EVENT-L7ZcH").OnError(err).Panic("unable to create policy cache")
 
 	return &PolicyCache{policyCache: policyCache}, nil
 }
@@ -21,7 +21,7 @@ func StartCache(conf *config.CacheConfig) (*PolicyCache, error) {
 func (c *PolicyCache) getPolicy(id string) (policy *PasswordComplexityPolicy) {
 	policy = &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: id}}
 	if err := c.policyCache.Get(id, policy); err != nil {
-		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
+		logging.Log("EVENT-tkUue").WithError(err).Debug("error in getting cache")
 	}
 	return policy
 }
@@ -29,6 +29,6 @@ func (c *PolicyCache) getPolicy(id string) (policy *PasswordComplexityPolicy) {
 func (c *PolicyCache) cachePolicy(policy *PasswordComplexityPolicy) {
 	err := c.policyCache.Set(policy.AggregateID, policy)
 	if err != nil {
-		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting policy cache")
+		logging.Log("EVENT-DVcpF").WithError(err).Debug("error in setting policy cache")
 	}
 }

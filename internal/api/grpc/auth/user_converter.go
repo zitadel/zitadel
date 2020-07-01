@@ -2,10 +2,13 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -336,4 +339,37 @@ func mfaTypeFromModel(mfatype usr_model.MfaType) grpc.MfaType {
 	default:
 		return grpc.MfaType_MFATYPE_UNSPECIFIED
 	}
+}
+
+func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: userChangesToMgtAPI(response),
+	}
+}
+
+func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		var data *structpb.Struct
+		changedData, err := json.Marshal(change.Data)
+		if err == nil {
+			data = new(structpb.Struct)
+			err = protojson.Unmarshal(changedData, data)
+			logging.Log("GRPC-0kRsY").OnError(err).Debug("unable to marshal changed data to struct")
+		}
+
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+			EditorId:   change.ModifierId,
+			Editor:     change.ModifierName,
+		}
+	}
+
+	return result
 }

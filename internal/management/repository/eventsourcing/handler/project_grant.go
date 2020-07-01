@@ -50,7 +50,7 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		p.updateExistingProjects(project)
+		return p.updateExistingProjects(project)
 	case es_model.ProjectGrantAdded:
 		err = grantedProject.AppendEvent(event)
 		if err != nil {
@@ -107,19 +107,25 @@ func (p *ProjectGrant) getProject(projectID string) (*proj_model.Project, error)
 	return p.projectEvents.ProjectByID(context.Background(), projectID)
 }
 
-func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView) {
-	projects, err := p.view.ProjectGrantsByProjectID(project.ProjectID)
+func (p *ProjectGrant) updateExistingProjects(project *view_model.ProjectView) error {
+	projectGrants, err := p.view.ProjectGrantsByProjectID(project.ProjectID)
 	if err != nil {
 		logging.LogWithFields("SPOOL-los03", "id", project.ProjectID).WithError(err).Warn("could not update existing projects")
 	}
-	for _, existing := range projects {
+	for _, existing := range projectGrants {
 		existing.Name = project.Name
 		err := p.view.PutProjectGrant(existing)
-		logging.LogWithFields("SPOOL-sjwi3", "id", existing.ProjectID).WithError(err).Warn("could not update existing project")
+		if err != nil {
+			logging.LogWithFields("SPOOL-sjwi3", "id", existing.ProjectID).WithError(err).Warn("could not update existing project")
+			return err
+		}
 	}
+
+	return p.view.ProcessedProjectGrantSequence(project.Sequence)
 }
 
 func (p *ProjectGrant) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectGrantFailedEvent, p.view.ProcessedProjectGrantFailedEvent, p.view.ProcessedProjectGrantSequence, p.errorCountUntilSkip)
 }
+ 
