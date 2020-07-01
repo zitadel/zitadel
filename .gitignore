@@ -27,6 +27,9 @@ google-credentials
 key.json
 .keys/*
 
+# dumps
+.backups
+
 cockroach-data/*
 .build/
 
