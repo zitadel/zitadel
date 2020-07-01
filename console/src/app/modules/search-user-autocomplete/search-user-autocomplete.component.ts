@@ -52,7 +52,7 @@ export class SearchUserAutocompleteComponent {
                 const query = new UserSearchQuery();
                 query.setKey(UserSearchKey.USERSEARCHKEY_EMAIL);
                 query.setValue(value);
-                query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
+                query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
                 if (this.target === UserTarget.SELF) {
                     return from(this.userService.SearchUsers(10, 0, [query]));
                 } else {
