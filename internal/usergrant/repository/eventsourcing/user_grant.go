@@ -210,10 +210,7 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 		if !existsUser {
 			return errors.ThrowPreconditionFailed(nil, "EVENT-Sl8uS", "user doesn't exist")
 		}
-		if err := checkProjectConditions(resourceOwner, grant, project); err != nil {
-			return err
-		}
-		return nil
+		return checkProjectConditions(resourceOwner, grant, project)
 	}
 }
 

@@ -189,6 +189,16 @@ service AuthService {
     };
   }
 
+  rpc GetMyUserChanges(ChangesRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/users/me/changes"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc UpdateMyUserAddress(UpdateUserAddressRequest) returns (UserAddress) {
     option (google.api.http) = {
       put: "/users/me/address"
@@ -622,4 +632,25 @@ enum SearchMethod {
   SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
   SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
   SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
+}
+
+message ChangesRequest {
+  uint64 limit= 1;
+  uint64 sequence_offset = 2;
+  bool asc = 3;
+}
+
+message Changes {
+  repeated Change changes = 1;
+  uint64 offset = 2;
+  uint64 limit = 3;
+}
+
+message Change {
+  google.protobuf.Timestamp change_date = 1;
+  string event_type = 2;
+  uint64 sequence = 3;
+  string editor_id = 4;
+  string editor = 5;
+  google.protobuf.Struct data = 6;
 }

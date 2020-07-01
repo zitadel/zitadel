@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type UserGrantView struct {
@@ -13,6 +14,7 @@ type UserGrantView struct {
 	UserName      string
 	FirstName     string
 	LastName      string
+	DisplayName   string
 	Email         string
 	ProjectName   string
 	OrgName       string

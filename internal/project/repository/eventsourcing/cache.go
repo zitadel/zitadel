@@ -14,7 +14,7 @@ type ProjectCache struct {
 
 func StartCache(conf *config.CacheConfig) (*ProjectCache, error) {
 	projectCache, err := conf.Config.NewCache()
-	logging.Log("EVENT-vDneN").OnError(err).Panic("unable to create project cache")
+	logging.Log("EVENT-CsHdo").OnError(err).Panic("unable to create project cache")
 
 	return &ProjectCache{projectCache: projectCache}, nil
 }
@@ -22,7 +22,7 @@ func StartCache(conf *config.CacheConfig) (*ProjectCache, error) {
 func (c *ProjectCache) getProject(ID string) (project *model.Project) {
 	project = &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: ID}}
 	if err := c.projectCache.Get(ID, project); err != nil {
-		logging.Log("EVENT-4eTZh").WithError(err).Debug("error in getting cache")
+		logging.Log("EVENT-tMydV").WithError(err).Debug("error in getting cache")
 	}
 	return project
 }
@@ -30,6 +30,6 @@ func (c *ProjectCache) getProject(ID string) (project *model.Project) {
 func (c *ProjectCache) cacheProject(project *model.Project) {
 	err := c.projectCache.Set(project.AggregateID, project)
 	if err != nil {
-		logging.Log("EVENT-ThnBb").WithError(err).Debug("error in setting project cache")
+		logging.Log("EVENT-3wKzj").WithError(err).Debug("error in setting project cache")
 	}
 }

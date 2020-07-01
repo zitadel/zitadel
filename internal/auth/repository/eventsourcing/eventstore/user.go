@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
@@ -256,6 +257,21 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 		}
 	}
 	return usr_view_model.UserToModel(&userCopy), nil
+}
+
+func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error) {
+	changes, err := repo.UserEvents.UserChanges(ctx, auth.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
+	if err != nil {
+		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
+	return changes, nil
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
