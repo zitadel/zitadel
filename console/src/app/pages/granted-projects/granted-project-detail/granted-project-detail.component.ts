@@ -16,6 +16,7 @@ import {
     ProjectRoleSearchResponse,
     ProjectState,
     ProjectType,
+    UserGrantSearchKey,
 } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -57,6 +58,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
     public isZitadel: boolean = false;
 
+    public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -86,6 +89,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         if (this.projectId && this.grantId) {
             this.projectService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
+                console.log(this.project);
             }).catch(error => {
                 this.toast.showError(error.message);
             });

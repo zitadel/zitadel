@@ -3,7 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { from, merge } from 'rxjs';
+import { forkJoin, from } from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
 import {
     ProjectGrantView,
@@ -47,16 +47,15 @@ export class SearchProjectAutocompleteComponent {
                     const query = new ProjectSearchQuery();
                     query.setKey(ProjectSearchKey.PROJECTSEARCHKEY_PROJECT_NAME);
                     query.setValue(value);
-                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
-                    return merge(
+                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
+                    return forkJoin([
                         from(this.projectService.SearchGrantedProjects(10, 0, [query])),
                         from(this.projectService.SearchProjects(10, 0, [query])),
-                    );
+                    ]);
                 }),
-                // finalize(() => this.isLoading = false),
-            ).subscribe((projects) => {
+            ).subscribe(([granted, owned]) => {
                 this.isLoading = false;
-                this.filteredProjects = projects.toObject().resultList;
+                this.filteredProjects = [...owned.toObject().resultList, ...granted.toObject().resultList];
                 console.log(this.filteredProjects);
             });
     }

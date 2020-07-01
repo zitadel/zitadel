@@ -38,7 +38,6 @@ export class ProjectApplicationsComponent implements AfterViewInit, OnInit {
 
     public ngAfterViewInit(): void {
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
         merge(this.sort.sortChange, this.paginator.page)
             .pipe(
                 tap(() => this.loadRolesPage()),

@@ -20,6 +20,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
+import { ProjectGrantMembersModule } from 'src/app/modules/project-grant-members/project-grant-members.module';
+import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 
 import { HttpLoaderFactory } from '../../app.module';
 import { HasRoleModule } from '../../directives/has-role/has-role.module';
@@ -39,9 +42,6 @@ import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
 import { OwnedProjectsComponent } from './owned-projects.component';
 import { ProjectApplicationGridComponent } from './project-application-grid/project-application-grid.component';
 import { ProjectApplicationsComponent } from './project-applications/project-applications.component';
-import {
-    ProjectGrantMembersCreateDialogComponent,
-} from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
@@ -53,14 +53,16 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         ProjectApplicationGridComponent,
         ProjectApplicationsComponent,
         ProjectGrantsComponent,
-        ProjectGrantMembersCreateDialogComponent,
     ],
     imports: [
         CommonModule,
         OwnedProjectsRoutingModule,
+        UserGrantsModule,
         ProjectContributorsModule,
+        ProjectGrantMembersModule,
         FormsModule,
         TranslateModule,
+        AvatarModule,
         ReactiveFormsModule,
         HasRoleModule,
         MatTableModule,

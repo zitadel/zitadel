@@ -3820,7 +3820,8 @@ proto.caos.zitadel.management.api.v1.Change.toObject = function(includeInstance,
     changeDate: (f = msg.getChangeDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     eventType: jspb.Message.getFieldWithDefault(msg, 2, ""),
     sequence: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    editor: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    editorId: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    editor: jspb.Message.getFieldWithDefault(msg, 5, ""),
     data: (f = msg.getData()) && google_protobuf_struct_pb.Struct.toObject(includeInstance, f)
   };
 
@@ -3873,9 +3874,13 @@ proto.caos.zitadel.management.api.v1.Change.deserializeBinaryFromReader = functi
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setEditor(value);
+      msg.setEditorId(value);
       break;
     case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEditor(value);
+      break;
+    case 6:
       var value = new google_protobuf_struct_pb.Struct;
       reader.readMessage(value,google_protobuf_struct_pb.Struct.deserializeBinaryFromReader);
       msg.setData(value);
@@ -3931,17 +3936,24 @@ proto.caos.zitadel.management.api.v1.Change.serializeBinaryToWriter = function(m
       f
     );
   }
-  f = message.getEditor();
+  f = message.getEditorId();
   if (f.length > 0) {
     writer.writeString(
       4,
       f
     );
   }
+  f = message.getEditor();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
   f = message.getData();
   if (f != null) {
     writer.writeMessage(
-      5,
+      6,
       f,
       google_protobuf_struct_pb.Struct.serializeBinaryToWriter
     );
@@ -4013,33 +4025,48 @@ proto.caos.zitadel.management.api.v1.Change.prototype.setSequence = function(val
 
 
 /**
- * optional string editor = 4;
+ * optional string editor_id = 4;
  * @return {string}
  */
-proto.caos.zitadel.management.api.v1.Change.prototype.getEditor = function() {
+proto.caos.zitadel.management.api.v1.Change.prototype.getEditorId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.caos.zitadel.management.api.v1.Change.prototype.setEditor = function(value) {
+proto.caos.zitadel.management.api.v1.Change.prototype.setEditorId = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
 
 /**
- * optional google.protobuf.Struct data = 5;
+ * optional string editor = 5;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.Change.prototype.getEditor = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.Change.prototype.setEditor = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional google.protobuf.Struct data = 6;
  * @return {?proto.google.protobuf.Struct}
  */
 proto.caos.zitadel.management.api.v1.Change.prototype.getData = function() {
   return /** @type{?proto.google.protobuf.Struct} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_struct_pb.Struct, 5));
+    jspb.Message.getWrapperField(this, google_protobuf_struct_pb.Struct, 6));
 };
 
 
 /** @param {?proto.google.protobuf.Struct|undefined} value */
 proto.caos.zitadel.management.api.v1.Change.prototype.setData = function(value) {
-  jspb.Message.setWrapperField(this, 5, value);
+  jspb.Message.setWrapperField(this, 6, value);
 };
 
 
@@ -4056,7 +4083,7 @@ proto.caos.zitadel.management.api.v1.Change.prototype.clearData = function() {
  * @return {boolean}
  */
 proto.caos.zitadel.management.api.v1.Change.prototype.hasData = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 6) != null;
 };
 
 

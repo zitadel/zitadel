@@ -1,0 +1,15 @@
+<div class="max-width-container">
+    <div class="container">
+        <div class="left">
+            <a *ngIf="userid" [routerLink]="[ '/users', userid]" mat-icon-button>
+                <mat-icon class="icon">arrow_back</mat-icon>
+            </a>
+        </div>
+        <div class="right">
+            <div class="head">
+                <h1>{{ 'GRANTS.DETAIL.TITLE' | translate }}</h1>
+                <p class="desc">{{ 'GRANTS.DETAIL.DESCRIPTION' | translate }}</p>
+            </div>
+        </div>
+    </div>
+</div>

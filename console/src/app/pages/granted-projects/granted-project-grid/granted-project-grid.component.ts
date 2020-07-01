@@ -47,9 +47,9 @@ export class GrantedProjectGridComponent {
 
     public selectItem(item: ProjectGrantView.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {
-            this.router.navigate(['projects', item.projectId, 'grant', `${item.id}`]);
+            this.router.navigate(['granted-projects', item.projectId, 'grant', `${item.id}`]);
         } else if (!event) {
-            this.router.navigate(['projects', item.projectId, 'grant', `${item.id}`]);
+            this.router.navigate(['granted-projects', item.projectId, 'grant', `${item.id}`]);
         }
     }
 

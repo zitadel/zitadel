@@ -23,7 +23,6 @@
 
             <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id" *ngFor="let temporg of orgs"
                 mat-menu-item (click)="setActiveOrg(temporg)">
-                <mat-icon class="avatar">business</mat-icon>
                 {{temporg?.name ? temporg.name : 'NO NAME'}}
             </button>
 

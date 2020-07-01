@@ -158,14 +158,6 @@
             "REGION": "Region",
             "COUNTRY": "Country"
         },
-        "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Define the operations and rights that are made available to the user",
-            "CREATE": {
-                "TITLE": "Create User Grant",
-                "DESCRIPTION": "Search for the organization, the project and the corresponding project roles!"
-            }
-        },
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
             "REQUIRED": "The input field is empty",
@@ -322,7 +314,11 @@
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
             "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
+            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!",
+            "TYPE":{
+                "OWNED":"Owned Projects",
+                "GRANTED":"Granted Projects"
+            }
         },
         "STATE": {
             "TITLE":"State",
@@ -355,16 +351,25 @@
                 "TITLE": "Create Member Grant",
                 "SEL_USERS": "Select the users you wish to grant",
                 "SEL_PROJECT": "Search for a project",
-                "SEL_ROLES": "Select the roles you want be be added to the grant",
+                "SEL_ROLES": "Select the roles you want to be added to the grant",
                 "SEL_ORG": "Search for the domain",
                 "ORG_TITLE":"Organization",
-                "ORG_DESCRIPTION":"You are about to grant a user on the organization {{name}}",
-                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user of another organization",
-                "SEL_ORG_BUTTON": "Search Organization"
+                "ORG_DESCRIPTION":"You are about to grant a user for the organization {{name}}",
+                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organization",
+                "SEL_ORG_BUTTON": "Search Organization",
+                "FOR_ORG":"The grant is created for:"
             },
+            "DETAIL": {
+                "TITLE":"Managers of the granted organization",
+                "DESC":"These are the Managers of the granted organization. You can select which users are allowed to maintain control of the project."
+            },
+            "SHOWDETAIL":"Show Details",
+            "USER":"User",
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
             "ROLENAMESLIST": "Roles"
@@ -499,9 +504,25 @@
         "PROJECT_GRANT_USER_GRANT_VIEWER":"Project Grant User Grant Viewer"
     },
     "GRANTS": {
-        "DELETE":"Delete grant",
-        "ADD":"Create grant",
-        "ADD_BTN":"New"
+        "DELETE":"delete authorization",
+        "ADD":"create authorization",
+        "ADD_BTN":"new",
+        "PROJECT": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified project. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "USER": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified user. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "CREATE": {
+            "TITLE": "Create authorization",
+            "DESCRIPTION": "Search for the orgnanization, the project and the corresponding roles."
+        },
+        "DETAIL": {
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":""
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Last Changes",

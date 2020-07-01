@@ -7,11 +7,13 @@
     <span class="u-email">{{profile?.userName}}</span>
     <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
-    <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
+    <button (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let user of users" (click)="selectAccount(user.userName)">
-            <i class="small-avatar las la-user-circle"></i>
+            <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))" class="small-avatar"
+                [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" [size]="32">
+            </app-avatar>
 
             <div class="col">
                 <span class="title">{{user.userName}}</span>
@@ -22,7 +24,7 @@
         </a>
         <a class="row" (click)="selectAccount()">
             <div class="icon-wrapper">
-                <mat-icon>add</mat-icon>
+                <i class="las la-user-plus"></i>
             </div>
             <span class="col">
                 <span class="title">{{'USER.ADDACCOUNT' | translate}}</span>
@@ -32,5 +34,5 @@
         </a>
     </div>
 
-    <button color="primary" (click)="logout()" mat-stroked-button>{{'MENU.LOGOUT' | translate}}</button>
+    <button (click)="logout()" mat-stroked-button>{{'MENU.LOGOUT' | translate}}</button>
 </div>

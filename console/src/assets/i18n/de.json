@@ -158,14 +158,6 @@
             "REGION": "Kanton",
             "COUNTRY": "Land"
         },
-        "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden.",
-            "CREATE": {
-                "TITLE": "User Grant erstellen",
-                "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
-            }
-        },
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
             "REQUIRED": "Das Feld ist leer",
@@ -192,7 +184,7 @@
         "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
-        "ADDACCOUNT":"mit einem anderen Account anmelden"
+        "ADDACCOUNT":"Account hinzufügen"
     },
     "IAM": {
         "DETAIL": {
@@ -321,7 +313,11 @@
             "CREATE_DESC": "Geben Sie den Namen ein",
             "ROLE": "Rolle",
             "NOITEMS": "Keine Projekte",
-            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!"
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!",
+            "TYPE":{
+                "OWNED":"Eigene Projekte",
+                "GRANTED":"Berechtigte Projekte"
+            }
         },
         "STATE": {
             "TITLE":"Status",
@@ -359,11 +355,20 @@
                 "ORG_TITLE":"Organisation",
                 "ORG_DESCRIPTION":"Sie sind im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
                 "ORG_DESCRIPTION_DESC":"Wechseln Sie den Context um die Organisation zu wechseln!",
-                "SEL_ORG_BUTTON": "Suche Organisation"
+                "SEL_ORG_BUTTON": "Suche Organisation",
+                "FOR_ORG":"The grant wird erstellt für:"
             },
+            "DETAIL": {
+                "TITLE":"Berechtigte Manager der Organisation",
+                "DESC":"Dies sind die Manager der berechtigten Organisation. Wählen Sie die Benutzer, die Zugriff zum editieren der jeweiligen Zugänge erhalten."
+            },
+            "SHOWDETAIL":"Zeige Details",
+            "USER":"Benutzer",
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Projekt Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
             "ROLENAMESLIST": "Rollen"
@@ -500,7 +505,23 @@
     "GRANTS": {
         "DELETE":"Grant löschen",
         "ADD":"Grant erstellen",
-        "ADD_BTN":"Neu"
+        "ADD_BTN":"Neu",
+        "PROJECT": {
+            "TITLE": "Authorisierung",
+            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+        },
+        "USER": {
+            "TITLE": "Authorisierung",
+            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+        },
+        "CREATE": {
+            "TITLE": "Authorisierung erstellen",
+            "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
+        },
+        "DETAIL": {
+            "TITLE":"Authorisierung Detail",
+            "DESCRIPTION":""
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Letzte Änderungen",

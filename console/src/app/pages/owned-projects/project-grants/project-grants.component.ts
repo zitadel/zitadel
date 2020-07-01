@@ -5,14 +5,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
+import {
+    ProjectGrantMembersCreateDialogComponent,
+    ProjectGrantMembersCreateDialogExportType,
+} from 'src/app/modules/project-grant-members/project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrant, ProjectMemberView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    ProjectGrantMembersCreateDialogComponent,
-    ProjectGrantMembersCreateDialogExportType,
-} from '../project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrantsDataSource } from './project-grants-datasource';
 
 @Component({
@@ -76,28 +76,21 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
             this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
     }
 
-    public setExpandableRow(grant: ProjectGrant.AsObject): void {
-        this.expandedElement = this.expandedElement === grant ? null : grant;
-        this.projectService.SearchProjectGrantMembers(this.projectId, grant.id, 10, 0).then(ret => {
-            this.selectedGrantMembers = ret.toObject().resultList;
-        });
-    }
+    public async addProjectGrantMember(grant: ProjectGrant.AsObject): Promise<void> {
+        const keysList = (await this.projectService.GetProjectGrantMemberRoles()).toObject();
+        console.log(keysList);
 
-    // TODO
-    public addProjectGrantMember(grant: ProjectGrant.AsObject): void {
         const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
             data: {
-                orgId: grant.grantedOrgId,
-                grantId: grant.id,
-                projectId: grant.projectId,
-                roleKeysList: grant.roleKeysList,
+                roleKeysList: keysList.rolesList,
             },
             width: '400px',
         });
 
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
+            console.log(dataToAdd);
             if (dataToAdd) {
-                dataToAdd.userIds.forEach(userid => {
+                dataToAdd.userIds.forEach((userid: string) => {
                     this.projectService.AddProjectGrantMember(
                         this.projectId,
                         grant.id,
@@ -111,15 +104,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
                 });
 
             }
-        });
-    }
-
-    // TODO
-    public removeProjectGrantMember(grantId: string, userId: string): void {
-        this.projectService.RemoveProjectGrantMember(this.projectId, grantId, userId).then(() => {
-            this.toast.showInfo('Project Grant Member successfully removed');
-        }).catch(error => {
-            this.toast.showInfo(error.message);
         });
     }
 }
