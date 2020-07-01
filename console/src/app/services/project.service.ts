@@ -36,6 +36,7 @@ import {
     ProjectMemberSearchRequest,
     ProjectMemberSearchResponse,
     ProjectRoleAdd,
+    ProjectRoleAddBulk,
     ProjectRoleRemove,
     ProjectRoleSearchQuery,
     ProjectRoleSearchRequest,
@@ -354,6 +355,20 @@ export class ProjectService {
         req.setGroup(role.group);
         return await this.request(
             c => c.addProjectRole,
+            req,
+            f => f,
+        );
+    }
+
+    public async BulkAddProjectRole(
+        id: string,
+        rolesList: ProjectRoleAdd[],
+    ): Promise<Empty> {
+        const req = new ProjectRoleAddBulk();
+        req.setId(id);
+        req.setProjectRolesList(rolesList);
+        return await this.request(
+            c => c.bulkAddProjectRole,
             req,
             f => f,
         );

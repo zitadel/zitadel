@@ -314,7 +314,11 @@
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
             "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
+            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!",
+            "TYPE":{
+                "OWNED":"Owned Projects",
+                "GRANTED":"Granted Projects"
+            }
         },
         "STATE": {
             "TITLE":"State",
