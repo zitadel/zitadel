@@ -16,10 +16,20 @@
             {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION_DESC' | translate}}
         </p>
 
-        <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
+        <ng-container *ngIf="filter && filter == UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID">
+            <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
 
-        <app-search-project-autocomplete class="block" singleOutput="true" (selectionChanged)="selectProject($event)">
-        </app-search-project-autocomplete>
+            <app-search-project-autocomplete class="block" singleOutput="true"
+                (selectionChanged)="selectProject($event)">
+            </app-search-project-autocomplete>
+        </ng-container>
+
+        <ng-container *ngIf="filter && filter == UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID">
+            <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
+
+            <app-search-user-autocomplete class="block" singleOutput="true" (selectionChanged)="selectUser($event)">
+            </app-search-user-autocomplete>
+        </ng-container>
     </ng-container>
 
     <ng-container *ngIf="currentCreateStep === STEPS">
@@ -32,8 +42,9 @@
 
     <div class="btn-container">
         <ng-container *ngIf="currentCreateStep === 1">
-            <button [disabled]="!org || !userId" (click)="next()" color="primary" mat-raised-button class="big-button"
-                cdkFocusInitial>
+            <button
+                [disabled]="!org || (filter == UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID && !userId) || (filter == UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID && !projectId)"
+                (click)="next()" color="primary" mat-raised-button class="big-button" cdkFocusInitial>
                 {{ 'ACTIONS.CONTINUE' | translate }}
             </button>
         </ng-container>

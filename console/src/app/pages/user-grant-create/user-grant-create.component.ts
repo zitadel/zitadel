@@ -7,6 +7,7 @@ import {
     ProjectGrantView,
     ProjectRole,
     ProjectView,
+    User,
     UserGrant,
     UserGrantSearchKey,
 } from 'src/app/proto/generated/management_pb';
@@ -33,6 +34,8 @@ export class UserGrantCreateComponent implements OnDestroy {
     public filterValue: string = '';
 
     private subscription: Subscription = new Subscription();
+
+    public UserGrantSearchKey: any = UserGrantSearchKey;
     constructor(
         private authService: AuthService,
         private userService: MgmtUserService,
@@ -45,10 +48,10 @@ export class UserGrantCreateComponent implements OnDestroy {
             const { filter, filterValue } = params;
             this.filter = filter;
             switch (filter) {
-                case (UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID.toString()):
+                case (`${UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID}`):
                     this.projectId = filterValue;
                     break;
-                case (UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID.toString()):
+                case (`${UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID}`):
                     this.userId = filterValue;
                     break;
             }
@@ -79,6 +82,10 @@ export class UserGrantCreateComponent implements OnDestroy {
 
     public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
         this.projectId = project.id ? project.id : project.projectId ? project.projectId : undefined;
+    }
+
+    public selectUser(user: User.AsObject): void {
+        this.userId = user.id;
     }
 
     public selectRoles(roles: ProjectRole.AsObject[]): void {
