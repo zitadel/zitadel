@@ -260,7 +260,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 }
 
 func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error) {
-	changes, err := repo.UserEvents.UserChanges(ctx, auth.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
+	changes, err := repo.UserEvents.UserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}

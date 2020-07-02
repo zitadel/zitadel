@@ -1,3 +1,8 @@
+Log:
+  Level: $ZITADEL_LOG_LEVEL
+  Formatter:
+    Format: text
+
 Tracing:
   Type: google
   Config:
@@ -5,94 +10,32 @@ Tracing:
     MetricPrefix: ZITADEL-V1
     Fraction: $ZITADEL_TRACING_FRACTION
 
-Log:
-  Level: $ZITADEL_LOG_LEVEL
-  Formatter:
-    Format: text
+AuthZ:
+  Repository:
+    Eventstore:
+      ServiceName: 'AuthZ'
+      Repository:
+        SQL:
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'authz'
+          Database: 'eventstore'
+          SSLmode: disable
+      Cache:
+        Type: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
+    View:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'authz'
+      Database: 'authz'
+      SSLmode: disable
+    Spooler:
+      ConcurrentTasks: 1
+      BulkLimit: 100
+      FailureCountUntilSkip: 5
 
-API:
-  GRPC:
-    ServerPort: 50010
-    GatewayPort: 50011
-    CustomHeaders:
-      - x-zitadel-
-
-Mgmt:
-#  API:
-#    GRPC:
-#      ServerPort: 50010
-#      GatewayPort: 50011
-#      CustomHeaders:
-#        - x-zitadel-
-#  Repository:
-  SearchLimit: 100
-  Domain: $ZITADEL_DEFAULT_DOMAIN
-  Eventstore:
-    ServiceName: 'ManagementAPI'
-    Repository:
-      SQL:
-        Host: $ZITADEL_EVENTSTORE_HOST
-        Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'management'
-        Database: 'eventstore'
-        SSLmode: disable
-    Cache:
-      Type: 'fastcache'
-      Config:
-        MaxCacheSizeInByte: 10485760 #10mb
-  View:
-    Host: $ZITADEL_EVENTSTORE_HOST
-    Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'management'
-    Database: 'management'
-    SSLmode: disable
-  Spooler:
-    ConcurrentTasks: 4
-    BulkLimit: 100
-    FailureCountUntilSkip: 5
-
-#Auth:
-#  API:
-#    GRPC:
-#      ServerPort: 50020
-#      GatewayPort: 50021
-#      CustomHeaders:
-#        - x-zitadel-
-OIDC:
-  OPConfig:
-    Issuer: $ZITADEL_ISSUER
-    DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
-    Port: 50022
-  StorageConfig:
-    DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
-    DefaultAccessTokenLifetime: 12h
-    DefaultIdTokenLifetime: 12h
-    SigningKeyAlgorithm: RS256
-  UserAgentCookieConfig:
-    Name: caos.zitadel.useragent
-    Domain: $ZITADEL_COOKIE_DOMAIN
-    Key:
-      EncryptionKeyID: $ZITADEL_COOKIE_KEY
-  Cache:
-    MaxAge: $ZITADEL_CACHE_MAXAGE
-    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-  Endpoints:
-    Auth:
-      Path: 'authorize'
-      URL: '$ZITADEL_AUTHORIZE/authorize'
-    Token:
-      Path: 'token'
-      URL: '$ZITADEL_OAUTH/token'
-    EndSession:
-      Path: 'endsession'
-      URL: '$ZITADEL_AUTHORIZE/endsession'
-    Userinfo:
-      Path: 'userinfo'
-      URL: '$ZITADEL_OAUTH/userinfo'
-    Keys:
-      Path: 'keys'
-      URL: '$ZITADEL_OAUTH/keys'
-#  Repository:
 Auth:
   SearchLimit: 100
   Eventstore:
@@ -133,59 +76,7 @@ Auth:
       EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
     SigningKeyRotation: 10s
 
-UI:
-  Port: 50020
-
-Login:
-  Handler:
-    OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
-    ZitadelURL: '$ZITADEL_CONSOLE'
-    LanguageCookieName: 'caos.zitadel.login.lang'
-    DefaultLanguage: 'de'
-    CSRF:
-      CookieName: 'caos.zitadel.login.csrf'
-      Key:
-        EncryptionKeyID: $ZITADEL_CSRF_KEY
-      Development: $ZITADEL_CSRF_DEV
-    Cache:
-      MaxAge: $ZITADEL_CACHE_MAXAGE
-      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-
-
-AuthZ:
-  Repository:
-    Eventstore:
-      ServiceName: 'AuthZ'
-      Repository:
-        SQL:
-          Host: $ZITADEL_EVENTSTORE_HOST
-          Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'authz'
-          Database: 'eventstore'
-          SSLmode: disable
-      Cache:
-        Type: 'fastcache'
-        Config:
-          MaxCacheSizeInByte: 10485760 #10mb
-    View:
-      Host: $ZITADEL_EVENTSTORE_HOST
-      Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'authz'
-      Database: 'authz'
-      SSLmode: disable
-    Spooler:
-      ConcurrentTasks: 1
-      BulkLimit: 100
-      FailureCountUntilSkip: 5
-
 Admin:
-#  API:
-#    GRPC:
-#      ServerPort: 50040
-#      GatewayPort: 50041
-#      CustomHeaders:
-#        - x-zitadel-
-#  Repository:
   SearchLimit: 100
   Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
@@ -212,17 +103,101 @@ Admin:
     BulkLimit: 100
     FailureCountUntilSkip: 5
 
-Console:
-  Port: 50050
-  EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
-  ShortCache:
-    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
-    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
-  LongCache:
+Mgmt:
+  SearchLimit: 100
+  Domain: $ZITADEL_DEFAULT_DOMAIN
+  Eventstore:
+    ServiceName: 'ManagementAPI'
+    Repository:
+      SQL:
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'management'
+        Database: 'eventstore'
+        SSLmode: disable
+    Cache:
+      Type: 'fastcache'
+      Config:
+        MaxCacheSizeInByte: 10485760 #10mb
+  View:
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'management'
+    Database: 'management'
+    SSLmode: disable
+  Spooler:
+    ConcurrentTasks: 4
+    BulkLimit: 100
+    FailureCountUntilSkip: 5
+
+API:
+  GRPC:
+    ServerPort: 50001
+    GatewayPort: 50002
+    CustomHeaders:
+      - x-zitadel-
+  OIDC:
+    OPConfig:
+      Issuer: $ZITADEL_ISSUER
+      DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
+    StorageConfig:
+      DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+      DefaultAccessTokenLifetime: 12h
+      DefaultIdTokenLifetime: 12h
+      SigningKeyAlgorithm: RS256
+    UserAgentCookieConfig:
+      Name: caos.zitadel.useragent
+      Domain: $ZITADEL_COOKIE_DOMAIN
+      Key:
+        EncryptionKeyID: $ZITADEL_COOKIE_KEY
+    Cache:
       MaxAge: $ZITADEL_CACHE_MAXAGE
       SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-  CSPDomain: $ZITADEL_DEFAULT_DOMAIN
+    Endpoints:
+      Auth:
+        Path: 'authorize'
+        URL: '$ZITADEL_AUTHORIZE/authorize'
+      Token:
+        Path: 'token'
+        URL: '$ZITADEL_OAUTH/token'
+      EndSession:
+        Path: 'endsession'
+        URL: '$ZITADEL_AUTHORIZE/endsession'
+      Userinfo:
+        Path: 'userinfo'
+        URL: '$ZITADEL_OAUTH/userinfo'
+      Keys:
+        Path: 'keys'
+        URL: '$ZITADEL_OAUTH/keys'
 
+UI:
+  Port: 50020
+  Login:
+    Handler:
+      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
+      ZitadelURL: '$ZITADEL_CONSOLE'
+      LanguageCookieName: 'caos.zitadel.login.lang'
+      DefaultLanguage: 'de'
+      CSRF:
+        CookieName: 'caos.zitadel.login.csrf'
+        Key:
+          EncryptionKeyID: $ZITADEL_CSRF_KEY
+        Development: $ZITADEL_CSRF_DEV
+      Cache:
+        MaxAge: $ZITADEL_CACHE_MAXAGE
+        SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+  Console:
+    EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
+    ShortCache:
+      MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
+    LongCache:
+      MaxAge: $ZITADEL_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+    CSPDomain: $ZITADEL_DEFAULT_DOMAIN
+      ConcurrentTasks: 1
+      BulkLimit: 100
+      FailureCountUntilSkip: 5
 
 Notification:
   Repository:

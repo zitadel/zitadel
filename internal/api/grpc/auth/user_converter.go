@@ -341,16 +341,16 @@ func mfaTypeFromModel(mfatype usr_model.MfaType) grpc.MfaType {
 	}
 }
 
-func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit uint64) (_ *Changes) {
-	return &Changes{
+func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit uint64) (_ *grpc.Changes) {
+	return &grpc.Changes{
 		Limit:   limit,
 		Offset:  offset,
 		Changes: userChangesToMgtAPI(response),
 	}
 }
 
-func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
-	result := make([]*Change, len(changes.Changes))
+func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*grpc.Change) {
+	result := make([]*grpc.Change, len(changes.Changes))
 
 	for i, change := range changes.Changes {
 		var data *structpb.Struct
@@ -361,7 +361,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
 			logging.Log("GRPC-0kRsY").OnError(err).Debug("unable to marshal changed data to struct")
 		}
 
-		result[i] = &Change{
+		result[i] = &grpc.Change{
 			ChangeDate: change.ChangeDate,
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,

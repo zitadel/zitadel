@@ -27,22 +27,20 @@ import (
 )
 
 type Config struct {
-	API api.Config
-	UI  ui.Config
-
-	Admin        admin_es.Config
-	Mgmt         mgmt_es.Config
-	Auth         auth_es.Config
-	AuthZ        authz.Config
-	OIDC         oidc.OPHandlerConfig
-	Login        login.Config
-	Console      console.Config
-	Notification notification.Config
-
 	Log            logging.Config
 	Tracing        tracing.TracingConfig
 	InternalAuthZ  internal_authz.Config
 	SystemDefaults sd.SystemDefaults
+
+	AuthZ authz.Config
+	Auth  auth_es.Config
+	Admin admin_es.Config
+	Mgmt  mgmt_es.Config
+
+	API api.Config
+	UI  ui.Config
+
+	Notification notification.Config
 }
 
 var (
@@ -87,10 +85,10 @@ func main() {
 func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) {
 	uis := ui.Create(conf.UI)
 	if *loginEnabled {
-		uis.RegisterHandler(ui.LoginHandler, login.Start(conf.Login, authRepo, ui.LoginHandler).Handler())
+		uis.RegisterHandler(ui.LoginHandler, login.Start(conf.UI.Login, authRepo, ui.LoginHandler).Handler())
 	}
 	if *consoleEnabled {
-		consoleHandler, err := console.Start(conf.Console)
+		consoleHandler, err := console.Start(conf.UI.Console)
 		logging.Log("API-AGD1f").OnError(err).Fatal("error starting console")
 		uis.RegisterHandler(ui.ConsoleHandler, consoleHandler)
 	}
@@ -117,8 +115,8 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 		apis.RegisterServer(ctx, auth.CreateServer(authRepo))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.OIDC, authRepo)
-		apis.RegisterHandler("/oauth/v2", op.HttpHandler().Handler)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo)
+		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	apis.Start(ctx)
 }

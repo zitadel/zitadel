@@ -54,10 +54,9 @@ type OPStorage struct {
 func NewProvider(ctx context.Context, config OPHandlerConfig, repo repository.Repository) op.OpenIDProvider {
 	cookieHandler, err := http_utils.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator)
 	logging.Log("OIDC-sd4fd").OnError(err).Panic("cannot user agent handler")
-	cache, err := middleware.DefaultCacheInterceptor(config.Endpoints.Keys.Path, config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
 	nextHandler := func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			cache(http_utils.CopyHeadersToContext(handlerFunc))
+			middleware.NoCacheInterceptor(http_utils.CopyHeadersToContext(handlerFunc))
 		}
 	}
 	provider, err := op.NewDefaultOP(
