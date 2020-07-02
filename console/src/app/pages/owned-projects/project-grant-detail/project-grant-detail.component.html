@@ -1,0 +1,19 @@
+<div class="max-width-container">
+    <div class="container">
+        <div class="left">
+            <a *ngIf="projectid" [routerLink]="[ '/projects', projectid]" mat-icon-button>
+                <mat-icon class="icon">arrow_back</mat-icon>
+            </a>
+        </div>
+        <div class="right">
+            <div class="head">
+                <h1>{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}</h1>
+                <p class="desc">{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}</p>
+            </div>
+
+            <app-project-grant-members *ngIf="this.projectid && this.grantid" [disabled]="isZitadel"
+                [projectId]="projectid" [grantId]="grantid" [type]="projectType">
+            </app-project-grant-members>
+        </div>
+    </div>
+</div>

@@ -17,11 +17,6 @@
                 (matChipInputTokenEnd)="add($event)" />
         </mat-chip-list>
 
-        <!-- <mat-hint *ngIf="hint">
-            {{hint}}
-            <a (click)=" changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-        </mat-hint> -->
-
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
             <mat-option *ngIf="isLoading" class="is-loading">
                 <mat-spinner diameter="30"></mat-spinner>

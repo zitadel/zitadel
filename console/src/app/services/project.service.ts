@@ -29,6 +29,7 @@ import {
     ProjectGrantUpdate,
     ProjectGrantView,
     ProjectID,
+    ProjectMember,
     ProjectMemberAdd,
     ProjectMemberChange,
     ProjectMemberRemove,
@@ -36,6 +37,7 @@ import {
     ProjectMemberSearchRequest,
     ProjectMemberSearchResponse,
     ProjectRoleAdd,
+    ProjectRoleAddBulk,
     ProjectRoleRemove,
     ProjectRoleSearchQuery,
     ProjectRoleSearchRequest,
@@ -159,18 +161,6 @@ export class ProjectService {
         );
     }
 
-    public async ChangeProjectMember(id: string, userId: string, rolesList: string[]): Promise<Empty> {
-        const req = new ProjectMemberChange();
-        req.setId(id);
-        req.setUserId(userId);
-        req.setRolesList(rolesList);
-        return await this.request(
-            c => c.changeProjectMember,
-            req,
-            f => f,
-        );
-    }
-
     public async DeactivateProject(projectId: string): Promise<Project> {
         const req = new ProjectID();
         req.setId(projectId);
@@ -212,13 +202,25 @@ export class ProjectService {
         );
     }
 
-    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
+    public async AddProjectMember(id: string, userId: string, rolesList: string[]): Promise<Empty> {
         const req = new ProjectMemberAdd();
-        req.setId(projectId);
+        req.setId(id);
         req.setUserId(userId);
         req.setRolesList(rolesList);
         return await this.request(
             c => c.addProjectMember,
+            req,
+            f => f,
+        );
+    }
+
+    public async ChangeProjectMember(id: string, userId: string, rolesList: string[]): Promise<ProjectMember> {
+        const req = new ProjectMemberChange();
+        req.setId(id);
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.changeProjectMember,
             req,
             f => f,
         );
@@ -354,6 +356,20 @@ export class ProjectService {
         req.setGroup(role.group);
         return await this.request(
             c => c.addProjectRole,
+            req,
+            f => f,
+        );
+    }
+
+    public async BulkAddProjectRole(
+        id: string,
+        rolesList: ProjectRoleAdd[],
+    ): Promise<Empty> {
+        const req = new ProjectRoleAddBulk();
+        req.setId(id);
+        req.setProjectRolesList(rolesList);
+        return await this.request(
+            c => c.bulkAddProjectRole,
             req,
             f => f,
         );

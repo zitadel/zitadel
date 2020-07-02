@@ -16,6 +16,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
@@ -26,7 +27,6 @@ import { DialogOtpComponent } from './dialog-otp/dialog-otp.component';
 import { ThemeSettingComponent } from './theme-setting/theme-setting.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';
-import { UserGrantsModule } from './user-grants/user-grants.module';
 import { UserMfaComponent } from './user-mfa/user-mfa.component';
 
 @NgModule({

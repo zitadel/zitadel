@@ -6,6 +6,8 @@
     $primary-color: mat-color($primary, 500);
     $accent-color: mat-color($accent, 500);
     $primary-dark: mat-color($primary, A900);
+    $sec-dark: mat-color($primary, A800);
+
 
     .mat-menu-item {
         &.show-all {
@@ -19,7 +21,7 @@
         color: inherit;
 
         &:hover {
-            background-color: #00000020;
+            background-color: $sec-dark;
             border-top-right-radius: 1.5rem;
             border-bottom-right-radius: 1.5rem;
         }

@@ -7,7 +7,7 @@
       flex-direction: column;
       .desc {
           font-size: .8rem;
-          color: #81868a;
+          color: #8795a1;
       }
       .count {
           font-size: 2rem;
@@ -65,68 +65,12 @@
             }
         }
 
+        tr {
+            outline: none;
+        }
+
         tr.detail-row {
             height: 0;
-
-        }
-
-        tr {
-            .element-row:not(.expanded-row):hover {
-                background: whitesmoke;
-            }
-            
-            .element-row:not(.expanded-row):active {
-                background: #efefef;
-            }
-        }
-        
-        .element-row td {
-            border-bottom-width: 0;
-        }
-        
-        .element-detail {
-            overflow: hidden;
-            display: flex;
-           
-            .right {
-                display: flex;
-                flex-direction: column;
-
-                .title-row {
-                    display: flex;
-                    align-items: center;
-
-                    .mem-title {
-                        font-size: .8rem;
-                        color: #81868a;
-                    }
-                }
-
-                .mem-description {
-                    border: 2px solid #81868a;
-                    background-color: #212224;
-                    border-radius: .5rem;
-                    padding: 1rem;
-                    margin: .5rem 0;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                }
-            }
-        }
-        
-        .element-symbol {
-            font-weight: bold;
-            font-size: 40px;
-            line-height: normal;
-        }
-        
-        .element-description {
-            padding: 16px;
-        }
-        
-        .element-description-attribution {
-            opacity: 0.5;
         }
 
         .selection {

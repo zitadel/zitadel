@@ -214,7 +214,11 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 	}
 }
 
+//TODO: rethink this function i know it's ugly.
 func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) error {
+	if grant.ProjectID != project.AggregateID {
+		return errors.ThrowInvalidArgument(nil, "EVENT-ixlMx", "project doesn't exist")
+	}
 	if project.State == int32(proj_model.ProjectStateRemoved) {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Lxp0s", "project doesn't exist")
 	}

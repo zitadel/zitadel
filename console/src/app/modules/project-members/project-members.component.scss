@@ -36,7 +36,7 @@
                 width: 100%;
                 display: block;
                 font-size: .9rem;
-                color: #81868a;
+                color: #8795a1;
             }
         }
     }
@@ -51,7 +51,7 @@
       flex-direction: column;
       .desc {
           font-size: .8rem;
-          color: #81868a;
+          color: #8795a1;
       }
       .count {
           font-size: 2rem;
@@ -108,11 +108,6 @@
         .selection {
             width: 50px;
             max-width: 50px;
-        }
-
-        .role {
-            display: inline-block;
-            margin: .25rem;
         }
     }
 }

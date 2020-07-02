@@ -8,7 +8,7 @@
 
     <div class="container">
         <ng-template appHasRole [appHasRole]="['iam.write']">
-            <div class="item">
+            <div class="item card">
                 <div class="top">
                     <h2>
                         <i class="icon las la-gem"></i>
@@ -22,7 +22,7 @@
             </div>
         </ng-template>
 
-        <div class="item">
+        <div class="item card">
             <div class="top">
                 <h2> <i class="icon las la-user-circle"></i>
                     {{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
@@ -36,7 +36,7 @@
         </div>
 
         <ng-template appHasRole [appHasRole]="['project.read']">
-            <div class="item">
+            <div class="item card">
                 <div class="top">
                     <h2>
                         <i class="icon las la-layer-group"></i>
@@ -51,7 +51,7 @@
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['org.read']">
-            <div class="item">
+            <div class="item card">
                 <div class="top">
                     <h2> <i class="icon las la-archway"></i>
                         {{'HOME.PROTECTION'| translate}}</h2>
@@ -66,7 +66,7 @@
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['user.read']">
-            <div class="item">
+            <div class="item card">
                 <div class="top">
                     <h2>
                         <i class="las la-crosshairs"></i>

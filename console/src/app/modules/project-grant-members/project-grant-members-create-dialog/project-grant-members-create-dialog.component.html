@@ -6,7 +6,7 @@
     <app-search-user-autocomplete (selectionChanged)="selectUsers($event)">
     </app-search-user-autocomplete>
 
-    <mat-form-field class="full-width">
+    <mat-form-field class="full-width" appearance="outline">
         <mat-label>{{ 'PROJECT.MEMBER.ROLES' | translate }}</mat-label>
         <mat-select [(ngModel)]="roleKeyList" multiple>
             <mat-option *ngFor="let key of data.roleKeysList" [value]="key">

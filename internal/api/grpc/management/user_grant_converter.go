@@ -168,6 +168,10 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *grpc.UserGrantVie
 		OrgName:       grant.OrgName,
 		OrgDomain:     grant.OrgDomain,
 		RoleKeys:      grant.RoleKeys,
+		UserId:        grant.UserID,
+		ProjectId:     grant.ProjectID,
+		OrgId:         grant.ResourceOwner,
+		DisplayName:   grant.DisplayName,
 	}
 }
 
