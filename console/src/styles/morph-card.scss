@@ -18,7 +18,9 @@
         margin: 1rem;
         border-radius: 16px;
         border: 1px solid $accent-color;
-        background: $primary-dark;
+        background-color: $primary-dark;
+        transition: background-color .5s ease-in-out;
+
 
         &.add {
             background: $accent-color;

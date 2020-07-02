@@ -1,14 +1,20 @@
 $dark-background: #2d2e30;
 
-.app {
-    position: relative;
+// * {
+//     transition: background-color .5s ease-in-out;
+// }
+
+:root {
+    transition: none;
 }
 
-.content {
+.theme-app {
+    position: relative;
+}
+.theme-content {
   display: flex;
   flex-direction: column;
   text-align: center;
-//   width: 300px;
 }
 .circle {
   position: relative;
@@ -23,8 +29,6 @@ $dark-background: #2d2e30;
   border-radius: 100%;
   right: 0;
   width: 4rem;
-  height: 4rem;
-  background: white;
   transform: scale(0);
   transform-origin: top right;
   transition: transform .6s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -60,7 +64,6 @@ label {
   position: absolute;
   background-color: #fff;
   box-shadow: 0 2px 15px rgba(0,0,0,.15);
-  transition: transform .3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .names {
   font-size: 90%;
@@ -79,45 +82,33 @@ label {
   display: none;
 }
 /* Toggle */
-[type="checkbox"]:checked + .app .toggle{
+[type="checkbox"]:checked + .theme-app .toggle{
   transform: translateX(100%);
   background-color: $dark-background;
 }
-[type="checkbox"]:checked + .app .dark{
+[type="checkbox"]:checked + .theme-app .dark{
   opacity: 1;
 }
-[type="checkbox"]:checked + .app .light{
+[type="checkbox"]:checked + .theme-app .light{
   opacity: .5;
 }
 /* App */
-[type="checkbox"]:checked + .app{
+[type="checkbox"]:checked + .theme-app{
   background-color:  $dark-background;
   color: white;
 }
 /* Circle */
-[type="checkbox"]:checked + .app .crescent{
+[type="checkbox"]:checked + .theme-app .crescent{
   transform: scale(1);
   background: $dark-background;
 }
-[type="checkbox"]:checked + .app .circle{
+[type="checkbox"]:checked + .theme-app .circle{
   background: linear-gradient(40deg, #8983F7, #A3DAFB 70%);
 }
-[type="checkbox"]:checked + .app .main-circle{
+[type="checkbox"]:checked + .theme-app .main-circle{
   background: linear-gradient(40deg, #8983F7, #A3DAFB 70%);
 }
 /* Fab */
-[type="checkbox"]:checked + .app .fab{
+[type="checkbox"]:checked + .theme-app .fab{
   background-color: $dark-background;
-}
-[type="checkbox"]:checked + .app .arrow,
-[type="checkbox"]:checked + .app .mark,
-[type="checkbox"]:checked + .app .battery{
-  background-color: white;
-}
-[type="checkbox"]:checked + .app .network{
-  border-color: transparent transparent white transparent;
-}
-[type="checkbox"]:checked + .app .swipe{
-  background-color: $dark-background;
-  opacity: 1;
 }
