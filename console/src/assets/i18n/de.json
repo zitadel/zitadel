@@ -193,6 +193,10 @@
         }, 
         "MEMBER": {
             "TITLE":"IAM Members"
+        },
+        "VIEWS": {
+            "TITLE":"Views und Events",
+            "DESCRIPTION":"Diese Ansicht zeigt Ihre Zitadel Views, Sie können Sie zurücksetzen und fehlgeschlagene Events entfernen."
         }
     },
     "ORG": {
