@@ -140,7 +140,7 @@ func (s *Server) GetMyUserChanges(ctx context.Context, request *ChangesRequest) 
 		Changes: []*model.UserChange{
 			{
 				ChangeDate: ptypes.TimestampNow(),
-				EventType:  "user.added",
+				EventType:  "EventTypes.user.added",
 			},
 		},
 	}
