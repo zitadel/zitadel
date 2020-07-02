@@ -9,6 +9,8 @@ import * as protoc$gen$swagger_options_annotations_pb from './protoc-gen-swagger
 import * as authoption_options_pb from './authoption/options_pb';
 
 import {
+  Changes,
+  ChangesRequest,
   MfaOtpResponse,
   MultiFactors,
   MyPermissions,
@@ -151,6 +153,13 @@ export class AuthServiceClient {
     callback: (err: grpcWeb.Error,
                response: UserAddressView) => void
   ): grpcWeb.ClientReadableStream<UserAddressView>;
+
+  getMyUserChanges(
+    request: ChangesRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: Changes) => void
+  ): grpcWeb.ClientReadableStream<Changes>;
 
   updateMyUserAddress(
     request: UpdateUserAddressRequest,
@@ -308,6 +317,11 @@ export class AuthServicePromiseClient {
     request: google_protobuf_empty_pb.Empty,
     metadata?: grpcWeb.Metadata
   ): Promise<UserAddressView>;
+
+  getMyUserChanges(
+    request: ChangesRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<Changes>;
 
   updateMyUserAddress(
     request: UpdateUserAddressRequest,

@@ -194,6 +194,15 @@
         "MEMBER": {
             "TITLE":"Managers",
             "DESCRIPTION":"Managers can add and edit organizations and make changes to their corresponding projects and apps"
+        },
+        "VIEWS": {
+            "TITLE":"Views and Events",
+            "DESCRIPTION":"This Card shows your Zitadel Views, you can clear them and remove failed events.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Database",
+            "SEQUENCE":"Sequence",
+            "ACTIONS":"Actions",
+            "CLEAR":"Clear"
         }
     },
     "ORG": {

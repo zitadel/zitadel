@@ -18,6 +18,8 @@ import {
     OrgSetUpRequest,
     OrgSetUpResponse,
     RemoveIamMemberRequest,
+    ViewID,
+    Views,
 } from '../proto/generated/admin_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -63,6 +65,25 @@ export class AdminService {
         return await this.request(
             c => c.getIamMemberRoles,
             new Empty(),
+            f => f,
+        );
+    }
+
+    public async GetViews(): Promise<Views> {
+        return await this.request(
+            c => c.getViews,
+            new Empty(),
+            f => f,
+        );
+    }
+
+    public async ClearView(viewname: string, db: string): Promise<Empty> {
+        const req: ViewID = new ViewID();
+        req.setDatabase(db);
+        req.setViewName(viewname);
+        return await this.request(
+            c => c.clearView,
+            req,
             f => f,
         );
     }

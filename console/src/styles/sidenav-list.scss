@@ -50,6 +50,7 @@
     .root-header {
         @include mat-elevation(3);
         background: $primary-dark !important;
+        transition: background .5s ease-in-out;
     }
 
     .admin-line {

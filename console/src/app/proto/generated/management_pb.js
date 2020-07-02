@@ -35628,7 +35628,8 @@ proto.caos.zitadel.management.api.v1.UserGrantView.toObject = function(includeIn
     orgDomain: jspb.Message.getFieldWithDefault(msg, 14, ""),
     projectName: jspb.Message.getFieldWithDefault(msg, 15, ""),
     sequence: jspb.Message.getFieldWithDefault(msg, 16, 0),
-    resourceOwner: jspb.Message.getFieldWithDefault(msg, 17, "")
+    resourceOwner: jspb.Message.getFieldWithDefault(msg, 17, ""),
+    displayName: jspb.Message.getFieldWithDefault(msg, 18, "")
   };
 
   if (includeInstance) {
@@ -35734,6 +35735,10 @@ proto.caos.zitadel.management.api.v1.UserGrantView.deserializeBinaryFromReader =
     case 17:
       var value = /** @type {string} */ (reader.readString());
       msg.setResourceOwner(value);
+      break;
+    case 18:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDisplayName(value);
       break;
     default:
       reader.skipField();
@@ -35882,6 +35887,13 @@ proto.caos.zitadel.management.api.v1.UserGrantView.serializeBinaryToWriter = fun
   if (f.length > 0) {
     writer.writeString(
       17,
+      f
+    );
+  }
+  f = message.getDisplayName();
+  if (f.length > 0) {
+    writer.writeString(
+      18,
       f
     );
   }
@@ -36193,6 +36205,21 @@ proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getResourceOwner = 
 /** @param {string} value */
 proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setResourceOwner = function(value) {
   jspb.Message.setProto3StringField(this, 17, value);
+};
+
+
+/**
+ * optional string display_name = 18;
+ * @return {string}
+ */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.getDisplayName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 18, ""));
+};
+
+
+/** @param {string} value */
+proto.caos.zitadel.management.api.v1.UserGrantView.prototype.setDisplayName = function(value) {
+  jspb.Message.setProto3StringField(this, 18, value);
 };
 
 

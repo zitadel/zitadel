@@ -5,7 +5,7 @@
 @import './styles/changes';
 @import './styles/avatar';
 @import './styles/meta';
-
+@import './styles/theme-card';
 
 @mixin component-themes($theme) {
     @include avatar-theme($theme);
@@ -15,4 +15,5 @@
     @include morph-card-theme($theme);
     @include changes-theme($theme);
     @include meta-theme($theme);
+    @include theme-card($theme);
 }

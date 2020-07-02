@@ -9,6 +9,7 @@
     .mat-table,
     mat-paginator {
         background-color: $secondary-dark !important;
+        transition: background-color .5s ease-in-out;
 
         &.background-style {
             background-color: $primary-dark !important;
