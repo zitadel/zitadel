@@ -8,6 +8,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 import "authoption/options.proto";
+import "message/message.proto";
 
 package caos.zitadel.management.api.v1;
 

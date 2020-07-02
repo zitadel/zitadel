@@ -40,6 +40,7 @@ func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Serve
 		middleware.TracingStatsServer("/Healthz", "/Ready", "/Validate"),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
+				middleware.TranslationHandler(defaults.DefaultLanguage),
 				middleware.ErrorHandler(defaults.DefaultLanguage),
 				AuthService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),

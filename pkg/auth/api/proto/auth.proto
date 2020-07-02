@@ -7,6 +7,7 @@ import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "authoption/options.proto";
+import "message/message.proto";
 
 package caos.zitadel.auth.api.v1;
 
@@ -648,7 +649,7 @@ message Changes {
 
 message Change {
   google.protobuf.Timestamp change_date = 1;
-  string event_type = 2;
+  caos.zitadel.api.v1.LocalizedMessage event_type = 2;
   uint64 sequence = 3;
   string editor_id = 4;
   string editor = 5;
