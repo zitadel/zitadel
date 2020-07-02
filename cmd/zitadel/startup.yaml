@@ -171,7 +171,7 @@ API:
         URL: '$ZITADEL_OAUTH/keys'
 
 UI:
-  Port: 50020
+  Port: 50003
   Login:
     Handler:
       OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
@@ -195,9 +195,6 @@ UI:
       MaxAge: $ZITADEL_CACHE_MAXAGE
       SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
     CSPDomain: $ZITADEL_DEFAULT_DOMAIN
-      ConcurrentTasks: 1
-      BulkLimit: 100
-      FailureCountUntilSkip: 5
 
 Notification:
   Repository:
