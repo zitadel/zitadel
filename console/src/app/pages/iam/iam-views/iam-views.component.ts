@@ -1,10 +1,11 @@
-import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
-import { MatTable } from '@angular/material/table';
+import { Component, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { View } from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
-
-import { IamViewsDataSource } from './iam-views.datasource';
 
 @Component({
     selector: 'app-iam-views',
@@ -13,35 +14,35 @@ import { IamViewsDataSource } from './iam-views.datasource';
 })
 export class IamViewsComponent {
     public views: View.AsObject[] = [];
+
+
+    @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<View.AsObject>;
-    public dataSource!: IamViewsDataSource;
-    public selection: SelectionModel<View.AsObject> = new SelectionModel<View.AsObject>(true, []);
-    @Output() public changedSelection: EventEmitter<Array<View.AsObject>> = new EventEmitter();
+    @ViewChild(MatSort) public sort!: MatSort;
+    public dataSource!: MatTableDataSource<View.AsObject>;
 
-    public displayedColumns: string[] = ['select', 'viewname', 'database', 'sequence', 'actions'];
-
+    public displayedColumns: string[] = ['viewName', 'database', 'sequence', 'actions'];
+    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     constructor(private adminService: AdminService) {
-        this.dataSource = new IamViewsDataSource(this.adminService);
-        this.dataSource.loadViews();
+        this.loadViews();
+    }
 
-        this.selection.changed.subscribe(() => {
-            this.changedSelection.emit(this.selection.selected);
+    public loadViews(): void {
+        this.loadingSubject.next(true);
+        from(this.adminService.GetViews()).pipe(
+            map(resp => {
+                return resp.toObject().viewsList;
+            }),
+            catchError(() => of([])),
+            finalize(() => this.loadingSubject.next(false)),
+        ).subscribe(views => {
+            this.dataSource = new MatTableDataSource(views);
+            this.dataSource.paginator = this.paginator;
         });
     }
 
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.viewsSubject.value.length;
-        return numSelected === numRows;
-    }
-
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.viewsSubject.value.forEach((row: View.AsObject) => this.selection.select(row));
-    }
-
-    public cancelSelectedViews(): void {
-
+    public cancelView(viewname: string, db: string): void {
+        this.adminService.ClearView(viewname, db);
     }
 }
