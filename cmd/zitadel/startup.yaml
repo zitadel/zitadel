@@ -29,7 +29,10 @@ Mgmt:
           User: 'management'
           Database: 'eventstore'
           SSL:
-            Mode: disable
+            Mode: $CR_SSL_MODE
+            RootCert: $CR_ROOT_CERT
+            Cert: $CR_MANAGEMENT_CERT
+            Key: $CR_MANAGEMENT_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -40,7 +43,10 @@ Mgmt:
       User: 'management'
       Database: 'management'
       SSL:
-        Mode: disable
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_MANAGEMENT_CERT
+        Key: $CR_MANAGEMENT_KEY
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100
@@ -98,7 +104,10 @@ Auth:
           User: 'auth'
           Database: 'eventstore'
           SSL:
-            Mode: disable
+            Mode: $CR_SSL_MODE
+            RootCert: $CR_ROOT_CERT
+            Cert: $CR_AUTH_CERT
+            Key: $CR_AUTH_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -110,14 +119,20 @@ Auth:
         User: 'auth'
         Database: 'auth'
         SSL:
-          Mode: disable
+          Mode: $CR_SSL_MODE
+          RootCert: $CR_ROOT_CERT
+          Cert: $CR_AUTH_CERT
+          Key: $CR_AUTH_KEY
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'auth'
       Database: 'auth'
       SSL:
-        Mode: disable
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_AUTH_CERT
+        Key: $CR_AUTH_KEY
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100
@@ -158,7 +173,10 @@ AuthZ:
           User: 'authz'
           Database: 'eventstore'
           SSL:
-            Mode: disable
+            Mode: $CR_SSL_MODE
+            RootCert: $CR_ROOT_CERT
+            Cert: $CR_AUTHZ_CERT
+            Key: $CR_AUTHZ_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -169,7 +187,10 @@ AuthZ:
       User: 'authz'
       Database: 'authz'
       SSL:
-        Mode: disable
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_AUTHZ_CERT
+        Key: $CR_AUTHZ_KEY
     Spooler:
       ConcurrentTasks: 1
       BulkLimit: 100
@@ -194,7 +215,10 @@ Admin:
           User: 'admin_api'
           Database: 'eventstore'
           SSL:
-            Mode: disable
+            Mode: $CR_SSL_MODE
+            RootCert: $CR_ROOT_CERT
+            Cert: $CR_ADMIN_CERT
+            Key: $CR_ADMIN_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -205,7 +229,10 @@ Admin:
       User: 'admin_api'
       Database: 'admin_api'
       SSL:
-        Mode: disable
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_ADMIN_CERT
+        Key: $CR_ADMIN_KEY
     Spooler:
       ConcurrentTasks: 1
       BulkLimit: 100
@@ -235,7 +262,10 @@ Notification:
           User: 'notification'
           Database: 'eventstore'
           SSL:
-            Mode: disable
+            Mode: $CR_SSL_MODE
+            RootCert: $CR_ROOT_CERT
+            Cert: $CR_NOTIFY_CERT
+            Key: $CR_NOTIFY_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -246,7 +276,10 @@ Notification:
       User: 'notification'
       Database: 'notification'
       SSL:
-        Mode: disable
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_NOTIFY_CERT
+        Key: $CR_NOTIFY_KEY
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100
