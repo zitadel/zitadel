@@ -1,3 +1,69 @@
-<p *ngFor="let view of views">
-    {{view.viewName}} {{view.database}} {{view.sequence}}
-</p>
+<div class="table-header-row">
+    <div class="col">
+        <ng-container *ngIf="!selection.hasValue()">
+            <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
+            <span class="count">{{dataSource?.viewsSubject.value.length}}</span>
+        </ng-container>
+        <ng-container *ngIf="selection.hasValue()">
+            <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
+            <span class="count">{{selection?.selected?.length}}</span>
+        </ng-container>
+    </div>
+    <span class="fill-space"></span>
+    <ng-template appHasRole [appHasRole]="['iam.views.delete']">
+        <button color="warn" matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" class="icon-button"
+            (click)="cancelSelectedViews()" mat-icon-button *ngIf="selection.hasValue()">
+            <i class="las la-trash"></i>
+        </button>
+    </ng-template>
+</div>
+
+<div class="table-wrapper" *ngIf="dataSource">
+    <div class="spinner-container" *ngIf="dataSource.loading$ | async">
+        <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <table [dataSource]="dataSource" mat-table class="full-width-table background-style" matSort aria-label="Elements">
+        <ng-container matColumnDef="select">
+            <th class="selection" mat-header-cell *matHeaderCellDef>
+                <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td class="selection" mat-cell *matCellDef="let row">
+                <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="viewname">
+            <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
+            <td mat-cell *matCellDef="let role"> {{role.viewName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="database">
+            <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.DATABASE' | translate }} </th>
+            <td mat-cell *matCellDef="let role"> {{role.database}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sequence">
+            <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.SEQUENCE' | translate }} </th>
+            <td mat-cell *matCellDef="let role">
+                <span class="role app-label">{{role.sequence}}</span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.ACTIONS' | translate }} </th>
+            <td mat-cell *matCellDef="let role">
+                <button mat-icon-button matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"><i
+                        class="las la-redo-alt"></i></button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div>
