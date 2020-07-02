@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	sslDisabledMode = "disabled"
+	sslDisabledMode = "disable"
 )
 
 type SQL struct {
@@ -18,31 +18,35 @@ type SQL struct {
 	User     string
 	Password string
 	Database string
-	// type of connection security
-	SSLMode string
-	// RootCert Path to the CA certificate
-	SSLRootCert string
-	// Cert Path to the client certificate
-	SSLCert string
-	// Key Path to the client private key
-	SSLKey string
+	SSL      *ssl
 }
 
-func (s *SQL) ConnectionString() string {
+type ssl struct {
+	// type of connection security
+	Mode string
+	// RootCert Path to the CA certificate
+	RootCert string
+	// Cert Path to the client certificate
+	Cert string
+	// Key Path to the client private key
+	Key string
+}
+
+func (s *SQL) connectionString() string {
 	fields := []string{
 		"host=" + s.Host,
 		"port=" + s.Port,
 		"user=" + s.User,
 		"password=" + s.Password,
 		"dbname=" + s.Database,
-		"sslmode=" + s.SSLMode,
+		"sslmode=" + s.SSL.Mode,
 	}
-	if s.SSLMode != sslDisabledMode {
+	if s.SSL.Mode != sslDisabledMode {
 		fields = append(fields, []string{
 			"ssl=true",
-			"sslrootcert=" + s.SSLRootCert,
-			"sslcert=" + s.SSLCert,
-			"sslkey=" + s.SSLKey,
+			"sslrootcert=" + s.SSL.RootCert,
+			"sslcert=" + s.SSL.Cert,
+			"sslkey=" + s.SSL.Key,
 		}...)
 	}
 
@@ -51,7 +55,7 @@ func (s *SQL) ConnectionString() string {
 
 func (s *SQL) Start() (*sql.DB, error) {
 	s.checkSSL()
-	client, err := sql.Open("postgres", s.ConnectionString())
+	client, err := sql.Open("postgres", s.connectionString())
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
 	}
@@ -59,12 +63,15 @@ func (s *SQL) Start() (*sql.DB, error) {
 }
 
 func (s *SQL) checkSSL() {
-	if s.SSLMode != sslDisabledMode && (s.SSLCert == "" || s.SSLKey == "" || s.SSLRootCert == "") {
-		logging.LogWithFields("TYPES-LFdzP", "mode",
-			s.SSLMode, "cert",
-			s.SSLCert, "key",
-			s.SSLKey, "rootCert",
-			s.SSLRootCert).
-			Fatal("wrong SSL config for database")
+	if s.SSL == nil || s.SSL.Mode == sslDisabledMode {
+		s.SSL = &ssl{Mode: sslDisabledMode}
+		return
+	}
+	if s.SSL.Cert == "" || s.SSL.Key == "" || s.SSL.RootCert == "" {
+		logging.LogWithFields("TYPES-LFdzP",
+			"cert set", s.SSL.Cert != "",
+			"key set", s.SSL.Key != "",
+			"rootCert set", s.SSL.RootCert != "",
+		).Fatal("fields for secure connection missing")
 	}
 }
