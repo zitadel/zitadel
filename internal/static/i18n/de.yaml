@@ -169,107 +169,107 @@ EventTypes:
         skipped: Multifaktor Initialisierung übersprungen
     signed:
       out: Benutzer ausgeloggt
-		grant:
+    grant:
       added: Berechtigung hinzugefügt
-			changed: Berechtigung geändert
-			removed: Berechtigung entfernt
-			deactivated: Berechtigung deaktiviert
-			reactivated: Berechtigung reaktiviert
-			reserved: Berechtigung reserviert
-			released: Berechtigung freigegeben
-			cascade:
+      changed: Berechtigung geändert
+      removed: Berechtigung entfernt
+      deactivated: Berechtigung deaktiviert
+      reactivated: Berechtigung reaktiviert
+      reserved: Berechtigung reserviert
+      released: Berechtigung freigegeben
+      cascade:
         removed: Berechtigung entfernt
-			  changed: Berechtigung geändert
+        changed: Berechtigung geändert
   org:
-		added: Organisation hinzugefügt
-		changed: Organisation geändert
-		deactivated: Organisation deaktiviert
-		reactivated: Organisation reaktiviert
-		removed: Organisation entfernt
-		domain:
+    added: Organisation hinzugefügt
+    changed: Organisation geändert
+    deactivated: Organisation deaktiviert
+    reactivated: Organisation reaktiviert
+    removed: Organisation entfernt
+    domain:
       added: Domäne hinzugefügt
       verified: Domäne verifiziert
       removed: Domäne entfernt
       primary:
         set: Primäre Domäne gesetzt
-		name:
+    name:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben
-		domain:
+    domain:
       reserved: Domäne reserviert
-		  released: Domäne freigegeben
-		member:
+      released: Domäne freigegeben
+    member:
       added: Organisationsmitglied hinzugefügt
-		  changed: Organisationsmitglied geändert
-		  removed: Organisationsmitglied entfernt
-		iam:
-    	policy:
-      	added: neue System Richtlinie der Organisation hinzugefügt
-		    changed: System Richtlinie der Organisation geändert
-		    removed: System Richtlinie der Organisation entfernt
+      changed: Organisationsmitglied geändert
+      removed: Organisationsmitglied entfernt
+    iam:
+      policy:
+        added: neue System Richtlinie der Organisation hinzugefügt
+        changed: System Richtlinie der Organisation geändert
+        removed: System Richtlinie der Organisation entfernt
   project:
-		added: Projekt hinzugefügt
-		changed: Project geändert
-		deactivated: Projekt deaktiviert
-		reactivated: Projekt reaktiviert
-		removed: Projekt entfernt
-		member:
+    added: Projekt hinzugefügt
+    changed: Project geändert
+    deactivated: Projekt deaktiviert
+    reactivated: Projekt reaktiviert
+    removed: Projekt entfernt
+    member:
       added: Projektmitglied hinzugefügt
-		  changed: Projektmitglied geändert
-		  removed: Projektmitglied entfernt
-		role:
+      changed: Projektmitglied geändert
+      removed: Projektmitglied entfernt
+    role:
       added: Projektrolle hinzugefügt
-		  changed: Projektrolle geändert
-		  removed: Projektrolle entfernt
-		grant:
+      changed: Projektrolle geändert
+      removed: Projektrolle entfernt
+    grant:
       added: Verwaltungszugriff hinzugefügt
-		  changed: Verwaltungszugriff geändert
-		  removed: Verwaltungszugriff entfernt
-		  deactivated: Verwaltungszugriff deaktiviert
-		  reactivated: Verwaltungszugriff reaktiviert
-		  cascade:
+      changed: Verwaltungszugriff geändert
+      removed: Verwaltungszugriff entfernt
+      deactivated: Verwaltungszugriff deaktiviert
+      reactivated: Verwaltungszugriff reaktiviert
+      cascade:
         changed: Verwaltungszugriff geändert
       member:
         added: Verwaltungszugriffsmitglied hinzugefügt
-		    changed: Verwaltungszugriffsmitglied geändert
-		    removed: Verwaltungszugriffsmitglied entfernt
-		application:
+        changed: Verwaltungszugriffsmitglied geändert
+        removed: Verwaltungszugriffsmitglied entfernt
+    application:
       added: Applikation hinzugefügt
       changed: Applikation geändert
-		  removed: Applikation entfernt
-		  deactivated: Applikation deaktiviert
-		  reactivated: Applikation reaktiviert
-		    config:
-          oidc:
-            added: OIDC Konfiguration hinzugefügt
-		        changed: OIDC Konfiguration geändert
-		        secret:
-              changed: OIDC Client Secret geändert
-		          check:
-                succeeded: OIDC Client Secret Validierung erfolgreich
-		            failed: OIDC Client Secret Validierung fehlgeschlagen
+      removed: Applikation entfernt
+      deactivated: Applikation deaktiviert
+      reactivated: Applikation reaktiviert
+      config:
+        oidc:
+          added: OIDC Konfiguration hinzugefügt
+          changed: OIDC Konfiguration geändert
+          secret:
+            changed: OIDC Client Secret geändert
+            check:
+              succeeded: OIDC Client Secret Validierung erfolgreich
+              failed: OIDC Client Secret Validierung fehlgeschlagen
   policy:
-		password:
+    password:
       complexity:
         added: Passwortkomplexitätsrichtline hinzugefügt
-		    changed: Passwortkomplexitätsrichtline geändert
-		  age:
+        changed: Passwortkomplexitätsrichtline geändert
+      age:
         added: Passwortaltersrichtlinie hinzugefügt
-		    changed: Passwortaltersrichtlinie geändert
-		  lockout:
+        changed: Passwortaltersrichtlinie geändert
+      lockout:
         added: Passwortaussperrrichtlinie hizugefügt
-		    changed: Passwortaussperrrichtlinie geändert
+        changed: Passwortaussperrrichtlinie geändert
   iam:
-		setup:
+    setup:
       started: Zitadel Initialisierung gestartet
-		  done: Zitadel Initialisierung abgeschlossen
-		global:
+      done: Zitadel Initialisierung abgeschlossen
+    global:
       org:
         set: Globale Organisation von Zitadel gesetzt
-		project:
+    project:
       iam:
         set: Zitadel Projekt gesetzt
-		member:
+    member:
       added: Zitadelmitglied hinzugefügt
       changed: Zitadelmitglied geändert
       removed: Zitadelmitglied entfernt
