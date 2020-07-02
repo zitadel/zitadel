@@ -1367,6 +1367,86 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserAddre
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.auth.api.v1.ChangesRequest,
+ *   !proto.caos.zitadel.auth.api.v1.Changes>}
+ */
+const methodDescriptor_AuthService_GetMyUserChanges = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.auth.api.v1.AuthService/GetMyUserChanges',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.auth.api.v1.ChangesRequest,
+  proto.caos.zitadel.auth.api.v1.Changes,
+  /**
+   * @param {!proto.caos.zitadel.auth.api.v1.ChangesRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.Changes.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.auth.api.v1.ChangesRequest,
+ *   !proto.caos.zitadel.auth.api.v1.Changes>}
+ */
+const methodInfo_AuthService_GetMyUserChanges = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.auth.api.v1.Changes,
+  /**
+   * @param {!proto.caos.zitadel.auth.api.v1.ChangesRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.Changes.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.auth.api.v1.ChangesRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.Changes)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.Changes>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyUserChanges =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyUserChanges',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyUserChanges,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.auth.api.v1.ChangesRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.Changes>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyUserChanges =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyUserChanges',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyUserChanges);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.caos.zitadel.auth.api.v1.UpdateUserAddressRequest,
  *   !proto.caos.zitadel.auth.api.v1.UserAddress>}
  */
