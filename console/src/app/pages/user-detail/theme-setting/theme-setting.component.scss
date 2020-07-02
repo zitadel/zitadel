@@ -29,6 +29,8 @@ $dark-background: #2d2e30;
   border-radius: 100%;
   right: 0;
   width: 4rem;
+  height: 4rem;
+  background: #fafafa;
   transform: scale(0);
   transform-origin: top right;
   transition: transform .6s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -62,7 +64,7 @@ label {
 }
 .toggle {
   position: absolute;
-  background-color: #fff;
+  background-color: #fafafa;
   box-shadow: 0 2px 15px rgba(0,0,0,.15);
 }
 .names {
@@ -95,7 +97,7 @@ label {
 /* App */
 [type="checkbox"]:checked + .theme-app{
   background-color:  $dark-background;
-  color: white;
+  color: #fafafa;
 }
 /* Circle */
 [type="checkbox"]:checked + .theme-app .crescent{
