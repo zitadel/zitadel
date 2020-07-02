@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: accounts-v1
+  name: ui-v1
 spec:
   ports:
-  - name: http
+  - name: ui
     port: 80
-    targetPort: accounts-http
+    targetPort: ui
   selector:
     app: zitadel
     version: v1
