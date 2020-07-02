@@ -3,7 +3,14 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Org } from 'src/app/proto/generated/auth_pb';
-import { Project, ProjectRole, UserGrant } from 'src/app/proto/generated/management_pb';
+import {
+    ProjectGrantView,
+    ProjectRole,
+    ProjectView,
+    User,
+    UserGrant,
+    UserGrantSearchKey,
+} from 'src/app/proto/generated/management_pb';
 import { AuthService } from 'src/app/services/auth.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -20,10 +27,15 @@ export class UserGrantCreateComponent implements OnDestroy {
     public grantId: string = '';
     public rolesList: string[] = [];
 
-    public STEPS: number = 3; // org, project, roles
+    public STEPS: number = 2; // project, roles
     public currentCreateStep: number = 1;
 
+    public filter!: UserGrantSearchKey;
+    public filterValue: string = '';
+
     private subscription: Subscription = new Subscription();
+
+    public UserGrantSearchKey: any = UserGrantSearchKey;
     constructor(
         private authService: AuthService,
         private userService: MgmtUserService,
@@ -31,14 +43,24 @@ export class UserGrantCreateComponent implements OnDestroy {
         private _location: Location,
         private route: ActivatedRoute,
     ) {
-        this.subscription = this.route.params.subscribe(({ id }: Params) => {
-            console.log(id);
-            this.userId = id;
+        this.subscription = this.route.params.subscribe((params: Params) => {
+            console.log(params);
+            const { filter, filterValue } = params;
+            this.filter = filter;
+            switch (filter) {
+                case (`${UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID}`):
+                    this.projectId = filterValue;
+                    break;
+                case (`${UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID}`):
+                    this.userId = filterValue;
+                    break;
+            }
+
+            console.log(this.projectId, this.userId);
         });
 
         this.authService.GetActiveOrg().then(org => {
             this.org = org;
-            console.log(org);
         });
     }
 
@@ -52,16 +74,20 @@ export class UserGrantCreateComponent implements OnDestroy {
             this.userId,
             this.rolesList,
         ).then((data: UserGrant) => {
-            console.log(data);
             this.close();
         }).catch(error => {
             this.toast.showError(error.message);
         });
     }
 
-    public selectProject(project: Project.AsObject): void {
-        this.projectId = project.id;
+    public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
         console.log(project);
+        this.projectId = project.projectId;
+    }
+
+    public selectUser(user: User.AsObject): void {
+        console.log(user);
+        this.userId = user.id;
     }
 
     public selectRoles(roles: ProjectRole.AsObject[]): void {

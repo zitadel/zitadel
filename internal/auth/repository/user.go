@@ -3,11 +3,13 @@ package repository
 import (
 	"context"
 
+	org_model "github.com/caos/zitadel/internal/org/model"
+
 	"github.com/caos/zitadel/internal/user/model"
 )
 
 type UserRepository interface {
-	Register(ctx context.Context, user *model.User, resourceOwner string) (*model.User, error)
+	Register(ctx context.Context, user *model.User, member *org_model.OrgMember, resourceOwner string) (*model.User, error)
 
 	myUserRepo
 	SkipMfaInit(ctx context.Context, userID string) error
@@ -22,12 +24,14 @@ type UserRepository interface {
 	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
-	SignOut(ctx context.Context, agentID, userID string) error
+	SignOut(ctx context.Context, agentID string) error
 
-	UserByID(ctx context.Context, userID string) (*model.User, error)
+	UserByID(ctx context.Context, userID string) (*model.UserView, error)
 }
 
 type myUserRepo interface {
+	MyUser(ctx context.Context) (*model.UserView, error)
+
 	MyProfile(ctx context.Context) (*model.Profile, error)
 	ChangeMyProfile(ctx context.Context, profile *model.Profile) (*model.Profile, error)
 
@@ -46,7 +50,10 @@ type myUserRepo interface {
 
 	ChangeMyPassword(ctx context.Context, old, new string) error
 
+	MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error)
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
 	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
+
+	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 }

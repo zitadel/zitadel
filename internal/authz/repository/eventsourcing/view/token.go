@@ -3,7 +3,7 @@ package view
 import (
 	"github.com/caos/zitadel/internal/token/repository/view"
 	"github.com/caos/zitadel/internal/token/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -35,7 +35,7 @@ func (v *View) DeleteToken(tokenID string, eventSequence uint64) error {
 }
 
 func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64) error {
-	err := view.DeleteTokens(v.Db, tokenTable, agentID, userID)
+	err := view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
 	if err != nil {
 		return nil
 	}
@@ -50,10 +50,10 @@ func (v *View) ProcessedTokenSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(tokenTable, eventSequence)
 }
 
-func (v *View) GetLatestTokenFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestTokenFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(tokenTable, sequence)
 }
 
-func (v *View) ProcessedTokenFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedTokenFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

@@ -22,7 +22,7 @@ func TestAppendDeactivatedEvent(t *testing.T) {
 			args: args{
 				user: &User{},
 			},
-			result: &User{State: int32(model.USERSTATE_INACTIVE)},
+			result: &User{State: int32(model.UserStateInactive)},
 		},
 	}
 	for _, tt := range tests {
@@ -49,7 +49,7 @@ func TestAppendReactivatedEvent(t *testing.T) {
 			args: args{
 				user: &User{},
 			},
-			result: &User{State: int32(model.USERSTATE_ACTIVE)},
+			result: &User{State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {
@@ -76,7 +76,7 @@ func TestAppendLockEvent(t *testing.T) {
 			args: args{
 				user: &User{},
 			},
-			result: &User{State: int32(model.USERSTATE_LOCKED)},
+			result: &User{State: int32(model.UserStateLocked)},
 		},
 	}
 	for _, tt := range tests {
@@ -103,7 +103,7 @@ func TestAppendUnlockEvent(t *testing.T) {
 			args: args{
 				user: &User{},
 			},
-			result: &User{State: int32(model.USERSTATE_ACTIVE)},
+			result: &User{State: int32(model.UserStateActive)},
 		},
 	}
 	for _, tt := range tests {

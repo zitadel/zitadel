@@ -2,7 +2,6 @@
     "APP_NAME": "zitadel",
     "HOME": {
         "TITLE": "zitadel",
-        "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
         "SECURITYANDPRIVACY": "Data protection and personalization",
         "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",
         "SECURITYANDPRIVACY_BUTTON": "Personalize data",
@@ -14,15 +13,21 @@
         "PROJECTS_BUTTON": "Project Overview",
         "USERS": "Total control and monitorability",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
-        "USERS_BUTTON": "Show users"
+        "USERS_BUTTON": "Show users",
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Add new organizations or elect managers to do it for you.",
+        "IAM_BUTTON": "Manage Zitadel"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
+        "IAM":"IAM",
         "ORGANIZATION": "Organization",
         "PROJECT": "Projects",
+        "GRANTEDPROJECT":"Granted Projects",
         "USER": "Users",
         "LOGOUT": "Log out",
-        "NEWORG":"New Organization"
+        "NEWORG":"New Organization",
+        "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!"
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -51,7 +56,12 @@
             "DESCRIPTION": "Here you can create new users or edit data that has already been entered.",
             "DETAIL": "Detail",
             "CREATE": "Create",
-            "MY": "My Informations"
+            "MY": "My Informations",
+            "LOGINNAMES":"Loginnames",
+            "LOGINNAMESDESC":"You can log into zitadel with these names",
+            "COPY":"Copy to clipboard",
+            "COPIED":"Copied to clipboard!",
+            "NOUSER":"No User"
         },
         "MFA": {
             "TITLE": "Multifactor Authentication",
@@ -148,17 +158,15 @@
             "REGION": "Region",
             "COUNTRY": "Country"
         },
-        "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Define the operations and rights that are made available to the user",
-            "CREATE": {
-                "TITLE": "Create User Grant",
-                "DESCRIPTION": "Search for the organization, the project and the corresponding project roles!"
-            }
-        },
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
-            "REQUIRED": "The input field is empty"
+            "REQUIRED": "The input field is empty",
+            "MINLENGTH":"The password has to be at least {{requiredLength}} characters long!",
+            "NOEMAIL":"Username can not be an email",
+            "UPPERCASEMISSING":"An uppercase character is needed!",
+            "LOWERCASEMISSING":"A lowercase character is needed!",
+            "SYMBOLERROR":"The password must include a symbol!",
+            "NUMBERERROR":"The password must include a number!"
         },
         "STATE": {
             "0":"unbekannt",
@@ -176,7 +184,17 @@
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"Add new account"
+        "ADDACCOUNT":"log in with another account"
+    },
+    "IAM": {
+        "DETAIL": {
+            "TITLE":"Identity and Access Management",
+            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, elect managers and define global policies."
+        },
+        "MEMBER": {
+            "TITLE":"Managers",
+            "DESCRIPTION":"Managers can add and edit organizations and make changes to their corresponding projects and apps"
+        }
     },
     "ORG": {
         "PAGES": {
@@ -192,19 +210,31 @@
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organization"
         },
+        "DOMAINS": {
+            "TITLE":"Domains",
+            "DESCRIPTION":"Configure your domains on which your users will be registered."
+        },
         "STATE": {
             "0": "nicht definiert",
             "1": "aktiv",
             "2": "inaktiv"
         },
+        "MEMBER": {
+            "TITLE":"Organization Managers",
+            "DESCRIPTION":"Define Accounts which can change your organizations preferences."
+        },
         "POLICY": {
             "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged solutions that save you time and ensure security",
+            "DESCRIPTION":"Pre-packaged solutions that to ensure security of your data",
             "PWD_COMPLEXITY": {
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
                 "TITLECREATE":"Create Password Complexity Policy",
-                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern"
+                "DESCRIPTIONCREATE":"Ensures that all set passwords correspond to a specific pattern",
+                "SYMBOLANDNUMBERERROR":"The password must consist of a number and a symbol",
+                "SYMBOLERROR":"The password must include a symbol!",
+                "NUMBERERROR":"The password must include a number!",
+                "PATTERNERROR":"The required pattern is not fulfilled!"
             },
             "PWD_AGE": {
                 "TITLE":"Password Age",
@@ -218,7 +248,13 @@
                 "TITLECREATE":"Create Password Lockout Policy",
                 "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to install this extention if you want to show retries or set a max try number."
             },
-            "BTN_INSTALL":"Install",
+            "IAM_POLICY": {
+                "TITLE":"IAM Access Preferences",
+                "DESCRIPTION":"Define access properties of your users",
+                "TITLECREATE":"Set IAM Access preferences",
+                "DESCRIPTIONCREATE":"Emails as username is not allowed for enabled UserLoginMustBeDomain"
+            },
+            "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
                 "DESCRIPTION":"Description",
@@ -230,7 +266,8 @@
                 "SHOWLOCKOUTFAILURES":"show lockout failures",
                 "MAXATTEMPTS":"Max Attempts",
                 "EXPIREWARNDAYS":"Expiration Warning after day",
-                "MAXAGEDAYS":"Max Age in days"
+                "MAXAGEDAYS":"Max Age in days",
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Uninstall Policy"
         }
@@ -275,7 +312,13 @@
             "DETAIL": "Detail",
             "CREATE": "Create project",
             "CREATE_DESC": "Insert your projects name",
-            "ROLE": "Role"
+            "ROLE": "Role",
+            "NOITEMS": "No projects",
+            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!",
+            "TYPE":{
+                "OWNED":"Owned Projects",
+                "GRANTED":"Granted Projects"
+            }
         },
         "STATE": {
             "TITLE":"State",
@@ -291,14 +334,15 @@
         },
         "NAME": "Name",
         "MEMBER": {
-            "TITLE": "Contributors",
-            "TITLEDESC":"Contributors can make changes on this very entity",
-            "DESCRIPTION":"Here you can find all contributors of this project. You can add a new member and manage persisting ones.",
+            "TITLE": "Managers",
+            "TITLEDESC":"Managers can make changes on this very entity, based on their given role in zitadel.",
+            "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage persisting ones.",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
             "EMAIL": "Email",
-            "ROLES": "Roles"
+            "ROLES": "Roles",
+            "USERID":"User Id"
         },
         "GRANT": {
             "TITLE": "Grants",
@@ -307,16 +351,25 @@
                 "TITLE": "Create Member Grant",
                 "SEL_USERS": "Select the users you wish to grant",
                 "SEL_PROJECT": "Search for a project",
-                "SEL_ROLES": "Select the roles you want be be added to the grant",
+                "SEL_ROLES": "Select the roles you want to be added to the grant",
                 "SEL_ORG": "Search for the domain",
                 "ORG_TITLE":"Organization",
-                "ORG_DESCRIPTION":"You are about to grant a user on the organization {{name}}",
-                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user of another organization",
-                "SEL_ORG_BUTTON": "Search Organization"
+                "ORG_DESCRIPTION":"You are about to grant a user for the organization {{name}}",
+                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organization",
+                "SEL_ORG_BUTTON": "Search Organization",
+                "FOR_ORG":"The grant is created for:"
             },
+            "DETAIL": {
+                "TITLE":"Managers of the granted organization",
+                "DESC":"These are the Managers of the granted organization. You can select which users are allowed to maintain control of the project."
+            },
+            "SHOWDETAIL":"Show Details",
+            "USER":"User",
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
             "ROLENAMESLIST": "Roles"
@@ -407,7 +460,7 @@
         "en": "English"
     },
     "MEMBER":{
-        "ADD":"Add a contributor"
+        "ADD":"Add a manager"
     },
     "ROLES": {
         "ORG_OWNER": "Org Owner",
@@ -451,12 +504,29 @@
         "PROJECT_GRANT_USER_GRANT_VIEWER":"Project Grant User Grant Viewer"
     },
     "GRANTS": {
-        "DELETE":"Delete grant",
-        "ADD":"Create grant",
-        "ADD_BTN":"New"
+        "DELETE":"delete authorization",
+        "ADD":"create authorization",
+        "ADD_BTN":"new",
+        "PROJECT": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified project. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "USER": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified user. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "CREATE": {
+            "TITLE": "Create authorization",
+            "DESCRIPTION": "Search for the orgnanization, the project and the corresponding roles."
+        },
+        "DETAIL": {
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":""
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Last Changes",
+        "BOTTOM":"Bottom",
         "ORG": {
             "TITLE":"Activity",
             "DESCRIPTION":"Here you can see the latest events that have affected an organization change"
@@ -470,18 +540,33 @@
             "DESCRIPTION":"Here you can see the latest events that have affected a userchange"
         },
         "EVENTS": {
-            "org.added": "Org created",
-            "org.changed":"Org edited",
-            "org.member.added":"Organization Member created",
-            "org.member.removed":"Organization Member deleted",
-            "project.added": "Project created",
-            "project.changed":"Project edited",
-            "project.deactivated":"Project deactivated",
-            "project.member.added":"Project Member created",
-            "project.member.removed":"Project Member deleted",
-            "project.role.added":"Role created",
-            "project.role.removed":"Role deleted",
+            "org.added": "created",
+            "org.changed":"changed",
+            "org.member.added":"member created",
+            "org.member.removed":"member deleted",
+            "org.domain.added":"domain added",
+            "org.domain.verified":"domain verified",
+            "org.domain.primary.set":"set primary domain",
+            "org.domain.removed":"domain removed",
+            "org.iam.policy.added":"IAM policy added",
+            "project.added": "added",
+            "project.changed":"changed",
+            "project.deactivated":"deactivated",
+            "project.member.added":"added member",
+            "project.member.removed":"member deleted",
+            "project.role.added":"created role",
+            "project.role.removed":"deleted role",
+            "project.application.added":"added app",
+            "project.application.config.oidc.added":"added OIDC config",  
+            "user.added":"User added",
+            "user.initialization.code.added":"Init code added",
+            "user.phone.code.added":"Phone code added",
+            "user.phone.code.sent":"User phone code sent",
+            "user.initialization.code.sent":"Init code sent",
             "user.email.verification.sended": "User email verified",
+            "user.email.code.added":"Email code added",
+            "user.email.code.sent":"Email code sent",           
+            "user.email.verified":"Email verified",
             "user.phone.verificationsended":"User phone verification sent",
             "user.phone.code":"User phone code created",
             "user.initialization.verification.sended":"User mail verification sent",
@@ -497,8 +582,18 @@
             "user.email.password.request.sended":"Email password request sended",
             "user.password.set.requested":"Password request",
             "user.phone.verification.sended":"User Phone verification sended",
+            "user.phone.changed":"User phone changed",
+            "user.phone.verified":"User phone verified",
             "updated.user.profile":"User Profile update",
-            "user.email.init.sended":"User Email init sended"
+            "user.email.init.sended":"User Email init sended",
+            "user.password.changed":"Password geändert",
+            "user.initialization.check.succeeded":"Init check succeeded",
+            "user.password.check.succeeded":"Password check succeeded",
+            "user.mfa.init.skipped":"MFA init skipped",
+            "user.mfa.otp.added":"MFA OTP added",
+            "user.mfa.otp.verified":"MFA OTP verified",
+            "user.mfa.otp.removed":"MFA OTP removed",
+            "user.selfregistered":"self registered"
         }
     }
 }

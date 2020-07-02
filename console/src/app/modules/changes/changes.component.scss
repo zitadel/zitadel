@@ -6,28 +6,30 @@
 }
 
 .scroll-container {
-    max-height: 540px;
+    max-height: 60vh;
     overflow-y: scroll;
 
     .item {
         box-sizing: border-box;
-        height: 60px;
         padding: .5rem;
         margin: .25rem 0;
         border-radius: .5rem;
         display: flex;
         flex-direction: column;
-
+        .editor {
+            color: #8795a1;
+            font-size: 12px;
+            align-self: flex-end;
+        }
         .seq {
-            color: #81868a;
+            color: #8795a1;
             font-size: 12px;
             align-self: flex-end;
         }
 
         .desc {
             overflow-x: auto;
-            font-size: .9rem;
-            margin: 4px 0;
+            font-size: 14px;
         }
     }
 
@@ -37,8 +39,8 @@
         justify-content: center;
     }
 
-    .err-container {
-        font-size: 14px;
-        color: rgb(201,51,71);
+    .end-container {
+        font-size: 12px;
+        color: #8795a1;
     }
 }

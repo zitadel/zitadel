@@ -18,14 +18,15 @@ const routes: Routes = [
         loadChildren: () => import('./org-create/org-create.module').then(m => m.OrgCreateModule),
     },
     {
-        path: ':id/policy/:policytype/create',
+        path: 'policy/:policytype/create',
         component: PasswordPolicyComponent,
         data: {
             action: PolicyComponentAction.CREATE,
         },
     },
+    /// TODO: add roleguard for iam policy
     {
-        path: ':id/policy/:policytype',
+        path: 'policy/:policytype',
         component: PasswordPolicyComponent,
         data: {
             action: PolicyComponentAction.MODIFY,
@@ -33,11 +34,15 @@ const routes: Routes = [
         loadChildren: () => import('./password-policy/password-policy.module').then(m => m.PasswordPolicyModule),
     },
     {
-        path: ':id',
-        component: OrgDetailComponent,
+        path: 'members',
+        loadChildren: () => import('./org-members/org-members.module').then(m => m.OrgMembersModule),
     },
     {
         path: '',
+        component: OrgDetailComponent,
+    },
+    {
+        path: 'overview',
         component: OrgGridComponent,
     },
 ];

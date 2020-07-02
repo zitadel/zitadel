@@ -5,6 +5,8 @@
 
 <form action="{{ mfaPromptUrl }}" method="POST">
 
+    {{ .CSRF }}
+
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
     
     <div class="fields">

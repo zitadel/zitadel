@@ -1,7 +1,7 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProjectRoleAdd } from 'src/app/proto/generated/management_pb';
@@ -47,22 +47,19 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
         private toast: ToastService,
         private projectService: ProjectService,
         private _location: Location,
-        private fb: FormBuilder,
     ) {
         this.formGroup = new FormGroup({
-            key: new FormControl(''),
-            name: new FormControl(''),
+            key: new FormControl('', [Validators.required]),
             displayName: new FormControl(''),
-            group: new FormControl('', [Validators.required]),
+            group: new FormControl(''),
         });
 
         this.formArray = new FormArray([this.formGroup]);
-
     }
 
     public addEntry(): void {
         const newGroup = new FormGroup({
-            name: new FormControl(''),
+            key: new FormControl(''),
             displayName: new FormControl(''),
             group: new FormControl('', [Validators.required]),
         });
@@ -87,14 +84,14 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     }
 
     public addRole(): void {
-        Promise.all(this.formArray.value.map((role: ProjectRoleAdd.AsObject) => {
+        const promises = this.formArray.value.map((role: ProjectRoleAdd.AsObject) => {
             role.id = this.projectId;
-            console.log(role);
             return this.projectService.AddProjectRole(role);
-        })).then(() => {
+        });
+
+        Promise.all(promises).then(() => {
             this.router.navigate(['projects', this.projectId]);
         }).catch(data => {
-            console.log(data);
             this.toast.showError(data.message);
         });
     }

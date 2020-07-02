@@ -2,35 +2,41 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/model"
+	usr_es "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"strings"
+
+	"github.com/caos/zitadel/internal/api/auth"
+	global_model "github.com/caos/zitadel/internal/model"
+	"github.com/caos/zitadel/internal/org/repository/view/model"
 
 	"github.com/caos/zitadel/internal/errors"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/org/repository/view"
 )
 
 type OrgRepository struct {
 	SearchLimit uint64
 	*org_es.OrgEventstore
-	View  *mgmt_view.View
-	Roles []string
+	UserEvents *usr_es.UserEventstore
+	View       *mgmt_view.View
+	Roles      []string
 }
 
-func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.Org, error) {
-	org := org_model.NewOrg(id)
-	return repo.OrgEventstore.OrgByID(ctx, org)
-}
-
-func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error) {
-	org, err := repo.View.OrgByDomain(domain)
+func (repo *OrgRepository) OrgByID(ctx context.Context, id string) (*org_model.OrgView, error) {
+	org, err := repo.View.OrgByID(id)
 	if err != nil {
 		return nil, err
 	}
-	return view.OrgToModel(org), nil
+	return model.OrgToModel(org), nil
+}
+
+func (repo *OrgRepository) OrgByDomainGlobal(ctx context.Context, domain string) (*org_model.OrgView, error) {
+	verifiedDomain, err := repo.View.VerifiedOrgDomain(domain)
+	if err != nil {
+		return nil, err
+	}
+	return repo.OrgByID(ctx, verifiedDomain.OrgID)
 }
 
 func (repo *OrgRepository) UpdateOrg(ctx context.Context, org *org_model.Org) (*org_model.Org, error) {
@@ -45,9 +51,56 @@ func (repo *OrgRepository) ReactivateOrg(ctx context.Context, id string) (*org_m
 	return repo.OrgEventstore.ReactivateOrg(ctx, id)
 }
 
-func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (member *org_model.OrgMember, err error) {
-	member = org_model.NewOrgMember(orgID, userID)
-	return repo.OrgEventstore.OrgMemberByIDs(ctx, member)
+func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*org_model.OrgIamPolicy, error) {
+	return repo.OrgEventstore.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+}
+
+func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: auth.GetCtxData(ctx).OrgID})
+	domains, count, err := repo.View.SearchOrgDomains(request)
+	if err != nil {
+		return nil, err
+	}
+	return &org_model.OrgDomainSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.OrgDomainsToModel(domains),
+	}, nil
+}
+
+func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
+	domain.AggregateID = auth.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.AddOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string) error {
+	d := org_model.NewOrgDomain(auth.GetCtxData(ctx).OrgID, domain)
+	return repo.OrgEventstore.RemoveOrgDomain(ctx, d)
+}
+
+func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*org_model.OrgChanges, error) {
+	changes, err := repo.OrgEventstore.OrgChanges(ctx, id, lastSequence, limit, sortAscending)
+	if err != nil {
+		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
+	return changes, nil
+}
+
+func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (*org_model.OrgMemberView, error) {
+	member, err := repo.View.OrgMemberByIDs(orgID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.OrgMemberToModel(member), nil
 }
 
 func (repo *OrgRepository) AddMyOrgMember(ctx context.Context, member *org_model.OrgMember) (*org_model.OrgMember, error) {
@@ -67,7 +120,7 @@ func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string)
 
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
-	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.ORGMEMBERSEARCHKEY_ORG_ID, Method: model.SEARCHMETHOD_EQUALS, Value: auth.GetCtxData(ctx).OrgID}
+	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: auth.GetCtxData(ctx).OrgID}
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
 		return nil, err
@@ -76,7 +129,7 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      view.OrgMembersToModel(members),
+		Result:      model.OrgMembersToModel(members),
 	}, nil
 }
 

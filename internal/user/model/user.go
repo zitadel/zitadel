@@ -1,7 +1,11 @@
 package model
 
 import (
+	caos_errors "github.com/caos/zitadel/internal/errors"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"strings"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -23,6 +27,19 @@ type User struct {
 	PasswordCode *PasswordCode
 	OTP          *OTP
 }
+type UserChanges struct {
+	Changes      []*UserChange
+	LastSequence uint64
+}
+
+type UserChange struct {
+	ChangeDate   *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType    string               `json:"eventType,omitempty"`
+	Sequence     uint64               `json:"sequence,omitempty"`
+	ModifierId   string               `json:"modifierUser,omitempty"`
+	ModifierName string               `json:"-"`
+	Data         interface{}          `json:"data,omitempty"`
+}
 
 type InitUserCode struct {
 	es_models.ObjectRoot
@@ -34,27 +51,40 @@ type InitUserCode struct {
 type UserState int32
 
 const (
-	USERSTATE_UNSPECIFIED UserState = iota
-	USERSTATE_ACTIVE
-	USERSTATE_INACTIVE
-	USERSTATE_DELETED
-	USERSTATE_LOCKED
-	USERSTATE_SUSPEND
-	USERSTATE_INITIAL
+	UserStateUnspecified UserState = iota
+	UserStateActive
+	UserStateInactive
+	UserStateDeleted
+	UserStateLocked
+	UserStateSuspend
+	UserStateInitial
 )
 
 type Gender int32
 
 const (
-	GENDER_UNDEFINED Gender = iota
-	GENDER_FEMALE
-	GENDER_MALE
-	GENDER_DIVERSE
+	GenderUnspecified Gender = iota
+	GenderFemale
+	GenderMale
+	GenderDiverse
 )
 
-func (u *User) SetEmailAsUsername() {
-	if u.Profile != nil && u.UserName == "" && u.Email != nil {
+func (u *User) CheckOrgIamPolicy(policy *org_model.OrgIamPolicy) error {
+	if policy == nil {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-zSH7j", "Errors.Users.OrgIamPolicyNil")
+	}
+	if policy.UserLoginMustBeDomain && strings.Contains(u.UserName, "@") {
+		return caos_errors.ThrowPreconditionFailed(nil, "MODEL-se4sJ", "Errors.User.EmailAsUsernameNotAllowed")
+	}
+	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.UserName == "" && u.Email != nil {
 		u.UserName = u.EmailAddress
+	}
+	return nil
+}
+
+func (u *User) SetNamesAsDisplayname() {
+	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
+		u.DisplayName = u.FirstName + " " + u.LastName
 	}
 }
 
@@ -67,23 +97,23 @@ func (u *User) IsInitialState() bool {
 }
 
 func (u *User) IsActive() bool {
-	return u.State == USERSTATE_ACTIVE
+	return u.State == UserStateActive
 }
 
 func (u *User) IsInitial() bool {
-	return u.State == USERSTATE_INITIAL
+	return u.State == UserStateInitial
 }
 
 func (u *User) IsInactive() bool {
-	return u.State == USERSTATE_INACTIVE
+	return u.State == UserStateInactive
 }
 
 func (u *User) IsLocked() bool {
-	return u.State == USERSTATE_LOCKED
+	return u.State == UserStateLocked
 }
 
 func (u *User) IsOTPReady() bool {
-	return u.OTP != nil && u.OTP.State == MFASTATE_READY
+	return u.OTP != nil && u.OTP.State == MfaStateReady
 }
 
 func (u *User) HashPasswordIfExisting(policy *policy_model.PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {

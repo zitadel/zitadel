@@ -42,11 +42,11 @@ type KeySearchRequest struct {
 type KeySearchKey int32
 
 const (
-	KEYSEARCHKEY_UNSPECIFIED KeySearchKey = iota
-	KEYSEARCHKEY_ID
-	KEYSEARCHKEY_PRIVATE
-	KEYSEARCHKEY_EXPIRY
-	KEYSEARCHKEY_USAGE
+	KeySearchKeyUnspecified KeySearchKey = iota
+	KeySearchKeyID
+	KeySearchKeyPrivate
+	KeySearchKeyExpiry
+	KeySearchKeyUsage
 )
 
 type KeySearchQuery struct {

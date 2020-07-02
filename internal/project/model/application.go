@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type Application struct {
@@ -13,24 +14,37 @@ type Application struct {
 	Type       AppType
 	OIDCConfig *OIDCConfig
 }
+type ApplicationChanges struct {
+	Changes      []*ApplicationChange
+	LastSequence uint64
+}
+
+type ApplicationChange struct {
+	ChangeDate   *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType    string               `json:"eventType,omitempty"`
+	Sequence     uint64               `json:"sequence,omitempty"`
+	ModifierId   string               `json:"modifierUser,omitempty"`
+	ModifierName string               `json:"-"`
+	Data         interface{}          `json:"data,omitempty"`
+}
 
 type AppState int32
 
 const (
-	APPSTATE_ACTIVE AppState = iota
-	APPSTATE_INACTIVE
+	AppStateActive AppState = iota
+	AppStateInactive
 )
 
 type AppType int32
 
 const (
-	APPTYPE_UNDEFINED AppType = iota
-	APPTYPE_OIDC
-	APPTYPE_SAML
+	AppTypeUnspecified AppType = iota
+	AppTypeOIDC
+	AppTypeSAML
 )
 
 func NewApplication(projectID, appID string) *Application {
-	return &Application{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, AppID: appID, State: APPSTATE_ACTIVE}
+	return &Application{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, AppID: appID, State: AppStateActive}
 }
 
 func (a *Application) IsValid(includeConfig bool) bool {
@@ -40,7 +54,7 @@ func (a *Application) IsValid(includeConfig bool) bool {
 	if !includeConfig {
 		return true
 	}
-	if a.Type == APPTYPE_OIDC && !a.OIDCConfig.IsValid() {
+	if a.Type == AppTypeOIDC && !a.OIDCConfig.IsValid() {
 		return false
 	}
 	return true

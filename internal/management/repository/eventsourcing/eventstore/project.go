@@ -2,9 +2,21 @@ package eventstore
 
 import (
 	"context"
+	"strings"
+
+	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	es_int "github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
+	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	global_model "github.com/caos/zitadel/internal/model"
-	"strings"
 
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -14,14 +26,36 @@ import (
 )
 
 type ProjectRepo struct {
-	SearchLimit   uint64
-	ProjectEvents *proj_event.ProjectEventstore
-	View          *view.View
-	Roles         []string
+	es_int.Eventstore
+	SearchLimit     uint64
+	ProjectEvents   *proj_event.ProjectEventstore
+	UserGrantEvents *usr_grant_event.UserGrantEventStore
+	UserEvents      *usr_event.UserEventstore
+	View            *view.View
+	Roles           []string
 }
 
-func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (project *proj_model.Project, err error) {
-	return repo.ProjectEvents.ProjectByID(ctx, id)
+func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
+	project, err := repo.View.ProjectByID(id)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+
+	events, err := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
+	if err != nil {
+		logging.Log("EVENT-V9x1V").WithError(err).Debug("error retrieving new events")
+		return model.ProjectToModel(project), nil
+	}
+
+	viewProject := *project
+	for _, event := range events {
+		err := project.AppendEvent(event)
+		if err != nil {
+			return model.ProjectToModel(&viewProject), nil
+		}
+	}
+
+	return model.ProjectToModel(project), nil
 }
 
 func (repo *ProjectRepo) CreateProject(ctx context.Context, name string) (*proj_model.Project, error) {
@@ -41,38 +75,41 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 	return repo.ProjectEvents.ReactivateProject(ctx, id)
 }
 
-func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.GrantedProjectSearchRequest) (*proj_model.GrantedProjectSearchResponse, error) {
+func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 
 	permissions := auth.GetPermissionsFromCtx(ctx)
 	if !auth.HasGlobalPermission(permissions) {
 		ids := auth.GetPermissionCtxIDs(permissions)
-		request.Queries = append(request.Queries, &proj_model.GrantedProjectSearchQuery{Key: proj_model.GRANTEDPROJECTSEARCHKEY_PROJECTID, Method: global_model.SEARCHMETHOD_IN, Value: ids})
+		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
 	}
 
-	projects, count, err := repo.View.SearchGrantedProjects(request)
+	projects, count, err := repo.View.SearchProjects(request)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.GrantedProjectSearchResponse{
+	return &proj_model.ProjectViewSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      model.GrantedProjectsToModel(projects),
+		Result:      model.ProjectsToModel(projects),
 	}, nil
 }
 
-func (repo *ProjectRepo) GetGrantedProjectGrantByIDs(ctx context.Context, projectID, grantID string) (project *proj_model.GrantedProjectView, err error) {
-	p, err := repo.View.GrantedProjectGrantByIDs(projectID, grantID)
+func (repo *ProjectRepo) ProjectGrantViewByID(ctx context.Context, grantID string) (project *proj_model.ProjectGrantView, err error) {
+	p, err := repo.View.ProjectGrantByID(grantID)
 	if err != nil {
 		return nil, err
 	}
-	return model.GrantedProjectToModel(p), nil
+	return model.ProjectGrantToModel(p), nil
 }
 
-func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (member *proj_model.ProjectMember, err error) {
-	member = proj_model.NewProjectMember(projectID, userID)
-	return repo.ProjectEvents.ProjectMemberByIDs(ctx, member)
+func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectMemberView, error) {
+	member, err := repo.View.ProjectMemberByIDs(projectID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectMemberToModel(member), nil
 }
 
 func (repo *ProjectRepo) AddProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*proj_model.ProjectMember, error) {
@@ -102,8 +139,13 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 	}, nil
 }
 
-func (repo *ProjectRepo) AddProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
-	return repo.ProjectEvents.AddProjectRole(ctx, member)
+func (repo *ProjectRepo) AddProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
+	return repo.ProjectEvents.AddProjectRoles(ctx, role)
+}
+
+func (repo *ProjectRepo) BulkAddProjectRole(ctx context.Context, roles []*proj_model.ProjectRole) error {
+	_, err := repo.ProjectEvents.AddProjectRoles(ctx, roles...)
+	return err
 }
 
 func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
@@ -111,8 +153,40 @@ func (repo *ProjectRepo) ChangeProjectRole(ctx context.Context, member *proj_mod
 }
 
 func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key string) error {
-	member := proj_model.NewProjectRole(projectID, key)
-	return repo.ProjectEvents.RemoveProjectRole(ctx, member)
+	role := proj_model.NewProjectRole(projectID, key)
+	aggregates := make([]*es_models.Aggregate, 0)
+	project, agg, err := repo.ProjectEvents.PrepareRemoveProjectRole(ctx, role)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+
+	usergrants, err := repo.View.UserGrantsByProjectIDAndRoleKey(projectID, key)
+	if err != nil {
+		return err
+	}
+	for _, grant := range usergrants {
+		changed := &usr_grant_model.UserGrant{
+			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.ResourceOwner},
+			RoleKeys:   grant.RoleKeys,
+			ProjectID:  grant.ProjectID,
+			UserID:     grant.UserID,
+		}
+		changed.RemoveRoleKeyIfExisting(key)
+		_, agg, err := repo.UserGrantEvents.PrepareChangeUserGrant(ctx, changed, true)
+		if err != nil {
+			return err
+		}
+		aggregates = append(aggregates, agg)
+	}
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
@@ -129,8 +203,27 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_m
 	}, nil
 }
 
-func (repo *ProjectRepo) ApplicationByID(ctx context.Context, projectID, appID string) (app *proj_model.Application, err error) {
-	return repo.ProjectEvents.ApplicationByIDs(ctx, projectID, appID)
+func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
+	changes, err := repo.ProjectEvents.ProjectChanges(ctx, id, lastSequence, limit, sortAscending)
+	if err != nil {
+		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
+	return changes, nil
+}
+
+func (repo *ProjectRepo) ApplicationByID(ctx context.Context, appID string) (*proj_model.ApplicationView, error) {
+	app, err := repo.View.ApplicationByID(appID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ApplicationViewToModel(app), nil
 }
 
 func (repo *ProjectRepo) AddApplication(ctx context.Context, app *proj_model.Application) (*proj_model.Application, error) {
@@ -168,6 +261,21 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	}, nil
 }
 
+func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
+	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
+	if err != nil {
+		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
+	return changes, nil
+}
+
 func (repo *ProjectRepo) ChangeOIDCConfig(ctx context.Context, config *proj_model.OIDCConfig) (*proj_model.OIDCConfig, error) {
 	return repo.ProjectEvents.ChangeOIDCConfig(ctx, config)
 }
@@ -176,34 +284,130 @@ func (repo *ProjectRepo) ChangeOIDConfigSecret(ctx context.Context, projectID, a
 	return repo.ProjectEvents.ChangeOIDCConfigSecret(ctx, projectID, appID)
 }
 
-func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, projectID, appID string) (app *proj_model.ProjectGrant, err error) {
-	return repo.ProjectEvents.ProjectGrantByIDs(ctx, projectID, appID)
+func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (*proj_model.ProjectGrantView, error) {
+	grant, err := repo.View.ProjectGrantByID(grantID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectGrantToModel(grant), nil
 }
 
-func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, app *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.AddProjectGrant(ctx, app)
+func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	projects, count, err := repo.View.SearchProjectGrants(request)
+	if err != nil {
+		return nil, err
+	}
+	return &proj_model.ProjectGrantViewSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectGrantsToModel(projects),
+	}, nil
 }
 
-func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, app *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.ChangeProjectGrant(ctx, app)
+func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.AddProjectGrant(ctx, grant)
 }
 
-func (repo *ProjectRepo) DeactivateProjectGrant(ctx context.Context, projectID, appID string) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.DeactivateProjectGrant(ctx, projectID, appID)
+func (repo *ProjectRepo) ChangeProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
+	project, aggFunc, removedRoles, err := repo.ProjectEvents.PrepareChangeProjectGrant(ctx, grant)
+	if err != nil {
+		return nil, err
+	}
+	agg, err := aggFunc(ctx)
+	if err != nil {
+		return nil, err
+	}
+	aggregates := make([]*es_models.Aggregate, 0)
+	aggregates = append(aggregates, agg)
+
+	usergrants, err := repo.View.UserGrantsByProjectID(grant.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	for _, grant := range usergrants {
+		changed := &usr_grant_model.UserGrant{
+			ObjectRoot: models.ObjectRoot{AggregateID: grant.ID, Sequence: grant.Sequence, ResourceOwner: grant.ResourceOwner},
+			RoleKeys:   grant.RoleKeys,
+			ProjectID:  grant.ProjectID,
+			UserID:     grant.UserID,
+		}
+		existing := changed.RemoveRoleKeysIfExisting(removedRoles)
+		if existing {
+			_, agg, err := repo.UserGrantEvents.PrepareChangeUserGrant(ctx, changed, true)
+			if err != nil {
+				return nil, err
+			}
+			aggregates = append(aggregates, agg)
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+	if err != nil {
+		return nil, err
+	}
+	if _, g := es_proj_model.GetProjectGrant(project.Grants, grant.GrantID); g != nil {
+		return es_proj_model.GrantToModel(g), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-dksi8", "Could not find app in list")
 }
 
-func (repo *ProjectRepo) ReactivateProjectGrant(ctx context.Context, projectID, appID string) (*proj_model.ProjectGrant, error) {
-	return repo.ProjectEvents.ReactivateProjectGrant(ctx, projectID, appID)
+func (repo *ProjectRepo) DeactivateProjectGrant(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.DeactivateProjectGrant(ctx, projectID, grantID)
 }
 
-func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, appID string) error {
-	app := proj_model.NewProjectGrant(projectID, appID)
-	return repo.ProjectEvents.RemoveProjectGrant(ctx, app)
+func (repo *ProjectRepo) ReactivateProjectGrant(ctx context.Context, projectID, grantID string) (*proj_model.ProjectGrant, error) {
+	return repo.ProjectEvents.ReactivateProjectGrant(ctx, projectID, grantID)
 }
 
-func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, grantID, userID string) (member *proj_model.ProjectGrantMember, err error) {
-	member = proj_model.NewProjectGrantMember(projectID, grantID, userID)
-	return repo.ProjectEvents.ProjectGrantMemberByIDs(ctx, member)
+func (repo *ProjectRepo) RemoveProjectGrant(ctx context.Context, projectID, grantID string) error {
+	grant, err := repo.ProjectEvents.ProjectGrantByIDs(ctx, projectID, grantID)
+	if err != nil {
+		return err
+	}
+	aggregates := make([]*es_models.Aggregate, 0)
+	project, aggFunc, err := repo.ProjectEvents.PrepareRemoveProjectGrant(ctx, grant)
+	if err != nil {
+		return err
+	}
+	agg, err := aggFunc(ctx)
+	if err != nil {
+		return err
+	}
+	aggregates = append(aggregates, agg)
+
+	usergrants, err := repo.View.UserGrantsByOrgIDAndProjectID(grant.GrantedOrgID, projectID)
+	if err != nil {
+		return err
+	}
+	for _, grant := range usergrants {
+		_, grantAggregates, err := repo.UserGrantEvents.PrepareRemoveUserGrant(ctx, grant.ID, true)
+		if err != nil {
+			return err
+		}
+		for _, agg := range grantAggregates {
+			aggregates = append(aggregates, agg)
+		}
+	}
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectGrantMemberView, error) {
+	member, err := repo.View.ProjectGrantMemberByIDs(projectID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.ProjectGrantMemberToModel(member), nil
 }
 
 func (repo *ProjectRepo) AddProjectGrantMember(ctx context.Context, member *proj_model.ProjectGrantMember) (*proj_model.ProjectGrantMember, error) {

@@ -19,87 +19,23 @@
     "application/grpc"
   ],
   "paths": {
-    "/applications/{id}/changes": {
+    "/global/orgs/_bydomain": {
       "get": {
-        "operationId": "ApplicationChanges",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Changes"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "uint64"
-          },
-          {
-            "name": "sequence_offset",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "uint64"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/authgrants/_search": {
-      "post": {
-        "summary": "Grant",
-        "operationId": "SearchAuthGrant",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1AuthGrantSearchResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1AuthGrantSearchRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/global/orgs/domain/{domain}": {
-      "get": {
+        "summary": "search a organisation by its domain overall organisations",
         "operationId": "GetOrgByDomainGlobal",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Org"
+              "$ref": "#/definitions/v1OrgView"
             }
           }
         },
         "parameters": [
           {
             "name": "domain",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -108,8 +44,9 @@
         ]
       }
     },
-    "/global/users/email/{email}": {
+    "/global/users/_byemail": {
       "get": {
+        "summary": "GetUserByEmailGlobal returns User, global search is overall organisations",
         "operationId": "GetUserByEmailGlobal",
         "responses": {
           "200": {
@@ -122,8 +59,8 @@
         "parameters": [
           {
             "name": "email",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -134,13 +71,13 @@
     },
     "/grantedprojects/_search": {
       "post": {
-        "summary": "PROJECTS",
+        "summary": "returns all projects my organisation got granted from another organisation",
         "operationId": "SearchGrantedProjects",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GrantedProjectSearchResponse"
+              "$ref": "#/definitions/v1ProjectGrantSearchResponse"
             }
           }
         },
@@ -161,13 +98,13 @@
     },
     "/grantedprojects/{project_id}/grants/{id}": {
       "get": {
-        "summary": "GRANTED_PROJECT_GRANTS",
-        "operationId": "GetGrantedProjectGrantByID",
+        "summary": "returns a project my organisation got granted from another organisation",
+        "operationId": "GetGrantedProjectByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GrantedProject"
+              "$ref": "#/definitions/v1ProjectGrantView"
             }
           }
         },
@@ -199,6 +136,183 @@
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/iam": {
+      "get": {
+        "summary": "GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)",
+        "operationId": "GetIam",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Iam"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me": {
+      "get": {
+        "operationId": "GetMyOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgView"
+            }
+          }
+        },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/_deactivate": {
+      "put": {
+        "operationId": "DeactivateMyOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Org"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/_reactivate": {
+      "put": {
+        "operationId": "ReactivateMyOrg",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Org"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "properties": {}
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/domains": {
+      "post": {
+        "operationId": "AddMyOrgDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgDomain"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddOrgDomainRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/domains/_search": {
+      "post": {
+        "operationId": "SearchMyOrgDomains",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgDomainSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1OrgDomainSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/domains/{domain}": {
+      "delete": {
+        "operationId": "RemoveMyOrgDomain",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/orgs/me/iampolicy": {
+      "get": {
+        "operationId": "GetMyOrgIamPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1OrgIamPolicy"
             }
           }
         },
@@ -315,7 +429,6 @@
     },
     "/orgs/members/roles": {
       "get": {
-        "summary": "ORG_MEMBERS",
         "operationId": "GetOrgMemberRoles",
         "responses": {
           "200": {
@@ -330,97 +443,9 @@
         ]
       }
     },
-    "/orgs/{id}": {
-      "get": {
-        "summary": "ORG",
-        "operationId": "GetOrgByID",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Org"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{id}/_deactivate": {
-      "put": {
-        "operationId": "DeactivateOrg",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Org"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OrgID"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/orgs/{id}/_reactivate": {
-      "put": {
-        "operationId": "ReactivateOrg",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Org"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1OrgID"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/orgs/{id}/changes": {
       "get": {
+        "summary": "OrgChanges returns the event stream of the org object",
         "operationId": "OrgChanges",
         "responses": {
           "200": {
@@ -438,6 +463,12 @@
             "type": "string"
           },
           {
+            "name": "sec_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -450,6 +481,13 @@
             "required": false,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -459,7 +497,7 @@
     },
     "/policies/passwords/age": {
       "get": {
-        "summary": "PASSWORD_AGE_POLICY",
+        "summary": "returns default if nothing other set on organisation",
         "operationId": "GetPasswordAgePolicy",
         "responses": {
           "200": {
@@ -546,7 +584,7 @@
     },
     "/policies/passwords/complexity": {
       "get": {
-        "summary": "PASSWORD_COMPLEXITY_POLICY",
+        "summary": "returns default policy if nothing other set on organisation",
         "operationId": "GetPasswordComplexityPolicy",
         "responses": {
           "200": {
@@ -633,7 +671,7 @@
     },
     "/policies/passwords/lockout": {
       "get": {
-        "summary": "PASSWORD_LOCKOUT_POLICY",
+        "summary": "returns default if nothing other set on organisation",
         "operationId": "GetPasswordLockoutPolicy",
         "responses": {
           "200": {
@@ -720,7 +758,7 @@
     },
     "/projectgrants/{project_grant_id}/users/grants/_search": {
       "post": {
-        "summary": "PROJECT_GRANT_USER_GRANT",
+        "summary": "search user grants based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "SearchProjectGrantUserGrants",
         "responses": {
           "200": {
@@ -753,6 +791,7 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants": {
       "post": {
+        "summary": "create user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "CreateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -791,12 +830,13 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}": {
       "get": {
+        "summary": "get user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ProjectGrantUserGrantByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserGrant"
+              "$ref": "#/definitions/v1UserGrantView"
             }
           }
         },
@@ -825,6 +865,7 @@
         ]
       },
       "put": {
+        "summary": "update user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "UpdateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -869,6 +910,7 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_deactivate": {
       "put": {
+        "summary": "deactivate user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "DeactivateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -913,6 +955,7 @@
     },
     "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_reactivate": {
       "put": {
+        "summary": "reactivate user grant based on a projectgrant\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ReactivateProjectGrantUserGrant",
         "responses": {
           "200": {
@@ -981,9 +1024,34 @@
         ]
       }
     },
+    "/projects/_search": {
+      "post": {
+        "operationId": "SearchProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProjectSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/projects/grants/members/roles": {
       "get": {
-        "summary": "PROJECT_GRANT_MEMBER",
         "operationId": "GetProjectGrantMemberRoles",
         "responses": {
           "200": {
@@ -1000,7 +1068,6 @@
     },
     "/projects/members/roles": {
       "get": {
-        "summary": "PROJECT_MEMBERS",
         "operationId": "GetProjectMemberRoles",
         "responses": {
           "200": {
@@ -1022,7 +1089,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Project"
+              "$ref": "#/definitions/v1ProjectView"
             }
           }
         },
@@ -1133,9 +1200,10 @@
         ]
       }
     },
-    "/projects/{id}/changes": {
+    "/projects/{id}/applications/{sec_id}/changes": {
       "get": {
-        "operationId": "ProjectChanges",
+        "summary": "ApplicationChanges returns the event stream of the application object",
+        "operationId": "ApplicationChanges",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1147,6 +1215,12 @@
         "parameters": [
           {
             "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sec_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1164,6 +1238,65 @@
             "required": false,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/projects/{id}/changes": {
+      "get": {
+        "summary": "ProjectChanges returns the event stream of the project object",
+        "operationId": "ProjectChanges",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Changes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sec_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "sequence_offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -1301,8 +1434,42 @@
         ]
       }
     },
+    "/projects/{id}/roles/_bulk": {
+      "post": {
+        "summary": "add a list of project roles in one request",
+        "operationId": "BulkAddProjectRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ProjectRoleAddBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/projects/{id}/roles/{key}": {
       "delete": {
+        "summary": "RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project",
         "operationId": "RemoveProjectRole",
         "responses": {
           "200": {
@@ -1369,7 +1536,6 @@
     },
     "/projects/{project_id}/applications/_search": {
       "post": {
-        "summary": "APPLICATIONS",
         "operationId": "SearchApplications",
         "responses": {
           "200": {
@@ -1445,7 +1611,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Application"
+              "$ref": "#/definitions/v1ApplicationView"
             }
           }
         },
@@ -1680,7 +1846,6 @@
     },
     "/projects/{project_id}/grants/_search": {
       "post": {
-        "summary": "PROJECT_GRANT",
         "operationId": "SearchProjectGrants",
         "responses": {
           "200": {
@@ -1872,7 +2037,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProjectGrant"
+              "$ref": "#/definitions/v1ProjectGrantView"
             }
           }
         },
@@ -1895,6 +2060,7 @@
         ]
       },
       "delete": {
+        "summary": "RemoveProjectGrant removes project grant and all user grants for this project grant",
         "operationId": "RemoveProjectGrant",
         "responses": {
           "200": {
@@ -2101,7 +2267,6 @@
     },
     "/projects/{project_id}/roles/_search": {
       "post": {
-        "summary": "PROJECT_ROLES",
         "operationId": "SearchProjectRoles",
         "responses": {
           "200": {
@@ -2134,7 +2299,7 @@
     },
     "/projects/{project_id}/users/grants/_search": {
       "post": {
-        "summary": "PROJECT_USER_GRANT",
+        "summary": "search user grants based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "SearchProjectUserGrants",
         "responses": {
           "200": {
@@ -2167,6 +2332,7 @@
     },
     "/projects/{project_id}/users/{user_id}/grants": {
       "post": {
+        "summary": "create user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "CreateProjectUserGrant",
         "responses": {
           "200": {
@@ -2205,12 +2371,13 @@
     },
     "/projects/{project_id}/users/{user_id}/grants/{id}": {
       "get": {
+        "summary": "get user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ProjectUserGrantByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserGrant"
+              "$ref": "#/definitions/v1UserGrantView"
             }
           }
         },
@@ -2239,6 +2406,7 @@
         ]
       },
       "put": {
+        "summary": "update user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "UpdateProjectUserGrant",
         "responses": {
           "200": {
@@ -2283,6 +2451,7 @@
     },
     "/projects/{project_id}/users/{user_id}/grants/{id}/_deactivate": {
       "put": {
+        "summary": "deactivate user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "DeactivateProjectUserGrant",
         "responses": {
           "200": {
@@ -2327,6 +2496,7 @@
     },
     "/projects/{project_id}/users/{user_id}/grants/{id}/_reactivate": {
       "put": {
+        "summary": "reactivate user grant based on a project\nThis request is required that the user authorizations of zitadel can be differentiated",
         "operationId": "ReactivateProjectUserGrant",
         "responses": {
           "200": {
@@ -2380,6 +2550,58 @@
             }
           }
         },
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/usergrants/_bulk": {
+      "post": {
+        "summary": "add a list of user grants in one request",
+        "operationId": "BulkCreateUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantCreateBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "put": {
+        "summary": "update a list of user grants in one request",
+        "operationId": "BulkUpdateUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantUpdateBulk"
+            }
+          }
+        ],
         "tags": [
           "ManagementService"
         ]
@@ -2443,6 +2665,7 @@
     },
     "/users/_search": {
       "post": {
+        "summary": "Limit should always be set, there is a default limit set by the service",
         "operationId": "SearchUsers",
         "responses": {
           "200": {
@@ -2469,7 +2692,6 @@
     },
     "/users/grants/_search": {
       "post": {
-        "summary": "USER_GRANT",
         "operationId": "SearchUserGrants",
         "responses": {
           "200": {
@@ -2496,13 +2718,12 @@
     },
     "/users/{id}": {
       "get": {
-        "summary": "USER",
         "operationId": "GetUserByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1User"
+              "$ref": "#/definitions/v1UserView"
             }
           }
         },
@@ -2637,72 +2858,6 @@
         ]
       }
     },
-    "/users/{id}/_sendsetpwnotify": {
-      "post": {
-        "summary": "PASSWORD\nSends an Notification (Email/SMS) with a password reset Link",
-        "operationId": "SendSetPasswordNotification",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1SetPasswordNotificationRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
-    "/users/{id}/_setinitialpw": {
-      "post": {
-        "summary": "A Manager is only allowed to set an initial password, on the next login the user has to change his password",
-        "operationId": "SetInitialPassword",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1PasswordRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ManagementService"
-        ]
-      }
-    },
     "/users/{id}/_unlock": {
       "put": {
         "operationId": "UnlockUser",
@@ -2737,13 +2892,12 @@
     },
     "/users/{id}/address": {
       "get": {
-        "summary": "USER_ADDRESS",
         "operationId": "GetUserAddress",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserAddress"
+              "$ref": "#/definitions/v1UserAddressView"
             }
           }
         },
@@ -2792,6 +2946,7 @@
     },
     "/users/{id}/changes": {
       "get": {
+        "summary": "UserChanges returns the event stream of the user object",
         "operationId": "UserChanges",
         "responses": {
           "200": {
@@ -2809,6 +2964,12 @@
             "type": "string"
           },
           {
+            "name": "sec_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -2821,6 +2982,13 @@
             "required": false,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -2830,13 +2998,12 @@
     },
     "/users/{id}/email": {
       "get": {
-        "summary": "USER_EMAIL",
         "operationId": "GetUserEmail",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserEmail"
+              "$ref": "#/definitions/v1UserEmailView"
             }
           }
         },
@@ -2917,7 +3084,6 @@
     },
     "/users/{id}/mfas": {
       "get": {
-        "summary": "MFA",
         "operationId": "GetUserMfas",
         "responses": {
           "200": {
@@ -2940,15 +3106,80 @@
         ]
       }
     },
+    "/users/{id}/password/_initialize": {
+      "post": {
+        "summary": "A Manager is only allowed to set an initial password, on the next login the user has to change his password",
+        "operationId": "SetInitialPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
+    "/users/{id}/password/_sendsetnotification": {
+      "post": {
+        "summary": "Sends an Notification (Email/SMS) with a password reset Link",
+        "operationId": "SendSetPasswordNotification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SetPasswordNotificationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/users/{id}/phone": {
       "get": {
-        "summary": "USER_PHONE",
         "operationId": "GetUserPhone",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserPhone"
+              "$ref": "#/definitions/v1UserPhoneView"
             }
           }
         },
@@ -3029,13 +3260,12 @@
     },
     "/users/{id}/profile": {
       "get": {
-        "summary": "USER_PROFILE",
         "operationId": "GetUserProfile",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserProfile"
+              "$ref": "#/definitions/v1UserProfileView"
             }
           }
         },
@@ -3121,7 +3351,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UserGrant"
+              "$ref": "#/definitions/v1UserGrantView"
             }
           }
         },
@@ -3284,6 +3514,33 @@
         ]
       }
     },
+    "/usersgrants/_bulk": {
+      "delete": {
+        "summary": "remove a list of user grants in one request",
+        "operationId": "BulkRemoveUserGrant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UserGrantRemoveBulk"
+            }
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      }
+    },
     "/validate": {
       "get": {
         "operationId": "Validate",
@@ -3291,7 +3548,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protobufStruct"
+              "type": "object"
             }
           }
         },
@@ -3302,19 +3559,6 @@
     }
   },
   "definitions": {
-    "protobufListValue": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Repeated field of dynamically typed values."
-        }
-      },
-      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
-    },
     "protobufNullValue": {
       "type": "string",
       "enum": [
@@ -3323,50 +3567,13 @@
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
-    "protobufStruct": {
+    "v1AddOrgDomainRequest": {
       "type": "object",
       "properties": {
-        "fields": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Unordered map of dynamically typed values."
+        "domain": {
+          "type": "string"
         }
-      },
-      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
-    },
-    "protobufValue": {
-      "type": "object",
-      "properties": {
-        "null_value": {
-          "$ref": "#/definitions/protobufNullValue",
-          "description": "Represents a null value."
-        },
-        "number_value": {
-          "type": "number",
-          "format": "double",
-          "description": "Represents a double value."
-        },
-        "string_value": {
-          "type": "string",
-          "description": "Represents a string value."
-        },
-        "bool_value": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Represents a boolean value."
-        },
-        "struct_value": {
-          "$ref": "#/definitions/protobufStruct",
-          "description": "Represents a structured value."
-        },
-        "list_value": {
-          "$ref": "#/definitions/protobufListValue",
-          "description": "Represents a repeated `Value`."
-        }
-      },
-      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+      }
     },
     "v1AddOrgMemberRequest": {
       "type": "object",
@@ -3541,99 +3748,6 @@
         }
       }
     },
-    "v1AuthGrant": {
-      "type": "object",
-      "properties": {
-        "orgId": {
-          "type": "string"
-        },
-        "projectId": {
-          "type": "string"
-        },
-        "userId": {
-          "type": "string"
-        },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "v1AuthGrantSearchKey": {
-      "type": "string",
-      "enum": [
-        "AUTHGRANTSEARCHKEY_UNSPECIFIED",
-        "AUTHGRANTSEARCHKEY_ORG_ID",
-        "AUTHGRANTSEARCHKEY_PROJECT_ID",
-        "AUTHGRANTSEARCHKEY_USER_ID"
-      ],
-      "default": "AUTHGRANTSEARCHKEY_UNSPECIFIED"
-    },
-    "v1AuthGrantSearchQuery": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "$ref": "#/definitions/v1AuthGrantSearchKey"
-        },
-        "method": {
-          "$ref": "#/definitions/v1SearchMethod"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
-    "v1AuthGrantSearchRequest": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "sorting_column": {
-          "$ref": "#/definitions/v1AuthGrantSearchKey"
-        },
-        "asc": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "queries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1AuthGrantSearchQuery"
-          }
-        }
-      }
-    },
-    "v1AuthGrantSearchResponse": {
-      "type": "object",
-      "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "total_result": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1AuthGrant"
-          }
-        }
-      }
-    },
     "v1Change": {
       "type": "object",
       "properties": {
@@ -3648,11 +3762,14 @@
           "type": "string",
           "format": "uint64"
         },
+        "editor_id": {
+          "type": "string"
+        },
         "editor": {
           "type": "string"
         },
         "data": {
-          "$ref": "#/definitions/protobufStruct"
+          "type": "object"
         }
       }
     },
@@ -3712,9 +3829,6 @@
         "nick_name": {
           "type": "string"
         },
-        "display_name": {
-          "type": "string"
-        },
         "preferred_language": {
           "type": "string"
         },
@@ -3765,72 +3879,6 @@
       ],
       "default": "GENDER_UNSPECIFIED"
     },
-    "v1GrantedProject": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "state": {
-          "$ref": "#/definitions/v1ProjectState"
-        },
-        "change_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "creation_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "type": {
-          "$ref": "#/definitions/v1ProjectType"
-        },
-        "resource_owner": {
-          "type": "string"
-        },
-        "org_id": {
-          "type": "string"
-        },
-        "org_name": {
-          "type": "string"
-        },
-        "org_domain": {
-          "type": "string"
-        },
-        "grant_id": {
-          "type": "string"
-        },
-        "sequence": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1GrantedProjectSearchKey": {
-      "type": "string",
-      "enum": [
-        "PROJECTSEARCHKEY_UNSPECIFIED",
-        "PROJECTSEARCHKEY_PROJECT_NAME"
-      ],
-      "default": "PROJECTSEARCHKEY_UNSPECIFIED"
-    },
-    "v1GrantedProjectSearchQuery": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "$ref": "#/definitions/v1GrantedProjectSearchKey"
-        },
-        "method": {
-          "$ref": "#/definitions/v1SearchMethod"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
     "v1GrantedProjectSearchRequest": {
       "type": "object",
       "properties": {
@@ -3845,31 +3893,27 @@
         "queries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1GrantedProjectSearchQuery"
+            "$ref": "#/definitions/v1ProjectSearchQuery"
           }
         }
       }
     },
-    "v1GrantedProjectSearchResponse": {
+    "v1Iam": {
       "type": "object",
       "properties": {
-        "offset": {
-          "type": "string",
-          "format": "uint64"
+        "global_org_id": {
+          "type": "string"
         },
-        "limit": {
-          "type": "string",
-          "format": "uint64"
+        "iam_project_id": {
+          "type": "string"
         },
-        "total_result": {
-          "type": "string",
-          "format": "uint64"
+        "set_up_done": {
+          "type": "boolean",
+          "format": "boolean"
         },
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1GrantedProject"
-          }
+        "set_up_started": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -4101,8 +4145,36 @@
         "name": {
           "type": "string"
         },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1OrgDomain": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
         "domain": {
           "type": "string"
+        },
+        "verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "primary": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "sequence": {
           "type": "string",
@@ -4110,11 +4182,117 @@
         }
       }
     },
-    "v1OrgID": {
+    "v1OrgDomainSearchKey": {
+      "type": "string",
+      "enum": [
+        "ORGDOMAINSEARCHKEY_UNSPECIFIED",
+        "ORGDOMAINSEARCHKEY_DOMAIN"
+      ],
+      "default": "ORGDOMAINSEARCHKEY_UNSPECIFIED"
+    },
+    "v1OrgDomainSearchQuery": {
       "type": "object",
       "properties": {
-        "id": {
+        "key": {
+          "$ref": "#/definitions/v1OrgDomainSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
           "type": "string"
+        }
+      }
+    },
+    "v1OrgDomainSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1OrgDomainSearchQuery"
+          }
+        }
+      }
+    },
+    "v1OrgDomainSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1OrgDomainView"
+          }
+        }
+      }
+    },
+    "v1OrgDomainView": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "primary": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1OrgIamPolicy": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "user_login_must_be_domain": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -4268,6 +4446,32 @@
         "ORGSTATE_INACTIVE"
       ],
       "default": "ORGSTATE_UNSPECIFIED"
+    },
+    "v1OrgView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1OrgState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
     },
     "v1PasswordAgePolicy": {
       "type": "object",
@@ -4831,6 +5035,29 @@
         }
       }
     },
+    "v1ProjectGrantSearchKey": {
+      "type": "string",
+      "enum": [
+        "PROJECTGRANTSEARCHKEY_UNSPECIFIED",
+        "PROJECTGRANTSEARCHKEY_PROJECT_NAME",
+        "PROJECTGRANTSEARCHKEY_ROLE_KEY"
+      ],
+      "default": "PROJECTGRANTSEARCHKEY_UNSPECIFIED"
+    },
+    "v1ProjectGrantSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1ProjectGrantSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "v1ProjectGrantSearchRequest": {
       "type": "object",
       "properties": {
@@ -4844,6 +5071,12 @@
         "limit": {
           "type": "string",
           "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectGrantSearchQuery"
+          }
         }
       }
     },
@@ -4990,9 +5223,6 @@
         "granted_org_name": {
           "type": "string"
         },
-        "granted_org_domain": {
-          "type": "string"
-        },
         "role_keys": {
           "type": "array",
           "items": {
@@ -5016,6 +5246,12 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "resource_owner_name": {
+          "type": "string"
         }
       }
     },
@@ -5253,6 +5489,20 @@
         }
       }
     },
+    "v1ProjectRoleAddBulk": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectRoleAdd"
+          }
+        }
+      }
+    },
     "v1ProjectRoleChange": {
       "type": "object",
       "properties": {
@@ -5363,6 +5613,70 @@
         }
       }
     },
+    "v1ProjectSearchKey": {
+      "type": "string",
+      "enum": [
+        "PROJECTSEARCHKEY_UNSPECIFIED",
+        "PROJECTSEARCHKEY_PROJECT_NAME"
+      ],
+      "default": "PROJECTSEARCHKEY_UNSPECIFIED"
+    },
+    "v1ProjectSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1ProjectSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProjectSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectSearchQuery"
+          }
+        }
+      }
+    },
+    "v1ProjectSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProjectView"
+          }
+        }
+      }
+    },
     "v1ProjectState": {
       "type": "string",
       "enum": [
@@ -5371,15 +5685,6 @@
         "PROJECTSTATE_INACTIVE"
       ],
       "default": "PROJECTSTATE_UNSPECIFIED"
-    },
-    "v1ProjectType": {
-      "type": "string",
-      "enum": [
-        "PROJECTTYPE_UNSPECIFIED",
-        "PROJECTTYPE_OWNED",
-        "PROJECTTYPE_GRANTED"
-      ],
-      "default": "PROJECTTYPE_UNSPECIFIED"
     },
     "v1ProjectUpdateRequest": {
       "type": "object",
@@ -5448,6 +5753,35 @@
         }
       }
     },
+    "v1ProjectView": {
+      "type": "object",
+      "properties": {
+        "project_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1ProjectState"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resource_owner": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
     "v1SearchMethod": {
       "type": "string",
       "enum": [
@@ -5456,7 +5790,12 @@
         "SEARCHMETHOD_CONTAINS",
         "SEARCHMETHOD_EQUALS_IGNORE_CASE",
         "SEARCHMETHOD_STARTS_WITH_IGNORE_CASE",
-        "SEARCHMETHOD_CONTAINS_IGNORE_CASE"
+        "SEARCHMETHOD_CONTAINS_IGNORE_CASE",
+        "SEARCHMETHOD_NOT_EQUALS",
+        "SEARCHMETHOD_GREATER_THAN",
+        "SEARCHMETHOD_LESS_THAN",
+        "SEARCHMETHOD_IS_ONE_OF",
+        "SEARCHMETHOD_LIST_CONTAINS"
       ],
       "default": "SEARCHMETHOD_EQUALS"
     },
@@ -5546,9 +5885,6 @@
           "type": "string"
         },
         "nick_name": {
-          "type": "string"
-        },
-        "display_name": {
           "type": "string"
         },
         "preferred_language": {
@@ -5667,7 +6003,69 @@
         }
       }
     },
+    "v1UserAddressView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1UserEmail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "is_email_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1UserEmailView": {
       "type": "object",
       "properties": {
         "id": {
@@ -5749,6 +6147,17 @@
         }
       }
     },
+    "v1UserGrantCreateBulk": {
+      "type": "object",
+      "properties": {
+        "user_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrantCreate"
+          }
+        }
+      }
+    },
     "v1UserGrantID": {
       "type": "object",
       "properties": {
@@ -5760,13 +6169,25 @@
         }
       }
     },
+    "v1UserGrantRemoveBulk": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "v1UserGrantSearchKey": {
       "type": "string",
       "enum": [
         "USERGRANTSEARCHKEY_UNSPECIFIED",
         "USERGRANTSEARCHKEY_PROJECT_ID",
         "USERGRANTSEARCHKEY_USER_ID",
-        "USERGRANTSEARCHKEY_ORG_ID"
+        "USERGRANTSEARCHKEY_ORG_ID",
+        "USERGRANTSEARCHKEY_ROLE_KEY"
       ],
       "default": "USERGRANTSEARCHKEY_UNSPECIFIED"
     },
@@ -5852,6 +6273,17 @@
         }
       }
     },
+    "v1UserGrantUpdateBulk": {
+      "type": "object",
+      "properties": {
+        "user_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1UserGrantUpdate"
+          }
+        }
+      }
+    },
     "v1UserGrantView": {
       "type": "object",
       "properties": {
@@ -5911,6 +6343,9 @@
         },
         "resource_owner": {
           "type": "string"
+        },
+        "display_name": {
+          "type": "string"
         }
       }
     },
@@ -5923,6 +6358,33 @@
       }
     },
     "v1UserPhone": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "is_phone_verified": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1UserPhoneView": {
       "type": "object",
       "properties": {
         "id": {
@@ -5987,6 +6449,56 @@
         "change_date": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1UserProfileView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "nick_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "preferred_language": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "login_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preferred_login_name": {
+          "type": "string"
         }
       }
     },
@@ -6160,6 +6672,15 @@
           "format": "uint64"
         },
         "resource_owner": {
+          "type": "string"
+        },
+        "login_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preferred_login_name": {
           "type": "string"
         }
       }

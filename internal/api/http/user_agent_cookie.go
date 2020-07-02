@@ -25,11 +25,11 @@ type UserAgentCookieConfig struct {
 }
 
 func NewUserAgentHandler(config *UserAgentCookieConfig, idGenerator id.Generator) (*UserAgentHandler, error) {
-	keys, _, err := crypto.LoadKeys(config.Key)
+	key, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
 	if err != nil {
 		return nil, err
 	}
-	cookieKey := []byte(keys[config.Key.EncryptionKeyID])
+	cookieKey := []byte(key)
 	handler := NewCookieHandler(
 		WithEncryption(cookieKey, cookieKey),
 		WithDomain(config.Domain),

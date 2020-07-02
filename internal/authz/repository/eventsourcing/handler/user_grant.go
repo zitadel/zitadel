@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"strings"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -14,8 +17,6 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"strings"
-	"time"
 )
 
 type UserGrant struct {
@@ -52,7 +53,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (u *UserGrant) Process(event *models.Event) (err error) {
+func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case proj_es_model.ProjectAggregate:
 		err = u.processProject(event)
@@ -69,11 +70,11 @@ func (u *UserGrant) processProject(event *models.Event) (err error) {
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectMemberRemoved:
 		member := new(proj_es_model.ProjectMember)
 		member.SetData(event)
-		return u.processMember(event, "PROJECT", true, member.UserID, member.Roles)
+		return u.processMember(event, "PROJECT", event.AggregateID, member.UserID, member.Roles)
 	case proj_es_model.ProjectGrantMemberAdded, proj_es_model.ProjectGrantMemberChanged, proj_es_model.ProjectGrantMemberRemoved:
 		member := new(proj_es_model.ProjectGrantMember)
 		member.SetData(event)
-		return u.processMember(event, "PROJECT_GRANT", true, member.UserID, member.Roles)
+		return u.processMember(event, "PROJECT_GRANT", member.GrantID, member.UserID, member.Roles)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
@@ -85,7 +86,7 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	case org_es_model.OrgMemberAdded, org_es_model.OrgMemberChanged, org_es_model.OrgMemberRemoved:
 		member := new(org_es_model.OrgMember)
 		member.SetData(event)
-		return u.processMember(event, "ORG", false, member.UserID, member.Roles)
+		return u.processMember(event, "ORG", "", member.UserID, member.Roles)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
@@ -108,7 +109,6 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 				ID:            u.iamProjectID + member.UserID,
 				ResourceOwner: u.iamID,
 				OrgName:       u.iamID,
-				OrgDomain:     u.iamID,
 				ProjectID:     u.iamProjectID,
 				UserID:        member.UserID,
 				RoleKeys:      member.Roles,
@@ -120,11 +120,10 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 		} else {
 			newRoles := member.Roles
 			if grant.RoleKeys != nil {
-				grant.RoleKeys = mergeExistingRoles(rolePrefix, grant.RoleKeys, newRoles)
+				grant.RoleKeys = mergeExistingRoles(rolePrefix, "", grant.RoleKeys, newRoles)
 			} else {
 				grant.RoleKeys = newRoles
 			}
-
 		}
 		grant.Sequence = event.Sequence
 		grant.ChangeDate = event.CreationDate
@@ -141,7 +140,7 @@ func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suf
 	}
 }
 
-func (u *UserGrant) processMember(event *models.Event, rolePrefix string, suffix bool, userID string, roleKeys []string) error {
+func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix string, userID string, roleKeys []string) error {
 	switch event.Type {
 	case org_es_model.OrgMemberAdded, proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded,
 		org_es_model.OrgMemberChanged, proj_es_model.ProjectMemberChanged, proj_es_model.ProjectGrantMemberChanged:
@@ -150,7 +149,7 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix string, suffix
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
-		if suffix {
+		if roleSuffix != "" {
 			roleKeys = suffixRoles(event.AggregateID, roleKeys)
 		}
 		if errors.IsNotFound(err) {
@@ -165,7 +164,7 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix string, suffix
 		} else {
 			newRoles := roleKeys
 			if grant.RoleKeys != nil {
-				grant.RoleKeys = mergeExistingRoles(rolePrefix, grant.RoleKeys, newRoles)
+				grant.RoleKeys = mergeExistingRoles(rolePrefix, roleSuffix, grant.RoleKeys, newRoles)
 			} else {
 				grant.RoleKeys = newRoles
 			}
@@ -195,10 +194,14 @@ func suffixRoles(suffix string, roles []string) []string {
 	return suffixedRoles
 }
 
-func mergeExistingRoles(rolePrefix string, existingRoles, newRoles []string) []string {
+func mergeExistingRoles(rolePrefix, suffix string, existingRoles, newRoles []string) []string {
 	mergedRoles := make([]string, 0)
 	for _, existing := range existingRoles {
 		if !strings.HasPrefix(existing, rolePrefix) {
+			mergedRoles = append(mergedRoles, existing)
+			continue
+		}
+		if suffix != "" && !strings.HasSuffix(existing, suffix) {
 			mergedRoles = append(mergedRoles, existing)
 		}
 	}
@@ -221,6 +224,6 @@ func (u *UserGrant) setIamProjectID() error {
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-8is4s", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.LogWithFields("SPOOL-VcVoJ", "id", event.AggregateID).WithError(err).Warn("something went wrong in user grant handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserGrantFailedEvent, u.view.ProcessedUserGrantFailedEvent, u.view.ProcessedUserGrantSequence, u.errorCountUntilSkip)
 }

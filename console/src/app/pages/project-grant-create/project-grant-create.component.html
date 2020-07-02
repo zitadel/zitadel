@@ -11,7 +11,7 @@
     <ng-container *ngIf="currentCreateStep === 1">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</h1>
 
-        <form (ngSubmit)="searchOrg(domain)">
+        <form (ngSubmit)="searchOrg(domain.value)">
             <mat-form-field class="org-domain">
                 <mat-label>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</mat-label>
                 <input #domain matInput />
@@ -23,11 +23,9 @@
             </button>
         </form>
 
-        <div class="card org" *ngIf="org">
-            <p>{{org?.name}}</p>
-            <span *ngIf="org.creationDate">created:
-                {{dateFromTimestamp(org.creationDate) | date: 'EEE dd. MMM, HH:mm'}}</span>
-        </div>
+        <span *ngIf="org">
+            {{'PROJECT.GRANT.CREATE.FOR_ORG' | translate}} {{org?.name}}
+        </span>
     </ng-container>
 
     <ng-container *ngIf="currentCreateStep === 2">
@@ -50,8 +48,8 @@
             <button (click)="previous()" color="primary" mat-button class="small-button">
                 {{ 'ACTIONS.BACK' | translate }}
             </button>
-            <button color="primary" [disabled]="!org || rolesKeyList.length == 0" (click)="addGrant()" mat-raised-button
-                class="big-button" cdkFocusInitial>
+            <button color="primary" [disabled]="!org" (click)="addGrant()" mat-raised-button class="big-button"
+                cdkFocusInitial>
                 {{ 'ACTIONS.SAVE' | translate }}
             </button>
         </ng-container>

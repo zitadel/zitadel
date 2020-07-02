@@ -13,12 +13,11 @@ func PasswordAgePolicyQuery(recourceOwner string, latestSequence uint64) *es_mod
 		AggregateTypeFilter(model.PasswordAgePolicyAggregate).
 		LatestSequenceFilter(latestSequence).
 		ResourceOwnerFilter(recourceOwner)
-
 }
 
 func PasswordAgePolicyAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, policy *PasswordAgePolicy) (*es_models.Aggregate, error) {
 	if policy == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-1T05i", "existing policy should not be nil")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-1T05i", "Errors.Internal")
 	}
 	return aggCreator.NewAggregate(ctx, policy.AggregateID, model.PasswordAgePolicyAggregate, policyAgeVersion, policy.Sequence)
 }
@@ -26,7 +25,7 @@ func PasswordAgePolicyAggregate(ctx context.Context, aggCreator *es_models.Aggre
 func PasswordAgePolicyCreateAggregate(aggCreator *es_models.AggregateCreator, policy *PasswordAgePolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if policy == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "policy should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-kdie6", "Errors.Internal")
 		}
 		agg, err := PasswordAgePolicyAggregate(ctx, aggCreator, policy)
 		if err != nil {
@@ -40,7 +39,7 @@ func PasswordAgePolicyCreateAggregate(aggCreator *es_models.AggregateCreator, po
 func PasswordAgePolicyUpdateAggregate(aggCreator *es_models.AggregateCreator, existing *PasswordAgePolicy, new *PasswordAgePolicy) func(ctx context.Context) (*es_models.Aggregate, error) {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		if new == nil {
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "new policy should not be nil")
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dhr74", "Errors.Internal")
 		}
 		agg, err := PasswordAgePolicyAggregate(ctx, aggCreator, existing)
 		if err != nil {

@@ -12,7 +12,7 @@ export class ToastService {
     }
 
     public showError(message: string): void {
-        this.showMessage(message, 'close');
+        this.showMessage(decodeURI(message), 'close');
     }
 
     private showMessage(message: string, action: string): void {

@@ -31,7 +31,6 @@ export class ProjectRolesDataSource extends DataSource<ProjectRole.AsObject> {
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(roles => {
-            console.log(roles);
             this.rolesSubject.next(roles);
         });
     }

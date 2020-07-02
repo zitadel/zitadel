@@ -1,23 +1,24 @@
 <app-meta-layout>
-
-    <div *ngIf="profile" class="max-width-container">
+    <div *ngIf="user" class="max-width-container">
         <div class="head">
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{profile?.firstName}}</h1>
+            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.firstName}}</h1>
 
             <p class="desc">{{ 'USER.PROFILE.DESCRIPTION' | translate }}</p>
         </div>
 
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
-        <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+profile?.id]">
+        <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
+
+        <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
             <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
                 description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
                 <app-detail-form
-                    *ngIf="((authUserService.isAllowed(['user.write:' + profile?.id, 'user.write']) | async) || false) as canwrite"
-                    [disabled]="canwrite" [genders]="genders" [languages]="languages" [profile]="profile"
+                    *ngIf="((authUserService.isAllowed(['user.write:' + user?.id, 'user.write']) | async) || false) as canwrite"
+                    [disabled]="canwrite" [genders]="genders" [languages]="languages" [profile]="user"
                     (submitData)="saveProfile($event)">
                 </app-detail-form>
             </app-card>
@@ -26,7 +27,7 @@
         <app-card title="{{'USER.PASSWORD.TITLE' | translate}}"
             description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">
             <card-actions class="card-actions">
-                <button mat-stroked-button color="primary"
+                <button *ngIf="user.state === UserState.USERSTATE_INITIAL" mat-stroked-button color="primary"
                     (click)="sendSetPasswordNotification()">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
             </card-actions>
             <form *ngIf="passwordForm" autocomplete="new-password" [formGroup]="passwordForm"
@@ -35,25 +36,51 @@
                     <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
                         <input autocomplete="off" name="password" matInput formControlName="password" type="password" />
-                        <mat-error *ngIf="password?.errors?.required">{{ 'USER.VALIDATION.REQUIRED' | translate }}
+
+                        <mat-error *ngIf="password?.errors?.required">
+                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.symbolValidator">
+                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.numberValidator">
+                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.upperCaseValidator">
+                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="password?.errors?.lowerCaseValidator">
+                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
                         </mat-error>
                         <mat-error *ngIf="password?.errors?.minlength">
-                            {{ 'USER.PASSWORD.MINLENGTHERROR' | translate: minLengthPassword }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.pattern">{{ 'USER.VALIDATION.INVALIDPATTERN' | translate }}
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:password?.errors?.minlength }}
                         </mat-error>
                     </mat-form-field>
                     <mat-form-field class="formfield">
                         <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
                         <input autocomplete="off" name="passwordRepeat" matInput formControlName="confirmPassword"
                             type="password" />
+
                         <mat-error *ngIf="confirmPassword?.errors?.required">
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.minlength">
-                            {{ 'USER.PASSWORD.MINLENGTHERROR' | translate: minLengthPassword }}
+                        <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
+                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
                         </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.notequal">{{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                        <mat-error *ngIf="confirmPassword?.errors?.numberValidator">
+                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.notequal">
+                            {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.upperCaseValidator">
+                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.lowerCaseValidator">
+                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="confirmPassword?.errors?.minlength">
+                            {{ 'USER.VALIDATION.MINLENGTH' | translate:confirmPassword?.errors?.minlength }}
                         </mat-error>
                     </mat-form-field>
                 </div>
@@ -67,16 +94,16 @@
         <app-card title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
             <div class="method-col">
-                <div *ngIf="email" class="method-row">
+                <div class="method-row">
                     <span class="label">{{ 'USER.EMAIL' | translate }}</span>
 
                     <ng-container *ngIf="!emailEditState; else emailEdit">
                         <div class="actions">
-                            <span class="name">{{email.email}}</span>
-                            <mat-icon *ngIf="email.isEmailVerified" color="primary" aria-hidden="false"
+                            <span class="name">{{user?.email}}</span>
+                            <mat-icon *ngIf="user?.isEmailVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
-                            <ng-container *ngIf="email.email && !email.isEmailVerified">
+                            <ng-container *ngIf="user?.email && !user?.isEmailVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
@@ -93,26 +120,26 @@
                     <ng-template #emailEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.EMAIL' | translate }}</mat-label>
-                            <input matInput [(ngModel)]="email.email" />
+                            <input matInput [(ngModel)]="user.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
                             <mat-icon>close</mat-icon>
                         </button>
-                        <button [disabled]="!email.email" class="submit-button" type="button" color="primary"
+                        <button [disabled]="!user.email" class="submit-button" type="button" color="primary"
                             (click)="saveEmail()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
 
-                <div *ngIf="phone" class="method-row">
+                <div class="method-row">
                     <span class="label">{{ 'USER.PHONE' | translate }}</span>
 
                     <ng-container *ngIf="!phoneEditState; else phoneEdit">
                         <div class="actions">
-                            <span class="name">{{phone.phone}}</span>
-                            <mat-icon *ngIf="phone.isPhoneVerified" color="primary" aria-hidden="false"
+                            <span class="name">{{user?.phone}}</span>
+                            <mat-icon *ngIf="user?.isPhoneVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
-                            <ng-container *ngIf="phone.phone && !phone.isPhoneVerified">
+                            <ng-container *ngIf="user?.phone && !user?.isPhoneVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
 
@@ -125,8 +152,8 @@
                             <button (click)="phoneEditState = true" mat-icon-button>
                                 <mat-icon>edit</mat-icon>
                             </button>
-                            <button *ngIf="phone.phone" (click)="deletePhone()" mat-icon-button>
-                                <mat-icon>delete_outline</mat-icon>
+                            <button *ngIf="user?.phone" (click)="deletePhone()" color="warn" mat-icon-button>
+                                <i class="las la-trash"></i>
                             </button>
                         </div>
                     </ng-container>
@@ -134,19 +161,21 @@
                     <ng-template #phoneEdit>
                         <mat-form-field class="name">
                             <mat-label>{{ 'USER.PHONE' | translate }}</mat-label>
-                            <input matInput [(ngModel)]="phone.phone" />
+                            <input matInput [(ngModel)]="user.phone" />
                         </mat-form-field>
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon>close</mat-icon>
                         </button>
-                        <button [disabled]="!phone.phone" type="button" color="primary" (click)="savePhone()"
+                        <button [disabled]="!user.phone" type="button" color="primary" (click)="savePhone()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
                 </div>
             </div>
         </app-card>
 
-        <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="address">
+        <app-user-mfa *ngIf="user" [user]="user"></app-user-mfa>
+
+        <!-- <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}">
             <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
                 <div class="content">
                     <mat-form-field class="formfield">
@@ -174,16 +203,25 @@
                     <button type="submit" color="primary" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                 </div>
             </form>
-        </app-card>
+        </app-card> -->
 
-        <app-card *ngIf="profile?.id" title="{{ 'USER.GRANTS.TITLE' | translate }}"
-            description="{{'USER.GRANTS.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="profile?.id"></app-user-grants>
+        <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
+            description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
+            <app-user-grants [filterValue]="user?.id" [allowCreate]="['user.grant.write'] | hasRole"
+                [allowDelete]="['user.grant.delete'] | hasRole"></app-user-grants>
         </app-card>
     </div>
 
-    <metainfo *ngIf="profile" class="side">
+    <metainfo *ngIf="user" class="side">
+        <div class="details">
+            <div class="row" *ngIf="user?.loginNamesList">
+                <span class="first">Login Names:</span>
+                <span class="second"><span style="display: block;"
+                        *ngFor="let login of user?.loginNamesList">{{login}}</span></span>
+            </div>
+        </div>
+
         <p class="side-section">{{ 'CHANGES.USER.TITLE' | translate }}</p>
-        <app-changes [changeType]="ChangeType.USER" [id]="profile.id"></app-changes>
+        <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </metainfo>
 </app-meta-layout>

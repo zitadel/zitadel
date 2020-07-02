@@ -1,42 +1,42 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
-import { ProjectMemberCreateDialogModule } from '../../../modules/add-member-dialog/project-member-create-dialog.module';
+import { OrgMembersRoutingModule } from './org-members-routing.module';
 import { OrgMembersComponent } from './org-members.component';
 
 
 @NgModule({
     declarations: [OrgMembersComponent],
     imports: [
+        OrgMembersRoutingModule,
         CommonModule,
-        FormsModule,
-        ProjectMemberCreateDialogModule,
-        HasRoleModule,
+        MatAutocompleteModule,
+        MatChipsModule,
         MatButtonModule,
-        MatDialogModule,
+        HasRoleModule,
+        MatCheckboxModule,
+        MatIconModule,
         MatTableModule,
         MatPaginatorModule,
-        MatIconModule,
-        RouterModule,
-        MatProgressSpinnerModule,
-        MatCheckboxModule,
+        MatSortModule,
         MatTooltipModule,
+        ReactiveFormsModule,
+        MatProgressSpinnerModule,
+        FormsModule,
         TranslateModule,
-    ],
-    exports: [
-        OrgMembersComponent,
     ],
 })
 export class OrgMembersModule { }

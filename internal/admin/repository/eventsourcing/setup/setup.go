@@ -45,21 +45,20 @@ type initializer struct {
 }
 
 const (
-	OrgOwnerRole                     = "ORG_OWNER"
-	SETUP_USER                       = "SETUP"
-	OIDCResponseType_CODE            = "CODE"
-	OIDCResponseType_ID_TOKEN        = "ID_TOKEN"
-	OIDCResponseType_TOKEN           = "TOKEN"
-	OIDCGrantType_AUTHORIZATION_CODE = "AUTHORIZATION_CODE"
-	OIDCGrantType_IMPLICIT           = "IMPLICIT"
-	OIDCGrantType_REFRESH_TOKEN      = "REFRESH_TOKEN"
-	OIDCApplicationType_NATIVE       = "NATIVE"
-	OIDCApplicationType_USER_AGENT   = "USER_AGENT"
-	OIDCApplicationType_WEB          = "WEB"
-	OIDCAuthMethodType_NONE          = "NONE"
-	OIDCAuthMethodType_BASIC         = "BASIC"
-	OIDCAuthMethodType_POST          = "POST"
-	DEFAULT_POLICY                   = "0"
+	OrgOwnerRole                   = "ORG_OWNER"
+	SetupUser                      = "SETUP"
+	OIDCResponseTypeCode           = "CODE"
+	OIDCResponseTypeIDToken        = "ID_TOKEN"
+	OIDCResponseTypeToken          = "TOKEN"
+	OIDCGrantTypeAuthorizationCode = "AUTHORIZATION_CODE"
+	OIDCGrantTypeImplicit          = "IMPLICIT"
+	OIDCGrantTypeRefreshToken      = "REFRESH_TOKEN"
+	OIDCApplicationTypeNative      = "NATIVE"
+	OIDCApplicationTypeUserAgent   = "USER_AGENT"
+	OIDCApplicationTypeWeb         = "WEB"
+	OIDCAuthMethodTypeNone         = "NONE"
+	OIDCAuthMethodTypeBasic        = "BASIC"
+	OIDCAuthMethodTypePost         = "POST"
 )
 
 func StartSetup(sd systemdefaults.SystemDefaults, repos EventstoreRepos) *Setup {
@@ -97,7 +96,7 @@ func (s *Setup) Execute(ctx context.Context) error {
 		createdProjects: make(map[string]*proj_model.Project),
 	}
 
-	pwComplexityPolicy, err := s.repos.PolicyEvents.GetPasswordComplexityPolicy(ctx, DEFAULT_POLICY)
+	pwComplexityPolicy, err := s.repos.PolicyEvents.GetPasswordComplexityPolicy(ctx, policy_model.DefaultPolicy)
 	if err != nil {
 		logging.Log("SETUP-9osWF").WithError(err).Error("unable to read complexity policy")
 		return err
@@ -167,8 +166,23 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 		}
 		setUp.createdOrgs[iamOrg.Name] = org
 
+		var policy *org_model.OrgIamPolicy
+		if iamOrg.OrgIamPolicy {
+			policy, err = setUp.iamorgpolicy(ctx, org)
+			if err != nil {
+				logging.LogWithFields("SETUP-IlLif", "Org Iam Policy", iamOrg.Name).WithError(err).Error("unable to create iam org policy")
+				return err
+			}
+		} else {
+			policy, err = setUp.repos.OrgEvents.GetOrgIamPolicy(ctx, policy_model.DefaultPolicy)
+			if err != nil {
+				logging.LogWithFields("SETUP-IS8wS", "Org Iam Policy", iamOrg.Name).WithError(err).Error("unable to get default iam org policy")
+				return err
+			}
+		}
+
 		ctx = setSetUpContextData(ctx, org.AggregateID)
-		err = setUp.users(ctx, iamOrg.Users)
+		err = setUp.users(ctx, iamOrg.Users, policy)
 		if err != nil {
 			logging.LogWithFields("SETUP-8zfwz", "Org", iamOrg.Name).WithError(err).Error("unable to set up org users")
 			return err
@@ -193,10 +207,19 @@ func (setUp *initializer) orgs(ctx context.Context, orgs []types.Org) error {
 func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Org, error) {
 	ctx = setSetUpContextData(ctx, "")
 	createOrg := &org_model.Org{
-		Name:   org.Name,
-		Domain: org.Domain,
+		Name:    org.Name,
+		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
 	}
 	return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
+}
+
+func (setUp *initializer) iamorgpolicy(ctx context.Context, org *org_model.Org) (*org_model.OrgIamPolicy, error) {
+	ctx = setSetUpContextData(ctx, org.AggregateID)
+	policy := &org_model.OrgIamPolicy{
+		ObjectRoot:            models.ObjectRoot{AggregateID: org.AggregateID},
+		UserLoginMustBeDomain: false,
+	}
+	return setUp.repos.OrgEvents.AddOrgIamPolicy(ctx, policy)
 }
 
 func (setUp *initializer) iamOwners(ctx context.Context, owners []string) error {
@@ -249,9 +272,9 @@ func (setUp *initializer) setIamProject(ctx context.Context) error {
 	return nil
 }
 
-func (setUp *initializer) users(ctx context.Context, users []types.User) error {
+func (setUp *initializer) users(ctx context.Context, users []types.User, orgPolicy *org_model.OrgIamPolicy) error {
 	for _, user := range users {
-		created, err := setUp.user(ctx, user)
+		created, err := setUp.user(ctx, user, orgPolicy)
 		if err != nil {
 			logging.LogWithFields("SETUP-9soer", "Email", user.Email).WithError(err).Error("unable to create iam user")
 			return err
@@ -261,7 +284,7 @@ func (setUp *initializer) users(ctx context.Context, users []types.User) error {
 	return nil
 }
 
-func (setUp *initializer) user(ctx context.Context, user types.User) (*usr_model.User, error) {
+func (setUp *initializer) user(ctx context.Context, user types.User, orgPolicy *org_model.OrgIamPolicy) (*usr_model.User, error) {
 	createUser := &usr_model.User{
 		Profile: &usr_model.Profile{
 			UserName:  user.UserName,
@@ -276,7 +299,7 @@ func (setUp *initializer) user(ctx context.Context, user types.User) (*usr_model
 			SecretString: user.Password,
 		},
 	}
-	return setUp.repos.UserEvents.CreateUser(ctx, createUser, setUp.pwComplexityPolicy)
+	return setUp.repos.UserEvents.CreateUser(ctx, createUser, setUp.pwComplexityPolicy, orgPolicy)
 }
 
 func (setUp *initializer) orgOwners(ctx context.Context, org *org_model.Org, owners []string) error {
@@ -356,14 +379,14 @@ func getOIDCResponseTypes(responseTypes []string) []proj_model.OIDCResponseType 
 
 func getOIDCResponseType(responseType string) proj_model.OIDCResponseType {
 	switch responseType {
-	case OIDCResponseType_CODE:
-		return proj_model.OIDCRESPONSETYPE_CODE
-	case OIDCResponseType_ID_TOKEN:
-		return proj_model.OIDCRESPONSETYPE_ID_TOKEN
-	case OIDCResponseType_TOKEN:
-		return proj_model.OIDCRESPONSETYPE_TOKEN
+	case OIDCResponseTypeCode:
+		return proj_model.OIDCResponseTypeCode
+	case OIDCResponseTypeIDToken:
+		return proj_model.OIDCResponseTypeIDToken
+	case OIDCResponseTypeToken:
+		return proj_model.OIDCResponseTypeToken
 	}
-	return proj_model.OIDCRESPONSETYPE_CODE
+	return proj_model.OIDCResponseTypeCode
 }
 
 func getOIDCGrantTypes(grantTypes []string) []proj_model.OIDCGrantType {
@@ -376,40 +399,40 @@ func getOIDCGrantTypes(grantTypes []string) []proj_model.OIDCGrantType {
 
 func getOIDCGrantType(grantTypes string) proj_model.OIDCGrantType {
 	switch grantTypes {
-	case OIDCGrantType_AUTHORIZATION_CODE:
-		return proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE
-	case OIDCGrantType_IMPLICIT:
-		return proj_model.OIDCGRANTTYPE_IMPLICIT
-	case OIDCGrantType_REFRESH_TOKEN:
-		return proj_model.OIDCGRANTTYPE_REFRESH_TOKEN
+	case OIDCGrantTypeAuthorizationCode:
+		return proj_model.OIDCGrantTypeAuthorizationCode
+	case OIDCGrantTypeImplicit:
+		return proj_model.OIDCGrantTypeImplicit
+	case OIDCGrantTypeRefreshToken:
+		return proj_model.OIDCGrantTypeRefreshToken
 	}
-	return proj_model.OIDCGRANTTYPE_AUTHORIZATION_CODE
+	return proj_model.OIDCGrantTypeAuthorizationCode
 }
 
 func getOIDCApplicationType(appType string) proj_model.OIDCApplicationType {
 	switch appType {
-	case OIDCApplicationType_NATIVE:
-		return proj_model.OIDCAPPLICATIONTYPE_NATIVE
-	case OIDCApplicationType_USER_AGENT:
-		return proj_model.OIDCAPPLICATIONTYPE_USER_AGENT
-	case OIDCApplicationType_WEB:
-		return proj_model.OIDCAPPLICATIONTYPE_WEB
+	case OIDCApplicationTypeNative:
+		return proj_model.OIDCApplicationTypeNative
+	case OIDCApplicationTypeUserAgent:
+		return proj_model.OIDCApplicationTypeUserAgent
+	case OIDCApplicationTypeWeb:
+		return proj_model.OIDCApplicationTypeWeb
 	}
-	return proj_model.OIDCAPPLICATIONTYPE_WEB
+	return proj_model.OIDCApplicationTypeWeb
 }
 
 func getOIDCAuthMethod(authMethod string) proj_model.OIDCAuthMethodType {
 	switch authMethod {
-	case OIDCAuthMethodType_NONE:
-		return proj_model.OIDCAUTHMETHODTYPE_NONE
-	case OIDCAuthMethodType_BASIC:
-		return proj_model.OIDCAUTHMETHODTYPE_BASIC
-	case OIDCAuthMethodType_POST:
-		return proj_model.OIDCAUTHMETHODTYPE_POST
+	case OIDCAuthMethodTypeNone:
+		return proj_model.OIDCAuthMethodTypeNone
+	case OIDCAuthMethodTypeBasic:
+		return proj_model.OIDCAuthMethodTypeBasic
+	case OIDCAuthMethodTypePost:
+		return proj_model.OIDCAuthMethodTypePost
 	}
-	return proj_model.OIDCAUTHMETHODTYPE_NONE
+	return proj_model.OIDCAuthMethodTypeNone
 }
 
 func setSetUpContextData(ctx context.Context, orgID string) context.Context {
-	return auth.SetCtxData(ctx, auth.CtxData{UserID: SETUP_USER, OrgID: orgID})
+	return auth.SetCtxData(ctx, auth.CtxData{UserID: SetupUser, OrgID: orgID})
 }

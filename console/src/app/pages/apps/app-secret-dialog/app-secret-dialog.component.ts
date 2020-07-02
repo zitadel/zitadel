@@ -7,7 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
     styleUrls: ['./app-secret-dialog.component.scss'],
 })
 export class AppSecretDialogComponent {
-    public copied: boolean = false;
+    public copied: string = '';
     constructor(public dialogRef: MatDialogRef<AppSecretDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any) { }
 
@@ -27,9 +27,9 @@ export class AppSecretDialogComponent {
         selBox.select();
         document.execCommand('copy');
         document.body.removeChild(selBox);
-        this.copied = true;
+        this.copied = value;
         setTimeout(() => {
-            this.copied = false;
+            this.copied = '';
         }, 3000);
     }
 }

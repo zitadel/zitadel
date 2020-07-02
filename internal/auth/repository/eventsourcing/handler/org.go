@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/org/repository/view"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	"time"
 )
 
@@ -32,8 +32,8 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	return eventsourcing.OrgQuery(sequence), nil
 }
 
-func (o *Org) Process(event *es_models.Event) error {
-	org := new(view.OrgView)
+func (o *Org) Reduce(event *es_models.Event) error {
+	org := new(org_model.OrgView)
 
 	switch event.Type {
 	case model.OrgAdded:

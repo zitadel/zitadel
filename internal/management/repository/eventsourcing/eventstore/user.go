@@ -2,8 +2,12 @@ package eventstore
 
 import (
 	"context"
+
+	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -14,19 +18,39 @@ type UserRepo struct {
 	SearchLimit  uint64
 	UserEvents   *usr_event.UserEventstore
 	PolicyEvents *policy_event.PolicyEventstore
+	OrgEvents    *org_event.OrgEventstore
 	View         *view.View
 }
 
-func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_model.User, err error) {
-	return repo.UserEvents.UserByID(ctx, id)
-}
-
-func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
+	user, err := repo.View.UserByID(id)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.CreateUser(ctx, user, policy)
+	events, err := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	if err != nil {
+		logging.Log("EVENT-PSoc3").WithError(err).Debug("error retrieving new events")
+		return model.UserToModel(user), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return model.UserToModel(user), nil
+		}
+	}
+	return model.UserToModel(&userCopy), nil
+}
+
+func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.CreateUser(ctx, user, pwPolicy, orgPolicy)
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
@@ -34,11 +58,15 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, policyResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	return repo.UserEvents.RegisterUser(ctx, user, policy, resourceOwner)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UserEvents.RegisterUser(ctx, user, pwPolicy, orgPolicy, resourceOwner)
 }
 
 func (repo *UserRepo) DeactivateUser(ctx context.Context, id string) (*usr_model.User, error) {
@@ -71,6 +99,21 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	}, nil
 }
 
+func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {
+	changes, err := repo.UserEvents.UserChanges(ctx, id, lastSequence, limit, sortAscending)
+	if err != nil {
+		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
+	return changes, nil
+}
+
 func (repo *UserRepo) GetGlobalUserByEmail(ctx context.Context, email string) (*usr_model.UserView, error) {
 	user, err := repo.View.GetGlobalUserByEmail(email)
 	if err != nil {
@@ -100,7 +143,11 @@ func (repo *UserRepo) RequestSetPassword(ctx context.Context, id string, notifyT
 }
 
 func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
-	return repo.UserEvents.ProfileByID(ctx, userID)
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetProfile(), nil
 }
 
 func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
@@ -108,7 +155,11 @@ func (repo *UserRepo) ChangeProfile(ctx context.Context, profile *usr_model.Prof
 }
 
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
-	return repo.UserEvents.EmailByID(ctx, userID)
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetEmail(), nil
 }
 
 func (repo *UserRepo) ChangeEmail(ctx context.Context, email *usr_model.Email) (*usr_model.Email, error) {
@@ -120,7 +171,11 @@ func (repo *UserRepo) CreateEmailVerificationCode(ctx context.Context, userID st
 }
 
 func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.Phone, error) {
-	return repo.UserEvents.PhoneByID(ctx, userID)
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetPhone(), nil
 }
 
 func (repo *UserRepo) ChangePhone(ctx context.Context, email *usr_model.Phone) (*usr_model.Phone, error) {
@@ -132,7 +187,11 @@ func (repo *UserRepo) CreatePhoneVerificationCode(ctx context.Context, userID st
 }
 
 func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
-	return repo.UserEvents.AddressByID(ctx, userID)
+	user, err := repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GetAddress(), nil
 }
 
 func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {

@@ -63,18 +63,18 @@ func (mr *MockHandlerMockRecorder) EventQuery() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EventQuery", reflect.TypeOf((*MockHandler)(nil).EventQuery))
 }
 
-// Process mocks base method
+// Reduce mocks base method
 func (m *MockHandler) Process(arg0 *models.Event) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Process", arg0)
+	ret := m.ctrl.Call(m, "Reduce", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Process indicates an expected call of Process
+// Reduce indicates an expected call of Reduce
 func (mr *MockHandlerMockRecorder) Process(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Process", reflect.TypeOf((*MockHandler)(nil).Process), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reduce", reflect.TypeOf((*MockHandler)(nil).Process), arg0)
 }
 
 // MinimumCycleDuration mocks base method

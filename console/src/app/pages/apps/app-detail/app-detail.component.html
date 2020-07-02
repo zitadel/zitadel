@@ -6,6 +6,7 @@
         <h1>{{ 'APP.PAGES.TITLE' | translate }} {{app?.name}}</h1>
 
         <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
+        <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
     </div>
 
     <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
@@ -15,11 +16,11 @@
             <div class="content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
                     <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE" matTooltip="Deactivate Org">
-                        <i class="las la-toggle-off"></i>
+                        <!-- <i class="las la-toggle-off"></i> -->
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
                     </mat-button-toggle>
                     <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE" matTooltip="Activate Org">
-                        <i class="las la-toggle-on"></i>
+                        <!-- <i class="las la-toggle-on"></i> -->
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
                     </mat-button-toggle>
                 </mat-button-toggle-group>

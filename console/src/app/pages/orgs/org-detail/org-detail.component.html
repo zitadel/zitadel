@@ -1,28 +1,51 @@
 <app-meta-layout>
-    <div class="max-width-container">
-        <!-- {{ 'ORG_DETAIL.TITLE' | translate }}  -->
+    <div class="enlarged-container">
         <h1>{{org?.name}}</h1>
         <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}
         </p>
+        <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
+            description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
+            <div *ngFor="let domain of domains" class="domain">
+                <span class="title">{{domain.domain}}</span>
+                <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
+                <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-chess-queen"></i>
+                <span class="fill-space"></span>
+                <!-- <button disabled mat-icon-button
+                    matTooltip="download /.well-known/caos-developer-domain-association.txt and deploy it on your domain. Then verify"><i
+                        class="las la-file-download"></i></button> -->
+                <button matTooltip="Remove domain" color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
+                        class="las la-trash"></i></button>
+            </div>
 
-        <ng-template appHasRole [appHasRole]="['org.member.read']">
-            <h3>{{ 'ORG_DETAIL.MEMBER.TITLE' | translate }}</h3>
+            <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
+            <div class="new-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>new domain</mat-label>
+                    <input matInput [(ngModel)]="newDomain" />
+                </mat-form-field>
 
-            <app-org-members [orgId]="orgId"></app-org-members>
+                <button matTooltip="Add domain" mat-icon-button color="primary" (click)="saveNewOrgDomain()">
+                    <mat-icon>check</mat-icon>
+                </button>
+
+                <!-- <button disabled mat-icon-button
+                    matTooltip="download /.well-known/caos-developer-domain-association.txt and deploy it on your domain. Then verify"><i
+                        class="las la-file-download"></i></button> -->
+                <!-- <button disabled mat-icon-button matTooltip="Verify"><i class=" las la-check-circle"></i></button> -->
+            </div>
+        </app-card>
+
+        <ng-template appHasRole [appHasRole]="['policy.read']">
+            <app-policy-grid></app-policy-grid>
         </ng-template>
     </div>
-
-    <ng-template appHasRole [appHasRole]="['policy.read']">
-        <div class="enlarged-container">
-            <app-policy-grid></app-policy-grid>
-        </div>
-    </ng-template>
 
     <metainfo class="side">
         <div class="details">
             <div class="row">
-                <span class="first">Domain:</span>
-                <span class="second" *ngIf="org?.domain">{{org.domain}}</span>
+                <span class="first">Domains:</span>
+                <span class="second"><span style="display: block;"
+                        *ngFor="let domain of domains">{{domain.domain}}</span></span>
             </div>
             <div class="row">
                 <span class="first">State:</span>
@@ -31,7 +54,14 @@
             </div>
         </div>
 
-        <p class="side-section">{{ 'CHANGES.ORG.TITLE' | translate }}</p>
-        <app-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></app-changes>
+        <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+            <mat-tab label="Details">
+                <app-org-contributors *ngIf="org" [org]="org">
+                </app-org-contributors>
+            </mat-tab>
+            <mat-tab label="{{ 'CHANGES.ORG.TITLE' | translate }}" class="flex-col">
+                <app-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></app-changes>
+            </mat-tab>
+        </mat-tab-group>
     </metainfo>
 </app-meta-layout>

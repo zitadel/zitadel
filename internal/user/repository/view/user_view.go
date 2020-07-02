@@ -1,16 +1,18 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/jinzhu/gorm"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/view"
-	"github.com/jinzhu/gorm"
 )
 
 func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_ID), userID)
+	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserID), userID)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
@@ -20,7 +22,7 @@ func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 
 func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_NAME), userName)
+	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso9s", "Errors.User.NotFound")
@@ -28,9 +30,35 @@ func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error
 	return user, err
 }
 
+func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, error) {
+	user := new(model.UserView)
+	loginNameQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyLoginNames,
+		Method: global_model.SearchMethodListContains,
+		Value:  loginName,
+	}
+	query := repository.PrepareGetByQuery(table, loginNameQuery)
+	err := query(db, user)
+	return user, err
+}
+
+func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
+	users := make([]*model.UserView, 0)
+	orgIDQuery := &usr_model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyResourceOwner,
+		Method: global_model.SearchMethodEquals,
+		Value:  orgID,
+	}
+	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{
+		Queries: []*usr_model.UserSearchQuery{orgIDQuery},
+	})
+	_, err := query(db, &users)
+	return users, err
+}
+
 func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([]*model.UserView, int, error) {
 	users := make([]*model.UserView, 0)
-	query := view.PrepareSearchQuery(table, model.UserSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
+	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &users)
 	if err != nil {
 		return nil, 0, err
@@ -40,7 +68,7 @@ func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([
 
 func GetGlobalUserByEmail(db *gorm.DB, table, email string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_EMAIL), email)
+	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-8uWer", "Errors.User.NotFound")
@@ -50,7 +78,7 @@ func GetGlobalUserByEmail(db *gorm.DB, table, email string) (*model.UserView, er
 
 func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	user := new(model.UserView)
-	query := view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_EMAIL), email)
+	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
 	err := query(db, user)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return false, err
@@ -58,7 +86,7 @@ func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	if user != nil {
 		return false, nil
 	}
-	query = view.PrepareGetByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_NAME), email)
+	query = repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), email)
 	err = query(db, user)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return false, err
@@ -71,18 +99,18 @@ func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, erro
 	if err != nil {
 		return nil, err
 	}
-	if user.OTPState == int32(usr_model.MFASTATE_UNSPECIFIED) {
+	if user.OTPState == int32(usr_model.MfaStateUnspecified) {
 		return []*usr_model.MultiFactor{}, nil
 	}
-	return []*usr_model.MultiFactor{&usr_model.MultiFactor{Type: usr_model.MFATYPE_OTP, State: usr_model.MfaState(user.OTPState)}}, nil
+	return []*usr_model.MultiFactor{&usr_model.MultiFactor{Type: usr_model.MfaTypeOTP, State: usr_model.MfaState(user.OTPState)}}, nil
 }
 
 func PutUser(db *gorm.DB, table string, project *model.UserView) error {
-	save := view.PrepareSave(table)
+	save := repository.PrepareSave(table)
 	return save(db, project)
 }
 
 func DeleteUser(db *gorm.DB, table, userID string) error {
-	delete := view.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.USERSEARCHKEY_USER_ID), userID)
+	delete := repository.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserID), userID)
 	return delete(db)
 }

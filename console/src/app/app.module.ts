@@ -25,6 +25,7 @@ import { AppComponent } from './app.component';
 import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
+import { AvatarModule } from './modules/avatar/avatar.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
@@ -56,11 +57,10 @@ const stateHandlerFn = (stateHandler: StatehandlerService) => {
     };
 };
 
-export const authConfig: AuthConfig = {
+export let authConfig = {
     redirectUri: window.location.origin + '/auth/callback',
     scope: 'openid profile email', // offline_access
     responseType: 'code',
-    // showDebugInformation: true,
     oidc: true,
     postLogoutRedirectUri: window.location.origin + '/signedout',
 };
@@ -102,6 +102,7 @@ export const authConfig: AuthConfig = {
         MatToolbarModule,
         MatMenuModule,
         MatSnackBarModule,
+        AvatarModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ],
     providers: [
@@ -150,4 +151,9 @@ export const authConfig: AuthConfig = {
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+
+    constructor() {
+        console.log(window.location.href);
+    }
+}

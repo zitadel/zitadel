@@ -34,13 +34,13 @@ func OTPToModel(otp *OTP) *model.OTP {
 
 func (u *User) appendOtpAddedEvent(event *es_models.Event) error {
 	u.OTP = &OTP{
-		State: int32(model.MFASTATE_NOTREADY),
+		State: int32(model.MfaStateNotReady),
 	}
 	return u.OTP.setData(event)
 }
 
 func (u *User) appendOtpVerifiedEvent() {
-	u.OTP.State = int32(model.MFASTATE_READY)
+	u.OTP.State = int32(model.MfaStateReady)
 }
 
 func (u *User) appendOtpRemovedEvent() {

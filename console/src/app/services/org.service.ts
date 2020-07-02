@@ -4,9 +4,16 @@ import { Metadata } from 'grpc-web';
 
 import { ManagementServicePromiseClient } from '../proto/generated/management_grpc_web_pb';
 import {
+    AddOrgDomainRequest,
     AddOrgMemberRequest,
+    Domain,
+    Iam,
     Org,
     OrgDomain,
+    OrgDomainSearchQuery,
+    OrgDomainSearchRequest,
+    OrgDomainSearchResponse,
+    OrgIamPolicy,
     OrgID,
     OrgMemberRoles,
     OrgMemberSearchRequest,
@@ -25,6 +32,7 @@ import {
     PasswordLockoutPolicyUpdate,
     ProjectGrant,
     ProjectGrantCreate,
+    RemoveOrgDomainRequest,
     RemoveOrgMemberRequest,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
@@ -51,11 +59,54 @@ export class OrgService {
         return responseMapper(response);
     }
 
-    public async GetOrgById(orgId: string): Promise<Org> {
-        const req: OrgID = new OrgID();
-        req.setId(orgId);
+    public async GetIam(): Promise<Iam> {
+        const req: Empty = new Empty();
         return await this.request(
-            c => c.getOrgByID,
+            c => c.getIam,
+            req,
+            f => f,
+        );
+    }
+
+    public async GetMyOrg(): Promise<Org> {
+        return await this.request(
+            c => c.getMyOrg,
+            new Empty(),
+            f => f,
+        );
+    }
+
+    public async AddMyOrgDomain(domain: string): Promise<OrgDomain> {
+        const req: AddOrgDomainRequest = new AddOrgDomainRequest();
+        req.setDomain(domain);
+        return await this.request(
+            c => c.addMyOrgDomain,
+            req,
+            f => f,
+        );
+    }
+
+    public async RemoveMyOrgDomain(domain: string): Promise<Empty> {
+        const req: RemoveOrgDomainRequest = new RemoveOrgDomainRequest();
+        req.setDomain(domain);
+        return await this.request(
+            c => c.removeMyOrgDomain,
+            req,
+            f => f,
+        );
+    }
+
+    public async SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
+        Promise<OrgDomainSearchResponse> {
+        const req: OrgDomainSearchRequest = new OrgDomainSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+
+        return await this.request(
+            c => c.searchMyOrgDomains,
             req,
             f => f,
         );
@@ -73,7 +124,7 @@ export class OrgService {
     }
 
     public async getOrgByDomainGlobal(domain: string): Promise<Org> {
-        const req = new OrgDomain();
+        const req = new Domain();
         req.setDomain(domain);
         return await this.request(
             c => c.getOrgByDomainGlobal,
@@ -105,22 +156,19 @@ export class OrgService {
         );
     }
 
-    public async DeactivateOrg(id: string): Promise<Org> {
-        const req = new OrgID();
-        req.setId(id);
+    public async DeactivateMyOrg(): Promise<Org> {
         return await this.request(
-            c => c.deactivateOrg,
-            req,
+            c => c.deactivateMyOrg,
+            new Empty(),
             f => f,
         );
     }
 
-    public async ReactivateOrg(id: string): Promise<Org> {
+    public async ReactivateMyOrg(): Promise<Org> {
         const req = new OrgID();
-        req.setId(id);
         return await this.request(
-            c => c.reactivateOrg,
-            req,
+            c => c.reactivateMyOrg,
+            new Empty(),
             f => f,
         );
     }
@@ -151,6 +199,14 @@ export class OrgService {
     }
 
     // Policy
+
+    public async GetMyOrgIamPolicy(): Promise<OrgIamPolicy> {
+        return await this.request(
+            c => c.getMyOrgIamPolicy,
+            new Empty(),
+            f => f,
+        );
+    }
 
     public async GetPasswordAgePolicy(): Promise<PasswordAgePolicy> {
         const req = new Empty();
@@ -206,11 +262,9 @@ export class OrgService {
     }
 
     public async GetPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
-        const req = new Empty();
-
         return await this.request(
             c => c.getPasswordComplexityPolicy,
-            req,
+            new Empty(),
             f => f,
         );
     }
@@ -321,5 +375,17 @@ export class OrgService {
             req,
             f => f,
         );
+    }
+
+    public getLocalizedComplexityPolicyPatternErrorString(policy: PasswordComplexityPolicy.AsObject): string {
+        if (policy.hasNumber && policy.hasSymbol) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLANDNUMBERERROR';
+        } else if (policy.hasNumber) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.NUMBERERROR';
+        } else if (policy.hasSymbol) {
+            return 'ORG.POLICY.PWD_COMPLEXITY.SYMBOLERROR';
+        } else {
+            return 'ORG.POLICY.PWD_COMPLEXITY.PATTERNERROR';
+        }
     }
 }

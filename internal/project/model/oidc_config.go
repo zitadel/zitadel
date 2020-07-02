@@ -22,33 +22,33 @@ type OIDCConfig struct {
 type OIDCResponseType int32
 
 const (
-	OIDCRESPONSETYPE_CODE OIDCResponseType = iota
-	OIDCRESPONSETYPE_ID_TOKEN
-	OIDCRESPONSETYPE_TOKEN
+	OIDCResponseTypeCode OIDCResponseType = iota
+	OIDCResponseTypeIDToken
+	OIDCResponseTypeToken
 )
 
 type OIDCGrantType int32
 
 const (
-	OIDCGRANTTYPE_AUTHORIZATION_CODE OIDCGrantType = iota
-	OIDCGRANTTYPE_IMPLICIT
-	OIDCGRANTTYPE_REFRESH_TOKEN
+	OIDCGrantTypeAuthorizationCode OIDCGrantType = iota
+	OIDCGrantTypeImplicit
+	OIDCGrantTypeRefreshToken
 )
 
 type OIDCApplicationType int32
 
 const (
-	OIDCAPPLICATIONTYPE_WEB OIDCApplicationType = iota
-	OIDCAPPLICATIONTYPE_USER_AGENT
-	OIDCAPPLICATIONTYPE_NATIVE
+	OIDCApplicationTypeWeb OIDCApplicationType = iota
+	OIDCApplicationTypeUserAgent
+	OIDCApplicationTypeNative
 )
 
 type OIDCAuthMethodType int32
 
 const (
-	OIDCAUTHMETHODTYPE_BASIC OIDCAuthMethodType = iota
-	OIDCAUTHMETHODTYPE_POST
-	OIDCAUTHMETHODTYPE_NONE
+	OIDCAuthMethodTypeBasic OIDCAuthMethodType = iota
+	OIDCAuthMethodTypePost
+	OIDCAuthMethodTypeNone
 )
 
 func (c *OIDCConfig) IsValid() bool {
@@ -67,11 +67,11 @@ func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
 	implicit := false
 	for _, r := range c.ResponseTypes {
 		switch r {
-		case OIDCRESPONSETYPE_CODE:
-			grantTypes = append(grantTypes, OIDCGRANTTYPE_AUTHORIZATION_CODE)
-		case OIDCRESPONSETYPE_ID_TOKEN, OIDCRESPONSETYPE_TOKEN:
+		case OIDCResponseTypeCode:
+			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
+		case OIDCResponseTypeIDToken, OIDCResponseTypeToken:
 			if !implicit {
-				grantTypes = append(grantTypes, OIDCGRANTTYPE_IMPLICIT)
+				grantTypes = append(grantTypes, OIDCGrantTypeImplicit)
 			}
 		}
 	}

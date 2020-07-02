@@ -51,7 +51,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 		LatestSequenceFilter(sequence), nil
 }
 
-func (u *UserGrant) Process(event *models.Event) (err error) {
+func (u *UserGrant) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
 	case grant_es_model.UserGrantAggregate:
 		err = u.processUserGrant(event)
@@ -73,6 +73,7 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 		}
 		err = u.fillData(grant, event.ResourceOwner)
 	case grant_es_model.UserGrantChanged,
+		grant_es_model.UserGrantCascadeChanged,
 		grant_es_model.UserGrantDeactivated,
 		grant_es_model.UserGrantReactivated:
 		grant, err = u.view.UserGrantByID(event.AggregateID)
@@ -80,8 +81,8 @@ func (u *UserGrant) processUserGrant(event *models.Event) (err error) {
 			return err
 		}
 		err = grant.AppendEvent(event)
-	case grant_es_model.UserGrantRemoved:
-		err = u.view.DeleteUserGrant(event.AggregateID, event.Sequence)
+	case grant_es_model.UserGrantRemoved, grant_es_model.UserGrantCascadeRemoved:
+		return u.view.DeleteUserGrant(event.AggregateID, event.Sequence)
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
@@ -161,6 +162,7 @@ func (u *UserGrant) fillUserData(grant *view_model.UserGrantView, user *usr_mode
 	grant.UserName = user.UserName
 	grant.FirstName = user.FirstName
 	grant.LastName = user.LastName
+	grant.DisplayName = user.DisplayName
 	grant.Email = user.EmailAddress
 }
 
@@ -169,7 +171,6 @@ func (u *UserGrant) fillProjectData(grant *view_model.UserGrantView, project *pr
 }
 
 func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.Org) {
-	grant.OrgDomain = org.Domain
 	grant.OrgName = org.Name
 }
 

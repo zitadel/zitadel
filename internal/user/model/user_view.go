@@ -1,6 +1,8 @@
 package model
 
 import (
+	"github.com/caos/zitadel/internal/eventstore/models"
+	"golang.org/x/text/language"
 	"time"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
@@ -18,6 +20,8 @@ type UserView struct {
 	PasswordChanged        time.Time
 	LastLogin              time.Time
 	UserName               string
+	PreferredLoginName     string
+	LoginNames             []string
 	FirstName              string
 	LastName               string
 	NickName               string
@@ -51,22 +55,23 @@ type UserSearchRequest struct {
 type UserSearchKey int32
 
 const (
-	USERSEARCHKEY_UNSPECIFIED UserSearchKey = iota
-	USERSEARCHKEY_USER_ID
-	USERSEARCHKEY_USER_NAME
-	USERSEARCHKEY_FIRST_NAME
-	USERSEARCHKEY_LAST_NAME
-	USERSEARCHKEY_NICK_NAME
-	USERSEARCHKEY_DISPLAY_NAME
-	USERSEARCHKEY_EMAIL
-	USERSEARCHKEY_STATE
-	USERSEARCHKEY_RESOURCEOWNER
+	UserSearchKeyUnspecified UserSearchKey = iota
+	UserSearchKeyUserID
+	UserSearchKeyUserName
+	UserSearchKeyFirstName
+	UserSearchKeyLastName
+	UserSearchKeyNickName
+	UserSearchKeyDisplayName
+	UserSearchKeyEmail
+	UserSearchKeyState
+	UserSearchKeyResourceOwner
+	UserSearchKeyLoginNames
 )
 
 type UserSearchQuery struct {
 	Key    UserSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type UserSearchResponse struct {
@@ -83,7 +88,7 @@ func (r *UserSearchRequest) EnsureLimit(limit uint64) {
 }
 
 func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserSearchQuery{Key: USERSEARCHKEY_RESOURCEOWNER, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
 
 func (u *UserView) MfaTypesSetupPossible(level req_model.MfaLevel) []req_model.MfaType {
@@ -92,7 +97,7 @@ func (u *UserView) MfaTypesSetupPossible(level req_model.MfaLevel) []req_model.M
 	default:
 		fallthrough
 	case req_model.MfaLevelSoftware:
-		if u.OTPState != MFASTATE_READY {
+		if u.OTPState != MfaStateReady {
 			types = append(types, req_model.MfaTypeOTP)
 		}
 		//PLANNED: add sms
@@ -109,7 +114,7 @@ func (u *UserView) MfaTypesAllowed(level req_model.MfaLevel) []req_model.MfaType
 	default:
 		fallthrough
 	case req_model.MfaLevelSoftware:
-		if u.OTPState == MFASTATE_READY {
+		if u.OTPState == MfaStateReady {
 			types = append(types, req_model.MfaTypeOTP)
 		}
 		//PLANNED: add sms
@@ -118,4 +123,70 @@ func (u *UserView) MfaTypesAllowed(level req_model.MfaLevel) []req_model.MfaType
 		//PLANNED: add token
 	}
 	return types
+}
+
+func (u *UserView) GetProfile() *Profile {
+	return &Profile{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   u.ID,
+			Sequence:      u.Sequence,
+			ResourceOwner: u.ResourceOwner,
+			CreationDate:  u.CreationDate,
+			ChangeDate:    u.ChangeDate,
+		},
+		UserName:           u.UserName,
+		FirstName:          u.FirstName,
+		LastName:           u.LastName,
+		NickName:           u.NickName,
+		DisplayName:        u.DisplayName,
+		PreferredLanguage:  language.Make(u.PreferredLanguage),
+		Gender:             u.Gender,
+		PreferredLoginName: u.PreferredLoginName,
+		LoginNames:         u.LoginNames,
+	}
+}
+
+func (u *UserView) GetPhone() *Phone {
+	return &Phone{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   u.ID,
+			Sequence:      u.Sequence,
+			ResourceOwner: u.ResourceOwner,
+			CreationDate:  u.CreationDate,
+			ChangeDate:    u.ChangeDate,
+		},
+		PhoneNumber:     u.Phone,
+		IsPhoneVerified: u.IsPhoneVerified,
+	}
+}
+
+func (u *UserView) GetEmail() *Email {
+	return &Email{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   u.ID,
+			Sequence:      u.Sequence,
+			ResourceOwner: u.ResourceOwner,
+			CreationDate:  u.CreationDate,
+			ChangeDate:    u.ChangeDate,
+		},
+		EmailAddress:    u.Email,
+		IsEmailVerified: u.IsEmailVerified,
+	}
+}
+
+func (u *UserView) GetAddress() *Address {
+	return &Address{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   u.ID,
+			Sequence:      u.Sequence,
+			ResourceOwner: u.ResourceOwner,
+			CreationDate:  u.CreationDate,
+			ChangeDate:    u.ChangeDate,
+		},
+		Country:       u.Country,
+		Locality:      u.Locality,
+		PostalCode:    u.PostalCode,
+		Region:        u.Region,
+		StreetAddress: u.StreetAddress,
+	}
 }

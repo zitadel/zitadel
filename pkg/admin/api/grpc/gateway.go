@@ -41,7 +41,7 @@ func (gw *Gateway) GatewayServeMuxOptions() []runtime.ServeMuxOption {
 					return header, true
 				}
 			}
-			return header, false
+			return runtime.DefaultHeaderMatcher(header)
 		}),
 	}
 }

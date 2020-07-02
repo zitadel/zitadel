@@ -9,15 +9,51 @@ import * as validate_validate_pb from './validate/validate_pb';
 import * as google_protobuf_descriptor_pb from 'google-protobuf/google/protobuf/descriptor_pb';
 import * as authoption_options_pb from './authoption/options_pb';
 
+export class Iam extends jspb.Message {
+  getGlobalOrgId(): string;
+  setGlobalOrgId(value: string): void;
+
+  getIamProjectId(): string;
+  setIamProjectId(value: string): void;
+
+  getSetUpDone(): boolean;
+  setSetUpDone(value: boolean): void;
+
+  getSetUpStarted(): boolean;
+  setSetUpStarted(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Iam.AsObject;
+  static toObject(includeInstance: boolean, msg: Iam): Iam.AsObject;
+  static serializeBinaryToWriter(message: Iam, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Iam;
+  static deserializeBinaryFromReader(message: Iam, reader: jspb.BinaryReader): Iam;
+}
+
+export namespace Iam {
+  export type AsObject = {
+    globalOrgId: string,
+    iamProjectId: string,
+    setUpDone: boolean,
+    setUpStarted: boolean,
+  }
+}
+
 export class ChangeRequest extends jspb.Message {
   getId(): string;
   setId(value: string): void;
+
+  getSecId(): string;
+  setSecId(value: string): void;
 
   getLimit(): number;
   setLimit(value: number): void;
 
   getSequenceOffset(): number;
   setSequenceOffset(value: number): void;
+
+  getAsc(): boolean;
+  setAsc(value: boolean): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ChangeRequest.AsObject;
@@ -30,8 +66,10 @@ export class ChangeRequest extends jspb.Message {
 export namespace ChangeRequest {
   export type AsObject = {
     id: string,
+    secId: string,
     limit: number,
     sequenceOffset: number,
+    asc: boolean,
   }
 }
 
@@ -75,6 +113,9 @@ export class Change extends jspb.Message {
   getSequence(): number;
   setSequence(value: number): void;
 
+  getEditorId(): string;
+  setEditorId(value: string): void;
+
   getEditor(): string;
   setEditor(value: string): void;
 
@@ -96,6 +137,7 @@ export namespace Change {
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     eventType: string,
     sequence: number,
+    editorId: string,
     editor: string,
     data?: google_protobuf_struct_pb.Struct.AsObject,
   }
@@ -159,19 +201,19 @@ export namespace UserID {
   }
 }
 
-export class UserEmailID extends jspb.Message {
+export class Email extends jspb.Message {
   getEmail(): string;
   setEmail(value: string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): UserEmailID.AsObject;
-  static toObject(includeInstance: boolean, msg: UserEmailID): UserEmailID.AsObject;
-  static serializeBinaryToWriter(message: UserEmailID, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): UserEmailID;
-  static deserializeBinaryFromReader(message: UserEmailID, reader: jspb.BinaryReader): UserEmailID;
+  toObject(includeInstance?: boolean): Email.AsObject;
+  static toObject(includeInstance: boolean, msg: Email): Email.AsObject;
+  static serializeBinaryToWriter(message: Email, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Email;
+  static deserializeBinaryFromReader(message: Email, reader: jspb.BinaryReader): Email;
 }
 
-export namespace UserEmailID {
+export namespace Email {
   export type AsObject = {
     email: string,
   }
@@ -230,9 +272,6 @@ export class CreateUserRequest extends jspb.Message {
   getNickName(): string;
   setNickName(value: string): void;
 
-  getDisplayName(): string;
-  setDisplayName(value: string): void;
-
   getPreferredLanguage(): string;
   setPreferredLanguage(value: string): void;
 
@@ -283,7 +322,6 @@ export namespace CreateUserRequest {
     firstName: string,
     lastName: string,
     nickName: string,
-    displayName: string,
     preferredLanguage: string,
     gender: Gender,
     email: string,
@@ -482,6 +520,14 @@ export class UserView extends jspb.Message {
   getResourceOwner(): string;
   setResourceOwner(value: string): void;
 
+  getLoginNamesList(): Array<string>;
+  setLoginNamesList(value: Array<string>): void;
+  clearLoginNamesList(): void;
+  addLoginNames(value: string, index?: number): void;
+
+  getPreferredLoginName(): string;
+  setPreferredLoginName(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserView.AsObject;
   static toObject(includeInstance: boolean, msg: UserView): UserView.AsObject;
@@ -516,6 +562,8 @@ export namespace UserView {
     streetAddress: string,
     sequence: number,
     resourceOwner: string,
+    loginNamesList: Array<string>,
+    preferredLoginName: string,
   }
 }
 
@@ -675,7 +723,7 @@ export namespace UserProfile {
   }
 }
 
-export class UpdateUserProfileRequest extends jspb.Message {
+export class UserProfileView extends jspb.Message {
   getId(): string;
   setId(value: string): void;
 
@@ -697,6 +745,75 @@ export class UpdateUserProfileRequest extends jspb.Message {
   getGender(): Gender;
   setGender(value: Gender): void;
 
+  getUserName(): string;
+  setUserName(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getLoginNamesList(): Array<string>;
+  setLoginNamesList(value: Array<string>): void;
+  clearLoginNamesList(): void;
+  addLoginNames(value: string, index?: number): void;
+
+  getPreferredLoginName(): string;
+  setPreferredLoginName(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserProfileView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserProfileView): UserProfileView.AsObject;
+  static serializeBinaryToWriter(message: UserProfileView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserProfileView;
+  static deserializeBinaryFromReader(message: UserProfileView, reader: jspb.BinaryReader): UserProfileView;
+}
+
+export namespace UserProfileView {
+  export type AsObject = {
+    id: string,
+    firstName: string,
+    lastName: string,
+    nickName: string,
+    displayName: string,
+    preferredLanguage: string,
+    gender: Gender,
+    userName: string,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    loginNamesList: Array<string>,
+    preferredLoginName: string,
+  }
+}
+
+export class UpdateUserProfileRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getFirstName(): string;
+  setFirstName(value: string): void;
+
+  getLastName(): string;
+  setLastName(value: string): void;
+
+  getNickName(): string;
+  setNickName(value: string): void;
+
+  getPreferredLanguage(): string;
+  setPreferredLanguage(value: string): void;
+
+  getGender(): Gender;
+  setGender(value: Gender): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UpdateUserProfileRequest.AsObject;
   static toObject(includeInstance: boolean, msg: UpdateUserProfileRequest): UpdateUserProfileRequest.AsObject;
@@ -711,7 +828,6 @@ export namespace UpdateUserProfileRequest {
     firstName: string,
     lastName: string,
     nickName: string,
-    displayName: string,
     preferredLanguage: string,
     gender: Gender,
   }
@@ -749,6 +865,48 @@ export class UserEmail extends jspb.Message {
 }
 
 export namespace UserEmail {
+  export type AsObject = {
+    id: string,
+    email: string,
+    isEmailVerified: boolean,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class UserEmailView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getEmail(): string;
+  setEmail(value: string): void;
+
+  getIsEmailVerified(): boolean;
+  setIsEmailVerified(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserEmailView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserEmailView): UserEmailView.AsObject;
+  static serializeBinaryToWriter(message: UserEmailView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserEmailView;
+  static deserializeBinaryFromReader(message: UserEmailView, reader: jspb.BinaryReader): UserEmailView;
+}
+
+export namespace UserEmailView {
   export type AsObject = {
     id: string,
     email: string,
@@ -827,6 +985,48 @@ export namespace UserPhone {
   }
 }
 
+export class UserPhoneView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getPhone(): string;
+  setPhone(value: string): void;
+
+  getIsPhoneVerified(): boolean;
+  setIsPhoneVerified(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserPhoneView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserPhoneView): UserPhoneView.AsObject;
+  static serializeBinaryToWriter(message: UserPhoneView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserPhoneView;
+  static deserializeBinaryFromReader(message: UserPhoneView, reader: jspb.BinaryReader): UserPhoneView;
+}
+
+export namespace UserPhoneView {
+  export type AsObject = {
+    id: string,
+    phone: string,
+    isPhoneVerified: boolean,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
 export class UpdateUserPhoneRequest extends jspb.Message {
   getId(): string;
   setId(value: string): void;
@@ -894,6 +1094,60 @@ export class UserAddress extends jspb.Message {
 }
 
 export namespace UserAddress {
+  export type AsObject = {
+    id: string,
+    country: string,
+    locality: string,
+    postalCode: string,
+    region: string,
+    streetAddress: string,
+    sequence: number,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class UserAddressView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getCountry(): string;
+  setCountry(value: string): void;
+
+  getLocality(): string;
+  setLocality(value: string): void;
+
+  getPostalCode(): string;
+  setPostalCode(value: string): void;
+
+  getRegion(): string;
+  setRegion(value: string): void;
+
+  getStreetAddress(): string;
+  setStreetAddress(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserAddressView.AsObject;
+  static toObject(includeInstance: boolean, msg: UserAddressView): UserAddressView.AsObject;
+  static serializeBinaryToWriter(message: UserAddressView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserAddressView;
+  static deserializeBinaryFromReader(message: UserAddressView, reader: jspb.BinaryReader): UserAddressView;
+}
+
+export namespace UserAddressView {
   export type AsObject = {
     id: string,
     country: string,
@@ -1487,6 +1741,36 @@ export namespace PasswordLockoutPolicyUpdate {
   }
 }
 
+export class OrgIamPolicy extends jspb.Message {
+  getOrgId(): string;
+  setOrgId(value: string): void;
+
+  getDescription(): string;
+  setDescription(value: string): void;
+
+  getUserLoginMustBeDomain(): boolean;
+  setUserLoginMustBeDomain(value: boolean): void;
+
+  getDefault(): boolean;
+  setDefault(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgIamPolicy.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgIamPolicy): OrgIamPolicy.AsObject;
+  static serializeBinaryToWriter(message: OrgIamPolicy, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgIamPolicy;
+  static deserializeBinaryFromReader(message: OrgIamPolicy, reader: jspb.BinaryReader): OrgIamPolicy;
+}
+
+export namespace OrgIamPolicy {
+  export type AsObject = {
+    orgId: string,
+    description: string,
+    userLoginMustBeDomain: boolean,
+    pb_default: boolean,
+  }
+}
+
 export class OrgID extends jspb.Message {
   getId(): string;
   setId(value: string): void;
@@ -1502,24 +1786,6 @@ export class OrgID extends jspb.Message {
 export namespace OrgID {
   export type AsObject = {
     id: string,
-  }
-}
-
-export class OrgDomain extends jspb.Message {
-  getDomain(): string;
-  setDomain(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): OrgDomain.AsObject;
-  static toObject(includeInstance: boolean, msg: OrgDomain): OrgDomain.AsObject;
-  static serializeBinaryToWriter(message: OrgDomain, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): OrgDomain;
-  static deserializeBinaryFromReader(message: OrgDomain, reader: jspb.BinaryReader): OrgDomain;
-}
-
-export namespace OrgDomain {
-  export type AsObject = {
-    domain: string,
   }
 }
 
@@ -1543,9 +1809,6 @@ export class Org extends jspb.Message {
   getName(): string;
   setName(value: string): void;
 
-  getDomain(): string;
-  setDomain(value: string): void;
-
   getSequence(): number;
   setSequence(value: number): void;
 
@@ -1564,8 +1827,301 @@ export namespace Org {
     creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     name: string,
-    domain: string,
     sequence: number,
+  }
+}
+
+export class OrgView extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getState(): OrgState;
+  setState(value: OrgState): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getName(): string;
+  setName(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgView.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgView): OrgView.AsObject;
+  static serializeBinaryToWriter(message: OrgView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgView;
+  static deserializeBinaryFromReader(message: OrgView, reader: jspb.BinaryReader): OrgView;
+}
+
+export namespace OrgView {
+  export type AsObject = {
+    id: string,
+    state: OrgState,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    name: string,
+    sequence: number,
+  }
+}
+
+export class Domain extends jspb.Message {
+  getDomain(): string;
+  setDomain(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Domain.AsObject;
+  static toObject(includeInstance: boolean, msg: Domain): Domain.AsObject;
+  static serializeBinaryToWriter(message: Domain, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Domain;
+  static deserializeBinaryFromReader(message: Domain, reader: jspb.BinaryReader): Domain;
+}
+
+export namespace Domain {
+  export type AsObject = {
+    domain: string,
+  }
+}
+
+export class OrgDomains extends jspb.Message {
+  getDomainsList(): Array<OrgDomain>;
+  setDomainsList(value: Array<OrgDomain>): void;
+  clearDomainsList(): void;
+  addDomains(value?: OrgDomain, index?: number): OrgDomain;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgDomains.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgDomains): OrgDomains.AsObject;
+  static serializeBinaryToWriter(message: OrgDomains, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgDomains;
+  static deserializeBinaryFromReader(message: OrgDomains, reader: jspb.BinaryReader): OrgDomains;
+}
+
+export namespace OrgDomains {
+  export type AsObject = {
+    domainsList: Array<OrgDomain.AsObject>,
+  }
+}
+
+export class OrgDomain extends jspb.Message {
+  getOrgId(): string;
+  setOrgId(value: string): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getDomain(): string;
+  setDomain(value: string): void;
+
+  getVerified(): boolean;
+  setVerified(value: boolean): void;
+
+  getPrimary(): boolean;
+  setPrimary(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgDomain.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgDomain): OrgDomain.AsObject;
+  static serializeBinaryToWriter(message: OrgDomain, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgDomain;
+  static deserializeBinaryFromReader(message: OrgDomain, reader: jspb.BinaryReader): OrgDomain;
+}
+
+export namespace OrgDomain {
+  export type AsObject = {
+    orgId: string,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    domain: string,
+    verified: boolean,
+    primary: boolean,
+    sequence: number,
+  }
+}
+
+export class OrgDomainView extends jspb.Message {
+  getOrgId(): string;
+  setOrgId(value: string): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getDomain(): string;
+  setDomain(value: string): void;
+
+  getVerified(): boolean;
+  setVerified(value: boolean): void;
+
+  getPrimary(): boolean;
+  setPrimary(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgDomainView.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgDomainView): OrgDomainView.AsObject;
+  static serializeBinaryToWriter(message: OrgDomainView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgDomainView;
+  static deserializeBinaryFromReader(message: OrgDomainView, reader: jspb.BinaryReader): OrgDomainView;
+}
+
+export namespace OrgDomainView {
+  export type AsObject = {
+    orgId: string,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    domain: string,
+    verified: boolean,
+    primary: boolean,
+    sequence: number,
+  }
+}
+
+export class AddOrgDomainRequest extends jspb.Message {
+  getDomain(): string;
+  setDomain(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AddOrgDomainRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: AddOrgDomainRequest): AddOrgDomainRequest.AsObject;
+  static serializeBinaryToWriter(message: AddOrgDomainRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AddOrgDomainRequest;
+  static deserializeBinaryFromReader(message: AddOrgDomainRequest, reader: jspb.BinaryReader): AddOrgDomainRequest;
+}
+
+export namespace AddOrgDomainRequest {
+  export type AsObject = {
+    domain: string,
+  }
+}
+
+export class RemoveOrgDomainRequest extends jspb.Message {
+  getDomain(): string;
+  setDomain(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RemoveOrgDomainRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: RemoveOrgDomainRequest): RemoveOrgDomainRequest.AsObject;
+  static serializeBinaryToWriter(message: RemoveOrgDomainRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RemoveOrgDomainRequest;
+  static deserializeBinaryFromReader(message: RemoveOrgDomainRequest, reader: jspb.BinaryReader): RemoveOrgDomainRequest;
+}
+
+export namespace RemoveOrgDomainRequest {
+  export type AsObject = {
+    domain: string,
+  }
+}
+
+export class OrgDomainSearchResponse extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getTotalResult(): number;
+  setTotalResult(value: number): void;
+
+  getResultList(): Array<OrgDomainView>;
+  setResultList(value: Array<OrgDomainView>): void;
+  clearResultList(): void;
+  addResult(value?: OrgDomainView, index?: number): OrgDomainView;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgDomainSearchResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgDomainSearchResponse): OrgDomainSearchResponse.AsObject;
+  static serializeBinaryToWriter(message: OrgDomainSearchResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgDomainSearchResponse;
+  static deserializeBinaryFromReader(message: OrgDomainSearchResponse, reader: jspb.BinaryReader): OrgDomainSearchResponse;
+}
+
+export namespace OrgDomainSearchResponse {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    totalResult: number,
+    resultList: Array<OrgDomainView.AsObject>,
+  }
+}
+
+export class OrgDomainSearchRequest extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getQueriesList(): Array<OrgDomainSearchQuery>;
+  setQueriesList(value: Array<OrgDomainSearchQuery>): void;
+  clearQueriesList(): void;
+  addQueries(value?: OrgDomainSearchQuery, index?: number): OrgDomainSearchQuery;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgDomainSearchRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgDomainSearchRequest): OrgDomainSearchRequest.AsObject;
+  static serializeBinaryToWriter(message: OrgDomainSearchRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgDomainSearchRequest;
+  static deserializeBinaryFromReader(message: OrgDomainSearchRequest, reader: jspb.BinaryReader): OrgDomainSearchRequest;
+}
+
+export namespace OrgDomainSearchRequest {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    queriesList: Array<OrgDomainSearchQuery.AsObject>,
+  }
+}
+
+export class OrgDomainSearchQuery extends jspb.Message {
+  getKey(): OrgDomainSearchKey;
+  setKey(value: OrgDomainSearchKey): void;
+
+  getMethod(): SearchMethod;
+  setMethod(value: SearchMethod): void;
+
+  getValue(): string;
+  setValue(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OrgDomainSearchQuery.AsObject;
+  static toObject(includeInstance: boolean, msg: OrgDomainSearchQuery): OrgDomainSearchQuery.AsObject;
+  static serializeBinaryToWriter(message: OrgDomainSearchQuery, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OrgDomainSearchQuery;
+  static deserializeBinaryFromReader(message: OrgDomainSearchQuery, reader: jspb.BinaryReader): OrgDomainSearchQuery;
+}
+
+export namespace OrgDomainSearchQuery {
+  export type AsObject = {
+    key: OrgDomainSearchKey,
+    method: SearchMethod,
+    value: string,
   }
 }
 
@@ -1877,6 +2433,138 @@ export namespace ProjectUpdateRequest {
   }
 }
 
+export class ProjectSearchResponse extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getTotalResult(): number;
+  setTotalResult(value: number): void;
+
+  getResultList(): Array<ProjectView>;
+  setResultList(value: Array<ProjectView>): void;
+  clearResultList(): void;
+  addResult(value?: ProjectView, index?: number): ProjectView;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectSearchResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectSearchResponse): ProjectSearchResponse.AsObject;
+  static serializeBinaryToWriter(message: ProjectSearchResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectSearchResponse;
+  static deserializeBinaryFromReader(message: ProjectSearchResponse, reader: jspb.BinaryReader): ProjectSearchResponse;
+}
+
+export namespace ProjectSearchResponse {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    totalResult: number,
+    resultList: Array<ProjectView.AsObject>,
+  }
+}
+
+export class ProjectView extends jspb.Message {
+  getProjectId(): string;
+  setProjectId(value: string): void;
+
+  getName(): string;
+  setName(value: string): void;
+
+  getState(): ProjectState;
+  setState(value: ProjectState): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getResourceOwner(): string;
+  setResourceOwner(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectView.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectView): ProjectView.AsObject;
+  static serializeBinaryToWriter(message: ProjectView, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectView;
+  static deserializeBinaryFromReader(message: ProjectView, reader: jspb.BinaryReader): ProjectView;
+}
+
+export namespace ProjectView {
+  export type AsObject = {
+    projectId: string,
+    name: string,
+    state: ProjectState,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    resourceOwner: string,
+    sequence: number,
+  }
+}
+
+export class ProjectSearchRequest extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getQueriesList(): Array<ProjectSearchQuery>;
+  setQueriesList(value: Array<ProjectSearchQuery>): void;
+  clearQueriesList(): void;
+  addQueries(value?: ProjectSearchQuery, index?: number): ProjectSearchQuery;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectSearchRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectSearchRequest): ProjectSearchRequest.AsObject;
+  static serializeBinaryToWriter(message: ProjectSearchRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectSearchRequest;
+  static deserializeBinaryFromReader(message: ProjectSearchRequest, reader: jspb.BinaryReader): ProjectSearchRequest;
+}
+
+export namespace ProjectSearchRequest {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    queriesList: Array<ProjectSearchQuery.AsObject>,
+  }
+}
+
+export class ProjectSearchQuery extends jspb.Message {
+  getKey(): ProjectSearchKey;
+  setKey(value: ProjectSearchKey): void;
+
+  getMethod(): SearchMethod;
+  setMethod(value: SearchMethod): void;
+
+  getValue(): string;
+  setValue(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectSearchQuery.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectSearchQuery): ProjectSearchQuery.AsObject;
+  static serializeBinaryToWriter(message: ProjectSearchQuery, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectSearchQuery;
+  static deserializeBinaryFromReader(message: ProjectSearchQuery, reader: jspb.BinaryReader): ProjectSearchQuery;
+}
+
+export namespace ProjectSearchQuery {
+  export type AsObject = {
+    key: ProjectSearchKey,
+    method: SearchMethod,
+    value: string,
+  }
+}
+
 export class Projects extends jspb.Message {
   getProjectsList(): Array<Project>;
   setProjectsList(value: Array<Project>): void;
@@ -1936,158 +2624,6 @@ export namespace Project {
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     sequence: number,
-  }
-}
-
-export class GrantedProjectSearchResponse extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getTotalResult(): number;
-  setTotalResult(value: number): void;
-
-  getResultList(): Array<GrantedProject>;
-  setResultList(value: Array<GrantedProject>): void;
-  clearResultList(): void;
-  addResult(value?: GrantedProject, index?: number): GrantedProject;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProjectSearchResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProjectSearchResponse): GrantedProjectSearchResponse.AsObject;
-  static serializeBinaryToWriter(message: GrantedProjectSearchResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchResponse;
-  static deserializeBinaryFromReader(message: GrantedProjectSearchResponse, reader: jspb.BinaryReader): GrantedProjectSearchResponse;
-}
-
-export namespace GrantedProjectSearchResponse {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    totalResult: number,
-    resultList: Array<GrantedProject.AsObject>,
-  }
-}
-
-export class GrantedProject extends jspb.Message {
-  getId(): string;
-  setId(value: string): void;
-
-  getName(): string;
-  setName(value: string): void;
-
-  getState(): ProjectState;
-  setState(value: ProjectState): void;
-
-  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
-  hasChangeDate(): boolean;
-  clearChangeDate(): void;
-
-  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
-  hasCreationDate(): boolean;
-  clearCreationDate(): void;
-
-  getType(): ProjectType;
-  setType(value: ProjectType): void;
-
-  getResourceOwner(): string;
-  setResourceOwner(value: string): void;
-
-  getOrgId(): string;
-  setOrgId(value: string): void;
-
-  getOrgName(): string;
-  setOrgName(value: string): void;
-
-  getOrgDomain(): string;
-  setOrgDomain(value: string): void;
-
-  getGrantId(): string;
-  setGrantId(value: string): void;
-
-  getSequence(): number;
-  setSequence(value: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProject.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProject): GrantedProject.AsObject;
-  static serializeBinaryToWriter(message: GrantedProject, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProject;
-  static deserializeBinaryFromReader(message: GrantedProject, reader: jspb.BinaryReader): GrantedProject;
-}
-
-export namespace GrantedProject {
-  export type AsObject = {
-    id: string,
-    name: string,
-    state: ProjectState,
-    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    type: ProjectType,
-    resourceOwner: string,
-    orgId: string,
-    orgName: string,
-    orgDomain: string,
-    grantId: string,
-    sequence: number,
-  }
-}
-
-export class GrantedProjectSearchRequest extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getQueriesList(): Array<GrantedProjectSearchQuery>;
-  setQueriesList(value: Array<GrantedProjectSearchQuery>): void;
-  clearQueriesList(): void;
-  addQueries(value?: GrantedProjectSearchQuery, index?: number): GrantedProjectSearchQuery;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProjectSearchRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProjectSearchRequest): GrantedProjectSearchRequest.AsObject;
-  static serializeBinaryToWriter(message: GrantedProjectSearchRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchRequest;
-  static deserializeBinaryFromReader(message: GrantedProjectSearchRequest, reader: jspb.BinaryReader): GrantedProjectSearchRequest;
-}
-
-export namespace GrantedProjectSearchRequest {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    queriesList: Array<GrantedProjectSearchQuery.AsObject>,
-  }
-}
-
-export class GrantedProjectSearchQuery extends jspb.Message {
-  getKey(): GrantedProjectSearchKey;
-  setKey(value: GrantedProjectSearchKey): void;
-
-  getMethod(): SearchMethod;
-  setMethod(value: SearchMethod): void;
-
-  getValue(): string;
-  setValue(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GrantedProjectSearchQuery.AsObject;
-  static toObject(includeInstance: boolean, msg: GrantedProjectSearchQuery): GrantedProjectSearchQuery.AsObject;
-  static serializeBinaryToWriter(message: GrantedProjectSearchQuery, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchQuery;
-  static deserializeBinaryFromReader(message: GrantedProjectSearchQuery, reader: jspb.BinaryReader): GrantedProjectSearchQuery;
-}
-
-export namespace GrantedProjectSearchQuery {
-  export type AsObject = {
-    key: GrantedProjectSearchKey,
-    method: SearchMethod,
-    value: string,
   }
 }
 
@@ -2256,6 +2792,30 @@ export namespace ProjectRoleAdd {
     key: string,
     displayName: string,
     group: string,
+  }
+}
+
+export class ProjectRoleAddBulk extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getProjectRolesList(): Array<ProjectRoleAdd>;
+  setProjectRolesList(value: Array<ProjectRoleAdd>): void;
+  clearProjectRolesList(): void;
+  addProjectRoles(value?: ProjectRoleAdd, index?: number): ProjectRoleAdd;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectRoleAddBulk.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectRoleAddBulk): ProjectRoleAddBulk.AsObject;
+  static serializeBinaryToWriter(message: ProjectRoleAddBulk, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectRoleAddBulk;
+  static deserializeBinaryFromReader(message: ProjectRoleAddBulk, reader: jspb.BinaryReader): ProjectRoleAddBulk;
+}
+
+export namespace ProjectRoleAddBulk {
+  export type AsObject = {
+    id: string,
+    projectRolesList: Array<ProjectRoleAdd.AsObject>,
   }
 }
 
@@ -3182,9 +3742,6 @@ export class ProjectGrantView extends jspb.Message {
   getGrantedOrgName(): string;
   setGrantedOrgName(value: string): void;
 
-  getGrantedOrgDomain(): string;
-  setGrantedOrgDomain(value: string): void;
-
   getRoleKeysList(): Array<string>;
   setRoleKeysList(value: Array<string>): void;
   clearRoleKeysList(): void;
@@ -3209,6 +3766,12 @@ export class ProjectGrantView extends jspb.Message {
   getSequence(): number;
   setSequence(value: number): void;
 
+  getResourceOwner(): string;
+  setResourceOwner(value: string): void;
+
+  getResourceOwnerName(): string;
+  setResourceOwnerName(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ProjectGrantView.AsObject;
   static toObject(includeInstance: boolean, msg: ProjectGrantView): ProjectGrantView.AsObject;
@@ -3223,13 +3786,14 @@ export namespace ProjectGrantView {
     projectId: string,
     grantedOrgId: string,
     grantedOrgName: string,
-    grantedOrgDomain: string,
     roleKeysList: Array<string>,
     state: ProjectGrantState,
     creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     projectName: string,
     sequence: number,
+    resourceOwner: string,
+    resourceOwnerName: string,
   }
 }
 
@@ -3265,6 +3829,34 @@ export namespace ProjectGrantSearchResponse {
   }
 }
 
+export class GrantedProjectSearchRequest extends jspb.Message {
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getQueriesList(): Array<ProjectSearchQuery>;
+  setQueriesList(value: Array<ProjectSearchQuery>): void;
+  clearQueriesList(): void;
+  addQueries(value?: ProjectSearchQuery, index?: number): ProjectSearchQuery;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GrantedProjectSearchRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GrantedProjectSearchRequest): GrantedProjectSearchRequest.AsObject;
+  static serializeBinaryToWriter(message: GrantedProjectSearchRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GrantedProjectSearchRequest;
+  static deserializeBinaryFromReader(message: GrantedProjectSearchRequest, reader: jspb.BinaryReader): GrantedProjectSearchRequest;
+}
+
+export namespace GrantedProjectSearchRequest {
+  export type AsObject = {
+    offset: number,
+    limit: number,
+    queriesList: Array<ProjectSearchQuery.AsObject>,
+  }
+}
+
 export class ProjectGrantSearchRequest extends jspb.Message {
   getProjectId(): string;
   setProjectId(value: string): void;
@@ -3274,6 +3866,11 @@ export class ProjectGrantSearchRequest extends jspb.Message {
 
   getLimit(): number;
   setLimit(value: number): void;
+
+  getQueriesList(): Array<ProjectGrantSearchQuery>;
+  setQueriesList(value: Array<ProjectGrantSearchQuery>): void;
+  clearQueriesList(): void;
+  addQueries(value?: ProjectGrantSearchQuery, index?: number): ProjectGrantSearchQuery;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ProjectGrantSearchRequest.AsObject;
@@ -3288,6 +3885,33 @@ export namespace ProjectGrantSearchRequest {
     projectId: string,
     offset: number,
     limit: number,
+    queriesList: Array<ProjectGrantSearchQuery.AsObject>,
+  }
+}
+
+export class ProjectGrantSearchQuery extends jspb.Message {
+  getKey(): ProjectGrantSearchKey;
+  setKey(value: ProjectGrantSearchKey): void;
+
+  getMethod(): SearchMethod;
+  setMethod(value: SearchMethod): void;
+
+  getValue(): string;
+  setValue(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectGrantSearchQuery.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectGrantSearchQuery): ProjectGrantSearchQuery.AsObject;
+  static serializeBinaryToWriter(message: ProjectGrantSearchQuery, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectGrantSearchQuery;
+  static deserializeBinaryFromReader(message: ProjectGrantSearchQuery, reader: jspb.BinaryReader): ProjectGrantSearchQuery;
+}
+
+export namespace ProjectGrantSearchQuery {
+  export type AsObject = {
+    key: ProjectGrantSearchKey,
+    method: SearchMethod,
+    value: string,
   }
 }
 
@@ -3647,6 +4271,26 @@ export namespace UserGrant {
   }
 }
 
+export class UserGrantCreateBulk extends jspb.Message {
+  getUserGrantsList(): Array<UserGrantCreate>;
+  setUserGrantsList(value: Array<UserGrantCreate>): void;
+  clearUserGrantsList(): void;
+  addUserGrants(value?: UserGrantCreate, index?: number): UserGrantCreate;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserGrantCreateBulk.AsObject;
+  static toObject(includeInstance: boolean, msg: UserGrantCreateBulk): UserGrantCreateBulk.AsObject;
+  static serializeBinaryToWriter(message: UserGrantCreateBulk, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserGrantCreateBulk;
+  static deserializeBinaryFromReader(message: UserGrantCreateBulk, reader: jspb.BinaryReader): UserGrantCreateBulk;
+}
+
+export namespace UserGrantCreateBulk {
+  export type AsObject = {
+    userGrantsList: Array<UserGrantCreate.AsObject>,
+  }
+}
+
 export class UserGrantCreate extends jspb.Message {
   getUserId(): string;
   setUserId(value: string): void;
@@ -3675,6 +4319,26 @@ export namespace UserGrantCreate {
   }
 }
 
+export class UserGrantUpdateBulk extends jspb.Message {
+  getUserGrantsList(): Array<UserGrantUpdate>;
+  setUserGrantsList(value: Array<UserGrantUpdate>): void;
+  clearUserGrantsList(): void;
+  addUserGrants(value?: UserGrantUpdate, index?: number): UserGrantUpdate;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserGrantUpdateBulk.AsObject;
+  static toObject(includeInstance: boolean, msg: UserGrantUpdateBulk): UserGrantUpdateBulk.AsObject;
+  static serializeBinaryToWriter(message: UserGrantUpdateBulk, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserGrantUpdateBulk;
+  static deserializeBinaryFromReader(message: UserGrantUpdateBulk, reader: jspb.BinaryReader): UserGrantUpdateBulk;
+}
+
+export namespace UserGrantUpdateBulk {
+  export type AsObject = {
+    userGrantsList: Array<UserGrantUpdate.AsObject>,
+  }
+}
+
 export class UserGrantUpdate extends jspb.Message {
   getUserId(): string;
   setUserId(value: string): void;
@@ -3700,6 +4364,26 @@ export namespace UserGrantUpdate {
     userId: string,
     id: string,
     roleKeysList: Array<string>,
+  }
+}
+
+export class UserGrantRemoveBulk extends jspb.Message {
+  getIdsList(): Array<string>;
+  setIdsList(value: Array<string>): void;
+  clearIdsList(): void;
+  addIds(value: string, index?: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UserGrantRemoveBulk.AsObject;
+  static toObject(includeInstance: boolean, msg: UserGrantRemoveBulk): UserGrantRemoveBulk.AsObject;
+  static serializeBinaryToWriter(message: UserGrantRemoveBulk, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UserGrantRemoveBulk;
+  static deserializeBinaryFromReader(message: UserGrantRemoveBulk, reader: jspb.BinaryReader): UserGrantRemoveBulk;
+}
+
+export namespace UserGrantRemoveBulk {
+  export type AsObject = {
+    idsList: Array<string>,
   }
 }
 
@@ -4115,132 +4799,6 @@ export namespace ProjectGrantUserGrantSearchRequest {
   }
 }
 
-export class AuthGrantSearchRequest extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getSortingColumn(): AuthGrantSearchKey;
-  setSortingColumn(value: AuthGrantSearchKey): void;
-
-  getAsc(): boolean;
-  setAsc(value: boolean): void;
-
-  getQueriesList(): Array<AuthGrantSearchQuery>;
-  setQueriesList(value: Array<AuthGrantSearchQuery>): void;
-  clearQueriesList(): void;
-  addQueries(value?: AuthGrantSearchQuery, index?: number): AuthGrantSearchQuery;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrantSearchRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrantSearchRequest): AuthGrantSearchRequest.AsObject;
-  static serializeBinaryToWriter(message: AuthGrantSearchRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrantSearchRequest;
-  static deserializeBinaryFromReader(message: AuthGrantSearchRequest, reader: jspb.BinaryReader): AuthGrantSearchRequest;
-}
-
-export namespace AuthGrantSearchRequest {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    sortingColumn: AuthGrantSearchKey,
-    asc: boolean,
-    queriesList: Array<AuthGrantSearchQuery.AsObject>,
-  }
-}
-
-export class AuthGrantSearchQuery extends jspb.Message {
-  getKey(): AuthGrantSearchKey;
-  setKey(value: AuthGrantSearchKey): void;
-
-  getMethod(): SearchMethod;
-  setMethod(value: SearchMethod): void;
-
-  getValue(): string;
-  setValue(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrantSearchQuery.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrantSearchQuery): AuthGrantSearchQuery.AsObject;
-  static serializeBinaryToWriter(message: AuthGrantSearchQuery, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrantSearchQuery;
-  static deserializeBinaryFromReader(message: AuthGrantSearchQuery, reader: jspb.BinaryReader): AuthGrantSearchQuery;
-}
-
-export namespace AuthGrantSearchQuery {
-  export type AsObject = {
-    key: AuthGrantSearchKey,
-    method: SearchMethod,
-    value: string,
-  }
-}
-
-export class AuthGrantSearchResponse extends jspb.Message {
-  getOffset(): number;
-  setOffset(value: number): void;
-
-  getLimit(): number;
-  setLimit(value: number): void;
-
-  getTotalResult(): number;
-  setTotalResult(value: number): void;
-
-  getResultList(): Array<AuthGrant>;
-  setResultList(value: Array<AuthGrant>): void;
-  clearResultList(): void;
-  addResult(value?: AuthGrant, index?: number): AuthGrant;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrantSearchResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrantSearchResponse): AuthGrantSearchResponse.AsObject;
-  static serializeBinaryToWriter(message: AuthGrantSearchResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrantSearchResponse;
-  static deserializeBinaryFromReader(message: AuthGrantSearchResponse, reader: jspb.BinaryReader): AuthGrantSearchResponse;
-}
-
-export namespace AuthGrantSearchResponse {
-  export type AsObject = {
-    offset: number,
-    limit: number,
-    totalResult: number,
-    resultList: Array<AuthGrant.AsObject>,
-  }
-}
-
-export class AuthGrant extends jspb.Message {
-  getOrgid(): string;
-  setOrgid(value: string): void;
-
-  getProjectid(): string;
-  setProjectid(value: string): void;
-
-  getUserid(): string;
-  setUserid(value: string): void;
-
-  getRolesList(): Array<string>;
-  setRolesList(value: Array<string>): void;
-  clearRolesList(): void;
-  addRoles(value: string, index?: number): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthGrant.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthGrant): AuthGrant.AsObject;
-  static serializeBinaryToWriter(message: AuthGrant, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthGrant;
-  static deserializeBinaryFromReader(message: AuthGrant, reader: jspb.BinaryReader): AuthGrant;
-}
-
-export namespace AuthGrant {
-  export type AsObject = {
-    orgid: string,
-    projectid: string,
-    userid: string,
-    rolesList: Array<string>,
-  }
-}
-
 export enum UserState { 
   USERSTATE_UNSPECIFIED = 0,
   USERSTATE_ACTIVE = 1,
@@ -4273,6 +4831,11 @@ export enum SearchMethod {
   SEARCHMETHOD_EQUALS_IGNORE_CASE = 3,
   SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4,
   SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5,
+  SEARCHMETHOD_NOT_EQUALS = 6,
+  SEARCHMETHOD_GREATER_THAN = 7,
+  SEARCHMETHOD_LESS_THAN = 8,
+  SEARCHMETHOD_IS_ONE_OF = 9,
+  SEARCHMETHOD_LIST_CONTAINS = 10,
 }
 export enum MfaType { 
   MFATYPE_UNSPECIFIED = 0,
@@ -4300,12 +4863,20 @@ export enum OrgState {
   ORGSTATE_ACTIVE = 1,
   ORGSTATE_INACTIVE = 2,
 }
+export enum OrgDomainSearchKey { 
+  ORGDOMAINSEARCHKEY_UNSPECIFIED = 0,
+  ORGDOMAINSEARCHKEY_DOMAIN = 1,
+}
 export enum OrgMemberSearchKey { 
   ORGMEMBERSEARCHKEY_UNSPECIFIED = 0,
   ORGMEMBERSEARCHKEY_FIRST_NAME = 1,
   ORGMEMBERSEARCHKEY_LAST_NAME = 2,
   ORGMEMBERSEARCHKEY_EMAIL = 3,
   ORGMEMBERSEARCHKEY_USER_ID = 4,
+}
+export enum ProjectSearchKey { 
+  PROJECTSEARCHKEY_UNSPECIFIED = 0,
+  PROJECTSEARCHKEY_PROJECT_NAME = 1,
 }
 export enum ProjectState { 
   PROJECTSTATE_UNSPECIFIED = 0,
@@ -4316,10 +4887,6 @@ export enum ProjectType {
   PROJECTTYPE_UNSPECIFIED = 0,
   PROJECTTYPE_OWNED = 1,
   PROJECTTYPE_GRANTED = 2,
-}
-export enum GrantedProjectSearchKey { 
-  PROJECTSEARCHKEY_UNSPECIFIED = 0,
-  PROJECTSEARCHKEY_PROJECT_NAME = 1,
 }
 export enum ProjectRoleSearchKey { 
   PROJECTROLESEARCHKEY_UNSPECIFIED = 0,
@@ -4368,6 +4935,11 @@ export enum ProjectGrantState {
   PROJECTGRANTSTATE_ACTIVE = 1,
   PROJECTGRANTSTATE_INACTIVE = 2,
 }
+export enum ProjectGrantSearchKey { 
+  PROJECTGRANTSEARCHKEY_UNSPECIFIED = 0,
+  PROJECTGRANTSEARCHKEY_PROJECT_NAME = 1,
+  PROJECTGRANTSEARCHKEY_ROLE_KEY = 2,
+}
 export enum ProjectGrantMemberSearchKey { 
   PROJECTGRANTMEMBERSEARCHKEY_UNSPECIFIED = 0,
   PROJECTGRANTMEMBERSEARCHKEY_FIRST_NAME = 1,
@@ -4386,10 +4958,5 @@ export enum UserGrantSearchKey {
   USERGRANTSEARCHKEY_PROJECT_ID = 1,
   USERGRANTSEARCHKEY_USER_ID = 2,
   USERGRANTSEARCHKEY_ORG_ID = 3,
-}
-export enum AuthGrantSearchKey { 
-  AUTHGRANTSEARCHKEY_UNSPECIFIED = 0,
-  AUTHGRANTSEARCHKEY_ORG_ID = 1,
-  AUTHGRANTSEARCHKEY_PROJECT_ID = 2,
-  AUTHGRANTSEARCHKEY_USER_ID = 3,
+  USERGRANTSEARCHKEY_ROLE_KEY = 4,
 }

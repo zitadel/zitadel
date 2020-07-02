@@ -317,7 +317,7 @@ func TestDeactivateUserGrant(t *testing.T) {
 			res: res{
 				result: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					ProjectID: "ProjectID",
-					State:     model.USERGRANTSTATE_INACTIVE,
+					State:     model.UserGrantStateInactive,
 				},
 			},
 		},
@@ -392,7 +392,7 @@ func TestReactivateUserGrant(t *testing.T) {
 			},
 			res: res{
 				result: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					State: model.USERGRANTSTATE_ACTIVE,
+					State: model.UserGrantStateActive,
 				},
 			},
 		},

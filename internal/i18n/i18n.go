@@ -1,7 +1,9 @@
 package i18n
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -89,6 +91,18 @@ func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[st
 	return s
 }
 
+func (t *Translator) LocalizeFromCtx(ctx context.Context, id string, args map[string]interface{}) string {
+	s, err := t.localizerFromCtx(ctx).Localize(&i18n.LocalizeConfig{
+		MessageID:    id,
+		TemplateData: args,
+	})
+	if err != nil {
+		logging.Log("I18N-MsF5sx").WithError(err).Warnf("missing translation")
+		return id
+	}
+	return s
+}
+
 func (t *Translator) Localize(id string, args map[string]interface{}, langs ...string) string {
 	s, _ := t.localizer(langs...).Localize(&i18n.LocalizeConfig{
 		MessageID:    id,
@@ -111,6 +125,10 @@ func (t *Translator) localizerFromRequest(r *http.Request) *i18n.Localizer {
 	return t.localizer(t.langsFromRequest(r)...)
 }
 
+func (t *Translator) localizerFromCtx(ctx context.Context) *i18n.Localizer {
+	return t.localizer(t.langsFromCtx(ctx)...)
+}
+
 func (t *Translator) localizer(langs ...string) *i18n.Localizer {
 	return i18n.NewLocalizer(t.bundle, langs...)
 }
@@ -125,4 +143,16 @@ func (t *Translator) langsFromRequest(r *http.Request) []string {
 		langs = append(langs, r.Header.Get("Accept-Language"))
 	}
 	return langs
+}
+
+func (t *Translator) langsFromCtx(ctx context.Context) []string {
+	langs := make([]string, 0)
+	if ctx != nil {
+		langs = append(langs, getAcceptLanguageHeader(ctx))
+	}
+	return langs
+}
+
+func getAcceptLanguageHeader(ctx context.Context) string {
+	return metautils.ExtractIncoming(ctx).Get("grpcgateway-accept-language")
 }

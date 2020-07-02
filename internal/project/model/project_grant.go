@@ -14,19 +14,24 @@ type ProjectGrant struct {
 	Members      []*ProjectGrantMember
 }
 
+type ProjectGrantIDs struct {
+	ProjectID string
+	GrantID   string
+}
+
 type ProjectGrantState int32
 
 const (
-	PROJECTGRANTSTATE_ACTIVE ProjectGrantState = iota
-	PROJECTGRANTSTATE_INACTIVE
+	ProjectGrantStateActive ProjectGrantState = iota
+	ProjectGrantStateInactive
 )
 
 func NewProjectGrant(projectID, grantID string) *ProjectGrant {
-	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, GrantID: grantID, State: PROJECTGRANTSTATE_ACTIVE}
+	return &ProjectGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, GrantID: grantID, State: ProjectGrantStateActive}
 }
 
 func (p *ProjectGrant) IsActive() bool {
-	return p.State == PROJECTGRANTSTATE_ACTIVE
+	return p.State == ProjectGrantStateActive
 }
 
 func (p *ProjectGrant) IsValid() bool {
@@ -40,4 +45,23 @@ func (p *ProjectGrant) GetMember(userID string) (int, *ProjectGrantMember) {
 		}
 	}
 	return -1, nil
+}
+
+func (p *ProjectGrant) GetRemovedRoles(roleKeys []string) []string {
+	removed := make([]string, 0)
+	for _, role := range p.RoleKeys {
+		if !containsKey(roleKeys, role) {
+			removed = append(removed, role)
+		}
+	}
+	return removed
+}
+
+func containsKey(roles []string, key string) bool {
+	for _, role := range roles {
+		if role == key {
+			return true
+		}
+	}
+	return false
 }

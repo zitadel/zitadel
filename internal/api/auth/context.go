@@ -17,10 +17,11 @@ const (
 )
 
 type CtxData struct {
-	UserID    string
-	OrgID     string
-	ProjectID string
-	AgentID   string
+	UserID            string
+	OrgID             string
+	ProjectID         string
+	AgentID           string
+	PreferredLanguage string
 }
 
 func (ctxData CtxData) IsZero() bool {
@@ -48,6 +49,7 @@ func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t Toke
 		clientID = grpc_util.GetHeader(ctx, api.ZitadelClientID)
 		projectID, err = t.GetProjectIDByClientID(ctx, clientID)
 		agentID = grpc_util.GetHeader(ctx, api.ZitadelAgentID)
+
 	} else {
 		userID, clientID, agentID, err = verifyAccessToken(ctx, token, t)
 		if err != nil {

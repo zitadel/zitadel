@@ -10,8 +10,6 @@ export class AuthInterceptorService implements HttpInterceptor {
     constructor() { }
 
     public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        console.log(req.url);
-
         return next.handle(req);
     }
 }

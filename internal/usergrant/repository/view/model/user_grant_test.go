@@ -31,31 +31,31 @@ func TestUserAppendEvent(t *testing.T) {
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantAdded, ResourceOwner: "OrgID", Data: mockUserGrantData(&es_model.UserGrant{UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}})},
 				grant: &UserGrantView{},
 			},
-			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.USERGRANTSTATE_ACTIVE)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 		},
 		{
 			name: "append change grant profile event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantChanged, ResourceOwner: "OrgID", Data: mockUserGrantData(&es_model.UserGrant{RoleKeys: pq.StringArray{"KeysChanged"}})},
-				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.USERGRANTSTATE_ACTIVE)},
+				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 			},
-			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"KeysChanged"}, State: int32(model.USERGRANTSTATE_ACTIVE)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"KeysChanged"}, State: int32(model.UserGrantStateActive)},
 		},
 		{
 			name: "append grant deactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantDeactivated, ResourceOwner: "OrgID"},
-				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.USERGRANTSTATE_ACTIVE)},
+				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 			},
-			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.USERGRANTSTATE_INACTIVE)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateInactive)},
 		},
 		{
 			name: "append grant reactivate event",
 			args: args{
 				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.UserGrantReactivated, ResourceOwner: "OrgID"},
-				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.USERGRANTSTATE_INACTIVE)},
+				grant: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateInactive)},
 			},
-			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.USERGRANTSTATE_ACTIVE)},
+			result: &UserGrantView{ID: "AggregateID", ResourceOwner: "OrgID", UserID: "UserID", ProjectID: "ProjectID", RoleKeys: pq.StringArray{"Keys"}, State: int32(model.UserGrantStateActive)},
 		},
 	}
 	for _, tt := range tests {

@@ -15,8 +15,7 @@ type OrgView struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	Name   string
-	Domain string
+	Name string
 }
 
 type OrgSearchRequest struct {
@@ -30,18 +29,18 @@ type OrgSearchRequest struct {
 type OrgSearchKey int32
 
 const (
-	ORGSEARCHKEY_UNSPECIFIED OrgSearchKey = iota
-	ORGSEARCHKEY_ORG_ID
-	ORGSEARCHKEY_ORG_NAME
-	ORGSEARCHKEY_ORG_DOMAIN
-	ORGSEARCHKEY_STATE
-	ORGSEARCHKEY_RESOURCEOWNER
+	OrgSearchKeyUnspecified OrgSearchKey = iota
+	OrgSearchKeyOrgID
+	OrgSearchKeyOrgName
+	OrgSearchKeyOrgDomain
+	OrgSearchKeyState
+	OrgSearchKeyResourceOwner
 )
 
 type OrgSearchQuery struct {
 	Key    OrgSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type OrgSearchResult struct {
@@ -66,8 +65,7 @@ func OrgViewToOrg(o *OrgView) *Org {
 			ResourceOwner: o.ResourceOwner,
 			Sequence:      o.Sequence,
 		},
-		Domain: o.Domain,
-		Name:   o.Name,
-		State:  o.State,
+		Name:  o.Name,
+		State: o.State,
 	}
 }

@@ -1,11 +1,15 @@
 package grpc
 
 import (
+	"encoding/json"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func userFromModel(user *usr_model.User) *User {
@@ -57,7 +61,6 @@ func userCreateToModel(u *CreateUserRequest) *usr_model.User {
 			FirstName:         u.FirstName,
 			LastName:          u.LastName,
 			NickName:          u.NickName,
-			DisplayName:       u.DisplayName,
 			PreferredLanguage: preferredLanguage,
 			Gender:            genderToModel(u.Gender),
 		},
@@ -116,21 +119,21 @@ func userSearchQueryToModel(query *UserSearchQuery) *usr_model.UserSearchQuery {
 func userSearchKeyToModel(key UserSearchKey) usr_model.UserSearchKey {
 	switch key {
 	case UserSearchKey_USERSEARCHKEY_USER_NAME:
-		return usr_model.USERSEARCHKEY_USER_NAME
+		return usr_model.UserSearchKeyUserName
 	case UserSearchKey_USERSEARCHKEY_FIRST_NAME:
-		return usr_model.USERSEARCHKEY_FIRST_NAME
+		return usr_model.UserSearchKeyFirstName
 	case UserSearchKey_USERSEARCHKEY_LAST_NAME:
-		return usr_model.USERSEARCHKEY_LAST_NAME
+		return usr_model.UserSearchKeyLastName
 	case UserSearchKey_USERSEARCHKEY_NICK_NAME:
-		return usr_model.USERSEARCHKEY_NICK_NAME
+		return usr_model.UserSearchKeyNickName
 	case UserSearchKey_USERSEARCHKEY_DISPLAY_NAME:
-		return usr_model.USERSEARCHKEY_DISPLAY_NAME
+		return usr_model.UserSearchKeyDisplayName
 	case UserSearchKey_USERSEARCHKEY_EMAIL:
-		return usr_model.USERSEARCHKEY_EMAIL
+		return usr_model.UserSearchKeyEmail
 	case UserSearchKey_USERSEARCHKEY_STATE:
-		return usr_model.USERSEARCHKEY_STATE
+		return usr_model.UserSearchKeyState
 	default:
-		return usr_model.USERSEARCHKEY_UNSPECIFIED
+		return usr_model.UserSearchKeyUnspecified
 	}
 }
 
@@ -156,6 +159,30 @@ func profileFromModel(profile *usr_model.Profile) *UserProfile {
 	}
 }
 
+func profileViewFromModel(profile *usr_model.Profile) *UserProfileView {
+	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
+	logging.Log("GRPC-sk8sk").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(profile.ChangeDate)
+	logging.Log("GRPC-s30Ks'").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserProfileView{
+		Id:                 profile.AggregateID,
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		Sequence:           profile.Sequence,
+		UserName:           profile.UserName,
+		FirstName:          profile.FirstName,
+		LastName:           profile.LastName,
+		DisplayName:        profile.DisplayName,
+		NickName:           profile.NickName,
+		PreferredLanguage:  profile.PreferredLanguage.String(),
+		Gender:             genderFromModel(profile.Gender),
+		LoginNames:         profile.LoginNames,
+		PreferredLoginName: profile.PreferredLoginName,
+	}
+}
+
 func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
 	preferredLanguage, err := language.Parse(u.PreferredLanguage)
 	logging.Log("GRPC-d8k2s").OnError(err).Debug("language malformed")
@@ -165,7 +192,6 @@ func updateProfileToModel(u *UpdateUserProfileRequest) *usr_model.Profile {
 		FirstName:         u.FirstName,
 		LastName:          u.LastName,
 		NickName:          u.NickName,
-		DisplayName:       u.DisplayName,
 		PreferredLanguage: preferredLanguage,
 		Gender:            genderToModel(u.Gender),
 	}
@@ -179,6 +205,23 @@ func emailFromModel(email *usr_model.Email) *UserEmail {
 	logging.Log("GRPC-s0dkw").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserEmail{
+		Id:              email.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        email.Sequence,
+		Email:           email.EmailAddress,
+		IsEmailVerified: email.IsEmailVerified,
+	}
+}
+
+func emailViewFromModel(email *usr_model.Email) *UserEmailView {
+	creationDate, err := ptypes.TimestampProto(email.CreationDate)
+	logging.Log("GRPC-sKefs").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(email.ChangeDate)
+	logging.Log("GRPC-0isjD").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserEmailView{
 		Id:              email.AggregateID,
 		CreationDate:    creationDate,
 		ChangeDate:      changeDate,
@@ -213,6 +256,22 @@ func phoneFromModel(phone *usr_model.Phone) *UserPhone {
 	}
 }
 
+func phoneViewFromModel(phone *usr_model.Phone) *UserPhoneView {
+	creationDate, err := ptypes.TimestampProto(phone.CreationDate)
+	logging.Log("GRPC-6gSj").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(phone.ChangeDate)
+	logging.Log("GRPC-lKs8f").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserPhoneView{
+		Id:              phone.AggregateID,
+		CreationDate:    creationDate,
+		ChangeDate:      changeDate,
+		Sequence:        phone.Sequence,
+		Phone:           phone.PhoneNumber,
+		IsPhoneVerified: phone.IsPhoneVerified,
+	}
+}
 func updatePhoneToModel(e *UpdateUserPhoneRequest) *usr_model.Phone {
 	return &usr_model.Phone{
 		ObjectRoot:      models.ObjectRoot{AggregateID: e.Id},
@@ -229,6 +288,26 @@ func addressFromModel(address *usr_model.Address) *UserAddress {
 	logging.Log("GRPC-si9ws").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserAddress{
+		Id:            address.AggregateID,
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Sequence:      address.Sequence,
+		Country:       address.Country,
+		StreetAddress: address.StreetAddress,
+		Region:        address.Region,
+		PostalCode:    address.PostalCode,
+		Locality:      address.Locality,
+	}
+}
+
+func addressViewFromModel(address *usr_model.Address) *UserAddressView {
+	creationDate, err := ptypes.TimestampProto(address.CreationDate)
+	logging.Log("GRPC-67stC").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(address.ChangeDate)
+	logging.Log("GRPC-0jSfs").OnError(err).Debug("unable to parse timestamp")
+
+	return &UserAddressView{
 		Id:            address.AggregateID,
 		CreationDate:  creationDate,
 		ChangeDate:    changeDate,
@@ -283,27 +362,32 @@ func userViewFromModel(user *usr_model.UserView) *UserView {
 	logging.Log("GRPC-dl9ws").OnError(err).Debug("unable to parse timestamp")
 
 	return &UserView{
-		Id:              user.ID,
-		State:           userStateFromModel(user.State),
-		CreationDate:    creationDate,
-		ChangeDate:      changeDate,
-		LastLogin:       lastLogin,
-		PasswordChanged: passwordChanged,
-		Sequence:        user.Sequence,
-		ResourceOwner:   user.ResourceOwner,
-		UserName:        user.UserName,
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
-		NickName:        user.NickName,
-		Email:           user.Email,
-		IsEmailVerified: user.IsEmailVerified,
-		Phone:           user.Phone,
-		IsPhoneVerified: user.IsPhoneVerified,
-		Country:         user.Country,
-		Locality:        user.Locality,
-		Region:          user.Region,
-		PostalCode:      user.PostalCode,
-		StreetAddress:   user.StreetAddress,
+		Id:                 user.ID,
+		State:              userStateFromModel(user.State),
+		CreationDate:       creationDate,
+		ChangeDate:         changeDate,
+		LastLogin:          lastLogin,
+		PasswordChanged:    passwordChanged,
+		UserName:           user.UserName,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		DisplayName:        user.DisplayName,
+		NickName:           user.NickName,
+		PreferredLanguage:  user.PreferredLanguage,
+		Gender:             genderFromModel(user.Gender),
+		Email:              user.Email,
+		IsEmailVerified:    user.IsEmailVerified,
+		Phone:              user.Phone,
+		IsPhoneVerified:    user.IsPhoneVerified,
+		Country:            user.Country,
+		Locality:           user.Locality,
+		PostalCode:         user.PostalCode,
+		Region:             user.Region,
+		StreetAddress:      user.StreetAddress,
+		Sequence:           user.Sequence,
+		ResourceOwner:      user.ResourceOwner,
+		LoginNames:         user.LoginNames,
+		PreferredLoginName: user.PreferredLoginName,
 	}
 }
 
@@ -325,25 +409,25 @@ func mfaFromModel(mfa *usr_model.MultiFactor) *MultiFactor {
 func notifyTypeToModel(state NotificationType) usr_model.NotificationType {
 	switch state {
 	case NotificationType_NOTIFICATIONTYPE_EMAIL:
-		return usr_model.NOTIFICATIONTYPE_EMAIL
+		return usr_model.NotificationTypeEmail
 	case NotificationType_NOTIFICATIONTYPE_SMS:
-		return usr_model.NOTIFICATIONTYPE_SMS
+		return usr_model.NotificationTypeSms
 	default:
-		return usr_model.NOTIFICATIONTYPE_EMAIL
+		return usr_model.NotificationTypeEmail
 	}
 }
 
 func userStateFromModel(state usr_model.UserState) UserState {
 	switch state {
-	case usr_model.USERSTATE_ACTIVE:
+	case usr_model.UserStateActive:
 		return UserState_USERSTATE_ACTIVE
-	case usr_model.USERSTATE_INACTIVE:
+	case usr_model.UserStateInactive:
 		return UserState_USERSTATE_INACTIVE
-	case usr_model.USERSTATE_LOCKED:
+	case usr_model.UserStateLocked:
 		return UserState_USERSTATE_LOCKED
-	case usr_model.USERSTATE_INITIAL:
+	case usr_model.UserStateInitial:
 		return UserState_USERSTATE_INITIAL
-	case usr_model.USERSTATE_SUSPEND:
+	case usr_model.UserStateSuspend:
 		return UserState_USERSTATE_SUSPEND
 	default:
 		return UserState_USERSTATE_UNSPECIFIED
@@ -352,11 +436,11 @@ func userStateFromModel(state usr_model.UserState) UserState {
 
 func genderFromModel(gender usr_model.Gender) Gender {
 	switch gender {
-	case usr_model.GENDER_FEMALE:
+	case usr_model.GenderFemale:
 		return Gender_GENDER_FEMALE
-	case usr_model.GENDER_MALE:
+	case usr_model.GenderMale:
 		return Gender_GENDER_MALE
-	case usr_model.GENDER_DIVERSE:
+	case usr_model.GenderDiverse:
 		return Gender_GENDER_DIVERSE
 	default:
 		return Gender_GENDER_UNSPECIFIED
@@ -366,21 +450,21 @@ func genderFromModel(gender usr_model.Gender) Gender {
 func genderToModel(gender Gender) usr_model.Gender {
 	switch gender {
 	case Gender_GENDER_FEMALE:
-		return usr_model.GENDER_FEMALE
+		return usr_model.GenderFemale
 	case Gender_GENDER_MALE:
-		return usr_model.GENDER_MALE
+		return usr_model.GenderMale
 	case Gender_GENDER_DIVERSE:
-		return usr_model.GENDER_DIVERSE
+		return usr_model.GenderDiverse
 	default:
-		return usr_model.GENDER_UNDEFINED
+		return usr_model.GenderUnspecified
 	}
 }
 
-func mfaTypeFromModel(mfatype usr_model.MFAType) MfaType {
+func mfaTypeFromModel(mfatype usr_model.MfaType) MfaType {
 	switch mfatype {
-	case usr_model.MFATYPE_OTP:
+	case usr_model.MfaTypeOTP:
 		return MfaType_MFATYPE_OTP
-	case usr_model.MFATYPE_SMS:
+	case usr_model.MfaTypeSMS:
 		return MfaType_MFATYPE_SMS
 	default:
 		return MfaType_MFATYPE_UNSPECIFIED
@@ -389,11 +473,44 @@ func mfaTypeFromModel(mfatype usr_model.MFAType) MfaType {
 
 func mfaStateFromModel(state usr_model.MfaState) MFAState {
 	switch state {
-	case usr_model.MFASTATE_READY:
+	case usr_model.MfaStateReady:
 		return MFAState_MFASTATE_READY
-	case usr_model.MFASTATE_NOTREADY:
+	case usr_model.MfaStateNotReady:
 		return MFAState_MFASTATE_NOT_READY
 	default:
 		return MFAState_MFASTATE_UNSPECIFIED
 	}
+}
+
+func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit uint64) (_ *Changes) {
+	return &Changes{
+		Limit:   limit,
+		Offset:  offset,
+		Changes: userChangesToMgtAPI(response),
+	}
+}
+
+func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
+	result := make([]*Change, len(changes.Changes))
+
+	for i, change := range changes.Changes {
+		var data *structpb.Struct
+		changedData, err := json.Marshal(change.Data)
+		if err == nil {
+			data = new(structpb.Struct)
+			err = protojson.Unmarshal(changedData, data)
+			logging.Log("GRPC-a7F54").OnError(err).Debug("unable to marshal changed data to struct")
+		}
+
+		result[i] = &Change{
+			ChangeDate: change.ChangeDate,
+			EventType:  change.EventType,
+			Sequence:   change.Sequence,
+			Data:       data,
+			EditorId:   change.ModifierId,
+			Editor:     change.ModifierName,
+		}
+	}
+
+	return result
 }

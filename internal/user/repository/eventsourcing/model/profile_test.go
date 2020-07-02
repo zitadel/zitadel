@@ -22,8 +22,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "all attributes changed",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GENDER_FEMALE)},
-				new:      &Profile{UserName: "UserNameChanged", FirstName: "FirstNameChanged", LastName: "LastNameChanged", NickName: "NickNameChanged", DisplayName: "DisplayNameChanged", PreferredLanguage: language.English, Gender: int32(user_model.GENDER_MALE)},
+				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				new:      &Profile{UserName: "UserNameChanged", FirstName: "FirstNameChanged", LastName: "LastNameChanged", NickName: "NickNameChanged", DisplayName: "DisplayNameChanged", PreferredLanguage: language.English, Gender: int32(user_model.GenderMale)},
 			},
 			res: res{
 				changesLen: 6,
@@ -32,8 +32,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GENDER_FEMALE)},
-				new:      &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GENDER_FEMALE)},
+				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				new:      &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
 			},
 			res: res{
 				changesLen: 0,
@@ -42,8 +42,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "username changed",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GENDER_FEMALE)},
-				new:      &Profile{UserName: "UserNameChanged", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GENDER_FEMALE)},
+				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				new:      &Profile{UserName: "UserNameChanged", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
 			},
 			res: res{
 				changesLen: 0,
@@ -52,8 +52,8 @@ func TestProfileChanges(t *testing.T) {
 		{
 			name: "empty names",
 			args: args{
-				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GENDER_FEMALE)},
-				new:      &Profile{UserName: "UserName", FirstName: "", LastName: "", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GENDER_FEMALE)},
+				existing: &Profile{UserName: "UserName", FirstName: "FirstName", LastName: "LastName", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
+				new:      &Profile{UserName: "UserName", FirstName: "", LastName: "", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: language.German, Gender: int32(user_model.GenderFemale)},
 			},
 			res: res{
 				changesLen: 0,

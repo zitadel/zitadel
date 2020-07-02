@@ -136,9 +136,9 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		es_model.ApplicationChanged:
 		err = a.SetData(event)
 	case es_model.ApplicationDeactivated:
-		a.State = int32(model.APPSTATE_INACTIVE)
+		a.State = int32(model.AppStateInactive)
 	case es_model.ApplicationReactivated:
-		a.State = int32(model.APPSTATE_ACTIVE)
+		a.State = int32(model.AppStateActive)
 	}
 	return err
 }

@@ -19,6 +19,7 @@ Mgmt:
         - x-zitadel-
   Repository:
     SearchLimit: 100
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'ManagementAPI'
       Repository:
@@ -65,6 +66,9 @@ Auth:
         Domain: $ZITADEL_COOKIE_DOMAIN
         Key:
           EncryptionKeyID: $ZITADEL_COOKIE_KEY
+      Cache:
+        MaxAge: $ZITADEL_CACHE_MAXAGE
+        SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
       Endpoints:
         Auth:
           Path: 'authorize'
@@ -128,6 +132,14 @@ Login:
     ZitadelURL: '$ZITADEL_CONSOLE'
     LanguageCookieName: 'caos.zitadel.login.lang'
     DefaultLanguage: 'de'
+    CSRF:
+      CookieName: 'caos.zitadel.login.csrf'
+      Key:
+        EncryptionKeyID: $ZITADEL_CSRF_KEY
+      Development: $ZITADEL_CSRF_DEV
+    Cache:
+      MaxAge: $ZITADEL_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
 
 
 AuthZ:
@@ -165,6 +177,7 @@ Admin:
         - x-zitadel-
   Repository:
     SearchLimit: 100
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'Admin'
       Repository:
@@ -192,6 +205,13 @@ Admin:
 Console:
   Port: 50050
   EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
+  ShortCache:
+    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
+    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
+  LongCache:
+      MaxAge: $ZITADEL_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+  CSPDomain: $ZITADEL_DEFAULT_DOMAIN
 
 
 Notification:

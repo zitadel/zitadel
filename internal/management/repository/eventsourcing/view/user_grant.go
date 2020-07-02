@@ -4,7 +4,7 @@ import (
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -31,6 +31,14 @@ func (v *View) UserGrantsByOrgID(orgID string) ([]*model.UserGrantView, error) {
 	return view.UserGrantsByOrgID(v.Db, userGrantTable, orgID)
 }
 
+func (v *View) UserGrantsByProjectIDAndRoleKey(projectID, roleKey string) ([]*model.UserGrantView, error) {
+	return view.UserGrantsByProjectIDAndRole(v.Db, userGrantTable, projectID, roleKey)
+}
+
+func (v *View) UserGrantsByOrgIDAndProjectID(orgID, projectID string) ([]*model.UserGrantView, error) {
+	return view.UserGrantsByOrgIDAndProjectID(v.Db, userGrantTable, orgID, projectID)
+}
+
 func (v *View) PutUserGrant(grant *model.UserGrantView, sequence uint64) error {
 	err := view.PutUserGrant(v.Db, userGrantTable, grant)
 	if err != nil {
@@ -55,10 +63,10 @@ func (v *View) ProcessedUserGrantSequence(eventSequence uint64) error {
 	return v.saveCurrentSequence(userGrantTable, eventSequence)
 }
 
-func (v *View) GetLatestUserGrantFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
+func (v *View) GetLatestUserGrantFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(userGrantTable, sequence)
 }
 
-func (v *View) ProcessedUserGrantFailedEvent(failedEvent *global_view.FailedEvent) error {
+func (v *View) ProcessedUserGrantFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }

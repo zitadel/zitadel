@@ -15,6 +15,8 @@ type UserSessionView struct {
 	UserAgentID                 string
 	UserID                      string
 	UserName                    string
+	LoginName                   string
+	DisplayName                 string
 	PasswordVerification        time.Time
 	MfaSoftwareVerification     time.Time
 	MfaSoftwareVerificationType req_model.MfaType
@@ -34,17 +36,17 @@ type UserSessionSearchRequest struct {
 type UserSessionSearchKey int32
 
 const (
-	USERSESSIONSEARCHKEY_UNSPECIFIED UserSessionSearchKey = iota
-	USERSESSIONSEARCHKEY_USER_AGENT_ID
-	USERSESSIONSEARCHKEY_USER_ID
-	USERSESSIONSEARCHKEY_STATE
-	USERSESSIONSEARCHKEY_RESOURCEOWNER
+	UserSessionSearchKeyUnspecified UserSessionSearchKey = iota
+	UserSessionSearchKeyUserAgentID
+	UserSessionSearchKeyUserID
+	UserSessionSearchKeyState
+	UserSessionSearchKeyResourceOwner
 )
 
 type UserSessionSearchQuery struct {
 	Key    UserSessionSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type UserSessionSearchResponse struct {

@@ -7,11 +7,17 @@ import {
     ChangeRequest,
     Changes,
     CreateUserRequest,
+    Email,
+    Gender,
+    MultiFactors,
     NotificationType,
     PasswordRequest,
     ProjectGrantMemberSearchQuery,
     ProjectGrantMemberSearchRequest,
     ProjectGrantMemberSearchResponse,
+    ProjectGrantUserGrantID,
+    ProjectGrantUserGrantSearchRequest,
+    ProjectGrantUserGrantUpdate,
     ProjectRoleAdd,
     SetPasswordNotificationRequest,
     UpdateUserAddressRequest,
@@ -21,18 +27,21 @@ import {
     User,
     UserAddress,
     UserEmail,
-    UserEmailID,
     UserGrant,
     UserGrantCreate,
+    UserGrantID,
     UserGrantSearchQuery,
     UserGrantSearchRequest,
     UserGrantSearchResponse,
+    UserGrantUpdate,
+    UserGrantView,
     UserID,
     UserPhone,
     UserProfile,
     UserSearchQuery,
     UserSearchRequest,
     UserSearchResponse,
+    UserView,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -65,7 +74,6 @@ export class MgmtUserService {
         req.setFirstName(user.firstName);
         req.setLastName(user.lastName);
         req.setNickName(user.nickName);
-        req.setDisplayName(user.displayName);
         req.setPassword(user.password);
         req.setPreferredLanguage(user.preferredLanguage);
         req.setGender(user.gender);
@@ -82,6 +90,16 @@ export class MgmtUserService {
         );
     }
 
+    public async GetUserByID(id: string): Promise<UserView> {
+        const req = new UserID();
+        req.setId(id);
+        return await this.request(
+            c => c.getUserByID,
+            req,
+            f => f,
+        );
+    }
+
     public async GetUserProfile(id: string): Promise<UserProfile> {
         const req = new UserID();
         req.setId(id);
@@ -92,15 +110,41 @@ export class MgmtUserService {
         );
     }
 
-    public async SaveUserProfile(profile: UserProfile.AsObject): Promise<UserProfile> {
+    public async getUserMfas(id: string): Promise<MultiFactors> {
+        const req = new UserID();
+        req.setId(id);
+        return await this.request(
+            c => c.getUserMfas,
+            req,
+            f => f,
+        );
+    }
+
+    public async SaveUserProfile(
+        id: string,
+        firstName?: string,
+        lastName?: string,
+        nickName?: string,
+        preferredLanguage?: string,
+        gender?: Gender,
+    ): Promise<UserProfile> {
         const req = new UpdateUserProfileRequest();
-        req.setId(profile.id);
-        req.setFirstName(profile.firstName);
-        req.setLastName(profile.lastName);
-        req.setNickName(profile.nickName);
-        req.setDisplayName(profile.displayName);
-        req.setPreferredLanguage(profile.preferredLanguage);
-        req.setGender(profile.gender);
+        req.setId(id);
+        if (firstName) {
+            req.setFirstName(firstName);
+        }
+        if (lastName) {
+            req.setLastName(lastName);
+        }
+        if (nickName) {
+            req.setNickName(nickName);
+        }
+        if (gender) {
+            req.setGender(gender);
+        }
+        if (preferredLanguage) {
+            req.setPreferredLanguage(preferredLanguage);
+        }
         return await this.request(
             c => c.updateUserProfile,
             req,
@@ -118,10 +162,10 @@ export class MgmtUserService {
         );
     }
 
-    public async SaveUserEmail(email: UserEmail.AsObject): Promise<UserEmail> {
+    public async SaveUserEmail(id: string, email: string): Promise<UserEmail> {
         const req = new UpdateUserEmailRequest();
-        req.setId(email.id);
-        req.setEmail(email.email);
+        req.setId(id);
+        req.setEmail(email);
         return await this.request(
             c => c.changeUserEmail,
             req,
@@ -139,10 +183,10 @@ export class MgmtUserService {
         );
     }
 
-    public async SaveUserPhone(phone: UserPhone.AsObject): Promise<UserPhone> {
+    public async SaveUserPhone(id: string, phone: string): Promise<UserPhone> {
         const req = new UpdateUserPhoneRequest();
-        req.setId(phone.id);
-        req.setPhone(phone.phone);
+        req.setId(id);
+        req.setPhone(phone);
         return await this.request(
             c => c.changeUserPhone,
             req,
@@ -191,7 +235,9 @@ export class MgmtUserService {
         const req = new ProjectRoleAdd();
         req.setId(id);
         req.setKey(key);
-        req.setDisplayName(displayName);
+        if (displayName) {
+            req.setDisplayName(displayName);
+        }
         req.setGroup(group);
         return await this.request(
             c => c.addProjectRole,
@@ -300,7 +346,7 @@ export class MgmtUserService {
     }
 
     public async GetUserByEmailGlobal(email: string): Promise<User> {
-        const req = new UserEmailID();
+        const req = new Email();
         req.setEmail(email);
         return await this.request(
             c => c.getUserByEmailGlobal,
@@ -322,6 +368,93 @@ export class MgmtUserService {
         }
         return await this.request(
             c => c.searchUserGrants,
+            req,
+            f => f,
+        );
+    }
+
+
+    public async searchProjectGrantUserGrants(
+        limit: number,
+        offset: number,
+        queryList?: UserGrantSearchQuery[],
+    ): Promise<UserGrantSearchResponse> {
+        const req = new ProjectGrantUserGrantSearchRequest();
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchProjectGrantUserGrants,
+            req,
+            f => f,
+        );
+    }
+
+    public async projectGrantUserGrantByID(
+        id: string,
+        userId: string,
+        projectGrantId: string,
+    ): Promise<UserGrant> {
+        const req = new ProjectGrantUserGrantID();
+        req.setId(id);
+        req.setUserId(userId);
+        req.setProjectGrantId(projectGrantId);
+
+        return await this.request(
+            c => c.projectGrantUserGrantByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async UserGrantByID(
+        id: string,
+        userId: string,
+    ): Promise<UserGrantView> {
+        const req = new UserGrantID();
+        req.setId(id);
+        req.setUserId(userId);
+
+        return await this.request(
+            c => c.userGrantByID,
+            req,
+            f => f,
+        );
+    }
+
+    public async UpdateUserGrant(
+        id: string,
+        userId: string,
+        roleKeysList: string[],
+    ): Promise<UserGrant> {
+        const req = new UserGrantUpdate();
+        req.setId(id);
+        req.setRoleKeysList(roleKeysList);
+        req.setUserId(userId);
+
+        return await this.request(
+            c => c.updateUserGrant,
+            req,
+            f => f,
+        );
+    }
+
+    public async updateProjectGrantUserGrant(
+        id: string,
+        roleKeysList: string[],
+        userId: string,
+        projectGrantId: string,
+    ): Promise<UserGrant> {
+        const req = new ProjectGrantUserGrantUpdate();
+        req.setId(id);
+        req.setRoleKeysList(roleKeysList);
+        req.setUserId(userId);
+        req.setProjectGrantId(projectGrantId);
+
+        return await this.request(
+            c => c.updateProjectGrantUserGrant,
             req,
             f => f,
         );

@@ -2,21 +2,22 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
-func (s *Server) GetUserByID(ctx context.Context, id *UserID) (*User, error) {
+func (s *Server) GetUserByID(ctx context.Context, id *UserID) (*UserView, error) {
 	user, err := s.user.UserByID(ctx, id.Id)
 	if err != nil {
 		return nil, err
 	}
-	return userFromModel(user), nil
+	return userViewFromModel(user), nil
 }
 
-func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *UserEmailID) (*UserView, error) {
+func (s *Server) GetUserByEmailGlobal(ctx context.Context, email *Email) (*UserView, error) {
 	user, err := s.user.GetGlobalUserByEmail(ctx, email.Email)
 	if err != nil {
 		return nil, err
@@ -36,7 +37,11 @@ func (s *Server) SearchUsers(ctx context.Context, in *UserSearchRequest) (*UserS
 }
 
 func (s *Server) UserChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-pl6Zu", "Not implemented")
+	response, err := s.user.UserChanges(ctx, changesRequest.Id, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
+	if err != nil {
+		return nil, err
+	}
+	return userChangesToResponse(response, changesRequest.GetSequenceOffset(), changesRequest.GetLimit()), nil
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, request *UniqueUserRequest) (*UniqueUserResponse, error) {
@@ -91,12 +96,12 @@ func (s *Server) DeleteUser(ctx context.Context, in *UserID) (*empty.Empty, erro
 	return nil, errors.ThrowUnimplemented(nil, "GRPC-as4fg", "Not implemented")
 }
 
-func (s *Server) GetUserProfile(ctx context.Context, in *UserID) (*UserProfile, error) {
+func (s *Server) GetUserProfile(ctx context.Context, in *UserID) (*UserProfileView, error) {
 	profile, err := s.user.ProfileByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return profileFromModel(profile), nil
+	return profileViewFromModel(profile), nil
 }
 
 func (s *Server) UpdateUserProfile(ctx context.Context, request *UpdateUserProfileRequest) (*UserProfile, error) {
@@ -107,12 +112,12 @@ func (s *Server) UpdateUserProfile(ctx context.Context, request *UpdateUserProfi
 	return profileFromModel(profile), nil
 }
 
-func (s *Server) GetUserEmail(ctx context.Context, in *UserID) (*UserEmail, error) {
+func (s *Server) GetUserEmail(ctx context.Context, in *UserID) (*UserEmailView, error) {
 	email, err := s.user.EmailByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return emailFromModel(email), nil
+	return emailViewFromModel(email), nil
 }
 
 func (s *Server) ChangeUserEmail(ctx context.Context, request *UpdateUserEmailRequest) (*UserEmail, error) {
@@ -128,12 +133,12 @@ func (s *Server) ResendEmailVerificationMail(ctx context.Context, in *UserID) (*
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetUserPhone(ctx context.Context, in *UserID) (*UserPhone, error) {
+func (s *Server) GetUserPhone(ctx context.Context, in *UserID) (*UserPhoneView, error) {
 	phone, err := s.user.PhoneByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return phoneFromModel(phone), nil
+	return phoneViewFromModel(phone), nil
 }
 
 func (s *Server) ChangeUserPhone(ctx context.Context, request *UpdateUserPhoneRequest) (*UserPhone, error) {
@@ -149,12 +154,12 @@ func (s *Server) ResendPhoneVerificationCode(ctx context.Context, in *UserID) (*
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetUserAddress(ctx context.Context, in *UserID) (*UserAddress, error) {
+func (s *Server) GetUserAddress(ctx context.Context, in *UserID) (*UserAddressView, error) {
 	address, err := s.user.AddressByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return addressFromModel(address), nil
+	return addressViewFromModel(address), nil
 }
 
 func (s *Server) UpdateUserAddress(ctx context.Context, request *UpdateUserAddressRequest) (*UserAddress, error) {

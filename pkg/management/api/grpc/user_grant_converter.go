@@ -26,6 +26,14 @@ func usergrantFromModel(grant *grant_model.UserGrant) *UserGrant {
 	}
 }
 
+func userGrantCreateBulkToModel(u *UserGrantCreateBulk) []*grant_model.UserGrant {
+	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
+	for i, grant := range u.UserGrants {
+		grants[i] = userGrantCreateToModel(grant)
+	}
+	return grants
+}
+
 func userGrantCreateToModel(u *UserGrantCreate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.UserId},
@@ -35,11 +43,27 @@ func userGrantCreateToModel(u *UserGrantCreate) *grant_model.UserGrant {
 	}
 }
 
+func userGrantUpdateBulkToModel(u *UserGrantUpdateBulk) []*grant_model.UserGrant {
+	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
+	for i, grant := range u.UserGrants {
+		grants[i] = userGrantUpdateToModel(grant)
+	}
+	return grants
+}
+
 func userGrantUpdateToModel(u *UserGrantUpdate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
 	}
+}
+
+func userGrantRemoveBulkToModel(u *UserGrantRemoveBulk) []string {
+	ids := make([]string, len(u.Ids))
+	for i, id := range u.Ids {
+		ids[i] = id
+	}
+	return ids
 }
 
 func projectUserGrantUpdateToModel(u *ProjectUserGrantUpdate) *grant_model.UserGrant {
@@ -91,13 +115,15 @@ func userGrantSearchQueryToModel(query *UserGrantSearchQuery) *grant_model.UserG
 func userGrantSearchKeyToModel(key UserGrantSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_ORG_ID:
-		return grant_model.USERGRANTSEARCHKEY_RESOURCEOWNER
+		return grant_model.UserGrantSearchKeyResourceOwner
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_PROJECT_ID:
-		return grant_model.USERGRANTSEARCHKEY_PROJECT_ID
+		return grant_model.UserGrantSearchKeyProjectID
 	case UserGrantSearchKey_USERGRANTSEARCHKEY_USER_ID:
-		return grant_model.USERGRANTSEARCHKEY_USER_ID
+		return grant_model.UserGrantSearchKeyUserID
+	case UserGrantSearchKey_USERGRANTSEARCHKEY_ROLE_KEY:
+		return grant_model.UserGrantSearchKeyRoleKey
 	default:
-		return grant_model.USERGRANTSEARCHKEY_UNSPECIFIED
+		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 
@@ -140,14 +166,18 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *UserGrantView {
 		OrgName:       grant.OrgName,
 		OrgDomain:     grant.OrgDomain,
 		RoleKeys:      grant.RoleKeys,
+		UserId:        grant.UserID,
+		ProjectId:     grant.ProjectID,
+		OrgId:         grant.ResourceOwner,
+		DisplayName:   grant.DisplayName,
 	}
 }
 
 func usergrantStateFromModel(state grant_model.UserGrantState) UserGrantState {
 	switch state {
-	case grant_model.USERGRANTSTATE_ACTIVE:
+	case grant_model.UserGrantStateActive:
 		return UserGrantState_USERGRANTSTATE_ACTIVE
-	case grant_model.USERGRANTSTATE_INACTIVE:
+	case grant_model.UserGrantStateInactive:
 		return UserGrantState_USERGRANTSTATE_INACTIVE
 	default:
 		return UserGrantState_USERGRANTSTATE_UNSPECIFIED

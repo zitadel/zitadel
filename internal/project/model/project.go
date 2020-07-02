@@ -2,6 +2,7 @@ package model
 
 import (
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type Project struct {
@@ -14,21 +15,34 @@ type Project struct {
 	Applications []*Application
 	Grants       []*ProjectGrant
 }
+type ProjectChanges struct {
+	Changes      []*ProjectChange
+	LastSequence uint64
+}
+
+type ProjectChange struct {
+	ChangeDate   *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType    string               `json:"eventType,omitempty"`
+	Sequence     uint64               `json:"sequence,omitempty"`
+	ModifierId   string               `json:"modifierUser,omitempty"`
+	ModifierName string               `json:"-"`
+	Data         interface{}          `json:"data,omitempty"`
+}
 
 type ProjectState int32
 
 const (
-	PROJECTSTATE_ACTIVE ProjectState = iota
-	PROJECTSTATE_INACTIVE
-	PROJECTSTATE_REMOVED
+	ProjectStateActive ProjectState = iota
+	ProjectStateInactive
+	ProjectStateRemoved
 )
 
 func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: PROJECTSTATE_ACTIVE}
+	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: ProjectStateActive}
 }
 
 func (p *Project) IsActive() bool {
-	return p.State == PROJECTSTATE_ACTIVE
+	return p.State == ProjectStateActive
 }
 
 func (p *Project) IsValid() bool {

@@ -15,7 +15,6 @@ export class HasRoleDirective {
                     this.viewContainerRef.clear();
                     this.viewContainerRef.createEmbeddedView(this.templateRef);
                 } else if (this.hasView) {
-                    console.log('User blocked!', roles, isAllowed);
                     this.viewContainerRef.clear();
                     this.hasView = false;
                 }

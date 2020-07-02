@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { ProjectRolesModule } from '../../modules/project-roles/project-roles.module';
 import { ProjectGrantCreateRoutingModule } from './project-grant-create-routing.module';
@@ -32,6 +33,7 @@ import { ProjectGrantCreateComponent } from './project-grant-create.component';
         ProjectRolesModule,
         MatIconModule,
         MatTooltipModule,
+        PipesModule,
         ReactiveFormsModule,
         MatProgressSpinnerModule,
         FormsModule,

@@ -182,7 +182,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 			name: "project update aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				member:     &model.ProjectMember{UserID: "UserID"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -208,7 +208,7 @@ func TestProjectCreateAggregate(t *testing.T) {
 			name: "new member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				member:     nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -266,8 +266,8 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			name: "project update aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
-				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName_Changed", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
+				new:        &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName_Changed", State: int32(proj_model.ProjectStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -293,7 +293,7 @@ func TestProjectUpdateAggregate(t *testing.T) {
 			name: "new project nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -346,7 +346,7 @@ func TestProjectDeactivateAggregate(t *testing.T) {
 			name: "project deactivate aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -407,7 +407,7 @@ func TestProjectReactivateAggregate(t *testing.T) {
 			name: "project reactivate aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_INACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateInactive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -469,7 +469,7 @@ func TestProjectMemberAddedAggregate(t *testing.T) {
 			name: "projectmember added ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -496,7 +496,7 @@ func TestProjectMemberAddedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -550,7 +550,7 @@ func TestProjectMemberChangedAggregate(t *testing.T) {
 			name: "projectmember changed ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -577,7 +577,7 @@ func TestProjectMemberChangedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -631,7 +631,7 @@ func TestProjectMemberRemovedAggregate(t *testing.T) {
 			name: "projectmember removed ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectMember{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -658,7 +658,7 @@ func TestProjectMemberRemovedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -694,7 +694,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Project
-		new        *model.ProjectRole
+		new        []*model.ProjectRole
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -712,12 +712,28 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 			name: "projectrole added ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
-				new:        &model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
+				new:        []*model.ProjectRole{&model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
 				eventLen:  1,
+				eventType: model.ProjectRoleAdded,
+			},
+		},
+		{
+			name: "projectrole multiple added ok",
+			args: args{
+				ctx:      auth.NewMockContext("orgID", "userID"),
+				existing: &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
+				new: []*model.ProjectRole{
+					&model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
+					&model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key2"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:  2,
 				eventType: model.ProjectRoleAdded,
 			},
 		},
@@ -739,7 +755,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -753,7 +769,7 @@ func TestProjectRoleAddedAggregate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectRoleAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := ProjectRoleAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new...)(tt.args.ctx)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
@@ -793,7 +809,7 @@ func TestProjectRoleChangedAggregate(t *testing.T) {
 			name: "projectmember changed ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -820,7 +836,7 @@ func TestProjectRoleChangedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -857,13 +873,14 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 		ctx        context.Context
 		existing   *model.Project
 		new        *model.ProjectRole
+		grants     []*model.ProjectGrant
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
-		eventLen  int
-		eventType models.EventType
-		wantErr   bool
-		errFunc   func(err error) bool
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
 	}
 	tests := []struct {
 		name string
@@ -874,13 +891,32 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 			name: "projectrole changed ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:  1,
-				eventType: model.ProjectRoleRemoved,
+				eventLen:   1,
+				eventTypes: []models.EventType{model.ProjectRoleRemoved},
+			},
+		},
+		{
+			name: "projectrole changed with grant",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.Project{
+					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
+					Name:       "ProjectName",
+					State:      int32(proj_model.ProjectStateActive),
+					Grants:     []*model.ProjectGrant{&model.ProjectGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{"ROLE"}}},
+				},
+				new:        &model.ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Key: "Key"},
+				grants:     []*model.ProjectGrant{&model.ProjectGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, GrantID: "GrantID", GrantedOrgID: "OrgID", RoleKeys: []string{}}},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   2,
+				eventTypes: []models.EventType{model.ProjectRoleRemoved, model.ProjectGrantCascadeChanged},
 			},
 		},
 		{
@@ -891,41 +927,42 @@ func TestProjectRoleRemovedAggregate(t *testing.T) {
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:  1,
-				eventType: model.ProjectRoleRemoved,
-				wantErr:   true,
-				errFunc:   caos_errs.IsPreconditionFailed,
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 		{
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:  1,
-				eventType: model.ProjectRoleRemoved,
-				wantErr:   true,
-				errFunc:   caos_errs.IsPreconditionFailed,
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			agg, err := ProjectRoleRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+			agg, err := ProjectRoleRemovedAggregate(tt.args.ctx, tt.args.aggCreator, tt.args.existing, tt.args.new, tt.args.grants)
 
 			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
 				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
 			}
-			if !tt.res.wantErr && agg.Events[0].Type != tt.res.eventType {
-				t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventType, agg.Events[0].Type.String())
+			if agg != nil {
+				for i, _ := range agg.Events {
+					if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+						t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+					}
+					if !tt.res.wantErr && agg.Events[i].Data == nil {
+						t.Errorf("should have data in event")
+					}
+				}
 			}
-			if !tt.res.wantErr && agg.Events[0].Data == nil {
-				t.Errorf("should have data in event")
-			}
+
 			if tt.res.wantErr && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
@@ -955,7 +992,7 @@ func TestProjectAppAddedAggregate(t *testing.T) {
 			name: "add oidc application",
 			args: args{
 				ctx:      auth.NewMockContext("orgID", "userID"),
-				existing: &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing: &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new: &model.Application{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:      "AppId",
@@ -985,7 +1022,7 @@ func TestProjectAppAddedAggregate(t *testing.T) {
 			name: "app nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1045,7 +1082,7 @@ func TestProjectAppChangedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Applications: []*model.Application{
 						&model.Application{AppID: "AppID", Name: "Name"},
 					}},
@@ -1077,7 +1114,7 @@ func TestProjectAppChangedAggregate(t *testing.T) {
 			name: "app nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1135,7 +1172,7 @@ func TestProjectAppRemovedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Applications: []*model.Application{
 						&model.Application{AppID: "AppID", Name: "Name"},
 					}},
@@ -1167,7 +1204,7 @@ func TestProjectAppRemovedAggregate(t *testing.T) {
 			name: "app nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1225,7 +1262,7 @@ func TestProjectAppDeactivatedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Applications: []*model.Application{
 						&model.Application{AppID: "AppID", Name: "Name"},
 					}},
@@ -1257,7 +1294,7 @@ func TestProjectAppDeactivatedAggregate(t *testing.T) {
 			name: "app nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1315,7 +1352,7 @@ func TestProjectAppReactivatedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Applications: []*model.Application{
 						&model.Application{AppID: "AppID", Name: "Name"},
 					}},
@@ -1347,7 +1384,7 @@ func TestProjectAppReactivatedAggregate(t *testing.T) {
 			name: "app nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1405,7 +1442,7 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Applications: []*model.Application{
 						&model.Application{AppID: "AppID", Name: "Name", OIDCConfig: &model.OIDCConfig{AppID: "AppID", AuthMethodType: 1}},
 					}},
@@ -1437,7 +1474,7 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 			name: "app nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1495,7 +1532,7 @@ func TestOIDCConfigSecretChangeAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Applications: []*model.Application{
 						&model.Application{AppID: "AppID", Name: "Name", OIDCConfig: &model.OIDCConfig{AppID: "AppID", AuthMethodType: 1}},
 					}},
@@ -1573,7 +1610,7 @@ func TestProjectGrantAddedAggregate(t *testing.T) {
 			name: "projectgrant added ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, GrantID: "GrantID", GrantedOrgID: "OrgID"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1600,7 +1637,7 @@ func TestProjectGrantAddedAggregate(t *testing.T) {
 			name: "grant nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1657,7 +1694,7 @@ func TestProjectGrantChangedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Grants: []*model.ProjectGrant{
 						&model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: []string{"Key"}},
 					}},
@@ -1690,7 +1727,7 @@ func TestProjectGrantChangedAggregate(t *testing.T) {
 			name: "projectgrant nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1748,7 +1785,7 @@ func TestProjectGrantRemovedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Grants: []*model.ProjectGrant{
 						&model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID"},
 					}},
@@ -1781,7 +1818,7 @@ func TestProjectGrantRemovedAggregate(t *testing.T) {
 			name: "projectgrant nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1839,7 +1876,7 @@ func TestProjectGrantDeactivatedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_ACTIVE),
+					State:      int32(proj_model.ProjectStateActive),
 					Grants: []*model.ProjectGrant{
 						&model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID"},
 					}},
@@ -1872,7 +1909,7 @@ func TestProjectGrantDeactivatedAggregate(t *testing.T) {
 			name: "grant nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -1930,7 +1967,7 @@ func TestProjectGrantReactivatedAggregate(t *testing.T) {
 				existing: &model.Project{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Name:       "ProjectName",
-					State:      int32(proj_model.PROJECTSTATE_INACTIVE),
+					State:      int32(proj_model.ProjectStateInactive),
 					Grants: []*model.ProjectGrant{
 						&model.ProjectGrant{GrantID: "GrantID", GrantedOrgID: "GrantedOrgID"},
 					}},
@@ -1963,7 +2000,7 @@ func TestProjectGrantReactivatedAggregate(t *testing.T) {
 			name: "grant nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_INACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateInactive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -2018,7 +2055,7 @@ func TestProjectGrantMemberAddedAggregate(t *testing.T) {
 			name: "project grant member added ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectGrantMember{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, GrantID: "GrantID", UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -2045,7 +2082,7 @@ func TestProjectGrantMemberAddedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -2099,7 +2136,7 @@ func TestProjectGrantMemberChangedAggregate(t *testing.T) {
 			name: "project grant member changed ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectGrantMember{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", Roles: []string{"RolesChanged"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -2126,7 +2163,7 @@ func TestProjectGrantMemberChangedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -2180,7 +2217,7 @@ func TestProjectGrantMemberRemovedAggregate(t *testing.T) {
 			name: "project grant member removed ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        &model.ProjectGrantMember{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", Roles: []string{"Roles"}},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -2207,7 +2244,7 @@ func TestProjectGrantMemberRemovedAggregate(t *testing.T) {
 			name: "member nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.PROJECTSTATE_ACTIVE)},
+				existing:   &model.Project{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, Name: "ProjectName", State: int32(proj_model.ProjectStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},

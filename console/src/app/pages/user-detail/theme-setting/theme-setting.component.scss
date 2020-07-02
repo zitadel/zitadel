@@ -13,8 +13,8 @@ $dark-background: #2d2e30;
 .circle {
   position: relative;
   border-radius: 100%;
-  width: 8rem;
-  height: 8rem;
+  width: 6rem;
+  height: 6rem;
   background: linear-gradient(40deg, #FF0080,#FF8C00 70%);
   margin: auto;
 }
@@ -22,8 +22,8 @@ $dark-background: #2d2e30;
   position: absolute;
   border-radius: 100%;
   right: 0;
-  width: 6rem;
-  height: 6rem;
+  width: 4rem;
+  height: 4rem;
   background: white;
   transform: scale(0);
   transform-origin: top right;
@@ -33,20 +33,27 @@ p {
   font-size: 90%;
 }
 .heading {
-  font-size: 140%;
+  font-size: 100%;
   font-weight: bolder;
   margin: 2rem 0 .2rem 0;
 }
+
+.desc {
+    font-size: 14px;
+    color: #8795a1;
+}
+
 label, .toggle {
   height: 2.8rem;
   border-radius: 100px;
 }
+
 label {
   width: 100%;
   background-color: rgba(0,0,0,.1);
   border-radius: 100px;
   position: relative;
-  margin: 1.8rem 0 1rem 0; 
+  margin: 1rem 0 1rem 0; 
   cursor: pointer;
 }
 .toggle {

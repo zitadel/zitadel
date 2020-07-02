@@ -7,6 +7,7 @@ import (
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
@@ -16,6 +17,8 @@ var _ AdminServiceServer = (*Server)(nil)
 type Server struct {
 	port     string
 	org      repository.OrgRepository
+	iam      repository.IamRepository
+	administrator repository.AdministratorRepository
 	verifier auth.TokenVerifier
 	authZ    auth.Config
 	repo     repository.Repository
@@ -25,6 +28,8 @@ func StartServer(conf grpc_util.ServerConfig, authZRepo *authz_repo.EsRepository
 	return &Server{
 		port:     conf.Port,
 		org:      repo,
+		iam:      repo,
+		administrator: repo,
 		repo:     repo,
 		authZ:    authZ,
 		verifier: admin_auth.Start(authZRepo),
@@ -35,12 +40,12 @@ func (s *Server) GRPCPort() string {
 	return s.port
 }
 
-func (s *Server) GRPCServer() (*grpc.Server, error) {
+func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error) {
 	gs := grpc.NewServer(
 		middleware.TracingStatsServer("/Healthz", "/Ready", "/Validate"),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				middleware.ErrorHandler(),
+				middleware.ErrorHandler(defaults.DefaultLanguage),
 				AdminService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),
 		),

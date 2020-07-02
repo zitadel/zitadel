@@ -177,22 +177,22 @@ func TestAppendAppStateEvent(t *testing.T) {
 		{
 			name: "append deactivate application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.APPSTATE_ACTIVE)}}},
+				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateActive)}}},
 				app:     &ApplicationID{AppID: "AppID"},
 				event:   &es_models.Event{},
-				state:   model.APPSTATE_INACTIVE,
+				state:   model.AppStateInactive,
 			},
-			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.APPSTATE_INACTIVE)}}},
+			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateInactive)}}},
 		},
 		{
 			name: "append reactivate application event",
 			args: args{
-				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.APPSTATE_INACTIVE)}}},
+				project: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateInactive)}}},
 				app:     &ApplicationID{AppID: "AppID"},
 				event:   &es_models.Event{},
-				state:   model.APPSTATE_ACTIVE,
+				state:   model.AppStateActive,
 			},
-			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.APPSTATE_ACTIVE)}}},
+			result: &Project{Applications: []*Application{&Application{AppID: "AppID", Name: "Application", State: int32(model.AppStateActive)}}},
 		},
 	}
 	for _, tt := range tests {

@@ -18,12 +18,8 @@
                 <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'PROJECT.ROLE.KEY' | translate }}</mat-label>
                     <input matInput formControlName="key" />
-                    <!-- <mat-error *ngIf="name?.errors?.required">{{'ERRORS.REQUIRED' | translate}}</mat-error> -->
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="formfield">
-                    <mat-label>{{ 'PROJECT.ROLE.NAME' | translate }}</mat-label>
-                    <input matInput formControlName="name" />
-                    <!-- <mat-error *ngIf="name?.errors?.required">{{'ERRORS.REQUIRED' | translate}}</mat-error> -->
+                    <!-- <mat-error *ngIf="formGroup.get('key')?.errors?.required">{{'ERRORS.REQUIRED' | translate}}
+                    </mat-error> -->
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</mat-label>
@@ -33,8 +29,9 @@
                     <mat-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</mat-label>
                     <input matInput formControlName="group" />
                 </mat-form-field>
-                <button mat-icon-button (click)="removeEntry(i)" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
-                    <mat-icon>remove_circle</mat-icon>
+                <button mat-icon-button (click)="removeEntry(i)" color="warn"
+                    matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
+                    <i class="las la-trash"></i>
                 </button>
             </ng-container>
         </div>

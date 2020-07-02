@@ -1,0 +1,73 @@
+package model
+
+import (
+	"github.com/caos/zitadel/internal/model"
+	"time"
+)
+
+type ProjectGrantView struct {
+	ProjectID         string
+	Name              string
+	CreationDate      time.Time
+	ChangeDate        time.Time
+	State             ProjectState
+	ResourceOwner     string
+	ResourceOwnerName string
+	OrgID             string
+	OrgName           string
+	OrgDomain         string
+	Sequence          uint64
+	GrantID           string
+	GrantedRoleKeys   []string
+}
+
+type ProjectGrantViewSearchRequest struct {
+	Offset        uint64
+	Limit         uint64
+	SortingColumn ProjectGrantViewSearchKey
+	Asc           bool
+	Queries       []*ProjectGrantViewSearchQuery
+}
+
+type ProjectGrantViewSearchKey int32
+
+const (
+	GrantedProjectSearchKeyUnspecified ProjectGrantViewSearchKey = iota
+	GrantedProjectSearchKeyName
+	GrantedProjectSearchKeyProjectID
+	GrantedProjectSearchKeyGrantID
+	GrantedProjectSearchKeyOrgID
+	GrantedProjectSearchKeyResourceOwner
+	GrantedProjectSearchKeyRoleKeys
+)
+
+type ProjectGrantViewSearchQuery struct {
+	Key    ProjectGrantViewSearchKey
+	Method model.SearchMethod
+	Value  interface{}
+}
+
+type ProjectGrantViewSearchResponse struct {
+	Offset      uint64
+	Limit       uint64
+	TotalResult uint64
+	Result      []*ProjectGrantView
+}
+
+func (r *ProjectGrantViewSearchRequest) AppendMyOrgQuery(orgID string) {
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: model.SearchMethodEquals, Value: orgID})
+}
+
+func (r *ProjectGrantViewSearchRequest) AppendNotMyOrgQuery(orgID string) {
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: model.SearchMethodNotEquals, Value: orgID})
+}
+
+func (r *ProjectGrantViewSearchRequest) AppendMyResourceOwnerQuery(orgID string) {
+	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
+}
+
+func (r *ProjectGrantViewSearchRequest) EnsureLimit(limit uint64) {
+	if r.Limit == 0 || r.Limit > limit {
+		r.Limit = limit
+	}
+}

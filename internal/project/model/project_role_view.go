@@ -27,18 +27,18 @@ type ProjectRoleSearchRequest struct {
 type ProjectRoleSearchKey int32
 
 const (
-	PROJECTROLESEARCHKEY_UNSPECIFIED ProjectRoleSearchKey = iota
-	PROJECTROLESEARCHKEY_KEY
-	PROJECTROLESEARCHKEY_PROJECTID
-	PROJECTROLESEARCHKEY_ORGID
-	PROJECTROLESEARCHKEY_RESOURCEOWNER
-	PROJECTROLESEARCHKEY_DISPLAY_NAME
+	ProjectRoleSearchKeyUnspecified ProjectRoleSearchKey = iota
+	ProjectRoleSearchKeyKey
+	ProjectRoleSearchKeyProjectID
+	ProjectRoleSearchKeyOrgID
+	ProjectRoleSearchKeyResourceOwner
+	ProjectRoleSearchKeyDisplayName
 )
 
 type ProjectRoleSearchQuery struct {
 	Key    ProjectRoleSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type ProjectRoleSearchResponse struct {
@@ -49,10 +49,10 @@ type ProjectRoleSearchResponse struct {
 }
 
 func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: PROJECTROLESEARCHKEY_ORGID, Method: model.SEARCHMETHOD_EQUALS, Value: orgID})
+	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyOrgID, Method: model.SearchMethodEquals, Value: orgID})
 }
 func (r *ProjectRoleSearchRequest) AppendProjectQuery(projectID string) {
-	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: PROJECTROLESEARCHKEY_PROJECTID, Method: model.SEARCHMETHOD_EQUALS, Value: projectID})
+	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID})
 }
 
 func (r *ProjectRoleSearchRequest) EnsureLimit(limit uint64) {

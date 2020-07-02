@@ -31,7 +31,10 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     produces: "application/grpc";
 };
 
+// All requests are based on your context if nothing other is specified
+// Requests which have /me in the url get the parameter from the context
 service ManagementService {
+
     //READINESS
     rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty) {
         option (google.api.http) = {
@@ -51,8 +54,18 @@ service ManagementService {
         };
     }
 
-    //USER
-    rpc GetUserByID(UserID) returns (User) {
+    // GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)
+    rpc GetIam(google.protobuf.Empty) returns (Iam) {
+        option (google.api.http) = {
+            get: "/iam"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+          permission: "authenticated"
+        };
+    }
+
+    rpc GetUserByID(UserID) returns (UserView) {
         option (google.api.http) = {
             get: "/users/{id}"
         };
@@ -62,9 +75,10 @@ service ManagementService {
         };
     }
 
-    rpc GetUserByEmailGlobal(UserEmailID) returns (UserView) {
+    // GetUserByEmailGlobal returns User, global search is overall organisations
+    rpc GetUserByEmailGlobal(Email) returns (UserView) {
         option (google.api.http) = {
-            get: "/global/users/email/{email}"
+            get: "/global/users/_byemail"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -72,6 +86,7 @@ service ManagementService {
         };
     }
 
+    // Limit should always be set, there is a default limit set by the service
     rpc SearchUsers(UserSearchRequest) returns (UserSearchResponse) {
         option (google.api.http) = {
             post: "/users/_search"
@@ -158,6 +173,7 @@ service ManagementService {
         };
     }
 
+    // UserChanges returns the event stream of the user object
     rpc UserChanges(ChangeRequest) returns (Changes) {
         option (google.api.http) = {
             get: "/users/{id}/changes"
@@ -168,9 +184,10 @@ service ManagementService {
         };
     }
 
+    // ApplicationChanges returns the event stream of the application object
     rpc ApplicationChanges(ChangeRequest) returns (Changes) {
         option (google.api.http) = {
-            get: "/applications/{id}/changes"
+            get: "/projects/{id}/applications/{sec_id}/changes"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -178,6 +195,7 @@ service ManagementService {
         };
     }
 
+    // OrgChanges returns the event stream of the org object
     rpc OrgChanges(ChangeRequest) returns (Changes) {
         option (google.api.http) = {
             get: "/orgs/{id}/changes"
@@ -188,6 +206,7 @@ service ManagementService {
         };
     }
 
+    // ProjectChanges returns the event stream of the project object
     rpc ProjectChanges(ChangeRequest) returns (Changes) {
         option (google.api.http) = {
             get: "/projects/{id}/changes"
@@ -198,8 +217,7 @@ service ManagementService {
         };
     }
 
-    //USER_PROFILE
-    rpc GetUserProfile(UserID) returns (UserProfile) {
+    rpc GetUserProfile(UserID) returns (UserProfileView) {
         option (google.api.http) = {
             get: "/users/{id}/profile"
         };
@@ -220,8 +238,7 @@ service ManagementService {
         };
     }
 
-    //USER_EMAIL
-    rpc GetUserEmail(UserID) returns (UserEmail) {
+    rpc GetUserEmail(UserID) returns (UserEmailView) {
         option (google.api.http) = {
             get: "/users/{id}/email"
         };
@@ -253,8 +270,7 @@ service ManagementService {
         };
     }
 
-    //USER_PHONE
-    rpc GetUserPhone(UserID) returns (UserPhone) {
+    rpc GetUserPhone(UserID) returns (UserPhoneView) {
         option (google.api.http) = {
             get: "/users/{id}/phone"
         };
@@ -286,8 +302,7 @@ service ManagementService {
         };
     }
 
-    //USER_ADDRESS
-    rpc GetUserAddress(UserID) returns (UserAddress) {
+    rpc GetUserAddress(UserID) returns (UserAddressView) {
         option (google.api.http) = {
             get: "/users/{id}/address"
         };
@@ -307,7 +322,7 @@ service ManagementService {
             permission: "user.write"
         };
     }
-    //MFA
+
     rpc GetUserMfas(UserID) returns (MultiFactors) {
         option (google.api.http) = {
             get: "/users/{id}/mfas"
@@ -318,11 +333,10 @@ service ManagementService {
         };
     }
 
-    //PASSWORD
     // Sends an Notification (Email/SMS) with a password reset Link
     rpc SendSetPasswordNotification(SetPasswordNotificationRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            post: "/users/{id}/_sendsetpwnotify"
+            post: "/users/{id}/password/_sendsetnotification"
             body: "*"
         };
 
@@ -334,7 +348,7 @@ service ManagementService {
     // A Manager is only allowed to set an initial password, on the next login the user has to change his password
     rpc SetInitialPassword(PasswordRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            post: "/users/{id}/_setinitialpw"
+            post: "/users/{id}/password/_initialize"
             body: "*"
         };
 
@@ -343,8 +357,7 @@ service ManagementService {
         };
     }
 
-
-    //PASSWORD_COMPLEXITY_POLICY
+    // returns default policy if nothing other set on organisation
     rpc GetPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
         option (google.api.http) = {
             get: "/policies/passwords/complexity"
@@ -387,7 +400,7 @@ service ManagementService {
         };
     }
 
-    //PASSWORD_AGE_POLICY
+    // returns default if nothing other set on organisation
     rpc GetPasswordAgePolicy(google.protobuf.Empty) returns (PasswordAgePolicy) {
         option (google.api.http) = {
             get: "/policies/passwords/age"
@@ -430,7 +443,7 @@ service ManagementService {
         };
     }
 
-    //PASSWORD_LOCKOUT_POLICY
+    // returns default if nothing other set on organisation
     rpc GetPasswordLockoutPolicy(google.protobuf.Empty) returns (PasswordLockoutPolicy) {
         option (google.api.http) = {
             get: "/policies/passwords/lockout"
@@ -473,10 +486,9 @@ service ManagementService {
         };
     }
 
-    //ORG
-    rpc GetOrgByID(OrgID) returns (Org) {
+    rpc GetMyOrg(google.protobuf.Empty) returns (OrgView) {
         option (google.api.http) = {
-            get: "/orgs/{id}"
+            get: "/orgs/me"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -484,9 +496,10 @@ service ManagementService {
         };
     }
 
-    rpc GetOrgByDomainGlobal(OrgDomain) returns (Org) {
+    // search a organisation by its domain overall organisations
+    rpc GetOrgByDomainGlobal(Domain) returns (OrgView) {
         option (google.api.http) = {
-            get: "/global/orgs/domain/{domain}"
+            get: "/global/orgs/_bydomain"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -494,9 +507,9 @@ service ManagementService {
         };
     }
 
-    rpc DeactivateOrg(OrgID) returns (Org) {
+    rpc DeactivateMyOrg(google.protobuf.Empty) returns (Org) {
         option (google.api.http) = {
-            put: "/orgs/{id}/_deactivate"
+            put: "/orgs/me/_deactivate"
             body: "*"
         };
 
@@ -505,9 +518,9 @@ service ManagementService {
         };
     }
 
-    rpc ReactivateOrg(OrgID) returns (Org) {
+    rpc ReactivateMyOrg(google.protobuf.Empty) returns (Org) {
         option (google.api.http) = {
-            put: "/orgs/{id}/_reactivate"
+            put: "/orgs/me/_reactivate"
             body: "*"
         };
 
@@ -516,7 +529,48 @@ service ManagementService {
         };
     }
 
-    //ORG_MEMBERS
+    rpc SearchMyOrgDomains(OrgDomainSearchRequest) returns (OrgDomainSearchResponse) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.read"
+        };
+    }
+
+    rpc AddMyOrgDomain(AddOrgDomainRequest) returns (OrgDomain) {
+        option (google.api.http) = {
+            post: "/orgs/me/domains"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc RemoveMyOrgDomain(RemoveOrgDomainRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/orgs/me/domains/{domain}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    rpc GetMyOrgIamPolicy(google.protobuf.Empty) returns (OrgIamPolicy) {
+        option (google.api.http) = {
+            get: "/orgs/me/iampolicy"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     rpc GetOrgMemberRoles(google.protobuf.Empty) returns (OrgMemberRoles) {
         option (google.api.http) = {
             get: "/orgs/members/roles"
@@ -570,10 +624,9 @@ service ManagementService {
         };
     }
 
-    //PROJECTS
-    rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (GrantedProjectSearchResponse) {
+    rpc SearchProjects(ProjectSearchRequest) returns (ProjectSearchResponse) {
         option (google.api.http) = {
-            post: "/grantedprojects/_search"
+            post: "/projects/_search"
             body: "*"
         };
 
@@ -582,7 +635,7 @@ service ManagementService {
         };
     }
 
-    rpc ProjectByID(ProjectID) returns (Project) {
+    rpc ProjectByID(ProjectID) returns (ProjectView) {
         option (google.api.http) = {
             get: "/projects/{id}"
         };
@@ -640,8 +693,21 @@ service ManagementService {
         };
     }
 
-    //GRANTED_PROJECT_GRANTS
-    rpc GetGrantedProjectGrantByID(ProjectGrantID) returns (GrantedProject) {
+    // returns all projects my organisation got granted from another organisation
+    rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (ProjectGrantSearchResponse) {
+        option (google.api.http) = {
+            post: "/grantedprojects/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.read"
+            check_field_name: "ProjectId"
+        };
+    }
+
+    // returns a project my organisation got granted from another organisation
+    rpc GetGrantedProjectByID(ProjectGrantID) returns (ProjectGrantView) {
         option (google.api.http) = {
             get: "/grantedprojects/{project_id}/grants/{id}"
         };
@@ -651,7 +717,6 @@ service ManagementService {
         };
     }
 
-    //PROJECT_MEMBERS
     rpc GetProjectMemberRoles(google.protobuf.Empty) returns (ProjectMemberRoles) {
         option (google.api.http) = {
             get: "/projects/members/roles"
@@ -709,7 +774,6 @@ service ManagementService {
         };
     }
 
-    //PROJECT_ROLES
     rpc SearchProjectRoles(ProjectRoleSearchRequest) returns (ProjectRoleSearchResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles/_search"
@@ -734,6 +798,19 @@ service ManagementService {
         };
     }
 
+    // add a list of project roles in one request
+    rpc BulkAddProjectRole(ProjectRoleAddBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/projects/{id}/roles/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.role.write"
+            check_field_name: "Id"
+        };
+    }
+
     rpc ChangeProjectRole(ProjectRoleChange) returns (ProjectRole) {
         option (google.api.http) = {
             put: "/projects/{id}/roles/{key}"
@@ -746,6 +823,7 @@ service ManagementService {
         };
     }
 
+    // RemoveProjectRole removes role from UserGrants, ProjectGrants and from Project
     rpc RemoveProjectRole(ProjectRoleRemove) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/projects/{id}/roles/{key}"
@@ -757,7 +835,6 @@ service ManagementService {
         };
     }
 
-    //APPLICATIONS
     rpc SearchApplications(ApplicationSearchRequest) returns (ApplicationSearchResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/applications/_search"
@@ -770,7 +847,7 @@ service ManagementService {
         };
     }
 
-    rpc ApplicationByID(ApplicationID) returns (Application) {
+    rpc ApplicationByID(ApplicationID) returns (ApplicationView) {
         option (google.api.http) = {
             get: "/projects/{project_id}/applications/{id}"
         };
@@ -864,7 +941,6 @@ service ManagementService {
         };
     }
 
-    //PROJECT_GRANT
     rpc SearchProjectGrants(ProjectGrantSearchRequest) returns (ProjectGrantSearchResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/_search"
@@ -877,7 +953,7 @@ service ManagementService {
         };
     }
 
-    rpc ProjectGrantByID(ProjectGrantID) returns (ProjectGrant) {
+    rpc ProjectGrantByID(ProjectGrantID) returns (ProjectGrantView) {
         option (google.api.http) = {
             get: "/projects/{project_id}/grants/{id}"
         };
@@ -931,6 +1007,7 @@ service ManagementService {
         };
     }
 
+    // RemoveProjectGrant removes project grant and all user grants for this project grant
     rpc RemoveProjectGrant(ProjectGrantID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/grants/{id}"
@@ -941,7 +1018,6 @@ service ManagementService {
         };
     }
 
-    //PROJECT_GRANT_MEMBER
     rpc GetProjectGrantMemberRoles(google.protobuf.Empty) returns (ProjectGrantMemberRoles) {
         option (google.api.http) = {
             get: "/projects/grants/members/roles"
@@ -951,6 +1027,7 @@ service ManagementService {
             permission: "project.grant.member.read"
         };
     }
+
     rpc SearchProjectGrantMembers(ProjectGrantMemberSearchRequest) returns (ProjectGrantMemberSearchResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members/_search"
@@ -994,7 +1071,6 @@ service ManagementService {
         };
     }
 
-    //USER_GRANT
     rpc SearchUserGrants(UserGrantSearchRequest) returns (UserGrantSearchResponse) {
         option (google.api.http) = {
             post: "/users/grants/_search"
@@ -1006,7 +1082,7 @@ service ManagementService {
         };
     }
 
-    rpc UserGrantByID(UserGrantID) returns (UserGrant) {
+    rpc UserGrantByID(UserGrantID) returns (UserGrantView) {
         option (google.api.http) = {
             get: "/users/{user_id}/grants/{id}"
         };
@@ -1070,7 +1146,44 @@ service ManagementService {
         };
     }
 
-    //PROJECT_USER_GRANT
+    // add a list of user grants in one request
+    rpc BulkCreateUserGrant(UserGrantCreateBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/usergrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    // update a list of user grants in one request
+    rpc BulkUpdateUserGrant(UserGrantUpdateBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            put: "/usergrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    // remove a list of user grants in one request
+    rpc BulkRemoveUserGrant(UserGrantRemoveBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/usersgrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.delete"
+        };
+    }
+
+    // search user grants based on a project
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc SearchProjectUserGrants(ProjectUserGrantSearchRequest) returns (UserGrantSearchResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/users/grants/_search"
@@ -1083,7 +1196,9 @@ service ManagementService {
         };
     }
 
-    rpc ProjectUserGrantByID(ProjectUserGrantID) returns (UserGrant) {
+    // get user grant based on a project
+    // This request is required that the user authorizations of zitadel can be differentiated
+    rpc ProjectUserGrantByID(ProjectUserGrantID) returns (UserGrantView) {
         option (google.api.http) = {
             get: "/projects/{project_id}/users/{user_id}/grants/{id}"
         };
@@ -1094,6 +1209,8 @@ service ManagementService {
         };
     }
 
+    // create user grant based on a project
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc CreateProjectUserGrant(UserGrantCreate) returns (UserGrant) {
         option (google.api.http) = {
             post: "/projects/{project_id}/users/{user_id}/grants"
@@ -1106,6 +1223,8 @@ service ManagementService {
         };
     }
 
+    // update user grant based on a project
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc UpdateProjectUserGrant(ProjectUserGrantUpdate) returns (UserGrant) {
         option (google.api.http) = {
             put: "/projects/{project_id}/users/{user_id}/grants/{id}"
@@ -1118,6 +1237,8 @@ service ManagementService {
         };
     }
 
+    // deactivate user grant based on a project
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc DeactivateProjectUserGrant(ProjectUserGrantID) returns (UserGrant) {
         option (google.api.http) = {
             put: "/projects/{project_id}/users/{user_id}/grants/{id}/_deactivate"
@@ -1130,6 +1251,8 @@ service ManagementService {
         };
     }
 
+    // reactivate user grant based on a project
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc ReactivateProjectUserGrant(ProjectUserGrantID) returns (UserGrant) {
         option (google.api.http) = {
             put: "/projects/{project_id}/users/{user_id}/grants/{id}/_reactivate"
@@ -1141,7 +1264,9 @@ service ManagementService {
             check_field_name: "ProjectId"
         };
     }
-    //PROJECT_GRANT_USER_GRANT
+
+    // search user grants based on a projectgrant
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc SearchProjectGrantUserGrants(ProjectGrantUserGrantSearchRequest) returns (UserGrantSearchResponse) {
         option (google.api.http) = {
             post: "/projectgrants/{project_grant_id}/users/grants/_search"
@@ -1154,7 +1279,9 @@ service ManagementService {
         };
     }
 
-    rpc ProjectGrantUserGrantByID(ProjectGrantUserGrantID) returns (UserGrant) {
+    // get user grant based on a projectgrant
+    // This request is required that the user authorizations of zitadel can be differentiated
+    rpc ProjectGrantUserGrantByID(ProjectGrantUserGrantID) returns (UserGrantView) {
         option (google.api.http) = {
             get: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
         };
@@ -1165,6 +1292,8 @@ service ManagementService {
         };
     }
 
+    // create user grant based on a projectgrant
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc CreateProjectGrantUserGrant(ProjectGrantUserGrantCreate) returns (UserGrant) {
         option (google.api.http) = {
             post: "/projectgrants/{project_grant_id}/users/{user_id}/grants"
@@ -1177,6 +1306,8 @@ service ManagementService {
         };
     }
 
+    // update user grant based on a projectgrant
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc UpdateProjectGrantUserGrant(ProjectGrantUserGrantUpdate) returns (UserGrant) {
         option (google.api.http) = {
             put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
@@ -1189,6 +1320,8 @@ service ManagementService {
         };
     }
 
+    // deactivate user grant based on a projectgrant
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc DeactivateProjectGrantUserGrant(ProjectGrantUserGrantID) returns (UserGrant) {
         option (google.api.http) = {
             put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_deactivate"
@@ -1201,6 +1334,8 @@ service ManagementService {
         };
     }
 
+    // reactivate user grant based on a projectgrant
+    // This request is required that the user authorizations of zitadel can be differentiated
     rpc ReactivateProjectGrantUserGrant(ProjectGrantUserGrantID) returns (UserGrant) {
         option (google.api.http) = {
             put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_reactivate"
@@ -1212,19 +1347,21 @@ service ManagementService {
             check_field_name: "ProjectGrantId"
         };
     }
-    //Grant
-    rpc SearchAuthGrant(AuthGrantSearchRequest) returns (AuthGrantSearchResponse) {
-        option (google.api.http) = {
-            post: "/authgrants/_search"
-            body: "*"
-        };
-    }
+}
+
+message Iam {
+    string global_org_id = 1;
+    string iam_project_id = 2;
+    bool set_up_done = 3;
+    bool set_up_started = 4;
 }
 
 message ChangeRequest {
     string id = 1;
-    uint64 limit= 2;
-    uint64 sequence_offset = 3;
+    string sec_id = 2;
+    uint64 limit= 3;
+    uint64 sequence_offset = 4;
+    bool asc = 5;
 }
 
 message Changes {
@@ -1237,8 +1374,9 @@ message Change {
     google.protobuf.Timestamp change_date = 1;
     string event_type = 2;
     uint64 sequence = 3;
-    string editor = 4;
-    google.protobuf.Struct data = 5;
+    string editor_id = 4;
+    string editor = 5;
+    google.protobuf.Struct data = 6;
 }
 
 message ApplicationID {
@@ -1254,7 +1392,7 @@ message UserID {
     string id = 1;
 }
 
-message UserEmailID {
+message Email {
     string email = 1;
 }
 
@@ -1272,19 +1410,18 @@ message CreateUserRequest {
     string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-    string display_name = 5[(validate.rules).string = {max_len: 200}];
-    string preferred_language = 6[(validate.rules).string = {max_len: 200}];
-    Gender gender = 7;
-    string email = 8 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
-    bool is_email_verified = 9;
-    string phone = 11 [(validate.rules).string = {max_len: 20}];
-    bool is_phone_verified = 12;
-    string country = 13 [(validate.rules).string = {max_len: 200}];
-    string locality = 14 [(validate.rules).string = {max_len: 200}];
-    string postal_code = 15 [(validate.rules).string = {max_len: 200}];
-    string region = 16 [(validate.rules).string = {max_len: 200}];
-    string street_address = 17 [(validate.rules).string = {max_len: 200}];
-    string password = 18 [(validate.rules).string = {max_len: 72}];
+    string preferred_language = 5[(validate.rules).string = {max_len: 200}];
+    Gender gender = 6;
+    string email = 7 [(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
+    bool is_email_verified = 8;
+    string phone = 9 [(validate.rules).string = {max_len: 20}];
+    bool is_phone_verified = 10;
+    string country = 11 [(validate.rules).string = {max_len: 200}];
+    string locality = 12 [(validate.rules).string = {max_len: 200}];
+    string postal_code = 13 [(validate.rules).string = {max_len: 200}];
+    string region = 14 [(validate.rules).string = {max_len: 200}];
+    string street_address = 15 [(validate.rules).string = {max_len: 200}];
+    string password = 16 [(validate.rules).string = {max_len: 72}];
 }
 
 message User {
@@ -1353,6 +1490,8 @@ message UserView {
     string street_address = 22;
     uint64 sequence = 23;
     string resource_owner = 24;
+    repeated string login_names = 25;
+    string preferred_login_name = 26;
 }
 
 message UserSearchRequest {
@@ -1394,6 +1533,11 @@ enum SearchMethod {
     SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
     SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
     SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
+    SEARCHMETHOD_NOT_EQUALS = 6;
+    SEARCHMETHOD_GREATER_THAN = 7;
+    SEARCHMETHOD_LESS_THAN = 8;
+    SEARCHMETHOD_IS_ONE_OF = 9;
+    SEARCHMETHOD_LIST_CONTAINS = 10;
 }
 
 message UserProfile {
@@ -1410,17 +1554,41 @@ message UserProfile {
     google.protobuf.Timestamp change_date = 11;
 }
 
+message UserProfileView {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string nick_name = 4;
+    string display_name = 5;
+    string preferred_language = 6;
+    Gender gender = 7;
+    string user_name = 8;
+    uint64 sequence = 9;
+    google.protobuf.Timestamp creation_date = 10;
+    google.protobuf.Timestamp change_date = 11;
+    repeated string login_names = 12;
+    string preferred_login_name = 27;
+}
+
 message UpdateUserProfileRequest {
     string id = 1;
     string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-    string display_name = 5 [(validate.rules).string = {max_len: 200}];
-    string preferred_language = 6 [(validate.rules).string = {max_len: 200}];
-    Gender gender = 7;
+    string preferred_language = 5 [(validate.rules).string = {max_len: 200}];
+    Gender gender = 6;
 }
 
 message UserEmail {
+    string id = 1;
+    string email = 2;
+    bool is_email_verified = 3;
+    uint64 sequence = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    google.protobuf.Timestamp change_date = 6;
+}
+
+message UserEmailView {
     string id = 1;
     string email = 2;
     bool is_email_verified = 3;
@@ -1444,6 +1612,15 @@ message UserPhone {
     google.protobuf.Timestamp change_date = 7;
 }
 
+message UserPhoneView {
+    string id = 1;
+    string phone = 2;
+    bool is_phone_verified = 3;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp creation_date = 6;
+    google.protobuf.Timestamp change_date = 7;
+}
+
 message UpdateUserPhoneRequest {
     string id = 1;
     string phone = 2 [(validate.rules).string = {min_len: 1, max_len: 20}];
@@ -1451,6 +1628,18 @@ message UpdateUserPhoneRequest {
 }
 
 message UserAddress {
+    string id = 1;
+    string country = 2;
+    string locality = 3;
+    string postal_code = 4;
+    string region = 5;
+    string street_address = 6;
+    uint64 sequence = 7;
+    google.protobuf.Timestamp creation_date = 8;
+    google.protobuf.Timestamp change_date = 9;
+}
+
+message UserAddressView {
     string id = 1;
     string country = 2;
     string locality = 3;
@@ -1620,12 +1809,15 @@ enum PolicyState {
     POLICYSTATE_DELETED = 3;
 }
 
-message OrgID {
-    string id = 1;
+message OrgIamPolicy {
+    string org_id = 1;
+    string description = 2;
+    bool user_login_must_be_domain = 3;
+    bool default = 4;
 }
 
-message OrgDomain {
-    string domain = 1;
+message OrgID {
+    string id = 1;
 }
 
 message Org {
@@ -1634,14 +1826,82 @@ message Org {
     google.protobuf.Timestamp creation_date = 3;
     google.protobuf.Timestamp change_date = 4;
     string name = 5;
-    string domain = 6;
-    uint64 sequence = 7;
+    uint64 sequence = 6;
+}
+
+message OrgView {
+    string id = 1;
+    OrgState state = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+    string name = 5;
+    uint64 sequence = 6;
 }
 
 enum OrgState {
     ORGSTATE_UNSPECIFIED = 0;
     ORGSTATE_ACTIVE = 1;
     ORGSTATE_INACTIVE = 2;
+}
+
+message Domain {
+    string domain = 1;
+}
+
+message OrgDomains {
+    repeated OrgDomain domains = 1;
+}
+
+message OrgDomain {
+    string org_id = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp change_date = 3;
+    string domain = 4;
+    bool verified = 5;
+    bool primary = 6;
+    uint64 sequence = 7;
+}
+
+message OrgDomainView {
+    string org_id = 1;
+    google.protobuf.Timestamp creation_date = 2;
+    google.protobuf.Timestamp change_date = 3;
+    string domain = 4;
+    bool verified = 5;
+    bool primary = 6;
+    uint64 sequence = 7;
+}
+
+message AddOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveOrgDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message OrgDomainSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated OrgDomainView result = 4;
+}
+
+message OrgDomainSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated OrgDomainSearchQuery queries = 3;
+}
+
+message OrgDomainSearchQuery {
+    OrgDomainSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum OrgDomainSearchKey {
+    ORGDOMAINSEARCHKEY_UNSPECIFIED = 0;
+    ORGDOMAINSEARCHKEY_DOMAIN = 1;
 }
 
 message OrgMemberRoles {
@@ -1718,6 +1978,41 @@ message ProjectUpdateRequest {
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
+message ProjectSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated ProjectView result = 4;
+}
+
+message ProjectView {
+    string project_id = 1;
+    string name = 2;
+    ProjectState state = 3;
+    google.protobuf.Timestamp change_date = 4;
+    google.protobuf.Timestamp creation_date = 5;
+    string resource_owner = 6;
+    uint64 sequence = 7;
+}
+
+
+message ProjectSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated ProjectSearchQuery queries = 3;
+}
+
+message ProjectSearchQuery {
+    ProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum ProjectSearchKey {
+    PROJECTSEARCHKEY_UNSPECIFIED = 0;
+    PROJECTSEARCHKEY_PROJECT_NAME = 1;
+}
+
 message Projects {
     repeated Project projects = 1;
 }
@@ -1741,45 +2036,6 @@ enum ProjectType {
     PROJECTTYPE_UNSPECIFIED = 0;
     PROJECTTYPE_OWNED = 1;
     PROJECTTYPE_GRANTED = 2;
-}
-
-message GrantedProjectSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated GrantedProject result = 4;
-}
-
-message GrantedProject {
-    string id = 1;
-    string name = 2;
-    ProjectState state = 3;
-    google.protobuf.Timestamp change_date = 4;
-    google.protobuf.Timestamp creation_date = 5;
-    ProjectType type = 6;
-    string resource_owner = 7;
-    string org_id = 8;
-    string org_name = 9;
-    string org_domain = 10;
-    string grant_id = 11;
-    uint64 sequence = 12;
-}
-
-message GrantedProjectSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    repeated GrantedProjectSearchQuery queries = 3;
-}
-
-message GrantedProjectSearchQuery {
-    GrantedProjectSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
-    SearchMethod method = 2;
-    string value = 3;
-}
-
-enum GrantedProjectSearchKey {
-    PROJECTSEARCHKEY_UNSPECIFIED = 0;
-    PROJECTSEARCHKEY_PROJECT_NAME = 1;
 }
 
 message ProjectMemberRoles {
@@ -1816,6 +2072,11 @@ message ProjectRoleAdd {
      string key = 2;
      string display_name = 3;
      string group = 4;
+}
+
+message ProjectRoleAddBulk {
+    string id = 1;
+    repeated ProjectRoleAdd project_roles = 2;
 }
 
 message ProjectRoleChange {
@@ -2077,13 +2338,14 @@ message ProjectGrantView {
     string project_id = 2;
     string granted_org_id = 3;
     string granted_org_name = 4;
-    string granted_org_domain = 5;
-    repeated string role_keys = 6;
-    ProjectGrantState state = 7;
-    google.protobuf.Timestamp creation_date = 8;
-    google.protobuf.Timestamp change_date = 9;
-    string project_name = 10;
-    uint64 sequence = 11;
+    repeated string role_keys = 5;
+    ProjectGrantState state = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    google.protobuf.Timestamp change_date = 8;
+    string project_name = 9;
+    uint64 sequence = 10;
+    string resource_owner = 11;
+    string resource_owner_name = 12;
 }
 
 message ProjectGrantSearchResponse {
@@ -2093,11 +2355,31 @@ message ProjectGrantSearchResponse {
     repeated ProjectGrantView result = 4;
 }
 
+message GrantedProjectSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated ProjectSearchQuery queries = 3;
+}
+
 message ProjectGrantSearchRequest {
     string project_id = 1;
     uint64 offset = 2;
     uint64 limit = 3;
+    repeated ProjectGrantSearchQuery queries = 4;
 }
+
+message ProjectGrantSearchQuery {
+    ProjectGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum ProjectGrantSearchKey {
+    PROJECTGRANTSEARCHKEY_UNSPECIFIED = 0;
+    PROJECTGRANTSEARCHKEY_PROJECT_NAME = 1;
+    PROJECTGRANTSEARCHKEY_ROLE_KEY = 2;
+}
+
 
 message ProjectGrantMemberRoles {
     repeated string roles = 1;
@@ -2185,16 +2467,28 @@ message UserGrant {
     uint64 sequence = 9;
 }
 
+message UserGrantCreateBulk {
+    repeated UserGrantCreate user_grants = 1;
+}
+
 message UserGrantCreate {
     string user_id = 1;
     string project_id = 2;
     repeated string role_keys = 3;
 }
 
+message UserGrantUpdateBulk {
+    repeated UserGrantUpdate user_grants = 1;
+}
+
 message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
     repeated string role_keys = 3;
+}
+
+message UserGrantRemoveBulk {
+    repeated string ids = 1;
 }
 
 message UserGrantID {
@@ -2260,6 +2554,7 @@ message UserGrantView {
     string project_name = 15;
     uint64 sequence = 16;
     string resource_owner = 17;
+    string display_name = 18;
 }
 
 
@@ -2286,6 +2581,7 @@ enum UserGrantSearchKey {
     USERGRANTSEARCHKEY_PROJECT_ID = 1;
     USERGRANTSEARCHKEY_USER_ID = 2;
     USERGRANTSEARCHKEY_ORG_ID = 3;
+    USERGRANTSEARCHKEY_ROLE_KEY = 4;
 }
 
 message ProjectUserGrantSearchRequest {
@@ -2300,39 +2596,4 @@ message ProjectGrantUserGrantSearchRequest {
     uint64 offset = 2;
     uint64 limit = 3;
     repeated UserGrantSearchQuery queries = 4;
-}
-
-message AuthGrantSearchRequest {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    AuthGrantSearchKey sorting_column = 3 [(validate.rules).enum = {not_in: [0]}];
-    bool asc = 4;
-    repeated AuthGrantSearchQuery queries = 5;
-}
-
-message AuthGrantSearchQuery {
-    AuthGrantSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
-    SearchMethod method = 2 [(validate.rules).enum = {in: [0]}];
-    string value = 3;
-}
-
-enum AuthGrantSearchKey {
-    AUTHGRANTSEARCHKEY_UNSPECIFIED = 0;
-    AUTHGRANTSEARCHKEY_ORG_ID = 1;
-    AUTHGRANTSEARCHKEY_PROJECT_ID = 2;
-    AUTHGRANTSEARCHKEY_USER_ID = 3;
-}
-
-message AuthGrantSearchResponse {
-    uint64 offset = 1;
-    uint64 limit = 2;
-    uint64 total_result = 3;
-    repeated AuthGrant result = 4;
-}
-
-message AuthGrant {
-    string orgId = 1;
-    string projectId = 2;
-    string userId = 3;
-    repeated string roles = 4;
 }

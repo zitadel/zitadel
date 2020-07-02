@@ -11,9 +11,10 @@
     </div>
     <span class="fill-space"></span>
     <ng-template appHasRole [appHasRole]="['project.role.delete']">
-        <button [disabled]="disabled" matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" class="icon-button"
-            (click)="deleteSelectedRoles()" mat-icon-button *ngIf="selection.hasValue() && actionsVisible">
-            <mat-icon>delete_outline</mat-icon>
+        <button color="warn" [disabled]="disabled" matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}"
+            class="icon-button" (click)="deleteSelectedRoles()" mat-icon-button
+            *ngIf="selection.hasValue() && actionsVisible">
+            <i class="las la-trash"></i>
         </button>
     </ng-template>
     <ng-template appHasRole [appHasRole]="['project.role.write:' + projectId, 'project.role.write']">
@@ -32,14 +33,14 @@
     <table [dataSource]="dataSource" mat-table class="full-width-table" matSort aria-label="Elements">
         <ng-container matColumnDef="select">
             <th class="selection" mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? masterToggle() : null"
+                <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
                     [checked]="selection.hasValue() && isAllSelected()"
                     [indeterminate]="selection.hasValue() && !isAllSelected()">
                 </mat-checkbox>
             </th>
             <td class="selection" mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)">
+                <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
                 </mat-checkbox>
             </td>
         </ng-container>
@@ -66,11 +67,9 @@
         <ng-container matColumnDef="creationDate">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.CREATIONDATE' | translate }} </th>
             <td mat-cell *matCellDef="let role">
-                <span>{{dateFromTimestamp(role.creationDate) | date: 'dd. MMM, HH:mm' }}</span>
+                <span>{{role.creationDate | timestampToDate | date: 'dd. MMM, HH:mm' }}</span>
             </td>
         </ng-container>
-
-
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

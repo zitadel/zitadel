@@ -3,22 +3,23 @@ package view
 import (
 	"github.com/caos/zitadel/internal/org/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/view"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
 	orgTable = "auth.orgs"
 )
 
-func (v *View) OrgByID(orgID string) (*org_view.OrgView, error) {
+func (v *View) OrgByID(orgID string) (*org_model.OrgView, error) {
 	return org_view.OrgByID(v.Db, orgTable, orgID)
 }
 
-func (v *View) SearchOrgs(req *model.OrgSearchRequest) ([]*org_view.OrgView, int, error) {
+func (v *View) SearchOrgs(req *model.OrgSearchRequest) ([]*org_model.OrgView, int, error) {
 	return org_view.SearchOrgs(v.Db, orgTable, req)
 }
 
-func (v *View) PutOrg(org *org_view.OrgView) error {
+func (v *View) PutOrg(org *org_model.OrgView) error {
 	err := org_view.PutOrg(v.Db, orgTable, org)
 	if err != nil {
 		return err
@@ -26,11 +27,11 @@ func (v *View) PutOrg(org *org_view.OrgView) error {
 	return v.ProcessedOrgSequence(org.Sequence)
 }
 
-func (v *View) GetLatestOrgFailedEvent(sequence uint64) (*view.FailedEvent, error) {
+func (v *View) GetLatestOrgFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
 	return v.latestFailedEvent(orgTable, sequence)
 }
 
-func (v *View) ProcessedOrgFailedEvent(failedEvent *view.FailedEvent) error {
+func (v *View) ProcessedOrgFailedEvent(failedEvent *repository.FailedEvent) error {
 	return v.saveFailedEvent(failedEvent)
 }
 

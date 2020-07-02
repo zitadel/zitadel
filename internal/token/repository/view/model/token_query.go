@@ -3,7 +3,7 @@ package model
 import (
 	global_model "github.com/caos/zitadel/internal/model"
 	token_model "github.com/caos/zitadel/internal/token/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type TokenSearchRequest token_model.TokenSearchRequest
@@ -18,8 +18,8 @@ func (req TokenSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req TokenSearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == token_model.TOKENSEARCHKEY_UNSPECIFIED {
+func (req TokenSearchRequest) GetSortingColumn() repository.ColumnKey {
+	if req.SortingColumn == token_model.TokenSearchKeyUnspecified {
 		return nil
 	}
 	return TokenSearchKey(req.SortingColumn)
@@ -29,15 +29,15 @@ func (req TokenSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req TokenSearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, len(req.Queries))
+func (req TokenSearchRequest) GetQueries() []repository.SearchQuery {
+	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
 		result[i] = TokenSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req TokenSearchQuery) GetKey() view.ColumnKey {
+func (req TokenSearchQuery) GetKey() repository.ColumnKey {
 	return TokenSearchKey(req.Key)
 }
 
@@ -51,17 +51,17 @@ func (req TokenSearchQuery) GetValue() interface{} {
 
 func (key TokenSearchKey) ToColumnName() string {
 	switch token_model.TokenSearchKey(key) {
-	case token_model.TOKENSEARCHKEY_TOKEN_ID:
+	case token_model.TokenSearchKeyTokenID:
 		return TokenKeyTokenID
-	case token_model.TOKENSEARCHKEY_USER_AGENT_ID:
+	case token_model.TokenSearchKeyUserAgentID:
 		return TokenKeyUserAgentID
-	case token_model.TOKENSEARCHKEY_USER_ID:
+	case token_model.TokenSearchKeyUserID:
 		return TokenKeyUserID
-	case token_model.TOKENSEARCHKEY_APPLICATION_ID:
+	case token_model.TokenSearchKeyApplicationID:
 		return TokenKeyApplicationID
-	case token_model.TOKENSEARCHKEY_EXPIRATION:
+	case token_model.TokenSearchKeyExpiration:
 		return TokenKeyExpiration
-	case token_model.TOKENSEARCHKEY_RESOURCEOWNER:
+	case token_model.TokenSearchKeyResourceOwner:
 		return TokenKeyResourceOwner
 	default:
 		return ""

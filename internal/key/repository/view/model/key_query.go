@@ -3,7 +3,7 @@ package model
 import (
 	key_model "github.com/caos/zitadel/internal/key/model"
 	global_model "github.com/caos/zitadel/internal/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type KeySearchRequest key_model.KeySearchRequest
@@ -18,8 +18,8 @@ func (req KeySearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req KeySearchRequest) GetSortingColumn() view.ColumnKey {
-	if req.SortingColumn == key_model.KEYSEARCHKEY_UNSPECIFIED {
+func (req KeySearchRequest) GetSortingColumn() repository.ColumnKey {
+	if req.SortingColumn == key_model.KeySearchKeyUnspecified {
 		return nil
 	}
 	return KeySearchKey(req.SortingColumn)
@@ -29,15 +29,15 @@ func (req KeySearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req KeySearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, len(req.Queries))
+func (req KeySearchRequest) GetQueries() []repository.SearchQuery {
+	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
 		result[i] = KeySearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req KeySearchQuery) GetKey() view.ColumnKey {
+func (req KeySearchQuery) GetKey() repository.ColumnKey {
 	return KeySearchKey(req.Key)
 }
 
@@ -51,13 +51,13 @@ func (req KeySearchQuery) GetValue() interface{} {
 
 func (key KeySearchKey) ToColumnName() string {
 	switch key_model.KeySearchKey(key) {
-	case key_model.KEYSEARCHKEY_ID:
+	case key_model.KeySearchKeyID:
 		return KeyKeyID
-	case key_model.KEYSEARCHKEY_PRIVATE:
+	case key_model.KeySearchKeyPrivate:
 		return KeyPrivate
-	case key_model.KEYSEARCHKEY_USAGE:
+	case key_model.KeySearchKeyUsage:
 		return KeyUsage
-	case key_model.KEYSEARCHKEY_EXPIRY:
+	case key_model.KeySearchKeyExpiry:
 		return KeyExpiry
 	default:
 		return ""

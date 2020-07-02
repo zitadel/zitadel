@@ -32,7 +32,7 @@ func TestPasswordComplexityPolicyQuery(t *testing.T) {
 				sequence:      0,
 			},
 			res: res{
-				filterLen: 3,
+				filterLen: 2,
 			},
 		},
 		{
@@ -143,7 +143,7 @@ func TestPasswordComplexityPolicyCreateAggregate(t *testing.T) {
 			name: "policy update aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				new:        &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.POLICYSTATE_ACTIVE)},
+				new:        &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -208,8 +208,8 @@ func TestPasswordComplexityPolicyUpdateAggregate(t *testing.T) {
 			name: "policy update aggregate ok",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.POLICYSTATE_ACTIVE)},
-				new:        &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName_Changed", State: int32(policy_model.POLICYSTATE_ACTIVE)},
+				existing:   &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
+				new:        &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName_Changed", State: int32(policy_model.PolicyStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -235,7 +235,7 @@ func TestPasswordComplexityPolicyUpdateAggregate(t *testing.T) {
 			name: "new policy nil",
 			args: args{
 				ctx:        auth.NewMockContext("orgID", "userID"),
-				existing:   &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "ProjectName", State: int32(policy_model.POLICYSTATE_ACTIVE)},
+				existing:   &PasswordComplexityPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "ProjectName", State: int32(policy_model.PolicyStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},

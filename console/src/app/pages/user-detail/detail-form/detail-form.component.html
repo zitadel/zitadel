@@ -17,10 +17,6 @@
             <input matInput formControlName="nickName" />
         </mat-form-field>
         <mat-form-field class="formfield">
-            <mat-label>{{ 'USER.PROFILE.DISPLAYNAME' | translate }}</mat-label>
-            <input matInput formControlName="displayName" />
-        </mat-form-field>
-        <mat-form-field class="formfield">
             <mat-label>{{ 'USER.PROFILE.GENDER' | translate }}</mat-label>
             <mat-select formControlName="gender">
                 <mat-option *ngFor="let gender of genders" [value]="gender">

@@ -16,5 +16,5 @@ type Config struct {
 }
 
 func Start(ctx context.Context, config Config, authZRepo *authz_repo.EsRepository, authZ auth.Config, systemDefaults sd.SystemDefaults, authRepo *eventsourcing.EsRepository) {
-	api.Start(ctx, config.API, authZRepo, authZ, authRepo)
+	api.Start(ctx, config.API, authZRepo, authZ, systemDefaults, authRepo)
 }

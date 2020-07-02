@@ -2,7 +2,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { tap } from 'rxjs/operators';
 import { ProjectRole } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
@@ -32,6 +31,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     constructor(private projectService: ProjectService, private toast: ToastService) { }
 
     public ngOnInit(): void {
+        console.log(this.projectId);
         this.dataSource = new ProjectRolesDataSource(this.projectService);
         this.dataSource.loadRoles(this.projectId, 0, 25, 'asc');
 
@@ -107,10 +107,5 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             .catch(data => {
                 this.toast.showError(data.message);
             });
-    }
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 }

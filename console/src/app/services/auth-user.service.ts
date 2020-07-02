@@ -6,6 +6,7 @@ import { switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
+    Gender,
     MfaOtpResponse,
     MultiFactors,
     MyProjectOrgSearchQuery,
@@ -21,6 +22,7 @@ import {
     UserPhone,
     UserProfile,
     UserSessionViews,
+    UserView,
     VerifyMfaOtp,
     VerifyUserPhoneRequest,
 } from '../proto/generated/auth_pb';
@@ -61,6 +63,14 @@ export class AuthUserService {
         );
     }
 
+    public async GetMyUser(): Promise<UserView> {
+        return await this.request(
+            c => c.getMyUser,
+            new Empty(),
+            f => f,
+        );
+    }
+
     public async GetMyMfas(): Promise<MultiFactors> {
         return await this.request(
             c => c.getMyMfas,
@@ -88,14 +98,29 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserProfile(profile: UserProfile.AsObject): Promise<UserProfile> {
+    public async SaveMyUserProfile(
+        firstName?: string,
+        lastName?: string,
+        nickName?: string,
+        preferredLanguage?: string,
+        gender?: Gender,
+    ): Promise<UserProfile> {
         const req = new UpdateUserProfileRequest();
-        req.setFirstName(profile.firstName);
-        req.setLastName(profile.lastName);
-        req.setNickName(profile.nickName);
-        req.setDisplayName(profile.displayName);
-        req.setPreferredLanguage(profile.preferredLanguage);
-        req.setGender(profile.gender);
+        if (firstName) {
+            req.setFirstName(firstName);
+        }
+        if (lastName) {
+            req.setLastName(lastName);
+        }
+        if (nickName) {
+            req.setNickName(nickName);
+        }
+        if (gender) {
+            req.setGender(gender);
+        }
+        if (preferredLanguage) {
+            req.setPreferredLanguage(preferredLanguage);
+        }
         return await this.request(
             c => c.updateMyUserProfile,
             req,
@@ -119,9 +144,9 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserEmail(email: UserEmail.AsObject): Promise<UserEmail> {
+    public async SaveMyUserEmail(email: string): Promise<UserEmail> {
         const req = new UpdateUserEmailRequest();
-        req.setEmail(email.email);
+        req.setEmail(email);
         return await this.request(
             c => c.changeMyUserEmail,
             req,
@@ -159,9 +184,9 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserPhone(phone: UserPhone.AsObject): Promise<UserPhone> {
+    public async SaveMyUserPhone(phone: string): Promise<UserPhone> {
         const req = new UpdateUserPhoneRequest();
-        req.setPhone(phone.phone);
+        req.setPhone(phone);
         return await this.request(
             c => c.changeMyUserPhone,
             req,
@@ -264,7 +289,12 @@ export class AuthUserService {
 
             return this.GetMyzitadelPermissions().pipe(
                 switchMap(response => {
-                    const userRoles = response.toObject().permissionsList;
+                    let userRoles = [];
+                    if (response.toObject().permissionsList) {
+                        userRoles = response.toObject().permissionsList;
+                    } else {
+                        userRoles = ['user.resourceowner'];
+                    }
                     this._roleCache = userRoles;
                     return of(this.hasRoles(userRoles, roles, each));
                 }),

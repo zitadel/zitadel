@@ -38,8 +38,8 @@ func (l *Login) renderMfaVerify(w http.ResponseWriter, r *http.Request, authReq 
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := userData{
-		baseData: l.getBaseData(r, authReq, "Mfa Verify", errType, errMessage),
-		UserName: authReq.UserName,
+		baseData:  l.getBaseData(r, authReq, "Mfa Verify", errType, errMessage),
+		LoginName: authReq.LoginName,
 	}
 	if verificationStep != nil {
 		data.MfaProviders = verificationStep.MfaProviders

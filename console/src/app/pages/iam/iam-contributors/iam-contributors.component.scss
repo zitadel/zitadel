@@ -1,0 +1,71 @@
+.groups {
+    padding-top: 1rem;
+
+    .header {
+      display: block;
+      margin-bottom: 1rem;
+      font-weight: 400;
+    }
+
+    .sub-header {
+        font-size: .8rem;
+        color: #8795a1;
+    }
+  
+    .people {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+  
+      .owner {
+        margin-right: 1rem;
+      }
+  
+      .img-list {
+        width: 100%;
+        margin-top: 0.5rem;
+        margin-left: 1rem;
+        display: flex;
+        align-items: center;
+  
+        .avatar-img, .avatar-circle {
+          float: left;
+          margin: 0 8px 0 -15px;
+          height: 32px;
+          width: 32px;
+          border-radius: 50%;
+        }
+
+        .add-img {
+            float: left;
+            margin: 0 8px 0 -15px;
+        }
+
+        .avatar-img {
+            &:before {
+                content: '';
+                display: block;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                height: 32px;
+                width: 32px;
+            }
+        }
+
+        .avatar-circle {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: indianred;
+        }
+  
+        .margin-neg {
+          margin-left: -1rem;
+        }
+      }
+    }
+  }
+  

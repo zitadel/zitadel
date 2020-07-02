@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { Gender as authGender, UserProfile as authUP } from 'src/app/proto/generated/auth_pb';
 import { Gender as mgmtGender, UserProfile as mgmtUP } from 'src/app/proto/generated/management_pb';
 
+
 @Component({
     selector: 'app-detail-form',
     templateUrl: './detail-form.component.html',
@@ -23,11 +24,12 @@ export class DetailFormComponent implements OnInit, OnDestroy {
 
     constructor(private fb: FormBuilder) {
         this.profileForm = this.fb.group({
-            userName: [{ value: '', disabled: true }, [Validators.required]],
+            userName: [{ value: '', disabled: true }, [
+                Validators.required,
+            ]],
             firstName: [{ value: '', disabled: this.disabled }, Validators.required],
             lastName: [{ value: '', disabled: this.disabled }, Validators.required],
             nickName: [{ value: '', disabled: this.disabled }],
-            displayName: [{ value: '', disabled: this.disabled }],
             gender: [{ value: 0 }, { disabled: this.disabled }],
             preferredLanguage: [{ value: '', disabled: this.disabled }],
         });
@@ -61,9 +63,6 @@ export class DetailFormComponent implements OnInit, OnDestroy {
     }
     public get nickName(): AbstractControl | null {
         return this.profileForm.get('nickName');
-    }
-    public get displayName(): AbstractControl | null {
-        return this.profileForm.get('displayName');
     }
     public get gender(): AbstractControl | null {
         return this.profileForm.get('gender');

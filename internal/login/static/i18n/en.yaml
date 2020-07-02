@@ -1,7 +1,8 @@
 Login:
   Title: Login
   Description: Enter your logindata.
-  Username: Username
+  Loginname: Loginname
+  LoginnamePlaceHolder: username@domain
 
 UserSelection:
   Title: Select account
@@ -89,7 +90,7 @@ EmailVerificationDone:
 
 Registration:
   Title: Registration
-  Description: Enter your Userdata. Your email address will be used as username.
+  Description: Enter your Userdata. Your email address will be used as loginname.
   Email: E-Mail
   Firstname: Firstname
   Lastname: Lastname
@@ -125,7 +126,7 @@ Errors:
     NotFound: User could not be found
     NotMatchingUserID: User and user in authrequest don't match
     UserIDMissing: UserID is empty
-    InvalidData: Invalid userdata
+    Invalid: Invalid userdata
     Password:
       ConfirmationWrong: Passwordconfirmation is wrong
       Empty: Password is empty
@@ -153,6 +154,8 @@ Errors:
         NotExisting: Multifactor OTP (OneTimePassword) doesn't exist
         InvalidCode: Invalid code
         NotReady: Multifactor OTP (OneTimePassword) isn't ready
+    Locked: User is locked
+    NotActive: User is not active
 
 
 optional: (optional)

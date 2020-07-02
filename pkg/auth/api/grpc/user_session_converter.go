@@ -15,11 +15,13 @@ func userSessionViewsFromModel(userSessions []*usr_model.UserSessionView) []*Use
 
 func userSessionViewFromModel(userSession *usr_model.UserSessionView) *UserSessionView {
 	return &UserSessionView{
-		Sequence:  userSession.Sequence,
-		AgentId:   userSession.UserAgentID,
-		UserId:    userSession.UserID,
-		UserName:  userSession.UserName,
-		AuthState: userSessionStateFromModel(userSession.State),
+		Sequence:    userSession.Sequence,
+		AgentId:     userSession.UserAgentID,
+		UserId:      userSession.UserID,
+		UserName:    userSession.UserName,
+		LoginName:   userSession.LoginName,
+		DisplayName: userSession.DisplayName,
+		AuthState:   userSessionStateFromModel(userSession.State),
 	}
 }
 

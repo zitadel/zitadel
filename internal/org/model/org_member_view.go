@@ -30,19 +30,19 @@ type OrgMemberSearchRequest struct {
 type OrgMemberSearchKey int32
 
 const (
-	ORGMEMBERSEARCHKEY_UNSPECIFIED OrgMemberSearchKey = iota
-	ORGMEMBERSEARCHKEY_USER_NAME
-	ORGMEMBERSEARCHKEY_EMAIL
-	ORGMEMBERSEARCHKEY_FIRST_NAME
-	ORGMEMBERSEARCHKEY_LAST_NAME
-	ORGMEMBERSEARCHKEY_ORG_ID
-	ORGMEMBERSEARCHKEY_USER_ID
+	OrgMemberSearchKeyUnspecified OrgMemberSearchKey = iota
+	OrgMemberSearchKeyUserName
+	OrgMemberSearchKeyEmail
+	OrgMemberSearchKeyFirstName
+	OrgMemberSearchKeyLastName
+	OrgMemberSearchKeyOrgID
+	OrgMemberSearchKeyUserID
 )
 
 type OrgMemberSearchQuery struct {
 	Key    OrgMemberSearchKey
 	Method model.SearchMethod
-	Value  string
+	Value  interface{}
 }
 
 type OrgMemberSearchResponse struct {

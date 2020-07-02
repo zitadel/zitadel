@@ -2,11 +2,12 @@ package spooler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/query"
-	global_view "github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 
 	"time"
 )
@@ -95,7 +96,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 			logging.Log("SPOOL-FTKwH").WithField("view", s.ViewModel()).Debug("context canceled")
 			return nil
 		default:
-			if err := s.Process(event); err != nil {
+			if err := s.Reduce(event); err != nil {
 				return s.OnError(event, err)
 			}
 		}
@@ -104,8 +105,8 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 }
 
 func HandleError(event *models.Event, failedErr error,
-	latestFailedEvent func(sequence uint64) (*global_view.FailedEvent, error),
-	processFailedEvent func(*global_view.FailedEvent) error,
+	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
+	processFailedEvent func(*repository.FailedEvent) error,
 	processSequence func(uint64) error, errorCountUntilSkip uint64) error {
 	failedEvent, err := latestFailedEvent(event.Sequence)
 	if err != nil {
@@ -117,7 +118,7 @@ func HandleError(event *models.Event, failedErr error,
 	if err != nil {
 		return err
 	}
-	if errorCountUntilSkip == failedEvent.FailureCount {
+	if errorCountUntilSkip <= failedEvent.FailureCount {
 		return processSequence(event.Sequence)
 	}
 	return nil
