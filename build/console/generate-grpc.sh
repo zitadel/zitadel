@@ -12,6 +12,10 @@ rm -rf $GEN_PATH
 echo "Create folders"
 mkdir -p $GEN_PATH
 
+echo "Go Get additional protos files"
+go get github.com/envoyproxy/protoc-gen-validate
+go get github.com/grpc-ecosystem/grpc-gateway
+
 echo "Generate grpc"
 
 protoc \
@@ -21,8 +25,8 @@ protoc \
   -I=pkg/admin/api/proto \
   -I=internal/protoc/protoc-gen-authoption \
   -I=console/node_modules/google-proto-files \
-  -I=${GOPATH}/pkg/mod/github.com/envoyproxy/protoc-gen-validate@v0.4.0 \
-  -I=${GOPATH}/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.14.6 \
+  -I=${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate \
+  -I=${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
   pkg/management/api/proto/*.proto \
