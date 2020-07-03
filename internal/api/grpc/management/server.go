@@ -1,9 +1,6 @@
 package management
 
 import (
-	"context"
-	"errors"
-
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -69,10 +66,4 @@ func (s *Server) RegisterGateway() server.GatewayFunc {
 
 func (s *Server) GatewayPathPrefix() string {
 	return "/mgmt/v1"
-}
-
-func (s *Server) Validations() map[string]server.ValidationFunction {
-	return map[string]server.ValidationFunction{
-		"Test": func(_ context.Context) error { return errors.New("Test") },
-	}
 }

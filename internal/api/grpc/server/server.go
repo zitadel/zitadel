@@ -20,23 +20,17 @@ const (
 type Server interface {
 	Gateway
 	RegisterServer(*grpc.Server)
-	//AuthInterceptor() grpc.UnaryServerInterceptor
-	//GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error) TODO: remove
 	AppName() string
 	MethodPrefix() string
 	AuthMethods() authz.MethodMapping
 }
 
-func CreateServer(servers []Server, verifier *authz.TokenVerifier, authConfig authz.Config) *grpc.Server {
-	//authInterceptors := make([]grpc.UnaryServerInterceptor, len(servers))
-	//for i, server := range servers {
-	//	authInterceptors[i] = server.AuthInterceptor()
-	//}
+func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang language.Tag) *grpc.Server {
 	return grpc.NewServer(
 		middleware.TracingStatsServer(http.Healthz, http.Readiness, http.Validation),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				middleware.ErrorHandler(language.German),
+				middleware.ErrorHandler(lang),
 				grpc_middleware.ChainUnaryServer(
 					middleware.AuthorizationInterceptor(verifier, authConfig),
 				),

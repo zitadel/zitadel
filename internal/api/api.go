@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/api/oidc"
 	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 )
 
 type Config struct {
@@ -25,14 +26,12 @@ type API struct {
 	serverPort     string
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository) *API {
-	apis := make([]server.Server, 0, 3)
-
+func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
 	api.verifier = authz.Start(authZRepo)
-	api.grpcServer = server.CreateServer(apis, api.verifier, authZ)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
 
 	return api
