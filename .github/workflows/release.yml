@@ -10,20 +10,6 @@ env:
 
 jobs:
 
-  angular-test: # will be added later on
-    runs-on: ubuntu-18.04
-    defaults:
-      run:
-        working-directory: ./console
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-    - run: npm ci
-    #- run: npm test 
-    - run: echo "replace me with real test"
-
   angular-lint: # will be added later on
     runs-on: ubuntu-18.04
     defaults:
@@ -156,22 +142,6 @@ jobs:
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: results.sarif
-
-  container-test:
-    runs-on: ubuntu-18.04
-    needs: container-prod
-    steps:
-    - name: Source checkout
-      uses: actions/checkout@v2
-    - name: Generate Short SHA Container Tag
-      id: vars
-      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-    - name: Check outputs
-      run: echo ${{ steps.vars.outputs.sha_short }}
-    - name: Docker Login
-      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-    - name: Docker Run Test
-      run: echo "replace me with real test"
 
   release:
     runs-on: ubuntu-18.04
