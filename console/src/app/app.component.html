@@ -19,7 +19,8 @@
 
         <mat-menu #menu="matMenu">
             <mat-progress-bar *ngIf="orgLoading" color="accent" mode="indeterminate"></mat-progress-bar>
-            <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">Show all organizations</button>
+            <button class="show-all" mat-menu-item
+                [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
 
             <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id" *ngFor="let temporg of orgs"
                 mat-menu-item (click)="setActiveOrg(temporg)">

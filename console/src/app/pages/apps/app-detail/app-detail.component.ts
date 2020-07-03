@@ -144,13 +144,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public changeState(event: MatButtonToggleChange): void {
         if (event.value === AppState.APPSTATE_ACTIVE) {
-            this.projectService.ReactivateApplication(this.app.id).then(() => {
+            this.projectService.ReactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('Reactivated Application');
             }).catch((error: any) => {
                 this.toast.showError(error.message);
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
-            this.projectService.DectivateApplication(this.app.id).then(() => {
+            this.projectService.DeactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('Deactivated Application');
             }).catch((error: any) => {
                 this.toast.showError(error.message);

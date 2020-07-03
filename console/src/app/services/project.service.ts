@@ -297,9 +297,11 @@ export class ProjectService {
         );
     }
 
-    public async ReactivateApplication(appId: string): Promise<Application> {
+    public async ReactivateApplication(projectId: string, appId: string): Promise<Application> {
         const req = new ApplicationID();
         req.setId(appId);
+        req.setProjectId(projectId);
+
         return await this.request(
             c => c.reactivateApplication,
             req,
@@ -307,9 +309,11 @@ export class ProjectService {
         );
     }
 
-    public async DectivateApplication(projectId: string): Promise<Application> {
+    public async DeactivateApplication(projectId: string, appId: string): Promise<Application> {
         const req = new ApplicationID();
-        req.setId(projectId);
+        req.setId(appId);
+        req.setProjectId(projectId);
+
         return await this.request(
             c => c.deactivateApplication,
             req,
