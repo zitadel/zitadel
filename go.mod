@@ -11,7 +11,6 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/VictoriaMetrics/fastcache v1.5.7
-	github.com/aaronarduino/goqrsvg v0.0.0-20170617203649-603647895681
 	github.com/ajstarks/svgo v0.0.0-20200320125537-f189e35d30ca
 	github.com/allegro/bigcache v1.2.1
 	github.com/aws/aws-sdk-go v1.30.25 // indirect
