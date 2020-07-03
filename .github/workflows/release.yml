@@ -125,7 +125,7 @@ jobs:
         path: .artifacts
     - uses: docker/build-push-action@v1
       with:
-        dockerfile: build/docker/prod
+        dockerfile: build/docker/Dockerfile
         username: ${{ github.actor }}
         password: ${{ github.token }}
         registry: ${{ env.REGISTRY }}
