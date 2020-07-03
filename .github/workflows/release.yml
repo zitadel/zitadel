@@ -69,7 +69,7 @@ jobs:
   
   go-build:
     runs-on: ubuntu-18.04
-    needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
+    needs: [angular-build, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
