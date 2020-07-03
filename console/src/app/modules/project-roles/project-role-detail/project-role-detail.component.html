@@ -1,0 +1,30 @@
+<h1 mat-dialog-title>
+    <span class="title">{{'PROJECT.ROLE.EDITTITLE' | translate}}</span>
+</h1>
+<p class="desc"> {{'PROJECT.ROLE.EDITDESCRIPTION' | translate}}</p>
+<div mat-dialog-content>
+    <form *ngIf="formGroup" class="full-width" [formGroup]="formGroup" (ngSubmit)="submitForm()">
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'PROJECT.ROLE.KEY' | translate }}</mat-label>
+            <input matInput formControlName="key" />
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</mat-label>
+            <input matInput formControlName="displayName" />
+        </mat-form-field>
+        <mat-form-field class="formfield">
+            <mat-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</mat-label>
+            <input matInput formControlName="group" />
+        </mat-form-field>
+    </form>
+</div>
+
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()">
+        {{'ACTIONS.CANCEL' | translate}}
+    </button>
+
+    <button [disabled]="formGroup.invalid" color="primary" mat-raised-button class="ok-button" (click)="submitForm()">
+        {{'ACTIONS.SAVE' | translate}}
+    </button>
+</div>

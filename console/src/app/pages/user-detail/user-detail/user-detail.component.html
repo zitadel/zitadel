@@ -4,7 +4,7 @@
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.firstName}}</h1>
+            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.displayName}}</h1>
 
             <p class="desc">{{ 'USER.PROFILE.DESCRIPTION' | translate }}</p>
         </div>
@@ -175,36 +175,6 @@
 
         <app-user-mfa *ngIf="user" [user]="user"></app-user-mfa>
 
-        <!-- <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}">
-            <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
-                <div class="content">
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.STREET' | translate }}</mat-label>
-                        <input matInput formControlName="streetAddress" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.POSTAL_CODE' | translate }}</mat-label>
-                        <input matInput formControlName="postalCode" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.LOCALITY' | translate }}</mat-label>
-                        <input matInput formControlName="locality" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.REGION' | translate }}</mat-label>
-                        <input matInput formControlName="region" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.COUNTRY' | translate }}</mat-label>
-                        <input matInput formControlName="country" />
-                    </mat-form-field>
-                </div>
-                <div class="btn-container">
-                    <button type="submit" color="primary" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-                </div>
-            </form>
-        </app-card> -->
-
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <app-user-grants [filterValue]="user?.id" [allowCreate]="['user.grant.write'] | hasRole"
@@ -221,7 +191,6 @@
             </div>
         </div>
 
-        <p class="side-section">{{ 'CHANGES.USER.TITLE' | translate }}</p>
         <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </metainfo>
 </app-meta-layout>

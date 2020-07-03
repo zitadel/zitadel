@@ -36,8 +36,10 @@ import {
     ProjectMemberRoles,
     ProjectMemberSearchRequest,
     ProjectMemberSearchResponse,
+    ProjectRole,
     ProjectRoleAdd,
     ProjectRoleAddBulk,
+    ProjectRoleChange,
     ProjectRoleRemove,
     ProjectRoleSearchQuery,
     ProjectRoleSearchRequest,
@@ -385,6 +387,22 @@ export class ProjectService {
             f => f,
         );
     }
+
+
+    public async ChangeProjectRole(projectId: string, key: string, displayName: string, group: string):
+        Promise<ProjectRole> {
+        const req = new ProjectRoleChange();
+        req.setId(projectId);
+        req.setKey(key);
+        req.setGroup(group);
+        req.setDisplayName(displayName);
+        return await this.request(
+            c => c.changeProjectRole,
+            req,
+            f => f,
+        );
+    }
+
 
     public async RemoveProjectMember(id: string, userId: string): Promise<Empty> {
         const req = new ProjectMemberRemove();

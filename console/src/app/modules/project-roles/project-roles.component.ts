@@ -1,5 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
@@ -7,6 +8,7 @@ import { ProjectRole } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
 import { ProjectRolesDataSource } from './project-roles-datasource';
 
 
@@ -28,7 +30,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService) { }
+    constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
         console.log(this.projectId);
@@ -107,5 +109,15 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             .catch(data => {
                 this.toast.showError(data.message);
             });
+    }
+
+    public openDetailDialog(role: ProjectRole.AsObject): void {
+        this.dialog.open(ProjectRoleDetailComponent, {
+            data: {
+                role,
+                projectId: this.projectId,
+            },
+            width: '400px',
+        });
     }
 }

@@ -41,7 +41,6 @@ const routes: Routes = [
     {
         path: ':projectid/roles/create',
         loadChildren: () => import('../project-role-create/project-role-create.module').then(m => m.ProjectRoleCreateModule),
-
     },
     {
         path: ':projectid/grants/create',

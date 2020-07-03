@@ -18,10 +18,6 @@ const routes: Routes = [
             roles: ['user.read'],
         },
     },
-    {
-        path: ':id/grant/:grantid',
-        loadChildren: () => import('src/app/modules/user-grant/user-grant.module').then(m => m.UserGrantModule),
-    },
 ];
 
 @NgModule({

@@ -32,10 +32,12 @@
     "ACTIONS": {
         "SAVE": "Save",
         "NEW": "New",
+        "ADD":"Add",
         "CREATE": "Create",
         "CONTINUE": "Continue",
         "BACK": "back",
         "CLOSE": "Close",
+        "CANCEL":"cancel",
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
@@ -397,8 +399,11 @@
             "ACTIONS": "Actions",
             "ADDTITLE": "Create role",
             "ADDDESCRIPTION": "Enter the data for the new role!",
+            "EDITTITLE": "Edit role",
+            "EDITDESCRIPTION": "Enter the new data for the role!",
             "DELETE":"Delete Role",
-            "CREATIONDATE":"Created"
+            "CREATIONDATE":"Created",
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}"
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -535,7 +540,7 @@
     },
     "CHANGES": {
         "LISTTITLE":"Last Changes",
-        "BOTTOM":"Bottom",
+        "BOTTOM":"You've arrived at the bottom",
         "ORG": {
             "TITLE":"Activity",
             "DESCRIPTION":"Here you can see the latest events that have affected an organization change"
