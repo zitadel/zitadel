@@ -4,7 +4,7 @@ set -eux
 
 GOPATH=${GOPATH:-~/go}
 
-GEN_PATH=${GOPATH}/src/github.com/caos/zitadel/console/src/app/proto/generated
+GEN_PATH=console/src/app/proto/generated
 
 echo "Remove old files"
 rm -rf $GEN_PATH
@@ -16,18 +16,18 @@ echo "Generate grpc"
 
 protoc \
   -I=/usr/local/include \
-  -I=${GOPATH}/src/github.com/caos/zitadel/pkg/management/api/proto \
-  -I=${GOPATH}/src/github.com/caos/zitadel/pkg/auth/api/proto \
-  -I=${GOPATH}/src/github.com/caos/zitadel/pkg/admin/api/proto \
-  -I=${GOPATH}/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption \
-  -I=${GOPATH}/src/github.com/caos/zitadel/console/node_modules/google-proto-files \
+  -I=pkg/management/api/proto \
+  -I=pkg/auth/api/proto \
+  -I=pkg/admin/api/proto \
+  -I=internal/protoc/protoc-gen-authoption \
+  -I=console/node_modules/google-proto-files \
   -I=${GOPATH}/pkg/mod/github.com/envoyproxy/protoc-gen-validate@v0.4.0 \
   -I=${GOPATH}/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.14.6 \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
-  ${GOPATH}/src/github.com/caos/zitadel/pkg/management/api/proto/*.proto \
-  ${GOPATH}/src/github.com/caos/zitadel/pkg/admin/api/proto/*.proto \
-  ${GOPATH}/src/github.com/caos/zitadel/pkg/auth/api/proto/*.proto
+  pkg/management/api/proto/*.proto \
+  pkg/admin/api/proto/*.proto \
+  pkg/auth/api/proto/*.proto
 
 echo "Generate annotations js file (compatibility)"
 
