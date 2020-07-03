@@ -145,7 +145,7 @@ jobs:
 
   release:
     runs-on: ubuntu-18.04
-    needs: [container-prod, container-test]
+    needs: [container-prod]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
