@@ -10,10 +10,11 @@
 
     <ng-container *ngIf="currentCreateStep === 1">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</h1>
+        <p>{{'PROJECT.GRANT.CREATE.SEL_ORG_DESC' | translate}}</p>
 
         <form (ngSubmit)="searchOrg(domain.value)">
             <mat-form-field class="org-domain">
-                <mat-label>{{'PROJECT.GRANT.CREATE.SEL_ORG' | translate}}</mat-label>
+                <mat-label>{{'PROJECT.GRANT.CREATE.SEL_ORG_FORMFIELD' | translate}}</mat-label>
                 <input #domain matInput />
             </mat-form-field>
 

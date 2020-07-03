@@ -27,7 +27,8 @@
         "USER": "Benutzer",
         "LOGOUT": "abmelden",
         "NEWORG":"Neue Organisation",
-        "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!"
+        "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!",
+        "SHOWORGS":"Alle organisationen anzeigen"
     },
     "ACTIONS": {
         "SAVE": "speichern",
@@ -355,17 +356,20 @@
             "USERID":"User Id"
         },
         "GRANT": {
-            "TITLE": "Grants",
+            "TITLE": "Berechtigte Organisationen",
             "DESCRIPTION": "Gewähren Sie einer anderen Organisation Zugriff (Grant) auf dieses Projekt",
             "CREATE": {
-                "TITLE": "Member Grant erstellen",
+                "TITLE": "Organisation berechtigen",
                 "SEL_USERS": "Selektieren Sie die gewünschten User für das Erstellen des Grants!",
                 "SEL_ROLES": "Selektieren Sie die gewünschten Rollen für das Erstellen des Grants!",
                 "SEL_PROJECT": "Suchen Sie nach dem Projekt",
+                "SEL_USER":"Suchen Sie nach einem User",
                 "SEL_ORG": "Suchen Sie nach der Domain",
+                "SEL_ORG_DESC":"Geben Sie die vollständige Domain ein um Resultate zu erhalten!",
                 "ORG_TITLE":"Organisation",
                 "ORG_DESCRIPTION":"Sie sind im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
                 "ORG_DESCRIPTION_DESC":"Wechseln Sie den Context um die Organisation zu wechseln!",
+                "SEL_ORG_FORMFIELD":"Vollständige Domain",
                 "SEL_ORG_BUTTON": "Suche Organisation",
                 "FOR_ORG":"The grant wird erstellt für:"
             },
@@ -377,7 +381,7 @@
             "USER":"Benutzer",
             "MEMBERS":"Managers",
             "PROJECTNAME":"Projekt Name",
-            "GRANTEDORG": "Granted Organization",
+            "GRANTEDORG": "Granted Organisation",
             "GRANTEDORGDOMAIN": "Domain",
             "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Erstelldatum",

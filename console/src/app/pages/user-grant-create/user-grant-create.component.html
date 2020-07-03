@@ -25,7 +25,7 @@
         </ng-container>
 
         <ng-container *ngIf="filter && filter == UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID">
-            <h1>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h1>
+            <h1>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h1>
 
             <app-search-user-autocomplete class="block" singleOutput="true" (selectionChanged)="selectUser($event)">
             </app-search-user-autocomplete>
