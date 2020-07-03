@@ -2,9 +2,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, scan, take, tap } from 'rxjs/operators';
 import { Change, Changes } from 'src/app/proto/generated/management_pb';
+import { AuthUserService } from 'src/app/services/auth-user.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
 export enum ChangeType {
+    MYUSER = 'myuser',
     USER = 'user',
     ORG = 'org',
     PROJECT = 'project',
@@ -30,7 +32,7 @@ export class ChangesComponent implements OnInit {
     loading: Observable<boolean> = this._loading.asObservable();
     public data!: Observable<Change.AsObject[]>;
     public changes!: Changes.AsObject;
-    constructor(private mgmtUserService: MgmtUserService) { }
+    constructor(private mgmtUserService: MgmtUserService, private authUserService: AuthUserService) { }
 
     ngOnInit(): void {
         this.init();
@@ -45,6 +47,8 @@ export class ChangesComponent implements OnInit {
     private init(): void {
         let first: Promise<Changes>;
         switch (this.changeType) {
+            case ChangeType.MYUSER: first = this.authUserService.GetMyUserChanges(10, 0);
+                break;
             case ChangeType.USER: first = this.mgmtUserService.UserChanges(this.id, 10, 0);
                 break;
             case ChangeType.PROJECT: first = this.mgmtUserService.ProjectChanges(this.id, 20, 0);
@@ -68,6 +72,8 @@ export class ChangesComponent implements OnInit {
         let more: Promise<Changes>;
 
         switch (this.changeType) {
+            case ChangeType.MYUSER: more = this.authUserService.GetMyUserChanges(10, cursor);
+                break;
             case ChangeType.USER: more = this.mgmtUserService.UserChanges(this.id, 10, cursor);
                 break;
             case ChangeType.PROJECT: more = this.mgmtUserService.ProjectChanges(this.id, 10, cursor);

@@ -1206,6 +1206,102 @@ export namespace MyPermissions {
   }
 }
 
+export class ChangesRequest extends jspb.Message {
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  getSequenceOffset(): number;
+  setSequenceOffset(value: number): void;
+
+  getAsc(): boolean;
+  setAsc(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ChangesRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ChangesRequest): ChangesRequest.AsObject;
+  static serializeBinaryToWriter(message: ChangesRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ChangesRequest;
+  static deserializeBinaryFromReader(message: ChangesRequest, reader: jspb.BinaryReader): ChangesRequest;
+}
+
+export namespace ChangesRequest {
+  export type AsObject = {
+    limit: number,
+    sequenceOffset: number,
+    asc: boolean,
+  }
+}
+
+export class Changes extends jspb.Message {
+  getChangesList(): Array<Change>;
+  setChangesList(value: Array<Change>): void;
+  clearChangesList(): void;
+  addChanges(value?: Change, index?: number): Change;
+
+  getOffset(): number;
+  setOffset(value: number): void;
+
+  getLimit(): number;
+  setLimit(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Changes.AsObject;
+  static toObject(includeInstance: boolean, msg: Changes): Changes.AsObject;
+  static serializeBinaryToWriter(message: Changes, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Changes;
+  static deserializeBinaryFromReader(message: Changes, reader: jspb.BinaryReader): Changes;
+}
+
+export namespace Changes {
+  export type AsObject = {
+    changesList: Array<Change.AsObject>,
+    offset: number,
+    limit: number,
+  }
+}
+
+export class Change extends jspb.Message {
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getEventType(): string;
+  setEventType(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getEditorId(): string;
+  setEditorId(value: string): void;
+
+  getEditor(): string;
+  setEditor(value: string): void;
+
+  getData(): google_protobuf_struct_pb.Struct | undefined;
+  setData(value?: google_protobuf_struct_pb.Struct): void;
+  hasData(): boolean;
+  clearData(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Change.AsObject;
+  static toObject(includeInstance: boolean, msg: Change): Change.AsObject;
+  static serializeBinaryToWriter(message: Change, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Change;
+  static deserializeBinaryFromReader(message: Change, reader: jspb.BinaryReader): Change;
+}
+
+export namespace Change {
+  export type AsObject = {
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    eventType: string,
+    sequence: number,
+    editorId: string,
+    editor: string,
+    data?: google_protobuf_struct_pb.Struct.AsObject,
+  }
+}
+
 export enum UserSessionState { 
   USERSESSIONSTATE_UNSPECIFIED = 0,
   USERSESSIONSTATE_ACTIVE = 1,

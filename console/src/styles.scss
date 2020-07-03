@@ -122,7 +122,8 @@ $custom-typography: mat-typography-config(
     color: #202124;
 
 	.crescent, .side, .main-container {
-		background-color: white;
+        background-color: white;
+        transition: background-color .5s ease-in-out;
     }
 }
 
@@ -131,7 +132,8 @@ $custom-typography: mat-typography-config(
     @include angular-material-theme($dark-theme);
 
 	.crescent, .side, .main-container {
-		background-color: #212224;
+        background-color: #212224;
+        transition: background-color .5s ease-in-out;
     }
     
     .mat-dialog-container {

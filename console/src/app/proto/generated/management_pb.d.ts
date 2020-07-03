@@ -4619,6 +4619,9 @@ export class UserGrantView extends jspb.Message {
   getResourceOwner(): string;
   setResourceOwner(value: string): void;
 
+  getDisplayName(): string;
+  setDisplayName(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserGrantView.AsObject;
   static toObject(includeInstance: boolean, msg: UserGrantView): UserGrantView.AsObject;
@@ -4646,6 +4649,7 @@ export namespace UserGrantView {
     projectName: string,
     sequence: number,
     resourceOwner: string,
+    displayName: string,
   }
 }
 
