@@ -15,7 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/form"
-	_ "github.com/caos/zitadel/internal/login/statik"
+	_ "github.com/caos/zitadel/internal/ui/login/statik"
 )
 
 type Login struct {

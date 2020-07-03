@@ -1,13 +1,15 @@
 package handler
 
 import (
+	"net/http"
+
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/auth_request/model"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	"golang.org/x/text/language"
-	"net/http"
 )
 
 const (

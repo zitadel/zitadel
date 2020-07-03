@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"net/http"
+	"path"
 
 	"github.com/gorilla/csrf"
 
@@ -12,8 +14,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
-	"net/http"
-	"path"
 
 	"github.com/caos/logging"
 	"golang.org/x/text/language"

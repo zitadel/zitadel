@@ -18,12 +18,12 @@ import (
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/login"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	tracing "github.com/caos/zitadel/internal/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/internal/ui/console"
+	"github.com/caos/zitadel/internal/ui/login"
 )
 
 type Config struct {

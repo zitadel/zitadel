@@ -2,7 +2,7 @@ package login
 
 import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/login/handler"
+	"github.com/caos/zitadel/internal/ui/login/handler"
 )
 
 type Config struct {

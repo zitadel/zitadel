@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/auth_request/model"
 )
 
 func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {

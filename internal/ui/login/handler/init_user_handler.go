@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/auth_request/model"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"net/http"
 	"strconv"
+
+	"github.com/caos/zitadel/internal/auth_request/model"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 const (
