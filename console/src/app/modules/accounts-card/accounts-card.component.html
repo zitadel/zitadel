@@ -11,8 +11,8 @@
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let user of users" (click)="selectAccount(user.userName)">
-            <app-avatar *ngIf="user && (user.displayName || (user.firstName && user.lastName))" class="small-avatar"
-                [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)" [size]="32">
+            <app-avatar *ngIf="user && user.displayName" class="small-avatar"
+                [name]="user.displayName ? user.displayName : ''" [size]="32">
             </app-avatar>
 
             <div class="col">

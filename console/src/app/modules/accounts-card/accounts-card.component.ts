@@ -17,10 +17,7 @@ export class AccountsCardComponent implements OnInit {
     @Output() public close: EventEmitter<void> = new EventEmitter();
     public users: UserSessionView.AsObject[] = [];
     public loadingUsers: boolean = false;
-    constructor(public authService: AuthService, private router: Router, private userService: AuthUserService) { }
-
-    public ngOnInit(): void {
-        this.loadingUsers = true;
+    constructor(public authService: AuthService, private router: Router, private userService: AuthUserService) {
         this.userService.getMyUserSessions().then(sessions => {
             this.users = sessions.toObject().userSessionsList;
 
@@ -31,6 +28,10 @@ export class AccountsCardComponent implements OnInit {
         }).catch(() => {
             this.loadingUsers = false;
         });
+    }
+
+    public ngOnInit(): void {
+        this.loadingUsers = true;
     }
 
     public editUserProfile(): void {
