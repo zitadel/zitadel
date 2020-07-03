@@ -4,7 +4,12 @@ import (
 	"database/sql"
 	"strings"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
+)
+
+const (
+	sslDisabledMode = "disable"
 )
 
 type SQL struct {
@@ -13,26 +18,60 @@ type SQL struct {
 	User     string
 	Password string
 	Database string
-	SSLmode  string
+	SSL      *ssl
 }
 
-func (s *SQL) ConnectionString() string {
+type ssl struct {
+	// type of connection security
+	Mode string
+	// RootCert Path to the CA certificate
+	RootCert string
+	// Cert Path to the client certificate
+	Cert string
+	// Key Path to the client private key
+	Key string
+}
+
+func (s *SQL) connectionString() string {
 	fields := []string{
 		"host=" + s.Host,
 		"port=" + s.Port,
 		"user=" + s.User,
 		"password=" + s.Password,
 		"dbname=" + s.Database,
-		"sslmode=" + s.SSLmode,
+		"sslmode=" + s.SSL.Mode,
+	}
+	if s.SSL.Mode != sslDisabledMode {
+		fields = append(fields, []string{
+			"ssl=true",
+			"sslrootcert=" + s.SSL.RootCert,
+			"sslcert=" + s.SSL.Cert,
+			"sslkey=" + s.SSL.Key,
+		}...)
 	}
 
 	return strings.Join(fields, " ")
 }
 
 func (s *SQL) Start() (*sql.DB, error) {
-	client, err := sql.Open("postgres", s.ConnectionString())
+	s.checkSSL()
+	client, err := sql.Open("postgres", s.connectionString())
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
 	}
 	return client, nil
+}
+
+func (s *SQL) checkSSL() {
+	if s.SSL == nil || s.SSL.Mode == sslDisabledMode {
+		s.SSL = &ssl{Mode: sslDisabledMode}
+		return
+	}
+	if s.SSL.Cert == "" || s.SSL.Key == "" || s.SSL.RootCert == "" {
+		logging.LogWithFields("TYPES-LFdzP",
+			"cert set", s.SSL.Cert != "",
+			"key set", s.SSL.Key != "",
+			"rootCert set", s.SSL.RootCert != "",
+		).Fatal("fields for secure connection missing")
+	}
 }
