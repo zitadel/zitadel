@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserGrantComponent } from './user-grant.component';
+import { ProjectRoleDetailComponent } from './project-role-detail.component';
 
-describe('UserGrantComponent', () => {
-    let component: UserGrantComponent;
-    let fixture: ComponentFixture<UserGrantComponent>;
+describe('ProjectRoleDetailComponent', () => {
+    let component: ProjectRoleDetailComponent;
+    let fixture: ComponentFixture<ProjectRoleDetailComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [UserGrantComponent],
+            declarations: [ProjectRoleDetailComponent],
         })
             .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(UserGrantComponent);
+        fixture = TestBed.createComponent(ProjectRoleDetailComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
