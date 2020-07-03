@@ -18,6 +18,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
+import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 
 import { HttpLoaderFactory } from '../../app.module';
@@ -70,6 +71,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatProgressSpinnerModule,
         MetaLayoutModule,
         MatProgressBarModule,
+        ProjectRolesModule,
         MatTabsModule,
         MatCheckboxModule,
         CardModule,
