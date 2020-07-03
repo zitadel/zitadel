@@ -149,7 +149,7 @@ jobs:
     - uses: anchore/scan-action@master
       with:
         image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ steps.vars.outputs.sha_short }}"
-        dockerfile-path: "./build/docker/prod"
+        dockerfile-path: "./build/docker/Dockerfile"
         fail-build: false
         acs-report-enable: true
     - name: Upload Anchore Scan Report
