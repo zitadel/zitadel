@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>
-    <span class="title">{{'MEMBER.ADD' | translate}}</span>
+    <span class="title">{{'PROJECT.ROLE.EDITTITLE' | translate}}</span>
 </h1>
-<p class="desc"> {{'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate}}</p>
+<p class="desc"> {{'PROJECT.ROLE.EDITDESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
     <form *ngIf="formGroup" class="full-width" [formGroup]="formGroup" (ngSubmit)="submitForm()">
         <mat-form-field class="formfield">
@@ -21,7 +21,7 @@
 
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()">
-        cancel
+        {{'ACTIONS.CANCEL' | translate}}
     </button>
 
     <button [disabled]="formGroup.invalid" color="primary" mat-raised-button class="ok-button" (click)="submitForm()">

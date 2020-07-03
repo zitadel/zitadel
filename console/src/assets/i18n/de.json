@@ -32,10 +32,12 @@
     "ACTIONS": {
         "SAVE": "speichern",
         "NEW": "neu",
+        "ADD":"Hinzufügen",
         "CREATE": "create",
         "CONTINUE": "Weiter",
         "BACK": "zurück",
         "CLOSE": "schliessen",
+        "CANCEL":"abbrechen",
         "INFO": "Info",
         "OK": "Ok",
         "VIEW": "Ansehen",
@@ -396,8 +398,11 @@
             "ACTIONS": "Aktion",
             "ADDTITLE": "Rolle erstellen",
             "ADDDESCRIPTION": "Geben Sie die Daten für die zu erstellende Rolle ein!",
+            "EDITTITLE": "Rolle ändern",
+            "EDITDESCRIPTION": "Geben Sie die Daten für die zu verändernde Rolle ein!",
             "DELETE":"Rolle löschen",
-            "CREATIONDATE":"Erstelldatum"
+            "CREATIONDATE":"Erstelldatum",
+            "SELECTGROUPTOOLTIP":"Selektiere alle Rollen der Gruppe {{group}}"
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt:",

@@ -23,11 +23,11 @@
 </div>
 <div mat-dialog-actions class="action">
     <button mat-button (click)="closeDialog()">
-        cancel
+        {{'ACTIONS.CANCEL' | translate}}
     </button>
 
     <button [disabled]="users.length == 0 || roles.length == 0" color="primary" mat-raised-button class="ok-button"
         (click)="closeDialogWithSuccess()">
-        Add
+        {{'ACTIONS.ADD' | translate}}
     </button>
 </div>

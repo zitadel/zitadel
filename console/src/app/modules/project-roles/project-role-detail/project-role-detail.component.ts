@@ -19,7 +19,7 @@ export class ProjectRoleDetailComponent implements OnInit {
 
         this.projectId = data.projectId;
         this.formGroup = new FormGroup({
-            key: new FormControl('', [Validators.required]),
+            key: new FormControl({ value: '', disabled: true }, [Validators.required]),
             displayName: new FormControl(''),
             group: new FormControl(''),
         });

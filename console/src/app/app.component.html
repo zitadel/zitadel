@@ -3,7 +3,7 @@
         <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
             <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
-        <a *ngIf="(isHandset$ | async) == false" class="title ailerons" [routerLink]="['/']">
+        <a *ngIf="(isHandset$ | async) == false" class="title" [routerLink]="['/']">
             <img class="logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
                 src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
             <ng-template #lighttheme>
