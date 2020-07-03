@@ -5,10 +5,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import {
-    ProjectGrantMembersCreateDialogComponent,
-    ProjectGrantMembersCreateDialogExportType,
-} from 'src/app/modules/project-grant-members/project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrant, ProjectMemberView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -74,36 +70,5 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
         this.isAllSelected() ?
             this.selection.clear() :
             this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
-    }
-
-    public async addProjectGrantMember(grant: ProjectGrant.AsObject): Promise<void> {
-        const keysList = (await this.projectService.GetProjectGrantMemberRoles()).toObject();
-        console.log(keysList);
-
-        const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
-            data: {
-                roleKeysList: keysList.rolesList,
-            },
-            width: '400px',
-        });
-
-        dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
-            console.log(dataToAdd);
-            if (dataToAdd) {
-                dataToAdd.userIds.forEach((userid: string) => {
-                    this.projectService.AddProjectGrantMember(
-                        this.projectId,
-                        grant.id,
-                        userid,
-                        dataToAdd.rolesKeyList,
-                    ).then(() => {
-                        this.toast.showInfo('Project Grant Member successfully added!');
-                    }).catch(error => {
-                        this.toast.showError(error.message);
-                    });
-                });
-
-            }
-        });
     }
 }

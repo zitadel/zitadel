@@ -16,15 +16,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { SearchUserAutocompleteModule } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.module';
 
-import { SearchUserAutocompleteModule } from '../search-user-autocomplete/search-user-autocomplete.module';
 import {
-    ProjectGrantMembersCreateDialogComponent,
-} from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
+    ProjectGrantMembersCreateDialogModule,
+} from './project-grant-members-create-dialog/project-grant-members-create-dialog.module';
 import { ProjectGrantMembersComponent } from './project-grant-members.component';
 
 @NgModule({
-    declarations: [ProjectGrantMembersComponent, ProjectGrantMembersCreateDialogComponent],
+    declarations: [ProjectGrantMembersComponent],
     imports: [
         CommonModule,
         HasRoleModule,
@@ -37,6 +37,7 @@ import { ProjectGrantMembersComponent } from './project-grant-members.component'
         MatSelectModule,
         MatTableModule,
         SearchUserAutocompleteModule,
+        ProjectGrantMembersCreateDialogModule,
         MatPaginatorModule,
         MatSortModule,
         MatTooltipModule,
