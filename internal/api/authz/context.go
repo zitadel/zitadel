@@ -32,12 +32,6 @@ type Grant struct {
 	Roles []string
 }
 
-type TokenVerifierOld interface {
-	VerifyAccessToken(ctx context.Context, token string) (string, string, string, error)
-	ResolveGrant(ctx context.Context) (*Grant, error)
-	GetProjectIDByClientID(ctx context.Context, clientID string) (string, error)
-}
-
 func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ context.Context, err error) {
 	userID, clientID, agentID, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
