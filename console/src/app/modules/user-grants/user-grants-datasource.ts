@@ -1,7 +1,12 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { UserGrant, UserGrantSearchQuery, UserGrantSearchResponse } from 'src/app/proto/generated/management_pb';
+import {
+    UserGrant,
+    UserGrantSearchKey,
+    UserGrantSearchQuery,
+    UserGrantSearchResponse,
+} from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
 import { UserGrantContext } from './user-grants.component';
@@ -23,6 +28,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
         data: {
             projectId?: string;
             grantId?: string;
+            userId?: string;
         },
         queries?: UserGrantSearchQuery[],
     ): void {
@@ -32,8 +38,19 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
 
         switch (context) {
             case UserGrantContext.USER:
-                const promise = this.userService.SearchUserGrants(10, 0, queries);
-                this.loadResponse(promise);
+                if (data && data.userId) {
+                    const userfilter = new UserGrantSearchQuery();
+                    userfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
+                    userfilter.setValue(data.userId);
+                    if (queries) {
+                        queries.push(userfilter);
+                    } else {
+                        queries = [userfilter];
+                    }
+
+                    const promise = this.userService.SearchUserGrants(10, 0, queries);
+                    this.loadResponse(promise);
+                }
                 break;
             case UserGrantContext.OWNED_PROJECT:
                 if (data && data.projectId) {

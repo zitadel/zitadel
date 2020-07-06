@@ -15,6 +15,7 @@ import {
     ProjectGrantMemberSearchQuery,
     ProjectGrantMemberSearchRequest,
     ProjectGrantMemberSearchResponse,
+    ProjectGrantUserGrantCreate,
     ProjectGrantUserGrantID,
     ProjectGrantUserGrantSearchRequest,
     ProjectGrantUserGrantUpdate,
@@ -31,6 +32,7 @@ import {
     UserGrant,
     UserGrantCreate,
     UserGrantID,
+    UserGrantRemoveBulk,
     UserGrantSearchQuery,
     UserGrantSearchRequest,
     UserGrantSearchResponse,
@@ -217,6 +219,44 @@ export class MgmtUserService {
 
         return await this.request(
             c => c.createUserGrant,
+            req,
+            f => f,
+        );
+    }
+
+    public async CreateProjectUserGrant(
+        projectId: string,
+        userId: string,
+        roleNamesList: string[],
+    ): Promise<UserGrant> {
+        const req = new UserGrantCreate();
+        req.setProjectId(projectId);
+        req.setUserId(userId);
+        req.setRoleKeysList(roleNamesList);
+
+        return await this.request(
+            c => c.createProjectUserGrant,
+            req,
+            f => f,
+        );
+    }
+
+    public async CreateProjectGrantUserGrant(
+        orgId: string,
+        projectId: string,
+        grantId: string,
+        userId: string,
+        roleNamesList: string[],
+    ): Promise<UserGrant> {
+        const req = new ProjectGrantUserGrantCreate();
+        req.setOrgId(orgId);
+        req.setProjectId(projectId);
+        req.setProjectGrantId(grantId);
+        req.setUserId(userId);
+        req.setRoleKeysList(roleNamesList);
+
+        return await this.request(
+            c => c.createProjectGrantUserGrant,
             req,
             f => f,
         );
@@ -483,6 +523,36 @@ export class MgmtUserService {
             f => f,
         );
     }
+
+    public async RemoveUserGrant(
+        id: string,
+        userId: string,
+    ): Promise<Empty> {
+        const req = new UserGrantID();
+        req.setId(id);
+        req.setUserId(userId);
+
+        return await this.request(
+            c => c.removeUserGrant,
+            req,
+            f => f,
+        );
+    }
+
+    public async BulkRemoveUserGrant(
+        idsList: string[],
+    ): Promise<Empty> {
+        const req = new UserGrantRemoveBulk();
+        req.setIdsList(idsList);
+
+        return await this.request(
+            c => c.bulkRemoveUserGrant,
+            req,
+            f => f,
+        );
+    }
+
+    //
 
     public async ApplicationChanges(id: string, limit: number, offset: number): Promise<Changes> {
         const req = new ChangeRequest();

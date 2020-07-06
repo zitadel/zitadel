@@ -4,7 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, ProjectRoleView, UserGrant, UserGrantSearchKey } from 'src/app/proto/generated/management_pb';
+import { ProjectGrant, ProjectRoleView, UserGrant } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -24,8 +24,8 @@ export enum UserGrantContext {
     styleUrls: ['./user-grants.component.scss'],
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
-    @Input() filterValue: string = '';
-    @Input() filter: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID;
+    // @Input() filterValue: string = '';
+    // @Input() filter: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID;
     @Input() context: UserGrantContext = UserGrantContext.USER;
     public grants: UserGrant.AsObject[] = [];
 
@@ -37,10 +37,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @Input() allowCreate: boolean = false;
     @Input() allowDelete: boolean = false;
 
+    @Input() userId: string = '';
     @Input() projectId: string = '';
     @Input() grantId: string = '';
 
     public roleOptions: ProjectRoleView.AsObject[] = [];
+    public routerLink: any = [''];
 
     constructor(
         private userService: MgmtUserService,
@@ -57,14 +59,33 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         this.dataSource = new UserGrantsDataSource(this.userService);
         const data = {
             projectId: this.projectId,
-            projectGrantId: this.grantId,
+            grantId: this.grantId,
+            userId: this.userId,
         };
+        console.log(this.context);
+
+        switch (this.context) {
+            case UserGrantContext.OWNED_PROJECT:
+                if (this.projectId) {
+                    this.getRoleOptions(this.projectId);
+                    this.routerLink = ['/grant-create', 'project', this.projectId];
+                }
+                break;
+            case UserGrantContext.GRANTED_PROJECT:
+                if (data && data.grantId) {
+                    this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
+                }
+                break;
+            case UserGrantContext.USER:
+                if (this.userId) {
+                    this.routerLink = ['/grant-create', 'user', this.userId];
+                }
+                break;
+            default:
+                this.routerLink = ['/grant-create'];
+        }
         console.log(data);
         this.dataSource.loadGrants(this.context, 0, 25, data);
-
-        if (this.filter === UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID) {
-            this.getRoleOptions(this.filterValue);
-        }
     }
 
     public ngAfterViewInit(): void {
@@ -100,7 +121,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public loadRoleOptions(projectId: string): void {
-        if (this.filter === UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID) {
+        if (this.context === UserGrantContext.USER) {
             this.getRoleOptions(projectId);
         }
     }
@@ -121,5 +142,14 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             }).catch(error => {
                 this.toast.showError(error.message);
             });
+    }
+
+    deleteGrantSelection(): void {
+        this.userService.BulkRemoveUserGrant(this.selection.selected.map(grant => grant.id)).then(() => {
+            this.toast.showInfo('Grants deleted');
+            this.loadGrantsPage();
+        }).catch(error => {
+            this.toast.showError(error.message);
+        });
     }
 }
