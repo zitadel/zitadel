@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -75,8 +74,15 @@ func (s *Server) BulkRemoveUserGrant(ctx context.Context, in *UserGrantRemoveBul
 	return &empty.Empty{}, err
 }
 
-func (s *Server) SearchProjectUserGrants(ctx context.Context, request *ProjectUserGrantSearchRequest) (*UserGrantSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-8jdSw", "Not implemented")
+func (s *Server) SearchProjectUserGrants(ctx context.Context, in *ProjectUserGrantSearchRequest) (*UserGrantSearchResponse, error) {
+	request := projectUserGrantSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendProjectIDQuery(in.ProjectId)
+	response, err := s.usergrant.SearchUserGrants(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectUserGrantByID(ctx context.Context, request *ProjectUserGrantID) (*UserGrantView, error) {
@@ -118,8 +124,19 @@ func (s *Server) ReactivateProjectUserGrant(ctx context.Context, in *ProjectUser
 	return usergrantFromModel(user), nil
 }
 
-func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, request *ProjectGrantUserGrantSearchRequest) (*UserGrantSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-32sFs", "Not implemented")
+func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, in *ProjectGrantUserGrantSearchRequest) (*UserGrantSearchResponse, error) {
+	grant, err := s.project.ProjectGrantByID(ctx, in.ProjectGrantId)
+	if err != nil {
+		return nil, err
+	}
+	request := projectGrantUserGrantSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendProjectIDQuery(grant.ProjectID)
+	response, err := s.usergrant.SearchUserGrants(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *ProjectGrantUserGrantID) (*UserGrantView, error) {

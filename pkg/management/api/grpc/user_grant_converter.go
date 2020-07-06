@@ -97,7 +97,7 @@ func userGrantSearchRequestsToModel(project *UserGrantSearchRequest) *grant_mode
 }
 
 func userGrantSearchQueriesToModel(queries []*UserGrantSearchQuery) []*grant_model.UserGrantSearchQuery {
-	converted := make([]*grant_model.UserGrantSearchQuery, len(queries))
+	converted := make([]*grant_model.UserGrantSearchQuery, 0)
 	for i, q := range queries {
 		converted[i] = userGrantSearchQueryToModel(q)
 	}
@@ -181,5 +181,21 @@ func usergrantStateFromModel(state grant_model.UserGrantState) UserGrantState {
 		return UserGrantState_USERGRANTSTATE_INACTIVE
 	default:
 		return UserGrantState_USERGRANTSTATE_UNSPECIFIED
+	}
+}
+
+func projectUserGrantSearchRequestsToModel(project *ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+	return &grant_model.UserGrantSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: userGrantSearchQueriesToModel(project.Queries),
+	}
+}
+
+func projectGrantUserGrantSearchRequestsToModel(project *ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+	return &grant_model.UserGrantSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: userGrantSearchQueriesToModel(project.Queries),
 	}
 }
