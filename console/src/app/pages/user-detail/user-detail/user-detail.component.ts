@@ -135,9 +135,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         });
     }
 
-    public sendSetPasswordNotification(userId: string): void {
-        this.mgmtUserService.SendSetPasswordNotification(userId, NotificationType.NOTIFICATIONTYPE_EMAIL)
-            .then((data: any) => {
+    public sendSetPasswordNotification(): void {
+        this.mgmtUserService.SendSetPasswordNotification(this.user.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
+            .then(() => {
                 this.toast.showInfo('Set initial Password');
             }).catch(data => {
                 this.toast.showError(data.message);
