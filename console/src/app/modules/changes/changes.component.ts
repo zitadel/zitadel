@@ -23,12 +23,10 @@ export class ChangesComponent implements OnInit {
     @Input() public sortDirectionAsc: boolean = true;
     public bottom: boolean = false;
 
-    // Source data
     private _done: BehaviorSubject<any> = new BehaviorSubject(false);
     private _loading: BehaviorSubject<any> = new BehaviorSubject(false);
     private _data: BehaviorSubject<any> = new BehaviorSubject([]);
 
-    // Observable data
     loading: Observable<boolean> = this._loading.asObservable();
     public data!: Observable<Change.AsObject[]>;
     public changes!: Changes.AsObject;

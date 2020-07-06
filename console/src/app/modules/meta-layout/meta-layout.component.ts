@@ -19,6 +19,4 @@ export class MetaLayoutComponent {
         .pipe(map(result => {
             return result.matches;
         }));
-
-
 }

@@ -11,11 +11,11 @@
     </div>
     <span class="fill-space"></span>
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button
-        *ngIf="selection.hasValue() && allowDelete">
+        (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && allowDelete">
         <i class="las la-trash"></i>
     </button>
     <a *ngIf="allowCreate" matTooltip="{{'GRANTS.ADD' | translate}}" color="primary" class="add-button" color="primary"
-        mat-raised-button [routerLink]="['/grant-create', {filter: filter, filterValue: filterValue}]">
+        mat-raised-button [routerLink]="routerLink">
         <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
     </a>
 </div>
@@ -86,7 +86,7 @@
                     </button>
                 </ng-container>
                 <ng-template #showOptions>
-                    <mat-form-field class="form-field" appearance="outline" *ngIf="filterValue">
+                    <mat-form-field class="form-field" appearance="outline" *ngIf="projectId">
                         <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
                         <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowCreate == false"
                             (selectionChange)="updateRoles(grant, $event)">

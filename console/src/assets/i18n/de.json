@@ -3,7 +3,7 @@
     "HOME": {
         "TITLE": "zitadel",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-        "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
+        "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Zitadel Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Zitadel für sich zu personalisieren",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
         "PROTECTION": "Organisationsrichtlinien",
         "PROTECTION_DESC": "Verwalten Sie Ihre Organisationsrichtlinien. Entdecken Sie einige vorgefertigte Lösungen, die Ihnen Zeit sparen und Sicherheit gewährleisten.",
@@ -52,7 +52,7 @@
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Zitadel optimal an Ihre Bedürfnisse anzupassen",
         "PAGES": {
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
@@ -112,18 +112,19 @@
             "TITLE": "Profil",
             "EMAIL": "Email",
             "PHONE": "Phonenumber",
-            "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+            "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Zitadel optimal an Ihre Bedürfnisse anzupassen",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
             "NICKNAME": "Spitzname",
             "DISPLAYNAME": "Anzeigename",
             "PREFERRED_LANGUAGE": "Sprache",
-            "GENDER": "Geschlecht"
+            "GENDER": "Geschlecht",
+            "PASSWORD":"Passwort"
         },
         "PASSWORD": {
             "TITLE": "Passwort",
-            "DESCRIPTION": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
+            "DESCRIPTION": "Beachten Sie, dass das Password der von Ihrer Organisation definierten Richtlinie entsprechen muss.",
             "OLD": "Aktuelles Passwort",
             "NEW": "Neues Passwort",
             "CONFIRM": "Neues Passwort Wiederholung",
