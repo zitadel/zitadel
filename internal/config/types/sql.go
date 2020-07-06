@@ -63,7 +63,7 @@ func (s *SQL) Start() (*sql.DB, error) {
 }
 
 func (s *SQL) checkSSL() {
-	if s.SSL == nil || s.SSL.Mode == sslDisabledMode {
+	if s.SSL == nil || s.SSL.Mode == sslDisabledMode || s.SSL.Mode == "" {
 		s.SSL = &ssl{Mode: sslDisabledMode}
 		return
 	}
