@@ -9,7 +9,7 @@
   }
 
   h1 {
-      font-size: 1.2rem;
+      font-size: 2rem;
       margin: 0 1rem;
       margin-left: 2rem;
       font-weight: normal;
@@ -82,6 +82,10 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
+
+            .notify-change-pwd {
+                border-radius: .5rem;
+            }
         }
     
         .label {

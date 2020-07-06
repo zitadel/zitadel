@@ -9,14 +9,7 @@ import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { UserGrantsDataSource } from './user-grants-datasource';
-
-export enum UserGrantContext {
-    // AUTHUSER = 'authuser',
-    USER = 'user',
-    OWNED_PROJECT = 'owned',
-    GRANTED_PROJECT = 'granted',
-}
+import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
 
 @Component({
     selector: 'app-user-grants',

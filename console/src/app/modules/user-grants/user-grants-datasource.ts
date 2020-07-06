@@ -9,7 +9,12 @@ import {
 } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
-import { UserGrantContext } from './user-grants.component';
+export enum UserGrantContext {
+    // AUTHUSER = 'authuser',
+    USER = 'user',
+    OWNED_PROJECT = 'owned',
+    GRANTED_PROJECT = 'granted',
+}
 
 export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     public totalResult: number = 0;

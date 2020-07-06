@@ -24,76 +24,22 @@
             </app-card>
         </ng-template>
 
-        <app-card title="{{'USER.PASSWORD.TITLE' | translate}}"
-            description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">
-            <card-actions class="card-actions">
-                <button *ngIf="user.state === UserState.USERSTATE_INITIAL" mat-stroked-button color="primary"
-                    (click)="sendSetPasswordNotification()">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-            </card-actions>
-            <form *ngIf="passwordForm" autocomplete="new-password" [formGroup]="passwordForm"
-                (ngSubmit)="setInitialPassword()">
-                <div class="content center">
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
-                        <input autocomplete="off" name="password" matInput formControlName="password" type="password" />
-
-                        <mat-error *ngIf="password?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.symbolValidator">
-                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.numberValidator">
-                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.upperCaseValidator">
-                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.lowerCaseValidator">
-                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate:password?.errors?.minlength }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
-                        <input autocomplete="off" name="passwordRepeat" matInput formControlName="confirmPassword"
-                            type="password" />
-
-                        <mat-error *ngIf="confirmPassword?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
-                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.numberValidator">
-                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.notequal">
-                            {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.upperCaseValidator">
-                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.lowerCaseValidator">
-                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate:confirmPassword?.errors?.minlength }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-                <div class="btn-container">
-                    <button [disabled]="passwordForm.invalid" mat-raised-button
-                        color="primary">{{ 'USER.PASSWORD.SET' | translate }}</button>
-                </div>
-            </form>
-        </app-card>
-
         <app-card title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
             <div class="method-col">
+                <div class="method-row">
+                    <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
+
+                    <span>*********</span>
+                    <div class="actions">
+                        <button class="notify-change-pwd" (click)="sendSetPasswordNotification()" mat-stroked-button
+                            color="primary"
+                            *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+                        <a [routerLink]="['password']" mat-icon-button>
+                            <mat-icon>chevron_right</mat-icon>
+                        </a>
+                    </div>
+                </div>
                 <div class="method-row">
                     <span class="label">{{ 'USER.EMAIL' | translate }}</span>
 
