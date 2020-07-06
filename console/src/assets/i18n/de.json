@@ -332,7 +332,9 @@
             "TYPE":{
                 "OWNED":"Eigene Projekte",
                 "GRANTED":"Berechtigte Projekte"
-            }
+            },
+            "PINNED":"Angepinnt",
+            "ALL": "Alle"
         },
         "STATE": {
             "TITLE":"Status",

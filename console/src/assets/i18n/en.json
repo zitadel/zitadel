@@ -333,7 +333,9 @@
             "TYPE":{
                 "OWNED":"Owned Projects",
                 "GRANTED":"Granted Projects"
-            }
+            },
+            "PINNED":"Pinned",
+            "ALL": "All"
         },
         "STATE": {
             "TITLE":"State",

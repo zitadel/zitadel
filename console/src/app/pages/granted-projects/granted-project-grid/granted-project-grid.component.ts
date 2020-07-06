@@ -1,6 +1,6 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/generated/management_pb';
 
@@ -28,28 +28,29 @@ import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/gener
         ]),
     ],
 })
-export class GrantedProjectGridComponent {
+export class GrantedProjectGridComponent implements OnChanges {
     @Input() items: Array<ProjectGrantView.AsObject> = [];
+    public notPinned: Array<ProjectGrantView.AsObject> = [];
     @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
     @Output() changedView: EventEmitter<boolean> = new EventEmitter();
     @Input() loading: boolean = false;
-    public selection: SelectionModel<string> = new SelectionModel<string>(true, []);
-
+    public selection: SelectionModel<ProjectGrantView.AsObject> = new SelectionModel<ProjectGrantView.AsObject>(true, []);
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
 
     constructor(private router: Router) {
-        const storageEntry = localStorage.getItem('pinned-granted-projects');
-        if (storageEntry) {
-            const array = JSON.parse(storageEntry);
-            this.selection.select(...array);
-        }
-
         this.selection.changed.subscribe(selection => {
-            console.log(this.selection.selected);
-            localStorage.setItem('pinned-granted-projects', JSON.stringify(this.selection.selected));
+            localStorage.setItem('pinned-granted-projects', JSON.stringify(
+                this.selection.selected.map(item => item.projectId),
+            ));
+            const filtered = this.notPinned.filter(item => item === selection.added.find(i => i === item));
+            filtered.forEach((f, i) => {
+                this.notPinned.splice(i, 1);
+            });
+
+            this.notPinned.push(...selection.removed);
         });
     }
 
@@ -63,5 +64,33 @@ export class GrantedProjectGridComponent {
 
     public addItem(): void {
         this.newClicked.emit(true);
+    }
+
+    public ngOnChanges(changes: SimpleChanges): void {
+        if (changes.items.currentValue && changes.items.currentValue.length > 0) {
+            this.notPinned = Object.assign([], this.items);
+            this.reorganizeItems();
+        }
+    }
+
+    public reorganizeItems(): void {
+        const storageEntry = localStorage.getItem('pinned-granted-projects');
+        if (storageEntry) {
+            const array: string[] = JSON.parse(storageEntry);
+            const toSelect: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
+                if (array.includes(item.projectId)) {
+                    // this.notPinned.splice(index, 1);
+                    return true;
+                }
+            });
+            this.selection.select(...toSelect);
+
+            const toNotPinned: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
+                if (!array.includes(item.projectId)) {
+                    return true;
+                }
+            });
+            this.notPinned = toNotPinned;
+        }
     }
 }
