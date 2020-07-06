@@ -2,15 +2,9 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Org } from 'src/app/proto/generated/auth_pb';
-import {
-    ProjectGrantView,
-    ProjectRole,
-    ProjectView,
-    User,
-    UserGrant,
-    UserGrantSearchKey,
-} from 'src/app/proto/generated/management_pb';
+import { ProjectGrantView, ProjectRole, ProjectView, User, UserGrant } from 'src/app/proto/generated/management_pb';
 import { AuthService } from 'src/app/services/auth.service';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -21,6 +15,8 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./user-grant-create.component.scss'],
 })
 export class UserGrantCreateComponent implements OnDestroy {
+    public context!: UserGrantContext;
+
     public org!: Org.AsObject;
     public userId: string = '';
     public projectId: string = '';
@@ -30,12 +26,11 @@ export class UserGrantCreateComponent implements OnDestroy {
     public STEPS: number = 2; // project, roles
     public currentCreateStep: number = 1;
 
-    public filter!: UserGrantSearchKey;
     public filterValue: string = '';
 
     private subscription: Subscription = new Subscription();
 
-    public UserGrantSearchKey: any = UserGrantSearchKey;
+    public UserGrantContext: any = UserGrantContext;
     constructor(
         private authService: AuthService,
         private userService: MgmtUserService,
@@ -45,18 +40,20 @@ export class UserGrantCreateComponent implements OnDestroy {
     ) {
         this.subscription = this.route.params.subscribe((params: Params) => {
             console.log(params);
-            const { filter, filterValue } = params;
-            this.filter = filter;
-            switch (filter) {
-                case (`${UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID}`):
-                    this.projectId = filterValue;
-                    break;
-                case (`${UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID}`):
-                    this.userId = filterValue;
-                    break;
-            }
+            const { context, projectid, grantid, userid } = params;
+            this.context = context;
 
-            console.log(this.projectId, this.userId);
+            this.projectId = projectid;
+            this.grantId = grantid;
+            this.userId = userid;
+
+            if (this.userId) {
+                this.context = UserGrantContext.USER;
+            } else if (this.projectId && !this.grantId) {
+                this.context = UserGrantContext.OWNED_PROJECT;
+            } else if (this.projectId && this.grantId) {
+                this.context = UserGrantContext.GRANTED_PROJECT;
+            }
         });
 
         this.authService.GetActiveOrg().then(org => {
@@ -69,15 +66,48 @@ export class UserGrantCreateComponent implements OnDestroy {
     }
 
     public addGrant(): void {
-        this.userService.CreateUserGrant(
-            this.projectId,
-            this.userId,
-            this.rolesList,
-        ).then((data: UserGrant) => {
-            this.close();
-        }).catch(error => {
-            this.toast.showError(error.message);
-        });
+        switch (this.context) {
+            case UserGrantContext.USER:
+                this.userService.CreateUserGrant(
+                    this.projectId,
+                    this.userId,
+                    this.rolesList,
+                ).then((data: UserGrant) => {
+                    this.toast.showInfo('User Grant added');
+                    this.close();
+                }).catch(error => {
+                    this.toast.showError(error.message);
+                });
+                break;
+            case UserGrantContext.OWNED_PROJECT:
+                this.userService.CreateProjectUserGrant(
+                    this.projectId,
+                    this.userId,
+                    this.rolesList,
+                ).then((data: UserGrant) => {
+                    this.toast.showInfo('Project User Grant added');
+                    this.close();
+                }).catch(error => {
+                    this.toast.showError(error.message);
+                });
+                break;
+            case UserGrantContext.GRANTED_PROJECT:
+                this.userService.CreateProjectGrantUserGrant(
+                    this.org.id,
+                    this.projectId,
+                    this.grantId,
+                    this.userId,
+                    this.rolesList,
+                ).then((data: UserGrant) => {
+                    this.toast.showInfo('Project Grant User Grant added');
+                    this.close();
+                }).catch(error => {
+                    this.toast.showError(error.message);
+                });
+                break;
+
+        }
+
     }
 
     public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {

@@ -35,6 +35,11 @@
           height: 32px;
           width: 32px;
           border-radius: 50%;
+          &:not(:first-child) {
+            -webkit-box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
+            -moz-box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
+            box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
+            }
         }
 
         .add-img {

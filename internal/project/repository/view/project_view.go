@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -14,6 +15,9 @@ func ProjectByID(db *gorm.DB, table, projectID string) (*model.ProjectView, erro
 	projectIDQuery := model.ProjectSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, projectIDQuery)
 	err := query(db, project)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-NEO7W", "Errors.Project.NotFound")
+	}
 	return project, err
 }
 

@@ -4,12 +4,12 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, ProjectRoleView, UserGrant, UserGrantSearchKey } from 'src/app/proto/generated/management_pb';
+import { ProjectGrant, ProjectRoleView, UserGrant } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { UserGrantsDataSource } from './user-grants-datasource';
+import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
 
 @Component({
     selector: 'app-user-grants',
@@ -17,8 +17,9 @@ import { UserGrantsDataSource } from './user-grants-datasource';
     styleUrls: ['./user-grants.component.scss'],
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
-    @Input() filterValue: string = '';
-    @Input() filter: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID;
+    // @Input() filterValue: string = '';
+    // @Input() filter: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID;
+    @Input() context: UserGrantContext = UserGrantContext.USER;
     public grants: UserGrant.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;
@@ -29,7 +30,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @Input() allowCreate: boolean = false;
     @Input() allowDelete: boolean = false;
 
+    @Input() userId: string = '';
+    @Input() projectId: string = '';
+    @Input() grantId: string = '';
+
     public roleOptions: ProjectRoleView.AsObject[] = [];
+    public routerLink: any = [''];
 
     constructor(
         private userService: MgmtUserService,
@@ -44,11 +50,35 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public ngOnInit(): void {
         this.dataSource = new UserGrantsDataSource(this.userService);
-        this.dataSource.loadGrants(this.filter, this.filterValue, 0, 25);
+        const data = {
+            projectId: this.projectId,
+            grantId: this.grantId,
+            userId: this.userId,
+        };
+        console.log(this.context);
 
-        if (this.filter === UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID) {
-            this.getRoleOptions(this.filterValue);
+        switch (this.context) {
+            case UserGrantContext.OWNED_PROJECT:
+                if (this.projectId) {
+                    this.getRoleOptions(this.projectId);
+                    this.routerLink = ['/grant-create', 'project', this.projectId];
+                }
+                break;
+            case UserGrantContext.GRANTED_PROJECT:
+                if (data && data.grantId) {
+                    this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
+                }
+                break;
+            case UserGrantContext.USER:
+                if (this.userId) {
+                    this.routerLink = ['/grant-create', 'user', this.userId];
+                }
+                break;
+            default:
+                this.routerLink = ['/grant-create'];
         }
+        console.log(data);
+        this.dataSource.loadGrants(this.context, 0, 25, data);
     }
 
     public ngAfterViewInit(): void {
@@ -61,10 +91,13 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     private loadGrantsPage(): void {
         this.dataSource.loadGrants(
-            this.filter,
-            this.filterValue,
+            this.context,
             this.paginator.pageIndex,
             this.paginator.pageSize,
+            {
+                projectId: this.projectId,
+                grantId: this.grantId,
+            },
         );
     }
 
@@ -81,7 +114,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public loadRoleOptions(projectId: string): void {
-        if (this.filter === UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID) {
+        if (this.context === UserGrantContext.USER) {
             this.getRoleOptions(projectId);
         }
     }
@@ -102,5 +135,14 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             }).catch(error => {
                 this.toast.showError(error.message);
             });
+    }
+
+    deleteGrantSelection(): void {
+        this.userService.BulkRemoveUserGrant(this.selection.selected.map(grant => grant.id)).then(() => {
+            this.toast.showInfo('Grants deleted');
+            this.loadGrantsPage();
+        }).catch(error => {
+            this.toast.showError(error.message);
+        });
     }
 }

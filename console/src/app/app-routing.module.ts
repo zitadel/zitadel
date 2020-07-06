@@ -55,11 +55,28 @@ const routes: Routes = [
             roles: ['org.read'],
         },
     },
+
+    {
+        path: 'grant-create/project/:projectid/grant/:grantid',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
+    {
+        path: 'grant-create/project/:projectid',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
+    {
+        path: 'grant-create/user/:userid',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
     {
         path: 'grant-create',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
             .then(m => m.UserGrantCreateModule),
     },
+
     {
         path: 'signedout',
         loadChildren: () => import('./pages/signedout/signedout.module').then(m => m.SignedoutModule),

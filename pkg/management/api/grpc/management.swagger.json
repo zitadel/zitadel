@@ -3195,6 +3195,28 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "put": {
         "operationId": "ChangeUserPhone",
         "responses": {

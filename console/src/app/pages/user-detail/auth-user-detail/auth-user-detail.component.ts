@@ -1,17 +1,15 @@
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { Gender, UserAddress, UserEmail, UserPhone, UserProfile, UserView } from 'src/app/proto/generated/auth_pb';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
@@ -44,7 +42,6 @@ export class AuthUserDetailComponent implements OnDestroy {
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
-    public passwordForm!: FormGroup;
     private subscription: Subscription = new Subscription();
 
     public emailEditState: boolean = false;
@@ -52,7 +49,6 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public loading: boolean = false;
 
-    public policy!: PasswordComplexityPolicy.AsObject;
     public copied: string = '';
 
     public ChangeType: any = ChangeType;
@@ -66,40 +62,6 @@ export class AuthUserDetailComponent implements OnDestroy {
         private dialog: MatDialog,
         private orgService: OrgService,
     ) {
-        const validators: Validators[] = [Validators.required];
-        this.orgService.GetPasswordComplexityPolicy().then(data => {
-            this.policy = data.toObject();
-            if (this.policy.minLength) {
-                validators.push(Validators.minLength(this.policy.minLength));
-            }
-            if (this.policy.hasLowercase) {
-                validators.push(lowerCaseValidator);
-            }
-            if (this.policy.hasUppercase) {
-                validators.push(upperCaseValidator);
-            }
-            if (this.policy.hasNumber) {
-                validators.push(numberValidator);
-            }
-            if (this.policy.hasSymbol) {
-                validators.push(symbolValidator);
-            }
-
-            this.passwordForm = this.fb.group({
-                currentPassword: ['', []],
-                newPassword: ['', validators],
-                confirmPassword: ['', [...validators, passwordConfirmValidator]],
-            });
-        }).catch(error => {
-            this.toast.showError(error.message);
-            console.error(error.message);
-            this.passwordForm = this.fb.group({
-                currentPassword: ['', []],
-                newPassword: ['', validators],
-                confirmPassword: ['', [...validators, passwordConfirmValidator]],
-            });
-        });
-
         this.loading = true;
         this.getData().then(() => {
             this.loading = false;
@@ -136,19 +98,6 @@ export class AuthUserDetailComponent implements OnDestroy {
             });
     }
 
-    public setPassword(): void {
-        if (this.passwordForm.valid && this.currentPassword &&
-            this.currentPassword.value &&
-            this.newPassword && this.newPassword.value && this.newPassword.valid) {
-            this.userService
-                .ChangeMyPassword(this.currentPassword.value, this.newPassword.value).then((data: any) => {
-                    this.toast.showInfo('Password Set');
-                }).catch(data => {
-                    this.toast.showError(data.message);
-                });
-        }
-    }
-
     public saveEmail(): void {
         this.emailEditState = false;
 
@@ -161,11 +110,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showError(data.message);
                 this.emailEditState = false;
             });
-    }
-
-    public deletePhone(): void {
-        this.user.phone = '';
-        this.savePhone();
     }
 
     public enterCode(): void {
@@ -218,16 +162,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showError(data.message);
                 this.phoneEditState = false;
             });
-    }
-
-    public get currentPassword(): AbstractControl | null {
-        return this.passwordForm.get('currentPassword');
-    }
-    public get newPassword(): AbstractControl | null {
-        return this.passwordForm.get('newPassword');
-    }
-    public get confirmPassword(): AbstractControl | null {
-        return this.passwordForm.get('confirmPassword');
     }
 
     private async getData(): Promise<void> {

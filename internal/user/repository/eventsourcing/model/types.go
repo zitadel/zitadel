@@ -38,6 +38,7 @@ const (
 	UserEmailCodeSent           models.EventType = "user.email.code.sent"
 
 	UserPhoneChanged            models.EventType = "user.phone.changed"
+	UserPhoneRemoved            models.EventType = "user.phone.removed"
 	UserPhoneVerified           models.EventType = "user.phone.verified"
 	UserPhoneVerificationFailed models.EventType = "user.phone.verification.failed"
 	UserPhoneCodeAdded          models.EventType = "user.phone.code.added"

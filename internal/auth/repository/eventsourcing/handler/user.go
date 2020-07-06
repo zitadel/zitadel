@@ -67,6 +67,7 @@ func (p *User) ProcessUser(event *models.Event) (err error) {
 		es_model.UserEmailVerified,
 		es_model.UserPhoneChanged,
 		es_model.UserPhoneVerified,
+		es_model.UserPhoneRemoved,
 		es_model.UserAddressChanged,
 		es_model.UserDeactivated,
 		es_model.UserReactivated,

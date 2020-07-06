@@ -65,6 +65,11 @@ var AuthService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.auth.api.v1.AuthService/RemoveMyUserPhone": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
@@ -96,6 +101,11 @@ var AuthService_AuthMethods = utils_auth.MethodMapping{
 	},
 
 	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyPassword": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyPasswordComplexityPolicy": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},

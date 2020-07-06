@@ -112,6 +112,22 @@
         ]
       }
     },
+    "/policies/passwords/complexity": {
+      "get": {
+        "operationId": "GetMyPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicy"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/ready": {
       "get": {
         "operationId": "Ready",
@@ -467,6 +483,20 @@
           "AuthService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveMyUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
       "put": {
         "operationId": "ChangeMyUserPhone",
         "responses": {
@@ -670,7 +700,7 @@
         "key": {
           "type": "string"
         },
-        "message": {
+        "localized_message": {
           "type": "string"
         }
       }
@@ -831,6 +861,53 @@
         },
         "new_password": {
           "type": "string"
+        }
+      }
+    },
+    "v1PasswordComplexityPolicy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_lowercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_uppercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_number": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
