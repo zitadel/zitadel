@@ -129,10 +129,9 @@
 
     <metainfo *ngIf="user" class="side">
         <div class="details">
-            <div class="row" *ngIf="user?.loginNamesList">
-                <span class="first">Login Names:</span>
-                <span class="second"><span style="display: block;"
-                        *ngFor="let login of user?.loginNamesList">{{login}}</span></span>
+            <div class="row" *ngIf="user?.preferredLoginName">
+                <span class="first">Preferred Loginname:</span>
+                <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
         </div>
 

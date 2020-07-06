@@ -20,12 +20,14 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
-        "IAM":"IAM",
+        "IAM":"Administration",
         "ORGANIZATION": "Organization",
+        "PROJECTSSECTION":"Projects",
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
+        "USERSECTION":"Benutzer",
         "USER": "Users",
-        "LOGOUT": "Log out",
+        "LOGOUT": "Logout all users",
         "NEWORG":"New Organization",
         "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!",
         "SHOWORGS":"Show all organizations"

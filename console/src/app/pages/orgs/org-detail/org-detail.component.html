@@ -8,11 +8,8 @@
             <div *ngFor="let domain of domains" class="domain">
                 <span class="title">{{domain.domain}}</span>
                 <i matTooltip="verified" *ngIf="domain.verified" class="verified las la-check-circle"></i>
-                <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-chess-queen"></i>
+                <i matTooltip="primary" *ngIf="domain.primary" class="primary las la-star"></i>
                 <span class="fill-space"></span>
-                <!-- <button disabled mat-icon-button
-                    matTooltip="download /.well-known/caos-developer-domain-association.txt and deploy it on your domain. Then verify"><i
-                        class="las la-file-download"></i></button> -->
                 <button matTooltip="Remove domain" color="warn" mat-icon-button (click)="removeDomain(domain.domain)"><i
                         class="las la-trash"></i></button>
             </div>
@@ -27,11 +24,6 @@
                 <button matTooltip="Add domain" mat-icon-button color="primary" (click)="saveNewOrgDomain()">
                     <mat-icon>check</mat-icon>
                 </button>
-
-                <!-- <button disabled mat-icon-button
-                    matTooltip="download /.well-known/caos-developer-domain-association.txt and deploy it on your domain. Then verify"><i
-                        class="las la-file-download"></i></button> -->
-                <!-- <button disabled mat-icon-button matTooltip="Verify"><i class=" las la-check-circle"></i></button> -->
             </div>
         </app-card>
 
@@ -43,9 +35,8 @@
     <metainfo class="side">
         <div class="details">
             <div class="row">
-                <span class="first">Domains:</span>
-                <span class="second"><span style="display: block;"
-                        *ngFor="let domain of domains">{{domain.domain}}</span></span>
+                <span class="first">Primary Domain:</span>
+                <span class="second"><span style="display: block;">{{primaryDomain}}</span></span>
             </div>
             <div class="row">
                 <span class="first">State:</span>

@@ -20,12 +20,14 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
-        "IAM":"IAM",
+        "IAM":"Administration",
         "ORGANIZATION": "Organisation",
+        "PROJECTSSECTION":"Projekte",
         "PROJECT": "Projekte",
         "GRANTEDPROJECT":"Berechtigte Projekte",
+        "USERSECTION":"Benutzer",
         "USER": "Benutzer",
-        "LOGOUT": "abmelden",
+        "LOGOUT": "alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
         "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!",
         "SHOWORGS":"Alle organisationen anzeigen"

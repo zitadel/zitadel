@@ -2,9 +2,7 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProjectGrantView, ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
-import { ProjectService } from 'src/app/services/project.service';
-import { ToastService } from 'src/app/services/toast.service';
+import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/generated/management_pb';
 
 @Component({
     selector: 'app-granted-project-grid',
@@ -35,15 +33,25 @@ export class GrantedProjectGridComponent {
     @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
     @Output() changedView: EventEmitter<boolean> = new EventEmitter();
     @Input() loading: boolean = false;
+    public selection: SelectionModel<string> = new SelectionModel<string>(true, []);
 
-    public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
-    public selectedIndex: number = -1;
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
 
-    constructor(private router: Router, private projectService: ProjectService, private toast: ToastService) { }
+    constructor(private router: Router) {
+        const storageEntry = localStorage.getItem('pinned-granted-projects');
+        if (storageEntry) {
+            const array = JSON.parse(storageEntry);
+            this.selection.select(...array);
+        }
+
+        this.selection.changed.subscribe(selection => {
+            console.log(this.selection.selected);
+            localStorage.setItem('pinned-granted-projects', JSON.stringify(this.selection.selected));
+        });
+    }
 
     public selectItem(item: ProjectGrantView.AsObject, event?: any): void {
         if (event && !event.target.classList.contains('mat-icon')) {

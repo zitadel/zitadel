@@ -88,6 +88,9 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         this.projectService.SearchGrantedProjects(limit, offset).then(res => {
             this.grantedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
+            if (this.totalResult > 5) {
+                this.grid = false;
+            }
             this.dataSource.data = this.grantedProjectList;
             this.loadingSubject.next(false);
         }).catch(error => {
