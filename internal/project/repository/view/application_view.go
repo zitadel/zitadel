@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -12,6 +13,9 @@ func ApplicationByID(db *gorm.DB, table, appID string) (*model.ApplicationView, 
 	app := new(model.ApplicationView)
 	query := repository.PrepareGetByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
 	err := query(db, app)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DGdfx", "Errors.Application.NotFound")
+	}
 	return app, err
 }
 
@@ -20,6 +24,9 @@ func ApplicationByOIDCClientID(db *gorm.DB, table, clientID string) (*model.Appl
 	clientIDQuery := model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyOIDCClientID, Value: clientID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, clientIDQuery)
 	err := query(db, app)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DG1qh", "Errors.Project.AppNotFound")
+	}
 	return app, err
 }
 
@@ -29,6 +36,9 @@ func ApplicationByProjectIDAndAppName(db *gorm.DB, table, projectID, appName str
 	appNameQuery := model.ApplicationSearchQuery{Key: proj_model.AppSearchKeyName, Value: appName, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, projectIDQuery, appNameQuery)
 	err := query(db, app)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Jqw1z", "Errors.Project.AppNotFound")
+	}
 	return app, err
 }
 
