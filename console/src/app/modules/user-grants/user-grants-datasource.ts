@@ -1,8 +1,10 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { UserGrant, UserGrantSearchKey, UserGrantSearchQuery } from 'src/app/proto/generated/management_pb';
+import { UserGrant, UserGrantSearchQuery, UserGrantSearchResponse } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
+
+import { UserGrantContext } from './user-grants.component';
 
 export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     public totalResult: number = 0;
@@ -14,17 +16,42 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
         super();
     }
 
-    public loadGrants(filter: UserGrantSearchKey, userId: string, pageIndex: number, pageSize: number): void {
+    public loadGrants(
+        context: UserGrantContext,
+        pageIndex: number,
+        pageSize: number,
+        data: {
+            projectId?: string;
+            grantId?: string;
+        },
+        queries?: UserGrantSearchQuery[],
+    ): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
 
-        const query = new UserGrantSearchQuery();
-        query.setKey(filter);
-        query.setValue(userId);
+        switch (context) {
+            case UserGrantContext.USER:
+                const promise = this.userService.SearchUserGrants(10, 0, queries);
+                this.loadResponse(promise);
+                break;
+            case UserGrantContext.OWNED_PROJECT:
+                if (data && data.projectId) {
+                    const promise1 = this.userService.SearchProjectUserGrants(data.projectId, 10, 0, queries);
+                    this.loadResponse(promise1);
+                }
+                break;
+            case UserGrantContext.GRANTED_PROJECT:
+                if (data && data.grantId) {
+                    const promise2 = this.userService.SearchProjectGrantUserGrants(data.grantId, 10, 0, queries);
+                    this.loadResponse(promise2);
+                }
+                break;
+        }
+    }
 
-        const queries: UserGrantSearchQuery[] = [query];
-        from(this.userService.SearchUserGrants(10, 0, queries)).pipe(
+    private loadResponse(promise: Promise<UserGrantSearchResponse>): void {
+        from(promise).pipe(
             map(resp => {
                 this.totalResult = resp.toObject().totalResult;
                 console.log(resp.toObject().resultList);

@@ -173,7 +173,7 @@
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [filterValue]="user?.id" [allowCreate]="['user.grant.write'] | hasRole"
+            <app-user-grants [allowCreate]="['user.grant.write'] | hasRole"
                 [allowDelete]="['user.grant.delete'] | hasRole"></app-user-grants>
         </app-card>
     </div>

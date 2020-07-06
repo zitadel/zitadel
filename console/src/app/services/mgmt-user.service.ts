@@ -19,6 +19,7 @@ import {
     ProjectGrantUserGrantSearchRequest,
     ProjectGrantUserGrantUpdate,
     ProjectRoleAdd,
+    ProjectUserGrantSearchRequest,
     SetPasswordNotificationRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
@@ -355,6 +356,8 @@ export class MgmtUserService {
         );
     }
 
+    // USER GRANTS
+
     public async SearchUserGrants(
         limit: number,
         offset: number,
@@ -373,13 +376,34 @@ export class MgmtUserService {
         );
     }
 
+    public async SearchProjectUserGrants(
+        projectId: string,
+        limit: number,
+        offset: number,
+        queryList?: UserGrantSearchQuery[],
+    ): Promise<UserGrantSearchResponse> {
+        const req = new ProjectUserGrantSearchRequest();
+        req.setProjectId(projectId);
+        req.setLimit(limit);
+        req.setOffset(offset);
+        if (queryList) {
+            req.setQueriesList(queryList);
+        }
+        return await this.request(
+            c => c.searchProjectUserGrants,
+            req,
+            f => f,
+        );
+    }
 
-    public async searchProjectGrantUserGrants(
+    public async SearchProjectGrantUserGrants(
+        projectGrantId: string,
         limit: number,
         offset: number,
         queryList?: UserGrantSearchQuery[],
     ): Promise<UserGrantSearchResponse> {
         const req = new ProjectGrantUserGrantSearchRequest();
+        req.setProjectGrantId(projectGrantId);
         req.setLimit(limit);
         req.setOffset(offset);
         if (queryList) {

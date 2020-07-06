@@ -11,6 +11,13 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { UserGrantsDataSource } from './user-grants-datasource';
 
+export enum UserGrantContext {
+    // AUTHUSER = 'authuser',
+    USER = 'user',
+    OWNED_PROJECT = 'owned',
+    GRANTED_PROJECT = 'granted',
+}
+
 @Component({
     selector: 'app-user-grants',
     templateUrl: './user-grants.component.html',
@@ -19,6 +26,7 @@ import { UserGrantsDataSource } from './user-grants-datasource';
 export class UserGrantsComponent implements OnInit, AfterViewInit {
     @Input() filterValue: string = '';
     @Input() filter: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID;
+    @Input() context: UserGrantContext = UserGrantContext.USER;
     public grants: UserGrant.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;
@@ -28,6 +36,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     @Input() allowCreate: boolean = false;
     @Input() allowDelete: boolean = false;
+
+    @Input() projectId: string = '';
+    @Input() grantId: string = '';
 
     public roleOptions: ProjectRoleView.AsObject[] = [];
 
@@ -44,7 +55,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public ngOnInit(): void {
         this.dataSource = new UserGrantsDataSource(this.userService);
-        this.dataSource.loadGrants(this.filter, this.filterValue, 0, 25);
+        const data = {
+            projectId: this.projectId,
+            projectGrantId: this.grantId,
+        };
+        console.log(data);
+        this.dataSource.loadGrants(this.context, 0, 25, data);
 
         if (this.filter === UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID) {
             this.getRoleOptions(this.filterValue);
@@ -61,10 +77,13 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     private loadGrantsPage(): void {
         this.dataSource.loadGrants(
-            this.filter,
-            this.filterValue,
+            this.context,
             this.paginator.pageIndex,
             this.paginator.pageSize,
+            {
+                projectId: this.projectId,
+                grantId: this.grantId,
+            },
         );
     }
 
