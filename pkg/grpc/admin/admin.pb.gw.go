@@ -2,11 +2,11 @@
 // source: admin.proto
 
 /*
-Package grpc is a reverse proxy.
+Package admin is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package grpc
+package admin
 
 import (
 	"context"

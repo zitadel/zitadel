@@ -8,14 +8,14 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
-	mgmt_grpc "github.com/caos/zitadel/pkg/management/grpc"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
 const (
 	mgmtName = "Management-API"
 )
 
-var _ mgmt_grpc.ManagementServiceServer = (*Server)(nil)
+var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
 	project        repository.ProjectRepository
@@ -45,7 +45,7 @@ func CreateServer(repo repository.Repository, sd systemdefaults.SystemDefaults) 
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	mgmt_grpc.RegisterManagementServiceServer(grpcServer, s)
+	management.RegisterManagementServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
@@ -53,15 +53,15 @@ func (s *Server) AppName() string {
 }
 
 func (s *Server) MethodPrefix() string {
-	return mgmt_grpc.ManagementService_MethodPrefix
+	return management.ManagementService_MethodPrefix
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return mgmt_grpc.ManagementService_AuthMethods
+	return management.ManagementService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.GatewayFunc {
-	return mgmt_grpc.RegisterManagementServiceHandlerFromEndpoint
+	return management.RegisterManagementServiceHandlerFromEndpoint
 }
 
 func (s *Server) GatewayPathPrefix() string {

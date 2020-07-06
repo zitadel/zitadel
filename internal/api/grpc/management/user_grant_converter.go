@@ -6,17 +6,17 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/pkg/management/grpc"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func usergrantFromModel(grant *grant_model.UserGrant) *grpc.UserGrant {
+func usergrantFromModel(grant *grant_model.UserGrant) *management.UserGrant {
 	creationDate, err := ptypes.TimestampProto(grant.CreationDate)
 	logging.Log("GRPC-ki9ds").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(grant.ChangeDate)
 	logging.Log("GRPC-sl9ew").OnError(err).Debug("unable to parse timestamp")
 
-	return &grpc.UserGrant{
+	return &management.UserGrant{
 		Id:           grant.AggregateID,
 		UserId:       grant.UserID,
 		State:        usergrantStateFromModel(grant.State),
@@ -28,7 +28,7 @@ func usergrantFromModel(grant *grant_model.UserGrant) *grpc.UserGrant {
 	}
 }
 
-func userGrantCreateBulkToModel(u *grpc.UserGrantCreateBulk) []*grant_model.UserGrant {
+func userGrantCreateBulkToModel(u *management.UserGrantCreateBulk) []*grant_model.UserGrant {
 	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
 	for i, grant := range u.UserGrants {
 		grants[i] = userGrantCreateToModel(grant)
@@ -36,7 +36,7 @@ func userGrantCreateBulkToModel(u *grpc.UserGrantCreateBulk) []*grant_model.User
 	return grants
 }
 
-func userGrantCreateToModel(u *grpc.UserGrantCreate) *grant_model.UserGrant {
+func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.UserId},
 		UserID:     u.UserId,
@@ -45,7 +45,7 @@ func userGrantCreateToModel(u *grpc.UserGrantCreate) *grant_model.UserGrant {
 	}
 }
 
-func userGrantUpdateBulkToModel(u *grpc.UserGrantUpdateBulk) []*grant_model.UserGrant {
+func userGrantUpdateBulkToModel(u *management.UserGrantUpdateBulk) []*grant_model.UserGrant {
 	grants := make([]*grant_model.UserGrant, len(u.UserGrants))
 	for i, grant := range u.UserGrants {
 		grants[i] = userGrantUpdateToModel(grant)
@@ -53,14 +53,14 @@ func userGrantUpdateBulkToModel(u *grpc.UserGrantUpdateBulk) []*grant_model.User
 	return grants
 }
 
-func userGrantUpdateToModel(u *grpc.UserGrantUpdate) *grant_model.UserGrant {
+func userGrantUpdateToModel(u *management.UserGrantUpdate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
 	}
 }
 
-func userGrantRemoveBulkToModel(u *grpc.UserGrantRemoveBulk) []string {
+func userGrantRemoveBulkToModel(u *management.UserGrantRemoveBulk) []string {
 	ids := make([]string, len(u.Ids))
 	for i, id := range u.Ids {
 		ids[i] = id
@@ -68,14 +68,14 @@ func userGrantRemoveBulkToModel(u *grpc.UserGrantRemoveBulk) []string {
 	return ids
 }
 
-func projectUserGrantUpdateToModel(u *grpc.ProjectUserGrantUpdate) *grant_model.UserGrant {
+func projectUserGrantUpdateToModel(u *management.ProjectUserGrantUpdate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
 	}
 }
 
-func projectGrantUserGrantCreateToModel(u *grpc.ProjectGrantUserGrantCreate) *grant_model.UserGrant {
+func projectGrantUserGrantCreateToModel(u *management.ProjectGrantUserGrantCreate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		UserID:    u.UserId,
 		ProjectID: u.ProjectId,
@@ -83,14 +83,14 @@ func projectGrantUserGrantCreateToModel(u *grpc.ProjectGrantUserGrantCreate) *gr
 	}
 }
 
-func projectGrantUserGrantUpdateToModel(u *grpc.ProjectGrantUserGrantUpdate) *grant_model.UserGrant {
+func projectGrantUserGrantUpdateToModel(u *management.ProjectGrantUserGrantUpdate) *grant_model.UserGrant {
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
 	}
 }
 
-func userGrantSearchRequestsToModel(project *grpc.UserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+func userGrantSearchRequestsToModel(project *management.UserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
 	return &grant_model.UserGrantSearchRequest{
 		Offset:  project.Offset,
 		Limit:   project.Limit,
@@ -98,7 +98,7 @@ func userGrantSearchRequestsToModel(project *grpc.UserGrantSearchRequest) *grant
 	}
 }
 
-func userGrantSearchQueriesToModel(queries []*grpc.UserGrantSearchQuery) []*grant_model.UserGrantSearchQuery {
+func userGrantSearchQueriesToModel(queries []*management.UserGrantSearchQuery) []*grant_model.UserGrantSearchQuery {
 	converted := make([]*grant_model.UserGrantSearchQuery, len(queries))
 	for i, q := range queries {
 		converted[i] = userGrantSearchQueryToModel(q)
@@ -106,7 +106,7 @@ func userGrantSearchQueriesToModel(queries []*grpc.UserGrantSearchQuery) []*gran
 	return converted
 }
 
-func userGrantSearchQueryToModel(query *grpc.UserGrantSearchQuery) *grant_model.UserGrantSearchQuery {
+func userGrantSearchQueryToModel(query *management.UserGrantSearchQuery) *grant_model.UserGrantSearchQuery {
 	return &grant_model.UserGrantSearchQuery{
 		Key:    userGrantSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
@@ -114,23 +114,23 @@ func userGrantSearchQueryToModel(query *grpc.UserGrantSearchQuery) *grant_model.
 	}
 }
 
-func userGrantSearchKeyToModel(key grpc.UserGrantSearchKey) grant_model.UserGrantSearchKey {
+func userGrantSearchKeyToModel(key management.UserGrantSearchKey) grant_model.UserGrantSearchKey {
 	switch key {
-	case grpc.UserGrantSearchKey_USERGRANTSEARCHKEY_ORG_ID:
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_ORG_ID:
 		return grant_model.UserGrantSearchKeyResourceOwner
-	case grpc.UserGrantSearchKey_USERGRANTSEARCHKEY_PROJECT_ID:
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_PROJECT_ID:
 		return grant_model.UserGrantSearchKeyProjectID
-	case grpc.UserGrantSearchKey_USERGRANTSEARCHKEY_USER_ID:
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_USER_ID:
 		return grant_model.UserGrantSearchKeyUserID
-	case grpc.UserGrantSearchKey_USERGRANTSEARCHKEY_ROLE_KEY:
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_ROLE_KEY:
 		return grant_model.UserGrantSearchKeyRoleKey
 	default:
 		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 
-func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchResponse) *grpc.UserGrantSearchResponse {
-	return &grpc.UserGrantSearchResponse{
+func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchResponse) *management.UserGrantSearchResponse {
+	return &management.UserGrantSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
@@ -138,22 +138,22 @@ func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchRespo
 	}
 }
 
-func userGrantViewsFromModel(users []*grant_model.UserGrantView) []*grpc.UserGrantView {
-	converted := make([]*grpc.UserGrantView, len(users))
+func userGrantViewsFromModel(users []*grant_model.UserGrantView) []*management.UserGrantView {
+	converted := make([]*management.UserGrantView, len(users))
 	for i, user := range users {
 		converted[i] = userGrantViewFromModel(user)
 	}
 	return converted
 }
 
-func userGrantViewFromModel(grant *grant_model.UserGrantView) *grpc.UserGrantView {
+func userGrantViewFromModel(grant *grant_model.UserGrantView) *management.UserGrantView {
 	creationDate, err := ptypes.TimestampProto(grant.CreationDate)
 	logging.Log("GRPC-dl9we").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(grant.ChangeDate)
 	logging.Log("GRPC-lpsg5").OnError(err).Debug("unable to parse timestamp")
 
-	return &grpc.UserGrantView{
+	return &management.UserGrantView{
 		Id:            grant.ID,
 		State:         usergrantStateFromModel(grant.State),
 		CreationDate:  creationDate,
@@ -175,13 +175,13 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *grpc.UserGrantVie
 	}
 }
 
-func usergrantStateFromModel(state grant_model.UserGrantState) grpc.UserGrantState {
+func usergrantStateFromModel(state grant_model.UserGrantState) management.UserGrantState {
 	switch state {
 	case grant_model.UserGrantStateActive:
-		return grpc.UserGrantState_USERGRANTSTATE_ACTIVE
+		return management.UserGrantState_USERGRANTSTATE_ACTIVE
 	case grant_model.UserGrantStateInactive:
-		return grpc.UserGrantState_USERGRANTSTATE_INACTIVE
+		return management.UserGrantState_USERGRANTSTATE_INACTIVE
 	default:
-		return grpc.UserGrantState_USERGRANTSTATE_UNSPECIFIED
+		return management.UserGrantState_USERGRANTSTATE_UNSPECIFIED
 	}
 }

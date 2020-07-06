@@ -7,7 +7,7 @@ import (
 
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/caos/zitadel/pkg/auth/grpc"
+	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 
 type Gateway struct {
@@ -25,7 +25,7 @@ func StartGateway(conf grpc_util.GatewayConfig) *Gateway {
 }
 
 func (gw *Gateway) Gateway() server.GatewayFunc {
-	return grpc.RegisterAuthServiceHandlerFromEndpoint
+	return auth.RegisterAuthServiceHandlerFromEndpoint
 }
 
 func (gw *Gateway) GRPCEndpoint() string {

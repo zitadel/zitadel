@@ -5,10 +5,10 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/caos/zitadel/pkg/management/grpc"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) SearchApplications(ctx context.Context, in *grpc.ApplicationSearchRequest) (*grpc.ApplicationSearchResponse, error) {
+func (s *Server) SearchApplications(ctx context.Context, in *management.ApplicationSearchRequest) (*management.ApplicationSearchResponse, error) {
 	response, err := s.project.SearchApplications(ctx, applicationSearchRequestsToModel(in))
 	if err != nil {
 		return nil, err
@@ -16,7 +16,7 @@ func (s *Server) SearchApplications(ctx context.Context, in *grpc.ApplicationSea
 	return applicationSearchResponseFromModel(response), nil
 }
 
-func (s *Server) ApplicationByID(ctx context.Context, in *grpc.ApplicationID) (*grpc.ApplicationView, error) {
+func (s *Server) ApplicationByID(ctx context.Context, in *management.ApplicationID) (*management.ApplicationView, error) {
 	app, err := s.project.ApplicationByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
@@ -24,28 +24,28 @@ func (s *Server) ApplicationByID(ctx context.Context, in *grpc.ApplicationID) (*
 	return applicationViewFromModel(app), nil
 }
 
-func (s *Server) CreateOIDCApplication(ctx context.Context, in *grpc.OIDCApplicationCreate) (*grpc.Application, error) {
+func (s *Server) CreateOIDCApplication(ctx context.Context, in *management.OIDCApplicationCreate) (*management.Application, error) {
 	app, err := s.project.AddApplication(ctx, oidcAppCreateToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return appFromModel(app), nil
 }
-func (s *Server) UpdateApplication(ctx context.Context, in *grpc.ApplicationUpdate) (*grpc.Application, error) {
+func (s *Server) UpdateApplication(ctx context.Context, in *management.ApplicationUpdate) (*management.Application, error) {
 	app, err := s.project.ChangeApplication(ctx, appUpdateToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return appFromModel(app), nil
 }
-func (s *Server) DeactivateApplication(ctx context.Context, in *grpc.ApplicationID) (*grpc.Application, error) {
+func (s *Server) DeactivateApplication(ctx context.Context, in *management.ApplicationID) (*management.Application, error) {
 	app, err := s.project.DeactivateApplication(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}
 	return appFromModel(app), nil
 }
-func (s *Server) ReactivateApplication(ctx context.Context, in *grpc.ApplicationID) (*grpc.Application, error) {
+func (s *Server) ReactivateApplication(ctx context.Context, in *management.ApplicationID) (*management.Application, error) {
 	app, err := s.project.ReactivateApplication(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
@@ -53,12 +53,12 @@ func (s *Server) ReactivateApplication(ctx context.Context, in *grpc.Application
 	return appFromModel(app), nil
 }
 
-func (s *Server) RemoveApplication(ctx context.Context, in *grpc.ApplicationID) (*empty.Empty, error) {
+func (s *Server) RemoveApplication(ctx context.Context, in *management.ApplicationID) (*empty.Empty, error) {
 	err := s.project.RemoveApplication(ctx, in.ProjectId, in.Id)
 	return &empty.Empty{}, err
 }
 
-func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *grpc.OIDCConfigUpdate) (*grpc.OIDCConfig, error) {
+func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *management.OIDCConfigUpdate) (*management.OIDCConfig, error) {
 	config, err := s.project.ChangeOIDCConfig(ctx, oidcConfigUpdateToModel(in))
 	if err != nil {
 		return nil, err
@@ -66,15 +66,15 @@ func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *grpc.OIDCC
 	return oidcConfigFromModel(config), nil
 }
 
-func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *grpc.ApplicationID) (*grpc.ClientSecret, error) {
+func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *mgmt_grpc.ApplicationID) (*mgmt_grpc.ClientSecret, error) {
 	config, err := s.project.ChangeOIDConfigSecret(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &grpc.ClientSecret{ClientSecret: config.ClientSecretString}, nil
+	return &mgmt_grpc.ClientSecret{ClientSecret: config.ClientSecretString}, nil
 }
 
-func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *grpc.ChangeRequest) (*grpc.Changes, error) {
+func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *mgmt_grpc.ChangeRequest) (*mgmt_grpc.Changes, error) {
 	response, err := s.project.ApplicationChanges(ctx, changesRequest.Id, changesRequest.SecId, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err

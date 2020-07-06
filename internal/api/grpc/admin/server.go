@@ -7,14 +7,14 @@ import (
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
-	admin_grpc "github.com/caos/zitadel/pkg/admin/grpc"
+	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
 const (
 	adminName = "Admin-API"
 )
 
-var _ admin_grpc.AdminServiceServer = (*Server)(nil)
+var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	org           repository.OrgRepository
@@ -37,7 +37,7 @@ func CreateServer(repo repository.Repository) *Server {
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	admin_grpc.RegisterAdminServiceServer(grpcServer, s)
+	admin.RegisterAdminServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
@@ -45,15 +45,15 @@ func (s *Server) AppName() string {
 }
 
 func (s *Server) MethodPrefix() string {
-	return admin_grpc.AdminService_MethodPrefix
+	return admin.AdminService_MethodPrefix
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return admin_grpc.AdminService_AuthMethods
+	return admin.AdminService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.GatewayFunc {
-	return admin_grpc.RegisterAdminServiceHandlerFromEndpoint
+	return admin.RegisterAdminServiceHandlerFromEndpoint
 }
 
 func (s *Server) GatewayPathPrefix() string {

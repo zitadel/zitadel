@@ -2,11 +2,11 @@
 // source: management.proto
 
 /*
-Package grpc is a reverse proxy.
+Package management is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package grpc
+package management
 
 import (
 	"context"

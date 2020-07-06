@@ -8,31 +8,31 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/pkg/management/grpc"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) CreateProject(ctx context.Context, in *grpc.ProjectCreateRequest) (*grpc.Project, error) {
+func (s *Server) CreateProject(ctx context.Context, in *management.ProjectCreateRequest) (*management.Project, error) {
 	project, err := s.project.CreateProject(ctx, in.Name)
 	if err != nil {
 		return nil, err
 	}
 	return projectFromModel(project), nil
 }
-func (s *Server) UpdateProject(ctx context.Context, in *grpc.ProjectUpdateRequest) (*grpc.Project, error) {
+func (s *Server) UpdateProject(ctx context.Context, in *management.ProjectUpdateRequest) (*management.Project, error) {
 	project, err := s.project.UpdateProject(ctx, projectUpdateToModel(in))
 	if err != nil {
 		return nil, err
 	}
 	return projectFromModel(project), nil
 }
-func (s *Server) DeactivateProject(ctx context.Context, in *grpc.ProjectID) (*grpc.Project, error) {
+func (s *Server) DeactivateProject(ctx context.Context, in *management.ProjectID) (*management.Project, error) {
 	project, err := s.project.DeactivateProject(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
 	return projectFromModel(project), nil
 }
-func (s *Server) ReactivateProject(ctx context.Context, in *grpc.ProjectID) (*grpc.Project, error) {
+func (s *Server) ReactivateProject(ctx context.Context, in *management.ProjectID) (*management.Project, error) {
 	project, err := s.project.ReactivateProject(ctx, in.Id)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *Server) ReactivateProject(ctx context.Context, in *grpc.ProjectID) (*gr
 	return projectFromModel(project), nil
 }
 
-func (s *Server) SearchProjects(ctx context.Context, in *grpc.ProjectSearchRequest) (*grpc.ProjectSearchResponse, error) {
+func (s *Server) SearchProjects(ctx context.Context, in *management.ProjectSearchRequest) (*management.ProjectSearchResponse, error) {
 	request := projectSearchRequestsToModel(in)
 	request.AppendMyResourceOwnerQuery(grpc_util.GetHeader(ctx, http.ZitadelOrgID))
 	response, err := s.project.SearchProjects(ctx, request)
@@ -50,7 +50,7 @@ func (s *Server) SearchProjects(ctx context.Context, in *grpc.ProjectSearchReque
 	return projectSearchResponseFromModel(response), nil
 }
 
-func (s *Server) ProjectByID(ctx context.Context, id *grpc.ProjectID) (*grpc.ProjectView, error) {
+func (s *Server) ProjectByID(ctx context.Context, id *management.ProjectID) (*management.ProjectView, error) {
 	project, err := s.project.ProjectByID(ctx, id.Id)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (s *Server) ProjectByID(ctx context.Context, id *grpc.ProjectID) (*grpc.Pro
 	return projectViewFromModel(project), nil
 }
 
-func (s *Server) SearchGrantedProjects(ctx context.Context, in *grpc.GrantedProjectSearchRequest) (*grpc.ProjectGrantSearchResponse, error) {
+func (s *Server) SearchGrantedProjects(ctx context.Context, in *management.GrantedProjectSearchRequest) (*management.ProjectGrantSearchResponse, error) {
 	request := grantedProjectSearchRequestsToModel(in)
 	request.AppendMyOrgQuery(grpc_util.GetHeader(ctx, http.ZitadelOrgID))
 	response, err := s.project.SearchProjectGrants(ctx, request)
@@ -68,7 +68,7 @@ func (s *Server) SearchGrantedProjects(ctx context.Context, in *grpc.GrantedProj
 	return projectGrantSearchResponseFromModel(response), nil
 }
 
-func (s *Server) GetGrantedProjectByID(ctx context.Context, in *grpc.ProjectGrantID) (*grpc.ProjectGrantView, error) {
+func (s *Server) GetGrantedProjectByID(ctx context.Context, in *management.ProjectGrantID) (*management.ProjectGrantView, error) {
 	project, err := s.project.ProjectGrantViewByID(ctx, in.Id)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (s *Server) GetGrantedProjectByID(ctx context.Context, in *grpc.ProjectGran
 	return projectGrantFromGrantedProjectModel(project), nil
 }
 
-func (s *Server) AddProjectRole(ctx context.Context, in *grpc.ProjectRoleAdd) (*grpc.ProjectRole, error) {
+func (s *Server) AddProjectRole(ctx context.Context, in *management.ProjectRoleAdd) (*management.ProjectRole, error) {
 	role, err := s.project.AddProjectRole(ctx, projectRoleAddToModel(in))
 	if err != nil {
 		return nil, err
@@ -84,12 +84,12 @@ func (s *Server) AddProjectRole(ctx context.Context, in *grpc.ProjectRoleAdd) (*
 	return projectRoleFromModel(role), nil
 }
 
-func (s *Server) BulkAddProjectRole(ctx context.Context, in *grpc.ProjectRoleAddBulk) (*empty.Empty, error) {
+func (s *Server) BulkAddProjectRole(ctx context.Context, in *management.ProjectRoleAddBulk) (*empty.Empty, error) {
 	err := s.project.BulkAddProjectRole(ctx, projectRoleAddBulkToModel(in))
 	return &empty.Empty{}, err
 }
 
-func (s *Server) ChangeProjectRole(ctx context.Context, in *grpc.ProjectRoleChange) (*grpc.ProjectRole, error) {
+func (s *Server) ChangeProjectRole(ctx context.Context, in *management.ProjectRoleChange) (*management.ProjectRole, error) {
 	role, err := s.project.ChangeProjectRole(ctx, projectRoleChangeToModel(in))
 	if err != nil {
 		return nil, err
@@ -97,12 +97,12 @@ func (s *Server) ChangeProjectRole(ctx context.Context, in *grpc.ProjectRoleChan
 	return projectRoleFromModel(role), nil
 }
 
-func (s *Server) RemoveProjectRole(ctx context.Context, in *grpc.ProjectRoleRemove) (*empty.Empty, error) {
+func (s *Server) RemoveProjectRole(ctx context.Context, in *management.ProjectRoleRemove) (*empty.Empty, error) {
 	err := s.project.RemoveProjectRole(ctx, in.Id, in.Key)
 	return &empty.Empty{}, err
 }
 
-func (s *Server) SearchProjectRoles(ctx context.Context, in *grpc.ProjectRoleSearchRequest) (*grpc.ProjectRoleSearchResponse, error) {
+func (s *Server) SearchProjectRoles(ctx context.Context, in *management.ProjectRoleSearchRequest) (*management.ProjectRoleSearchResponse, error) {
 	request := projectRoleSearchRequestsToModel(in)
 	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	request.AppendProjectQuery(in.ProjectId)
@@ -113,7 +113,7 @@ func (s *Server) SearchProjectRoles(ctx context.Context, in *grpc.ProjectRoleSea
 	return projectRoleSearchResponseFromModel(response), nil
 }
 
-func (s *Server) ProjectChanges(ctx context.Context, changesRequest *grpc.ChangeRequest) (*grpc.Changes, error) {
+func (s *Server) ProjectChanges(ctx context.Context, changesRequest *management.ChangeRequest) (*management.Changes, error) {
 	response, err := s.project.ProjectChanges(ctx, changesRequest.Id, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err

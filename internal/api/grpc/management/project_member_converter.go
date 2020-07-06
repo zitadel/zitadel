@@ -6,17 +6,17 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/pkg/management/grpc"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func projectMemberFromModel(member *proj_model.ProjectMember) *grpc.ProjectMember {
+func projectMemberFromModel(member *proj_model.ProjectMember) *management.ProjectMember {
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
 	logging.Log("GRPC-kd8re").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
 	logging.Log("GRPC-dlei3").OnError(err).Debug("unable to parse timestamp")
 
-	return &grpc.ProjectMember{
+	return &management.ProjectMember{
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
 		Sequence:     member.Sequence,
@@ -25,7 +25,7 @@ func projectMemberFromModel(member *proj_model.ProjectMember) *grpc.ProjectMembe
 	}
 }
 
-func projectMemberAddToModel(member *grpc.ProjectMemberAdd) *proj_model.ProjectMember {
+func projectMemberAddToModel(member *management.ProjectMemberAdd) *proj_model.ProjectMember {
 	return &proj_model.ProjectMember{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: member.Id,
@@ -35,7 +35,7 @@ func projectMemberAddToModel(member *grpc.ProjectMemberAdd) *proj_model.ProjectM
 	}
 }
 
-func projectMemberChangeToModel(member *grpc.ProjectMemberChange) *proj_model.ProjectMember {
+func projectMemberChangeToModel(member *management.ProjectMemberChange) *proj_model.ProjectMember {
 	return &proj_model.ProjectMember{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: member.Id,
@@ -45,7 +45,7 @@ func projectMemberChangeToModel(member *grpc.ProjectMemberChange) *proj_model.Pr
 	}
 }
 
-func projectMemberSearchRequestsToModel(role *grpc.ProjectMemberSearchRequest) *proj_model.ProjectMemberSearchRequest {
+func projectMemberSearchRequestsToModel(role *management.ProjectMemberSearchRequest) *proj_model.ProjectMemberSearchRequest {
 	return &proj_model.ProjectMemberSearchRequest{
 		Offset:  role.Offset,
 		Limit:   role.Limit,
@@ -53,7 +53,7 @@ func projectMemberSearchRequestsToModel(role *grpc.ProjectMemberSearchRequest) *
 	}
 }
 
-func projectMemberSearchQueriesToModel(queries []*grpc.ProjectMemberSearchQuery) []*proj_model.ProjectMemberSearchQuery {
+func projectMemberSearchQueriesToModel(queries []*management.ProjectMemberSearchQuery) []*proj_model.ProjectMemberSearchQuery {
 	converted := make([]*proj_model.ProjectMemberSearchQuery, len(queries))
 	for i, q := range queries {
 		converted[i] = projectMemberSearchQueryToModel(q)
@@ -61,7 +61,7 @@ func projectMemberSearchQueriesToModel(queries []*grpc.ProjectMemberSearchQuery)
 	return converted
 }
 
-func projectMemberSearchQueryToModel(query *grpc.ProjectMemberSearchQuery) *proj_model.ProjectMemberSearchQuery {
+func projectMemberSearchQueryToModel(query *management.ProjectMemberSearchQuery) *proj_model.ProjectMemberSearchQuery {
 	return &proj_model.ProjectMemberSearchQuery{
 		Key:    projectMemberSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
@@ -69,23 +69,23 @@ func projectMemberSearchQueryToModel(query *grpc.ProjectMemberSearchQuery) *proj
 	}
 }
 
-func projectMemberSearchKeyToModel(key grpc.ProjectMemberSearchKey) proj_model.ProjectMemberSearchKey {
+func projectMemberSearchKeyToModel(key management.ProjectMemberSearchKey) proj_model.ProjectMemberSearchKey {
 	switch key {
-	case grpc.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_EMAIL:
+	case management.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_EMAIL:
 		return proj_model.ProjectMemberSearchKeyEmail
-	case grpc.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_FIRST_NAME:
+	case management.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_FIRST_NAME:
 		return proj_model.ProjectMemberSearchKeyFirstName
-	case grpc.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_LAST_NAME:
+	case management.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_LAST_NAME:
 		return proj_model.ProjectMemberSearchKeyLastName
-	case grpc.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_USER_NAME:
+	case management.ProjectMemberSearchKey_PROJECTMEMBERSEARCHKEY_USER_NAME:
 		return proj_model.ProjectMemberSearchKeyUserName
 	default:
 		return proj_model.ProjectMemberSearchKeyUnspecified
 	}
 }
 
-func projectMemberSearchResponseFromModel(response *proj_model.ProjectMemberSearchResponse) *grpc.ProjectMemberSearchResponse {
-	return &grpc.ProjectMemberSearchResponse{
+func projectMemberSearchResponseFromModel(response *proj_model.ProjectMemberSearchResponse) *management.ProjectMemberSearchResponse {
+	return &management.ProjectMemberSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
@@ -93,22 +93,22 @@ func projectMemberSearchResponseFromModel(response *proj_model.ProjectMemberSear
 	}
 }
 
-func projectMemberViewsFromModel(members []*proj_model.ProjectMemberView) []*grpc.ProjectMemberView {
-	converted := make([]*grpc.ProjectMemberView, len(members))
+func projectMemberViewsFromModel(members []*proj_model.ProjectMemberView) []*management.ProjectMemberView {
+	converted := make([]*management.ProjectMemberView, len(members))
 	for i, member := range members {
 		converted[i] = projectMemberViewFromModel(member)
 	}
 	return converted
 }
 
-func projectMemberViewFromModel(member *proj_model.ProjectMemberView) *grpc.ProjectMemberView {
+func projectMemberViewFromModel(member *proj_model.ProjectMemberView) *management.ProjectMemberView {
 	creationDate, err := ptypes.TimestampProto(member.CreationDate)
 	logging.Log("GRPC-sl9cs").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(member.ChangeDate)
 	logging.Log("GRPC-8iw2d").OnError(err).Debug("unable to parse timestamp")
 
-	return &grpc.ProjectMemberView{
+	return &management.ProjectMemberView{
 		UserId:       member.UserID,
 		UserName:     member.UserName,
 		Email:        member.Email,

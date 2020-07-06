@@ -2,22 +2,21 @@ package management
 
 import (
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/policy/model"
-	"github.com/caos/zitadel/pkg/management/grpc"
-
-	"github.com/golang/protobuf/ptypes"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func passwordAgePolicyFromModel(policy *model.PasswordAgePolicy) *grpc.PasswordAgePolicy {
+func passwordAgePolicyFromModel(policy *model.PasswordAgePolicy) *management.PasswordAgePolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-6ILdB").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
 	logging.Log("GRPC-ngUzJ").OnError(err).Debug("unable to parse timestamp")
 
-	return &grpc.PasswordAgePolicy{
+	return &management.PasswordAgePolicy{
 		Id:             policy.AggregateID,
 		CreationDate:   creationDate,
 		ChangeDate:     changeDate,
@@ -29,7 +28,7 @@ func passwordAgePolicyFromModel(policy *model.PasswordAgePolicy) *grpc.PasswordA
 	}
 }
 
-func passwordAgePolicyToModel(policy *grpc.PasswordAgePolicy) *model.PasswordAgePolicy {
+func passwordAgePolicyToModel(policy *management.PasswordAgePolicy) *model.PasswordAgePolicy {
 	creationDate, err := ptypes.Timestamp(policy.CreationDate)
 	logging.Log("GRPC-2QSfU").OnError(err).Debug("unable to parse timestamp")
 
@@ -49,7 +48,7 @@ func passwordAgePolicyToModel(policy *grpc.PasswordAgePolicy) *model.PasswordAge
 	}
 }
 
-func passwordAgePolicyCreateToModel(policy *grpc.PasswordAgePolicyCreate) *model.PasswordAgePolicy {
+func passwordAgePolicyCreateToModel(policy *management.PasswordAgePolicyCreate) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
 		Description:    policy.Description,
 		ExpireWarnDays: policy.ExpireWarnDays,
@@ -57,7 +56,7 @@ func passwordAgePolicyCreateToModel(policy *grpc.PasswordAgePolicyCreate) *model
 	}
 }
 
-func passwordAgePolicyUpdateToModel(policy *grpc.PasswordAgePolicyUpdate) *model.PasswordAgePolicy {
+func passwordAgePolicyUpdateToModel(policy *management.PasswordAgePolicyUpdate) *model.PasswordAgePolicy {
 	return &model.PasswordAgePolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: policy.Id,

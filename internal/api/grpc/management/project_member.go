@@ -5,14 +5,14 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/caos/zitadel/pkg/management/grpc"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) GetProjectMemberRoles(ctx context.Context, _ *empty.Empty) (*grpc.ProjectMemberRoles, error) {
-	return &grpc.ProjectMemberRoles{Roles: s.project.GetProjectMemberRoles()}, nil
+func (s *Server) GetProjectMemberRoles(ctx context.Context, _ *empty.Empty) (*management.ProjectMemberRoles, error) {
+	return &management.ProjectMemberRoles{Roles: s.project.GetProjectMemberRoles()}, nil
 }
 
-func (s *Server) SearchProjectMembers(ctx context.Context, in *grpc.ProjectMemberSearchRequest) (*grpc.ProjectMemberSearchResponse, error) {
+func (s *Server) SearchProjectMembers(ctx context.Context, in *management.ProjectMemberSearchRequest) (*management.ProjectMemberSearchResponse, error) {
 	request := projectMemberSearchRequestsToModel(in)
 	request.AppendProjectQuery(in.ProjectId)
 	response, err := s.project.SearchProjectMembers(ctx, request)
@@ -22,7 +22,7 @@ func (s *Server) SearchProjectMembers(ctx context.Context, in *grpc.ProjectMembe
 	return projectMemberSearchResponseFromModel(response), nil
 }
 
-func (s *Server) AddProjectMember(ctx context.Context, in *grpc.ProjectMemberAdd) (*grpc.ProjectMember, error) {
+func (s *Server) AddProjectMember(ctx context.Context, in *management.ProjectMemberAdd) (*management.ProjectMember, error) {
 	member, err := s.project.AddProjectMember(ctx, projectMemberAddToModel(in))
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (s *Server) AddProjectMember(ctx context.Context, in *grpc.ProjectMemberAdd
 	return projectMemberFromModel(member), nil
 }
 
-func (s *Server) ChangeProjectMember(ctx context.Context, in *grpc.ProjectMemberChange) (*grpc.ProjectMember, error) {
+func (s *Server) ChangeProjectMember(ctx context.Context, in *management.ProjectMemberChange) (*management.ProjectMember, error) {
 	member, err := s.project.ChangeProjectMember(ctx, projectMemberChangeToModel(in))
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (s *Server) ChangeProjectMember(ctx context.Context, in *grpc.ProjectMember
 	return projectMemberFromModel(member), nil
 }
 
-func (s *Server) RemoveProjectMember(ctx context.Context, in *grpc.ProjectMemberRemove) (*empty.Empty, error) {
+func (s *Server) RemoveProjectMember(ctx context.Context, in *management.ProjectMemberRemove) (*empty.Empty, error) {
 	err := s.project.RemoveProjectMember(ctx, in.Id, in.UserId)
 	return &empty.Empty{}, err
 }

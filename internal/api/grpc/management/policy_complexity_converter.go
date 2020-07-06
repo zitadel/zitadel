@@ -3,21 +3,21 @@ package management
 import (
 	"github.com/caos/logging"
 
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/policy/model"
-	"github.com/caos/zitadel/pkg/management/grpc"
-
-	"github.com/golang/protobuf/ptypes"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *grpc.PasswordComplexityPolicy {
+func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *management.PasswordComplexityPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-cQRHE").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
 	logging.Log("GRPC-PVA1c").OnError(err).Debug("unable to parse timestamp")
 
-	return &grpc.PasswordComplexityPolicy{
+	return &management.PasswordComplexityPolicy{
 		Id:           policy.AggregateID,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,
@@ -32,7 +32,7 @@ func passwordComplexityPolicyFromModel(policy *model.PasswordComplexityPolicy) *
 	}
 }
 
-func passwordComplexityPolicyToModel(policy *grpc.PasswordComplexityPolicy) *model.PasswordComplexityPolicy {
+func passwordComplexityPolicyToModel(policy *management.PasswordComplexityPolicy) *model.PasswordComplexityPolicy {
 	creationDate, err := ptypes.Timestamp(policy.CreationDate)
 	logging.Log("GRPC-asmEZ").OnError(err).Debug("unable to parse timestamp")
 
@@ -55,7 +55,7 @@ func passwordComplexityPolicyToModel(policy *grpc.PasswordComplexityPolicy) *mod
 	}
 }
 
-func passwordComplexityPolicyCreateToModel(policy *grpc.PasswordComplexityPolicyCreate) *model.PasswordComplexityPolicy {
+func passwordComplexityPolicyCreateToModel(policy *management.PasswordComplexityPolicyCreate) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
 		Description:  policy.Description,
 		MinLength:    policy.MinLength,
@@ -66,7 +66,7 @@ func passwordComplexityPolicyCreateToModel(policy *grpc.PasswordComplexityPolicy
 	}
 }
 
-func passwordComplexityPolicyUpdateToModel(policy *grpc.PasswordComplexityPolicyUpdate) *model.PasswordComplexityPolicy {
+func passwordComplexityPolicyUpdateToModel(policy *management.PasswordComplexityPolicyUpdate) *model.PasswordComplexityPolicy {
 	return &model.PasswordComplexityPolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: policy.Id,

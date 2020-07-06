@@ -10,24 +10,24 @@ import (
 	"github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/pkg/admin/grpc"
+	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func setUpRequestToModel(setUp *grpc.OrgSetUpRequest) *admin_model.SetupOrg {
+func setUpRequestToModel(setUp *admin.OrgSetUpRequest) *admin_model.SetupOrg {
 	return &admin_model.SetupOrg{
 		Org:  orgCreateRequestToModel(setUp.Org),
 		User: userCreateRequestToModel(setUp.User),
 	}
 }
 
-func orgCreateRequestToModel(org *grpc.CreateOrgRequest) *org_model.Org {
+func orgCreateRequestToModel(org *admin.CreateOrgRequest) *org_model.Org {
 	return &org_model.Org{
 		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
 		Name:    org.Name,
 	}
 }
 
-func userCreateRequestToModel(user *grpc.CreateUserRequest) *usr_model.User {
+func userCreateRequestToModel(user *admin.CreateUserRequest) *usr_model.User {
 	preferredLanguage, err := language.Parse(user.PreferredLanguage)
 	logging.Log("GRPC-30hwz").OnError(err).Debug("unable to parse language")
 	result := &usr_model.User{
@@ -60,15 +60,15 @@ func userCreateRequestToModel(user *grpc.CreateUserRequest) *usr_model.User {
 	return result
 }
 
-func setUpOrgResponseFromModel(setUp *admin_model.SetupOrg) *grpc.OrgSetUpResponse {
-	return &grpc.OrgSetUpResponse{
+func setUpOrgResponseFromModel(setUp *admin_model.SetupOrg) *admin.OrgSetUpResponse {
+	return &admin.OrgSetUpResponse{
 		Org:  orgFromModel(setUp.Org),
 		User: userFromModel(setUp.User),
 	}
 }
 
-func orgViewsFromModel(orgs []*org_model.OrgView) []*grpc.Org {
-	result := make([]*grpc.Org, len(orgs))
+func orgViewsFromModel(orgs []*org_model.OrgView) []*admin.Org {
+	result := make([]*admin.Org, len(orgs))
 	for i, org := range orgs {
 		result[i] = orgViewFromModel(org)
 	}
@@ -76,14 +76,14 @@ func orgViewsFromModel(orgs []*org_model.OrgView) []*grpc.Org {
 	return result
 }
 
-func orgFromModel(org *org_model.Org) *grpc.Org {
+func orgFromModel(org *org_model.Org) *admin.Org {
 	creationDate, err := ptypes.TimestampProto(org.CreationDate)
 	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
 
 	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
-	return &grpc.Org{
+	return &admin.Org{
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.AggregateID,
@@ -92,14 +92,14 @@ func orgFromModel(org *org_model.Org) *grpc.Org {
 	}
 }
 
-func orgViewFromModel(org *org_model.OrgView) *grpc.Org {
+func orgViewFromModel(org *org_model.OrgView) *admin.Org {
 	creationDate, err := ptypes.TimestampProto(org.CreationDate)
 	logging.Log("GRPC-GTHsZ").OnError(err).Debug("unable to get timestamp from time")
 
 	changeDate, err := ptypes.TimestampProto(org.ChangeDate)
 	logging.Log("GRPC-dVnoj").OnError(err).Debug("unable to get timestamp from time")
 
-	return &grpc.Org{
+	return &admin.Org{
 		ChangeDate:   changeDate,
 		CreationDate: creationDate,
 		Id:           org.ID,
@@ -108,14 +108,14 @@ func orgViewFromModel(org *org_model.OrgView) *grpc.Org {
 	}
 }
 
-func userFromModel(user *usr_model.User) *grpc.User {
+func userFromModel(user *usr_model.User) *admin.User {
 	creationDate, err := ptypes.TimestampProto(user.CreationDate)
 	logging.Log("GRPC-8duwe").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(user.ChangeDate)
 	logging.Log("GRPC-ckoe3d").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &grpc.User{
+	converted := &admin.User{
 		Id:                user.AggregateID,
 		State:             userStateFromModel(user.State),
 		CreationDate:      creationDate,
@@ -147,57 +147,57 @@ func userFromModel(user *usr_model.User) *grpc.User {
 	return converted
 }
 
-func orgStateFromModel(state org_model.OrgState) grpc.OrgState {
+func orgStateFromModel(state org_model.OrgState) admin.OrgState {
 	switch state {
 	case org_model.OrgStateActive:
-		return grpc.OrgState_ORGSTATE_ACTIVE
+		return admin.OrgState_ORGSTATE_ACTIVE
 	case org_model.OrgStateInactive:
-		return grpc.OrgState_ORGSTATE_INACTIVE
+		return admin.OrgState_ORGSTATE_INACTIVE
 	default:
-		return grpc.OrgState_ORGSTATE_UNSPECIFIED
+		return admin.OrgState_ORGSTATE_UNSPECIFIED
 	}
 }
 
-func genderFromModel(gender usr_model.Gender) grpc.Gender {
+func genderFromModel(gender usr_model.Gender) admin.Gender {
 	switch gender {
 	case usr_model.GenderFemale:
-		return grpc.Gender_GENDER_FEMALE
+		return admin.Gender_GENDER_FEMALE
 	case usr_model.GenderMale:
-		return grpc.Gender_GENDER_MALE
+		return admin.Gender_GENDER_MALE
 	case usr_model.GenderDiverse:
-		return grpc.Gender_GENDER_DIVERSE
+		return admin.Gender_GENDER_DIVERSE
 	default:
-		return grpc.Gender_GENDER_UNSPECIFIED
+		return admin.Gender_GENDER_UNSPECIFIED
 	}
 }
 
-func genderToModel(gender grpc.Gender) usr_model.Gender {
+func genderToModel(gender admin.Gender) usr_model.Gender {
 	switch gender {
-	case grpc.Gender_GENDER_FEMALE:
+	case admin.Gender_GENDER_FEMALE:
 		return usr_model.GenderFemale
-	case grpc.Gender_GENDER_MALE:
+	case admin.Gender_GENDER_MALE:
 		return usr_model.GenderMale
-	case grpc.Gender_GENDER_DIVERSE:
+	case admin.Gender_GENDER_DIVERSE:
 		return usr_model.GenderDiverse
 	default:
 		return usr_model.GenderUnspecified
 	}
 }
 
-func userStateFromModel(state usr_model.UserState) grpc.UserState {
+func userStateFromModel(state usr_model.UserState) admin.UserState {
 	switch state {
 	case usr_model.UserStateActive:
-		return grpc.UserState_USERSTATE_ACTIVE
+		return admin.UserState_USERSTATE_ACTIVE
 	case usr_model.UserStateInactive:
-		return grpc.UserState_USERSTATE_INACTIVE
+		return admin.UserState_USERSTATE_INACTIVE
 	case usr_model.UserStateLocked:
-		return grpc.UserState_USERSTATE_LOCKED
+		return admin.UserState_USERSTATE_LOCKED
 	default:
-		return grpc.UserState_USERSTATE_UNSPECIFIED
+		return admin.UserState_USERSTATE_UNSPECIFIED
 	}
 }
 
-func orgSearchRequestToModel(req *grpc.OrgSearchRequest) *org_model.OrgSearchRequest {
+func orgSearchRequestToModel(req *admin.OrgSearchRequest) *org_model.OrgSearchRequest {
 	return &org_model.OrgSearchRequest{
 		Limit:         req.Limit,
 		Asc:           req.Asc,
@@ -207,7 +207,7 @@ func orgSearchRequestToModel(req *grpc.OrgSearchRequest) *org_model.OrgSearchReq
 	}
 }
 
-func orgQueriesToModel(queries []*grpc.OrgSearchQuery) []*org_model.OrgSearchQuery {
+func orgQueriesToModel(queries []*admin.OrgSearchQuery) []*org_model.OrgSearchQuery {
 	modelQueries := make([]*org_model.OrgSearchQuery, len(queries))
 
 	for i, query := range queries {
@@ -217,7 +217,7 @@ func orgQueriesToModel(queries []*grpc.OrgSearchQuery) []*org_model.OrgSearchQue
 	return modelQueries
 }
 
-func orgQueryToModel(query *grpc.OrgSearchQuery) *org_model.OrgSearchQuery {
+func orgQueryToModel(query *admin.OrgSearchQuery) *org_model.OrgSearchQuery {
 	return &org_model.OrgSearchQuery{
 		Key:    orgQueryKeyToModel(query.Key),
 		Value:  query.Value,
@@ -225,40 +225,40 @@ func orgQueryToModel(query *grpc.OrgSearchQuery) *org_model.OrgSearchQuery {
 	}
 }
 
-func orgQueryKeyToModel(key grpc.OrgSearchKey) org_model.OrgSearchKey {
+func orgQueryKeyToModel(key admin.OrgSearchKey) org_model.OrgSearchKey {
 	switch key {
-	case grpc.OrgSearchKey_ORGSEARCHKEY_DOMAIN:
+	case admin.OrgSearchKey_ORGSEARCHKEY_DOMAIN:
 		return org_model.OrgSearchKeyOrgDomain
-	case grpc.OrgSearchKey_ORGSEARCHKEY_ORG_NAME:
+	case admin.OrgSearchKey_ORGSEARCHKEY_ORG_NAME:
 		return org_model.OrgSearchKeyOrgName
-	case grpc.OrgSearchKey_ORGSEARCHKEY_STATE:
+	case admin.OrgSearchKey_ORGSEARCHKEY_STATE:
 		return org_model.OrgSearchKeyState
 	default:
 		return org_model.OrgSearchKeyUnspecified
 	}
 }
 
-func orgQueryMethodToModel(method grpc.OrgSearchMethod) model.SearchMethod {
+func orgQueryMethodToModel(method admin.OrgSearchMethod) model.SearchMethod {
 	switch method {
-	case grpc.OrgSearchMethod_ORGSEARCHMETHOD_CONTAINS:
+	case admin.OrgSearchMethod_ORGSEARCHMETHOD_CONTAINS:
 		return model.SearchMethodContains
-	case grpc.OrgSearchMethod_ORGSEARCHMETHOD_EQUALS:
+	case admin.OrgSearchMethod_ORGSEARCHMETHOD_EQUALS:
 		return model.SearchMethodEquals
-	case grpc.OrgSearchMethod_ORGSEARCHMETHOD_STARTS_WITH:
+	case admin.OrgSearchMethod_ORGSEARCHMETHOD_STARTS_WITH:
 		return model.SearchMethodStartsWith
 	default:
 		return 0
 	}
 }
 
-func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *grpc.OrgIamPolicy {
+func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *admin.OrgIamPolicy {
 	creationDate, err := ptypes.TimestampProto(policy.CreationDate)
 	logging.Log("GRPC-ush36").OnError(err).Debug("unable to get timestamp from time")
 
 	changeDate, err := ptypes.TimestampProto(policy.ChangeDate)
 	logging.Log("GRPC-Ps9fW").OnError(err).Debug("unable to get timestamp from time")
 
-	return &grpc.OrgIamPolicy{
+	return &admin.OrgIamPolicy{
 		OrgId:                 policy.AggregateID,
 		Description:           policy.Description,
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
@@ -268,7 +268,7 @@ func orgIamPolicyFromModel(policy *org_model.OrgIamPolicy) *grpc.OrgIamPolicy {
 	}
 }
 
-func orgIamPolicyRequestToModel(policy *grpc.OrgIamPolicyRequest) *org_model.OrgIamPolicy {
+func orgIamPolicyRequestToModel(policy *admin.OrgIamPolicyRequest) *org_model.OrgIamPolicy {
 	return &org_model.OrgIamPolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: policy.OrgId,

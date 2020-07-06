@@ -7,10 +7,10 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	auth_grpc "github.com/caos/zitadel/pkg/auth/grpc"
+	"github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-var _ auth_grpc.AuthServiceServer = (*Server)(nil)
+var _ auth.AuthServiceServer = (*Server)(nil)
 
 const (
 	authName = "Auth-API"
@@ -31,7 +31,7 @@ func CreateServer(authRepo repository.Repository) *Server {
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	auth_grpc.RegisterAuthServiceServer(grpcServer, s)
+	auth.RegisterAuthServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
@@ -39,15 +39,15 @@ func (s *Server) AppName() string {
 }
 
 func (s *Server) MethodPrefix() string {
-	return auth_grpc.AuthService_MethodPrefix
+	return auth.AuthService_MethodPrefix
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return auth_grpc.AuthService_AuthMethods
+	return auth.AuthService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.GatewayFunc {
-	return auth_grpc.RegisterAuthServiceHandlerFromEndpoint
+	return auth.RegisterAuthServiceHandlerFromEndpoint
 }
 
 func (s *Server) GatewayPathPrefix() string {

@@ -3,11 +3,11 @@ package management
 import (
 	"strings"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/caos/zitadel/pkg/management/grpc"
-
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
 type Gateway struct {
@@ -25,7 +25,7 @@ func StartGateway(conf grpc_util.GatewayConfig) *Gateway {
 }
 
 func (gw *Gateway) Gateway() server.GatewayFunc {
-	return grpc.RegisterManagementServiceHandlerFromEndpoint
+	return management.RegisterManagementServiceHandlerFromEndpoint
 }
 
 func (gw *Gateway) GRPCEndpoint() string {

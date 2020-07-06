@@ -6,12 +6,11 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "validate/validate.proto";
-import "google/protobuf/descriptor.proto";
 import "authoption/options.proto";
 
 package caos.zitadel.management.api.v1;
 
-option go_package = "github.com/caos/zitadel/pkg/management/grpc";
+option go_package = "github.com/caos/zitadel/pkg/grpc/management";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
     info: {

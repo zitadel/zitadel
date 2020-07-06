@@ -11,17 +11,17 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/pkg/management/grpc"
+	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func appFromModel(app *proj_model.Application) *grpc.Application {
+func appFromModel(app *proj_model.Application) *management.Application {
 	creationDate, err := ptypes.TimestampProto(app.CreationDate)
 	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(app.ChangeDate)
 	logging.Log("GRPC-di7rw").OnError(err).Debug("unable to parse timestamp")
 
-	return &grpc.Application{
+	return &management.Application{
 		Id:           app.AppID,
 		State:        appStateFromModel(app.State),
 		CreationDate: creationDate,
@@ -32,17 +32,17 @@ func appFromModel(app *proj_model.Application) *grpc.Application {
 	}
 }
 
-func appConfigFromModel(app *proj_model.Application) grpc.AppConfig {
+func appConfigFromModel(app *proj_model.Application) management.AppConfig {
 	if app.Type == proj_model.AppTypeOIDC {
-		return &grpc.Application_OidcConfig{
+		return &management.Application_OidcConfig{
 			OidcConfig: oidcConfigFromModel(app.OIDCConfig),
 		}
 	}
 	return nil
 }
 
-func oidcConfigFromModel(config *proj_model.OIDCConfig) *grpc.OIDCConfig {
-	return &grpc.OIDCConfig{
+func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
+	return &management.OIDCConfig{
 		RedirectUris:           config.RedirectUris,
 		ResponseTypes:          oidcResponseTypesFromModel(config.ResponseTypes),
 		GrantTypes:             oidcGrantTypesFromModel(config.GrantTypes),
@@ -54,8 +54,8 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *grpc.OIDCConfig {
 	}
 }
 
-func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *grpc.OIDCConfig {
-	return &grpc.OIDCConfig{
+func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *management.OIDCConfig {
+	return &management.OIDCConfig{
 		RedirectUris:           app.OIDCRedirectUris,
 		ResponseTypes:          oidcResponseTypesFromModel(app.OIDCResponseTypes),
 		GrantTypes:             oidcGrantTypesFromModel(app.OIDCGrantTypes),
@@ -66,7 +66,7 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *grpc.O
 	}
 }
 
-func oidcAppCreateToModel(app *grpc.OIDCApplicationCreate) *proj_model.Application {
+func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
@@ -84,7 +84,7 @@ func oidcAppCreateToModel(app *grpc.OIDCApplicationCreate) *proj_model.Applicati
 	}
 }
 
-func appUpdateToModel(app *grpc.ApplicationUpdate) *proj_model.Application {
+func appUpdateToModel(app *management.ApplicationUpdate) *proj_model.Application {
 	return &proj_model.Application{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
@@ -94,7 +94,7 @@ func appUpdateToModel(app *grpc.ApplicationUpdate) *proj_model.Application {
 	}
 }
 
-func oidcConfigUpdateToModel(app *grpc.OIDCConfigUpdate) *proj_model.OIDCConfig {
+func oidcConfigUpdateToModel(app *management.OIDCConfigUpdate) *proj_model.OIDCConfig {
 	return &proj_model.OIDCConfig{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
@@ -109,7 +109,7 @@ func oidcConfigUpdateToModel(app *grpc.OIDCConfigUpdate) *proj_model.OIDCConfig 
 	}
 }
 
-func applicationSearchRequestsToModel(request *grpc.ApplicationSearchRequest) *proj_model.ApplicationSearchRequest {
+func applicationSearchRequestsToModel(request *management.ApplicationSearchRequest) *proj_model.ApplicationSearchRequest {
 	return &proj_model.ApplicationSearchRequest{
 		Offset:  request.Offset,
 		Limit:   request.Limit,
@@ -117,7 +117,7 @@ func applicationSearchRequestsToModel(request *grpc.ApplicationSearchRequest) *p
 	}
 }
 
-func applicationSearchQueriesToModel(projectID string, queries []*grpc.ApplicationSearchQuery) []*proj_model.ApplicationSearchQuery {
+func applicationSearchQueriesToModel(projectID string, queries []*management.ApplicationSearchQuery) []*proj_model.ApplicationSearchQuery {
 	converted := make([]*proj_model.ApplicationSearchQuery, len(queries)+1)
 	for i, q := range queries {
 		converted[i] = applicationSearchQueryToModel(q)
@@ -127,7 +127,7 @@ func applicationSearchQueriesToModel(projectID string, queries []*grpc.Applicati
 	return converted
 }
 
-func applicationSearchQueryToModel(query *grpc.ApplicationSearchQuery) *proj_model.ApplicationSearchQuery {
+func applicationSearchQueryToModel(query *management.ApplicationSearchQuery) *proj_model.ApplicationSearchQuery {
 	return &proj_model.ApplicationSearchQuery{
 		Key:    applicationSearchKeyToModel(query.Key),
 		Method: searchMethodToModel(query.Method),
@@ -135,17 +135,17 @@ func applicationSearchQueryToModel(query *grpc.ApplicationSearchQuery) *proj_mod
 	}
 }
 
-func applicationSearchKeyToModel(key grpc.ApplicationSearchKey) proj_model.AppSearchKey {
+func applicationSearchKeyToModel(key management.ApplicationSearchKey) proj_model.AppSearchKey {
 	switch key {
-	case grpc.ApplicationSearchKey_APPLICATIONSEARCHKEY_APP_NAME:
+	case management.ApplicationSearchKey_APPLICATIONSEARCHKEY_APP_NAME:
 		return proj_model.AppSearchKeyName
 	default:
 		return proj_model.AppSearchKeyUnspecified
 	}
 }
 
-func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchResponse) *grpc.ApplicationSearchResponse {
-	return &grpc.ApplicationSearchResponse{
+func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchResponse) *management.ApplicationSearchResponse {
+	return &management.ApplicationSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
@@ -153,7 +153,7 @@ func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchRe
 	}
 }
 
-func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*grpc.ApplicationView {
+func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*management.ApplicationView {
 	converted := make([]*grpc.ApplicationView, len(apps))
 	for i, app := range apps {
 		converted[i] = applicationViewFromModel(app)
