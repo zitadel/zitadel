@@ -20,7 +20,7 @@ func CaosToGRPCError(err error, ctx context.Context, translator *i18n.Translator
 	if !ok {
 		return status.Convert(err).Err()
 	}
-	var msg string
+	msg := key
 	if translator != nil {
 		msg = translator.LocalizeFromCtx(ctx, key, nil)
 	}
