@@ -39,6 +39,9 @@ func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, err
 	}
 	query := repository.PrepareGetByQuery(table, loginNameQuery)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFound")
+	}
 	return user, err
 }
 
