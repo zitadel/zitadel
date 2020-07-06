@@ -66,15 +66,15 @@ func (s *Server) UpdateApplicationOIDCConfig(ctx context.Context, in *management
 	return oidcConfigFromModel(config), nil
 }
 
-func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *mgmt_grpc.ApplicationID) (*mgmt_grpc.ClientSecret, error) {
+func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, in *management.ApplicationID) (*management.ClientSecret, error) {
 	config, err := s.project.ChangeOIDConfigSecret(ctx, in.ProjectId, in.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_grpc.ClientSecret{ClientSecret: config.ClientSecretString}, nil
+	return &management.ClientSecret{ClientSecret: config.ClientSecretString}, nil
 }
 
-func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *mgmt_grpc.ChangeRequest) (*mgmt_grpc.Changes, error) {
+func (s *Server) ApplicationChanges(ctx context.Context, changesRequest *management.ChangeRequest) (*management.Changes, error) {
 	response, err := s.project.ApplicationChanges(ctx, changesRequest.Id, changesRequest.SecId, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err

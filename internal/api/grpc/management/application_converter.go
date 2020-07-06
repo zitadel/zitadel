@@ -154,21 +154,21 @@ func applicationSearchResponseFromModel(response *proj_model.ApplicationSearchRe
 }
 
 func applicationViewsFromModel(apps []*proj_model.ApplicationView) []*management.ApplicationView {
-	converted := make([]*grpc.ApplicationView, len(apps))
+	converted := make([]*management.ApplicationView, len(apps))
 	for i, app := range apps {
 		converted[i] = applicationViewFromModel(app)
 	}
 	return converted
 }
 
-func applicationViewFromModel(application *proj_model.ApplicationView) *grpc.ApplicationView {
+func applicationViewFromModel(application *proj_model.ApplicationView) *management.ApplicationView {
 	creationDate, err := ptypes.TimestampProto(application.CreationDate)
 	logging.Log("GRPC-lo9sw").OnError(err).Debug("unable to parse timestamp")
 
 	changeDate, err := ptypes.TimestampProto(application.ChangeDate)
 	logging.Log("GRPC-8uwsd").OnError(err).Debug("unable to parse timestamp")
 
-	converted := &grpc.ApplicationView{
+	converted := &management.ApplicationView{
 		Id:           application.ID,
 		State:        appStateFromModel(application.State),
 		CreationDate: creationDate,
@@ -177,25 +177,25 @@ func applicationViewFromModel(application *proj_model.ApplicationView) *grpc.App
 		Sequence:     application.Sequence,
 	}
 	if application.IsOIDC {
-		converted.AppConfig = &grpc.ApplicationView_OidcConfig{
+		converted.AppConfig = &management.ApplicationView_OidcConfig{
 			OidcConfig: oidcConfigFromApplicationViewModel(application),
 		}
 	}
 	return converted
 }
 
-func appStateFromModel(state proj_model.AppState) grpc.AppState {
+func appStateFromModel(state proj_model.AppState) management.AppState {
 	switch state {
 	case proj_model.AppStateActive:
-		return grpc.AppState_APPSTATE_ACTIVE
+		return management.AppState_APPSTATE_ACTIVE
 	case proj_model.AppStateInactive:
-		return grpc.AppState_APPSTATE_INACTIVE
+		return management.AppState_APPSTATE_INACTIVE
 	default:
-		return grpc.AppState_APPSTATE_UNSPECIFIED
+		return management.AppState_APPSTATE_UNSPECIFIED
 	}
 }
 
-func oidcResponseTypesToModel(responseTypes []grpc.OIDCResponseType) []proj_model.OIDCResponseType {
+func oidcResponseTypesToModel(responseTypes []management.OIDCResponseType) []proj_model.OIDCResponseType {
 	if responseTypes == nil || len(responseTypes) == 0 {
 		return []proj_model.OIDCResponseType{proj_model.OIDCResponseTypeCode}
 	}
@@ -203,11 +203,11 @@ func oidcResponseTypesToModel(responseTypes []grpc.OIDCResponseType) []proj_mode
 
 	for i, responseType := range responseTypes {
 		switch responseType {
-		case grpc.OIDCResponseType_OIDCRESPONSETYPE_CODE:
+		case management.OIDCResponseType_OIDCRESPONSETYPE_CODE:
 			oidcResponseTypes[i] = proj_model.OIDCResponseTypeCode
-		case grpc.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN:
+		case management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN:
 			oidcResponseTypes[i] = proj_model.OIDCResponseTypeIDToken
-		case grpc.OIDCResponseType_OIDCRESPONSETYPE_TOKEN:
+		case management.OIDCResponseType_OIDCRESPONSETYPE_TOKEN:
 			oidcResponseTypes[i] = proj_model.OIDCResponseTypeToken
 		}
 	}
@@ -215,24 +215,24 @@ func oidcResponseTypesToModel(responseTypes []grpc.OIDCResponseType) []proj_mode
 	return oidcResponseTypes
 }
 
-func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []grpc.OIDCResponseType {
-	oidcResponseTypes := make([]grpc.OIDCResponseType, len(responseTypes))
+func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []management.OIDCResponseType {
+	oidcResponseTypes := make([]management.OIDCResponseType, len(responseTypes))
 
 	for i, responseType := range responseTypes {
 		switch responseType {
 		case proj_model.OIDCResponseTypeCode:
-			oidcResponseTypes[i] = grpc.OIDCResponseType_OIDCRESPONSETYPE_CODE
+			oidcResponseTypes[i] = management.OIDCResponseType_OIDCRESPONSETYPE_CODE
 		case proj_model.OIDCResponseTypeIDToken:
-			oidcResponseTypes[i] = grpc.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN
+			oidcResponseTypes[i] = management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN
 		case proj_model.OIDCResponseTypeToken:
-			oidcResponseTypes[i] = grpc.OIDCResponseType_OIDCRESPONSETYPE_TOKEN
+			oidcResponseTypes[i] = management.OIDCResponseType_OIDCRESPONSETYPE_TOKEN
 		}
 	}
 
 	return oidcResponseTypes
 }
 
-func oidcGrantTypesToModel(grantTypes []grpc.OIDCGrantType) []proj_model.OIDCGrantType {
+func oidcGrantTypesToModel(grantTypes []management.OIDCGrantType) []proj_model.OIDCGrantType {
 	if grantTypes == nil || len(grantTypes) == 0 {
 		return []proj_model.OIDCGrantType{proj_model.OIDCGrantTypeAuthorizationCode}
 	}
@@ -240,94 +240,94 @@ func oidcGrantTypesToModel(grantTypes []grpc.OIDCGrantType) []proj_model.OIDCGra
 
 	for i, grantType := range grantTypes {
 		switch grantType {
-		case grpc.OIDCGrantType_OIDCGRANTTYPE_AUTHORIZATION_CODE:
+		case management.OIDCGrantType_OIDCGRANTTYPE_AUTHORIZATION_CODE:
 			oidcGrantTypes[i] = proj_model.OIDCGrantTypeAuthorizationCode
-		case grpc.OIDCGrantType_OIDCGRANTTYPE_IMPLICIT:
+		case management.OIDCGrantType_OIDCGRANTTYPE_IMPLICIT:
 			oidcGrantTypes[i] = proj_model.OIDCGrantTypeImplicit
-		case grpc.OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN:
+		case management.OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN:
 			oidcGrantTypes[i] = proj_model.OIDCGrantTypeRefreshToken
 		}
 	}
 	return oidcGrantTypes
 }
 
-func oidcGrantTypesFromModel(grantTypes []proj_model.OIDCGrantType) []grpc.OIDCGrantType {
-	oidcGrantTypes := make([]grpc.OIDCGrantType, len(grantTypes))
+func oidcGrantTypesFromModel(grantTypes []proj_model.OIDCGrantType) []management.OIDCGrantType {
+	oidcGrantTypes := make([]management.OIDCGrantType, len(grantTypes))
 
 	for i, grantType := range grantTypes {
 		switch grantType {
 		case proj_model.OIDCGrantTypeAuthorizationCode:
-			oidcGrantTypes[i] = grpc.OIDCGrantType_OIDCGRANTTYPE_AUTHORIZATION_CODE
+			oidcGrantTypes[i] = management.OIDCGrantType_OIDCGRANTTYPE_AUTHORIZATION_CODE
 		case proj_model.OIDCGrantTypeImplicit:
-			oidcGrantTypes[i] = grpc.OIDCGrantType_OIDCGRANTTYPE_IMPLICIT
+			oidcGrantTypes[i] = management.OIDCGrantType_OIDCGRANTTYPE_IMPLICIT
 		case proj_model.OIDCGrantTypeRefreshToken:
-			oidcGrantTypes[i] = grpc.OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN
+			oidcGrantTypes[i] = management.OIDCGrantType_OIDCGRANTTYPE_REFRESH_TOKEN
 		}
 	}
 	return oidcGrantTypes
 }
 
-func oidcApplicationTypeToModel(appType grpc.OIDCApplicationType) proj_model.OIDCApplicationType {
+func oidcApplicationTypeToModel(appType management.OIDCApplicationType) proj_model.OIDCApplicationType {
 	switch appType {
-	case grpc.OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB:
+	case management.OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB:
 		return proj_model.OIDCApplicationTypeWeb
-	case grpc.OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT:
+	case management.OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT:
 		return proj_model.OIDCApplicationTypeUserAgent
-	case grpc.OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE:
+	case management.OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE:
 		return proj_model.OIDCApplicationTypeNative
 	}
 	return proj_model.OIDCApplicationTypeWeb
 }
 
-func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) grpc.OIDCApplicationType {
+func oidcApplicationTypeFromModel(appType proj_model.OIDCApplicationType) management.OIDCApplicationType {
 	switch appType {
 	case proj_model.OIDCApplicationTypeWeb:
-		return grpc.OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
+		return management.OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
 	case proj_model.OIDCApplicationTypeUserAgent:
-		return grpc.OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT
+		return management.OIDCApplicationType_OIDCAPPLICATIONTYPE_USER_AGENT
 	case proj_model.OIDCApplicationTypeNative:
-		return grpc.OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE
+		return management.OIDCApplicationType_OIDCAPPLICATIONTYPE_NATIVE
 	default:
-		return grpc.OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
+		return management.OIDCApplicationType_OIDCAPPLICATIONTYPE_WEB
 	}
 }
 
-func oidcAuthMethodTypeToModel(authType grpc.OIDCAuthMethodType) proj_model.OIDCAuthMethodType {
+func oidcAuthMethodTypeToModel(authType management.OIDCAuthMethodType) proj_model.OIDCAuthMethodType {
 	switch authType {
-	case grpc.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC:
+	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC:
 		return proj_model.OIDCAuthMethodTypeBasic
-	case grpc.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST:
+	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST:
 		return proj_model.OIDCAuthMethodTypePost
-	case grpc.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
+	case management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE:
 		return proj_model.OIDCAuthMethodTypeNone
 	default:
 		return proj_model.OIDCAuthMethodTypeBasic
 	}
 }
 
-func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) grpc.OIDCAuthMethodType {
+func oidcAuthMethodTypeFromModel(authType proj_model.OIDCAuthMethodType) management.OIDCAuthMethodType {
 	switch authType {
 	case proj_model.OIDCAuthMethodTypeBasic:
-		return grpc.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 	case proj_model.OIDCAuthMethodTypePost:
-		return grpc.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_POST
 	case proj_model.OIDCAuthMethodTypeNone:
-		return grpc.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_NONE
 	default:
-		return grpc.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
+		return management.OIDCAuthMethodType_OIDCAUTHMETHODTYPE_BASIC
 	}
 }
 
-func appChangesToResponse(response *proj_model.ApplicationChanges, offset uint64, limit uint64) (_ *grpc.Changes) {
-	return &grpc.Changes{
+func appChangesToResponse(response *proj_model.ApplicationChanges, offset uint64, limit uint64) (_ *management.Changes) {
+	return &management.Changes{
 		Limit:   limit,
 		Offset:  offset,
 		Changes: appChangesToMgtAPI(response),
 	}
 }
 
-func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*grpc.Change) {
-	result := make([]*grpc.Change, len(changes.Changes))
+func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*management.Change) {
+	result := make([]*management.Change, len(changes.Changes))
 
 	for i, change := range changes.Changes {
 		b, err := json.Marshal(change.Data)
@@ -335,7 +335,7 @@ func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*grpc.Chang
 		err = protojson.Unmarshal(b, data)
 		if err != nil {
 		}
-		result[i] = &grpc.Change{
+		result[i] = &management.Change{
 			ChangeDate: change.ChangeDate,
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,
