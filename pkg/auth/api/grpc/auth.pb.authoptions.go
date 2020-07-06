@@ -105,6 +105,11 @@ var AuthService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyPasswordComplexityPolicy": utils_auth.Option{
+		Permission: "authenticated",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.auth.api.v1.AuthService/AddMfaOTP": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",

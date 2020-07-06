@@ -241,6 +241,16 @@ service AuthService {
     };
   }
 
+  rpc GetMyPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
+    option (google.api.http) = {
+            get: "/policies/passwords/complexity"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
+  }
+
   // MFA
   rpc AddMfaOTP(google.protobuf.Empty) returns (MfaOtpResponse) {
     option (google.api.http) = {
@@ -663,4 +673,18 @@ message Change {
   string editor_id = 4;
   string editor = 5;
   google.protobuf.Struct data = 6;
+}
+
+message PasswordComplexityPolicy {
+  string id = 1;
+  string description = 2;
+  google.protobuf.Timestamp creation_date = 3;
+  google.protobuf.Timestamp change_date = 4;
+  uint64 min_length = 5;
+  bool has_lowercase = 6;
+  bool has_uppercase = 7;
+  bool has_number = 8;
+  bool has_symbol = 9;
+  uint64 sequence = 10;
+  bool is_default = 11;
 }
