@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
@@ -11,6 +12,9 @@ func NotifyUserByID(db *gorm.DB, table, userID string) (*model.NotifyUser, error
 	user := new(model.NotifyUser)
 	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.NotifyUserSearchKeyUserID), userID)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Gad31", "Errors.User.NotFound")
+	}
 	return user, err
 }
 

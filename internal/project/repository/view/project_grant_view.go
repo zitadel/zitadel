@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -15,6 +16,9 @@ func ProjectGrantByProjectAndOrg(db *gorm.DB, table, projectID, orgID string) (*
 	orgIDQuery := model.ProjectGrantSearchQuery{Key: proj_model.GrantedProjectSearchKeyOrgID, Value: orgID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, projectIDQuery, orgIDQuery)
 	err := query(db, projectGrant)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-WR3z2", "Errors.Project.GrantNotExists")
+	}
 	return projectGrant, err
 }
 
@@ -23,6 +27,9 @@ func ProjectGrantByID(db *gorm.DB, table, grantID string) (*model.ProjectGrantVi
 	grantIDQuery := model.ProjectGrantSearchQuery{Key: proj_model.GrantedProjectSearchKeyGrantID, Value: grantID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, grantIDQuery)
 	err := query(db, projectGrant)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-EGdh4", "Errors.Project.GrantNotFound")
+	}
 	return projectGrant, err
 }
 
