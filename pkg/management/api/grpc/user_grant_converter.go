@@ -97,7 +97,7 @@ func userGrantSearchRequestsToModel(project *UserGrantSearchRequest) *grant_mode
 }
 
 func userGrantSearchQueriesToModel(queries []*UserGrantSearchQuery) []*grant_model.UserGrantSearchQuery {
-	converted := make([]*grant_model.UserGrantSearchQuery, 0)
+	converted := make([]*grant_model.UserGrantSearchQuery, len(queries))
 	for i, q := range queries {
 		converted[i] = userGrantSearchQueryToModel(q)
 	}
