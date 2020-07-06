@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -16,6 +17,9 @@ func ProjectRoleByIDs(db *gorm.DB, table, projectID, orgID, key string) (*model.
 	keyQuery := model.ProjectRoleSearchQuery{Key: proj_model.ProjectRoleSearchKeyKey, Value: key, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, projectIDQuery, grantIDQuery, keyQuery)
 	err := query(db, role)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Wtg72", "Errors.Project.RoleNotExisting")
+	}
 	return role, err
 }
 

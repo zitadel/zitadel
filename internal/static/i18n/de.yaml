@@ -54,6 +54,7 @@ Errors:
     InvalidDomain: Domäne ist ungültig
     DomainMissing: Domäne fehlt
     DomainNotOnOrg: Domäne fehlt auf Organisation
+    DomainNotFound: Domäne konnte nicht gefunden werden
     MemberIDMissing: Member ID fehlt
     MemberNotFound: Organisations Member konnte nicht gefunden werden
     InvalidMember: Organisations Member ist ungültig
@@ -69,6 +70,7 @@ Errors:
     Invalid: Projekt ist ungültig
     NotActive: Projekt ist nicht aktiv
     NotInactive: Projekt ist nicht deaktiviert
+    NotFound: Project konnte nicht gefunden werden
     UserIDMissing: User ID fehlt
     MemberNotFound: Member konnte nicht gefunden werden
     MemberInvalid: Member ist ungültig
@@ -108,3 +110,7 @@ Errors:
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
+  Token:
+    NotFound: Token konnte nicht gefunden werden
+  UserSession:
+    NotFound: UserSession konnte nicht gefunden werden
