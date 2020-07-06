@@ -111,6 +111,14 @@ func (s *Server) ChangeMyPassword(ctx context.Context, request *PasswordChange) 
 	return &empty.Empty{}, err
 }
 
+func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*PasswordComplexityPolicy, error) {
+	policy, err := s.repo.GetMyPasswordComplexityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return passwordComplexityPolicyFromModel(policy), nil
+}
+
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpResponse, err error) {
 	otp, err := s.repo.AddMyMfaOTP(ctx)
 	if err != nil {
