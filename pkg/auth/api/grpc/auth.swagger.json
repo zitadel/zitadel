@@ -483,6 +483,20 @@
           "AuthService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveMyUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
       "put": {
         "operationId": "ChangeMyUserPhone",
         "responses": {

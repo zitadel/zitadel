@@ -508,6 +508,16 @@ func PhoneChangeAggregate(aggCreator *es_models.AggregateCreator, existing *mode
 	}
 }
 
+func PhoneRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		agg, err := UserAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		return agg.AppendEvent(model.UserPhoneRemoved, nil)
+	}
+}
+
 func PhoneVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing *model.User) es_sdk.AggregateFunc {
 	return func(ctx context.Context) (*es_models.Aggregate, error) {
 		agg, err := UserAggregate(ctx, aggCreator, existing)

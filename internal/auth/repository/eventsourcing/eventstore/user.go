@@ -130,6 +130,10 @@ func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*m
 	return repo.UserEvents.ChangePhone(ctx, phone)
 }
 
+func (repo *UserRepo) RemoveMyPhone(ctx context.Context) error {
+	return repo.UserEvents.RemovePhone(ctx, auth.GetCtxData(ctx).UserID)
+}
+
 func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {
 	return repo.UserEvents.VerifyPhone(ctx, auth.GetCtxData(ctx).UserID, code)
 }

@@ -193,6 +193,9 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		err = u.setData(event)
 	case es_model.UserPhoneVerified:
 		u.IsPhoneVerified = true
+	case es_model.UserPhoneRemoved:
+		u.Phone = ""
+		u.IsPhoneVerified = false
 	case es_model.UserDeactivated:
 		u.State = int32(model.UserStateInactive)
 	case es_model.UserReactivated,
