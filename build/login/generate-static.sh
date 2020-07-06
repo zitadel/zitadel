@@ -2,4 +2,4 @@
 
 set -eux
 
-go generate internal/login/statik/generate.go
+go generate internal/ui/login/statik/generate.go
