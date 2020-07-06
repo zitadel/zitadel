@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
@@ -15,6 +16,9 @@ func OrgMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.OrgMemberV
 	userIDQuery := &model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
 	err := query(db, member)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-DG1qh", "Errors.Org.MemberNotFound")
+	}
 	return member, err
 }
 

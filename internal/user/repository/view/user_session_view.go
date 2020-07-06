@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 
@@ -23,6 +24,9 @@ func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSe
 	}
 	query := repository.PrepareGetByQuery(table, userAgentQuery, userQuery)
 	err := query(db, userSession)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-NGBs1", "Errors.UserSession.NotFound")
+	}
 	return userSession, err
 }
 

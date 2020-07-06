@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_model "github.com/caos/zitadel/internal/model"
@@ -15,6 +16,9 @@ func IamMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.IamMemberV
 	userIDQuery := &model.IamMemberSearchQuery{Key: iam_model.IamMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
 	err := query(db, member)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.Iam.MemberNotExisting")
+	}
 	return member, err
 }
 
