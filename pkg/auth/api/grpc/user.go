@@ -3,8 +3,6 @@ package grpc
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/user/model"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 )
 
@@ -135,14 +133,6 @@ func (s *Server) GetMyUserChanges(ctx context.Context, request *ChangesRequest) 
 	changes, err := s.repo.MyUserChanges(ctx, request.SequenceOffset, request.Limit, request.Asc)
 	if err != nil {
 		return nil, err
-	}
-	changes = &model.UserChanges{
-		Changes: []*model.UserChange{
-			{
-				ChangeDate: ptypes.TimestampNow(),
-				EventType:  "EventTypes.user.added",
-			},
-		},
 	}
 	return userChangesToResponse(changes, request.GetSequenceOffset(), request.GetLimit()), nil
 }

@@ -5,5 +5,9 @@ func (m *LocalizedMessage) LocalizationKey() string {
 }
 
 func (m *LocalizedMessage) SetLocalizedMessage(message string) {
-	m.Message = message
+	m.LocalizedMessage = message
+}
+
+func NewLocalizedEventType(key string) *LocalizedMessage {
+	return &LocalizedMessage{Key: "EventTypes." + key}
 }

@@ -10,7 +10,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	_ "github.com/caos/zitadel/internal/statik"
 )
 
@@ -28,7 +27,7 @@ func TranslationHandler(defaultLanguage language.Tag) func(ctx context.Context, 
 		if loc, ok := resp.(localizers); ok {
 			TranslateFields(ctx, loc, translator)
 		}
-		return resp, grpc_util.CaosToGRPCError(err, ctx, translator)
+		return resp, err
 	}
 }
 

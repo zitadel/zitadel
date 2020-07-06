@@ -359,10 +359,9 @@ func userChangesToAPI(changes *usr_model.UserChanges) (_ []*Change) {
 			err = protojson.Unmarshal(changedData, data)
 			logging.Log("GRPC-0kRsY").OnError(err).Debug("unable to marshal changed data to struct")
 		}
-
 		result[i] = &Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  &message.LocalizedMessage{Key: change.EventType},
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
 			EditorId:   change.ModifierId,

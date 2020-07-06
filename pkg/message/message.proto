@@ -11,5 +11,5 @@ message ErrorDetail {
 
 message LocalizedMessage {
     string key = 1;
-    string message = 2;
+    string localized_message = 2;
 }
