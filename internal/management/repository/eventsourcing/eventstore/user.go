@@ -182,6 +182,10 @@ func (repo *UserRepo) ChangePhone(ctx context.Context, email *usr_model.Phone) (
 	return repo.UserEvents.ChangePhone(ctx, email)
 }
 
+func (repo *UserRepo) RemovePhone(ctx context.Context, userID string) error {
+	return repo.UserEvents.RemovePhone(ctx, userID)
+}
+
 func (repo *UserRepo) CreatePhoneVerificationCode(ctx context.Context, userID string) error {
 	return repo.UserEvents.CreatePhoneVerificationCode(ctx, userID)
 }

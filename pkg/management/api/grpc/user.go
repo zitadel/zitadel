@@ -149,6 +149,10 @@ func (s *Server) ChangeUserPhone(ctx context.Context, request *UpdateUserPhoneRe
 	return phoneFromModel(phone), nil
 }
 
+func (s *Server) RemoveUserPhone(ctx context.Context, userID *UserID) (*empty.Empty, error) {
+	err := s.user.RemovePhone(ctx, userID.Id)
+	return &empty.Empty{}, err
+}
 func (s *Server) ResendPhoneVerificationCode(ctx context.Context, in *UserID) (*empty.Empty, error) {
 	err := s.user.CreatePhoneVerificationCode(ctx, in.Id)
 	return &empty.Empty{}, err

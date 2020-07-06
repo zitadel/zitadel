@@ -99,6 +99,9 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 		u.VerifiedEmail = u.LastEmail
 	case es_model.UserPhoneChanged:
 		err = u.setData(event)
+	case es_model.UserPhoneRemoved:
+		u.VerifiedPhone = ""
+		u.LastPhone = ""
 	case es_model.UserPhoneVerified:
 		u.VerifiedPhone = u.LastPhone
 	case es_model.UserPasswordChanged:
