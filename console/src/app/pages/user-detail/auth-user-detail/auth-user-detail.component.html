@@ -166,9 +166,6 @@
                             <button (click)="phoneEditState = true" mat-icon-button>
                                 <mat-icon>edit</mat-icon>
                             </button>
-                            <button color="warn" *ngIf="user?.phone" (click)="deletePhone()" mat-icon-button>
-                                <i class="las la-trash"></i>
-                            </button>
                         </div>
                     </ng-container>
 
@@ -188,36 +185,6 @@
         </app-card>
 
         <app-auth-user-mfa *ngIf="user"></app-auth-user-mfa>
-
-        <!-- <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}" *ngIf="user">
-            <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
-                <div class="content">
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.STREET' | translate }}</mat-label>
-                        <input matInput formControlName="streetAddress" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.POSTAL_CODE' | translate }}</mat-label>
-                        <input matInput formControlName="postalCode" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.LOCALITY' | translate }}</mat-label>
-                        <input matInput formControlName="locality" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.REGION' | translate }}</mat-label>
-                        <input matInput formControlName="region" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.COUNTRY' | translate }}</mat-label>
-                        <input matInput formControlName="country" />
-                    </mat-form-field>
-                </div>
-                <div class="btn-container">
-                    <button type="submit" color="primary" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-                </div>
-            </form>
-        </app-card> -->
     </div>
 
     <metainfo *ngIf="user" class="side">

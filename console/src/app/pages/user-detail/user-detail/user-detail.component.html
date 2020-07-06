@@ -142,7 +142,6 @@
                             <ng-container *ngIf="user?.phone && !user?.isPhoneVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
-
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
                                     (click)="resendPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                             </ng-container>
@@ -151,9 +150,6 @@
                         <div class="actions">
                             <button (click)="phoneEditState = true" mat-icon-button>
                                 <mat-icon>edit</mat-icon>
-                            </button>
-                            <button *ngIf="user?.phone" (click)="deletePhone()" color="warn" mat-icon-button>
-                                <i class="las la-trash"></i>
                             </button>
                         </div>
                     </ng-container>

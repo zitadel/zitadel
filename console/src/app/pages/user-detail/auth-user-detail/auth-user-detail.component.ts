@@ -163,11 +163,6 @@ export class AuthUserDetailComponent implements OnDestroy {
             });
     }
 
-    public deletePhone(): void {
-        this.user.phone = '';
-        this.savePhone();
-    }
-
     public enterCode(): void {
         const dialogRef = this.dialog.open(CodeDialogComponent, {
             data: {

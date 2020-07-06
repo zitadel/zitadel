@@ -21,7 +21,6 @@ import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
@@ -119,25 +118,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         this.subscription.unsubscribe();
-    }
-
-    public deletePhone(): void {
-        this.user.phone = '';
-        this.savePhone();
-    }
-
-    public enterCode(): void {
-        const dialogRef = this.dialog.open(CodeDialogComponent, {
-            data: {
-                number: this.user.phone,
-            },
-        });
-
-        dialogRef.afterClosed().subscribe(code => {
-            if (code) {
-                this.toast.showInfo('TODO: implement service');
-            }
-        });
     }
 
     public saveProfile(profileData: UserProfile.AsObject): void {
