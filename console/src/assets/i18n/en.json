@@ -3,7 +3,7 @@
     "HOME": {
         "TITLE": "zitadel",
         "SECURITYANDPRIVACY": "Data protection and personalization",
-        "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",
+        "SECURITYANDPRIVACY_DESC": "You can view the data in your Zitadel account and choose which activities are saved in order to personalize Zitadel for you",
         "SECURITYANDPRIVACY_BUTTON": "Personalize data",
         "PROTECTION": "Organizational Policies",
         "PROTECTION_DESC": "Manage your organizational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
@@ -112,18 +112,19 @@
             "TITLE": "Profile",
             "EMAIL": "Email",
             "PHONE": "Phonenumber",
-            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
+            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Zitadel to your needs",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
             "NICKNAME": "Nickname",
             "DISPLAYNAME": "Displayname",
             "PREFERRED_LANGUAGE": "Language",
-            "GENDER": "Gender"
+            "GENDER": "Gender",
+            "PASSWORD":"Password"
         },
         "PASSWORD": {
             "TITLE": "Password",
-            "DESCRIPTION": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
+            "DESCRIPTION": "Note that the possword must correspond to the policy your organization has set.",
             "OLD": "Current Password",
             "NEW": "New Password",
             "CONFIRM": "Password Confirmation",
@@ -137,7 +138,7 @@
         "EMAIL": "Email",
         "PHONE": "Phonenumber",
         "LOGINMETHODS": {
-            "TITLE": "Methods to check your identity",
+            "TITLE": "Methods to access your identity",
             "DESCRIPTION": "This allows us to confirm your identity when you register or to contact you if suspicious activity is detected in your account",
             "EMAIL": {
                 "TITLE": "Email",

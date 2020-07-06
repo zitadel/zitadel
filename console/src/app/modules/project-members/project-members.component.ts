@@ -38,7 +38,6 @@ export class ProjectMembersComponent implements AfterViewInit {
         private route: ActivatedRoute) {
         this.route.data.pipe(take(1)).subscribe(data => {
             this.projectType = data.type;
-            console.log(data);
 
             this.getRoleOptions();
 
@@ -156,6 +155,5 @@ export class ProjectMembersComponent implements AfterViewInit {
             }).catch(error => {
                 this.toast.showError(error.message);
             });
-
     }
 }

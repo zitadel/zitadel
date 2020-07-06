@@ -19,8 +19,8 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
         super();
     }
 
-    public loadMembers(projectId: string, grantId: string, pageIndex: number,
-        pageSize: number, sortDirection?: string): void {
+    public loadGrantMembers(projectId: string, grantId: string, pageIndex: number,
+        pageSize: number): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
@@ -40,7 +40,6 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
             });
 
     }
-
 
     /**
      * Connect this data source to the table. The table will only update when

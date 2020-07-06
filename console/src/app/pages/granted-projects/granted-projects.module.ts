@@ -3,10 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -29,10 +26,7 @@ import { ChangesModule } from '../../modules/changes/changes.module';
 import { MetaLayoutModule } from '../../modules/meta-layout/meta-layout.module';
 import { ProjectContributorsModule } from '../../modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from '../../modules/project-roles/project-roles.module';
-import { SearchUserAutocompleteModule } from '../../modules/search-user-autocomplete/search-user-autocomplete.module';
 import { PipesModule } from '../../pipes/pipes.module';
-import { OrgContributorsModule } from '../orgs/org-contributors/org-contributors.module';
-import { UserListModule } from '../user-list/user-list.module';
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { GrantedProjectGridComponent } from './granted-project-grid/granted-project-grid.component';
 import { GrantedProjectListComponent } from './granted-project-list/granted-project-list.component';
@@ -57,29 +51,23 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         HasRoleModule,
         MatTableModule,
         MatPaginatorModule,
+        MatMenuModule,
         MatFormFieldModule,
         MatInputModule,
         ChangesModule,
-        UserListModule,
-        MatMenuModule,
-        MatChipsModule,
         MatIconModule,
         MatSelectModule,
         MatButtonModule,
         MatProgressSpinnerModule,
         MetaLayoutModule,
         MatProgressBarModule,
-        MatDialogModule,
-        MatButtonToggleModule,
         MatTabsModule,
         ProjectRolesModule,
-        SearchUserAutocompleteModule,
         MatCheckboxModule,
         CardModule,
         MatTooltipModule,
         MatSortModule,
         PipesModule,
-        OrgContributorsModule,
         TranslateModule.forChild({
             loader: {
                 provide: TranslateLoader,

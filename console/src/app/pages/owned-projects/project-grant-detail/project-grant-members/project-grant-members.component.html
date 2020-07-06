@@ -67,24 +67,16 @@
 
         <ng-container matColumnDef="roles">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
-            <td class="pointer" [routerLink]="['/user', member.userId]" mat-cell *matCellDef="let member">
-                <span class="role app-label" *ngFor="let role of member.rolesList; index as i">
-                    {{ 'ROLES.'+role | translate }}</span>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="action" stickyEnd>
-            <th class="action" mat-header-cell *matHeaderCellDef></th>
-            <td class="action" mat-cell *matCellDef="let member">
-                <button [disabled]="disabled" [matMenuTriggerFor]="menu" mat-icon-button>
-                    <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">
-                    <button mat-menu-item [routerLink]="['/user', member.userId]">Edit Member</button>
-                    <button mat-menu-item (click)="removeMember(member)">
-                        Remove Member
-                    </button>
-                </mat-menu>
+            <td class="pointer" mat-cell *matCellDef="let member">
+                <mat-form-field class="form-field" appearance="outline" *ngIf="projectId">
+                    <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
+                    <mat-select [(ngModel)]="member.rolesList" multiple [disabled]="disabled"
+                        (selectionChange)="updateRoles(member, $event)">
+                        <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
+                            {{ 'ROLES.'+role | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </td>
         </ng-container>
 

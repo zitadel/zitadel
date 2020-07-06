@@ -94,7 +94,7 @@ h1 {
         flex-wrap: wrap;
 
         .label, .name {
-        margin-right: 1rem;
+            margin-right: 1rem;
         }
 
         .actions {
@@ -107,7 +107,7 @@ h1 {
         .label {
             flex: 1;
             font-size: .9rem;
-            color: #818a8a;
+            color: #8795a1;
         }
 
         mat-icon {
@@ -149,6 +149,20 @@ h1 {
 
     .theme-card {
         max-width: 300px;
+    }
+
+    .pwd-row {
+        display: flex;
+        align-items: center;
+
+        span {
+            flex: 1;
+        }
+
+        .title {
+            color: #8795a1;
+            font-size: 0.9rem;
+        }
     }
 }
 
