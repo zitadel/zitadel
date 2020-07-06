@@ -157,6 +157,16 @@ service AuthService {
     };
   }
 
+  rpc RemoveMyUserPhone(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/phone"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc VerifyMyUserPhone(VerifyUserPhoneRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/users/me/phone/_verify"

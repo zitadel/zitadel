@@ -46,7 +46,8 @@ func (p *NotifyUser) Reduce(event *models.Event) (err error) {
 		es_model.UserEmailChanged,
 		es_model.UserEmailVerified,
 		es_model.UserPhoneChanged,
-		es_model.UserPhoneVerified:
+		es_model.UserPhoneVerified,
+		es_model.UserPhoneRemoved:
 		user, err = p.view.NotifyUserByID(event.AggregateID)
 		if err != nil {
 			return err

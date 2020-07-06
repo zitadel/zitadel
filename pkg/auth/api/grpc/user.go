@@ -38,6 +38,10 @@ func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*UserPhone
 	return phoneViewFromModel(phone), nil
 }
 
+func (s *Server) RemoveMyUserPhone(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
+	err := s.repo.RemoveMyPhone(ctx)
+	return &empty.Empty{}, err
+}
 func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*UserAddressView, error) {
 	address, err := s.repo.MyAddress(ctx)
 	if err != nil {

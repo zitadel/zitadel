@@ -161,6 +161,8 @@ func (u *User) AppendEvent(event *es_models.Event) (err error) {
 		err = u.appendUserPhoneCodeAddedEvent(event)
 	case UserPhoneVerified:
 		u.appendUserPhoneVerifiedEvent()
+	case UserPhoneRemoved:
+		u.appendUserPhoneRemovedEvent()
 	case UserAddressChanged:
 		err = u.appendUserAddressChangedEvent(event)
 	case MfaOtpAdded:
