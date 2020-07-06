@@ -13,11 +13,11 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.5.7
 	github.com/ajstarks/svgo v0.0.0-20200320125537-f189e35d30ca
 	github.com/allegro/bigcache v1.2.1
-	github.com/aws/aws-sdk-go v1.33.0 // indirect
+	github.com/aws/aws-sdk-go v1.33.1 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.6.2
-	github.com/cockroachdb/cockroach-go v2.0.1+incompatible
+	github.com/cockroachdb/cockroach-go/v2 v2.0.0
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
