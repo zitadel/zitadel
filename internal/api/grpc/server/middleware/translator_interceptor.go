@@ -3,9 +3,7 @@ package middleware
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/i18n"
-	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
 	"google.golang.org/grpc"
@@ -14,13 +12,7 @@ import (
 )
 
 func TranslationHandler(defaultLanguage language.Tag) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	dir, err := fs.NewWithNamespace("zitadel")
-	logging.Log("MIDDL-76QHE").OnError(err).Panic("unable to get zitadel namespace")
-
-	translator, err := i18n.NewTranslator(dir, i18n.TranslatorConfig{DefaultLanguage: defaultLanguage})
-	if err != nil {
-		logging.Log("MIDDL-ELbF7").OnError(err).Panic("unable to get i18n translator")
-	}
+	translator := newZitadelTranslator(defaultLanguage)
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		resp, err := handler(ctx, req)
