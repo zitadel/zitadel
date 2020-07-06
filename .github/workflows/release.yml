@@ -88,7 +88,7 @@ jobs:
     - run: ./build/console/generate-static.sh
     - run: cat internal/ui/console/statik/statik.go
     - run: ./build/login/generate-static.sh
-    - run: cat internal/login/statik/statik.go
+    - run: cat internal/ui/login/statik/statik.go
     - run: ./build/notification/generate-static.sh
     - run: cat internal/notification/statik/statik.go
     - run: ./build/zitadel/generate-static.sh
