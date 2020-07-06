@@ -3,7 +3,7 @@
         <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
             <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
-        <a *ngIf="(isHandset$ | async) == false" class="title ailerons" [routerLink]="['/']">
+        <a *ngIf="(isHandset$ | async) == false" class="title" [routerLink]="['/']">
             <img class="logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
                 src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
             <ng-template #lighttheme>
@@ -19,11 +19,11 @@
 
         <mat-menu #menu="matMenu">
             <mat-progress-bar *ngIf="orgLoading" color="accent" mode="indeterminate"></mat-progress-bar>
-            <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">Show all organizations</button>
+            <button class="show-all" mat-menu-item
+                [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' | translate}}</button>
 
             <button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id" *ngFor="let temporg of orgs"
                 mat-menu-item (click)="setActiveOrg(temporg)">
-                <mat-icon class="avatar">business</mat-icon>
                 {{temporg?.name ? temporg.name : 'NO NAME'}}
             </button>
 

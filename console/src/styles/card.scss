@@ -12,7 +12,8 @@
 
     .card {
         background-color: $primary-dark;
-        border: 1px solid $border-color;
+        transition: background-color .5s ease-in-out;
+        border: 1px solid rgba($border-color, .2);
         box-sizing: border-box;
         border-radius: .5rem;
         outline: none;

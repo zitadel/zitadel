@@ -2,9 +2,10 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 import { ProjectMember, ProjectType, ProjectView, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -25,6 +26,7 @@ export class ProjectMembersComponent implements AfterViewInit {
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
     public dataSource!: ProjectMembersDataSource;
     public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
+    public memberRoleOptions: string[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'username', 'email', 'roles'];
@@ -34,13 +36,24 @@ export class ProjectMembersComponent implements AfterViewInit {
         private dialog: MatDialog,
         private toast: ToastService,
         private route: ActivatedRoute) {
-        this.route.params.subscribe(params => {
-            this.projectService.GetProjectById(params.projectid).then(project => {
-                this.project = project.toObject();
-                this.dataSource = new ProjectMembersDataSource(this.projectService);
-                this.dataSource.loadMembers(this.project, this.projectType, 0, 25, 'asc');
+        this.route.data.pipe(take(1)).subscribe(data => {
+            this.projectType = data.type;
+            console.log(data);
+
+            this.getRoleOptions();
+
+            this.route.params.subscribe(params => {
+                console.log(params);
+
+                console.log(this.projectType);
+                this.projectService.GetProjectById(params.projectid).then(project => {
+                    this.project = project.toObject();
+                    this.dataSource = new ProjectMembersDataSource(this.projectService);
+                    this.dataSource.loadMembers(this.project, this.projectType, 0, 25, 'asc');
+                });
             });
         });
+
     }
 
     public ngAfterViewInit(): void {
@@ -50,6 +63,22 @@ export class ProjectMembersComponent implements AfterViewInit {
             )
             .subscribe();
 
+    }
+
+    public getRoleOptions(): void {
+        if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+            this.projectService.GetProjectGrantMemberRoles().then(resp => {
+                this.memberRoleOptions = resp.toObject().rolesList;
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        } else if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+            this.projectService.GetProjectMemberRoles().then(resp => {
+                this.memberRoleOptions = resp.toObject().rolesList;
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        }
     }
 
     private loadMembersPage(): void {
@@ -116,5 +145,17 @@ export class ProjectMembersComponent implements AfterViewInit {
                 }
             }
         });
+    }
+
+    updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
+        console.log(member, selectionChange.value);
+        this.projectService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
+            .then((newmember: ProjectMember) => {
+                console.log(newmember.toObject());
+                this.toast.showInfo('Member updated!');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+
     }
 }

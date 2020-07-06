@@ -49,7 +49,7 @@
         min-height: 166px;
 
         &.inactive {
-            color: #81868a;
+            color: #8795a1;
         }
 
         .selection-icon {
@@ -58,10 +58,6 @@
             top: -12px;
             left: -12px;
             user-select: none;
-
-            &:hover {
-                color: white;
-            }
         }
 
         img {
@@ -81,14 +77,13 @@
                 font-size: 0.8rem;
                 margin-bottom: 0;
                 margin-top: .5rem;
-                color: #81868a;
+                color: #8795a1;
             }
 
             .name {
                 margin-top: 1rem;
                 font-size: 1.2rem;
                 margin-bottom: 0.5rem;
-                font-family: 'Rubik', sans-serif;
             }
 
             .description {
@@ -97,7 +92,7 @@
 
             .created {
                 font-size: 0.8rem;
-                color: #81868a;
+                color: #8795a1;
             }
 
             .organization {
@@ -127,7 +122,7 @@
                     margin-right: 3px;
                     font-size: 1.3rem;
                     height: 1.4rem;
-                    color: #81868a;
+                    color: #8795a1;
                 }
             }
 
@@ -186,7 +181,6 @@
         border-radius: 0.5rem;
         margin: 1rem;
         box-sizing: border-box;
-        font-family: 'Rubik', sans-serif;
 
         .icon {
             display: flex;
@@ -214,6 +208,6 @@
 .n-items {
     padding: 0 1rem;
     font-size: .8rem;
-    color: #81868a;
+    color: #8795a1;
     flex-basis: 100%;
 }

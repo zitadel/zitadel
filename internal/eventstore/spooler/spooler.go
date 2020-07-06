@@ -2,6 +2,7 @@ package spooler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -117,7 +118,7 @@ func HandleError(event *models.Event, failedErr error,
 	if err != nil {
 		return err
 	}
-	if errorCountUntilSkip == failedEvent.FailureCount {
+	if errorCountUntilSkip <= failedEvent.FailureCount {
 		return processSequence(event.Sequence)
 	}
 	return nil

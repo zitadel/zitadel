@@ -56,6 +56,11 @@ const routes: Routes = [
         },
     },
     {
+        path: 'grant-create',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
+    {
         path: 'signedout',
         loadChildren: () => import('./pages/signedout/signedout.module').then(m => m.SignedoutModule),
     },

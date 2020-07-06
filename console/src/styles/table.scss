@@ -9,6 +9,7 @@
     .mat-table,
     mat-paginator {
         background-color: $secondary-dark !important;
+        transition: background-color .5s ease-in-out;
 
         &.background-style {
             background-color: $primary-dark !important;
@@ -20,7 +21,13 @@
         border-radius: 1rem;
         color: mat-color($foreground, text);
         white-space: nowrap;
-        background-color: #81868a;
+        background-color: #8795a1;
         padding: .5rem 1rem;
+    }
+
+    td {
+        .mat-form-field-wrapper {
+            padding-bottom: 0;
+        }
     }
 }

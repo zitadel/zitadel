@@ -6,6 +6,8 @@ import { switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
+    Changes,
+    ChangesRequest,
     Gender,
     MfaOtpResponse,
     MultiFactors,
@@ -276,6 +278,17 @@ export class AuthUserService {
         req.setCountry(address.country);
         return await this.request(
             c => c.updateMyUserAddress,
+            req,
+            f => f,
+        );
+    }
+
+    public async GetMyUserChanges(limit: number, sequenceoffset: number): Promise<Changes> {
+        const req = new ChangesRequest();
+        req.setLimit(limit);
+        req.setSequenceOffset(sequenceoffset);
+        return await this.request(
+            c => c.getMyUserChanges,
             req,
             f => f,
         );

@@ -45,7 +45,6 @@ export class AuthUserDetailComponent implements OnDestroy {
     public languages: string[] = ['de', 'en'];
 
     public passwordForm!: FormGroup;
-    // public addressForm!: FormGroup;
     private subscription: Subscription = new Subscription();
 
     public emailEditState: boolean = false;
@@ -100,14 +99,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         });
-
-        // this.addressForm = this.fb.group({
-        //     streetAddress: [''],
-        //     postalCode: [''],
-        //     locality: [''],
-        //     region: [''],
-        //     country: [''],
-        // });
 
         this.loading = true;
         this.getData().then(() => {
@@ -229,33 +220,6 @@ export class AuthUserDetailComponent implements OnDestroy {
             });
     }
 
-    // public saveAddress(): void {
-    //     this.address = this.addressForm.value;
-    //     this.userService
-    //         .SaveMyUserAddress(this.address as UserAddress.AsObject).then((data: UserAddress) => {
-    //             this.toast.showInfo('Saved Address');
-    //             this.address = data.toObject();
-    //         }).catch(data => {
-    //             this.toast.showError(data.message);
-    //         });
-    // }
-
-    // public get streetAddress(): AbstractControl | null {
-    //     return this.addressForm.get('streetAddress');
-    // }
-    // public get postalCode(): AbstractControl | null {
-    //     return this.addressForm.get('postalCode');
-    // }
-    // public get locality(): AbstractControl | null {
-    //     return this.addressForm.get('locality');
-    // }
-    // public get region(): AbstractControl | null {
-    //     return this.addressForm.get('region');
-    // }
-    // public get country(): AbstractControl | null {
-    //     return this.addressForm.get('country');
-    // }
-
     public get currentPassword(): AbstractControl | null {
         return this.passwordForm.get('currentPassword');
     }
@@ -272,9 +236,6 @@ export class AuthUserDetailComponent implements OnDestroy {
         }).catch(err => {
             console.error(err);
         });
-
-        // this.address = (await this.userService.GetMyUserAddress()).toObject();
-        // this.addressForm.patchValue(this.address);
     }
 
     public copytoclipboard(value: string): void {

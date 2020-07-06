@@ -74,6 +74,16 @@
                         </app-project-roles>
                     </app-card>
                 </ng-template>
+
+                <ng-template appHasRole [appHasRole]="['user.grant.read']">
+                    <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
+                        description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
+                        <app-user-grants [filter]="userGrantSearchKey" [filterValue]="project.projectId"
+                            [allowCreate]="['user.grant.write'] | hasRole"
+                            [allowDelete]="['user.grant.delete'] | hasRole">
+                        </app-user-grants>
+                    </app-card>
+                </ng-template>
             </ng-container>
         </ng-container>
     </div>

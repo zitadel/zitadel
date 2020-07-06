@@ -19,7 +19,7 @@
 		font-weight: 400;
 		margin-left: 1rem;
 		line-height: 1.2rem;
-        font-family: 'Rubik';
+        font-family: 'Lato';
         margin-right: 1rem;
     }
 
@@ -41,7 +41,6 @@
 		.docs {
 			text-decoration: none;
 			font-size: 1.4rem;
-			font-family: 'ailerons', sans-serif;
 		}
 
         .avatar {
@@ -68,6 +67,7 @@
     font-size: 12px;
     padding: 4px 2rem;
     position: relative;
+    overflow: hidden;
 }
 
 .main-container {
@@ -107,7 +107,6 @@
                     text-decoration: none;
                     cursor: pointer;
                     padding: 0.2rem 1rem;
-                    // color: inherit;
                     margin-right: 0.5rem;
                     padding-right: 2rem;
             
@@ -117,7 +116,6 @@
             
                     .label {
                         margin-bottom: 0;
-                        font-family: 'Rubik';
                         font-weight: 500;
                         font-size: .9rem;
                     }
@@ -191,23 +189,6 @@
             margin: .5rem;
             cursor: pointer;
             background: linear-gradient(315deg, #000000, #000000);
-        }
-    }
-}
-
-.footer {
-    padding: 1rem;
-    a {
-        cursor: pointer;
-        text-decoration: none;
-        color: #81868a;
-        font-size: .8rem;
-        display: block;
-        margin-bottom: 1px;
-        font-weight: 300;
-
-        &:hover {
-            text-decoration: underline;
         }
     }
 }

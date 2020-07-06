@@ -22,11 +22,12 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { IamContributorsModule } from './iam-contributors/iam-contributors.module';
 import { IamRoutingModule } from './iam-routing.module';
 import { IamComponent } from './iam.component';
+import { IamViewsComponent } from './iam-views/iam-views.component';
 
 
 
 @NgModule({
-    declarations: [IamComponent],
+    declarations: [IamComponent, IamViewsComponent],
     imports: [
         CommonModule,
         IamRoutingModule,

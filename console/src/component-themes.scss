@@ -4,7 +4,8 @@
 @import './styles/morph-card';
 @import './styles/changes';
 @import './styles/avatar';
-
+@import './styles/meta';
+@import './styles/theme-card';
 
 @mixin component-themes($theme) {
     @include avatar-theme($theme);
@@ -13,4 +14,6 @@
     @include sidenav-list-theme($theme);
     @include morph-card-theme($theme);
     @include changes-theme($theme);
+    @include meta-theme($theme);
+    @include theme-card($theme);
 }

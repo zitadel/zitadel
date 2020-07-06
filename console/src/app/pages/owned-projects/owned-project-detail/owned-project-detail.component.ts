@@ -16,6 +16,7 @@ import {
     ProjectState,
     ProjectType,
     ProjectView,
+    UserGrantSearchKey,
 } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -56,6 +57,8 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public editstate: boolean = false;
 
     public isZitadel: boolean = false;
+
+    public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
 
     constructor(
         public translate: TranslateService,

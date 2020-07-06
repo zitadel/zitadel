@@ -27,15 +27,18 @@
         "USER": "Users",
         "LOGOUT": "Log out",
         "NEWORG":"New Organization",
-        "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!"
+        "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!",
+        "SHOWORGS":"Show all organizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
         "NEW": "New",
+        "ADD":"Add",
         "CREATE": "Create",
         "CONTINUE": "Continue",
         "BACK": "back",
         "CLOSE": "Close",
+        "CANCEL":"cancel",
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
@@ -158,14 +161,6 @@
             "REGION": "Region",
             "COUNTRY": "Country"
         },
-        "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Define the operations and rights that are made available to the user",
-            "CREATE": {
-                "TITLE": "Create User Grant",
-                "DESCRIPTION": "Search for the organization, the project and the corresponding project roles!"
-            }
-        },
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
             "REQUIRED": "The input field is empty",
@@ -202,6 +197,15 @@
         "MEMBER": {
             "TITLE":"Managers",
             "DESCRIPTION":"Managers can add and edit organizations and make changes to their corresponding projects and apps"
+        },
+        "VIEWS": {
+            "TITLE":"Views and Events",
+            "DESCRIPTION":"This Card shows your Zitadel Views, you can clear them and remove failed events.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Database",
+            "SEQUENCE":"Sequence",
+            "ACTIONS":"Actions",
+            "CLEAR":"Clear"
         }
     },
     "ORG": {
@@ -281,7 +285,7 @@
         }
     },
     "ORG_DETAIL": {
-        "TITLE": "Organisation",
+        "TITLE": "Organization",
         "DESCRIPTION": "Here you can edit your organization configuration and manage members",
         "DETAIL": {
             "TITLE": "Detail",
@@ -322,7 +326,11 @@
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
             "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
+            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!",
+            "TYPE":{
+                "OWNED":"Owned Projects",
+                "GRANTED":"Granted Projects"
+            }
         },
         "STATE": {
             "TITLE":"State",
@@ -349,22 +357,34 @@
             "USERID":"User Id"
         },
         "GRANT": {
-            "TITLE": "Grants",
+            "TITLE": "Granted organizations",
             "DESCRIPTION": "Allow an other organization to use your project",
             "CREATE": {
-                "TITLE": "Create Member Grant",
+                "TITLE": "Create organization grant",
                 "SEL_USERS": "Select the users you wish to grant",
                 "SEL_PROJECT": "Search for a project",
-                "SEL_ROLES": "Select the roles you want be be added to the grant",
-                "SEL_ORG": "Search for the domain",
+                "SEL_ROLES": "Select the roles you want to be added to the grant",
+                "SEL_USER":"Search for a user",
+                "SEL_ORG": "Set the domain",
+                "SEL_ORG_DESC":"Enter the complete domain to specify the organization to grant!",
                 "ORG_TITLE":"Organization",
-                "ORG_DESCRIPTION":"You are about to grant a user on the organization {{name}}",
-                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user of another organization",
-                "SEL_ORG_BUTTON": "Search Organization"
+                "ORG_DESCRIPTION":"You are about to grant a user for the organization {{name}}",
+                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organization",
+                "SEL_ORG_FORMFIELD":"Complete Domain",
+                "SEL_ORG_BUTTON": "Set Organization",
+                "FOR_ORG":"The grant is created for:"
             },
+            "DETAIL": {
+                "TITLE":"Managers of the granted organization",
+                "DESC":"These are the Managers of the granted organization. You can select which users are allowed to maintain control of the project."
+            },
+            "SHOWDETAIL":"Show Details",
+            "USER":"User",
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
             "ROLENAMESLIST": "Roles"
@@ -383,8 +403,11 @@
             "ACTIONS": "Actions",
             "ADDTITLE": "Create role",
             "ADDDESCRIPTION": "Enter the data for the new role!",
+            "EDITTITLE": "Edit role",
+            "EDITDESCRIPTION": "Enter the new data for the role!",
             "DELETE":"Delete Role",
-            "CREATIONDATE":"Created"
+            "CREATIONDATE":"Created",
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}"
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -499,13 +522,29 @@
         "PROJECT_GRANT_USER_GRANT_VIEWER":"Project Grant User Grant Viewer"
     },
     "GRANTS": {
-        "DELETE":"Delete grant",
-        "ADD":"Create grant",
-        "ADD_BTN":"New"
+        "DELETE":"delete authorization",
+        "ADD":"create authorization",
+        "ADD_BTN":"new",
+        "PROJECT": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified project. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "USER": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified user. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "CREATE": {
+            "TITLE": "Create authorization",
+            "DESCRIPTION": "Search for the orgnanization, the project and the corresponding roles."
+        },
+        "DETAIL": {
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":""
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Last Changes",
-        "BOTTOM":"Bottom",
+        "BOTTOM":"You've arrived at the bottom",
         "ORG": {
             "TITLE":"Activity",
             "DESCRIPTION":"Here you can see the latest events that have affected an organization change"
@@ -528,7 +567,7 @@
             "org.domain.primary.set":"set primary domain",
             "org.domain.removed":"domain removed",
             "org.iam.policy.added":"IAM policy added",
-            "project.added": "added",
+            "project.added": "project added",
             "project.changed":"changed",
             "project.deactivated":"deactivated",
             "project.member.added":"added member",

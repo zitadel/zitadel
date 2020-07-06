@@ -33,7 +33,7 @@ $caos-dark-brand: (
     A400: #38649d,
     A500: #666666,
     A600: #ffffff,
-    A700: #81868a,
+    A700: #8795a1,
     A800: #2d2e30,
     A900: #212224,
     contrast: (
@@ -55,61 +55,39 @@ $caos-dark-brand: (
 );
 
 $caos-light-brand: (
-    50: mat-color($mat-indigo, 50),
-    100:  mat-color($mat-indigo, 100),
-    200:  mat-color($mat-indigo, 200),
-    300:  mat-color($mat-indigo, 300),
-    400:  mat-color($mat-indigo, 400),
-    500: mat-color($mat-indigo, 500),
-    600:  mat-color($mat-indigo, 600),
-    700:  mat-color($mat-indigo, 700),
-    800:  mat-color($mat-indigo, 800),
-    900:  mat-color($mat-indigo, 900),
-    A100: mat-color($mat-indigo, A100),
-    A200: mat-color($mat-indigo, A200),
-    A300: mat-color($mat-indigo, A300),
-    A400: mat-color($mat-indigo, A400),
+    50: mat-color($mat-grey, 50),
+    100:  mat-color($mat-grey, 100),
+    200:  mat-color($mat-grey, 200),
+    300:  mat-color($mat-grey, 300),
+    400:  mat-color($mat-grey, 400),
+    500: mat-color($mat-grey, 500),
+    600:  mat-color($mat-grey, 600),
+    700:  mat-color($mat-grey, 700),
+    800:  mat-color($mat-grey, 800),
+    900:  mat-color($mat-grey, 900),
+    A100: mat-color($mat-grey, A100),
+    A200: mat-color($mat-grey, A200),
+    A300: mat-color($mat-grey, A300),
+    A400: mat-color($mat-grey, A400),
     A500:#333333,
     A600: #000000,
-    A700: #dadce0,
-    A800: #ffffff,
-    A900: #ffffff,
+    A700: #8795a1,
+    A800: #fafafa,
+    A900: #fafafa,
     contrast: (
-        50: $black-87-opacity,
-        100: $black-87-opacity,
-        200: $black-87-opacity,
-        300: $black-87-opacity,
-        400: $black-87-opacity,
+        50: #3d4852,
+        100: #3d4852,
+        200: #3d4852,
+        300: #3d4852,
+        400: #3d4852,
         500: white,
         600: white,
         700: white,
         800: white,
         900: white,
-        A100: $black-87-opacity,
-        A200: $black-87-opacity,
-        A400: $black-87-opacity,
-        A700: white,
-    )
-);
-
-$caos-custom: (
-    500:  rgb(144,212,210),
-    700: rgb(176, 241, 239),
-    A700: rgb(96, 139, 138),
-    contrast: (
-        50: $black-87-opacity,
-        100: $black-87-opacity,
-        200: $black-87-opacity,
-        300: $black-87-opacity,
-        400: $black-87-opacity,
-        500: #000000,
-        600: white,
-        700: white,
-        800: white,
-        900: white,
-        A100: $black-87-opacity,
-        A200: $black-87-opacity,
-        A400: $black-87-opacity,
+        A100: #3d4852,
+        A200: #3d4852,
+        A400: #3d4852,
         A700: white,
     )
 );
@@ -118,7 +96,7 @@ $caos-custom: (
 // hue. Available color palettes: https://material.io/design/color/
 
 $light-primary: mat-palette($caos-light-brand);
-$light-accent: mat-palette($mat-indigo);
+$light-accent: mat-palette($mat-pink);
 $light-warn: mat-palette($mat-red);
 
 $dark-primary: mat-palette($caos-dark-brand);
@@ -131,7 +109,7 @@ $dark-theme: mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 
 $custom-typography: mat-typography-config(
-    $font-family: 'Rubik'
+    $font-family: 'Lato'
 );
 @include mat-core($custom-typography);
 
@@ -143,12 +121,9 @@ $custom-typography: mat-typography-config(
     @include angular-material-theme($light-theme);
     color: #202124;
 
-    .crescent {
-        background-color:white !important;
-    }
-
-	mat-card, .side, .main-container {
-		background-color: white;
+	.side, .main-container {
+        background-color: white;
+        transition: background-color .5s ease-in-out;
     }
 }
 
@@ -156,12 +131,9 @@ $custom-typography: mat-typography-config(
     @include component-themes($dark-theme);
     @include angular-material-theme($dark-theme);
 
-    .crescent {
+	.side, .main-container {
         background-color: #212224;
-    }
-
-	mat-card, .side, .main-container {
-		background-color: #212224;
+        transition: background-color .5s ease-in-out;
     }
     
     .mat-dialog-container {
@@ -182,7 +154,7 @@ body {
 }
 body {
     margin: 0;
-    font-family: 'Rubik', -apple-system, BlinkMacSystemFont,
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont,
     "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans",
     "Droid Sans", "Helvetica Neue", sans-serif;

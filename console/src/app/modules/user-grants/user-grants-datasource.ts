@@ -14,17 +14,20 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
         super();
     }
 
-    public loadGrants(userId: string, pageIndex: number, pageSize: number): void {
+    public loadGrants(filter: UserGrantSearchKey, userId: string, pageIndex: number, pageSize: number): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
+
         const query = new UserGrantSearchQuery();
-        query.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
+        query.setKey(filter);
         query.setValue(userId);
+
         const queries: UserGrantSearchQuery[] = [query];
         from(this.userService.SearchUserGrants(10, 0, queries)).pipe(
             map(resp => {
                 this.totalResult = resp.toObject().totalResult;
+                console.log(resp.toObject().resultList);
                 return resp.toObject().resultList;
             }),
             catchError(() => of([])),

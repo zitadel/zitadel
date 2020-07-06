@@ -113,6 +113,9 @@ export class Change extends jspb.Message {
   getSequence(): number;
   setSequence(value: number): void;
 
+  getEditorId(): string;
+  setEditorId(value: string): void;
+
   getEditor(): string;
   setEditor(value: string): void;
 
@@ -134,6 +137,7 @@ export namespace Change {
     changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     eventType: string,
     sequence: number,
+    editorId: string,
     editor: string,
     data?: google_protobuf_struct_pb.Struct.AsObject,
   }
@@ -4615,6 +4619,9 @@ export class UserGrantView extends jspb.Message {
   getResourceOwner(): string;
   setResourceOwner(value: string): void;
 
+  getDisplayName(): string;
+  setDisplayName(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserGrantView.AsObject;
   static toObject(includeInstance: boolean, msg: UserGrantView): UserGrantView.AsObject;
@@ -4642,6 +4649,7 @@ export namespace UserGrantView {
     projectName: string,
     sequence: number,
     resourceOwner: string,
+    displayName: string,
   }
 }
 

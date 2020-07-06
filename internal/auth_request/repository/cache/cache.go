@@ -21,7 +21,7 @@ type AuthRequestCache struct {
 }
 
 func Start(conf Config) (*AuthRequestCache, error) {
-	client, err := sql.Open("postgres", conf.Connection.ConnectionString())
+	client, err := conf.Connection.Start()
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
 	}

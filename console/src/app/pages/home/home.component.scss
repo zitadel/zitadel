@@ -1,24 +1,4 @@
 
-.circle {
-    position: relative;
-    border-radius: 100%;
-    width: 8rem;
-    height: 8rem;
-    background: linear-gradient(40deg, #8983F7, #A3DAFB 70%);
-    margin: auto;
-  }
-  .crescent {
-    position: absolute;
-    border-radius: 100%;
-    right: 0;
-    width: 6rem;
-    height: 6rem;
-    background: #212224;
-    transform: scale(1);
-    transform-origin: top right;
-    transition: transform .6s cubic-bezier(0.645, 0.045, 0.355, 1);
-  }
-
 .wrapper {
 	width: 80%;
 	max-width: 1350px;
@@ -43,10 +23,9 @@
 
 		h1 {
 			font-size: 3rem;
-			font-family: ailerons;
 		}
 		p {
-			color: #81868a;
+			color: #8795a1;
 			text-align: center;
             font-size: 1rem;
             margin: 0;
@@ -78,14 +57,13 @@
 				padding: 1rem 2rem;
 				h2 {
 					margin-top: .5rem;
-                    font-family: 'Rubik';
                     display: flex;
                     align-items: center;
 				}
 
 				p {
 					display: block;
-					color: #81868a;
+					color: #8795a1;
 					font-size: .9rem;
                 }
                 
@@ -105,7 +83,11 @@
 				display: flex;
 				align-items: center;
 				padding: 0 1rem;
-				border-top: 1px solid #ffffff20;
+                border-top: 1px solid #ffffff20;
+                
+                a {
+                    border-radius: .5rem;
+                }
 			}
 		}
 	}
