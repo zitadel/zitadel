@@ -25,7 +25,7 @@
         "PROJECTSSECTION":"Projects",
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
-        "USERSECTION":"Benutzer",
+        "USERSECTION":"User Section",
         "USER": "Users",
         "LOGOUT": "Logout all users",
         "NEWORG":"New Organization",
@@ -231,7 +231,11 @@
         },
         "DOMAINS": {
             "TITLE":"Domains",
-            "DESCRIPTION":"Configure your domains on which your users will be registered."
+            "DESCRIPTION":"Configure your domains on which your users will be registered.",
+            "DELETE": {
+                "TITLE":"Delete domain?",
+                "DESCRIPTION":"You are about to delete one of your domains. Note that this action can trigger an irrevocable behaviour."
+            }
         },
         "STATE": {
             "0": "not defined",

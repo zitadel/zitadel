@@ -96,6 +96,16 @@ export class OrgService {
         );
     }
 
+    public async RemoveMyOrgDomain(domain: string): Promise<Empty> {
+        const req: RemoveOrgDomainRequest = new RemoveOrgDomainRequest();
+        req.setDomain(domain);
+        return await this.request(
+            c => c.,
+            req,
+            f => f,
+        );
+    }
+
     public async SearchMyOrgDomains(offset: number, limit: number, queryList?: OrgDomainSearchQuery[]):
         Promise<OrgDomainSearchResponse> {
         const req: OrgDomainSearchRequest = new OrgDomainSearchRequest();

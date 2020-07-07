@@ -10,7 +10,7 @@
     <button (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
-        <a class="row" *ngFor="let user of users" (click)="selectAccount(user.userName)">
+        <a class="row" *ngFor="let user of users" (click)="selectAccount(user.loginName)">
             <app-avatar *ngIf="user && user.displayName" class="small-avatar"
                 [name]="user.displayName ? user.displayName : ''" [size]="32">
             </app-avatar>
@@ -22,7 +22,7 @@
             <span class="fill-space"></span>
             <mat-icon>keyboard_arrow_right</mat-icon>
         </a>
-        <a class="row" (click)="selectAccount()">
+        <a class="row" (click)="selectNewAccount()">
             <div class="icon-wrapper">
                 <i class="las la-user-plus"></i>
             </div>

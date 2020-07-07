@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,11 +10,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { HttpLoaderFactory } from 'src/app/app.module';
+import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { OrgContributorsModule } from './org-contributors/org-contributors.module';
@@ -30,6 +29,7 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         CommonModule,
         OrgsRoutingModule,
         OrgContributorsModule,
+        WarnDialogModule,
         FormsModule,
         HasRoleModule,
         MatFormFieldModule,
@@ -45,13 +45,7 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         MatTooltipModule,
         MatMenuModule,
         ChangesModule,
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [HttpClient],
-            },
-        }),
+        TranslateModule,
     ],
     exports: [],
     schemas: [NO_ERRORS_SCHEMA],
