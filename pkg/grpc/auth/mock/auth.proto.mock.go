@@ -137,6 +137,26 @@ func (mr *MockAuthServiceClientMockRecorder) GetMyMfas(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyMfas", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyMfas), varargs...)
 }
 
+// GetMyPasswordComplexityPolicy mocks base method
+func (m *MockAuthServiceClient) GetMyPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*auth.PasswordComplexityPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetMyPasswordComplexityPolicy", varargs...)
+	ret0, _ := ret[0].(*auth.PasswordComplexityPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMyPasswordComplexityPolicy indicates an expected call of GetMyPasswordComplexityPolicy
+func (mr *MockAuthServiceClientMockRecorder) GetMyPasswordComplexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMyPasswordComplexityPolicy", reflect.TypeOf((*MockAuthServiceClient)(nil).GetMyPasswordComplexityPolicy), varargs...)
+}
+
 // GetMyProjectPermissions mocks base method
 func (m *MockAuthServiceClient) GetMyProjectPermissions(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*auth.MyPermissions, error) {
 	m.ctrl.T.Helper()
@@ -375,6 +395,26 @@ func (mr *MockAuthServiceClientMockRecorder) RemoveMfaOTP(arg0, arg1 interface{}
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMfaOTP", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMfaOTP), varargs...)
+}
+
+// RemoveMyUserPhone mocks base method
+func (m *MockAuthServiceClient) RemoveMyUserPhone(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveMyUserPhone", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveMyUserPhone indicates an expected call of RemoveMyUserPhone
+func (mr *MockAuthServiceClientMockRecorder) RemoveMyUserPhone(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyUserPhone", reflect.TypeOf((*MockAuthServiceClient)(nil).RemoveMyUserPhone), varargs...)
 }
 
 // ResendMyEmailVerificationMail mocks base method
