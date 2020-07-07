@@ -271,7 +271,7 @@ EventTypes:
       done: ZITADEL Initialisierung abgeschlossen
     global:
       org:
-        set: Globale Organisation von Zitadel gesetzt
+        set: Globale Organisation von ZITADEL gesetzt
     project:
       iam:
         set: Zitadel Projekt gesetzt
