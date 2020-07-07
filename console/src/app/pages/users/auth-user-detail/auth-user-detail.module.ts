@@ -17,8 +17,7 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 
-import { DetailFormModule } from '../../modules/detail-form/detail-form.module';
-import { PasswordModule } from '../password/password.module';
+import { DetailFormModule } from '../detail-form/detail-form.module';
 import { AuthUserDetailRoutingModule } from './auth-user-detail-routing.module';
 import { AuthUserDetailComponent } from './auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-mfa/auth-user-mfa.component';
@@ -38,7 +37,6 @@ import { ThemeSettingComponent } from './theme-setting/theme-setting.component';
         CommonModule,
         AuthUserDetailRoutingModule,
         ChangesModule,
-        PasswordModule,
         FormsModule,
         ReactiveFormsModule,
         DetailFormModule,

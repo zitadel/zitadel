@@ -9,8 +9,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { CardModule } from 'src/app/modules/card/card.module';
+import { ChangesModule } from 'src/app/modules/changes/changes.module';
+import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
-import { DetailFormModule } from '../../modules/detail-form/detail-form.module';
+import { DetailFormModule } from '../detail-form/detail-form.module';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail.component';
 import { UserMfaComponent } from './user-mfa/user-mfa.component';

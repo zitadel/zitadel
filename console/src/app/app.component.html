@@ -54,7 +54,7 @@
                 <div class="list">
                     <a *ngIf="authService.authenticationChanged | async" class="nav-item"
                         [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
-                        [routerLink]="['/user/me']">
+                        [routerLink]="['/users/me']">
                         <i class="icon las la-user-circle"></i>
                         <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                     </a>

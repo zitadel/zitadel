@@ -3,13 +3,17 @@ import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import {
+    lowerCaseValidator,
+    numberValidator,
+    symbolValidator,
+    upperCaseValidator,
+} from 'src/app/pages/users/validators.util';
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
-
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../user-detail/validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {
