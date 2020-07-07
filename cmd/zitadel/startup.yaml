@@ -270,7 +270,7 @@ Notification:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'notification'
-          Password: $CR_NOTIFY_PASSWORD
+          Password: $CR_NOTIFICATION_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -285,13 +285,13 @@ Notification:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'notification'
-      Password: $CR_NOTIFY_PASSWORD
+      Password: $CR_NOTIFICATION_PASSWORD
       Database: 'notification'
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_NOTIFY_CERT
-        Key: $CR_NOTIFY_KEY
+        Cert: $CR_NOTIFICATION_CERT
+        Key: $CR_NOTIFICATION_KEY
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100
