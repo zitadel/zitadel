@@ -156,15 +156,13 @@ export class AuthUserService {
         );
     }
 
-    // public async SaveMyUserEmail(email: string): Promise<UserEmail> {
-    //     const req = new UpdateUserEmailRequest();
-    //     req.setEmail(email);
-    //     return await this.request(
-    //         c => c.phone,
-    //         req,
-    //         f => f,
-    //     );
-    // }
+    public async RemoveMyUserPhone(): Promise<Empty> {
+        return await this.request(
+            c => c.removeMyUserPhone,
+            new Empty(),
+            f => f,
+        );
+    }
 
     private async getMyzitadelPermissions(): Promise<any> {
         return await this.request(

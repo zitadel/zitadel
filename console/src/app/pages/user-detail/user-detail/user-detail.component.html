@@ -132,6 +132,9 @@
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon>close</mat-icon>
                         </button>
+                        <button *ngIf="user.phone" color="warn" (click)="deletePhone()" mat-icon-button>
+                            <i class="las la-trash"></i>
+                        </button>
                         <button [disabled]="!user.phone" type="button" color="primary" (click)="savePhone()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>

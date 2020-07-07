@@ -118,6 +118,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         });
     }
 
+    public deletePhone(): void {
+        this.mgmtUserService.RemoveUserPhone(this.user.id).then(() => {
+            this.toast.showInfo('Phone removed with success!');
+            this.user.phone = '';
+            this.phoneEditState = false;
+        }).catch(data => {
+            this.toast.showError(data.message);
+        });
+    }
+
     public saveEmail(): void {
         this.emailEditState = false;
         this.mgmtUserService
@@ -135,6 +145,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             .SaveUserPhone(this.user.id, this.user.phone).then((data: UserPhone) => {
                 this.toast.showInfo('Saved Phone');
                 this.user.phone = data.toObject().phone;
+                this.phoneEditState = false;
             }).catch(data => {
                 this.toast.showError(data.message);
             });

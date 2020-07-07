@@ -24,7 +24,7 @@ import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
 import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
 import { DetailFormModule } from './detail-form/detail-form.module';
-import { PasswordComponent, PasswordComponent } from './password/password.component';
+import { PasswordComponent } from './password/password.component';
 import { ThemeSettingComponent } from './theme-setting/theme-setting.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';

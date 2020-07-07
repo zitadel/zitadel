@@ -197,6 +197,16 @@ export class MgmtUserService {
         );
     }
 
+    public async RemoveUserPhone(id: string): Promise<Empty> {
+        const req = new UserID();
+        req.setId(id);
+        return await this.request(
+            c => c.removeUserPhone,
+            req,
+            f => f,
+        );
+    }
+
     public async DeactivateUser(id: string): Promise<UserPhone> {
         const req = new UserID();
         req.setId(id);

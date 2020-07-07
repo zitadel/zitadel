@@ -107,10 +107,6 @@ export class AuthUserDetailComponent implements OnDestroy {
         });
     }
 
-    public deletePhone(): void {
-        // this.userService.rem;
-    }
-
     public changedLanguage(language: string): void {
         this.translate.use(language);
     }
@@ -126,6 +122,16 @@ export class AuthUserDetailComponent implements OnDestroy {
     public resendPhoneVerification(): void {
         this.userService.ResendPhoneVerification().then(() => {
             this.toast.showInfo('Phoneverification was successfully sent!');
+        }).catch(data => {
+            this.toast.showError(data.message);
+        });
+    }
+
+    public deletePhone(): void {
+        this.userService.RemoveMyUserPhone().then(() => {
+            this.toast.showInfo('Phone removed with success!');
+            this.user.phone = '';
+            this.phoneEditState = false;
         }).catch(data => {
             this.toast.showError(data.message);
         });
