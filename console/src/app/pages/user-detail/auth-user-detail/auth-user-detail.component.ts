@@ -108,7 +108,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
 
     public deletePhone(): void {
-        this.userService.rem;
+        // this.userService.rem;
     }
 
     public changedLanguage(language: string): void {
