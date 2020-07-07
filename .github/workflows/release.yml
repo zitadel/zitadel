@@ -10,63 +10,26 @@ env:
 
 jobs:
 
-  angular-test: # will be added later on
+  angular-build:
     runs-on: ubuntu-18.04
-    # defaults:
-    #   run:
-    #     working-directory: ./console
+    defaults:
+      run:
+        working-directory: ./console
     steps:
     - uses: actions/checkout@v2
     - name: Install Protoc
       uses: arduino/setup-protoc@master
       with:
         version: '3.x'
-    - uses: actions/setup-go@v2-beta
-      with:
-        go-version: ${{ env.GO_VERSION }}
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - run: go mod download
-    - run: ./build/console/generate-grpc.sh
-    - run: ls -la src/github.com/caos/zitadel/console/src/app/proto/generated
-    #- run: npm ci
-    #- run: npm test 
-    #- run: echo "replace me with real test"
-
-  # angular-lint: # will be added later on
-  #   runs-on: ubuntu-18.04
-  #   defaults:
-  #     run:
-  #       working-directory: ./console
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - uses: actions/setup-node@v1
-  #     with:
-  #       node-version: ${{ env.NODE_VERSION }}
-  #   - run: npm ci
-  #   - run: npm run lint
-
-  # angular-build:
-  #   runs-on: ubuntu-18.04
-  #   defaults:
-  #     run:
-  #       working-directory: ./console
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - uses: actions/setup-go@v2-beta
-  #     with:
-  #       go-version: ${{ env.GO_VERSION }}
-  #   - run: cd .. && go mod download
-  #   - uses: actions/setup-node@v1
-  #     with:
-  #       node-version: ${{ env.NODE_VERSION }}
-  #   - run: npm ci
-  #   - run: npm run prodbuild
-  #   - uses: actions/upload-artifact@v1
-  #     with:
-  #       name: angular
-  #       path: console/dist/console
+    - run: npm ci
+    - run: npm run prodbuild
+    - uses: actions/upload-artifact@v1
+      with:
+        name: angular
+        path: console/dist/console
 
   # go-test:
   #   runs-on: ubuntu-18.04
