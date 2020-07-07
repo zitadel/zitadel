@@ -10,6 +10,21 @@ env:
 
 jobs:
 
+  ## Angular Test
+
+  # angular-lint: # will be added later on
+  #   runs-on: ubuntu-18.04
+  #   defaults:
+  #     run:
+  #       working-directory: ./console
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: actions/setup-node@v1
+  #     with:
+  #       node-version: ${{ env.NODE_VERSION }}
+  #   - run: npm ci
+  #   - run: npm run lint
+
   angular-build:
     runs-on: ubuntu-18.04
     defaults:
@@ -21,6 +36,9 @@ jobs:
       uses: arduino/setup-protoc@master
       with:
         version: '3.x'
+    - run: wget -O protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64
+    - run: mv protoc-gen-grpc-web /usr/local/bin/protoc-gen-grpc-web
+    - run: chmod +x /usr/local/bin/protoc-gen-grpc-web
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
