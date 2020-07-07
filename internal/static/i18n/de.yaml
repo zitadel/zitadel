@@ -277,7 +277,7 @@ EventTypes:
         set: ZITADEL Projekt gesetzt
     member:
       added: ZITADEL Mitglied hinzugefügt
-      changed: Zitadelmitglied geändert
+      changed: ZITADEL Mitglied geändert
       removed: Zitadelmitglied entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
