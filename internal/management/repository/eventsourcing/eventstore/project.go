@@ -40,8 +40,7 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
-
-	if project == nil {
+	if caos_errs.IsNotFound(err) {
 		project = new(model.ProjectView)
 	}
 
