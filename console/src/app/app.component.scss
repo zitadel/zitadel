@@ -163,34 +163,6 @@
 			overflow: auto;
 		}
     }
-    
-    .theme-section {
-        display: block;
-        padding: 0 .5rem; 
-        margin-top: 2rem;
-        align-self: flex-start;
-        border-radius: 1rem;
-
-        .round-light {
-            display: inline-block;
-            border-radius: 50%;
-            height: 30px;
-            width: 30px;
-            margin: .5rem;
-            cursor: pointer;
-            background: linear-gradient(315deg, #e6e6e6, #ffffff);
-        }
-            
-        .round-dark {
-            display: inline-block;
-            border-radius: 50%;
-            height: 30px;
-            width: 30px;
-            margin: .5rem;
-            cursor: pointer;
-            background: linear-gradient(315deg, #000000, #000000);
-        }
-    }
 }
 
 .divider {

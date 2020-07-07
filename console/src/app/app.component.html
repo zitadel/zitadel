@@ -68,51 +68,46 @@
                         <span class="label">{{'MENU.IAM' | translate}}</span>
                     </a>
 
-                    <a *ngIf="showOrgSection" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
-                        <i class="icon las la-archway"></i>
-                        <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
-                    </a>
+                    <ng-container *ngIf="showOrgSection">
+                        <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
+                            <i class="icon las la-archway"></i>
+                            <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
+                        </a>
+                    </ng-container>
 
-                    <div *ngIf="showOrgSection" class="divider">
-                        <div class="line"></div>
-                        <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
-                        <div class="line"></div>
-                    </div>
+                    <ng-container *ngIf="showProjectSection">
+                        <div class="divider">
+                            <div class="line"></div>
+                            <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
+                            <div class="line"></div>
+                        </div>
 
-                    <a *ngIf="showProjectSection" class="nav-item" [routerLinkActive]="['active']"
-                        [routerLink]="[ '/projects']">
-                        <i class="icon las la-layer-group"></i>
-                        <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
-                            {{ 'MENU.PROJECT' | translate }}</span>
-                    </a>
+                        <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
+                            <i class="icon las la-layer-group"></i>
+                            <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
+                                {{ 'MENU.PROJECT' | translate }}</span>
+                        </a>
 
-                    <a *ngIf="showProjectSection" class="nav-item" [routerLinkActive]="['active']"
-                        [routerLink]="[ '/granted-projects']">
-                        <i class="icon las la-layer-group"></i>
-                        <span class="label">{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
-                    </a>
+                        <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/granted-projects']">
+                            <i class="icon las la-layer-group"></i>
+                            <span class="label">{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
+                        </a>
+                    </ng-container>
 
-                    <div *ngIf="showProjectSection" class="divider">
-                        <div class="line"></div>
-                        <span class="label">
-                            {{ 'MENU.USERSECTION' | translate }}</span>
-                        <div class="line"></div>
-
-                    </div>
-
-                    <a *ngIf="showUserSection" class="nav-item" [routerLinkActive]="['active']"
-                        [routerLink]="[ '/users']" [routerLinkActiveOptions]="{ exact: true }">
-                        <i class="icon las la-users"></i>
-                        <span class="label">{{ 'MENU.USER' | translate }}</span>
-                    </a>
-
-                    <span class="fill-space"></span>
+                    <ng-container *ngIf="showUserSection">
+                        <div class="divider">
+                            <div class="line"></div>
+                            <span class="label">
+                                {{ 'MENU.USERSECTION' | translate }}</span>
+                            <div class="line"></div>
+                        </div>
+                        <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/users']"
+                            [routerLinkActiveOptions]="{ exact: true }">
+                            <i class="icon las la-users"></i>
+                            <span class="label">{{ 'MENU.USER' | translate }}</span>
+                        </a>
+                    </ng-container>
                 </div>
-                <span class="fill-space"></span>
-                <!-- <div class="footer">
-                <a href="https://caos.ch/impressum/" target="_blank" rel="noreferrer">AGB</a>
-                <a href="https://caos.ch/impressum/" target="_blank" rel="noreferrer">Impressum</a>
-            </div> -->
             </div>
         </mat-drawer>
         <mat-drawer-content class="content">
