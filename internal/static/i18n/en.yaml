@@ -136,7 +136,7 @@ EventTypes:
       verification:
         failed: Email address verification failed
       code:
-        added: Email address verification code added
+        added: Email address verification code generated
         sent: Email address verification code sent
     locked: User locked
     unlocked: User unlocked
