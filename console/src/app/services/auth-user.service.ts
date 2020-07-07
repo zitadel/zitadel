@@ -156,6 +156,16 @@ export class AuthUserService {
         );
     }
 
+    public async SaveMyUserEmail(email: string): Promise<UserEmail> {
+        const req = new UpdateUserEmailRequest();
+        req.setEmail(email);
+        return await this.request(
+            c => c.pho,
+            req,
+            f => f,
+        );
+    }
+
     private async getMyzitadelPermissions(): Promise<any> {
         return await this.request(
             c => c.getMyZitadelPermissions,
