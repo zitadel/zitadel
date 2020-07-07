@@ -19,17 +19,17 @@ echo "Generate grpc"
 
 protoc \
   -I=/usr/local/include \
-  -I=../pkg/management/api/proto \
-  -I=../pkg/auth/api/proto \
-  -I=../pkg/admin/api/proto \
+  -I=../pkg/grpc/management/proto \
+  -I=../pkg/grpc/auth/proto \
+  -I=../pkg/grpc/admin/proto \
   -I=../internal/protoc/protoc-gen-authoption \
   -I=node_modules/google-proto-files \
   -I=tmp \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
-  ../pkg/management/api/proto/*.proto \
-  ../pkg/admin/api/proto/*.proto \
-  ../pkg/auth/api/proto/*.proto
+  ../pkg/grpc/management/proto/*.proto \
+  ../pkg/grpc/admin/proto/*.proto \
+  ../pkg/grpc/auth/proto/*.proto
 
 echo "Generate annotations js file (compatibility)"
 
