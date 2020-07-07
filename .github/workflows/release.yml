@@ -10,9 +10,9 @@ env:
 
 jobs:
 
-  ## Angular Test
+  ## Angular test, will be added later
 
-  angular-lint: # will be added later on
+  angular-lint: 
     runs-on: ubuntu-18.04
     defaults:
       run:
