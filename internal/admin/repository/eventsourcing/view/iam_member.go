@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	iamMemberTable = "admin_api.iam_members"
+	iamMemberTable = "adminapi.iam_members"
 )
 
 func (v *View) IamMemberByIDs(orgID, userID string) (*model.IamMemberView, error) {
