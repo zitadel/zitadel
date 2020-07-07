@@ -82,15 +82,20 @@ body {
 }
 
 html {
+  height: 100%;
+  width: 100%;
+  font-weight: 300;
   background-color: #282828;
-  color: #FFFFFF;
+  color: #BBBBC8;
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-image: url("../flavor-spikes01-narrow.png");
 }
 
 h1 {
-  color: #FFFFFF;
-  font-family: Aileron;
-  text-transform: uppercase;
-  text-align: center;
+  color: #BBBBC8;
+  font-family: Lato;
+  font-weight: 300;
   font-size: 40px;
 }
 
@@ -117,20 +122,18 @@ header .logo {
 }
 
 a {
-  color: #364DF6;
+  color: #3574C6;
   text-decoration: none;
-  text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 400;
 }
 a:hover {
-  color: #6778f8;
+  color: #5b8fd3;
 }
 
 button {
-  text-transform: uppercase;
   background-color: #282828;
-  color: #364DF6;
-  border: 2px solid #364DF6;
+  color: #3574C6;
+  border: 2px solid #3574C6;
   border-radius: 5px;
   width: 100%;
   max-width: 600px;
@@ -140,23 +143,23 @@ button {
   outline: none;
 }
 button:hover {
-  background-color: #6778f8;
-  border: 2px solid #6778f8;
+  background-color: #5b8fd3;
+  border: 2px solid #5b8fd3;
 }
 button.primary {
-  background-color: #364DF6;
-  color: #FFFFFF;
+  background-color: #3574C6;
+  color: #BBBBC8;
   border: none;
 }
 button.primary:hover {
-  background-color: #6778f8;
+  background-color: #5b8fd3;
 }
 
 input:not([type=radio]), select {
   background-color: #252525;
-  color: #FFFFFF;
+  color: #BBBBC8;
   height: 50px;
-  border: 2px solid #595959;
+  border: 2px solid #505050;
   border-radius: 5px;
   padding-left: 15px;
 }
@@ -200,7 +203,7 @@ form .actions button, form .actions a {
 form button.clean {
   border: none;
   height: auto;
-  color: #FFFFFF;
+  color: #BBBBC8;
   text-align: left;
   text-transform: unset;
   display: flex;
@@ -241,7 +244,7 @@ form button.user-selection .sessionstate {
   height: 20px;
   width: 20px;
   border-radius: 20px;
-  border-color: #595959;
+  border-color: #505050;
   border-style: solid;
   border-width: 1px;
   position: absolute;
@@ -303,7 +306,7 @@ form button.other-user > div:nth-of-type(2) {
   text-align: center;
 }
 #qrcode svg rect.color {
-  fill: #FFFFFF;
+  fill: #BBBBC8;
 }
 #qrcode svg rect.bg-color {
   fill: #282828;
@@ -315,7 +318,7 @@ form button.other-user > div:nth-of-type(2) {
 }
 
 footer {
-  background-image: url("../gradientdeco-full.svg");
+  background-image: url("");
   width: 100%;
   background-size: cover;
   height: 44vw;
