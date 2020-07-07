@@ -157,7 +157,7 @@ EventTypes:
       verification:
         failed: Phone number verification failed
       code:
-        added: Phone number code added
+        added: Phone number code generated
         sent: Phone number code sent
     profile:
       changed: User profile changed
