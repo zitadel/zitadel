@@ -27,6 +27,7 @@ Mgmt:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'management'
+          Password: $CR_MANAGEMENT_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -41,6 +42,7 @@ Mgmt:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'management'
+      Password: $CR_MANAGEMENT_PASSWORD
       Database: 'management'
       SSL:
         Mode: $CR_SSL_MODE
@@ -102,6 +104,7 @@ Auth:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'auth'
+          Password: $CR_AUTH_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -117,6 +120,7 @@ Auth:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
         User: 'auth'
+        Password: $CR_AUTH_PASSWORD
         Database: 'auth'
         SSL:
           Mode: $CR_SSL_MODE
@@ -127,6 +131,7 @@ Auth:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'auth'
+      Password: $CR_AUTH_PASSWORD
       Database: 'auth'
       SSL:
         Mode: $CR_SSL_MODE
@@ -171,6 +176,7 @@ AuthZ:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'authz'
+          Password: $CR_AUTHZ_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -185,6 +191,7 @@ AuthZ:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'authz'
+      Password: $CR_AUTHZ_PASSWORD
       Database: 'authz'
       SSL:
         Mode: $CR_SSL_MODE
@@ -213,6 +220,7 @@ Admin:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'admin_api'
+          Password: $CR_ADMIN_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -227,6 +235,7 @@ Admin:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'admin_api'
+      Password: $CR_ADMIN_PASSWORD
       Database: 'admin_api'
       SSL:
         Mode: $CR_SSL_MODE
@@ -260,6 +269,7 @@ Notification:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'notification'
+          Password: $CR_NOTIFY_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -274,6 +284,7 @@ Notification:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'notification'
+      Password: $CR_NOTIFY_PASSWORD
       Database: 'notification'
       SSL:
         Mode: $CR_SSL_MODE
