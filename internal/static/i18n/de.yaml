@@ -146,7 +146,7 @@ EventTypes:
     password:
       changed: Passwort geändert
       code:
-        added: Passwort code hinzugefügt
+        added: Passwort code generiert
         sent: Passwort code versendet
       check:
         succeeded: Passwortvalidierung erfolgreich
