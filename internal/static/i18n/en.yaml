@@ -267,17 +267,17 @@ EventTypes:
         changed: Password lockout policy changed
   iam:
     setup:
-      started: Zitadel setup started
-      done: Zitadel setup done
+      started: ZITADEL setup started
+      done: ZITADEL setup done
     global:
       org:
         set: Global org set
     project:
       iam:
-        set: Zitadel project set
+        set: ZITADEL project set
     member:
-      added: Zitadel member added
-      changed: Zitadel member changed
-      removed: Zitadel member removed
+      added: ZITADEL member added
+      changed: ZITADEL member changed
+      removed: ZITADEL member removed
   key_pair:
-    added: key pair added
+    added: Key pair added
