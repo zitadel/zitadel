@@ -120,7 +120,7 @@ EventTypes:
     selfregistered: Benutzer hat sich selbst registriert
     initialization: 
       code:
-        added: Initialisierungscode hinzugefügt
+        added: Initialisierungscode generiert
         sent: Initialiseriungscode versendet
       check:
         succeeded: Benutzerinitialisierung erfolgreich
