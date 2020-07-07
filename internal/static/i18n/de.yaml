@@ -274,7 +274,7 @@ EventTypes:
         set: Globale Organisation von ZITADEL gesetzt
     project:
       iam:
-        set: Zitadel Projekt gesetzt
+        set: ZITADEL Projekt gesetzt
     member:
       added: Zitadelmitglied hinzugefügt
       changed: Zitadelmitglied geändert
