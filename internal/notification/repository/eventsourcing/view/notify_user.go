@@ -14,12 +14,19 @@ func (v *View) NotifyUserByID(userID string) (*model.NotifyUser, error) {
 	return view.NotifyUserByID(v.Db, notifyUserTable, userID)
 }
 
-func (v *View) PutNotifyUser(user *model.NotifyUser) error {
+func (v *View) PutNotifyUser(user *model.NotifyUser, sequence uint64) error {
 	err := view.PutNotifyUser(v.Db, notifyUserTable, user)
 	if err != nil {
 		return err
 	}
-	return v.ProcessedNotifyUserSequence(user.Sequence)
+	if sequence != 0 {
+		return v.ProcessedNotifyUserSequence(sequence)
+	}
+	return nil
+}
+
+func (v *View) NotifyUsersByOrgID(orgID string) ([]*model.NotifyUser, error) {
+	return view.NotifyUsersByOrgID(v.Db, notifyUserTable, orgID)
 }
 
 func (v *View) DeleteNotifyUser(userID string, eventSequence uint64) error {

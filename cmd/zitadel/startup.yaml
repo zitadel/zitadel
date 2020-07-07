@@ -262,6 +262,7 @@ Console:
 Notification:
   Repository:
     DefaultLanguage: 'de'
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'Notification'
       Repository:
