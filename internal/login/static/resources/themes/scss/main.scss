@@ -226,11 +226,15 @@ form {
         .other-user-image {
             width: 100px;
             height: 75px;
+            background-repeat: no-repeat;
+            background-position: center;
             @include retina-background-image($otherUserImgDark, "png", false, 100px, 75px);
         }
 
         &:hover {
             .other-user-image {
+                background-repeat: no-repeat;
+                background-position: center;
                 @include retina-background-image($otherUserImgDark, "png", true, 100px, 75px);
             }
         }
