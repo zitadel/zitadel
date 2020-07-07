@@ -33,3 +33,7 @@ cockroach-data/*
 #binaries
 cmd/zitadel/zitadel
 **/statik/statik.go
+
+# buildfolders and generated js
+tmp/
+console/src/app/proto/generated/
