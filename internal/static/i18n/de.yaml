@@ -113,7 +113,7 @@ Errors:
   Token:
     NotFound: Token konnte nicht gefunden werden
   UserSession:
-    NotFound: UserSession konnte nicht gefunden werden
+    NotFound: Benutzer Sitzung konnte nicht gefunden werden
 EventTypes:
   user:
     added: Benutzer hinzugefügt
