@@ -39,11 +39,11 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     ): void {
         const offset = pageIndex * pageSize;
 
-        this.loadingSubject.next(true);
-
         switch (context) {
             case UserGrantContext.USER:
                 if (data && data.userId) {
+                    this.loadingSubject.next(true);
+
                     const userfilter = new UserGrantSearchQuery();
                     userfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID);
                     userfilter.setValue(data.userId);
@@ -59,12 +59,16 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                 break;
             case UserGrantContext.OWNED_PROJECT:
                 if (data && data.projectId) {
+                    this.loadingSubject.next(true);
+
                     const promise1 = this.userService.SearchProjectUserGrants(data.projectId, 10, 0, queries);
                     this.loadResponse(promise1);
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
                 if (data && data.grantId) {
+                    this.loadingSubject.next(true);
+
                     const promise2 = this.userService.SearchProjectGrantUserGrants(data.grantId, 10, 0, queries);
                     this.loadResponse(promise2);
                 }
