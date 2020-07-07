@@ -174,7 +174,7 @@ EventTypes:
       init:
         skipped: Multifaktor Initialisierung übersprungen
     signed:
-      out: Benutzer ausgeloggt
+      out: Benutzer erfolgreich abgemeldet
     grant:
       added: Berechtigung hinzugefügt
       changed: Berechtigung geändert
