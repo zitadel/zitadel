@@ -278,6 +278,6 @@ EventTypes:
     member:
       added: ZITADEL Mitglied hinzugefügt
       changed: ZITADEL Mitglied geändert
-      removed: Zitadelmitglied entfernt
+      removed: ZITADEL Mitglied entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
