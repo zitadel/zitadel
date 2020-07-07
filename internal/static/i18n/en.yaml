@@ -54,7 +54,7 @@ Errors:
     InvalidDomain: Invalid domain
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organisation
-    PrimaryDomainNotDeletable: Primary domain should not be deleted
+    PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
     MemberIDMissing: Member ID missing
     MemberNotFound: Organisations member not found
