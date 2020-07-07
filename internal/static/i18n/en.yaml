@@ -146,7 +146,7 @@ EventTypes:
     password:
       changed: Password changed
       code:
-        added: Password code added
+        added: Password code generated
         sent: Password code sent
       check:
         succeeded: Password check succeeded
