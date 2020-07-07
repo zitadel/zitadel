@@ -267,7 +267,7 @@ EventTypes:
         changed: Passwortaussperrrichtlinie geändert
   iam:
     setup:
-      started: Zitadel Initialisierung gestartet
+      started: ZITADEL Initialisierung gestartet
       done: Zitadel Initialisierung abgeschlossen
     global:
       org:
