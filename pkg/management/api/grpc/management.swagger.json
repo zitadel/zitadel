@@ -481,6 +481,13 @@
             "required": false,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -1231,6 +1238,13 @@
             "required": false,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -1276,6 +1290,13 @@
             "required": false,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -2961,6 +2982,13 @@
             "required": false,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -3152,6 +3180,28 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v1UserPhoneView"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
+      "delete": {
+        "operationId": "RemoveUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
             }
           }
         },
@@ -3791,6 +3841,9 @@
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "editor_id": {
+          "type": "string"
         },
         "editor": {
           "type": "string"
@@ -6369,6 +6422,9 @@
           "format": "uint64"
         },
         "resource_owner": {
+          "type": "string"
+        },
+        "display_name": {
           "type": "string"
         }
       }

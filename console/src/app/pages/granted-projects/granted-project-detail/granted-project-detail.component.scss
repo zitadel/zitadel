@@ -1,0 +1,131 @@
+.head {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ffffff20;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+
+    a {
+        display: block;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+        margin: 0 1rem;
+        margin-left: 2rem;
+        font-weight: normal;
+    }
+
+    .full-width {
+        padding-top: 1rem;
+        width: 100%;
+        display: block;
+
+        .icon-button {
+            margin-right: 1rem;
+        }
+
+        button {
+            border-radius: .5rem;
+        }
+
+        .desc {
+            font-size: .9rem;
+            color: #8795a1;
+        }
+
+        .zitadel-warning {
+            font-size: 14px;
+            color: rgb(201,51,71);
+        }
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 -.5rem; 
+
+    mat-form-field {
+        flex: 1 1 33%;
+        margin: 0 .5rem;
+    }
+}
+
+h1 {
+    font-size: 1.2rem;
+}
+
+.desc {
+    width: 100%;
+    display: block;
+    font-size: .9rem;
+    color: #8795a1;
+}
+
+.side {
+    .details {
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #81868a40;
+        padding-bottom: 1rem;
+    
+        .row {
+            display: flex;
+            margin-bottom: 0.5rem;
+            align-items: center;
+    
+            button {
+                display: none;
+                visibility: hidden;
+            }
+    
+            &:hover {
+                button {
+                    display: inline-block;
+                    visibility: visible;
+                    mat-icon {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+    
+            .first {
+                flex: 1;
+                font-size: 0.8rem;
+                margin-right: 0.5rem;
+            }
+    
+            .fill-space {
+                flex: 1;
+            }
+    
+            .second {
+                font-size: 0.8rem;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin-left: 1rem;
+            }
+
+            a {
+                &:hover {
+                    cursor: pointer;
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .side-section {
+            color: #8795a1;
+        }
+    } 
+
+    .mat-tab-label {
+        min-width: 100px !important;
+    }
+
+    .flex-col {
+        display: flex;
+        flex-direction: column;
+    }
+}

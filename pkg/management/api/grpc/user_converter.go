@@ -494,16 +494,21 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
 	result := make([]*Change, len(changes.Changes))
 
 	for i, change := range changes.Changes {
-		b, err := json.Marshal(change.Data)
-		data := &structpb.Struct{}
-		err = protojson.Unmarshal(b, data)
-		if err != nil {
+		var data *structpb.Struct
+		changedData, err := json.Marshal(change.Data)
+		if err == nil {
+			data = new(structpb.Struct)
+			err = protojson.Unmarshal(changedData, data)
+			logging.Log("GRPC-a7F54").OnError(err).Debug("unable to marshal changed data to struct")
 		}
+
 		result[i] = &Change{
 			ChangeDate: change.ChangeDate,
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,
 			Data:       data,
+			EditorId:   change.ModifierId,
+			Editor:     change.ModifierName,
 		}
 	}
 

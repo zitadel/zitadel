@@ -2604,7 +2604,7 @@ func TestChangesProject(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.ProjectChanges{Changes: []*model.ProjectChange{&model.ProjectChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &model.ProjectChanges{Changes: []*model.ProjectChange{&model.ProjectChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				project: &model.Project{Name: "MusterProject"},
 			},
 		},
@@ -2624,7 +2624,7 @@ func TestChangesProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ProjectChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.ProjectChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit, false)
 
 			project := &model.Project{}
 			if result != nil && len(result.Changes) > 0 {
@@ -2673,7 +2673,7 @@ func TestChangesApplication(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.ApplicationChanges{Changes: []*model.ApplicationChange{&model.ApplicationChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &model.ApplicationChanges{Changes: []*model.ApplicationChange{&model.ApplicationChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				app:     &model.Application{Name: "MusterApp", AppID: "AppId", Type: 3},
 			},
 		},
@@ -2694,7 +2694,7 @@ func TestChangesApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.ApplicationChanges(nil, tt.args.id, tt.args.secId, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.ApplicationChanges(nil, tt.args.id, tt.args.secId, tt.args.lastSequence, tt.args.limit, false)
 
 			app := &model.Application{}
 			if result != nil && len(result.Changes) > 0 {

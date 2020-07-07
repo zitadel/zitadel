@@ -1,7 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Subscription } from 'rxjs';
 import { Org, ProjectRole } from 'src/app/proto/generated/management_pb';
 import { AuthService } from 'src/app/services/auth.service';
@@ -36,7 +35,6 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.routeSubscription = this.route.params.subscribe(params => {
             this.projectId = params.projectid;
-            console.log(params);
         });
     }
 
@@ -44,16 +42,19 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
         this.routeSubscription.unsubscribe();
     }
 
-    public searchOrg(domain: any): void {
-        this.orgService.getOrgByDomainGlobal(domain.value).then((ret) => {
-            console.log(ret.toObject());
+    public searchOrg(domain: string): void {
+        console.log(domain);
+        this.orgService.getOrgByDomainGlobal(domain).then((ret) => {
             const tmp = ret.toObject();
+            console.log(ret.toObject());
             this.authService.GetActiveOrg().then((org) => {
+                console.log(org);
                 if (tmp !== org) {
                     this.org = tmp;
                 }
             });
             this.org = ret.toObject();
+            console.log(this.org);
         }).catch(error => {
             this.toast.showError(error.message);
         });
@@ -67,19 +68,11 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
         this.projectService
             .CreateProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
             .then((data) => {
-                console.log(data);
                 this.close();
             })
             .catch(error => {
                 this.toast.showError(error.message);
-                console.log(error);
             });
-    }
-
-
-    public dateFromTimestamp(date: Timestamp.AsObject): any {
-        const ts: Date = new Date(date.seconds * 1000 + date.nanos / 1000);
-        return ts;
     }
 
     public selectRoles(roles: ProjectRole.AsObject[]): void {

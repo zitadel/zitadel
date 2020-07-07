@@ -174,6 +174,8 @@ func orgChangesToMgtAPI(changes *org_model.OrgChanges) (_ []*Change) {
 			EventType:  change.EventType,
 			Sequence:   change.Sequence,
 			Data:       data,
+			Editor:     change.ModifierName,
+			EditorId:   change.ModifierId,
 		}
 	}
 

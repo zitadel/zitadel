@@ -16,7 +16,7 @@
             <ng-template appHasRole [appHasRole]="['policy.delete']">
                 <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" (click)="deletePolicy(PolicyComponentType.AGE)"
                     mat-icon-button>
-                    <mat-icon>delete_outline</mat-icon>
+                     <i class="las la-trash"></i>
                 </button>
             </ng-template>
         </div>
@@ -46,12 +46,11 @@
         <div class="title">
             <span>{{'ORG.POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
             <button mat-icon-button disabled>
-                <mat-icon class="icon" *ngIf="complexityPolicy">
-                    check_circle</mat-icon>
+                <i *ngIf="complexityPolicy" class="icon las la-check-circle"></i>
             </button>
-            <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}"
+            <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn"
                 (click)="deletePolicy(PolicyComponentType.COMPLEXITY)" mat-icon-button>
-                <mat-icon>delete_outline</mat-icon>
+                <i class="las la-trash"></i>
             </button>
         </div>
 
@@ -81,7 +80,7 @@
             </button>
             <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" (click)="deletePolicy(PolicyComponentType.LOCKOUT)"
                 mat-icon-button>
-                <mat-icon>delete_outline</mat-icon>
+                 <i class="las la-trash"></i>
             </button>
         </div>
 
@@ -99,4 +98,39 @@
                 mat-raised-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
         </div>
     </div> -->
+    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+        <div class="p-item card">
+            <div class="avatar"><i class="icon las la-gem"></i>
+            </div>
+            <div class="title">
+                <span>{{'ORG.POLICY.IAM_POLICY.TITLE' | translate}}</span>
+                <button mat-icon-button disabled>
+                    <i *ngIf="iamPolicy" class="icon las la-check-circle"></i>
+                </button>
+                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
+                    <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn"
+                        (click)="deletePolicy(PolicyComponentType.IAM_POLICY)" mat-icon-button>
+                        <i class="las la-trash"></i>
+                    </button>
+                </ng-template>
+            </div>
+
+            <p *ngIf="iamPolicy?.description; else showDescIAM" class="desc">
+                {{ iamPolicy.description }}</p>
+            <ng-template #showDescIAM>
+                <p class="desc">
+                    {{'ORG.POLICY.IAM_POLICY.DESCRIPTION' | translate}}</p>
+            </ng-template>
+
+            <span class="fill-space"></span>
+            <div class="btn-wrapper">
+                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
+                    <button [disabled]="iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM_POLICY,'create' ]"
+                        color="primary" mat-raised-button>{{'ORG.POLICY.BTN_INSTALL' | translate}}</button>
+                    <button [disabled]="!iamPolicy" [routerLink]="[ 'policy', PolicyComponentType.IAM_POLICY ]"
+                        mat-raised-button>{{'ORG.POLICY.BTN_EDIT' | translate}}</button>
+                </ng-template>
+            </div>
+        </div>
+    </ng-template>
 </div>

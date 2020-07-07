@@ -26,8 +26,8 @@
                 <ng-template appHasRole [appHasRole]="['org.member.delete:'+org.id,'org.member.delete']">
                     <button (click)="removeProjectMemberSelection()"
                         matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button
-                        *ngIf="selection.hasValue()">
-                        <mat-icon>remove_circle</mat-icon>
+                        *ngIf="selection.hasValue()" color="warn">
+                        <i class="las la-trash"></i>
                     </button>
                 </ng-template>
                 <ng-template appHasRole [appHasRole]="['org.member.write:'+org.id,'org.member.write']">
@@ -46,13 +46,13 @@
                     [dataSource]="dataSource">
                     <ng-container matColumnDef="select">
                         <th class="selection" mat-header-cell *matHeaderCellDef>
-                            <mat-checkbox (change)="$event ? masterToggle() : null"
+                            <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
                                 [checked]="selection.hasValue() && isAllSelected()"
                                 [indeterminate]="selection.hasValue() && !isAllSelected()">
                             </mat-checkbox>
                         </th>
                         <td class="selection" mat-cell *matCellDef="let row">
-                            <mat-checkbox (click)="$event.stopPropagation()"
+                            <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                                 (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
                             </mat-checkbox>
                         </td>

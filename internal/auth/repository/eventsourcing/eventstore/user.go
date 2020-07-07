@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
@@ -129,6 +130,10 @@ func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*m
 	return repo.UserEvents.ChangePhone(ctx, phone)
 }
 
+func (repo *UserRepo) RemoveMyPhone(ctx context.Context) error {
+	return repo.UserEvents.RemovePhone(ctx, auth.GetCtxData(ctx).UserID)
+}
+
 func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {
 	return repo.UserEvents.VerifyPhone(ctx, auth.GetCtxData(ctx).UserID, code)
 }
@@ -227,8 +232,16 @@ func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password st
 	return repo.UserEvents.SetPassword(ctx, policy, userID, code, password)
 }
 
-func (repo *UserRepo) SignOut(ctx context.Context, agentID, userID string) error {
-	return repo.UserEvents.SignOut(ctx, agentID, userID)
+func (repo *UserRepo) SignOut(ctx context.Context, agentID string) error {
+	userSessions, err := repo.View.UserSessionsByAgentID(agentID)
+	if err != nil {
+		return err
+	}
+	userIDs := make([]string, len(userSessions))
+	for i, session := range userSessions {
+		userIDs[i] = session.UserID
+	}
+	return repo.UserEvents.SignOut(ctx, agentID, userIDs)
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView, error) {
@@ -248,6 +261,21 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 		}
 	}
 	return usr_view_model.UserToModel(&userCopy), nil
+}
+
+func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error) {
+	changes, err := repo.UserEvents.UserChanges(ctx, auth.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
+	if err != nil {
+		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
+	return changes, nil
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {

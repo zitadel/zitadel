@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	org_model "github.com/caos/zitadel/internal/org/model"
 
 	"github.com/caos/zitadel/internal/user/model"
@@ -23,7 +24,7 @@ type UserRepository interface {
 	AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error)
 	VerifyMfaOTPSetup(ctx context.Context, userID, code string) error
 
-	SignOut(ctx context.Context, agentID, userID string) error
+	SignOut(ctx context.Context, agentID string) error
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
 }
@@ -41,6 +42,7 @@ type myUserRepo interface {
 
 	MyPhone(ctx context.Context) (*model.Phone, error)
 	ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error)
+	RemoveMyPhone(ctx context.Context) error
 	VerifyMyPhone(ctx context.Context, code string) error
 	ResendMyPhoneVerificationCode(ctx context.Context) error
 
@@ -53,4 +55,6 @@ type myUserRepo interface {
 	AddMyMfaOTP(ctx context.Context) (*model.OTP, error)
 	VerifyMyMfaOTPSetup(ctx context.Context, code string) error
 	RemoveMyMfaOTP(ctx context.Context) error
+
+	MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error)
 }

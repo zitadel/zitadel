@@ -78,7 +78,7 @@ jobs:
   
   go-build:
     runs-on: ubuntu-18.04
-    needs: [angular-build, angular-test, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
+    needs: [angular-build, angular-lint, go-test] ### We need the artifact from the angular build and that's why we wait here
     name: Build ${{ matrix.goos }}-${{ matrix.goarch }}
     strategy:
       matrix:
@@ -120,7 +120,7 @@ jobs:
         path: .artifacts
     - uses: docker/build-push-action@v1
       with:
-        dockerfile: build/docker/prod
+        dockerfile: build/docker/Dockerfile
         username: ${{ github.actor }}
         password: ${{ github.token }}
         registry: ${{ env.REGISTRY }}
@@ -144,34 +144,17 @@ jobs:
     - uses: anchore/scan-action@master
       with:
         image-reference: "${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:${{ steps.vars.outputs.sha_short }}"
-        dockerfile-path: "./build/docker/prod"
+        dockerfile-path: "./build/docker/Dockerfile"
         fail-build: false
-    - name: anchore inline scan JSON results
-      run: for j in `ls ./anchore-reports/*.json`; do echo "---- ${j} ----"; cat ${j}; echo; done
-    - uses: actions/upload-artifact@v1
+        acs-report-enable: true
+    - name: Upload Anchore Scan Report
+      uses: github/codeql-action/upload-sarif@v1
       with:
-        name: anchore-reports
-        path: ./anchore-reports/
-
-  container-test:
-    runs-on: ubuntu-18.04
-    needs: container-prod
-    steps:
-    - name: Source checkout
-      uses: actions/checkout@v2
-    - name: Generate Short SHA Container Tag
-      id: vars
-      run: echo "::set-output name=sha_short::SHA-$(git rev-parse --short HEAD)"
-    - name: Check outputs
-      run: echo ${{ steps.vars.outputs.sha_short }}
-    - name: Docker Login
-      run: docker login $REGISTRY -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-    - name: Docker Run Test
-      run: echo "replace me with real test"
+        sarif_file: results.sarif
 
   release:
     runs-on: ubuntu-18.04
-    needs: [container-prod, container-test]
+    needs: [container-prod]
     env:
       DOCKER_USERNAME: ${{ github.actor }}
       DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}

@@ -118,7 +118,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.projectService.GetApplicationById(projectid, id).then(app => {
             this.app = app.toObject();
             this.appNameForm.patchValue(this.app);
-            console.log(this.grpcService.clientid, this.app.oidcConfig?.clientId);
 
             if (this.app.state !== AppState.APPSTATE_ACTIVE) {
                 this.appNameForm.controls['name'].disable();
@@ -145,13 +144,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public changeState(event: MatButtonToggleChange): void {
         if (event.value === AppState.APPSTATE_ACTIVE) {
-            this.projectService.ReactivateApplication(this.app.id).then(() => {
+            this.projectService.ReactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('Reactivated Application');
             }).catch((error: any) => {
                 this.toast.showError(error.message);
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
-            this.projectService.DectivateApplication(this.app.id).then(() => {
+            this.projectService.DeactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('Deactivated Application');
             }).catch((error: any) => {
                 this.toast.showError(error.message);
@@ -220,8 +219,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
 
-                console.log(this.app.oidcConfig);
-
                 this.projectService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
                     .then((data: OIDCConfig) => {
@@ -235,9 +232,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateOIDCClientSecret(): void {
-        console.log(this.app.id, this.projectId);
         this.projectService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: OIDCConfig) => {
-            console.log(data.toObject());
             this.toast.showInfo('OIDC Secret Regenerated');
             this.dialog.open(AppSecretDialogComponent, {
                 data: {

@@ -3,7 +3,7 @@ package model
 import (
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type UserSessionSearchRequest usr_model.UserSessionSearchRequest
@@ -18,7 +18,7 @@ func (req UserSessionSearchRequest) GetOffset() uint64 {
 	return req.Offset
 }
 
-func (req UserSessionSearchRequest) GetSortingColumn() view.ColumnKey {
+func (req UserSessionSearchRequest) GetSortingColumn() repository.ColumnKey {
 	if req.SortingColumn == usr_model.UserSessionSearchKeyUnspecified {
 		return nil
 	}
@@ -29,15 +29,15 @@ func (req UserSessionSearchRequest) GetAsc() bool {
 	return req.Asc
 }
 
-func (req UserSessionSearchRequest) GetQueries() []view.SearchQuery {
-	result := make([]view.SearchQuery, len(req.Queries))
+func (req UserSessionSearchRequest) GetQueries() []repository.SearchQuery {
+	result := make([]repository.SearchQuery, len(req.Queries))
 	for i, q := range req.Queries {
 		result[i] = UserSessionSearchQuery{Key: q.Key, Value: q.Value, Method: q.Method}
 	}
 	return result
 }
 
-func (req UserSessionSearchQuery) GetKey() view.ColumnKey {
+func (req UserSessionSearchQuery) GetKey() repository.ColumnKey {
 	return UserSessionSearchKey(req.Key)
 }
 

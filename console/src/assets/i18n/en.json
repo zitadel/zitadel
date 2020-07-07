@@ -2,9 +2,8 @@
     "APP_NAME": "zitadel",
     "HOME": {
         "TITLE": "zitadel",
-        "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
         "SECURITYANDPRIVACY": "Data protection and personalization",
-        "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",
+        "SECURITYANDPRIVACY_DESC": "You can view the data in your Zitadel account and choose which activities are saved in order to personalize Zitadel for you",
         "SECURITYANDPRIVACY_BUTTON": "Personalize data",
         "PROTECTION": "Organizational Policies",
         "PROTECTION_DESC": "Manage your organizational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
@@ -14,23 +13,34 @@
         "PROJECTS_BUTTON": "Project Overview",
         "USERS": "Total control and monitorability",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
-        "USERS_BUTTON": "Show users"
+        "USERS_BUTTON": "Show users",
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Add new organizations or elect managers to do it for you.",
+        "IAM_BUTTON": "Manage Zitadel"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
+        "IAM":"Administration",
         "ORGANIZATION": "Organization",
+        "PROJECTSSECTION":"Projects",
         "PROJECT": "Projects",
+        "GRANTEDPROJECT":"Granted Projects",
+        "USERSECTION":"Benutzer",
         "USER": "Users",
-        "LOGOUT": "Log out",
-        "NEWORG":"New Organization"
+        "LOGOUT": "Logout all users",
+        "NEWORG":"New Organization",
+        "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!",
+        "SHOWORGS":"Show all organizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
         "NEW": "New",
+        "ADD":"Add",
         "CREATE": "Create",
         "CONTINUE": "Continue",
         "BACK": "back",
         "CLOSE": "Close",
+        "CANCEL":"cancel",
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
@@ -56,7 +66,9 @@
             "LOGINNAMESDESC":"You can log into zitadel with these names",
             "COPY":"Copy to clipboard",
             "COPIED":"Copied to clipboard!",
-            "NOUSER":"No User"
+            "NOUSER":"No User",
+            "REACTIVATE":"Reactivate",
+            "DEACTIVATE":"Deactivate"
         },
         "MFA": {
             "TITLE": "Multifactor Authentication",
@@ -104,18 +116,19 @@
             "TITLE": "Profile",
             "EMAIL": "Email",
             "PHONE": "Phonenumber",
-            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
+            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Zitadel to your needs",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
             "NICKNAME": "Nickname",
             "DISPLAYNAME": "Displayname",
             "PREFERRED_LANGUAGE": "Language",
-            "GENDER": "Gender"
+            "GENDER": "Gender",
+            "PASSWORD":"Password"
         },
         "PASSWORD": {
             "TITLE": "Password",
-            "DESCRIPTION": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
+            "DESCRIPTION": "Note that the possword must correspond to the policy your organization has set.",
             "OLD": "Current Password",
             "NEW": "New Password",
             "CONFIRM": "Password Confirmation",
@@ -129,7 +142,7 @@
         "EMAIL": "Email",
         "PHONE": "Phonenumber",
         "LOGINMETHODS": {
-            "TITLE": "Methods to check your identity",
+            "TITLE": "Methods to access your identity",
             "DESCRIPTION": "This allows us to confirm your identity when you register or to contact you if suspicious activity is detected in your account",
             "EMAIL": {
                 "TITLE": "Email",
@@ -152,14 +165,6 @@
             "POSTAL_CODE": "Postal Code",
             "REGION": "Region",
             "COUNTRY": "Country"
-        },
-        "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Define the operations and rights that are made available to the user",
-            "CREATE": {
-                "TITLE": "Create User Grant",
-                "DESCRIPTION": "Search for the organization, the project and the corresponding project roles!"
-            }
         },
         "VALIDATION": {
             "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
@@ -189,6 +194,25 @@
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"log in with another account"
     },
+    "IAM": {
+        "DETAIL": {
+            "TITLE":"Identity and Access Management",
+            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, elect managers and define global policies."
+        },
+        "MEMBER": {
+            "TITLE":"Managers",
+            "DESCRIPTION":"Managers can add and edit organizations and make changes to their corresponding projects and apps"
+        },
+        "VIEWS": {
+            "TITLE":"Views and Events",
+            "DESCRIPTION":"This Card shows your Zitadel Views, you can clear them and remove failed events.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Database",
+            "SEQUENCE":"Sequence",
+            "ACTIONS":"Actions",
+            "CLEAR":"Clear"
+        }
+    },
     "ORG": {
         "PAGES": {
             "LIST": "Organizations",
@@ -201,16 +225,18 @@
             "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
             "ORGDETAILUSER_TITLE":"Configure Organization Owner",
             "DOWNLOAD_FILE":"Download file",
-            "SELECTORGTOOLTIP":"Select this organization"
+            "SELECTORGTOOLTIP":"Select this organization",
+            "PRIMARYDOMAIN":"Primary Domain",
+            "STATE":"State"
         },
         "DOMAINS": {
             "TITLE":"Domains",
             "DESCRIPTION":"Configure your domains on which your users will be registered."
         },
         "STATE": {
-            "0": "nicht definiert",
-            "1": "aktiv",
-            "2": "inaktiv"
+            "0": "not defined",
+            "1": "active",
+            "2": "deactivated"
         },
         "MEMBER": {
             "TITLE":"Organization Managers",
@@ -218,7 +244,7 @@
         },
         "POLICY": {
             "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged solutions that save you time and ensure security",
+            "DESCRIPTION":"Pre-packaged solutions that to ensure security of your data",
             "PWD_COMPLEXITY": {
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
@@ -241,7 +267,13 @@
                 "TITLECREATE":"Create Password Lockout Policy",
                 "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to install this extention if you want to show retries or set a max try number."
             },
-            "BTN_INSTALL":"Install",
+            "IAM_POLICY": {
+                "TITLE":"IAM Access Preferences",
+                "DESCRIPTION":"Define access properties of your users",
+                "TITLECREATE":"Set IAM Access preferences",
+                "DESCRIPTIONCREATE":"Emails as username is not allowed for enabled UserLoginMustBeDomain"
+            },
+            "BTN_INSTALL":"Setup",
             "BTN_EDIT":"Modify",
             "DATA": {
                 "DESCRIPTION":"Description",
@@ -253,13 +285,14 @@
                 "SHOWLOCKOUTFAILURES":"show lockout failures",
                 "MAXATTEMPTS":"Max Attempts",
                 "EXPIREWARNDAYS":"Expiration Warning after day",
-                "MAXAGEDAYS":"Max Age in days"
+                "MAXAGEDAYS":"Max Age in days",
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Uninstall Policy"
         }
     },
     "ORG_DETAIL": {
-        "TITLE": "Organisation",
+        "TITLE": "Organization",
         "DESCRIPTION": "Here you can edit your organization configuration and manage members",
         "DETAIL": {
             "TITLE": "Detail",
@@ -300,7 +333,15 @@
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
             "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
+            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!",
+            "TYPE":{
+                "OWNED":"Owned Projects",
+                "GRANTED":"Granted Projects"
+            },
+            "PINNED":"Pinned",
+            "ALL": "All",
+            "CREATEDON":"created on",
+            "LASTMODIFIED":"last modified on"
         },
         "STATE": {
             "TITLE":"State",
@@ -323,25 +364,38 @@
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
             "EMAIL": "Email",
-            "ROLES": "Roles"
+            "ROLES": "Roles",
+            "USERID":"User Id"
         },
         "GRANT": {
-            "TITLE": "Grants",
+            "TITLE": "Granted organizations",
             "DESCRIPTION": "Allow an other organization to use your project",
             "CREATE": {
-                "TITLE": "Create Member Grant",
+                "TITLE": "Create organization grant",
                 "SEL_USERS": "Select the users you wish to grant",
                 "SEL_PROJECT": "Search for a project",
-                "SEL_ROLES": "Select the roles you want be be added to the grant",
-                "SEL_ORG": "Search for the domain",
+                "SEL_ROLES": "Select the roles you want to be added to the grant",
+                "SEL_USER":"Search for a user",
+                "SEL_ORG": "Set the domain",
+                "SEL_ORG_DESC":"Enter the complete domain to specify the organization to grant!",
                 "ORG_TITLE":"Organization",
-                "ORG_DESCRIPTION":"You are about to grant a user on the organization {{name}}",
-                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user of another organization",
-                "SEL_ORG_BUTTON": "Search Organization"
+                "ORG_DESCRIPTION":"You are about to grant a user for the organization {{name}}",
+                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organization",
+                "SEL_ORG_FORMFIELD":"Complete Domain",
+                "SEL_ORG_BUTTON": "Set Organization",
+                "FOR_ORG":"The grant is created for:"
             },
+            "DETAIL": {
+                "TITLE":"Managers of the granted organization",
+                "DESC":"These are the Managers of the granted organization. You can select which users are allowed to maintain control of the project."
+            },
+            "SHOWDETAIL":"Show Details",
+            "USER":"User",
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organization",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
             "ROLENAMESLIST": "Roles"
@@ -360,8 +414,11 @@
             "ACTIONS": "Actions",
             "ADDTITLE": "Create role",
             "ADDDESCRIPTION": "Enter the data for the new role!",
+            "EDITTITLE": "Edit role",
+            "EDITDESCRIPTION": "Enter the new data for the role!",
             "DELETE":"Delete Role",
-            "CREATIONDATE":"Created"
+            "CREATIONDATE":"Created",
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}"
         },
         "TABLE": {
             "TOTAL": "Entries total:",
@@ -374,7 +431,8 @@
             "STATE":"Status",
             "TYPE":"Type",
             "CREATIONDATE":"Created At",
-            "CHANGEDATE":"Last Modified"
+            "CHANGEDATE":"Last Modified",
+            "RESOURCEOWNER":"Owner"
         }
     },
     "APP": {
@@ -432,7 +490,7 @@
         "en": "English"
     },
     "MEMBER":{
-        "ADD":"Add a contributor"
+        "ADD":"Add a manager"
     },
     "ROLES": {
         "ORG_OWNER": "Org Owner",
@@ -476,12 +534,29 @@
         "PROJECT_GRANT_USER_GRANT_VIEWER":"Project Grant User Grant Viewer"
     },
     "GRANTS": {
-        "DELETE":"Delete grant",
-        "ADD":"Create grant",
-        "ADD_BTN":"New"
+        "DELETE":"delete authorization",
+        "ADD":"create authorization",
+        "ADD_BTN":"new",
+        "PROJECT": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified project. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "USER": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified user. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "CREATE": {
+            "TITLE": "Create authorization",
+            "DESCRIPTION": "Search for the orgnanization, the project and the corresponding roles."
+        },
+        "DETAIL": {
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":""
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Last Changes",
+        "BOTTOM":"You've arrived at the bottom",
         "ORG": {
             "TITLE":"Activity",
             "DESCRIPTION":"Here you can see the latest events that have affected an organization change"
@@ -495,23 +570,24 @@
             "DESCRIPTION":"Here you can see the latest events that have affected a userchange"
         },
         "EVENTS": {
-            "org.added": "Org created",
-            "org.changed":"Org edited",
-            "org.member.added":"Org Member created",
-            "org.member.removed":"Org Member deleted",
-            "org.domain.added":"Org Domain added",
-            "org.domain.verified":"Org Domain verified",
-            "org.domain.primary.set":"Primary domain set",
-            "org.iam.policy.added":"IAM Policy added",
-            "project.added": "Project created",
-            "project.changed":"Project edited",
-            "project.deactivated":"Project deactivated",
-            "project.member.added":"Project Member created",
-            "project.member.removed":"Project Member deleted",
-            "project.role.added":"Role created",
-            "project.role.removed":"Role deleted",
-            "project.application.added":"App added",
-            "project.application.config.oidc.added":"OIDC config added",  
+            "org.added": "created",
+            "org.changed":"changed",
+            "org.member.added":"member created",
+            "org.member.removed":"member deleted",
+            "org.domain.added":"domain added",
+            "org.domain.verified":"domain verified",
+            "org.domain.primary.set":"set primary domain",
+            "org.domain.removed":"domain removed",
+            "org.iam.policy.added":"IAM policy added",
+            "project.added": "project added",
+            "project.changed":"changed",
+            "project.deactivated":"deactivated",
+            "project.member.added":"added member",
+            "project.member.removed":"member deleted",
+            "project.role.added":"created role",
+            "project.role.removed":"deleted role",
+            "project.application.added":"added app",
+            "project.application.config.oidc.added":"added OIDC config",  
             "user.added":"User added",
             "user.initialization.code.added":"Init code added",
             "user.phone.code.added":"Phone code added",
@@ -545,7 +621,9 @@
             "user.password.check.succeeded":"Password check succeeded",
             "user.mfa.init.skipped":"MFA init skipped",
             "user.mfa.otp.added":"MFA OTP added",
-            "user.mfa.otp.verified":"MFA OTP verified"
+            "user.mfa.otp.verified":"MFA OTP verified",
+            "user.mfa.otp.removed":"MFA OTP removed",
+            "user.selfregistered":"self registered"
         }
     }
 }

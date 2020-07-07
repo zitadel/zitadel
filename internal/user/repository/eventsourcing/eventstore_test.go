@@ -3,11 +3,12 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
 	"net"
 	"testing"
 	"time"
+
+	org_model "github.com/caos/zitadel/internal/org/model"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
 
 	"github.com/golang/mock/gomock"
 
@@ -2603,6 +2604,70 @@ func TestVerifyPhone(t *testing.T) {
 	}
 }
 
+func TestRemovePhone(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es     *UserEventstore
+		ctx    context.Context
+		userID string
+		code   string
+	}
+	type res struct {
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove phone ok",
+			args: args{
+				es:     GetMockManipulateUserVerifiedPhone(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "code",
+			},
+			res: res{},
+		},
+		{
+			name: "empty userid",
+			args: args{
+				es:   GetMockManipulateUser(ctrl),
+				ctx:  auth.NewMockContext("orgID", "userID"),
+				code: "Code",
+			},
+			res: res{
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing user not found",
+			args: args{
+				es:     GetMockManipulateUserNoEvents(ctrl),
+				ctx:    auth.NewMockContext("orgID", "userID"),
+				userID: "AggregateID",
+				code:   "Code",
+			},
+			res: res{
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemovePhone(tt.args.ctx, tt.args.userID)
+
+			if tt.res.errFunc == nil && err != nil {
+				t.Errorf("should not get err %v", err)
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestCreatePhoneVerificationCode(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	type args struct {
@@ -3290,7 +3355,7 @@ func TestChangesUser(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &model.UserChanges{Changes: []*model.UserChange{&model.UserChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &model.UserChanges{Changes: []*model.UserChange{&model.UserChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				user:    &model.Profile{FirstName: "Hans", LastName: "Muster", UserName: "HansMuster"},
 			},
 		},
@@ -3310,7 +3375,7 @@ func TestChangesUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.UserChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.UserChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit, false)
 
 			user := &model.Profile{}
 			if result != nil && len(result.Changes) > 0 {

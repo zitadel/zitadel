@@ -6,6 +6,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslateModule } from '@ngx-translate/core';
 import { OutsideClickModule } from 'src/app/directives/outside-click/outside-click.module';
 
+import { AvatarModule } from '../avatar/avatar.module';
 import { AccountsCardComponent } from './accounts-card.component';
 
 @NgModule({
@@ -18,6 +19,7 @@ import { AccountsCardComponent } from './accounts-card.component';
         MatButtonModule,
         MatProgressBarModule,
         OutsideClickModule,
+        AvatarModule,
         TranslateModule,
     ],
     exports: [

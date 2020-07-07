@@ -17,7 +17,8 @@ import (
 type Config struct {
 	Port            string
 	EnvOverwriteDir string
-	Cache           middleware.CacheConfig
+	ShortCache      middleware.CacheConfig
+	LongCache       middleware.CacheConfig
 	CSPDomain       string
 }
 
@@ -28,8 +29,17 @@ type spaHandler struct {
 const (
 	envRequestPath = "/assets/environment.json"
 	envDefaultDir  = "/console/"
+)
 
-	manifestFile = "/manifest.webmanifest"
+var (
+	paths = []string{
+		"/index.html",
+		"/manifest.webmanifest",
+		"/ngsw.json",
+		"/ngsw-worker.js",
+		"/safety-worker.js",
+		"/worker-basic.min.js",
+	}
 )
 
 func (i *spaHandler) Open(name string) (http.File, error) {
@@ -50,7 +60,12 @@ func Start(ctx context.Context, config Config) error {
 	if config.EnvOverwriteDir != "" {
 		envDir = config.EnvOverwriteDir
 	}
-	cache := AssetsCacheInterceptorIgnoreManifest(config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
+	cache := AssetsCacheInterceptorIgnoreManifest(
+		config.ShortCache.MaxAge.Duration,
+		config.ShortCache.SharedMaxAge.Duration,
+		config.LongCache.MaxAge.Duration,
+		config.LongCache.SharedMaxAge.Duration,
+	)
 	security := middleware.SecurityHeaders(csp(config.CSPDomain), nil)
 	http.Handle("/", cache(security(http.FileServer(&spaHandler{statikFS}))))
 	http.Handle(envRequestPath, cache(security(http.StripPrefix("/assets", http.FileServer(http.Dir(envDir))))))
@@ -72,14 +87,16 @@ func csp(zitadelDomain string) *middleware.CSP {
 	return &csp
 }
 
-func AssetsCacheInterceptorIgnoreManifest(maxAge, sharedMaxAge time.Duration) func(http.Handler) http.Handler {
+func AssetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMaxAge, longSharedMaxAge time.Duration) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == manifestFile {
-				middleware.NoCacheInterceptor(handler).ServeHTTP(w, r)
-				return
+			for _, path := range paths {
+				if r.URL.Path == path {
+					middleware.AssetsCacheInterceptor(shortMaxAge, shortSharedMaxAge, handler).ServeHTTP(w, r)
+					return
+				}
+				middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge, handler).ServeHTTP(w, r)
 			}
-			middleware.AssetsCacheInterceptor(maxAge, sharedMaxAge, handler).ServeHTTP(w, r)
 		})
 	}
 }

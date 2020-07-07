@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -60,7 +61,7 @@ func (s *Server) RemoveMyOrgDomain(ctx context.Context, in *RemoveOrgDomainReque
 }
 
 func (s *Server) OrgChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	response, err := s.org.OrgChanges(ctx, changesRequest.Id, 0, 0)
+	response, err := s.org.OrgChanges(ctx, changesRequest.Id, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err
 	}

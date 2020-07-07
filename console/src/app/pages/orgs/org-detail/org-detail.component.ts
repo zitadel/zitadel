@@ -28,6 +28,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     private subscription: Subscription = new Subscription();
 
     public domains: OrgDomainView.AsObject[] = [];
+    public primaryDomain: string = '';
     public newDomain: string = '';
 
     constructor(
@@ -52,8 +53,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         });
 
         this.orgService.SearchMyOrgDomains(0, 100).then(result => {
-            console.log(result.toObject().resultList);
             this.domains = result.toObject().resultList;
+            this.primaryDomain = this.domains.find(domain => domain.primary)?.domain ?? '';
         });
     }
 
@@ -76,11 +77,11 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public saveNewOrgDomain(): void {
         this.orgService.AddMyOrgDomain(this.newDomain).then(domain => {
             this.domains.push(domain.toObject());
+            this.newDomain = '';
         });
     }
 
     public removeDomain(domain: string): void {
-        console.log(domain);
         this.orgService.RemoveMyOrgDomain(domain).then(() => {
             this.toast.showInfo('Removed');
             const index = this.domains.findIndex(d => d.domain === domain);

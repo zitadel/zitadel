@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -209,14 +210,15 @@ func addUserGrantValidation(resourceOwner string, grant *model.UserGrant) func(.
 		if !existsUser {
 			return errors.ThrowPreconditionFailed(nil, "EVENT-Sl8uS", "user doesn't exist")
 		}
-		if err := checkProjectConditions(resourceOwner, grant, project); err != nil {
-			return err
-		}
-		return nil
+		return checkProjectConditions(resourceOwner, grant, project)
 	}
 }
 
+//TODO: rethink this function i know it's ugly.
 func checkProjectConditions(resourceOwner string, grant *model.UserGrant, project *proj_es_model.Project) error {
+	if grant.ProjectID != project.AggregateID {
+		return errors.ThrowInvalidArgument(nil, "EVENT-ixlMx", "project doesn't exist")
+	}
 	if project.State == int32(proj_model.ProjectStateRemoved) {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Lxp0s", "project doesn't exist")
 	}

@@ -157,6 +157,16 @@ service AuthService {
     };
   }
 
+  rpc RemoveMyUserPhone(google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/users/me/phone"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
   rpc VerifyMyUserPhone(VerifyUserPhoneRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/users/me/phone/_verify"
@@ -182,6 +192,16 @@ service AuthService {
   rpc GetMyUserAddress(google.protobuf.Empty) returns (UserAddressView) {
     option (google.api.http) = {
       get: "/users/me/address"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+
+  rpc GetMyUserChanges(ChangesRequest) returns (Changes) {
+    option (google.api.http) = {
+      get: "/users/me/changes"
     };
 
     option (caos.zitadel.utils.v1.auth_option) = {
@@ -219,6 +239,16 @@ service AuthService {
     option (caos.zitadel.utils.v1.auth_option) = {
       permission: "authenticated"
     };
+  }
+
+  rpc GetMyPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
+    option (google.api.http) = {
+            get: "/policies/passwords/complexity"
+        };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "authenticated"
+        };
   }
 
   // MFA
@@ -622,4 +652,39 @@ enum SearchMethod {
   SEARCHMETHOD_EQUALS_IGNORE_CASE = 3;
   SEARCHMETHOD_STARTS_WITH_IGNORE_CASE = 4;
   SEARCHMETHOD_CONTAINS_IGNORE_CASE = 5;
+}
+
+message ChangesRequest {
+  uint64 limit= 1;
+  uint64 sequence_offset = 2;
+  bool asc = 3;
+}
+
+message Changes {
+  repeated Change changes = 1;
+  uint64 offset = 2;
+  uint64 limit = 3;
+}
+
+message Change {
+  google.protobuf.Timestamp change_date = 1;
+  string event_type = 2;
+  uint64 sequence = 3;
+  string editor_id = 4;
+  string editor = 5;
+  google.protobuf.Struct data = 6;
+}
+
+message PasswordComplexityPolicy {
+  string id = 1;
+  string description = 2;
+  google.protobuf.Timestamp creation_date = 3;
+  google.protobuf.Timestamp change_date = 4;
+  uint64 min_length = 5;
+  bool has_lowercase = 6;
+  bool has_uppercase = 7;
+  bool has_number = 8;
+  bool has_symbol = 9;
+  uint64 sequence = 10;
+  bool is_default = 11;
 }

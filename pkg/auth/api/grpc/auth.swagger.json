@@ -112,6 +112,22 @@
         ]
       }
     },
+    "/policies/passwords/complexity": {
+      "get": {
+        "operationId": "GetMyPasswordComplexityPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PasswordComplexityPolicy"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/ready": {
       "get": {
         "operationId": "Ready",
@@ -204,6 +220,45 @@
             "schema": {
               "$ref": "#/definitions/v1UpdateUserAddressRequest"
             }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/me/changes": {
+      "get": {
+        "operationId": "GetMyUserChanges",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Changes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "sequence_offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "asc",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -428,6 +483,20 @@
           "AuthService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveMyUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      },
       "put": {
         "operationId": "ChangeMyUserPhone",
         "responses": {
@@ -629,6 +698,50 @@
       },
       "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
     },
+    "v1Change": {
+      "type": "object",
+      "properties": {
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "editor_id": {
+          "type": "string"
+        },
+        "editor": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/protobufStruct"
+        }
+      }
+    },
+    "v1Changes": {
+      "type": "object",
+      "properties": {
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Change"
+          }
+        },
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
     "v1Gender": {
       "type": "string",
       "enum": [
@@ -795,6 +908,53 @@
         },
         "new_password": {
           "type": "string"
+        }
+      }
+    },
+    "v1PasswordComplexityPolicy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "min_length": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "has_lowercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_uppercase": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_number": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "has_symbol": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "is_default": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

@@ -1,17 +1,17 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/view"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
-	errTable = "authz.failed_event"
+	errTable = "authz.failed_events"
 )
 
-func (v *View) saveFailedEvent(failedEvent *view.FailedEvent) error {
-	return view.SaveFailedEvent(v.Db, errTable, failedEvent)
+func (v *View) saveFailedEvent(failedEvent *repository.FailedEvent) error {
+	return repository.SaveFailedEvent(v.Db, errTable, failedEvent)
 }
 
-func (v *View) latestFailedEvent(viewName string, sequence uint64) (*view.FailedEvent, error) {
-	return view.LatestFailedEvent(v.Db, errTable, viewName, sequence)
+func (v *View) latestFailedEvent(viewName string, sequence uint64) (*repository.FailedEvent, error) {
+	return repository.LatestFailedEvent(v.Db, errTable, viewName, sequence)
 }

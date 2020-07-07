@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { OAuthStorage } from 'angular-oauth2-oidc';
 
-import { GrpcService } from './grpc.service';
-
 
 @Injectable({
     providedIn: 'root',
@@ -11,7 +9,7 @@ import { GrpcService } from './grpc.service';
 export class StorageService implements OAuthStorage {
     private storage: Storage = window.sessionStorage;
 
-    constructor(private grpcService: GrpcService) { }
+    constructor() { }
 
     public setItem<TValue = string>(key: string, value: TValue): void {
         this.storage.setItem(this.getPrefixedKey(key), JSON.stringify(value));

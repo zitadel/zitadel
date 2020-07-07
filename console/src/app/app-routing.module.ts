@@ -11,8 +11,16 @@ const routes: Routes = [
         canActivate: [AuthGuard],
     },
     {
+        path: 'granted-projects',
+        loadChildren: () => import('./pages/granted-projects/granted-projects.module').then(m => m.GrantedProjectsModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['project.read'],
+        },
+    },
+    {
         path: 'projects',
-        loadChildren: () => import('./pages/projects/projects.module').then(m => m.ProjectsModule),
+        loadChildren: () => import('./pages/owned-projects/owned-projects.module').then(m => m.OwnedProjectsModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['project.read'],
@@ -32,6 +40,14 @@ const routes: Routes = [
         },
     },
     {
+        path: 'iam',
+        loadChildren: () => import('./pages/iam/iam.module').then(m => m.IamModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['iam.read'],
+        },
+    },
+    {
         path: 'org',
         loadChildren: () => import('./pages/orgs/orgs.module').then(m => m.OrgsModule),
         canActivate: [AuthGuard, RoleGuard],
@@ -39,6 +55,28 @@ const routes: Routes = [
             roles: ['org.read'],
         },
     },
+
+    {
+        path: 'grant-create/project/:projectid/grant/:grantid',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
+    {
+        path: 'grant-create/project/:projectid',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
+    {
+        path: 'grant-create/user/:userid',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
+    {
+        path: 'grant-create',
+        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+            .then(m => m.UserGrantCreateModule),
+    },
+
     {
         path: 'signedout',
         loadChildren: () => import('./pages/signedout/signedout.module').then(m => m.SignedoutModule),

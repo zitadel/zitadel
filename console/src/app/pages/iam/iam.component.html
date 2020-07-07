@@ -1,0 +1,15 @@
+<app-meta-layout>
+    <div class="enlarged-container">
+        <h1>{{'IAM.DETAIL.TITLE' | translate}}</h1>
+        <p class="sub">{{'IAM.DETAIL.DESCRIPTION' | translate}} </p>
+
+        <app-card title="{{ 'IAM.VIEWS.TITLE' | translate }}" description="{{ 'IAM.VIEWS.DESCRIPTION' | translate }}">
+            <app-iam-views></app-iam-views>
+        </app-card>
+    </div>
+
+    <metainfo class="side">
+        <app-iam-contributors>
+        </app-iam-contributors>
+    </metainfo>
+</app-meta-layout>

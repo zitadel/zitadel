@@ -3,7 +3,7 @@ BASEDIR=$(dirname "$0")
 gopass sync --store zitadel-secrets
 
 # Tracing
-gopass zitadel-secrets/zitadel/developer/default/zitadel-svc-account-eventstore-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
+gopass zitadel-secrets/zitadel/developer/default/zitadel-svc-account-zitadel-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
 export GOOGLE_APPLICATION_CREDENTIALS="$BASEDIR/local_svc-account-tracing.json"
 
 export ZITADEL_TRACING_PROJECT_ID=caos-citadel-test
@@ -54,6 +54,8 @@ export ZITADEL_CSRF_DEV=true
 #CACHE
 export ZITADEL_CACHE_MAXAGE=12h
 export ZITADEL_CACHE_SHARED_MAXAGE=168h
+export ZITADEL_SHORT_CACHE_MAXAGE=5m
+export ZITADEL_SHORT_CACHE_SHARED_MAXAGE=15min
 
 #Console
 export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/

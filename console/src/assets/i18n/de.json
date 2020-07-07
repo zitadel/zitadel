@@ -2,9 +2,8 @@
     "APP_NAME": "zitadel",
     "HOME": {
         "TITLE": "zitadel",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-        "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Caos-Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Caos für sich zu personalisieren",
+        "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Zitadel Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Zitadel für sich zu personalisieren",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
         "PROTECTION": "Organisationsrichtlinien",
         "PROTECTION_DESC": "Verwalten Sie Ihre Organisationsrichtlinien. Entdecken Sie einige vorgefertigte Lösungen, die Ihnen Zeit sparen und Sicherheit gewährleisten.",
@@ -14,23 +13,34 @@
         "PROJECTS_BUTTON": "Projekt Übersicht",
         "USERS": "Totale Kontrolle und Überwachbarkeit",
         "USERS_DESC": "Überwachen Sie Ihr Rollenkonzept in Echtzeit. Ergreifen Sie sofort Maßnahmen.",
-        "USERS_BUTTON": "Benutzer anzeigen"
+        "USERS_BUTTON": "Benutzer anzeigen",
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Fügen Sie neue Organisationen hinzu oder editieren Sie Ihre IAM Manager",
+        "IAM_BUTTON": "Zitadel verwalten"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
+        "IAM":"Administration",
         "ORGANIZATION": "Organisation",
+        "PROJECTSSECTION":"Projekte",
         "PROJECT": "Projekte",
+        "GRANTEDPROJECT":"Berechtigte Projekte",
+        "USERSECTION":"Benutzer",
         "USER": "Benutzer",
-        "LOGOUT": "abmelden",
-        "NEWORG":"Neue Organisation"
+        "LOGOUT": "alle Benutzer abmelden",
+        "NEWORG":"Neue Organisation",
+        "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!",
+        "SHOWORGS":"Alle organisationen anzeigen"
     },
     "ACTIONS": {
         "SAVE": "speichern",
         "NEW": "neu",
+        "ADD":"Hinzufügen",
         "CREATE": "create",
         "CONTINUE": "Weiter",
         "BACK": "zurück",
         "CLOSE": "schliessen",
+        "CANCEL":"abbrechen",
         "INFO": "Info",
         "OK": "Ok",
         "VIEW": "Ansehen",
@@ -44,7 +54,7 @@
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Zitadel optimal an Ihre Bedürfnisse anzupassen",
         "PAGES": {
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
@@ -56,7 +66,9 @@
             "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
             "COPY":"In die Zwischenablage kopieren",
             "COPIED":"In die Zwischenablage kopiert!",
-            "NOUSER":"Kein User"
+            "NOUSER":"Kein User",
+            "REACTIVATE":"Reaktivieren",
+            "DEACTIVATE":"Deaktivieren"
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
@@ -104,18 +116,19 @@
             "TITLE": "Profil",
             "EMAIL": "Email",
             "PHONE": "Phonenumber",
-            "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Caos optimal an Ihre Bedürfnisse anzupassen",
+            "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Zitadel optimal an Ihre Bedürfnisse anzupassen",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
             "NICKNAME": "Spitzname",
             "DISPLAYNAME": "Anzeigename",
             "PREFERRED_LANGUAGE": "Sprache",
-            "GENDER": "Geschlecht"
+            "GENDER": "Geschlecht",
+            "PASSWORD":"Passwort"
         },
         "PASSWORD": {
             "TITLE": "Passwort",
-            "DESCRIPTION": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
+            "DESCRIPTION": "Beachten Sie, dass das Password der von Ihrer Organisation definierten Richtlinie entsprechen muss.",
             "OLD": "Aktuelles Passwort",
             "NEW": "Neues Passwort",
             "CONFIRM": "Neues Passwort Wiederholung",
@@ -153,14 +166,6 @@
             "REGION": "Kanton",
             "COUNTRY": "Land"
         },
-        "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden.",
-            "CREATE": {
-                "TITLE": "User Grant erstellen",
-                "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
-            }
-        },
         "VALIDATION": {
             "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
             "REQUIRED": "Das Feld ist leer",
@@ -187,7 +192,25 @@
         "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
-        "ADDACCOUNT":"mit einem anderen Account anmelden"
+        "ADDACCOUNT":"Account hinzufügen"
+    },
+    "IAM": {
+        "DETAIL": {
+            "TITLE":"Identity and Access Management",
+            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, manage managers and define global policies."
+        }, 
+        "MEMBER": {
+            "TITLE":"IAM Members"
+        },
+        "VIEWS": {
+            "TITLE":"Views und Events",
+            "DESCRIPTION":"Diese Ansicht zeigt Ihre Zitadel Views, Sie können Sie zurücksetzen und fehlgeschlagene Events entfernen.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Datenbank",
+            "SEQUENCE":"SEQUENZ",
+            "ACTIONS":"Aktionen",
+            "CLEAR":"Aufräumen"
+        }
     },
     "ORG": {
         "PAGES": {
@@ -201,7 +224,9 @@
             "ORGDOMAIN_VERIFICATION_SKIP":"Sie können die Überprüfung vorerst überspringen und Ihre Organisation weiter erstellen. Um Ihre Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
             "DOWNLOAD_FILE":"File download",
-            "SELECTORGTOOLTIP":"Wähle diese Organisation"
+            "SELECTORGTOOLTIP":"Wähle diese Organisation",
+            "PRIMARYDOMAIN":"Primäre Domain",
+            "STATE":"Status"
         },
         "DOMAINS": {
             "TITLE":"Domains",
@@ -241,6 +266,12 @@
                 "TITLECREATE":"Kennwortsperrrichtlinie festlegen",
                 "DESCRIPTIONCREATE":"Kennwortwiederholungen sind im Standardmodus unendlich. Sie müssen diese Erweiterung installieren, wenn Sie Wiederholungsversuche anzeigen oder eine maximale Versuchsnummer festlegen möchten."
             },
+            "IAM_POLICY": {
+                "TITLE":"IAM Zugangseinstellungen",
+                "DESCRIPTION":"Definieren Sie Zugangseistellungen für Nutzer",
+                "TITLECREATE":"IAM Zugangseinstellungen festlegen",
+                "DESCRIPTIONCREATE":"Emails als Benutzername sind nicht erlaubt wenn UserLoginMustBeDomain gesetzt ist."
+            },
             "BTN_INSTALL":"Installieren",
             "BTN_EDIT":"Modifizieren",
             "DATA": {
@@ -253,7 +284,8 @@
                 "SHOWLOCKOUTFAILURES":"Zeige Anzahl Anmeldeversuche",
                 "MAXATTEMPTS":"Maximale Anzahl an Versuchen",
                 "EXPIREWARNDAYS":"Ablauf Warnung nach Tagen",
-                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen"
+                "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
+                "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Richtlinie entfernen"
         }
@@ -300,7 +332,15 @@
             "CREATE_DESC": "Geben Sie den Namen ein",
             "ROLE": "Rolle",
             "NOITEMS": "Keine Projekte",
-            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!"
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!",
+            "TYPE":{
+                "OWNED":"Eigene Projekte",
+                "GRANTED":"Berechtigte Projekte"
+            },
+            "PINNED":"Angepinnt",
+            "ALL": "Alle",
+            "CREATEDON":"erstellt am",
+            "LASTMODIFIED":"zuletzt verändert am"
         },
         "STATE": {
             "TITLE":"Status",
@@ -318,30 +358,43 @@
         "MEMBER": {
             "TITLE": "Manager",
             "TITLEDESC":"Manager können Änderungen an dieser Entität vornehmen",
-            "DESCRIPTION":"Hier finden Sie alle Mitwirkenden dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
+            "DESCRIPTION":"Hier finden Sie alle Manager dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
             "EMAIL": "Email",
-            "ROLES": "Rollen"
+            "ROLES": "Rollen",
+            "USERID":"User Id"
         },
         "GRANT": {
-            "TITLE": "Grants",
+            "TITLE": "Berechtigte Organisationen",
             "DESCRIPTION": "Gewähren Sie einer anderen Organisation Zugriff (Grant) auf dieses Projekt",
             "CREATE": {
-                "TITLE": "Member Grant erstellen",
+                "TITLE": "Organisation berechtigen",
                 "SEL_USERS": "Selektieren Sie die gewünschten User für das Erstellen des Grants!",
                 "SEL_ROLES": "Selektieren Sie die gewünschten Rollen für das Erstellen des Grants!",
                 "SEL_PROJECT": "Suchen Sie nach dem Projekt",
+                "SEL_USER":"Suchen Sie nach einem User",
                 "SEL_ORG": "Suchen Sie nach der Domain",
+                "SEL_ORG_DESC":"Geben Sie die vollständige Domain ein um Resultate zu erhalten!",
                 "ORG_TITLE":"Organisation",
                 "ORG_DESCRIPTION":"Sie sind im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
                 "ORG_DESCRIPTION_DESC":"Wechseln Sie den Context um die Organisation zu wechseln!",
-                "SEL_ORG_BUTTON": "Suche Organisation"
+                "SEL_ORG_FORMFIELD":"Vollständige Domain",
+                "SEL_ORG_BUTTON": "Suche Organisation",
+                "FOR_ORG":"The grant wird erstellt für:"
             },
+            "DETAIL": {
+                "TITLE":"Berechtigte Manager der Organisation",
+                "DESC":"Dies sind die Manager der berechtigten Organisation. Wählen Sie die Benutzer, die Zugriff zum editieren der jeweiligen Zugänge erhalten."
+            },
+            "SHOWDETAIL":"Zeige Details",
+            "USER":"Benutzer",
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Projekt Name",
-            "GRANTEDORG": "Granted Organization",
+            "GRANTEDORG": "Granted Organisation",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
             "ROLENAMESLIST": "Rollen"
@@ -360,8 +413,11 @@
             "ACTIONS": "Aktion",
             "ADDTITLE": "Rolle erstellen",
             "ADDDESCRIPTION": "Geben Sie die Daten für die zu erstellende Rolle ein!",
+            "EDITTITLE": "Rolle ändern",
+            "EDITDESCRIPTION": "Geben Sie die Daten für die zu verändernde Rolle ein!",
             "DELETE":"Rolle löschen",
-            "CREATIONDATE":"Erstelldatum"
+            "CREATIONDATE":"Erstelldatum",
+            "SELECTGROUPTOOLTIP":"Selektiere alle Rollen der Gruppe {{group}}"
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt:",
@@ -374,7 +430,8 @@
             "STATE":"Status",
             "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
-            "CHANGEDATE":"Letzte Änderung"
+            "CHANGEDATE":"Letzte Änderung",
+            "RESOURCEOWNER":"Besitzer"
         }
     },
     "APP": {
@@ -432,7 +489,7 @@
         "en": "Englisch"
     },
     "MEMBER":{
-        "ADD":"Mitwirkenden hinzufügen"
+        "ADD":"Manager hinzufügen"
     },
     "ROLES": {
         "ORG_OWNER": "Org Owner",
@@ -478,10 +535,27 @@
     "GRANTS": {
         "DELETE":"Grant löschen",
         "ADD":"Grant erstellen",
-        "ADD_BTN":"Neu"
+        "ADD_BTN":"Neu",
+        "PROJECT": {
+            "TITLE": "Authorisierung",
+            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+        },
+        "USER": {
+            "TITLE": "Authorisierung",
+            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+        },
+        "CREATE": {
+            "TITLE": "Authorisierung erstellen",
+            "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
+        },
+        "DETAIL": {
+            "TITLE":"Authorisierung Detail",
+            "DESCRIPTION":""
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Letzte Änderungen",
+        "BOTTOM":"Ende",
         "ORG": {
             "TITLE":"Aktivität",
             "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die die Organisation betreffen"
@@ -502,6 +576,7 @@
             "org.domain.added":"Org Domain hinzugefügt",
             "org.domain.verified":"Org Domain verifiziert",
             "org.domain.primary.set":"Primäre domain gesetzt",
+            "org.domain.removed":"Org domain entfernt",
             "org.iam.policy.added":"IAM Policy hinzugefügt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
@@ -545,7 +620,9 @@
             "user.password.check.succeeded":"Password check erfolgreich",
             "user.mfa.init.skipped":"MFA init übersprungen",
             "user.mfa.otp.added":"MFA OTP hinzugefügt",
-            "user.mfa.otp.verified":"MFA OTP verifiziert"
+            "user.mfa.otp.verified":"MFA OTP verifiziert",
+            "user.mfa.otp.removed":"MFA OTP entfernt",
+            "user.selfregistered":"selbst registriert"
         }
     }
 }

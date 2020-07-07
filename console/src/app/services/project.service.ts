@@ -19,7 +19,9 @@ import {
     ProjectGrant,
     ProjectGrantCreate,
     ProjectGrantID,
+    ProjectGrantMember,
     ProjectGrantMemberAdd,
+    ProjectGrantMemberChange,
     ProjectGrantMemberRemove,
     ProjectGrantMemberRoles,
     ProjectGrantMemberSearchQuery,
@@ -29,13 +31,17 @@ import {
     ProjectGrantUpdate,
     ProjectGrantView,
     ProjectID,
+    ProjectMember,
     ProjectMemberAdd,
     ProjectMemberChange,
     ProjectMemberRemove,
     ProjectMemberRoles,
     ProjectMemberSearchRequest,
     ProjectMemberSearchResponse,
+    ProjectRole,
     ProjectRoleAdd,
+    ProjectRoleAddBulk,
+    ProjectRoleChange,
     ProjectRoleRemove,
     ProjectRoleSearchQuery,
     ProjectRoleSearchRequest,
@@ -159,18 +165,6 @@ export class ProjectService {
         );
     }
 
-    public async ChangeProjectMember(id: string, userId: string, rolesList: string[]): Promise<Empty> {
-        const req = new ProjectMemberChange();
-        req.setId(id);
-        req.setUserId(userId);
-        req.setRolesList(rolesList);
-        return await this.request(
-            c => c.changeProjectMember,
-            req,
-            f => f,
-        );
-    }
-
     public async DeactivateProject(projectId: string): Promise<Project> {
         const req = new ProjectID();
         req.setId(projectId);
@@ -212,13 +206,25 @@ export class ProjectService {
         );
     }
 
-    public async AddProjectMember(projectId: string, userId: string, rolesList: string[]): Promise<Empty> {
+    public async AddProjectMember(id: string, userId: string, rolesList: string[]): Promise<Empty> {
         const req = new ProjectMemberAdd();
-        req.setId(projectId);
+        req.setId(id);
         req.setUserId(userId);
         req.setRolesList(rolesList);
         return await this.request(
             c => c.addProjectMember,
+            req,
+            f => f,
+        );
+    }
+
+    public async ChangeProjectMember(id: string, userId: string, rolesList: string[]): Promise<ProjectMember> {
+        const req = new ProjectMemberChange();
+        req.setId(id);
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.changeProjectMember,
             req,
             f => f,
         );
@@ -237,6 +243,24 @@ export class ProjectService {
         req.setRolesList(rolesList);
         return await this.request(
             c => c.addProjectGrantMember,
+            req,
+            f => f,
+        );
+    }
+
+    public async ChangeProjectGrantMember(
+        projectId: string,
+        grantId: string,
+        userId: string,
+        rolesList: string[],
+    ): Promise<ProjectGrantMember> {
+        const req = new ProjectGrantMemberChange();
+        req.setProjectId(projectId);
+        req.setGrantId(grantId);
+        req.setUserId(userId);
+        req.setRolesList(rolesList);
+        return await this.request(
+            c => c.changeProjectGrantMember,
             req,
             f => f,
         );
@@ -293,9 +317,11 @@ export class ProjectService {
         );
     }
 
-    public async ReactivateApplication(appId: string): Promise<Application> {
+    public async ReactivateApplication(projectId: string, appId: string): Promise<Application> {
         const req = new ApplicationID();
         req.setId(appId);
+        req.setProjectId(projectId);
+
         return await this.request(
             c => c.reactivateApplication,
             req,
@@ -303,9 +329,11 @@ export class ProjectService {
         );
     }
 
-    public async DectivateApplication(projectId: string): Promise<Application> {
+    public async DeactivateApplication(projectId: string, appId: string): Promise<Application> {
         const req = new ApplicationID();
-        req.setId(projectId);
+        req.setId(appId);
+        req.setProjectId(projectId);
+
         return await this.request(
             c => c.deactivateApplication,
             req,
@@ -359,6 +387,20 @@ export class ProjectService {
         );
     }
 
+    public async BulkAddProjectRole(
+        id: string,
+        rolesList: ProjectRoleAdd[],
+    ): Promise<Empty> {
+        const req = new ProjectRoleAddBulk();
+        req.setId(id);
+        req.setProjectRolesList(rolesList);
+        return await this.request(
+            c => c.bulkAddProjectRole,
+            req,
+            f => f,
+        );
+    }
+
     public async RemoveProjectRole(projectId: string, key: string): Promise<Empty> {
         const req = new ProjectRoleRemove();
         req.setId(projectId);
@@ -369,6 +411,22 @@ export class ProjectService {
             f => f,
         );
     }
+
+
+    public async ChangeProjectRole(projectId: string, key: string, displayName: string, group: string):
+        Promise<ProjectRole> {
+        const req = new ProjectRoleChange();
+        req.setId(projectId);
+        req.setKey(key);
+        req.setGroup(group);
+        req.setDisplayName(displayName);
+        return await this.request(
+            c => c.changeProjectRole,
+            req,
+            f => f,
+        );
+    }
+
 
     public async RemoveProjectMember(id: string, userId: string): Promise<Empty> {
         const req = new ProjectMemberRemove();

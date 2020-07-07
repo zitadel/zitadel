@@ -291,6 +291,16 @@ service ManagementService {
         };
     }
 
+    rpc RemoveUserPhone(UserID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/users/{id}/phone"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
     rpc ResendPhoneVerificationCode(UserID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             post: "/users/{id}/phone/_resendverification"
@@ -1361,6 +1371,7 @@ message ChangeRequest {
     string sec_id = 2;
     uint64 limit= 3;
     uint64 sequence_offset = 4;
+    bool asc = 5;
 }
 
 message Changes {
@@ -1373,8 +1384,9 @@ message Change {
     google.protobuf.Timestamp change_date = 1;
     string event_type = 2;
     uint64 sequence = 3;
-    string editor = 4;
-    google.protobuf.Struct data = 5;
+    string editor_id = 4;
+    string editor = 5;
+    google.protobuf.Struct data = 6;
 }
 
 message ApplicationID {
@@ -2552,6 +2564,7 @@ message UserGrantView {
     string project_name = 15;
     uint64 sequence = 16;
     string resource_owner = 17;
+    string display_name = 18;
 }
 
 

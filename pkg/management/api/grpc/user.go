@@ -37,7 +37,7 @@ func (s *Server) SearchUsers(ctx context.Context, in *UserSearchRequest) (*UserS
 }
 
 func (s *Server) UserChanges(ctx context.Context, changesRequest *ChangeRequest) (*Changes, error) {
-	response, err := s.user.UserChanges(ctx, changesRequest.Id, 0, 0)
+	response, err := s.user.UserChanges(ctx, changesRequest.Id, changesRequest.SequenceOffset, changesRequest.Limit, changesRequest.Asc)
 	if err != nil {
 		return nil, err
 	}
@@ -149,6 +149,10 @@ func (s *Server) ChangeUserPhone(ctx context.Context, request *UpdateUserPhoneRe
 	return phoneFromModel(phone), nil
 }
 
+func (s *Server) RemoveUserPhone(ctx context.Context, userID *UserID) (*empty.Empty, error) {
+	err := s.user.RemovePhone(ctx, userID.Id)
+	return &empty.Empty{}, err
+}
 func (s *Server) ResendPhoneVerificationCode(ctx context.Context, in *UserID) (*empty.Empty, error) {
 	err := s.user.CreatePhoneVerificationCode(ctx, in.Id)
 	return &empty.Empty{}, err

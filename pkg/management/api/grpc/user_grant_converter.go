@@ -166,6 +166,10 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *UserGrantView {
 		OrgName:       grant.OrgName,
 		OrgDomain:     grant.OrgDomain,
 		RoleKeys:      grant.RoleKeys,
+		UserId:        grant.UserID,
+		ProjectId:     grant.ProjectID,
+		OrgId:         grant.ResourceOwner,
+		DisplayName:   grant.DisplayName,
 	}
 }
 
@@ -177,5 +181,21 @@ func usergrantStateFromModel(state grant_model.UserGrantState) UserGrantState {
 		return UserGrantState_USERGRANTSTATE_INACTIVE
 	default:
 		return UserGrantState_USERGRANTSTATE_UNSPECIFIED
+	}
+}
+
+func projectUserGrantSearchRequestsToModel(project *ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+	return &grant_model.UserGrantSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: userGrantSearchQueriesToModel(project.Queries),
+	}
+}
+
+func projectGrantUserGrantSearchRequestsToModel(project *ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+	return &grant_model.UserGrantSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: userGrantSearchQueriesToModel(project.Queries),
 	}
 }

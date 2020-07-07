@@ -1057,7 +1057,7 @@ func TestChangesOrg(t *testing.T) {
 				limit:        0,
 			},
 			res: res{
-				changes: &org_model.OrgChanges{Changes: []*org_model.OrgChange{&org_model.OrgChange{EventType: "", Sequence: 1, Modifier: ""}}, LastSequence: 1},
+				changes: &org_model.OrgChanges{Changes: []*org_model.OrgChange{&org_model.OrgChange{EventType: "", Sequence: 1, ModifierId: ""}}, LastSequence: 1},
 				org:     &model.Org{Name: "MusterOrg"},
 			},
 		},
@@ -1077,7 +1077,7 @@ func TestChangesOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := tt.args.es.OrgChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit)
+			result, err := tt.args.es.OrgChanges(nil, tt.args.id, tt.args.lastSequence, tt.args.limit, false)
 
 			org := &model.Org{}
 			if result != nil && len(result.Changes) > 0 {

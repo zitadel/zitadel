@@ -1,0 +1,46 @@
+<div class="table-header-row">
+    <div class="col">
+        <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
+        <span class="count">{{dataSource?.data?.length}}</span>
+    </div>
+    <span class="fill-space"></span>
+</div>
+
+<div class="table-wrapper">
+    <div class="spinner-container" *ngIf="loading$ | async">
+        <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <table *ngIf="dataSource" [dataSource]="dataSource" mat-table class="full-width-table background-style" matSort
+        aria-label="Elements">
+        <ng-container matColumnDef="viewName">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
+            <td mat-cell *matCellDef="let role"> {{role.viewName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="database">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'IAM.VIEWS.DATABASE' | translate }} </th>
+            <td mat-cell *matCellDef="let role"> {{role.database}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sequence">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'IAM.VIEWS.SEQUENCE' | translate }} </th>
+            <td mat-cell *matCellDef="let role">
+                <span class="role app-label">{{role.sequence}}</span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.ACTIONS' | translate }} </th>
+            <td mat-cell *matCellDef="let role">
+                <button mat-icon-button matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"
+                    (click)="cancelView(role.viewName, role.database)"><i class="las la-redo-alt"></i></button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator class="background-style" #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 100, 250]">
+    </mat-paginator>
+</div>

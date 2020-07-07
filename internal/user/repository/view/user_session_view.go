@@ -1,12 +1,13 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
 
 	global_model "github.com/caos/zitadel/internal/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/view"
 )
 
 func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSessionView, error) {
@@ -21,8 +22,11 @@ func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSe
 		Method: global_model.SearchMethodEquals,
 		Value:  userID,
 	}
-	query := view.PrepareGetByQuery(table, userAgentQuery, userQuery)
+	query := repository.PrepareGetByQuery(table, userAgentQuery, userQuery)
 	err := query(db, userSession)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-NGBs1", "Errors.UserSession.NotFound")
+	}
 	return userSession, err
 }
 
@@ -33,7 +37,7 @@ func UserSessionsByUserID(db *gorm.DB, table, userID string) ([]*model.UserSessi
 		Method: global_model.SearchMethodEquals,
 		Value:  userID,
 	}
-	query := view.PrepareSearchQuery(table, model.UserSessionSearchRequest{
+	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
 		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
 	})
 	_, err := query(db, &userSessions)
@@ -47,7 +51,7 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSes
 		Method: global_model.SearchMethodEquals,
 		Value:  agentID,
 	}
-	query := view.PrepareSearchQuery(table, model.UserSessionSearchRequest{
+	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
 		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
 	})
 	_, err := query(db, &userSessions)
@@ -55,11 +59,11 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSes
 }
 
 func PutUserSession(db *gorm.DB, table string, session *model.UserSessionView) error {
-	save := view.PrepareSave(table)
+	save := repository.PrepareSave(table)
 	return save(db, session)
 }
 
 func DeleteUserSessions(db *gorm.DB, table, userID string) error {
-	delete := view.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), userID)
+	delete := repository.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), userID)
 	return delete(db)
 }
