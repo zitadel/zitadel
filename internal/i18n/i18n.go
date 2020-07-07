@@ -49,7 +49,6 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 	bundle := i18n.NewBundle(defaultLanguage)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
-	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	i18nDir, err := dir.Open(i18nPath)
 	if err != nil {
