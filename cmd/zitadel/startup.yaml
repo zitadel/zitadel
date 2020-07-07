@@ -237,7 +237,6 @@ Admin:
       User: 'admin_api'
       Password: $CR_ADMIN_PASSWORD
       Database: 'admin_api'
-      Password: $ZITADEL_EVENTSTORE_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
