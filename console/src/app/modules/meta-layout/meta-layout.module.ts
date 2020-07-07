@@ -1,6 +1,6 @@
 import { LayoutModule } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 
 import { MetaLayoutComponent } from './meta-layout.component';
@@ -14,6 +14,9 @@ import { MetaLayoutComponent } from './meta-layout.component';
         MatButtonModule,
         LayoutModule,
     ],
-    exports: [MetaLayoutComponent],
+    // exports: [MetaLayoutComponent],
+    schemas: [
+        CUSTOM_ELEMENTS_SCHEMA, // used for metainfo
+    ],
 })
 export class MetaLayoutModule { }

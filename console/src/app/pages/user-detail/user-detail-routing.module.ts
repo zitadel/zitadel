@@ -2,19 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from 'src/app/guards/role.guard';
 
-import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
-import { PasswordComponent } from './password/password.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 
 const routes: Routes = [
-    {
-        path: 'me',
-        component: AuthUserDetailComponent,
-    },
-    {
-        path: 'me/password',
-        component: PasswordComponent,
-    },
     {
         path: ':id',
         component: UserDetailComponent,
@@ -25,7 +15,7 @@ const routes: Routes = [
     },
     {
         path: ':id/password',
-        component: PasswordComponent,
+        loadChildren: () => import('src/app/pages/password/password.module').then(m => m.PasswordModule),
         canActivate: [RoleGuard],
         data: {
             roles: ['user.write'],

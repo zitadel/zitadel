@@ -7,7 +7,7 @@ import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../validators';
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../user-detail/validators';
 
 function passwordConfirmValidator(c: AbstractControl): any {
     if (!c.parent || !c) {

@@ -23,7 +23,7 @@ import { ChangesComponent } from './changes.component';
         ScrollingModule,
     ],
     exports: [
-        ChangesComponent,
+        // ChangesComponent,
         ScrollableModule,
     ],
 })

@@ -5,30 +5,27 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { DetailFormComponent } from './detail-form.component';
-
+import { PasswordRoutingModule } from './password-routing.module';
+import { PasswordComponent } from './password.component';
 
 @NgModule({
     declarations: [
-        DetailFormComponent,
+        PasswordComponent,
     ],
     imports: [
         CommonModule,
+        PasswordRoutingModule,
         FormsModule,
         ReactiveFormsModule,
-        TranslateModule,
         MatFormFieldModule,
         MatInputModule,
-        MatSelectModule,
-        MatButtonModule,
         MatIconModule,
+        MatButtonModule,
+        MatTooltipModule,
         TranslateModule,
     ],
-    exports: [
-        DetailFormComponent,
-    ],
 })
-export class DetailFormModule { }
+export class PasswordModule { }
