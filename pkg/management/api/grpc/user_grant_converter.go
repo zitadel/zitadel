@@ -183,3 +183,19 @@ func usergrantStateFromModel(state grant_model.UserGrantState) UserGrantState {
 		return UserGrantState_USERGRANTSTATE_UNSPECIFIED
 	}
 }
+
+func projectUserGrantSearchRequestsToModel(project *ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+	return &grant_model.UserGrantSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: userGrantSearchQueriesToModel(project.Queries),
+	}
+}
+
+func projectGrantUserGrantSearchRequestsToModel(project *ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+	return &grant_model.UserGrantSearchRequest{
+		Offset:  project.Offset,
+		Limit:   project.Limit,
+		Queries: userGrantSearchQueriesToModel(project.Queries),
+	}
+}

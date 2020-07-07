@@ -50,6 +50,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         HasRoleModule,
         MatTableModule,
         MatPaginatorModule,
+        MatMenuModule,
         MatFormFieldModule,
         MatInputModule,
         ChangesModule,

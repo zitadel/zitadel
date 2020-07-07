@@ -28,7 +28,7 @@ func (m *mockViewNoUserSession) UserSessionByIDs(string, string) (*user_view_mod
 }
 
 func (m *mockViewNoUserSession) UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, nil
 }
 
 type mockViewErrUserSession struct{}
@@ -173,8 +173,10 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"user not set, login step",
-			fields{},
+			"user not set no active session, login step",
+			fields{
+				userSessionViewProvider: &mockViewNoUserSession{},
+			},
 			args{&model.AuthRequest{}, false},
 			[]model.NextStep{&model.LoginStep{}},
 			nil,
@@ -182,7 +184,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		{
 			"user not set, prompt select account and internal error, internal error",
 			fields{
-				userSessionViewProvider: &mockViewNoUserSession{},
+				userSessionViewProvider: &mockViewErrUserSession{},
 			},
 			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
 			nil,
@@ -223,6 +225,22 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"user not set, prompt select account, no active session, login and select account steps",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					Users: nil,
+				},
+				userEventProvider: &mockEventUser{},
+			},
+			args{&model.AuthRequest{Prompt: model.PromptSelectAccount}, false},
+			[]model.NextStep{
+				&model.LoginStep{},
+				&model.SelectUserStep{
+					Users: []model.UserSelection{},
+				}},
+			nil,
+		},
+		{
 			"user not found, not found error",
 			fields{
 				userViewProvider:  &mockViewNoUser{},
@@ -240,6 +258,22 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					&es_models.Event{
 						AggregateType: user_es_model.UserAggregate,
 						Type:          user_es_model.UserDeactivated,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: org_model.OrgStateActive},
+			},
+			args{&model.AuthRequest{UserID: "UserID"}, false},
+			nil,
+			errors.IsPreconditionFailed,
+		},
+		{
+			"user locked, precondition failed error",
+			fields{
+				userViewProvider: &mockViewUser{},
+				userEventProvider: &mockEventUser{
+					&es_models.Event{
+						AggregateType: user_es_model.UserAggregate,
+						Type:          user_es_model.UserLocked,
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: org_model.OrgStateActive},

@@ -291,6 +291,16 @@ service ManagementService {
         };
     }
 
+    rpc RemoveUserPhone(UserID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/users/{id}/phone"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
     rpc ResendPhoneVerificationCode(UserID) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             post: "/users/{id}/phone/_resendverification"

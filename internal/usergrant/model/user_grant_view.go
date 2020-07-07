@@ -71,3 +71,7 @@ func (r *UserGrantSearchRequest) EnsureLimit(limit uint64) {
 func (r *UserGrantSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
+
+func (r *UserGrantSearchRequest) AppendProjectIDQuery(projectID string) {
+	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID})
+}

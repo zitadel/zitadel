@@ -42,6 +42,7 @@ type myUserRepo interface {
 
 	MyPhone(ctx context.Context) (*model.Phone, error)
 	ChangeMyPhone(ctx context.Context, phone *model.Phone) (*model.Phone, error)
+	RemoveMyPhone(ctx context.Context) error
 	VerifyMyPhone(ctx context.Context, code string) error
 	ResendMyPhoneVerificationCode(ctx context.Context) error
 

@@ -38,6 +38,10 @@ func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*UserPhone
 	return phoneViewFromModel(phone), nil
 }
 
+func (s *Server) RemoveMyUserPhone(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
+	err := s.repo.RemoveMyPhone(ctx)
+	return &empty.Empty{}, err
+}
 func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*UserAddressView, error) {
 	address, err := s.repo.MyAddress(ctx)
 	if err != nil {
@@ -109,6 +113,14 @@ func (s *Server) UpdateMyUserAddress(ctx context.Context, request *UpdateUserAdd
 func (s *Server) ChangeMyPassword(ctx context.Context, request *PasswordChange) (*empty.Empty, error) {
 	err := s.repo.ChangeMyPassword(ctx, request.OldPassword, request.NewPassword)
 	return &empty.Empty{}, err
+}
+
+func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*PasswordComplexityPolicy, error) {
+	policy, err := s.repo.GetMyPasswordComplexityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return passwordComplexityPolicyFromModel(policy), nil
 }
 
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpResponse, err error) {
