@@ -257,14 +257,14 @@ EventTypes:
   policy:
     password:
       complexity:
-        added: password complexity policy added
-        changed: password complexity policy changed
+        added: Password complexity policy added
+        changed: Password complexity policy changed
       age:
-        added: password age policy added
-        changed: password age policy changed
+        added: Password age policy added
+        changed: Password age policy changed
       lockout:
-        added: password lockout policy added
-        changed: password lockout policy changed
+        added: Password lockout policy added
+        changed: Password lockout policy changed
   iam:
     setup:
       started: Zitadel setup started
