@@ -2,8 +2,9 @@ package model
 
 import (
 	"encoding/json"
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"time"
+
+	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -14,7 +15,7 @@ import (
 
 const (
 	IamMemberKeyUserID    = "user_id"
-	IamMemberKeyIamID     = "org_id"
+	IamMemberKeyIamID     = "iam_id"
 	IamMemberKeyUserName  = "user_name"
 	IamMemberKeyEmail     = "email"
 	IamMemberKeyFirstName = "first_name"
