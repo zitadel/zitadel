@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	errTable  = "admin_api.failed_events"
+	errTable  = "adminapi.failed_events"
 	errColumn = "failed_events"
 )
 

@@ -219,7 +219,7 @@ Admin:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'admin_api'
+          User: 'adminapi'
           Password: $CR_ADMIN_PASSWORD
           Database: 'eventstore'
           SSL:
@@ -234,9 +234,9 @@ Admin:
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'admin_api'
+      User: 'adminapi'
       Password: $CR_ADMIN_PASSWORD
-      Database: 'admin_api'
+      Database: 'adminapi'
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
