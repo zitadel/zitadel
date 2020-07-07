@@ -120,11 +120,11 @@ EventTypes:
     selfregistered: User registered himself
     initialization:
       code:
-        added: Initializaion code added
-        sent: Initializaion code sent
+        added: Initialisation code generated
+        sent: Initialisation code sent
       check:
-        succeeded: Initializaion check succeded
-        failed: Initializaion check failed
+        succeeded: Initialisation check succeded
+        failed: Initialisation check failed
     username:
       reserved: Username reserved
       released: Username released
