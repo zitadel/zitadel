@@ -74,15 +74,7 @@ jobs:
         file: ./profile.cov
         name: codecov-go
       
-  go-lint:
-    runs-on: ubuntu-18.04
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2-beta
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - uses: actions/checkout@v2
-    - run: echo "replace me with real lint"
+  ## go lint, will be added later
   
   go-build:
     runs-on: ubuntu-18.04
