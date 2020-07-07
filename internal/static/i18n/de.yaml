@@ -210,7 +210,7 @@ EventTypes:
       removed: Organisationsmitglied entfernt
     iam:
       policy:
-        added: neue System Richtlinie der Organisation hinzugefügt
+        added: System Richtlinie der Organisation hinzugefügt
         changed: System Richtlinie der Organisation geändert
         removed: System Richtlinie der Organisation entfernt
   project:
