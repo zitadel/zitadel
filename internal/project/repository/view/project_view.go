@@ -16,7 +16,7 @@ func ProjectByID(db *gorm.DB, table, projectID string) (*model.ProjectView, erro
 	query := repository.PrepareGetByQuery(table, projectIDQuery)
 	err := query(db, project)
 	if caos_errs.IsNotFound(err) {
-		return project, caos_errs.ThrowNotFound(nil, "VIEW-NEO7W", "Errors.Project.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-NEO7W", "Errors.Project.NotFound")
 	}
 	return project, err
 }

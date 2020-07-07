@@ -41,6 +41,10 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 		return nil, err
 	}
 
+	if project == nil {
+		project = new(model.ProjectView)
+	}
+
 	events, err := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
 	if err != nil {
 		logging.Log("EVENT-V9x1V").WithError(err).Debug("error retrieving new events")
