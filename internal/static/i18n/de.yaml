@@ -268,7 +268,7 @@ EventTypes:
   iam:
     setup:
       started: ZITADEL Initialisierung gestartet
-      done: Zitadel Initialisierung abgeschlossen
+      done: ZITADEL Initialisierung abgeschlossen
     global:
       org:
         set: Globale Organisation von Zitadel gesetzt
