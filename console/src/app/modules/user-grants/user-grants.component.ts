@@ -37,6 +37,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public roleOptions: ProjectRoleView.AsObject[] = [];
     public routerLink: any = [''];
 
+    public loadedProjectId: string = '';
     constructor(
         private userService: MgmtUserService,
         private projectService: ProjectService,
@@ -121,16 +122,14 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     public getRoleOptions(projectId: string): void {
         this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
+            this.loadedProjectId = projectId;
             this.roleOptions = resp.toObject().resultList;
-            console.log(this.roleOptions);
         });
     }
 
     updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
-        console.log(grant, selectionChange.value);
         this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
             .then((newmember: UserGrant) => {
-                console.log(newmember.toObject());
                 this.toast.showInfo('Grant updated!');
             }).catch(error => {
                 this.toast.showError(error.message);

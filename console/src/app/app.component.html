@@ -59,7 +59,9 @@
                         <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                     </a>
 
-                    <div *ngIf="authService.authenticationChanged | async" class="divider"><span></span></div>
+                    <div *ngIf="authService.authenticationChanged | async" class="divider">
+                        <div class="line"></div>
+                    </div>
 
                     <a *ngIf="iamreadwrite" class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
                         <i class="icon las la-gem"></i>
@@ -71,12 +73,17 @@
                         <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
                     </a>
 
-                    <div *ngIf="showOrgSection" class="divider"><span></span></div>
+                    <div *ngIf="showOrgSection" class="divider">
+                        <div class="line"></div>
+                        <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
+                        <div class="line"></div>
+                    </div>
 
                     <a *ngIf="showProjectSection" class="nav-item" [routerLinkActive]="['active']"
                         [routerLink]="[ '/projects']">
                         <i class="icon las la-layer-group"></i>
-                        <span class="label">{{ 'MENU.PROJECT' | translate }}</span>
+                        <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
+                            {{ 'MENU.PROJECT' | translate }}</span>
                     </a>
 
                     <a *ngIf="showProjectSection" class="nav-item" [routerLinkActive]="['active']"
@@ -85,7 +92,13 @@
                         <span class="label">{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
                     </a>
 
-                    <div *ngIf="showProjectSection" class="divider"><span></span></div>
+                    <div *ngIf="showProjectSection" class="divider">
+                        <div class="line"></div>
+                        <span class="label">
+                            {{ 'MENU.USERSECTION' | translate }}</span>
+                        <div class="line"></div>
+
+                    </div>
 
                     <a *ngIf="showUserSection" class="nav-item" [routerLinkActive]="['active']"
                         [routerLink]="[ '/users']" [routerLinkActiveOptions]="{ exact: true }">

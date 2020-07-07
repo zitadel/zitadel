@@ -156,6 +156,14 @@ export class AuthUserService {
         );
     }
 
+    public async RemoveMyUserPhone(): Promise<Empty> {
+        return await this.request(
+            c => c.removeMyUserPhone,
+            new Empty(),
+            f => f,
+        );
+    }
+
     private async getMyzitadelPermissions(): Promise<any> {
         return await this.request(
             c => c.getMyZitadelPermissions,

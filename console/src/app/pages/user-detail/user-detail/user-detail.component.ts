@@ -36,6 +36,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public loading: boolean = false;
 
     public UserState: any = UserState;
+    public copied: string = '';
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -58,6 +60,22 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         this.subscription.unsubscribe();
+    }
+
+    public changeState(newState: UserState): void {
+        if (newState === UserState.USERSTATE_ACTIVE) {
+            this.mgmtUserService.ReactivateUser(this.user.id).then(() => {
+                this.toast.showInfo('reactivated User');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        } else if (newState === UserState.USERSTATE_INACTIVE) {
+            this.mgmtUserService.DeactivateUser(this.user.id).then(() => {
+                this.toast.showInfo('deactivated User');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        }
     }
 
     public saveProfile(profileData: UserProfile.AsObject): void {
@@ -100,6 +118,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         });
     }
 
+    public deletePhone(): void {
+        this.mgmtUserService.RemoveUserPhone(this.user.id).then(() => {
+            this.toast.showInfo('Phone removed with success!');
+            this.user.phone = '';
+            this.phoneEditState = false;
+        }).catch(data => {
+            this.toast.showError(data.message);
+        });
+    }
+
     public saveEmail(): void {
         this.emailEditState = false;
         this.mgmtUserService
@@ -117,6 +145,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             .SaveUserPhone(this.user.id, this.user.phone).then((data: UserPhone) => {
                 this.toast.showInfo('Saved Phone');
                 this.user.phone = data.toObject().phone;
+                this.phoneEditState = false;
             }).catch(data => {
                 this.toast.showError(data.message);
             });
@@ -142,5 +171,23 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             }).catch(data => {
                 this.toast.showError(data.message);
             });
+    }
+
+    public copytoclipboard(value: string): void {
+        const selBox = document.createElement('textarea');
+        selBox.style.position = 'fixed';
+        selBox.style.left = '0';
+        selBox.style.top = '0';
+        selBox.style.opacity = '0';
+        selBox.value = value;
+        document.body.appendChild(selBox);
+        selBox.focus();
+        selBox.select();
+        document.execCommand('copy');
+        document.body.removeChild(selBox);
+        this.copied = value;
+        setTimeout(() => {
+            this.copied = '';
+        }, 3000);
     }
 }

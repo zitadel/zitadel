@@ -2,7 +2,11 @@
     <div class="col">
         <div class="row" *ngFor="let mfa of mfaSubject | async">
             <span>{{'USER.MFA.TYPE.'+ mfa.type | translate}}</span>
-            <span>{{'USER.MFA.STATE.'+ mfa.state | translate}}</span>
+            <i matTooltip="{{'USER.MFA.STATE.'+ mfa.state | translate}}" *ngIf="mfa.state === MFAState.MFASTATE_READY"
+                class="verified las la-check-circle"></i>
+            <i matTooltip="{{'USER.MFA.STATE.'+ mfa.state | translate}}"
+                *ngIf="mfa.state === MFAState.MFASTATE_NOT_READY || mfa.state === MFAState.MFASTATE_REMOVED"
+                class="primary las la-ban"></i>
             <button mat-icon-button (click)="deleteMFA(mfa.type)" color="warn"
                 matTooltip="{{'ACTIONS.DELETE' | translate}}">
                 <i class="las la-trash"></i>

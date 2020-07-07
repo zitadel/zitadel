@@ -28,6 +28,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     private subscription: Subscription = new Subscription();
 
     public domains: OrgDomainView.AsObject[] = [];
+    public primaryDomain: string = '';
     public newDomain: string = '';
 
     constructor(
@@ -53,6 +54,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
         this.orgService.SearchMyOrgDomains(0, 100).then(result => {
             this.domains = result.toObject().resultList;
+            this.primaryDomain = this.domains.find(domain => domain.primary)?.domain ?? '';
         });
     }
 

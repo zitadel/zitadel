@@ -20,15 +20,15 @@ import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module
 import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
-import { AuthUserMfaComponent } from './auth-user-mfa/auth-user-mfa.component';
-import { CodeDialogModule } from './code-dialog/code-dialog.module';
+import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
+import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
+import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
 import { DetailFormModule } from './detail-form/detail-form.module';
-import { DialogOtpComponent } from './dialog-otp/dialog-otp.component';
+import { PasswordComponent } from './password/password.component';
 import { ThemeSettingComponent } from './theme-setting/theme-setting.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-mfa/user-mfa.component';
-import { PasswordComponent } from './password/password.component';
 
 @NgModule({
     declarations: [
@@ -39,6 +39,7 @@ import { PasswordComponent } from './password/password.component';
         UserMfaComponent,
         ThemeSettingComponent,
         PasswordComponent,
+        CodeDialogComponent,
     ],
     imports: [
         UserDetailRoutingModule,
@@ -53,7 +54,6 @@ import { PasswordComponent } from './password/password.component';
         PipesModule,
         MatFormFieldModule,
         UserGrantsModule,
-        CodeDialogModule,
         MatInputModule,
         MatButtonModule,
         MatIconModule,

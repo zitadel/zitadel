@@ -21,10 +21,15 @@ func setUpRequestToModel(setUp *admin.OrgSetUpRequest) *admin_model.SetupOrg {
 }
 
 func orgCreateRequestToModel(org *admin.CreateOrgRequest) *org_model.Org {
-	return &org_model.Org{
-		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
+	o := &org_model.Org{
+		Domains: []*org_model.OrgDomain{},
 		Name:    org.Name,
 	}
+	if org.Domain != "" {
+		o.Domains = append(o.Domains, &org_model.OrgDomain{Domain: org.Domain})
+	}
+
+	return o
 }
 
 func userCreateRequestToModel(user *admin.CreateUserRequest) *usr_model.User {

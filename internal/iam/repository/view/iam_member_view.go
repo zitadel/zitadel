@@ -12,9 +12,9 @@ import (
 func IamMemberByIDs(db *gorm.DB, table, orgID, userID string) (*model.IamMemberView, error) {
 	member := new(model.IamMemberView)
 
-	orgIDQuery := &model.IamMemberSearchQuery{Key: iam_model.IamMemberSearchKeyIamID, Value: orgID, Method: global_model.SearchMethodEquals}
+	iamIDQuery := &model.IamMemberSearchQuery{Key: iam_model.IamMemberSearchKeyIamID, Value: orgID, Method: global_model.SearchMethodEquals}
 	userIDQuery := &model.IamMemberSearchQuery{Key: iam_model.IamMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, orgIDQuery, userIDQuery)
+	query := repository.PrepareGetByQuery(table, iamIDQuery, userIDQuery)
 	err := query(db, member)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.Iam.MemberNotExisting")

@@ -1,13 +1,11 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { ProjectGrant, ProjectMemberView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
-import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectGrantsDataSource } from './project-grants-datasource';
 
@@ -34,9 +32,9 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     public selectedGrantMembers: ProjectMemberView.AsObject[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'grantedOrgName', 'grantedOrgDomain', 'creationDate', 'changeDate', 'roleNamesList'];
+    public displayedColumns: string[] = ['select', 'grantedOrgName', 'creationDate', 'changeDate', 'roleNamesList'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
+    constructor(private projectService: ProjectService) { }
 
     public ngOnInit(): void {
         this.dataSource = new ProjectGrantsDataSource(this.projectService);

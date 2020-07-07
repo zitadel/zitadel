@@ -52,18 +52,6 @@
             color: #8795a1;
         }
 
-        .selection-icon {
-            opacity: 0;
-            position: absolute;
-            top: -12px;
-            left: -12px;
-            user-select: none;
-
-            &:hover {
-                color: white;
-            }
-        }
-
         img {
             height: 50px;
             width: 50px;
@@ -136,16 +124,26 @@
         }
 
         .edit-button {
+            opacity: 0;
+            user-select: none;            
             position: absolute;
             bottom: 0;
             right: 0;
             margin: 0;
             margin-bottom: 0.25rem;
+            color: #8795a1;
+
+            &:hover {
+                color: white;
+            }
+
+            &.selected {
+                opacity: 1;
+            }
         }
 
-
         &:hover {
-            .selection-icon {
+            .edit-button {
                 opacity: 1;
             }
 
@@ -163,7 +161,7 @@
                 }
             }
 
-            .selection-icon {
+            .edit-button {
                 opacity: 1;
             }
 

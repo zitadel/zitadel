@@ -5,6 +5,14 @@
     flex-wrap: wrap;
     margin-bottom: 1rem;
 
+    .fill-space {
+        flex: 1;
+    }
+
+    .state-button {
+        border-radius: .5rem;
+    }
+
     a {
         display: block;
     }

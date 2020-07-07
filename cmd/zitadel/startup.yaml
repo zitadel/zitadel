@@ -20,6 +20,7 @@ AuthZ:
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'authz'
           Database: 'eventstore'
+          Password: $CR_AUTHZ_PASSWORD
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
@@ -54,6 +55,7 @@ Auth:
         Port: $ZITADEL_EVENTSTORE_PORT
         User: 'auth'
         Database: 'eventstore'
+        Password: $CR_AUTH_PASSWORD
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -69,6 +71,7 @@ Auth:
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'auth'
       Database: 'auth'
+      Password: $CR_AUTH_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
@@ -79,6 +82,7 @@ Auth:
     Port: $ZITADEL_EVENTSTORE_PORT
     User: 'auth'
     Database: 'auth'
+    Password: $CR_AUTH_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -107,6 +111,7 @@ Admin:
         Port: $ZITADEL_EVENTSTORE_PORT
         User: 'admin_api'
         Database: 'eventstore'
+        Password: $CR_ADMIN_PASSWORD
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -121,6 +126,7 @@ Admin:
     Port: $ZITADEL_EVENTSTORE_PORT
     User: 'admin_api'
     Database: 'admin_api'
+    Password: $CR_ADMIN_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -142,6 +148,7 @@ Mgmt:
         Port: $ZITADEL_EVENTSTORE_PORT
         User: 'management'
         Database: 'eventstore'
+        Password: $CR_MANAGEMENT_PASSWORD
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -156,6 +163,7 @@ Mgmt:
     Port: $ZITADEL_EVENTSTORE_PORT
     User: 'management'
     Database: 'management'
+    Password: $CR_MANAGEMENT_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -243,11 +251,12 @@ Notification:
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'notification'
           Database: 'eventstore'
+          Password: $CR_NOTIFICATION_PASSWORD
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_NOTIFY_CERT
-            Key: $CR_NOTIFY_KEY
+            Cert: $CR_NOTIFICATION_CERT
+            Key: $CR_NOTIFICATION_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -257,11 +266,12 @@ Notification:
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'notification'
       Database: 'notification'
+      Password: $CR_NOTIFICATION_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_NOTIFY_CERT
-        Key: $CR_NOTIFY_KEY
+        Cert: $CR_NOTIFICATION_CERT
+        Key: $CR_NOTIFICATION_KEY
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100
