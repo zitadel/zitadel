@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
+	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"net/http"
 	"time"
@@ -29,6 +30,7 @@ type handler struct {
 
 type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
+	OrgEvents  *org_event.OrgEventstore
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) []spooler.Handler {
@@ -37,7 +39,10 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
 	return []spooler.Handler{
-		&NotifyUser{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}},
+		&NotifyUser{
+			handler:   handler{view, bulkLimit, configs.cycleDuration("User"), errorCount},
+			orgEvents: repos.OrgEvents,
+		},
 		&Notification{
 			handler:        handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount},
 			eventstore:     eventstore,

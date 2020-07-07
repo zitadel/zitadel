@@ -3,7 +3,7 @@ InitCode:
   PreHeader: Initialize User
   Subject: Initialize User
   Greeting: Hello {{.FirstName}} {{.LastName}},
-  Text: This user was created in Zitadel. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
+  Text: This user was created in Zitadel. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
   ButtonText: Finish initialization
 PasswordReset:
   Title: Zitadel - Reset password
