@@ -62,6 +62,22 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this.subscription.unsubscribe();
     }
 
+    public changeState(newState: UserState): void {
+        if (newState === UserState.USERSTATE_ACTIVE) {
+            this.mgmtUserService.ReactivateUser(this.user.id).then(() => {
+                this.toast.showInfo('reactivated User');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        } else if (newState === UserState.USERSTATE_INACTIVE) {
+            this.mgmtUserService.DeactivateUser(this.user.id).then(() => {
+                this.toast.showInfo('deactivated User');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
+        }
+    }
+
     public saveProfile(profileData: UserProfile.AsObject): void {
         this.user.firstName = profileData.firstName;
         this.user.lastName = profileData.lastName;

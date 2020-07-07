@@ -6,6 +6,17 @@
             </a>
             <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.displayName}}</h1>
 
+            <span class="fill-space"></span>
+
+            <ng-template appHasRole [appHasRole]="['user.write', 'user.write:'+user?.id]">
+                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
+                    class="state-button"
+                    (click)="changeState(UserState.USERSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
+                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
+                    class="state-button"
+                    (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
+            </ng-template>
+
             <p class="desc">{{ 'USER.PROFILE.DESCRIPTION' | translate }}</p>
         </div>
 

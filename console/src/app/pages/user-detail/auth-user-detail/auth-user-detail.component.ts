@@ -1,35 +1,13 @@
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { Gender, UserAddress, UserEmail, UserPhone, UserProfile, UserView } from 'src/app/proto/generated/auth_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
-import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { CodeDialogComponent } from '../code-dialog/code-dialog.component';
-
-function passwordConfirmValidator(c: AbstractControl): any {
-    if (!c.parent || !c) {
-        return;
-    }
-    const pwd = c.parent.get('newPassword');
-    const cpwd = c.parent.get('confirmPassword');
-
-    if (!pwd || !cpwd) {
-        return;
-    }
-    if (pwd.value !== cpwd.value) {
-        return {
-            invalid: true,
-            notequal: {
-                valid: false,
-            },
-        };
-    }
-}
+import { CodeDialogComponent } from './code-dialog/code-dialog.component';
 
 @Component({
     selector: 'app-auth-user-detail',
@@ -58,9 +36,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         public translate: TranslateService,
         private toast: ToastService,
         private userService: AuthUserService,
-        private fb: FormBuilder,
         private dialog: MatDialog,
-        private orgService: OrgService,
     ) {
         this.loading = true;
         this.getData().then(() => {

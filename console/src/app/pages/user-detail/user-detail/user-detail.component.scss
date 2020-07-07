@@ -21,6 +21,14 @@
       font-size: .9rem;
       color: #8795a1;
   }
+
+  .fill-space {
+      flex: 1;
+  }
+
+  .state-button {
+      border-radius: .5rem;
+  }
 }
 
 .card-actions {

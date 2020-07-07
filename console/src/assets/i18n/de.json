@@ -66,7 +66,9 @@
             "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
             "COPY":"In die Zwischenablage kopieren",
             "COPIED":"In die Zwischenablage kopiert!",
-            "NOUSER":"Kein User"
+            "NOUSER":"Kein User",
+            "REACTIVATE":"Reaktivieren",
+            "DEACTIVATE":"Deaktivieren"
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
@@ -222,7 +224,9 @@
             "ORGDOMAIN_VERIFICATION_SKIP":"Sie können die Überprüfung vorerst überspringen und Ihre Organisation weiter erstellen. Um Ihre Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
             "DOWNLOAD_FILE":"File download",
-            "SELECTORGTOOLTIP":"Wähle diese Organisation"
+            "SELECTORGTOOLTIP":"Wähle diese Organisation",
+            "PRIMARYDOMAIN":"Primäre Domain",
+            "STATE":"Status"
         },
         "DOMAINS": {
             "TITLE":"Domains",
