@@ -53,19 +53,13 @@
 
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.NAME' | translate }} </th>
-                <td mat-cell *matCellDef="let project"> {{project.name}} </td>
+                <td mat-cell *matCellDef="let project"> {{project.projectName}} </td>
             </ng-container>
 
-            <ng-container matColumnDef="orgName">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.ORGNAME' | translate }} </th>
+            <ng-container matColumnDef="resourceOwnerName">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.RESOURCEOWNER' | translate }} </th>
                 <td class="pointer" mat-cell *matCellDef="let project">
-                    {{project.orgName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="orgDomain">
-                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.ORGDOMAIN' | translate }} </th>
-                <td class="pointer" mat-cell *matCellDef="let project">
-                    {{project?.orgDomain}} </td>
+                    {{project.resourceOwnerName}} </td>
             </ng-container>
 
             <ng-container matColumnDef="state">

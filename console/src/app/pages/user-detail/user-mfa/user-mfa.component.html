@@ -1,4 +1,5 @@
-<app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}">
+<app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}"
+    *ngIf="mfaSubject && (mfaSubject | async)?.length > 0">
     <div class="col">
         <div class="row" *ngFor="let mfa of mfaSubject | async">
             <span>{{'USER.MFA.TYPE.'+ mfa.type | translate}}</span>

@@ -309,6 +309,13 @@ export class ManagementServiceClient {
                response: UserPhone) => void
   ): grpcWeb.ClientReadableStream<UserPhone>;
 
+  removeUserPhone(
+    request: UserID,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
   resendPhoneVerificationCode(
     request: UserID,
     metadata: grpcWeb.Metadata | undefined,
@@ -1084,6 +1091,11 @@ export class ManagementServicePromiseClient {
     request: UpdateUserPhoneRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<UserPhone>;
+
+  removeUserPhone(
+    request: UserID,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
 
   resendPhoneVerificationCode(
     request: UserID,

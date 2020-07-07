@@ -1302,6 +1302,68 @@ export namespace Change {
   }
 }
 
+export class PasswordComplexityPolicy extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getDescription(): string;
+  setDescription(value: string): void;
+
+  getCreationDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreationDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasCreationDate(): boolean;
+  clearCreationDate(): void;
+
+  getChangeDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setChangeDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasChangeDate(): boolean;
+  clearChangeDate(): void;
+
+  getMinLength(): number;
+  setMinLength(value: number): void;
+
+  getHasLowercase(): boolean;
+  setHasLowercase(value: boolean): void;
+
+  getHasUppercase(): boolean;
+  setHasUppercase(value: boolean): void;
+
+  getHasNumber(): boolean;
+  setHasNumber(value: boolean): void;
+
+  getHasSymbol(): boolean;
+  setHasSymbol(value: boolean): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getIsDefault(): boolean;
+  setIsDefault(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PasswordComplexityPolicy.AsObject;
+  static toObject(includeInstance: boolean, msg: PasswordComplexityPolicy): PasswordComplexityPolicy.AsObject;
+  static serializeBinaryToWriter(message: PasswordComplexityPolicy, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PasswordComplexityPolicy;
+  static deserializeBinaryFromReader(message: PasswordComplexityPolicy, reader: jspb.BinaryReader): PasswordComplexityPolicy;
+}
+
+export namespace PasswordComplexityPolicy {
+  export type AsObject = {
+    id: string,
+    description: string,
+    creationDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    changeDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    minLength: number,
+    hasLowercase: boolean,
+    hasUppercase: boolean,
+    hasNumber: boolean,
+    hasSymbol: boolean,
+    sequence: number,
+    isDefault: boolean,
+  }
+}
+
 export enum UserSessionState { 
   USERSESSIONSTATE_UNSPECIFIED = 0,
   USERSESSIONSTATE_ACTIVE = 1,

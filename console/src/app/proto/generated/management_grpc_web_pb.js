@@ -2092,6 +2092,86 @@ proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.ch
  *   !proto.caos.zitadel.management.api.v1.UserID,
  *   !proto.google.protobuf.Empty>}
  */
+const methodDescriptor_ManagementService_RemoveUserPhone = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.management.api.v1.ManagementService/RemoveUserPhone',
+  grpc.web.MethodType.UNARY,
+  proto.caos.zitadel.management.api.v1.UserID,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.management.api.v1.UserID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.caos.zitadel.management.api.v1.UserID,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodInfo_ManagementService_RemoveUserPhone = new grpc.web.AbstractClientBase.MethodInfo(
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.caos.zitadel.management.api.v1.UserID} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.caos.zitadel.management.api.v1.UserID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.management.api.v1.ManagementServiceClient.prototype.removeUserPhone =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.management.api.v1.ManagementService/RemoveUserPhone',
+      request,
+      metadata || {},
+      methodDescriptor_ManagementService_RemoveUserPhone,
+      callback);
+};
+
+
+/**
+ * @param {!proto.caos.zitadel.management.api.v1.UserID} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.management.api.v1.ManagementServicePromiseClient.prototype.removeUserPhone =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.management.api.v1.ManagementService/RemoveUserPhone',
+      request,
+      metadata || {},
+      methodDescriptor_ManagementService_RemoveUserPhone);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.caos.zitadel.management.api.v1.UserID,
+ *   !proto.google.protobuf.Empty>}
+ */
 const methodDescriptor_ManagementService_ResendPhoneVerificationCode = new grpc.web.MethodDescriptor(
   '/caos.zitadel.management.api.v1.ManagementService/ResendPhoneVerificationCode',
   grpc.web.MethodType.UNARY,

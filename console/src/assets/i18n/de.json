@@ -20,12 +20,14 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
-        "IAM":"IAM",
+        "IAM":"Administration",
         "ORGANIZATION": "Organisation",
+        "PROJECTSSECTION":"Projekte",
         "PROJECT": "Projekte",
         "GRANTEDPROJECT":"Berechtigte Projekte",
+        "USERSECTION":"Benutzer",
         "USER": "Benutzer",
-        "LOGOUT": "abmelden",
+        "LOGOUT": "alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
         "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!",
         "SHOWORGS":"Alle organisationen anzeigen"
@@ -64,7 +66,9 @@
             "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
             "COPY":"In die Zwischenablage kopieren",
             "COPIED":"In die Zwischenablage kopiert!",
-            "NOUSER":"Kein User"
+            "NOUSER":"Kein User",
+            "REACTIVATE":"Reaktivieren",
+            "DEACTIVATE":"Deaktivieren"
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
@@ -220,7 +224,9 @@
             "ORGDOMAIN_VERIFICATION_SKIP":"Sie können die Überprüfung vorerst überspringen und Ihre Organisation weiter erstellen. Um Ihre Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
             "DOWNLOAD_FILE":"File download",
-            "SELECTORGTOOLTIP":"Wähle diese Organisation"
+            "SELECTORGTOOLTIP":"Wähle diese Organisation",
+            "PRIMARYDOMAIN":"Primäre Domain",
+            "STATE":"Status"
         },
         "DOMAINS": {
             "TITLE":"Domains",
@@ -330,7 +336,11 @@
             "TYPE":{
                 "OWNED":"Eigene Projekte",
                 "GRANTED":"Berechtigte Projekte"
-            }
+            },
+            "PINNED":"Angepinnt",
+            "ALL": "Alle",
+            "CREATEDON":"erstellt am",
+            "LASTMODIFIED":"zuletzt verändert am"
         },
         "STATE": {
             "TITLE":"Status",
@@ -420,7 +430,8 @@
             "STATE":"Status",
             "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
-            "CHANGEDATE":"Letzte Änderung"
+            "CHANGEDATE":"Letzte Änderung",
+            "RESOURCEOWNER":"Besitzer"
         }
     },
     "APP": {

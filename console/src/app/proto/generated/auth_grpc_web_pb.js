@@ -1127,6 +1127,86 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.changeMyUserPh
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_AuthService_RemoveMyUserPhone = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.auth.api.v1.AuthService/RemoveMyUserPhone',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodInfo_AuthService_RemoveMyUserPhone = new grpc.web.AbstractClientBase.MethodInfo(
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.removeMyUserPhone =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/RemoveMyUserPhone',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_RemoveMyUserPhone,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.removeMyUserPhone =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/RemoveMyUserPhone',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_RemoveMyUserPhone);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.caos.zitadel.auth.api.v1.VerifyUserPhoneRequest,
  *   !proto.google.protobuf.Empty>}
  */
@@ -1681,6 +1761,86 @@ proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.changeMyPasswo
       request,
       metadata || {},
       methodDescriptor_AuthService_ChangeMyPassword);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy>}
+ */
+const methodDescriptor_AuthService_GetMyPasswordComplexityPolicy = new grpc.web.MethodDescriptor(
+  '/caos.zitadel.auth.api.v1.AuthService/GetMyPasswordComplexityPolicy',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy.deserializeBinary
+);
+
+
+/**
+ * @const
+ * @type {!grpc.web.AbstractClientBase.MethodInfo<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy>}
+ */
+const methodInfo_AuthService_GetMyPasswordComplexityPolicy = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.Error, ?proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.caos.zitadel.auth.api.v1.AuthServiceClient.prototype.getMyPasswordComplexityPolicy =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyPasswordComplexityPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyPasswordComplexityPolicy,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.caos.zitadel.auth.api.v1.PasswordComplexityPolicy>}
+ *     A native promise that resolves to the response
+ */
+proto.caos.zitadel.auth.api.v1.AuthServicePromiseClient.prototype.getMyPasswordComplexityPolicy =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/caos.zitadel.auth.api.v1.AuthService/GetMyPasswordComplexityPolicy',
+      request,
+      metadata || {},
+      methodDescriptor_AuthService_GetMyPasswordComplexityPolicy);
 };
 
 

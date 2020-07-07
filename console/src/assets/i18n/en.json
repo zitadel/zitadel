@@ -20,12 +20,14 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
-        "IAM":"IAM",
+        "IAM":"Administration",
         "ORGANIZATION": "Organization",
+        "PROJECTSSECTION":"Projects",
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
+        "USERSECTION":"Benutzer",
         "USER": "Users",
-        "LOGOUT": "Log out",
+        "LOGOUT": "Logout all users",
         "NEWORG":"New Organization",
         "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!",
         "SHOWORGS":"Show all organizations"
@@ -64,7 +66,9 @@
             "LOGINNAMESDESC":"You can log into zitadel with these names",
             "COPY":"Copy to clipboard",
             "COPIED":"Copied to clipboard!",
-            "NOUSER":"No User"
+            "NOUSER":"No User",
+            "REACTIVATE":"Reactivate",
+            "DEACTIVATE":"Deactivate"
         },
         "MFA": {
             "TITLE": "Multifactor Authentication",
@@ -221,16 +225,18 @@
             "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
             "ORGDETAILUSER_TITLE":"Configure Organization Owner",
             "DOWNLOAD_FILE":"Download file",
-            "SELECTORGTOOLTIP":"Select this organization"
+            "SELECTORGTOOLTIP":"Select this organization",
+            "PRIMARYDOMAIN":"Primary Domain",
+            "STATE":"State"
         },
         "DOMAINS": {
             "TITLE":"Domains",
             "DESCRIPTION":"Configure your domains on which your users will be registered."
         },
         "STATE": {
-            "0": "nicht definiert",
-            "1": "aktiv",
-            "2": "inaktiv"
+            "0": "not defined",
+            "1": "active",
+            "2": "deactivated"
         },
         "MEMBER": {
             "TITLE":"Organization Managers",
@@ -331,7 +337,11 @@
             "TYPE":{
                 "OWNED":"Owned Projects",
                 "GRANTED":"Granted Projects"
-            }
+            },
+            "PINNED":"Pinned",
+            "ALL": "All",
+            "CREATEDON":"created on",
+            "LASTMODIFIED":"last modified on"
         },
         "STATE": {
             "TITLE":"State",
@@ -421,7 +431,8 @@
             "STATE":"Status",
             "TYPE":"Type",
             "CREATIONDATE":"Created At",
-            "CHANGEDATE":"Last Modified"
+            "CHANGEDATE":"Last Modified",
+            "RESOURCEOWNER":"Owner"
         }
     },
     "APP": {

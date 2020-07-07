@@ -17,6 +17,7 @@ import {
   MyProjectOrgSearchRequest,
   MyProjectOrgSearchResponse,
   PasswordChange,
+  PasswordComplexityPolicy,
   UpdateUserAddressRequest,
   UpdateUserEmailRequest,
   UpdateUserPhoneRequest,
@@ -133,6 +134,13 @@ export class AuthServiceClient {
                response: UserPhone) => void
   ): grpcWeb.ClientReadableStream<UserPhone>;
 
+  removeMyUserPhone(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
   verifyMyUserPhone(
     request: VerifyUserPhoneRequest,
     metadata: grpcWeb.Metadata | undefined,
@@ -181,6 +189,13 @@ export class AuthServiceClient {
     callback: (err: grpcWeb.Error,
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  getMyPasswordComplexityPolicy(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.Error,
+               response: PasswordComplexityPolicy) => void
+  ): grpcWeb.ClientReadableStream<PasswordComplexityPolicy>;
 
   addMfaOTP(
     request: google_protobuf_empty_pb.Empty,
@@ -303,6 +318,11 @@ export class AuthServicePromiseClient {
     metadata?: grpcWeb.Metadata
   ): Promise<UserPhone>;
 
+  removeMyUserPhone(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
   verifyMyUserPhone(
     request: VerifyUserPhoneRequest,
     metadata?: grpcWeb.Metadata
@@ -337,6 +357,11 @@ export class AuthServicePromiseClient {
     request: PasswordChange,
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
+
+  getMyPasswordComplexityPolicy(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<PasswordComplexityPolicy>;
 
   addMfaOTP(
     request: google_protobuf_empty_pb.Empty,
