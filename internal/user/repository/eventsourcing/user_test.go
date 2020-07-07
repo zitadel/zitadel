@@ -1621,6 +1621,56 @@ func TestVerifyPhoneAggregate(t *testing.T) {
 	}
 }
 
+func TestRemovePhoneAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.User
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "user phone removed aggregate ok",
+			args: args{
+				ctx: auth.NewMockContext("orgID", "userID"),
+				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
+					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.UserPhoneRemoved},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := PhoneRemovedAggregate(tt.args.aggCreator, tt.args.existing)(tt.args.ctx)
+
+			if tt.res.errFunc == nil && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if tt.res.errFunc == nil && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+			}
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func TestVerificationFailedPhoneAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context

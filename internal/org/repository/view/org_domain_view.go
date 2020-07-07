@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
@@ -14,6 +15,9 @@ func OrgDomainByOrgIDAndDomain(db *gorm.DB, table, orgID, domain string) (*model
 	domainQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyDomain, Value: domain, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, orgIDQuery, domainQuery)
 	err := query(db, domainView)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Gqwfq", "Errors.Org.DomainNotOnOrg")
+	}
 	return domainView, err
 }
 
@@ -23,6 +27,9 @@ func VerifiedOrgDomain(db *gorm.DB, table, domain string) (*model.OrgDomainView,
 	verifiedQuery := &model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyVerified, Value: true, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, domainQuery, verifiedQuery)
 	err := query(db, domainView)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Tew2q", "Errors.Org.DomainNotFound")
+	}
 	return domainView, err
 }
 

@@ -78,8 +78,15 @@ func (s *Server) BulkRemoveUserGrant(ctx context.Context, in *management.UserGra
 	return &empty.Empty{}, err
 }
 
-func (s *Server) SearchProjectUserGrants(ctx context.Context, request *management.ProjectUserGrantSearchRequest) (*management.UserGrantSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-8jdSw", "Not implemented")
+func (s *Server) SearchProjectUserGrants(ctx context.Context, in *management.ProjectUserGrantSearchRequest) (*management.UserGrantSearchResponse, error) {
+	request := projectUserGrantSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendProjectIDQuery(in.ProjectId)
+	response, err := s.usergrant.SearchUserGrants(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectUserGrantByID(ctx context.Context, request *management.ProjectUserGrantID) (*management.UserGrantView, error) {
@@ -121,8 +128,19 @@ func (s *Server) ReactivateProjectUserGrant(ctx context.Context, in *management.
 	return usergrantFromModel(user), nil
 }
 
-func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, request *management.ProjectGrantUserGrantSearchRequest) (*management.UserGrantSearchResponse, error) {
-	return nil, errors.ThrowUnimplemented(nil, "GRPC-32sFs", "Not implemented")
+func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, in *management.ProjectGrantUserGrantSearchRequest) (*management.UserGrantSearchResponse, error) {
+	grant, err := s.project.ProjectGrantByID(ctx, in.ProjectGrantId)
+	if err != nil {
+		return nil, err
+	}
+	request := projectGrantUserGrantSearchRequestsToModel(in)
+	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendProjectIDQuery(grant.ProjectID)
+	response, err := s.usergrant.SearchUserGrants(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantSearchResponseFromModel(response), nil
 }
 
 func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *management.ProjectGrantUserGrantID) (*management.UserGrantView, error) {

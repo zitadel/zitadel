@@ -70,6 +70,9 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	if err != nil {
 		return nil, err
 	}
+	if grant == nil {
+		return []string{}, nil
+	}
 	permissions := &grant_model.Permissions{Permissions: []string{}}
 	for _, role := range grant.Roles {
 		roleName, ctxID := authz.SplitPermission(role)

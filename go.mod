@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	cloud.google.com/go v0.57.0 // indirect
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.1
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.2
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.4.1
 	github.com/Masterminds/goutils v1.1.0 // indirect

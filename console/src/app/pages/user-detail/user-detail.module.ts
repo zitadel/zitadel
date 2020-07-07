@@ -28,6 +28,7 @@ import { ThemeSettingComponent } from './theme-setting/theme-setting.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-mfa/user-mfa.component';
+import { PasswordComponent } from './password/password.component';
 
 @NgModule({
     declarations: [
@@ -37,6 +38,7 @@ import { UserMfaComponent } from './user-mfa/user-mfa.component';
         AuthUserMfaComponent,
         UserMfaComponent,
         ThemeSettingComponent,
+        PasswordComponent,
     ],
     imports: [
         UserDetailRoutingModule,

@@ -895,6 +895,22 @@ func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID 
 	return nil
 }
 
+func (es *UserEventstore) RemovePhone(ctx context.Context, userID string) error {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	repoExisting := model.UserFromModel(existing)
+	removeAggregate := PhoneRemovedAggregate(es.AggregateCreator(), repoExisting)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, removeAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
 func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di8ws", "Errors.User.UserIDMissing")

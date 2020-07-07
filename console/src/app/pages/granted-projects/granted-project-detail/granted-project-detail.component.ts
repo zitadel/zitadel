@@ -6,6 +6,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import {
     Application,
     ApplicationSearchResponse,
@@ -58,6 +59,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
     public isZitadel: boolean = false;
 
+    public userGrantContext: UserGrantContext = UserGrantContext.GRANTED_PROJECT;
     public userGrantSearchKey: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID;
 
     constructor(

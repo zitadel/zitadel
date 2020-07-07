@@ -84,12 +84,15 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     }
 
     public addRole(): void {
-        const promises = this.formArray.value.map((role: ProjectRoleAdd.AsObject) => {
-            role.id = this.projectId;
-            return this.projectService.AddProjectRole(role);
+        const rolesToAdd: ProjectRoleAdd[] = this.formArray.value.map((element: any) => {
+            const role = new ProjectRoleAdd();
+            role.setKey(element.key);
+            role.setDisplayName(element.displayName);
+            role.setGroup(element.group);
+            return role;
         });
 
-        Promise.all(promises).then(() => {
+        this.projectService.BulkAddProjectRole(this.projectId, rolesToAdd).then(() => {
             this.router.navigate(['projects', this.projectId]);
         }).catch(data => {
             this.toast.showError(data.message);

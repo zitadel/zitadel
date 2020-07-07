@@ -39,6 +39,7 @@ export class IamViewsComponent {
         ).subscribe(views => {
             this.dataSource = new MatTableDataSource(views);
             this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
         });
     }
 

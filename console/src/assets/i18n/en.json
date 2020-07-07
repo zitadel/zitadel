@@ -3,7 +3,7 @@
     "HOME": {
         "TITLE": "zitadel",
         "SECURITYANDPRIVACY": "Data protection and personalization",
-        "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",
+        "SECURITYANDPRIVACY_DESC": "You can view the data in your Zitadel account and choose which activities are saved in order to personalize Zitadel for you",
         "SECURITYANDPRIVACY_BUTTON": "Personalize data",
         "PROTECTION": "Organizational Policies",
         "PROTECTION_DESC": "Manage your organizational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
@@ -27,7 +27,8 @@
         "USER": "Users",
         "LOGOUT": "Log out",
         "NEWORG":"New Organization",
-        "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!"
+        "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!",
+        "SHOWORGS":"Show all organizations"
     },
     "ACTIONS": {
         "SAVE": "Save",
@@ -111,18 +112,19 @@
             "TITLE": "Profile",
             "EMAIL": "Email",
             "PHONE": "Phonenumber",
-            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
+            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Zitadel to your needs",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
             "NICKNAME": "Nickname",
             "DISPLAYNAME": "Displayname",
             "PREFERRED_LANGUAGE": "Language",
-            "GENDER": "Gender"
+            "GENDER": "Gender",
+            "PASSWORD":"Password"
         },
         "PASSWORD": {
             "TITLE": "Password",
-            "DESCRIPTION": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
+            "DESCRIPTION": "Note that the possword must correspond to the policy your organization has set.",
             "OLD": "Current Password",
             "NEW": "New Password",
             "CONFIRM": "Password Confirmation",
@@ -136,7 +138,7 @@
         "EMAIL": "Email",
         "PHONE": "Phonenumber",
         "LOGINMETHODS": {
-            "TITLE": "Methods to check your identity",
+            "TITLE": "Methods to access your identity",
             "DESCRIPTION": "This allows us to confirm your identity when you register or to contact you if suspicious activity is detected in your account",
             "EMAIL": {
                 "TITLE": "Email",
@@ -284,7 +286,7 @@
         }
     },
     "ORG_DETAIL": {
-        "TITLE": "Organisation",
+        "TITLE": "Organization",
         "DESCRIPTION": "Here you can edit your organization configuration and manage members",
         "DETAIL": {
             "TITLE": "Detail",
@@ -356,18 +358,21 @@
             "USERID":"User Id"
         },
         "GRANT": {
-            "TITLE": "Grants",
+            "TITLE": "Granted organizations",
             "DESCRIPTION": "Allow an other organization to use your project",
             "CREATE": {
-                "TITLE": "Create Member Grant",
+                "TITLE": "Create organization grant",
                 "SEL_USERS": "Select the users you wish to grant",
                 "SEL_PROJECT": "Search for a project",
                 "SEL_ROLES": "Select the roles you want to be added to the grant",
-                "SEL_ORG": "Search for the domain",
+                "SEL_USER":"Search for a user",
+                "SEL_ORG": "Set the domain",
+                "SEL_ORG_DESC":"Enter the complete domain to specify the organization to grant!",
                 "ORG_TITLE":"Organization",
                 "ORG_DESCRIPTION":"You are about to grant a user for the organization {{name}}",
                 "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organization",
-                "SEL_ORG_BUTTON": "Search Organization",
+                "SEL_ORG_FORMFIELD":"Complete Domain",
+                "SEL_ORG_BUTTON": "Set Organization",
                 "FOR_ORG":"The grant is created for:"
             },
             "DETAIL": {
@@ -563,7 +568,7 @@
             "org.domain.primary.set":"set primary domain",
             "org.domain.removed":"domain removed",
             "org.iam.policy.added":"IAM policy added",
-            "project.added": "added",
+            "project.added": "project added",
             "project.changed":"changed",
             "project.deactivated":"deactivated",
             "project.member.added":"added member",

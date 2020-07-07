@@ -7,10 +7,8 @@
                 <ng-container *ngFor="let member of membersSubject | async">
                     <div (click)="showDetail()" class="avatar-circle"
                         matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
-                        <app-avatar
-                            *ngIf="member && (member.displayName || (member.firstName && member.lastName)); else thumbavatar"
-                            class="avatar dontcloseonclick"
-                            [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)"
+                        <app-avatar *ngIf="member && member.firstName && member.lastName; else thumbavatar"
+                            class="avatar dontcloseonclick" [name]="member.firstName + ' '+ member.lastName"
                             [size]="32">
                         </app-avatar>
                         <ng-template #thumbavatar>
