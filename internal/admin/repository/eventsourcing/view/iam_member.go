@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -31,10 +32,10 @@ func (v *View) PutIamMember(org *model.IamMemberView, sequence uint64) error {
 	return v.ProcessedIamMemberSequence(sequence)
 }
 
-func (v *View) DeleteIamMember(orgID, userID string, eventSequence uint64) error {
-	err := view.DeleteIamMember(v.Db, iamMemberTable, orgID, userID)
-	if err != nil {
-		return nil
+func (v *View) DeleteIamMember(iamID, userID string, eventSequence uint64) error {
+	err := view.DeleteIamMember(v.Db, iamMemberTable, iamID, userID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
 	return v.ProcessedIamMemberSequence(eventSequence)
 }
