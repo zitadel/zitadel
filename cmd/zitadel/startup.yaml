@@ -220,13 +220,13 @@ Admin:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'adminapi'
-          Password: $CR_ADMIN_PASSWORD
+          Password: $CR_ADMINAPI_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_ADMIN_CERT
-            Key: $CR_ADMIN_KEY
+            Cert: $CR_ADMINAPI_CERT
+            Key: $CR_ADMINAPI_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -235,13 +235,13 @@ Admin:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'adminapi'
-      Password: $CR_ADMIN_PASSWORD
+      Password: $CR_ADMINAPI_PASSWORD
       Database: 'adminapi'
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_ADMIN_CERT
-        Key: $CR_ADMIN_KEY
+        Cert: $CR_ADMINAPI_CERT
+        Key: $CR_ADMINAPI_KEY
     Spooler:
       ConcurrentTasks: 1
       BulkLimit: 100
