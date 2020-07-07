@@ -14,25 +14,22 @@ func TestValidator_Healthz(t *testing.T) {
 	type fields struct {
 		validations map[string]ValidationFunction
 	}
-	type args struct {
-		in0 context.Context
-		e   *empty.Empty
+	type res struct {
+		want   *empty.Empty
+		hasErr bool
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *empty.Empty
-		wantErr bool
+		name   string
+		fields fields
+		res    res
 	}{
 		{
 			"ok",
 			fields{},
-			args{
-				e: &empty.Empty{},
+			res{
+				&empty.Empty{},
+				false,
 			},
-			&empty.Empty{},
-			false,
 		},
 	}
 	for _, tt := range tests {
@@ -40,13 +37,13 @@ func TestValidator_Healthz(t *testing.T) {
 			v := &Validator{
 				validations: tt.fields.validations,
 			}
-			got, err := v.Healthz(tt.args.in0, tt.args.e)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Healthz() error = %v, wantErr %v", err, tt.wantErr)
+			got, err := v.Healthz(nil, &empty.Empty{})
+			if (err != nil) != tt.res.hasErr {
+				t.Errorf("Healthz() error = %v, wantErr %v", err, tt.res.hasErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Healthz() got = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got, tt.res.want) {
+				t.Errorf("Healthz() got = %v, want %v", got, tt.res.want)
 			}
 		})
 	}
@@ -56,16 +53,14 @@ func TestValidator_Ready(t *testing.T) {
 	type fields struct {
 		validations map[string]ValidationFunction
 	}
-	type args struct {
-		ctx context.Context
-		e   *empty.Empty
+	type res struct {
+		want   *empty.Empty
+		hasErr bool
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *empty.Empty
-		wantErr bool
+		name   string
+		fields fields
+		res    res
 	}{
 		{
 			"unready error",
@@ -74,12 +69,10 @@ func TestValidator_Ready(t *testing.T) {
 					return errors.ThrowInternal(nil, "id", "message")
 				},
 			}},
-			args{
-				ctx: context.Background(),
-				e:   &empty.Empty{},
+			res{
+				nil,
+				true,
 			},
-			nil,
-			true,
 		},
 		{
 			"ready ok",
@@ -88,12 +81,10 @@ func TestValidator_Ready(t *testing.T) {
 					return nil
 				},
 			}},
-			args{
-				ctx: context.Background(),
-				e:   &empty.Empty{},
+			res{
+				&empty.Empty{},
+				false,
 			},
-			&empty.Empty{},
-			false,
 		},
 	}
 	for _, tt := range tests {
@@ -101,13 +92,13 @@ func TestValidator_Ready(t *testing.T) {
 			v := &Validator{
 				validations: tt.fields.validations,
 			}
-			got, err := v.Ready(tt.args.ctx, tt.args.e)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Ready() error = %v, wantErr %v", err, tt.wantErr)
+			got, err := v.Ready(context.Background(), &empty.Empty{})
+			if (err != nil) != tt.res.hasErr {
+				t.Errorf("Ready() error = %v, wantErr %v", err, tt.res.hasErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Ready() got = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got, tt.res.want) {
+				t.Errorf("Ready() got = %v, want %v", got, tt.res.want)
 			}
 		})
 	}
@@ -115,30 +106,32 @@ func TestValidator_Ready(t *testing.T) {
 
 func Test_validate(t *testing.T) {
 	type args struct {
-		ctx         context.Context
 		validations map[string]ValidationFunction
+	}
+	type res struct {
+		want map[string]error
 	}
 	tests := []struct {
 		name string
 		args args
-		want map[string]error
+		res  res
 	}{
 		{
 			"no error empty",
 			args{
-				ctx: context.Background(),
 				validations: map[string]ValidationFunction{
 					"ok": func(_ context.Context) error {
 						return nil
 					},
 				},
 			},
-			map[string]error{},
+			res{
+				map[string]error{},
+			},
 		},
 		{
 			"error in list",
 			args{
-				ctx: context.Background(),
 				validations: map[string]ValidationFunction{
 					"ok": func(_ context.Context) error {
 						return nil
@@ -148,15 +141,17 @@ func Test_validate(t *testing.T) {
 					},
 				},
 			},
-			map[string]error{
-				"error": errors.ThrowInternal(nil, "id", "message"),
+			res{
+				map[string]error{
+					"error": errors.ThrowInternal(nil, "id", "message"),
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validate(tt.args.ctx, tt.args.validations); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("validate() = %v, want %v", got, tt.want)
+			if got := validate(context.Background(), tt.args.validations); !reflect.DeepEqual(got, tt.res.want) {
+				t.Errorf("validate() = %v, want %v", got, tt.res.want)
 			}
 		})
 	}

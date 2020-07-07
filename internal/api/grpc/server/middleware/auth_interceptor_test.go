@@ -44,11 +44,14 @@ func Test_authorize(t *testing.T) {
 		authConfig  authz.Config
 		authMethods authz.MethodMapping
 	}
-	tests := []struct {
-		name    string
-		args    args
+	type res struct {
 		want    interface{}
 		wantErr bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
 	}{
 		{
 			"no token needed ok",
@@ -64,8 +67,10 @@ func Test_authorize(t *testing.T) {
 				}(),
 				authMethods: mockMethods,
 			},
-			&mockReq{},
-			false,
+			res{
+				&mockReq{},
+				false,
+			},
 		},
 		{
 			"auth header missing error",
@@ -82,8 +87,10 @@ func Test_authorize(t *testing.T) {
 				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
-			nil,
-			true,
+			res{
+				nil,
+				true,
+			},
 		},
 		{
 			"unauthorized error",
@@ -100,8 +107,10 @@ func Test_authorize(t *testing.T) {
 				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
-			nil,
-			true,
+			res{
+				nil,
+				true,
+			},
 		},
 		{
 			"authorized ok",
@@ -118,19 +127,21 @@ func Test_authorize(t *testing.T) {
 				authConfig:  authz.Config{},
 				authMethods: mockMethods,
 			},
-			&mockReq{},
-			false,
+			res{
+				&mockReq{},
+				false,
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier, tt.args.authConfig)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("authorize() error = %v, wantErr %v", err, tt.wantErr)
+			if (err != nil) != tt.res.wantErr {
+				t.Errorf("authorize() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("authorize() got = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got, tt.res.want) {
+				t.Errorf("authorize() got = %v, want %v", got, tt.res.want)
 			}
 		})
 	}

@@ -18,11 +18,14 @@ func Test_tracingServerHandler_TagRPC(t *testing.T) {
 		ctx     context.Context
 		tagInfo *stats.RPCTagInfo
 	}
-	tests := []struct {
-		name     string
-		fields   fields
-		args     args
+	type res struct {
 		wantSpan bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
 	}{
 		{
 			"ignored method",
@@ -36,7 +39,7 @@ func Test_tracingServerHandler_TagRPC(t *testing.T) {
 					FullMethodName: "ignore",
 				},
 			},
-			false,
+			res{false},
 		},
 		{
 			"tag",
@@ -50,7 +53,7 @@ func Test_tracingServerHandler_TagRPC(t *testing.T) {
 					FullMethodName: "tag",
 				},
 			},
-			true,
+			res{true},
 		},
 	}
 	for _, tt := range tests {
@@ -60,8 +63,8 @@ func Test_tracingServerHandler_TagRPC(t *testing.T) {
 				ServerHandler:  tt.fields.ServerHandler,
 			}
 			got := s.TagRPC(tt.args.ctx, tt.args.tagInfo)
-			if (trace.FromContext(got) != nil) != tt.wantSpan {
-				t.Errorf("TagRPC() = %v, want %v", got, tt.wantSpan)
+			if (trace.FromContext(got) != nil) != tt.res.wantSpan {
+				t.Errorf("TagRPC() = %v, want %v", got, tt.res.wantSpan)
 			}
 		})
 	}
