@@ -13,31 +13,34 @@
                 </button>
             </ng-template>
 
+            <span class="fill-space"></span>
+
+            <button mat-stroked-button color="accent" [disabled]="isZitadel"
+                *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="state-button"
+                (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
+            <button mat-stroked-button color="accent" [disabled]="isZitadel"
+                *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="state-button"
+                (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
+
             <div class="full-width">
-                <ng-container *ngIf="editstate">
-                    <mat-form-field *ngIf="editstate && project?.name" class="formfield"
-                        hintLabel="The name is required!">
-                        <mat-label>Project Name</mat-label>
-                        <input matInput [(ngModel)]="project.name" />
-                    </mat-form-field>
-                    <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
-                        <mat-icon>check</mat-icon>
-                    </button>
-                    <button mat-stroked-button color="accent" [disabled]="isZitadel"
-                        *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="second"
-                        (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
-                    <button mat-stroked-button color="accent" [disabled]="isZitadel"
-                        *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="second"
-                        (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
-                </ng-container>
+                <div class="line">
+                    <ng-container *ngIf="editstate">
+                        <mat-form-field *ngIf="editstate && project?.name" class="formfield"
+                            hintLabel="The name is required!">
+                            <mat-label>{{'PROJECT.NAME' | translate}}</mat-label>
+                            <input matInput [(ngModel)]="project.name" />
+                        </mat-form-field>
+                        <button class="icon-button" *ngIf="editstate" mat-icon-button (click)="updateName()">
+                            <mat-icon>check</mat-icon>
+                        </button>
+                    </ng-container>
+                    <span class="fill-space"></span>
+                </div>
                 <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
-                <p *ngIf="isZitadel" class="zitadel-warning">This belongs to Zitadel project. If you change something,
-                    Zitadel
-                    may not behave as intended!</p>
+                <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
             </div>
         </div>
 
-        <!-- show only on owned projects-->
         <ng-container *ngIf="project">
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.projectId, 'project.app.read']">
                 <app-project-application-grid *ngIf="grid"
@@ -89,10 +92,6 @@
     </div>
     <metainfo class="side">
         <div class="details">
-            <div class="row">
-                <span class="first">{{'PROJECT.TYPE.TITLE' | translate}}:</span>
-                <span class="second">{{'PROJECT.TYPE.'+ ProjectType.PROJECTTYPE_OWNED | translate}}</span>
-            </div>
             <div class="row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
                 <span *ngIf="project && project.state !== undefined"

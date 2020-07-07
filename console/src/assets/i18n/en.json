@@ -335,7 +335,9 @@
                 "GRANTED":"Granted Projects"
             },
             "PINNED":"Pinned",
-            "ALL": "All"
+            "ALL": "All",
+            "CREATEDON":"created on",
+            "LASTMODIFIED":"last modified on"
         },
         "STATE": {
             "TITLE":"State",
@@ -425,7 +427,8 @@
             "STATE":"Status",
             "TYPE":"Type",
             "CREATIONDATE":"Created At",
-            "CHANGEDATE":"Last Modified"
+            "CHANGEDATE":"Last Modified",
+            "RESOURCEOWNER":"Owner"
         }
     },
     "APP": {

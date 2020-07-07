@@ -334,7 +334,9 @@
                 "GRANTED":"Berechtigte Projekte"
             },
             "PINNED":"Angepinnt",
-            "ALL": "Alle"
+            "ALL": "Alle",
+            "CREATEDON":"erstellt am",
+            "LASTMODIFIED":"zuletzt verändert am"
         },
         "STATE": {
             "TITLE":"Status",
@@ -424,7 +426,8 @@
             "STATE":"Status",
             "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
-            "CHANGEDATE":"Letzte Änderung"
+            "CHANGEDATE":"Letzte Änderung",
+            "RESOURCEOWNER":"Besitzer"
         }
     },
     "APP": {

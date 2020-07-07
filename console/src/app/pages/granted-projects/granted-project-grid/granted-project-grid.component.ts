@@ -1,8 +1,8 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { Router } from '@angular/router';
 import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/generated/management_pb';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     selector: 'app-granted-project-grid',
@@ -40,26 +40,19 @@ export class GrantedProjectGridComponent implements OnChanges {
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
 
-    constructor(private router: Router) {
+    constructor(private authService: AuthService) {
         this.selection.changed.subscribe(selection => {
-            localStorage.setItem('pinned-granted-projects', JSON.stringify(
+            this.setPrefixedItem('pinned-granted-projects', JSON.stringify(
                 this.selection.selected.map(item => item.projectId),
-            ));
-            const filtered = this.notPinned.filter(item => item === selection.added.find(i => i === item));
-            filtered.forEach((f, i) => {
-                this.notPinned.splice(i, 1);
+            )).then(() => {
+                const filtered = this.notPinned.filter(item => item === selection.added.find(i => i === item));
+                filtered.forEach((f, i) => {
+                    this.notPinned.splice(i, 1);
+                });
+
+                this.notPinned.push(...selection.removed);
             });
-
-            this.notPinned.push(...selection.removed);
         });
-    }
-
-    public selectItem(item: ProjectGrantView.AsObject, event?: any): void {
-        if (event && !event.target.classList.contains('mat-icon')) {
-            this.router.navigate(['granted-projects', item.projectId, 'grant', `${item.id}`]);
-        } else if (!event) {
-            this.router.navigate(['granted-projects', item.projectId, 'grant', `${item.id}`]);
-        }
     }
 
     public addItem(): void {
@@ -74,23 +67,34 @@ export class GrantedProjectGridComponent implements OnChanges {
     }
 
     public reorganizeItems(): void {
-        const storageEntry = localStorage.getItem('pinned-granted-projects');
-        if (storageEntry) {
-            const array: string[] = JSON.parse(storageEntry);
-            const toSelect: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
-                if (array.includes(item.projectId)) {
-                    // this.notPinned.splice(index, 1);
-                    return true;
-                }
-            });
-            this.selection.select(...toSelect);
+        this.getPrefixedItem('pinned-granted-projects').then(storageEntry => {
+            if (storageEntry) {
+                const array: string[] = JSON.parse(storageEntry);
+                const toSelect: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
+                    if (array.includes(item.projectId)) {
+                        // this.notPinned.splice(index, 1);
+                        return true;
+                    }
+                });
+                this.selection.select(...toSelect);
 
-            const toNotPinned: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
-                if (!array.includes(item.projectId)) {
-                    return true;
-                }
-            });
-            this.notPinned = toNotPinned;
-        }
+                const toNotPinned: ProjectGrantView.AsObject[] = this.items.filter((item, index) => {
+                    if (!array.includes(item.projectId)) {
+                        return true;
+                    }
+                });
+                this.notPinned = toNotPinned;
+            }
+        });
+    }
+
+    private async getPrefixedItem(key: string): Promise<string | null> {
+        const prefix = (await this.authService.GetActiveOrg()).id;
+        return localStorage.getItem(`${prefix}:${key}`);
+    }
+
+    private async setPrefixedItem(key: string, value: any): Promise<void> {
+        const prefix = (await this.authService.GetActiveOrg()).id;
+        return localStorage.setItem(`${prefix}:${key}`, value);
     }
 }
