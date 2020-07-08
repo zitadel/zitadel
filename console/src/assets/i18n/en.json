@@ -184,8 +184,8 @@
             "FOUND":"Found"
         },
         "TARGET": {
-            "SELF":"You will get users of your organisation. If you want to add an external user", #DAFUQ
-            "EXTERNAL":"To get users of your organisation", #DAFUQ
+            "SELF":"If you want to grant a user of an other organisation",
+            "EXTERNAL":"To grant a user of your organisation",
             "CLICKHERE":"Click here"
         },
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
