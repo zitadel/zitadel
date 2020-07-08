@@ -6,7 +6,7 @@ package {{.File.GoPkg.Name}}
 import (
     "google.golang.org/grpc"
     
-	utils_auth "github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
@@ -16,20 +16,18 @@ import (
  * {{$s.Name}}
  */
 
-var {{$s.Name}}_AuthMethods = utils_auth.MethodMapping {
+const {{$s.Name}}_MethodPrefix = "{{$.File.Package}}.{{$s.Name}}"
+
+var {{$s.Name}}_AuthMethods = authz.MethodMapping {
     {{ range $m := $s.Method}}
         {{ $mAuthOpt := option $m.Options "caos.zitadel.utils.v1.auth_option" }}
         {{ if and $mAuthOpt $mAuthOpt.Permission }}
-            "/{{$.File.Package}}.{{$s.Name}}/{{.Name}}": utils_auth.Option{
+            "/{{$.File.Package}}.{{$s.Name}}/{{.Name}}": authz.Option{
                 Permission: "{{$mAuthOpt.Permission}}",
                 CheckParam: "{{$mAuthOpt.CheckFieldName}}",
             },
         {{end}}
     {{ end}}
-}
-
-func {{$s.Name}}_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.Config) grpc.UnaryServerInterceptor {
-    return middleware.AuthorizationInterceptor(verifier, authConf, {{$s.Name}}_AuthMethods)
 }
 
 {{ end }}

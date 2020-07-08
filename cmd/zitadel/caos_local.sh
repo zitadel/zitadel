@@ -40,10 +40,10 @@ export SMTP_TLS=TRUE
 export CHAT_URL=$(gopass zitadel-secrets/zitadel/dev/google-chat-url)
 
 #OIDC
-export ZITADEL_ISSUER=http://localhost:50022
-export ZITADEL_ACCOUNTS=http://localhost:50031
-export ZITADEL_AUTHORIZE=http://localhost:50022
-export ZITADEL_OAUTH=http://localhost:50022
+export ZITADEL_ISSUER=http://localhost:50002/oauth/v2/
+export ZITADEL_ACCOUNTS=http://localhost:50003/login
+export ZITADEL_AUTHORIZE=http://localhost:50002/oauth/v2/
+export ZITADEL_OAUTH=http://localhost:50002/oauth/v2/
 export ZITADEL_CONSOLE=http://localhost:4200
 export CAOS_OIDC_DEV=true
 export ZITADEL_COOKIE_DOMAIN=localhost
@@ -55,7 +55,7 @@ export ZITADEL_CSRF_DEV=true
 export ZITADEL_CACHE_MAXAGE=12h
 export ZITADEL_CACHE_SHARED_MAXAGE=168h
 export ZITADEL_SHORT_CACHE_MAXAGE=5m
-export ZITADEL_SHORT_CACHE_SHARED_MAXAGE=15min
+export ZITADEL_SHORT_CACHE_SHARED_MAXAGE=15m
 
 #Console
 export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/

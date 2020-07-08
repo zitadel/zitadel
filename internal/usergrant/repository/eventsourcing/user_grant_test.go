@@ -2,11 +2,12 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+	"testing"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
-	"testing"
 )
 
 func TestUserGrantAddedAggregate(t *testing.T) {
@@ -28,7 +29,7 @@ func TestUserGrantAddedAggregate(t *testing.T) {
 		{
 			name: "usergrant added ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				grant:      &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}, UserID: "UserID", ProjectID: "ProjectID"},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -40,7 +41,7 @@ func TestUserGrantAddedAggregate(t *testing.T) {
 		{
 			name: "grant nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				grant:      nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -90,7 +91,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 		{
 			name: "change project grant",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
@@ -112,7 +113,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 		{
 			name: "change project grant cascade",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
@@ -135,7 +136,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 		{
 			name: "existing grant nil",
 			args: args{
-				ctx:      auth.NewMockContext("orgID", "userID"),
+				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: nil,
 				new: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
@@ -151,7 +152,7 @@ func TestUserGrantChangedAggregate(t *testing.T) {
 		{
 			name: "grant nil",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
@@ -209,7 +210,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 		{
 			name: "remove app",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
@@ -228,7 +229,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 		{
 			name: "remove app cascade",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
@@ -248,7 +249,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 		{
 			name: "existing project nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -259,7 +260,7 @@ func TestUserGrantRemovedAggregate(t *testing.T) {
 		{
 			name: "grant nil",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					UserID:     "UserID",
@@ -313,7 +314,7 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 		{
 			name: "deactivate project grant",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
@@ -330,7 +331,7 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 		{
 			name: "existing grant nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -341,7 +342,7 @@ func TestUserGrantDeactivatedAggregate(t *testing.T) {
 		{
 			name: "grant nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -391,7 +392,7 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 		{
 			name: "reactivate project grant",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.UserGrant{
 					ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 				},
@@ -408,7 +409,7 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 		{
 			name: "existing grant nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -419,7 +420,7 @@ func TestUserGrantReactivatedAggregate(t *testing.T) {
 		{
 			name: "grant nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &model.UserGrant{ObjectRoot: models.ObjectRoot{AggregateID: "ID"}},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),

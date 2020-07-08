@@ -2,23 +2,23 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
-	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
+	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_policy "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_user "github.com/caos/zitadel/internal/user/repository/eventsourcing"
@@ -47,7 +47,7 @@ type EsRepository struct {
 	eventstore.PolicyRepo
 }
 
-func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
+func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, authZRepo *authz_repo.EsRepository) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err

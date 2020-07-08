@@ -1,0 +1,357 @@
+@font-face {
+  font-family: Aileron;
+  src: url(../../../fonts/ailerons/ailerons.otf) format("opentype");
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Thin.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-ThinItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 100;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Light.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-LightItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Regular.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Italic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Bold.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 700;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-Black.ttf) format("truetype");
+  font-style: normal;
+  font-weight: 800;
+}
+@font-face {
+  font-family: Lato;
+  src: url(../../../fonts/lato/Lato-BlackItalic.ttf) format("truetype");
+  font-style: italic;
+  font-weight: 800;
+}
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../../fonts/material/MaterialIcons-Regular.eot);
+  /* For IE6-8 */
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url(../../../fonts/material/MaterialIcons-Regular.woff2) format("woff2"), url(../../../fonts/material/MaterialIcons-Regular.woff) format("woff"), url(../../../fonts/material/MaterialIcons-Regular.ttf) format("truetype");
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: Lato;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+  font-weight: 300;
+  background-color: #282828;
+  color: white;
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-size: contain;
+}
+
+h1 {
+  color: white;
+  font-family: Aileron;
+  font-weight: 300;
+  font-size: 40px;
+}
+
+p {
+  font-weight: 300;
+}
+
+header {
+  padding: 8px;
+}
+header .logo {
+  background-image: url("../logo-dark.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 80px;
+  margin: 30px;
+}
+
+.content {
+  margin: auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+}
+
+a {
+  color: #760038;
+  text-decoration: none;
+  font-weight: 400;
+}
+a:hover {
+  color: #f60075;
+}
+
+button {
+  background-color: #282828;
+  color: #760038;
+  border: 2px solid #760038;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 600px;
+  height: 50px;
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+button:hover {
+  background-color: #f60075;
+  border: 2px solid #f60075;
+}
+button.primary {
+  background-color: #760038;
+  color: white;
+  border: none;
+}
+button.primary:hover {
+  background-color: #f60075;
+}
+
+input:not([type=radio]), select {
+  background-color: #252525;
+  color: white;
+  height: 50px;
+  border: 2px solid #505050;
+  border-radius: 5px;
+  padding-left: 15px;
+}
+
+form .field {
+  display: grid;
+  padding: 10px 0;
+}
+form .field.radio-button {
+  display: flex;
+}
+form .field.radio-button input[type=radio] {
+  height: 20px;
+  vertical-align: middle;
+}
+form .field.radio-button label {
+  height: 20px;
+  display: inline-block;
+  padding: 3px 0 0 15px;
+  width: 100%;
+}
+form label {
+  color: #898989;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  margin-bottom: 3px;
+}
+form label span.optional {
+  font-style: italic;
+  text-transform: none;
+}
+form .actions {
+  padding: 20px 0;
+}
+form .actions .right {
+  float: right;
+}
+form .actions button, form .actions a {
+  margin: 10px 0;
+}
+form button.clean {
+  border: none;
+  height: auto;
+  color: white;
+  text-align: left;
+  text-transform: unset;
+  display: flex;
+  padding: 15px;
+}
+form button.clean:hover {
+  border: none;
+  background-color: #252525;
+}
+form button.clean * {
+  font-weight: 300;
+}
+form .user-selection-list {
+  margin-bottom: 80px;
+}
+form button.user-selection .profile-image {
+  width: 100px;
+  height: 100px;
+  background-image: url("/resources/images/icon-user-dark.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  form button.user-selection .profile-image {
+    background-image: url("/resources/images/icon-user-dark@2x.png");
+    background-size: 100px 100px;
+  }
+}
+form button.user-selection:hover .profile-image {
+  background-image: url("/resources/images/icon-user-dark-hover.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  form button.user-selection:hover .profile-image {
+    background-image: url("/resources/images/icon-user-dark-hover@2x.png");
+    background-size: 100px 100px;
+  }
+}
+form button.user-selection .sessionstate {
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+  border-color: #505050;
+  border-style: solid;
+  border-width: 1px;
+  position: absolute;
+  bottom: 0px;
+  right: 10px;
+}
+form button.user-selection .sessionstate.sessionstate-0 {
+  background-color: #138D00;
+}
+form button.user-selection .sessionstate.sessionstate-1 {
+  background-color: #BC372E;
+}
+form button.user-selection > div {
+  position: relative;
+}
+form button.user-selection > div.names {
+  margin: 15px;
+}
+form button.user-selection > div.names .displayname {
+  font-size: 1.4rem;
+}
+form button.user-selection > div.names .loginname {
+  color: #898989;
+}
+.user-selection + form button.other-user {
+  margin-top: 80px;
+}
+form button.other-user .other-user-image {
+  width: 100px;
+  height: 75px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url("/resources/images/icon-newuser-dark.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  form button.other-user .other-user-image {
+    background-image: url("/resources/images/icon-newuser-dark@2x.png");
+    background-size: 100px 75px;
+  }
+}
+form button.other-user:hover .other-user-image {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url("/resources/images/icon-newuser-dark-hover.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  form button.other-user:hover .other-user-image {
+    background-image: url("/resources/images/icon-newuser-dark-hover@2x.png");
+    background-size: 100px 75px;
+  }
+}
+form button.other-user > div:nth-of-type(2) {
+  margin: 15px;
+  font-size: 1.4rem;
+}
+
+#copy-secret {
+  visibility: hidden;
+  position: absolute;
+}
+
+#qrcode {
+  text-align: center;
+}
+#qrcode svg rect.color {
+  fill: white;
+}
+#qrcode svg rect.bg-color {
+  fill: #282828;
+}
+
+#secret .copy {
+  float: right;
+  cursor: pointer;
+}
+
+footer {
+  background-image: url("../gradientdeco-full.svg");
+  width: 100%;
+  background-size: cover;
+  height: 44vw;
+  position: fixed;
+  bottom: 0;
+  z-index: -1;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+/*# sourceMappingURL=dark.css.map */

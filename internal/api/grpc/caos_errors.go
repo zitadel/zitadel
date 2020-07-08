@@ -4,15 +4,17 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/pkg/message"
+
+	"github.com/caos/zitadel/pkg/grpc/message"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func CaosToGRPCError(err error, ctx context.Context, translator *i18n.Translator) error {
+func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator) error {
 	if err == nil {
 		return nil
 	}
@@ -39,7 +41,7 @@ func ExtractCaosError(err error) (c codes.Code, msg, id string, ok bool) {
 		return codes.AlreadyExists, caosErr.GetMessage(), caosErr.GetID(), true
 	case *caos_errs.DeadlineExceededError:
 		return codes.DeadlineExceeded, caosErr.GetMessage(), caosErr.GetID(), true
-	case caos_errs.InternalError:
+	case *caos_errs.InternalError:
 		return codes.Internal, caosErr.GetMessage(), caosErr.GetID(), true
 	case *caos_errs.InvalidArgumentError:
 		return codes.InvalidArgument, caosErr.GetMessage(), caosErr.GetID(), true

@@ -2,7 +2,8 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -20,11 +21,11 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (project *usr_mod
 }
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +33,7 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	policyResourceOwner := auth.GetCtxData(ctx).OrgID
+	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
