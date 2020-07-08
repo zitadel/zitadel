@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/crypto"
 	"testing"
 	"time"
 
@@ -756,12 +757,11 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 					Profile: &model.Profile{UserName: "UserName"},
 					Email:   &model.Email{EmailAddress: "EmailAddress", IsEmailVerified: true},
 				},
-				password:   &model.Password{ChangeRequired: false},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
-				eventLen:   2,
-				eventTypes: []models.EventType{model.UserPasswordChanged, model.InitializedUserCheckSucceeded},
+				eventLen:   1,
+				eventTypes: []models.EventType{model.InitializedUserCheckSucceeded},
 			},
 		},
 		{
@@ -772,7 +772,7 @@ func TestInitCodeVerifiedAggregate(t *testing.T) {
 					Profile: &model.Profile{UserName: "UserName"},
 					Email:   &model.Email{EmailAddress: "EmailAddress"},
 				},
-				password:   &model.Password{ChangeRequired: false},
+				password:   &model.Password{Secret: &crypto.CryptoValue{}, ChangeRequired: false},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{

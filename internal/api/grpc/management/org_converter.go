@@ -10,6 +10,7 @@ import (
 
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/pkg/message"
 )
 
 func orgsFromModel(orgs []*org_model.Org) []*management.Org {
@@ -173,7 +174,7 @@ func orgChangesToMgtAPI(changes *org_model.OrgChanges) (_ []*management.Change) 
 		}
 		result[i] = &management.Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
 			Editor:     change.ModifierName,

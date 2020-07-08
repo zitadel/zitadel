@@ -139,7 +139,17 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     deleteGrantSelection(): void {
         this.userService.BulkRemoveUserGrant(this.selection.selected.map(grant => grant.id)).then(() => {
             this.toast.showInfo('Grants deleted');
-            this.loadGrantsPage();
+            const data = this.dataSource.grantsSubject.getValue();
+            console.log(data);
+            this.selection.selected.forEach((item) => {
+                console.log(item);
+                const index = data.findIndex(i => i.id === item.id);
+                if (index > -1) {
+                    data.splice(index, 1);
+                    this.dataSource.grantsSubject.next(data);
+                }
+            });
+            this.selection.clear();
         }).catch(error => {
             this.toast.showError(error.message);
         });

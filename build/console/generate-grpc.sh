@@ -10,15 +10,20 @@ rm -rf $GEN_PATH
 echo "Create folders"
 mkdir -p $GEN_PATH
 
+targetcurl () {
+   mkdir -p $1 && cd $1 && { curl -O $2; cd -; }
+}
+
 echo "Download additional protofiles"
-wget -P tmp/validate https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0/validate/validate.proto
-wget -P tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto
-wget -P tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto
+targetcurl tmp/validate https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0/validate/validate.proto
+targetcurl tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto
+targetcurl tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto
 
 echo "Generate grpc"
 
 protoc \
   -I=/usr/local/include \
+  -I=../pkg/message \
   -I=../pkg/grpc/management/proto \
   -I=../pkg/grpc/auth/proto \
   -I=../pkg/grpc/admin/proto \
@@ -27,6 +32,7 @@ protoc \
   -I=tmp \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
+  ../pkg/message/*.proto \
   ../pkg/grpc/management/proto/*.proto \
   ../pkg/grpc/admin/proto/*.proto \
   ../pkg/grpc/auth/proto/*.proto

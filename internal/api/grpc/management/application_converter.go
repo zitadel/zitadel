@@ -337,7 +337,7 @@ func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*management
 		}
 		result[i] = &management.Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Editor:     change.ModifierName,
 			EditorId:   change.ModifierId,

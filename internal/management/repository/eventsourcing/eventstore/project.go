@@ -38,6 +38,9 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
+	if caos_errs.IsNotFound(err) {
+		project = new(model.ProjectView)
+	}
 
 	events, err := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
 	if err != nil {

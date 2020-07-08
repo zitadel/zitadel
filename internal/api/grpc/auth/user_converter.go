@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/auth"
+	message "github.com/caos/zitadel/pkg/message"
 )
 
 func userViewFromModel(user *usr_model.UserView) *auth.UserView {
@@ -345,11 +346,11 @@ func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit
 	return &auth.Changes{
 		Limit:   limit,
 		Offset:  offset,
-		Changes: userChangesToMgtAPI(response),
+		Changes: userChangesToAPI(response),
 	}
 }
 
-func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
+func userChangesToAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 	result := make([]*auth.Change, len(changes.Changes))
 
 	for i, change := range changes.Changes {
@@ -360,10 +361,9 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*auth.Change) {
 			err = protojson.Unmarshal(changedData, data)
 			logging.Log("GRPC-0kRsY").OnError(err).Debug("unable to marshal changed data to struct")
 		}
-
 		result[i] = &auth.Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
 			EditorId:   change.ModifierId,

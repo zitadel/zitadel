@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	lockTable      = "admin_api.locks"
+	lockTable      = "adminapi.locks"
 	lockedUntilKey = "locked_until"
 	lockerIDKey    = "locker_id"
 	objectTypeKey  = "object_type"

@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
+	message "github.com/caos/zitadel/pkg/message"
 )
 
 func userFromModel(user *usr_model.User) *management.User {
@@ -506,7 +507,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*management.Change
 
 		result[i] = &management.Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
 			EditorId:   change.ModifierId,

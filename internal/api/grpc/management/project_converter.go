@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/pkg/message"
 )
 
 func projectFromModel(project *proj_model.Project) *management.Project {
@@ -289,7 +290,7 @@ func projectChangesToMgtAPI(changes *proj_model.ProjectChanges) (_ []*management
 		}
 		result[i] = &management.Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Editor:     change.ModifierName,
 			EditorId:   change.ModifierId,

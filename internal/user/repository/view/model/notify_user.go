@@ -5,77 +5,106 @@ import (
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/lib/pq"
 	"time"
 )
 
 const (
-	NotifyUserKeyUserID = "id"
+	NotifyUserKeyUserID        = "id"
+	NotifyUserKeyResourceOwner = "id"
 )
 
 type NotifyUser struct {
-	ID                string    `json:"-" gorm:"column:id;primary_key"`
-	CreationDate      time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate        time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner     string    `json:"-" gorm:"column:resource_owner"`
-	UserName          string    `json:"userName" gorm:"column:user_name"`
-	FirstName         string    `json:"firstName" gorm:"column:first_name"`
-	LastName          string    `json:"lastName" gorm:"column:last_name"`
-	NickName          string    `json:"nickName" gorm:"column:nick_name"`
-	DisplayName       string    `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage string    `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender            int32     `json:"gender" gorm:"column:gender"`
-	LastEmail         string    `json:"email" gorm:"column:last_email"`
-	VerifiedEmail     string    `json:"-" gorm:"column:verified_email"`
-	LastPhone         string    `json:"phone" gorm:"column:last_phone"`
-	VerifiedPhone     string    `json:"-" gorm:"column:verified_phone"`
-	PasswordSet       bool      `json:"-" gorm:"column:password_set"`
-	Sequence          uint64    `json:"-" gorm:"column:sequence"`
+	ID                 string         `json:"-" gorm:"column:id;primary_key"`
+	CreationDate       time.Time      `json:"-" gorm:"column:creation_date"`
+	ChangeDate         time.Time      `json:"-" gorm:"column:change_date"`
+	ResourceOwner      string         `json:"-" gorm:"column:resource_owner"`
+	UserName           string         `json:"userName" gorm:"column:user_name"`
+	LoginNames         pq.StringArray `json:"-" gorm:"column:login_names"`
+	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
+	FirstName          string         `json:"firstName" gorm:"column:first_name"`
+	LastName           string         `json:"lastName" gorm:"column:last_name"`
+	NickName           string         `json:"nickName" gorm:"column:nick_name"`
+	DisplayName        string         `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage  string         `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender             int32          `json:"gender" gorm:"column:gender"`
+	LastEmail          string         `json:"email" gorm:"column:last_email"`
+	VerifiedEmail      string         `json:"-" gorm:"column:verified_email"`
+	LastPhone          string         `json:"phone" gorm:"column:last_phone"`
+	VerifiedPhone      string         `json:"-" gorm:"column:verified_phone"`
+	PasswordSet        bool           `json:"-" gorm:"column:password_set"`
+	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 }
 
 func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
 	return &NotifyUser{
-		ID:                user.ID,
-		ChangeDate:        user.ChangeDate,
-		CreationDate:      user.CreationDate,
-		ResourceOwner:     user.ResourceOwner,
-		UserName:          user.UserName,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		NickName:          user.NickName,
-		DisplayName:       user.DisplayName,
-		PreferredLanguage: user.PreferredLanguage,
-		Gender:            int32(user.Gender),
-		LastEmail:         user.LastEmail,
-		VerifiedEmail:     user.VerifiedEmail,
-		LastPhone:         user.LastPhone,
-		VerifiedPhone:     user.VerifiedPhone,
-		PasswordSet:       user.PasswordSet,
-		Sequence:          user.Sequence,
+		ID:                 user.ID,
+		ChangeDate:         user.ChangeDate,
+		CreationDate:       user.CreationDate,
+		ResourceOwner:      user.ResourceOwner,
+		UserName:           user.UserName,
+		LoginNames:         user.LoginNames,
+		PreferredLoginName: user.PreferredLoginName,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		NickName:           user.NickName,
+		DisplayName:        user.DisplayName,
+		PreferredLanguage:  user.PreferredLanguage,
+		Gender:             int32(user.Gender),
+		LastEmail:          user.LastEmail,
+		VerifiedEmail:      user.VerifiedEmail,
+		LastPhone:          user.LastPhone,
+		VerifiedPhone:      user.VerifiedPhone,
+		PasswordSet:        user.PasswordSet,
+		Sequence:           user.Sequence,
 	}
 }
 
 func NotifyUserToModel(user *NotifyUser) *model.NotifyUser {
 	return &model.NotifyUser{
-		ID:                user.ID,
-		ChangeDate:        user.ChangeDate,
-		CreationDate:      user.CreationDate,
-		ResourceOwner:     user.ResourceOwner,
-		UserName:          user.UserName,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		NickName:          user.NickName,
-		DisplayName:       user.DisplayName,
-		PreferredLanguage: user.PreferredLanguage,
-		Gender:            model.Gender(user.Gender),
-		LastEmail:         user.LastEmail,
-		VerifiedEmail:     user.VerifiedEmail,
-		LastPhone:         user.LastPhone,
-		VerifiedPhone:     user.VerifiedPhone,
-		PasswordSet:       user.PasswordSet,
-		Sequence:          user.Sequence,
+		ID:                 user.ID,
+		ChangeDate:         user.ChangeDate,
+		CreationDate:       user.CreationDate,
+		ResourceOwner:      user.ResourceOwner,
+		UserName:           user.UserName,
+		LoginNames:         user.LoginNames,
+		PreferredLoginName: user.PreferredLoginName,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		NickName:           user.NickName,
+		DisplayName:        user.DisplayName,
+		PreferredLanguage:  user.PreferredLanguage,
+		Gender:             model.Gender(user.Gender),
+		LastEmail:          user.LastEmail,
+		VerifiedEmail:      user.VerifiedEmail,
+		LastPhone:          user.LastPhone,
+		VerifiedPhone:      user.VerifiedPhone,
+		PasswordSet:        user.PasswordSet,
+		Sequence:           user.Sequence,
 	}
+}
+
+func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string {
+	if !appendDomain {
+		return u.UserName
+	}
+	return u.UserName + "@" + domain
+}
+
+func (u *NotifyUser) SetLoginNames(policy *org_model.OrgIamPolicy, domains []*org_model.OrgDomain) {
+	loginNames := make([]string, 0)
+	for _, d := range domains {
+		if d.Verified {
+			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
+		}
+	}
+	if !policy.UserLoginMustBeDomain {
+		loginNames = append(loginNames, u.UserName)
+	}
+	u.LoginNames = loginNames
 }
 
 func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {

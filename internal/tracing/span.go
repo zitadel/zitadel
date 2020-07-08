@@ -40,7 +40,7 @@ func (s *Span) SetStatusByError(err error) {
 }
 
 func statusFromError(err error) trace.Status {
-	code, msg, _, _ := grpc.Extract(err)
+	code, msg, _, _ := grpc.ExtractCaosError(err)
 	return trace.Status{Code: int32(code), Message: msg}
 }
 

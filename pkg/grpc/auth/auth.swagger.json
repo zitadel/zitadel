@@ -648,7 +648,7 @@
           "format": "date-time"
         },
         "event_type": {
-          "type": "string"
+          "$ref": "#/definitions/v1LocalizedMessage"
         },
         "sequence": {
           "type": "string",
@@ -693,6 +693,17 @@
         "GENDER_DIVERSE"
       ],
       "default": "GENDER_UNSPECIFIED"
+    },
+    "v1LocalizedMessage": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "localized_message": {
+          "type": "string"
+        }
+      }
     },
     "v1MFAState": {
       "type": "string",
