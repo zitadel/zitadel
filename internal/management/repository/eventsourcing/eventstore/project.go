@@ -36,17 +36,21 @@ type ProjectRepo struct {
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
-	project, err := repo.View.ProjectByID(id)
-	if err != nil && !caos_errs.IsNotFound(err) {
-		return nil, err
+	project, viewErr := repo.View.ProjectByID(id)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
 	}
-	if caos_errs.IsNotFound(err) {
+	if caos_errs.IsNotFound(viewErr) {
 		project = new(model.ProjectView)
 	}
 
-	events, err := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
-	if err != nil {
-		logging.Log("EVENT-V9x1V").WithError(err).Debug("error retrieving new events")
+	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
+	if caos_errs.IsNotFound(viewErr) && caos_errs.IsNotFound(esErr) {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8yfKu", "Errors.Project.NotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-V9x1V").WithError(viewErr).Debug("error retrieving new events")
 		return model.ProjectToModel(project), nil
 	}
 
