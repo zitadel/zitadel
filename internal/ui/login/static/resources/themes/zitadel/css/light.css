@@ -89,7 +89,8 @@ html {
   color: #BBBBC8;
   background-repeat: no-repeat;
   background-position: bottom right;
-  background-image: url("../flavor-spikes01-narrow.png");
+  background-size: contain;
+  background-image: url("../flavor-spikes01-wide.png");
 }
 
 h1 {
@@ -354,9 +355,9 @@ footer {
 }
 
 html {
-  background-color: #BBBBC8;
+  background-color: #f5f5f5;
   color: #282828;
-  background-image: url("../flavor-spikes01-narrow.png");
+  background-image: url("../flavor-spikes01-wide.png");
 }
 html header .logo {
   background-image: url("../logo-light.png");
@@ -365,7 +366,7 @@ html h1 {
   color: #282828;
 }
 html button {
-  background-color: #BBBBC8;
+  background-color: #f5f5f5;
   color: #3574C6;
   border: 2px solid #3574C6;
 }
@@ -384,6 +385,10 @@ html button.primary:hover {
 }
 html button.clean {
   color: #282828;
+}
+html button.clean:hover {
+  border: none;
+  background-color: #252525;
 }
 html button.user-selection .profile-image {
   background-image: url("/resources/images/icon-user-light.png");
@@ -424,15 +429,15 @@ html button.other-user:hover .other-user-image {
     background-size: 100px 75px;
   }
 }
-html input {
-  background-color: #BBBBC8;
+html input:not([type=radio]), html select {
+  background-color: #FFFFFF;
   color: #282828;
 }
 html #qrcode svg rect.color {
   fill: #282828;
 }
 html #qrcode svg rect.bg-color {
-  fill: #BBBBC8;
+  fill: #f5f5f5;
 }
 
 /*# sourceMappingURL=light.css.map */
