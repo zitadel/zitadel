@@ -1,10 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Org, OrgDomainView, OrgMember, OrgMemberSearchResponse, OrgState } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -32,6 +34,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public newDomain: string = '';
 
     constructor(
+        private dialog: MatDialog,
         public translate: TranslateService,
         private orgService: OrgService,
         private toast: ToastService,
@@ -82,14 +85,28 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public removeDomain(domain: string): void {
-        this.orgService.RemoveMyOrgDomain(domain).then(() => {
-            this.toast.showInfo('Removed');
-            const index = this.domains.findIndex(d => d.domain === domain);
-            if (index > -1) {
-                this.domains.splice(index, 1);
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'ORG.DOMAINS.DELETE.TITLE',
+                descriptionKey: 'ORG.DOMAINS.DELETE.DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.orgService.RemoveMyOrgDomain(domain).then(() => {
+                    this.toast.showInfo('Removed');
+                    const index = this.domains.findIndex(d => d.domain === domain);
+                    if (index > -1) {
+                        this.domains.splice(index, 1);
+                    }
+                }).catch(error => {
+                    this.toast.showError(error.message);
+                });
             }
-        }).catch(error => {
-            this.toast.showError(error.message);
         });
     }
 }

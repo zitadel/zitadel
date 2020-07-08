@@ -45,18 +45,24 @@ export class AccountsCardComponent implements OnInit {
         }
     }
 
-    public selectAccount(loginHint?: string, idToken?: string): void {
+    public selectAccount(loginName?: string): void {
         const configWithPrompt: Partial<AuthConfig> = {
             customQueryParams: {
-                prompt: 'select_account',
+                // prompt: 'select_account',
             } as any,
         };
-        if (loginHint) {
-            (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
+        if (loginName) {
+            (configWithPrompt as any).customQueryParams['login_hint'] = loginName;
         }
-        if (idToken) {
-            (configWithPrompt as any).customQueryParams['id_token_hint'] = idToken;
-        }
+        this.authService.authenticate(configWithPrompt);
+    }
+
+    public selectNewAccount(): void {
+        const configWithPrompt: Partial<AuthConfig> = {
+            customQueryParams: {
+                prompt: 'login',
+            } as any,
+        };
         this.authService.authenticate(configWithPrompt);
     }
 

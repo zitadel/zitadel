@@ -10,10 +10,14 @@ rm -rf $GEN_PATH
 echo "Create folders"
 mkdir -p $GEN_PATH
 
+targetcurl () {
+   mkdir -p $1 && cd $1 && { curl -O $2; cd -; }
+}
+
 echo "Download additional protofiles"
-wget -P tmp/validate https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0/validate/validate.proto
-wget -P tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto
-wget -P tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto
+targetcurl tmp/validate https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v0.4.0/validate/validate.proto
+targetcurl tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/annotations.proto
+targetcurl tmp/protoc-gen-swagger/options https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1.14.6/protoc-gen-swagger/options/openapiv2.proto
 
 echo "Generate grpc"
 
