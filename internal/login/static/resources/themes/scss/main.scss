@@ -12,15 +12,22 @@ body {
 }
 
 html {
+    height: 100%;
+    width: 100%;
+    font-weight: 300;
     background-color: $backgroundColor;
     color: $fontColor;
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    @if($bodyImgDark != "") {
+        background-image: url($bodyImgDark);
+    }
 }
 
 h1 {
     color: $fontColor;
     font-family: $headerFont;
-    text-transform: uppercase;
-    text-align: center;
+    font-weight: 300;
     font-size: 40px;
 }
 
@@ -50,8 +57,7 @@ header {
 a {
     color: $primaryColor;
     text-decoration: none;
-    text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 400;
 
     &:hover {
         color: $primaryColorHover;
@@ -59,7 +65,6 @@ a {
 }
 
 button {
-    text-transform: uppercase;
     background-color: $backgroundColor;
     color: $primaryColor;
     border: 2px solid $primaryColor;
@@ -221,11 +226,15 @@ form {
         .other-user-image {
             width: 100px;
             height: 75px;
+            background-repeat: no-repeat;
+            background-position: center;
             @include retina-background-image($otherUserImgDark, "png", false, 100px, 75px);
         }
 
         &:hover {
             .other-user-image {
+                background-repeat: no-repeat;
+                background-position: center;
                 @include retina-background-image($otherUserImgDark, "png", true, 100px, 75px);
             }
         }
@@ -262,7 +271,9 @@ form {
 }
 
 footer {
-    background-image: url($footerimgDark);
+    @if($footerimgDark != "") {
+        background-image: url($footerimgDark);
+    }
     width: 100%;
     background-size: cover;
     height: 44vw;
