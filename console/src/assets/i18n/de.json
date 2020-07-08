@@ -344,7 +344,8 @@
             "PINNED":"Angepinnt",
             "ALL": "Alle",
             "CREATEDON":"erstellt am",
-            "LASTMODIFIED":"zuletzt verändert am"
+            "LASTMODIFIED":"zuletzt verändert am",
+            "ADDNEW":"Neues Projekt erstellen"
         },
         "STATE": {
             "TITLE":"Status",
