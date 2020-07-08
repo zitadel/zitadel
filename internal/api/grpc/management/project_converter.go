@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	"github.com/caos/zitadel/pkg/message"
+	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
 func projectFromModel(project *proj_model.Project) *management.Project {

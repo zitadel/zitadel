@@ -10,7 +10,7 @@ import (
 
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	"github.com/caos/zitadel/pkg/message"
+	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
 func orgsFromModel(orgs []*org_model.Org) []*management.Org {

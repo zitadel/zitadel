@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package caos.zitadel.api.v1;
 
-option go_package = "github.com/caos/zitadel/pkg/message";
+option go_package = "github.com/caos/zitadel/pkg/grpc/message";
 
 message ErrorDetail {
     string id = 1;

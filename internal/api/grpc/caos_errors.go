@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/pkg/message"
+
+	"github.com/caos/zitadel/pkg/grpc/message"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator) error {

@@ -14,7 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/auth"
-	message "github.com/caos/zitadel/pkg/message"
+	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
 func userViewFromModel(user *usr_model.UserView) *auth.UserView {

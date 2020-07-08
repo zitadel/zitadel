@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
-	message "github.com/caos/zitadel/pkg/message"
+	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
 func userFromModel(user *usr_model.User) *management.User {
