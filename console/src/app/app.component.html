@@ -4,10 +4,10 @@
             <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
         <a *ngIf="(isHandset$ | async) == false" class="title" [routerLink]="['/']">
-            <img class="logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
+            <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
                 src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
             <ng-template #lighttheme>
-                <img class="logo" src="../assets/images/zitadel-logo-oneline-lightdesign.svg" />
+                <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-oneline-lightdesign.svg" />
             </ng-template>
         </a>
 

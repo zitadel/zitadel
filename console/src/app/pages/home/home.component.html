@@ -1,8 +1,9 @@
 <div class="wrapper">
     <div class="header">
-        <img *ngIf="dark; else lighttheme" src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
+        <img alt="zitadel logo" *ngIf="dark; else lighttheme"
+            src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
         <ng-template #lighttheme>
-            <img src="../assets/images/zitadel-logo-oneline-lightdesign.svg" />
+            <img alt="zitadel logo" src="../assets/images/zitadel-logo-oneline-lightdesign.svg" />
         </ng-template>
     </div>
 
