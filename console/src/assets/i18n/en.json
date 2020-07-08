@@ -230,7 +230,7 @@
         },
         "DOMAINS": {
             "TITLE":"Domains",
-            "DESCRIPTION":"Configure your domains. This domain can be used to login with your users."
+            "DESCRIPTION":"Configure your domains. This domain can be used to login with your users.",
             "DELETE": {
                 "TITLE":"Delete domain?",
                 "DESCRIPTION":"You are about to delete one of your domains. Note that your users can no longer use this domain for their logins."
