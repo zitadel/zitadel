@@ -1,17 +1,10 @@
 {
     "APP_NAME": "ZITADEL",
     "HOME": {
-<<<<<<< HEAD
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Data protection and personalization",
         "SECURITYANDPRIVACY_DESC": "Manage your Information and Security settings",
         "SECURITYANDPRIVACY_BUTTON": "Personalize Information and Security",
-=======
-        "TITLE": "zitadel",
-        "SECURITYANDPRIVACY": "Data protection and personalization",
-        "SECURITYANDPRIVACY_DESC": "You can view the data in your Zitadel account and choose which activities are saved in order to personalize Zitadel for you",
-        "SECURITYANDPRIVACY_BUTTON": "Personalize data",
->>>>>>> master
         "PROTECTION": "Organizational Policies",
         "PROTECTION_DESC": "Manage your organizational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
         "PROTECTION_BUTTON": "Explore",
@@ -27,26 +20,17 @@
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
-<<<<<<< HEAD
-        "ADMINISTRATION":"Administration",
-=======
         "IAM":"Administration",
->>>>>>> master
         "ORGANIZATION": "Organization",
         "PROJECTSSECTION":"Projects",
         "PROJECT": "Projects",
         "GRANTEDPROJECT":"Granted Projects",
         "USERSECTION":"Benutzer",
         "USER": "Users",
-<<<<<<< HEAD
-        "LOGOUT": "Log out",
-        "NEWORG":"Create Organization"
-=======
         "LOGOUT": "Logout all users",
         "NEWORG":"New Organization",
         "IAMADMIN":"You are an IAM Administrator. Note that you have enhanced permissions!",
         "SHOWORGS":"Show all organizations"
->>>>>>> master
     },
     "ACTIONS": {
         "SAVE": "Save",
