@@ -192,7 +192,23 @@
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"log in with another account"
+        "ADDACCOUNT":"log in with another account",
+        "TOAST": {
+            "CREATED":"User created with success!",
+            "SAVED":"Profile saved with success!",
+            "EMAILSAVED":"Email saved with success!",
+            "PHONESAVED":"Phone saved with success!",
+            "PHONEREMOVED":"Phone has been removed",
+            "PHONEVERIFIED":"Phone verified with success!",
+            "PHONEVERIFICATIONSENT":"Phone verification code sent!",
+            "EMAILVERIFICATIONSENT":"Email verification code sent!",
+            "OTPREMOVED":"OTP has been removed!",
+            "INITIALPASSWORDSET":"Initial password was set!",
+            "PASSWORDNOTIFICATIONSENT":"Password Changed Notification sent",
+            "PASSWORDCHANGED":"Password changed with success!",
+            "REACTIVATED":"User reactivated",
+            "DEACTIVATED":"User deactivated"
+        }
     },
     "IAM": {
         "DETAIL": {
@@ -438,6 +454,13 @@
             "CREATIONDATE":"Created At",
             "CHANGEDATE":"Last Modified",
             "RESOURCEOWNER":"Owner"
+        },
+        "TOAST":{
+            "MEMBERREMOVED":"Manager removed!",
+            "MEMBERSADDED": "Managers added!",
+            "MEMBERADDED": "Manager added!",
+            "ROLEREMOVED":"Role removed!",
+            "ROLECHANGED":"Role changed!"
         }
     },
     "APP": {
@@ -481,6 +504,12 @@
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
             "AUTHMETHOD2":"None"
+        },
+        "TOAST": {
+            "REACTIVATED":"App reactivated!",
+            "DEACTIVATED":"App deactivated!",
+            "OIDCUPDATED":"OIDC Config updated!",
+            "OIDCCLIENTSECRETREGENERATED":"OIDC Client Secret regenerated!"
         }
     },
     "GENDERS": {
@@ -557,6 +586,10 @@
         "DETAIL": {
             "TITLE":"Authorization Detail",
             "DESCRIPTION":""
+        },
+        "TOAST": {
+            "UPDATED":"Grant updated!",
+            "BULKREMOVED":"Grants removed!"
         }
     },
     "CHANGES": {

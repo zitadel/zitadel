@@ -35,7 +35,7 @@ export class ProjectRoleDetailComponent implements OnInit {
         if (this.formGroup.valid && this.key?.value && this.group?.value && this.displayName?.value) {
             this.projectService.ChangeProjectRole(this.projectId, this.key.value, this.key.value, this.group.value)
                 .then(() => {
-                    this.toast.showInfo('Role updated');
+                    this.toast.showInfo('PROJECT.TOAST.ROLECHANGED', true);
                     this.dialogRef.close(true);
                 }).catch(error => {
                     this.toast.showError(error.message);

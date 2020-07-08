@@ -36,7 +36,6 @@ export class SearchOrgAutocompleteComponent {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                // this.toast.showInfo(error.message);
             });
         });
     }

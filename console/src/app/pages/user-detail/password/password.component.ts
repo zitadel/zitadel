@@ -95,7 +95,7 @@ export class PasswordComponent implements OnInit {
     public setInitialPassword(userId: string): void {
         if (this.passwordForm.valid && this.password && this.password.value) {
             this.mgmtUserService.SetInitialPassword(userId, this.password.value).then((data: any) => {
-                this.toast.showInfo('Set initial Password');
+                this.toast.showInfo('USER.TOAST.INITIALPASSWORDSET', true);
                 window.history.back();
             }).catch(data => {
                 this.toast.showError(data.message);
@@ -109,7 +109,7 @@ export class PasswordComponent implements OnInit {
             this.newPassword && this.newPassword.value && this.newPassword.valid) {
             this.userService
                 .ChangeMyPassword(this.currentPassword.value, this.newPassword.value).then((data: any) => {
-                    this.toast.showInfo('Password Set');
+                    this.toast.showInfo('USER.TOAST.PASSWORDCHANGED', true);
                     window.history.back();
                 }).catch(data => {
                     this.toast.showError(data.message);

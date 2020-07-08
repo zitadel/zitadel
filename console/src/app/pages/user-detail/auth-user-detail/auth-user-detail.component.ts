@@ -66,7 +66,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.user.gender,
             )
             .then((data: UserProfile) => {
-                this.toast.showInfo('Saved Profile');
+                this.toast.showInfo('USER.TOAST.SAVED', true);
                 this.user = Object.assign(this.user, data.toObject());
             })
             .catch(data => {
@@ -79,7 +79,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
         this.userService
             .SaveMyUserEmail(this.user.email).then((data: UserEmail) => {
-                this.toast.showInfo('Saved Email');
+                this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
                 this.user.email = data.toObject().email;
                 this.emailEditState = false;
             }).catch(data => {
@@ -99,7 +99,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         dialogRef.afterClosed().subscribe(code => {
             if (code) {
                 this.userService.VerifyMyUserPhone(code).then(() => {
-                    this.toast.showInfo('Verified Phone');
+                    this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                 }).catch(error => {
                     this.toast.showError(error.message);
                 });
@@ -113,7 +113,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public resendVerification(): void {
         this.userService.ResendEmailVerification().then(() => {
-            this.toast.showInfo('Saved Email');
+            this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
         }).catch(data => {
             this.toast.showError(data.message);
         });
@@ -121,7 +121,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public resendPhoneVerification(): void {
         this.userService.ResendPhoneVerification().then(() => {
-            this.toast.showInfo('Phoneverification was successfully sent!');
+            this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
         }).catch(data => {
             this.toast.showError(data.message);
         });
@@ -129,7 +129,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     public deletePhone(): void {
         this.userService.RemoveMyUserPhone().then(() => {
-            this.toast.showInfo('Phone removed with success!');
+            this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
             this.user.phone = '';
             this.phoneEditState = false;
         }).catch(data => {
@@ -141,7 +141,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.phoneEditState = false;
         this.userService
             .SaveMyUserPhone(this.user.phone).then((data: UserPhone) => {
-                this.toast.showInfo('Saved Phone');
+                this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                 this.user.phone = data.toObject().phone;
                 this.phoneEditState = false;
             }).catch(data => {

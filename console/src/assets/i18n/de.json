@@ -192,7 +192,23 @@
         "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
-        "ADDACCOUNT":"Account hinzufügen"
+        "ADDACCOUNT":"Account hinzufügen",
+        "TOAST": {
+            "CREATED":"User erfolgreich erstellt",
+            "SAVED":"Profile gespeichert!",
+            "EMAILSAVED":"Email gespeichert!",
+            "PHONESAVED":"Telefonnummer gespeichert!",
+            "PHONEREMOVED":"Telefonnummer gelöscht!",
+            "PHONEVERIFIED":"Telefonnummer bestätigt!",
+            "PHONEVERIFICATIONSENT":"Tel. Bestätigungscode gesendet!",
+            "EMAILVERIFICATIONSENT":"Email Bestätigungscode gesendet!",
+            "OTPREMOVED":"OTP Faktor wurde entfernt!",
+            "INITIALPASSWORDSET":"Initiales Passwort gesetzt!",
+            "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt!",
+            "PASSWORDCHANGED":"Passwort geändert!",
+            "REACTIVATED":"User reaktiviert!",
+            "DEACTIVATED":"User deaktiviert!"
+        }
     },
     "IAM": {
         "DETAIL": {
@@ -437,6 +453,13 @@
             "CREATIONDATE":"Erstelldatum",
             "CHANGEDATE":"Letzte Änderung",
             "RESOURCEOWNER":"Besitzer"
+        },
+        "TOAST":{
+            "MEMBERREMOVED":"Manager entfernt!",
+            "MEMBERSADDED": "Manager hinzugefügt!",
+            "MEMBERADDED": "Manager hinzugefügt!",
+            "ROLEREMOVED":"Rolle entfernt!",
+            "ROLECHANGED":"Rolle verändert!"
         }
     },
     "APP": {
@@ -480,6 +503,12 @@
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
             "AUTHMETHOD2":"None"
+        },
+        "TOAST": {
+            "REACTIVATED":"App reaktiviert!",
+            "DEACTIVATED":"App deaktiviert!",
+            "OIDCUPDATED":"OIDC Config geändert!",
+            "OIDCCLIENTSECRETREGENERATED":"OIDC Client Secret regeneriert!"
         }
     },
     "GENDERS": {
@@ -556,6 +585,10 @@
         "DETAIL": {
             "TITLE":"Authorisierung Detail",
             "DESCRIPTION":""
+        },
+        "TOAST": {
+            "UPDATED":"Berechtigung geändert!",
+            "BULKREMOVED":"Berechtigungen entfernt!"
         }
     },
     "CHANGES": {

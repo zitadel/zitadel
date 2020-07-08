@@ -145,13 +145,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public changeState(event: MatButtonToggleChange): void {
         if (event.value === AppState.APPSTATE_ACTIVE) {
             this.projectService.ReactivateApplication(this.projectId, this.app.id).then(() => {
-                this.toast.showInfo('Reactivated Application');
+                this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error.message);
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
             this.projectService.DeactivateApplication(this.projectId, this.app.id).then(() => {
-                this.toast.showInfo('Deactivated Application');
+                this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
                 this.toast.showError(error.message);
             });
@@ -222,7 +222,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.projectService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
                     .then((data: OIDCConfig) => {
-                        this.toast.showInfo('OIDC Config saved');
+                        this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
                     .catch(data => {
                         this.toast.showError(data.message);
@@ -233,7 +233,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public regenerateOIDCClientSecret(): void {
         this.projectService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: OIDCConfig) => {
-            this.toast.showInfo('OIDC Secret Regenerated');
+            this.toast.showInfo('APP.TOAST.OIDCCLIENTSECRETREGENERATED', true);
             this.dialog.open(AppSecretDialogComponent, {
                 data: {
                     clientId: data.toObject().clientId,

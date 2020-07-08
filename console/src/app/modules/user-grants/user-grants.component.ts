@@ -129,8 +129,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
         this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
-            .then((newmember: UserGrant) => {
-                this.toast.showInfo('Grant updated!');
+            .then(() => {
+                this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             }).catch(error => {
                 this.toast.showError(error.message);
             });
@@ -138,7 +138,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
     deleteGrantSelection(): void {
         this.userService.BulkRemoveUserGrant(this.selection.selected.map(grant => grant.id)).then(() => {
-            this.toast.showInfo('Grants deleted');
+            this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
             console.log(data);
             this.selection.selected.forEach((item) => {
