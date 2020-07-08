@@ -15,6 +15,7 @@ import {
     MyProjectOrgSearchRequest,
     MyProjectOrgSearchResponse,
     PasswordChange,
+    PasswordComplexityPolicy,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
@@ -64,6 +65,15 @@ export class AuthUserService {
             f => f,
         );
     }
+
+    public async GetMyPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
+        return await this.request(
+            c => c.getMyPasswordComplexityPolicy,
+            new Empty(),
+            f => f,
+        );
+    }
+
 
     public async GetMyUser(): Promise<UserView> {
         return await this.request(

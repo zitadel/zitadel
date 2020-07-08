@@ -160,7 +160,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementLength(): void {
-        if (this.complexityData?.minLength) {
+        if (this.complexityData?.minLength !== undefined) {
             this.complexityData.minLength++;
         }
     }
@@ -172,7 +172,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementMaxAttempts(): void {
-        if (this.lockoutData?.maxAttempts) {
+        if (this.lockoutData?.maxAttempts !== undefined) {
             this.lockoutData.maxAttempts++;
         }
     }
@@ -184,7 +184,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementExpireWarnDays(): void {
-        if (this.ageData?.expireWarnDays) {
+        if (this.ageData?.expireWarnDays !== undefined) {
             this.ageData.expireWarnDays++;
         }
     }
@@ -196,7 +196,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementMaxAgeDays(): void {
-        if (this.ageData?.maxAgeDays) {
+        if (this.ageData?.maxAgeDays !== undefined) {
             this.ageData.maxAgeDays++;
         }
     }
