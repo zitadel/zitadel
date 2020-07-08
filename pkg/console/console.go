@@ -96,6 +96,7 @@ func AssetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMa
 					return
 				}
 				middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge, handler).ServeHTTP(w, r)
+				return
 			}
 		})
 	}
