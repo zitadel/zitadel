@@ -3,144 +3,149 @@
 package grpc
 
 import (
-	"github.com/caos/zitadel/internal/api/authz"
+	"google.golang.org/grpc"
+
+	utils_auth "github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
 /**
  * AuthService
  */
 
-const AuthService_MethodPrefix = "caos.zitadel.auth.api.v1.AuthService"
+var AuthService_AuthMethods = utils_auth.MethodMapping{
 
-var AuthService_AuthMethods = authz.MethodMapping{
-
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserSessions": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserSessions": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyUser": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUser": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserProfile": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserProfile": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/UpdateMyUserProfile": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/UpdateMyUserProfile": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserEmail": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserEmail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyUserEmail": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyUserEmail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyUserEmail": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyUserEmail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/ResendMyEmailVerificationMail": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ResendMyEmailVerificationMail": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserPhone": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyUserPhone": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/RemoveMyUserPhone": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/RemoveMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyUserPhone": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMyUserPhone": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/ResendMyPhoneVerificationCode": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ResendMyPhoneVerificationCode": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserAddress": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserAddress": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserChanges": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyUserChanges": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/UpdateMyUserAddress": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/UpdateMyUserAddress": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyMfas": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyMfas": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyPassword": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/ChangeMyPassword": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyPasswordComplexityPolicy": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyPasswordComplexityPolicy": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/AddMfaOTP": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/AddMfaOTP": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/VerifyMfaOTP": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/VerifyMfaOTP": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/RemoveMfaOTP": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/RemoveMfaOTP": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/SearchMyUserGrant": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/SearchMyUserGrant": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/SearchMyProjectOrgs": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/SearchMyProjectOrgs": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyZitadelPermissions": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyZitadelPermissions": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.auth.api.v1.AuthService/GetMyProjectPermissions": authz.Option{
+	"/caos.zitadel.auth.api.v1.AuthService/GetMyProjectPermissions": utils_auth.Option{
 		Permission: "authenticated",
 		CheckParam: "",
 	},
+}
+
+func AuthService_Authorization_Interceptor(verifier utils_auth.TokenVerifier, authConf *utils_auth.Config) grpc.UnaryServerInterceptor {
+	return middleware.AuthorizationInterceptor(verifier, authConf, AuthService_AuthMethods)
 }
