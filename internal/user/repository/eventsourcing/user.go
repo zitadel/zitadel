@@ -282,7 +282,7 @@ func InitCodeVerifiedAggregate(aggCreator *es_models.AggregateCreator, existing 
 				return nil, err
 			}
 		}
-		if password != nil {
+		if password != nil && password.Secret != nil {
 			agg, err = agg.AppendEvent(model.UserPasswordChanged, password)
 			if err != nil {
 				return nil, err
