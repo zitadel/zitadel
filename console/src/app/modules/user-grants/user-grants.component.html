@@ -77,25 +77,22 @@
 
         <ng-container matColumnDef="roleNamesList">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
-            <td mat-cell *matCellDef="let grant">
-                <!-- TODO check behaviour for empty role projects -->
-                <ng-container *ngIf="roleOptions.length === 0; else showOptions">
+            <td mat-cell *matCellDef="let grant; let i = index">
+                <ng-container *ngIf="loadedProjectId !== grant.projectId">
                     <span class="role app-label" *ngFor="let role of grant.roleKeysList">{{role}}</span>
                     <button mat-icon-button (click)="loadRoleOptions(grant.projectId)">
-                        <mat-icon>edit</mat-icon>
+                        <i class="las la-edit"></i>
                     </button>
                 </ng-container>
-                <ng-template #showOptions>
-                    <mat-form-field class="form-field" appearance="outline" *ngIf="projectId">
-                        <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
-                        <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowCreate == false"
-                            (selectionChange)="updateRoles(grant, $event)">
-                            <mat-option *ngFor="let role of roleOptions" [value]="role.key">
-                                {{ role.displayName }} {{role.key}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </ng-template>
+                <mat-form-field class="form-field" appearance="outline" *ngIf="loadedProjectId === grant.projectId">
+                    <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
+                    <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="allowCreate == false"
+                        (selectionChange)="updateRoles(grant, $event)">
+                        <mat-option *ngFor="let role of roleOptions" [value]="role.key">
+                            {{role.key}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </td>
         </ng-container>
 

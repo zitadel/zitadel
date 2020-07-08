@@ -6,23 +6,25 @@ import (
 )
 
 type NotifyUser struct {
-	ID                string
-	CreationDate      time.Time
-	ChangeDate        time.Time
-	ResourceOwner     string
-	UserName          string
-	FirstName         string
-	LastName          string
-	NickName          string
-	DisplayName       string
-	PreferredLanguage string
-	Gender            Gender
-	LastEmail         string
-	VerifiedEmail     string
-	LastPhone         string
-	VerifiedPhone     string
-	PasswordSet       bool
-	Sequence          uint64
+	ID                 string
+	CreationDate       time.Time
+	ChangeDate         time.Time
+	ResourceOwner      string
+	UserName           string
+	PreferredLoginName string
+	LoginNames         []string
+	FirstName          string
+	LastName           string
+	NickName           string
+	DisplayName        string
+	PreferredLanguage  string
+	Gender             Gender
+	LastEmail          string
+	VerifiedEmail      string
+	LastPhone          string
+	VerifiedPhone      string
+	PasswordSet        bool
+	Sequence           uint64
 }
 
 type NotifyUserSearchRequest struct {
@@ -36,8 +38,9 @@ type NotifyUserSearchRequest struct {
 type NotifyUserSearchKey int32
 
 const (
-	NotifyUserSearchKeyUnspecified UserSearchKey = iota
+	NotifyUserSearchKeyUnspecified NotifyUserSearchKey = iota
 	NotifyUserSearchKeyUserID
+	NotifyUserSearchKeyResourceOwner
 )
 
 type NotifyUserSearchQuery struct {

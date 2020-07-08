@@ -117,6 +117,9 @@
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon>close</mat-icon>
                         </button>
+                        <button *ngIf="user.phone" color="warn" (click)="deletePhone()" mat-icon-button>
+                            <i class="las la-trash"></i>
+                        </button>
                         <button [disabled]="!user.phone" type="button" color="primary" (click)="savePhone()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
@@ -129,10 +132,9 @@
 
     <metainfo *ngIf="user" class="side">
         <div class="details">
-            <div class="row" *ngIf="user?.loginNamesList">
-                <span class="first">Login Names:</span>
-                <span class="second"><span style="display: block;"
-                        *ngFor="let login of user?.loginNamesList">{{login}}</span></span>
+            <div class="row" *ngIf="user?.preferredLoginName">
+                <span class="first">Preferred Loginname:</span>
+                <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
         </div>
 

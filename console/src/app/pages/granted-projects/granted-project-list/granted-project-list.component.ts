@@ -40,7 +40,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         new MatTableDataSource<ProjectGrantView.AsObject>();
 
     public grantedProjectList: ProjectGrantView.AsObject[] = [];
-    public displayedColumns: string[] = ['select', 'name', 'orgName', 'orgDomain', 'state', 'creationDate', 'changeDate'];
+    public displayedColumns: string[] = ['select', 'name', 'resourceOwnerName', 'state', 'creationDate', 'changeDate'];
     public selection: SelectionModel<ProjectGrantView.AsObject> = new SelectionModel<ProjectGrantView.AsObject>(true, []);
 
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -88,6 +88,9 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         this.projectService.SearchGrantedProjects(limit, offset).then(res => {
             this.grantedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
+            if (this.totalResult > 5) {
+                this.grid = false;
+            }
             this.dataSource.data = this.grantedProjectList;
             this.loadingSubject.next(false);
         }).catch(error => {

@@ -27,6 +27,7 @@ Mgmt:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'management'
+          Password: $CR_MANAGEMENT_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -41,6 +42,7 @@ Mgmt:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'management'
+      Password: $CR_MANAGEMENT_PASSWORD
       Database: 'management'
       SSL:
         Mode: $CR_SSL_MODE
@@ -102,6 +104,7 @@ Auth:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'auth'
+          Password: $CR_AUTH_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -117,6 +120,7 @@ Auth:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
         User: 'auth'
+        Password: $CR_AUTH_PASSWORD
         Database: 'auth'
         SSL:
           Mode: $CR_SSL_MODE
@@ -127,6 +131,7 @@ Auth:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'auth'
+      Password: $CR_AUTH_PASSWORD
       Database: 'auth'
       SSL:
         Mode: $CR_SSL_MODE
@@ -171,6 +176,7 @@ AuthZ:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'authz'
+          Password: $CR_AUTHZ_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
@@ -185,6 +191,7 @@ AuthZ:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'authz'
+      Password: $CR_AUTHZ_PASSWORD
       Database: 'authz'
       SSL:
         Mode: $CR_SSL_MODE
@@ -212,13 +219,14 @@ Admin:
         SQL:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'admin_api'
+          User: 'adminapi'
+          Password: $CR_ADMINAPI_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_ADMIN_CERT
-            Key: $CR_ADMIN_KEY
+            Cert: $CR_ADMINAPI_CERT
+            Key: $CR_ADMINAPI_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -226,13 +234,14 @@ Admin:
     View:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'admin_api'
-      Database: 'admin_api'
+      User: 'adminapi'
+      Password: $CR_ADMINAPI_PASSWORD
+      Database: 'adminapi'
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_ADMIN_CERT
-        Key: $CR_ADMIN_KEY
+        Cert: $CR_ADMINAPI_CERT
+        Key: $CR_ADMINAPI_KEY
     Spooler:
       ConcurrentTasks: 1
       BulkLimit: 100
@@ -253,6 +262,7 @@ Console:
 Notification:
   Repository:
     DefaultLanguage: 'de'
+    Domain: $ZITADEL_DEFAULT_DOMAIN
     Eventstore:
       ServiceName: 'Notification'
       Repository:
@@ -260,12 +270,13 @@ Notification:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'notification'
+          Password: $CR_NOTIFICATION_PASSWORD
           Database: 'eventstore'
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_NOTIFY_CERT
-            Key: $CR_NOTIFY_KEY
+            Cert: $CR_NOTIFICATION_CERT
+            Key: $CR_NOTIFICATION_KEY
       Cache:
         Type: 'fastcache'
         Config:
@@ -274,12 +285,13 @@ Notification:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'notification'
+      Password: $CR_NOTIFICATION_PASSWORD
       Database: 'notification'
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_NOTIFY_CERT
-        Key: $CR_NOTIFY_KEY
+        Cert: $CR_NOTIFICATION_CERT
+        Key: $CR_NOTIFICATION_KEY
     Spooler:
       ConcurrentTasks: 4
       BulkLimit: 100

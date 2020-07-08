@@ -37,10 +37,13 @@ func (s *SQL) connectionString() string {
 		"host=" + s.Host,
 		"port=" + s.Port,
 		"user=" + s.User,
-		"password=" + s.Password,
 		"dbname=" + s.Database,
 		"sslmode=" + s.SSL.Mode,
 	}
+	if s.Password != "" {
+		fields = append(fields, "password="+s.Password)
+	}
+
 	if s.SSL.Mode != sslDisabledMode {
 		fields = append(fields, []string{
 			"ssl=true",

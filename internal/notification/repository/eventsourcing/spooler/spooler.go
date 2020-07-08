@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"net/http"
 )
 
@@ -17,10 +16,6 @@ type SpoolerConfig struct {
 	FailureCountUntilSkip uint64
 	ConcurrentTasks       int
 	Handlers              handler.Configs
-}
-
-type EventstoreRepos struct {
-	UserEvents *usr_event.UserEventstore
 }
 
 func StartSpooler(c SpoolerConfig, es eventstore.Eventstore, view *view.View, sql *sql.DB, eventstoreRepos handler.EventstoreRepos, systemDefaults sd.SystemDefaults, i18n *i18n.Translator, dir http.FileSystem) *spooler.Spooler {

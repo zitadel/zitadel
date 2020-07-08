@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	orgTable = "admin_api.orgs"
+	orgTable = "adminapi.orgs"
 )
 
 func (v *View) OrgByID(orgID string) (*model.OrgView, error) {

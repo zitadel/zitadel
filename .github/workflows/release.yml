@@ -10,12 +10,22 @@ env:
 
 jobs:
 
-  angular-lint: # will be added later on
+  ## Angular test, will be added later
+
+  angular-lint: 
     runs-on: ubuntu-18.04
     defaults:
       run:
         working-directory: ./console
     steps:
+    - uses: actions/checkout@v2
+    - name: Install Protoc
+      uses: arduino/setup-protoc@master
+      with:
+        version: '3.x'
+    - run: wget -O protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64
+    - run: sudo mv protoc-gen-grpc-web /usr/local/bin/protoc-gen-grpc-web
+    - run: sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
@@ -30,6 +40,13 @@ jobs:
         working-directory: ./console
     steps:
     - uses: actions/checkout@v2
+    - name: Install Protoc
+      uses: arduino/setup-protoc@master
+      with:
+        version: '3.x'
+    - run: wget -O protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64
+    - run: sudo mv protoc-gen-grpc-web /usr/local/bin/protoc-gen-grpc-web
+    - run: sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
@@ -57,15 +74,7 @@ jobs:
         file: ./profile.cov
         name: codecov-go
       
-  go-lint:
-    runs-on: ubuntu-18.04
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2-beta
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - uses: actions/checkout@v2
-    - run: echo "replace me with real lint"
+  ## go lint, will be added later
   
   go-build:
     runs-on: ubuntu-18.04

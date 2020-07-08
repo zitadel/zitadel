@@ -23,7 +23,7 @@
             </div>
         </form>
 
-        <div *ngIf="name?.touched" @openClose>
+        <!-- <div *ngIf="name?.touched" @openClose>
             <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate }}</p>
 
             <p>{{domain?.value}}/.well-known/caos-developer-domain-association.txt</p>
@@ -36,7 +36,7 @@
             </div>
 
             <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_SKIP' | translate }}</p>
-        </div>
+        </div> -->
     </ng-container>
 
     <ng-container *ngIf="currentCreateStep == createSteps">
