@@ -16,6 +16,7 @@ import { HttpLoaderFactory } from 'src/app/app.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { OrgContributorsModule } from './org-contributors/org-contributors.module';
@@ -43,6 +44,8 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         MetaLayoutModule,
         MatTabsModule,
         MatTooltipModule,
+        MatDialogModule,
+        WarnDialogModule,
         MatMenuModule,
         ChangesModule,
         TranslateModule.forChild({
