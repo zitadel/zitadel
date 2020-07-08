@@ -19,11 +19,10 @@ echo "Generate grpc"
 
 protoc \
   -I=/usr/local/include \
-  -I=../pkg \
+  -I=../pkg/message \
   -I=../pkg/management/api/proto \
   -I=../pkg/auth/api/proto \
   -I=../pkg/admin/api/proto \
-  -I=../pkg \
   -I=../internal/protoc/protoc-gen-authoption \
   -I=node_modules/google-proto-files \
   -I=tmp \

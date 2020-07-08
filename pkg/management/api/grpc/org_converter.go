@@ -5,6 +5,8 @@ import (
 
 	"github.com/caos/logging"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/pkg/message"
+
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -171,7 +173,7 @@ func orgChangesToMgtAPI(changes *org_model.OrgChanges) (_ []*Change) {
 		}
 		result[i] = &Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
 			Editor:     change.ModifierName,

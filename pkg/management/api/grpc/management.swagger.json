@@ -3778,7 +3778,7 @@
           "format": "date-time"
         },
         "event_type": {
-          "type": "string"
+          "$ref": "#/definitions/v1LocalizedMessage"
         },
         "sequence": {
           "type": "string",
@@ -3936,6 +3936,17 @@
         "set_up_started": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "v1LocalizedMessage": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "localized_message": {
+          "type": "string"
         }
       }
     },
