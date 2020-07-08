@@ -3,19 +3,19 @@
     "HOME": {
         "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-        "SECURITYANDPRIVACY_DESC": "Verwalten deine Informationen und Sicherheitseinstellungen.",
+        "SECURITYANDPRIVACY_DESC": "Verwalte deine Informationen und Sicherheitseinstellungen.",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
         "PROTECTION": "Organisationsrichtlinien",
-        "PROTECTION_DESC": "Verwalten deine Organisationsrichtlinien. Entdecken die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
+        "PROTECTION_DESC": "Verwalte deine Organisationsrichtlinien und entdecke die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
         "PROTECTION_BUTTON": "Erkunden",
         "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
-        "PROJECTS_DESC": "Autorisieren andere Benutzer, deine eigenen Projekte zu verwenden oder definieren benutzerdefinierte Rollen für berechtigte Projekte",
+        "PROJECTS_DESC": "Autorisiere andere Benutzer, deine eigenen Projekte zu verwenden oder definieren benutzerdefinierte Rollen für berechtigte Projekte",
         "PROJECTS_BUTTON": "Projekt Übersicht",
-        "USERS": "Erstelle und verwalten deine Benutzer.",
-        "USERS_DESC": "Überwachen dein Rollenkonzept in Echtzeit. Ergreifen sofort Massnahmen.",
+        "USERS": "Erstelle und verwalte deine Benutzer.",
+        "USERS_DESC": "Überwache dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
         "USERS_BUTTON": "Benutzer anzeigen",
         "ADMIN": "Identity and Access Management",
-        "ADMIN_DESC": "Verwalten deine Organisationen und Administratoren.",
+        "ADMIN_DESC": "Verwalte deine Organisationen und Administratoren.",
         "ADMIN_BUTTON": "ZITADEL verwalten"
     },
     "MENU": {
@@ -58,7 +58,7 @@
         "PAGES": {
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
-            "DESCRIPTION": "Erfasse und Verwalte die Benutzer in deiner Organisation",
+            "DESCRIPTION": "Erfasse und verwalte die Benutzer in deiner Organisation",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
             "MY": "Meine Informationen",
@@ -76,7 +76,7 @@
             "MANAGE_DESCRIPTION": "Verwalte die Multifaktor Merkmale deiner Benutzer.",
             "OTP": "OTP konfigurieren",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
-            "OTP_DIALOG_DESCRIPTION": "Scanne den QR Code mit einer Authenticator-App und verifizieren den erhaltenen Code um OTP zu aktivieren.",
+            "OTP_DIALOG_DESCRIPTION": "Scanne den QR Code mit einer Authenticator-App und verifiziere den erhaltenen Code um OTP zu aktivieren.",
             "TYPE": {
                 "0":"Keine MFA definiert",
                 "1":"SMS",
@@ -142,7 +142,7 @@
         "PHONE": "Telefonnummer",
         "LOGINMETHODS": {
             "TITLE": "Kontakt Informationen",
-            "DESCRIPTION": "Die Kontakt Informationen werden benötigt um dir wichtige Informationen wie Passwort Reset Email zu senden.",
+            "DESCRIPTION": "Die Kontakt Informationen werden benötigt um dir wichtige Informationen wie Passwort und Reset Email zu senden.",
             "EMAIL": {
                 "TITLE": "Email",
                 "VALID": "Validiert",
@@ -188,7 +188,7 @@
             "EXTERNAL": "Um einen Benutzer ihrer eigenen Organisation zu berechtigen",
             "CLICKHERE":"Hier klicken"
         },
-        "SIGNEDOUT":"Du bist abgemeldet. Klicke auf den Button um dich anzumelden!",
+        "SIGNEDOUT":"Du bist abgemeldet. Klicke auf den Button um dich erneut anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
         "ADDACCOUNT":"Account hinzufügen"
@@ -197,7 +197,7 @@
         "DETAIL": {
             "TITLE":"Identity and Access Management Administration",
             "DESCRIPTION":"Verwalte die ZITADEL Einstellungen."
-        }, 
+        },
         "MEMBER": {
             "TITLE":"Manager",
             "DESCRIPTION": "Manger können die Organisation editieren und Projekte verwalten."
@@ -220,7 +220,7 @@
             "CREATE":"Organisation erstellen",
             "ORGDETAIL_TITLE":"Gib den Namen und die Domain für die neue Organisation ein.",
             "ORGDOMAIN_TITLE":"Organisations Domain Verifikation",
-            "ORGDOMAIN_VERIFICATION":"Stelle deine Domain bereit und überprüfen deren Besitz indem du eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
+            "ORGDOMAIN_VERIFICATION":"Stelle deine Domain bereit und überprüfe deren Besitz indem du eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
             "ORGDOMAIN_VERIFICATION_SKIP":"Du kannst die Überprüfung vorerst überspringen und deine Organisation weiter erstellen. Um deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
             "DOWNLOAD_FILE":"Datei download",
@@ -383,7 +383,7 @@
                 "SEL_ORG": "Suchen nach der Domain",
                 "SEL_ORG_DESC":"Gib die vollständige Domain ein um Resultate zu erhalten!",
                 "ORG_TITLE":"Organisation",
-                "ORG_DESCRIPTION":"Du bistim Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
+                "ORG_DESCRIPTION":"Du bist im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
                 "ORG_DESCRIPTION_DESC":"Wechsel den Kontext um die Organisation zu wechseln!",
                 "SEL_ORG_FORMFIELD":"Vollständige Domain",
                 "SEL_ORG_BUTTON": "Suche Organisation",
@@ -443,7 +443,7 @@
         "LIST": "Applications",
         "PAGES": {
             "TITLE": "Applikation",
-            "DESCRIPTION": "Hier kannst du deine Applikation bearbeiten deren Konfiguration anpassen.",
+            "DESCRIPTION": "Hier kannst du deine Applikation bearbeiten und deren Konfiguration anpassen.",
             "CREATE_OIDC": "OIDC Applikation",
             "CREATE_OIDC_DESc": "Gib deine Applikationsdaten ein!",
             "DETAIL": {
