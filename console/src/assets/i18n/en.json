@@ -234,7 +234,7 @@
             "DESCRIPTION":"Configure your domains on which your users will be registered.",
             "DELETE": {
                 "TITLE":"Delete domain?",
-                "DESCRIPTION":"You are about to delete one of your domains. Note that this action can trigger an irrevocable behaviour."
+                "DESCRIPTION":"You are about to delete one of your domains. Note that your users can no longer use this domain for their logins."
             }
         },
         "STATE": {
