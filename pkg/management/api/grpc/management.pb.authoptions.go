@@ -125,6 +125,11 @@ var ManagementService_AuthMethods = utils_auth.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveUserPhone": utils_auth.Option{
+		Permission: "user.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/ResendPhoneVerificationCode": utils_auth.Option{
 		Permission: "user.write",
 		CheckParam: "",

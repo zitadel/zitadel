@@ -71,6 +71,14 @@ func (es *ProjectEventstore) ProjectByID(ctx context.Context, id string) (*proj_
 	return model.ProjectToModel(project), nil
 }
 
+func (es *ProjectEventstore) ProjectEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
+	query, err := ProjectByIDQuery(id, sequence)
+	if err != nil {
+		return nil, err
+	}
+	return es.FilterEvents(ctx, query)
+}
+
 func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_model.Project) (*proj_model.Project, error) {
 	if !project.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9dk45", "Errors.Project.Invalid")
@@ -250,7 +258,7 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 
 func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
 	if roles == nil || len(roles) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-idue3", "Errors.Project.MinimumOneRoleNeeded")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-uOJAs", "Errors.Project.MinimumOneRoleNeeded")
 	}
 	for _, role := range roles {
 		if !role.IsValid() {
@@ -380,7 +388,7 @@ func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, last
 		change := &proj_model.ProjectChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 
@@ -558,7 +566,7 @@ func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, 
 		change := &proj_model.ApplicationChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 		appendChanges := true

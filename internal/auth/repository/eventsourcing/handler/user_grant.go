@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"strings"
+	"time"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -22,8 +25,6 @@ import (
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	grant_es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"strings"
-	"time"
 )
 
 type UserGrant struct {
@@ -171,7 +172,6 @@ func (u *UserGrant) processOrg(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserGrantSequence(event.Sequence)
 	}
-	return nil
 }
 
 func (u *UserGrant) processIamMember(event *models.Event, rolePrefix string, suffix bool) error {
@@ -341,6 +341,6 @@ func (u *UserGrant) fillOrgData(grant *view_model.UserGrantView, org *org_model.
 }
 
 func (u *UserGrant) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-8is4s", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.LogWithFields("SPOOL-UZmc7", "id", event.AggregateID).WithError(err).Warn("something went wrong in user grant handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserGrantFailedEvent, u.view.ProcessedUserGrantFailedEvent, u.view.ProcessedUserGrantSequence, u.errorCountUntilSkip)
 }

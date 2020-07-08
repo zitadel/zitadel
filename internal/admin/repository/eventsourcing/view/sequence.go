@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	sequencesTable = "admin_api.current_sequences"
+	sequencesTable = "adminapi.current_sequences"
 )
 
 func (v *View) saveCurrentSequence(viewName string, sequence uint64) error {

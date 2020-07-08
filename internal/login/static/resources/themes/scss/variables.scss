@@ -1,6 +1,6 @@
 // ----- FONTS ------------
 $standardFont: Lato;
-$headerFont: Aileron;
+$headerFont: Lato;
 
 // ----- LAYOUT ------------
 $inputHeight: 50px;
@@ -21,11 +21,11 @@ $retina: "only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (
 
 // ----- DARK-THEME --------
 $backgroundColor: #282828;
-$fontColor: #FFFFFF;
-$primaryColor: #364DF6;
+$fontColor: #BBBBC8;
+$primaryColor: #3574C6;
 $primaryColorHover: lighten($primaryColor, 10%);
 $labelColor: #898989;
-$inputBorderColor: #595959;
+$inputBorderColor: #505050;
 $inputBackgroundColor: #252525;
 $buttonBackgroundColorHover: $inputBackgroundColor;
 $profileImgDark: "/resources/images/icon-user-dark";

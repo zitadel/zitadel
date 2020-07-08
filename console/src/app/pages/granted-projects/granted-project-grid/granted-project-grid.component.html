@@ -1,0 +1,59 @@
+<div class="view-toggle">
+    <button (click)="changedView.emit(true)" mat-icon-button>
+        <i class="show list view las la-th-list"></i>
+    </button>
+</div>
+<div class="container">
+    <mat-progress-bar *ngIf="loading" class="spinner" color="accent" mode="indeterminate"></mat-progress-bar>
+
+    <p class="n-items" *ngIf="!loading && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}</p>
+
+    <div class="item card" *ngFor="let item of selection.selected; index as i"
+        [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}"
+        [routerLink]="[item.projectId, 'grant', item.id]">
+        <div class="text-part">
+            <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+                {{
+                        item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+            }}</span>
+            <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
+            <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
+            <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+                {{ item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm' }}</span>
+            <span class="fill-space"></span>
+            <div class="icons">
+            </div>
+        </div>
+        <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
+            mat-icon-button>
+            <mat-icon>push_pin_outline</mat-icon>
+        </button>
+    </div>
+
+</div>
+<div class="container">
+    <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
+
+    <div class="item card" *ngFor="let item of notPinned; index as i" [routerLink]="[item.projectId, 'grant', item.id]"
+        [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
+        <div class="text-part">
+            <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+                {{
+                        item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+            }}</span>
+            <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
+            <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
+            <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+                {{ item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm' }}</span>
+            <span class="fill-space"></span>
+            <div class="icons">
+            </div>
+        </div>
+        <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
+            mat-icon-button>
+            <mat-icon>push_pin_outline</mat-icon>
+        </button>
+    </div>
+    <p class="n-items" *ngIf="!loading && items.length === 0 && selection.selected.length === 0">
+        {{'PROJECT.PAGES.NOITEMS' | translate}}</p>
+</div>

@@ -46,13 +46,13 @@
                     [dataSource]="dataSource">
                     <ng-container matColumnDef="select">
                         <th class="selection" mat-header-cell *matHeaderCellDef>
-                            <mat-checkbox (change)="$event ? masterToggle() : null"
+                            <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
                                 [checked]="selection.hasValue() && isAllSelected()"
                                 [indeterminate]="selection.hasValue() && !isAllSelected()">
                             </mat-checkbox>
                         </th>
                         <td class="selection" mat-cell *matCellDef="let row">
-                            <mat-checkbox (click)="$event.stopPropagation()"
+                            <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                                 (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
                             </mat-checkbox>
                         </td>

@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpLoaderFactory } from 'src/app/app.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 
 import { UserListRoutingModule } from './user-list-routing.module';
@@ -25,6 +26,7 @@ import { UserListComponent } from './user-list.component';
         UserListComponent,
     ],
     imports: [
+        AvatarModule,
         UserListRoutingModule,
         CommonModule,
         FormsModule,

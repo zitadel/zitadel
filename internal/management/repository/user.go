@@ -32,6 +32,7 @@ type UserRepository interface {
 
 	PhoneByID(ctx context.Context, userID string) (*model.Phone, error)
 	ChangePhone(ctx context.Context, email *model.Phone) (*model.Phone, error)
+	RemovePhone(ctx context.Context, userID string) error
 	CreatePhoneVerificationCode(ctx context.Context, userID string) error
 
 	AddressByID(ctx context.Context, userID string) (*model.Address, error)

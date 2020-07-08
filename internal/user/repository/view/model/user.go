@@ -193,6 +193,9 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		err = u.setData(event)
 	case es_model.UserPhoneVerified:
 		u.IsPhoneVerified = true
+	case es_model.UserPhoneRemoved:
+		u.Phone = ""
+		u.IsPhoneVerified = false
 	case es_model.UserDeactivated:
 		u.State = int32(model.UserStateInactive)
 	case es_model.UserReactivated,
@@ -250,6 +253,9 @@ func (u *UserView) ComputeObject() {
 		} else {
 			u.State = int32(model.UserStateInitial)
 		}
+	}
+	if u.OTPState != int32(model.MfaStateReady) {
+		u.MfaMaxSetUp = int32(req_model.MfaLevelNotSetUp)
 	}
 	if u.OTPState == int32(model.MfaStateReady) {
 		u.MfaMaxSetUp = int32(req_model.MfaLevelSoftware)

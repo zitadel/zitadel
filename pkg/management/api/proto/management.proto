@@ -8,6 +8,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 import "authoption/options.proto";
+import "message.proto";
 
 package caos.zitadel.management.api.v1;
 
@@ -284,6 +285,16 @@ service ManagementService {
         option (google.api.http) = {
             put: "/users/{id}/phone"
             body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    rpc RemoveUserPhone(UserID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/users/{id}/phone"
         };
 
         option (caos.zitadel.utils.v1.auth_option) = {
@@ -1372,10 +1383,11 @@ message Changes {
 
 message Change {
     google.protobuf.Timestamp change_date = 1;
-    string event_type = 2;
+    caos.zitadel.api.v1.LocalizedMessage event_type = 2;
     uint64 sequence = 3;
-    string editor = 4;
-    google.protobuf.Struct data = 5;
+    string editor_id = 4;
+    string editor = 5;
+    google.protobuf.Struct data = 6;
 }
 
 message ApplicationID {
@@ -2553,6 +2565,7 @@ message UserGrantView {
     string project_name = 15;
     uint64 sequence = 16;
     string resource_owner = 17;
+    string display_name = 18;
 }
 
 

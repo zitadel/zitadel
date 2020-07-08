@@ -104,6 +104,13 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	if err != nil {
 		return nil, err
 	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
 	return changes, nil
 }
 
@@ -173,6 +180,10 @@ func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.
 
 func (repo *UserRepo) ChangePhone(ctx context.Context, email *usr_model.Phone) (*usr_model.Phone, error) {
 	return repo.UserEvents.ChangePhone(ctx, email)
+}
+
+func (repo *UserRepo) RemovePhone(ctx context.Context, userID string) error {
+	return repo.UserEvents.RemovePhone(ctx, userID)
 }
 
 func (repo *UserRepo) CreatePhoneVerificationCode(ctx context.Context, userID string) error {

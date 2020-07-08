@@ -82,15 +82,19 @@ body {
 }
 
 html {
+  height: 100%;
+  width: 100%;
+  font-weight: 300;
   background-color: #282828;
   color: white;
+  background-repeat: no-repeat;
+  background-position: bottom right;
 }
 
 h1 {
   color: white;
   font-family: Aileron;
-  text-transform: uppercase;
-  text-align: center;
+  font-weight: 300;
   font-size: 40px;
 }
 
@@ -119,15 +123,13 @@ header .logo {
 a {
   color: #760038;
   text-decoration: none;
-  text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 400;
 }
 a:hover {
   color: #f60075;
 }
 
 button {
-  text-transform: uppercase;
   background-color: #282828;
   color: #760038;
   border: 2px solid #760038;
@@ -156,7 +158,7 @@ input:not([type=radio]), select {
   background-color: #252525;
   color: white;
   height: 50px;
-  border: 2px solid #595959;
+  border: 2px solid #505050;
   border-radius: 5px;
   padding-left: 15px;
 }
@@ -241,7 +243,7 @@ form button.user-selection .sessionstate {
   height: 20px;
   width: 20px;
   border-radius: 20px;
-  border-color: #595959;
+  border-color: #505050;
   border-style: solid;
   border-width: 1px;
   position: absolute;
@@ -272,6 +274,8 @@ form button.user-selection > div.names .loginname {
 form button.other-user .other-user-image {
   width: 100px;
   height: 75px;
+  background-repeat: no-repeat;
+  background-position: center;
   background-image: url("/resources/images/icon-newuser-dark.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
@@ -281,6 +285,8 @@ form button.other-user .other-user-image {
   }
 }
 form button.other-user:hover .other-user-image {
+  background-repeat: no-repeat;
+  background-position: center;
   background-image: url("/resources/images/icon-newuser-dark-hover.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
@@ -421,11 +427,11 @@ html input {
   background-color: white;
   color: #282828;
 }
-html #qrcode svg rect[style*="fill:white"] {
-  fill: white !important;
+html #qrcode svg rect.color {
+  fill: #282828;
 }
-html #qrcode svg rect[style*="fill:black"] {
-  fill: #282828 !important;
+html #qrcode svg rect.bg-color {
+  fill: white;
 }
 html footer {
   background-image: url("../gradientdeco-full.svg");

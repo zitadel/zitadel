@@ -1,7 +1,3 @@
-h1 {
-    font-family: ailerons;
-}
-
 .container {
 	padding: 4rem 4rem 2rem 4rem;
 
@@ -36,16 +32,15 @@ h1 {
 
 .org {
     height: 120px;
-    // width: 120px;
     padding: 1rem;
     display: flex;
     justify-content: center;
     flex-direction: column;
-    align-items: center;
 
-    .title {
+    .name {
         margin-top: 0;
         font-size: 1rem;
+        margin-bottom: 1rem;
     }
 
     span {

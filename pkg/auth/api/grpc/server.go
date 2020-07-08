@@ -41,6 +41,7 @@ func (s *Server) GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Serve
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.ErrorHandler(defaults.DefaultLanguage),
+				middleware.TranslationHandler(defaults.DefaultLanguage),
 				AuthService_Authorization_Interceptor(s.verifier, &s.authZ),
 			),
 		),

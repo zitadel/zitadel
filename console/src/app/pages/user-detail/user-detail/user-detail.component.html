@@ -1,11 +1,21 @@
 <app-meta-layout>
-
     <div *ngIf="user" class="max-width-container">
         <div class="head">
             <a (click)="navigateBack()" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.firstName}}</h1>
+            <h1>{{ 'USER.PROFILE.TITLE' | translate }} {{user?.displayName}}</h1>
+
+            <span class="fill-space"></span>
+
+            <ng-template appHasRole [appHasRole]="['user.write', 'user.write:'+user?.id]">
+                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
+                    class="state-button"
+                    (click)="changeState(UserState.USERSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
+                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
+                    class="state-button"
+                    (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
+            </ng-template>
 
             <p class="desc">{{ 'USER.PROFILE.DESCRIPTION' | translate }}</p>
         </div>
@@ -13,6 +23,19 @@
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
+
+        <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
+            description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
+            <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
+                <span>{{login}}</span>
+                <button color="primary" [disabled]="copied == login"
+                    [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
+                    (click)="copytoclipboard(login)" mat-icon-button>
+                    <i *ngIf="copied != login" class="las la-clipboard"></i>
+                    <i *ngIf="copied == login" class="las la-clipboard-check"></i>
+                </button>
+            </div>
+        </app-card>
 
         <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
             <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
@@ -25,76 +48,22 @@
             </app-card>
         </ng-template>
 
-        <app-card title="{{'USER.PASSWORD.TITLE' | translate}}"
-            description="{{'USER.PASSWORD.DESCRIPTION' | translate}}">
-            <card-actions class="card-actions">
-                <button *ngIf="user.state === UserState.USERSTATE_INITIAL" mat-stroked-button color="primary"
-                    (click)="sendSetPasswordNotification()">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-            </card-actions>
-            <form *ngIf="passwordForm" autocomplete="new-password" [formGroup]="passwordForm"
-                (ngSubmit)="setInitialPassword()">
-                <div class="content center">
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
-                        <input autocomplete="off" name="password" matInput formControlName="password" type="password" />
-
-                        <mat-error *ngIf="password?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.symbolValidator">
-                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.numberValidator">
-                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.upperCaseValidator">
-                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.lowerCaseValidator">
-                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate:password?.errors?.minlength }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
-                        <input autocomplete="off" name="passwordRepeat" matInput formControlName="confirmPassword"
-                            type="password" />
-
-                        <mat-error *ngIf="confirmPassword?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
-                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.numberValidator">
-                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.notequal">
-                            {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.upperCaseValidator">
-                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.lowerCaseValidator">
-                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate:confirmPassword?.errors?.minlength }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-                <div class="btn-container">
-                    <button [disabled]="passwordForm.invalid" mat-raised-button
-                        color="primary">{{ 'USER.PASSWORD.SET' | translate }}</button>
-                </div>
-            </form>
-        </app-card>
-
         <app-card title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
             description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
             <div class="method-col">
+                <div class="method-row">
+                    <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
+
+                    <span>*********</span>
+                    <div class="actions">
+                        <button class="notify-change-pwd" (click)="sendSetPasswordNotification()" mat-stroked-button
+                            color="primary"
+                            *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
+                        <a [routerLink]="['password']" mat-icon-button>
+                            <mat-icon>chevron_right</mat-icon>
+                        </a>
+                    </div>
+                </div>
                 <div class="method-row">
                     <span class="label">{{ 'USER.EMAIL' | translate }}</span>
 
@@ -143,7 +112,6 @@
                             <ng-container *ngIf="user?.phone && !user?.isPhoneVerified">
                                 <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
                                 </mat-icon>
-
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
                                     (click)="resendPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
                             </ng-container>
@@ -152,9 +120,6 @@
                         <div class="actions">
                             <button (click)="phoneEditState = true" mat-icon-button>
                                 <mat-icon>edit</mat-icon>
-                            </button>
-                            <button *ngIf="user?.phone" (click)="deletePhone()" color="warn" mat-icon-button>
-                                <i class="las la-trash"></i>
                             </button>
                         </div>
                     </ng-container>
@@ -167,6 +132,9 @@
                         <button (click)="phoneEditState = false" mat-icon-button>
                             <mat-icon>close</mat-icon>
                         </button>
+                        <button *ngIf="user.phone" color="warn" (click)="deletePhone()" mat-icon-button>
+                            <i class="las la-trash"></i>
+                        </button>
                         <button [disabled]="!user.phone" type="button" color="primary" (click)="savePhone()"
                             mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
                     </ng-template>
@@ -176,52 +144,21 @@
 
         <app-user-mfa *ngIf="user" [user]="user"></app-user-mfa>
 
-        <app-card title="{{ 'USER.ADDRESS.TITLE' | translate }}">
-            <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
-                <div class="content">
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.STREET' | translate }}</mat-label>
-                        <input matInput formControlName="streetAddress" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.POSTAL_CODE' | translate }}</mat-label>
-                        <input matInput formControlName="postalCode" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.LOCALITY' | translate }}</mat-label>
-                        <input matInput formControlName="locality" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.REGION' | translate }}</mat-label>
-                        <input matInput formControlName="region" />
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.COUNTRY' | translate }}</mat-label>
-                        <input matInput formControlName="country" />
-                    </mat-form-field>
-                </div>
-                <div class="btn-container">
-                    <button type="submit" color="primary" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-                </div>
-            </form>
-        </app-card>
-
-        <app-card *ngIf="user?.id" title="{{ 'USER.GRANTS.TITLE' | translate }}"
-            description="{{'USER.GRANTS.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user?.id"></app-user-grants>
+        <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
+            description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
+            <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole"
+                [allowDelete]="['user.grant.delete'] | hasRole"></app-user-grants>
         </app-card>
     </div>
 
     <metainfo *ngIf="user" class="side">
         <div class="details">
-            <div class="row" *ngIf="user?.loginNamesList">
-                <span class="first">Login Names:</span>
-                <span class="second"><span style="display: block;"
-                        *ngFor="let login of user?.loginNamesList">{{login}}</span></span>
+            <div class="row" *ngIf="user?.preferredLoginName">
+                <span class="first">Preferred Loginname:</span>
+                <span class="second"><span style="display: block;">{{user.preferredLoginName}}</span></span>
             </div>
         </div>
 
-        <p class="side-section">{{ 'CHANGES.USER.TITLE' | translate }}</p>
         <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </metainfo>
 </app-meta-layout>

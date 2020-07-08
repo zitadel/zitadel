@@ -68,7 +68,7 @@ export class OrgCreateComponent {
 
         this.orgForm = this.fb.group({
             name: ['', [Validators.required]],
-            domain: ['', [Validators.required]],
+            domain: [''],
         });
         this.orgService.GetPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
@@ -100,7 +100,6 @@ export class OrgCreateComponent {
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
         }).catch(error => {
-            console.log('no password complexity policy defined!');
             console.error(error);
             this.userForm = this.fb.group({
                 userName: ['', [Validators.required]],

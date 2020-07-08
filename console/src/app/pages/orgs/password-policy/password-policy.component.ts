@@ -124,7 +124,6 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                             break;
                         case PolicyComponentType.IAM_POLICY:
                             this.iamData = data.toObject();
-                            console.log(this.iamData);
                             break;
                     }
                 });
@@ -236,7 +235,6 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
                     break;
                 case PolicyComponentType.COMPLEXITY:
-                    console.log(this.complexityData);
                     this.orgService.CreatePasswordComplexityPolicy(
                         this.complexityData.description,
                         this.complexityData.hasLowercase,
@@ -252,7 +250,6 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     break;
 
                 case PolicyComponentType.IAM_POLICY:
-                    console.log(this.complexityData);
                     const orgId = this.sessionStorage.getItem('organization');
                     if (orgId) {
                         this.adminService.CreateOrgIamPolicy(
@@ -294,7 +291,6 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
                     break;
                 case PolicyComponentType.COMPLEXITY:
-                    console.log(this.complexityData);
                     this.orgService.UpdatePasswordComplexityPolicy(
                         this.complexityData.description,
                         this.complexityData.hasLowercase,
@@ -310,7 +306,6 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     break;
 
                 case PolicyComponentType.IAM_POLICY:
-                    console.log(this.complexityData);
                     const orgId = this.sessionStorage.getItem('organization');
                     if (orgId) {
                         this.adminService.UpdateOrgIamPolicy(

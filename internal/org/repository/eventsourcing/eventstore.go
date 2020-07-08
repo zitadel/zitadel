@@ -179,8 +179,12 @@ func (es *OrgEventstore) RemoveOrgDomain(ctx context.Context, domain *org_model.
 	if err != nil {
 		return err
 	}
-	if !existing.ContainsDomain(domain) {
+	_, d := existing.GetDomain(domain)
+	if d == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.DomainNotOnOrg")
+	}
+	if d.Primary {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.PrimaryDomainNotDeletable")
 	}
 	repoOrg := model.OrgFromModel(existing)
 	repoDomain := model.OrgDomainFromModel(domain)
@@ -215,7 +219,7 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence
 		change := &org_model.OrgChange{
 			ChangeDate: creationDate,
 			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
+			ModifierId: u.EditorUser,
 			Sequence:   u.Sequence,
 		}
 

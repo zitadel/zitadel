@@ -19,7 +19,7 @@
 		font-weight: 400;
 		margin-left: 1rem;
 		line-height: 1.2rem;
-        font-family: 'Rubik';
+        font-family: 'Lato';
         margin-right: 1rem;
     }
 
@@ -31,13 +31,6 @@
 	.fill-space {
 		flex: 1;
     }
-    
-    .iamreadwrite {
-        height: 8px;
-        width: 8px;
-        border-radius: 50%;
-        background: linear-gradient(to bottom right, rgb(240,140,53), rgb(233, 60, 231));
-    }
 
 	.icon-container {
 		display: flex;
@@ -48,47 +41,18 @@
 		.docs {
 			text-decoration: none;
 			font-size: 1.4rem;
-			font-family: 'ailerons', sans-serif;
 		}
 
-		.avatar-wrapper {
-			display: flex;
-            align-items: center;
+        .avatar {
+            display: block;
+            margin: auto;
+            cursor: pointer;
+        }
 
-            .avatar-circle {
-                height: 30px;
-                width: 30px;
-                font-size: 30px;
-                background-color: transparent;
-                border-radius: 50%;
-                animation: background-color .2s ease-in;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-left: .5rem;
-
-                .avatar {
-                    display: block;
-                    margin: auto auto;
-                    height: 30px;
-                    width: 30px;
-                    line-height: 30px;
-                    font-size: 30px;
-                    border-radius: 50%;
-                    text-align: center;
-                }
-                
-                &:hover, &.active {
-                    cursor: pointer;
-                    background-color: #ffffff20;
-                }
-            }
-
-			.name {
-				font-size: 1rem;
-				font-weight: 400;
-			}
-		}
+        .name {
+            font-size: 1rem;
+            font-weight: 400;
+        }
 
 		.a_card {
 			position: absolute;
@@ -97,6 +61,13 @@
 			overflow: hidden;
 		}
 	}
+}
+
+.admin-line {
+    font-size: 12px;
+    padding: 4px 2rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .main-container {
@@ -136,7 +107,6 @@
                     text-decoration: none;
                     cursor: pointer;
                     padding: 0.2rem 1rem;
-                    // color: inherit;
                     margin-right: 0.5rem;
                     padding-right: 2rem;
             
@@ -146,7 +116,6 @@
             
                     .label {
                         margin-bottom: 0;
-                        font-family: 'Rubik';
                         font-weight: 500;
                         font-size: .9rem;
                     }
@@ -224,19 +193,24 @@
     }
 }
 
-.footer {
-    padding: 1rem;
-    a {
-        cursor: pointer;
-        text-decoration: none;
-        color: #81868a;
-        font-size: .8rem;
-        display: block;
-        margin-bottom: 1px;
-        font-weight: 300;
+.divider {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: .5rem 0;
 
-        &:hover {
-            text-decoration: underline;
-        }
+    span {
+        border: 1px solid #ffffff10;
+        padding: 2px 1rem;
+        border-radius: .5rem;
+        color: #8795a1;
+        font-size: 12px;
+    }
+    .line {
+        display: block;
+        background-color: #ffffff10;
+        height: 1px;
+        margin: .5rem 0;
+        flex: 1;
     }
 }

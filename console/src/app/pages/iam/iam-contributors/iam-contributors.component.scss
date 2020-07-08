@@ -9,7 +9,7 @@
 
     .sub-header {
         font-size: .8rem;
-        color: #81868a;
+        color: #8795a1;
     }
   
     .people {
@@ -30,12 +30,16 @@
         align-items: center;
   
         .avatar-img, .avatar-circle {
-          float: left;
-          margin: 0 8px 0 -15px;
-          height: 32px;
-          width: 32px;
-          border-radius: 50%;
-          box-shadow: 0 5px 5px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.5);
+            float: left;
+            margin: 0 8px 0 -15px;
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            &:not(:first-child) {
+                -webkit-box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
+                -moz-box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
+                box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
+            }
         }
 
         .add-img {

@@ -42,14 +42,12 @@ export class MemberCreateDialogComponent {
         } else if (this.creationType === CreationType.PROJECT_OWNED) {
             this.projectService.GetProjectMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
-                console.log(this.memberRoleOptions);
             }).catch(error => {
                 toastService.showError(error.message);
             });
         } else if (this.creationType === CreationType.IAM) {
             this.adminService.GetIamMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
-                console.log(this.memberRoleOptions);
             }).catch(error => {
                 toastService.showError(error.message);
             });

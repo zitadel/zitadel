@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/cockroachdb/cockroach-go/crdb"
+	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"time"
 )
 

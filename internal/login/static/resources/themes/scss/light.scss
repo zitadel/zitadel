@@ -2,6 +2,9 @@
 html {
     background-color: $backgroundColorLight;
     color: $fontColorLight;
+    @if($bodyImgLight != "") {
+        background-image: url($bodyImgLight);
+    }
     
     header .logo {
         background-image: url($logoImgLight);
@@ -78,6 +81,8 @@ html {
     }
 
     footer {
-        background-image: url($footerimgLight);
+        @if($footerimgLight != "") {
+            background-image: url($footerimgLight);
+        }
     }
 }

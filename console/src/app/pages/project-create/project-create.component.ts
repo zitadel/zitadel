@@ -25,7 +25,6 @@ export class ProjectCreateComponent implements OnInit {
     public ngOnInit(): void { }
 
     public saveProject(): void {
-        console.log(this.project);
         this.projectService
             .CreateProject(this.project)
             .then((data: Project) => {

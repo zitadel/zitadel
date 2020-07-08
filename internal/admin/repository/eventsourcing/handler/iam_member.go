@@ -21,7 +21,7 @@ type IamMember struct {
 }
 
 const (
-	iamMemberTable = "admin_api.iam_members"
+	iamMemberTable = "adminapi.iam_members"
 )
 
 func (m *IamMember) MinimumCycleDuration() time.Duration { return m.cycleDuration }

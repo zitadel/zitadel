@@ -32,7 +32,12 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+                "@angular/common/locales/de",
+                "src/app/proto/generated/*.js",
+                "src/app/proto/generated/**/*.js"
+             ]
           },
           "configurations": {
             "production": {

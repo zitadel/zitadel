@@ -38,6 +38,10 @@ func (s *Server) GetMyUserPhone(ctx context.Context, _ *empty.Empty) (*UserPhone
 	return phoneViewFromModel(phone), nil
 }
 
+func (s *Server) RemoveMyUserPhone(ctx context.Context, _ *empty.Empty) (*empty.Empty, error) {
+	err := s.repo.RemoveMyPhone(ctx)
+	return &empty.Empty{}, err
+}
 func (s *Server) GetMyUserAddress(ctx context.Context, _ *empty.Empty) (*UserAddressView, error) {
 	address, err := s.repo.MyAddress(ctx)
 	if err != nil {
@@ -111,6 +115,14 @@ func (s *Server) ChangeMyPassword(ctx context.Context, request *PasswordChange) 
 	return &empty.Empty{}, err
 }
 
+func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*PasswordComplexityPolicy, error) {
+	policy, err := s.repo.GetMyPasswordComplexityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return passwordComplexityPolicyFromModel(policy), nil
+}
+
 func (s *Server) AddMfaOTP(ctx context.Context, _ *empty.Empty) (_ *MfaOtpResponse, err error) {
 	otp, err := s.repo.AddMyMfaOTP(ctx)
 	if err != nil {
@@ -127,4 +139,12 @@ func (s *Server) VerifyMfaOTP(ctx context.Context, request *VerifyMfaOtp) (*empt
 func (s *Server) RemoveMfaOTP(ctx context.Context, _ *empty.Empty) (_ *empty.Empty, err error) {
 	s.repo.RemoveMyMfaOTP(ctx)
 	return &empty.Empty{}, err
+}
+
+func (s *Server) GetMyUserChanges(ctx context.Context, request *ChangesRequest) (*Changes, error) {
+	changes, err := s.repo.MyUserChanges(ctx, request.SequenceOffset, request.Limit, request.Asc)
+	if err != nil {
+		return nil, err
+	}
+	return userChangesToResponse(changes, request.GetSequenceOffset(), request.GetLimit()), nil
 }

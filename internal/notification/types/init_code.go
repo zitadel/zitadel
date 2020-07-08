@@ -31,9 +31,10 @@ func SendUserInitCode(dir http.FileSystem, i18n *i18n.Translator, user *view_mod
 		return err
 	}
 	var args = map[string]interface{}{
-		"FirstName": user.FirstName,
-		"LastName":  user.LastName,
-		"Code":      codeString,
+		"FirstName":          user.FirstName,
+		"LastName":           user.LastName,
+		"Code":               codeString,
+		"PreferredLoginName": user.PreferredLoginName,
 	}
 	systemDefaults.Notifications.TemplateData.InitCode.Translate(i18n, args, user.PreferredLanguage)
 	initCodeData := &InitCodeEmailData{TemplateData: systemDefaults.Notifications.TemplateData.InitCode, URL: url}

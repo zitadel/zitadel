@@ -43,16 +43,14 @@ export class SearchRolesAutocompleteComponent {
                 switchMap(value => {
                     const query = new ProjectRoleSearchQuery();
                     query.setKey(ProjectRoleSearchKey.PROJECTROLESEARCHKEY_DISPLAY_NAME);
-                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS);
+                    query.setMethod(SearchMethod.SEARCHMETHOD_CONTAINS_IGNORE_CASE);
                     query.setValue(value);
                     return from(this.projectService.SearchProjectRoles(this.projectId, 10, 0, [query]));
                 }),
             ).subscribe((roles) => {
-                console.log(roles.toObject().resultList);
                 this.isLoading = false;
                 this.filteredRoles = roles.toObject().resultList;
             }, error => {
-                console.log(error);
                 this.isLoading = false;
             });
     }

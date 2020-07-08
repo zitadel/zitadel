@@ -3195,6 +3195,28 @@
           "ManagementService"
         ]
       },
+      "delete": {
+        "operationId": "RemoveUserPhone",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ManagementService"
+        ]
+      },
       "put": {
         "operationId": "ChangeUserPhone",
         "responses": {
@@ -3756,11 +3778,14 @@
           "format": "date-time"
         },
         "event_type": {
-          "type": "string"
+          "$ref": "#/definitions/v1LocalizedMessage"
         },
         "sequence": {
           "type": "string",
           "format": "uint64"
+        },
+        "editor_id": {
+          "type": "string"
         },
         "editor": {
           "type": "string"
@@ -3911,6 +3936,17 @@
         "set_up_started": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "v1LocalizedMessage": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "localized_message": {
+          "type": "string"
         }
       }
     },
@@ -6339,6 +6375,9 @@
           "format": "uint64"
         },
         "resource_owner": {
+          "type": "string"
+        },
+        "display_name": {
           "type": "string"
         }
       }

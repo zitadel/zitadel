@@ -22,11 +22,12 @@ type OrgChanges struct {
 }
 
 type OrgChange struct {
-	ChangeDate *timestamp.Timestamp `json:"changeDate,omitempty"`
-	EventType  string               `json:"eventType,omitempty"`
-	Sequence   uint64               `json:"sequence,omitempty"`
-	Modifier   string               `json:"modifierUser,omitempty"`
-	Data       interface{}          `json:"data,omitempty"`
+	ChangeDate   *timestamp.Timestamp `json:"changeDate,omitempty"`
+	EventType    string               `json:"eventType,omitempty"`
+	Sequence     uint64               `json:"sequence,omitempty"`
+	ModifierId   string               `json:"modifierUser,omitempty"`
+	ModifierName string               `json:"-"`
+	Data         interface{}          `json:"data,omitempty"`
 }
 
 type OrgState int32
@@ -48,13 +49,13 @@ func (o *Org) IsValid() bool {
 	return o.Name != ""
 }
 
-func (o *Org) ContainsDomain(domain *OrgDomain) bool {
-	for _, d := range o.Domains {
+func (o *Org) GetDomain(domain *OrgDomain) (int, *OrgDomain) {
+	for i, d := range o.Domains {
 		if d.Domain == domain.Domain {
-			return true
+			return i, d
 		}
 	}
-	return false
+	return -1, nil
 }
 
 func (o *Org) GetPrimaryDomain() *OrgDomain {

@@ -23,7 +23,7 @@
             </div>
         </form>
 
-        <div *ngIf="name?.touched" @openClose>
+        <!-- <div *ngIf="name?.touched" @openClose>
             <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate }}</p>
 
             <p>{{domain?.value}}/.well-known/caos-developer-domain-association.txt</p>
@@ -36,7 +36,7 @@
             </div>
 
             <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN_VERIFICATION_SKIP' | translate }}</p>
-        </div>
+        </div> -->
     </ng-container>
 
     <ng-container *ngIf="currentCreateStep == createSteps">
@@ -164,7 +164,7 @@
 
                 </div>
                 <div class="btn-container">
-                    <button color="accent" class="continue-button" [disabled]="orgForm.invalid || userForm.invalid"
+                    <button color="primary" class="continue-button" [disabled]="orgForm.invalid || userForm.invalid"
                         type="submit" mat-raised-button>{{ 'ACTIONS.FINISH' | translate }}</button>
                 </div>
             </form>

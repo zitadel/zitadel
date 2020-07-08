@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/jinzhu/gorm"
@@ -12,7 +13,7 @@ type ViewConfig struct {
 }
 
 func Start(conf ViewConfig) (*sql.DB, *gorm.DB, error) {
-	sqlClient, err := sql.Open("postgres", conf.SQL.ConnectionString())
+	sqlClient, err := conf.SQL.Start()
 	if err != nil {
 		return nil, nil, errors.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
 	}
