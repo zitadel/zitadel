@@ -148,7 +148,7 @@ func (s *Server) ProjectGrantUserGrantByID(ctx context.Context, request *Project
 }
 
 func (s *Server) CreateProjectGrantUserGrant(ctx context.Context, in *ProjectGrantUserGrantCreate) (*UserGrant, error) {
-	user, err := s.usergrant.ChangeUserGrant(ctx, projectGrantUserGrantCreateToModel(in))
+	user, err := s.usergrant.AddUserGrant(ctx, projectGrantUserGrantCreateToModel(in))
 	if err != nil {
 		return nil, err
 	}
