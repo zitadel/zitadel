@@ -344,7 +344,8 @@
             "PINNED":"Pinned",
             "ALL": "All",
             "CREATEDON":"Created on",
-            "LASTMODIFIED":"Last modified on"
+            "LASTMODIFIED":"Last modified on",
+            "ADDNEW":"Create new project"
         },
         "STATE": {
             "TITLE":"State",

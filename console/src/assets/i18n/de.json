@@ -185,8 +185,7 @@
         },
         "TARGET": {
             "SELF":"Um einen Benutzer aus einer anderen Organisation zu berechtigen",
-            "EXTERNAL": "Um einen Benutzer ihrer eigenen Organisation zu berechtigen", 
-``
+            "EXTERNAL": "Um einen Benutzer ihrer eigenen Organisation zu berechtigen",
             "CLICKHERE":"Hier klicken"
         },
         "SIGNEDOUT":"Sie sind abgemeldet. Klicke Sie den Button um sich anzumelden!",
@@ -345,7 +344,8 @@
             "PINNED":"Angepinnt",
             "ALL": "Alle",
             "CREATEDON":"Erstellt am",
-            "LASTMODIFIED":"Zuletzt verändert am"
+            "LASTMODIFIED":"Zuletzt verändert am",
+            "ADDNEW":"Neues Projekt erstellen"
         },
         "STATE": {
             "TITLE":"Status",

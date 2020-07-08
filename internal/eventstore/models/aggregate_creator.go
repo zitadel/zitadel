@@ -3,7 +3,7 @@ package models
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 )
 
 type AggregateCreator struct {
@@ -17,7 +17,7 @@ func NewAggregateCreator(serviceName string) *AggregateCreator {
 type option func(*Aggregate)
 
 func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, previousSequence uint64, opts ...option) (*Aggregate, error) {
-	ctxData := auth.GetCtxData(ctx)
+	ctxData := authz.GetCtxData(ctx)
 	editorUser := ctxData.UserID
 	resourceOwner := ctxData.OrgID
 

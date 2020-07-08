@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { PlatformLocation } from '@angular/common';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
@@ -12,6 +13,8 @@ import { GrpcRequestFn } from './grpc-handler';
 export class GrpcService {
     public issuer: string = '';
     public clientid: string = '';
+    public redirectUri: string = '';
+    public postLogoutRedirectUri: string = '';
 
     public auth!: AuthServicePromiseClient;
     public mgmt!: ManagementServicePromiseClient;
@@ -19,10 +22,11 @@ export class GrpcService {
 
     constructor(
         private http: HttpClient,
+        private platformLocation: PlatformLocation,
     ) { }
 
     public async loadAppEnvironment(): Promise<any> {
-        return this.http.get('/assets/environment.json')
+        return this.http.get('./assets/environment.json')
             .toPromise().then((data: any) => {
                 if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
                     this.auth = new AuthServicePromiseClient(data.authServiceUrl);
@@ -32,6 +36,8 @@ export class GrpcService {
                     this.issuer = data.issuer;
                     if (data.clientid) {
                         this.clientid = data.clientid;
+                        this.redirectUri = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback';
+                        this.postLogoutRedirectUri = window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout';
                     }
                 }
                 return Promise.resolve(data);

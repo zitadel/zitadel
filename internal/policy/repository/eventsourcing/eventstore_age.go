@@ -2,7 +2,8 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	pol_model "github.com/caos/zitadel/internal/policy/model"
@@ -25,7 +26,7 @@ func (es *PolicyEventstore) GetPasswordAgePolicy(ctx context.Context, id string)
 }
 
 func (es *PolicyEventstore) CreatePasswordAgePolicy(ctx context.Context, policy *pol_model.PasswordAgePolicy) (*pol_model.PasswordAgePolicy, error) {
-	ctxData := auth.GetCtxData(ctx)
+	ctxData := authz.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordAgePolicy(ctx, ctxData.OrgID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
@@ -53,7 +54,7 @@ func (es *PolicyEventstore) CreatePasswordAgePolicy(ctx context.Context, policy 
 }
 
 func (es *PolicyEventstore) UpdatePasswordAgePolicy(ctx context.Context, policy *pol_model.PasswordAgePolicy) (*pol_model.PasswordAgePolicy, error) {
-	ctxData := auth.GetCtxData(ctx)
+	ctxData := authz.GetCtxData(ctx)
 	existingPolicy, err := es.GetPasswordAgePolicy(ctx, ctxData.OrgID)
 	if err != nil {
 		return nil, err

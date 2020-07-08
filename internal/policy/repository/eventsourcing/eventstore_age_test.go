@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/golang/mock/gomock"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/policy/model"
-	"github.com/golang/mock/gomock"
 )
 
 func TestGetPasswordAgePolicy(t *testing.T) {
@@ -84,7 +85,7 @@ func TestCreatePasswordAgePolicy(t *testing.T) {
 			name: "create policy, ok",
 			args: args{
 				es:     GetMockPasswordAgePolicyNoEvents(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				policy: &model.PasswordAgePolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name"},
 			},
 			res: res{
@@ -130,7 +131,7 @@ func TestUpdatePasswordAgePolicy(t *testing.T) {
 			name: "update policy, ok",
 			args: args{
 				es:  GetMockPasswordAgePolicy(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				new: &model.PasswordAgePolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew"},
 			},
 			res: res{
@@ -141,7 +142,7 @@ func TestUpdatePasswordAgePolicy(t *testing.T) {
 			name: "existing policy not found",
 			args: args{
 				es:  GetMockPasswordAgePolicyNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				new: &model.PasswordAgePolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew"},
 			},
 			res: res{

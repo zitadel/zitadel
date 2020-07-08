@@ -22,24 +22,12 @@ spec:
         imagePullPolicy: IfNotPresent
         args: []
         ports:
-        - name: management-rest
-          containerPort: 50011
-        - name: management-grpc
-          containerPort: 50010
-        - name: auth-rest
-          containerPort: 50021
-        - name: issuer-rest
-          containerPort: 50022
-        - name: auth-grpc
-          containerPort: 50020
-        - name: admin-rest
-          containerPort: 50041
-        - name: admin-grpc
-          containerPort: 50040
-        - name: console-http
-          containerPort: 50050
-        - name: accounts-http
-          containerPort: 50031
+        - name: grpc
+          containerPort: 50001
+        - name: http
+          containerPort: 50002
+        - name: ui
+          containerPort: 50003
         env:
         - name: POD_IP
           valueFrom:

@@ -7,20 +7,20 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/cache/config"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/golang/protobuf/ptypes"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/cache/config"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	"github.com/caos/zitadel/internal/id"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 const (
@@ -91,7 +91,7 @@ func (es *ProjectEventstore) CreateProject(ctx context.Context, project *proj_mo
 	project.State = proj_model.ProjectStateActive
 	repoProject := model.ProjectFromModel(project)
 	member := &model.ProjectMember{
-		UserID: auth.GetCtxData(ctx).UserID,
+		UserID: authz.GetCtxData(ctx).UserID,
 		Roles:  []string{projectOwnerRole},
 	}
 
