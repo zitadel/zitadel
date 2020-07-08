@@ -86,7 +86,7 @@ html {
   width: 100%;
   font-weight: 300;
   background-color: #282828;
-  color: #BBBBC8;
+  color: #282828;
   background-repeat: no-repeat;
   background-position: bottom right;
   background-size: contain;
@@ -94,7 +94,7 @@ html {
 }
 
 h1 {
-  color: #BBBBC8;
+  color: #282828;
   font-family: Lato;
   font-weight: 300;
   font-size: 40px;
@@ -149,7 +149,7 @@ button:hover {
 }
 button.primary {
   background-color: #3574C6;
-  color: #BBBBC8;
+  color: #282828;
   border: none;
 }
 button.primary:hover {
@@ -157,8 +157,8 @@ button.primary:hover {
 }
 
 input:not([type=radio]), select {
-  background-color: #252525;
-  color: #BBBBC8;
+  background-color: #FFFFFF;
+  color: #282828;
   height: 50px;
   border: 2px solid #505050;
   border-radius: 5px;
@@ -204,7 +204,7 @@ form .actions button, form .actions a {
 form button.clean {
   border: none;
   height: auto;
-  color: #BBBBC8;
+  color: #282828;
   text-align: left;
   text-transform: unset;
   display: flex;
@@ -311,7 +311,7 @@ form button.other-user > div:nth-of-type(2) {
   text-align: center;
 }
 #qrcode svg rect.color {
-  fill: #BBBBC8;
+  fill: #282828;
 }
 #qrcode svg rect.bg-color {
   fill: #282828;
