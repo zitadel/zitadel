@@ -23,7 +23,7 @@ echo "Generate grpc"
 
 protoc \
   -I=/usr/local/include \
-  -I=../pkg/message \
+  -I=../pkg/grpc/message \
   -I=../pkg/grpc/management/proto \
   -I=../pkg/grpc/auth/proto \
   -I=../pkg/grpc/admin/proto \
@@ -32,7 +32,7 @@ protoc \
   -I=tmp \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
-  ../pkg/message/proto/*.proto \
+  ../pkg/grpc/message/proto/*.proto \
   ../pkg/grpc/management/proto/*.proto \
   ../pkg/grpc/admin/proto/*.proto \
   ../pkg/grpc/auth/proto/*.proto
