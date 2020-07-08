@@ -184,8 +184,9 @@
             "FOUND":"Gefunden"
         },
         "TARGET": {
-            "SELF":"Suchen Sie nach den Benutzern ihrer Organisation, Zum hinzufügen externer Benutzer", #DAFUQ
-            "EXTERNAL":"Um User Ihrer Organisation hinzuzufügen", #DAFUQ
+            "SELF":"Um einen Benutzer aus einer anderen Organisation zu berechtigen",
+            "EXTERNAL": "Um einen Benutzer ihrer eigenen Organisation zu berechtigen", 
+``
             "CLICKHERE":"Hier klicken"
         },
         "SIGNEDOUT":"Sie sind abgemeldet. Klicke Sie den Button um sich anzumelden!",
