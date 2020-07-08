@@ -43,7 +43,7 @@ func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_mode
 	}
 
 	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
-	if caos_errs.IsNotFound(viewErr) && caos_errs.IsNotFound(esErr) {
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8yfKu", "Errors.Project.NotFound")
 	}
 
