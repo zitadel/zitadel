@@ -26,19 +26,15 @@ func (v *Validator) Healthz(_ context.Context, e *empty.Empty) (*empty.Empty, er
 }
 
 func (v *Validator) Ready(ctx context.Context, e *empty.Empty) (*empty.Empty, error) {
-	return e, ready(ctx, v.validations)
+	if len(validate(ctx, v.validations)) == 0 {
+		return e, nil
+	}
+	return nil, errors.ThrowInternal(nil, "API-2jD9a", "not ready")
 }
 
 func (v *Validator) Validate(ctx context.Context, _ *empty.Empty) (*structpb.Struct, error) {
 	validations := validate(ctx, v.validations)
 	return proto.ToPBStruct(validations)
-}
-
-func ready(ctx context.Context, validations map[string]ValidationFunction) error {
-	if len(validate(ctx, validations)) == 0 {
-		return nil
-	}
-	return errors.ThrowInternal(nil, "API-2jD9a", "not ready")
 }
 
 func validate(ctx context.Context, validations map[string]ValidationFunction) map[string]error {

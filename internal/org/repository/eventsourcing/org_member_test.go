@@ -2,12 +2,12 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"testing"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -30,7 +30,7 @@ func TestOrgMemberAddedAggregate(t *testing.T) {
 			name: "no member",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				member:     nil,
 			},
 			res: res{
@@ -41,7 +41,7 @@ func TestOrgMemberAddedAggregate(t *testing.T) {
 			name: "member added sucessfully",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
@@ -91,7 +91,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			name: "no member",
 			args: args{
 				aggCreator:     es_models.NewAggregateCreator("test"),
-				ctx:            auth.NewMockContext("org", "user"),
+				ctx:            authz.NewMockContext("org", "user"),
 				member:         nil,
 				existingMember: &model.OrgMember{},
 			},
@@ -103,7 +103,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			name: "no existing member",
 			args: args{
 				aggCreator:     es_models.NewAggregateCreator("test"),
-				ctx:            auth.NewMockContext("org", "user"),
+				ctx:            authz.NewMockContext("org", "user"),
 				existingMember: nil,
 				member:         &model.OrgMember{},
 			},
@@ -115,7 +115,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			name: "no changes",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},
@@ -131,7 +131,7 @@ func TestOrgMemberChangedAggregate(t *testing.T) {
 			name: "with changes success",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 					Roles:      []string{"asdf"},
@@ -186,7 +186,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 			name: "no member",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				member:     nil,
 			},
 			res: res{
@@ -197,7 +197,7 @@ func TestOrgMemberRemovedAggregate(t *testing.T) {
 			name: "member added sucessfully",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				member: &model.OrgMember{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "asdf", Sequence: 234},
 				},

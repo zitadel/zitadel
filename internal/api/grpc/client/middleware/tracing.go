@@ -9,18 +9,27 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/stats"
 
-	"github.com/caos/zitadel/internal/api"
+	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/tracing"
 )
 
 type GRPCMethod string
 
 func TracingStatsClient(ignoredMethods ...GRPCMethod) grpc.DialOption {
-	return grpc.WithStatsHandler(&tracingClientHandler{ignoredMethods, ocgrpc.ClientHandler{StartOptions: trace.StartOptions{Sampler: tracing.Sampler(), SpanKind: trace.SpanKindClient}}})
+	return grpc.WithStatsHandler(
+		&tracingClientHandler{
+			ignoredMethods,
+			ocgrpc.ClientHandler{
+				StartOptions: trace.StartOptions{
+					Sampler:  tracing.Sampler(),
+					SpanKind: trace.SpanKindClient},
+			},
+		},
+	)
 }
 
 func DefaultTracingStatsClient() grpc.DialOption {
-	return TracingStatsClient(api.Healthz, api.Readiness, api.Validation)
+	return TracingStatsClient(http.Healthz, http.Readiness, http.Validation)
 }
 
 type tracingClientHandler struct {

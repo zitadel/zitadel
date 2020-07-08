@@ -5,8 +5,6 @@ namespace: zitadel
 
 resources:
 -  deployment.yaml
--  service-accounts.yaml
--  service-api-admin.yaml
--  service-api-auth.yaml
--  service-api-mangagement.yaml
--  service-console.yaml
+-  service-grpc.yaml
+-  service-http.yaml
+-  service-ui.yaml

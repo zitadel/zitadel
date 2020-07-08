@@ -92,12 +92,12 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: angular
-        path: console/dist/app
+        path: console/dist/console
     - run: go get github.com/rakyll/statik
     - run: ./build/console/generate-static.sh
-    - run: cat pkg/console/statik/statik.go
+    - run: cat internal/ui/console/statik/statik.go
     - run: ./build/login/generate-static.sh
-    - run: cat internal/login/statik/statik.go
+    - run: cat internal/ui/login/statik/statik.go
     - run: ./build/notification/generate-static.sh
     - run: cat internal/notification/statik/statik.go
     - run: ./build/zitadel/generate-static.sh

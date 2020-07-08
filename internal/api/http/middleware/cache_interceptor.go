@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/zitadel/internal/api"
+	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/config/types"
 )
 
@@ -120,9 +120,9 @@ func (c *Cache) serializeHeaders(w http.ResponseWriter) {
 		control = append(control, string(c.Revalidation))
 	}
 
-	w.Header().Set(api.CacheControl, strings.Join(control, ", "))
-	w.Header().Set(api.Expires, expires)
+	w.Header().Set(http_utils.CacheControl, strings.Join(control, ", "))
+	w.Header().Set(http_utils.Expires, expires)
 	if pragma {
-		w.Header().Set(api.Pragma, "no-cache")
+		w.Header().Set(http_utils.Pragma, "no-cache")
 	}
 }

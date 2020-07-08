@@ -9,7 +9,8 @@
 
     <p class="n-items" *ngIf="!loading && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}</p>
 
-    <div class="item card" *ngFor="let item of selection.selected; index as i" [routerLink]="[item.projectId]"
+    <div class="item card" *ngFor="let item of selection.selected; index as i"
+        (click)="navigateToProject(item.projectId, $event)"
         [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
@@ -36,7 +37,8 @@
 <div class="container">
     <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
-    <div class="item card" *ngFor="let item of notPinned; index as i" [routerLink]="[item.projectId]"
+    <div class="item card" *ngFor="let item of notPinned; index as i"
+        (click)="navigateToProject(item.projectId, $event)"
         [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
@@ -64,7 +66,7 @@
     <ng-template appHasRole [appHasRole]="['project.write']">
         <div class="add-project-button card" (click)="addItem()">
             <mat-icon class="icon">add</mat-icon>
-            <span>Add new project</span>
+            <span>{{'PROJECT.PAGES.ADDNEW' | translate}}</span>
         </div>
     </ng-template>
 </div>

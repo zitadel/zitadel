@@ -2,21 +2,21 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/handler"
-	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/id"
-	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/spooler"
 	authz_view "github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/id"
 	es_key "github.com/caos/zitadel/internal/key/repository/eventsourcing"
+	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 )
 
 type Config struct {
@@ -34,7 +34,7 @@ type EsRepository struct {
 	eventstore.TokenVerifierRepo
 }
 
-func Start(conf Config, authZ auth.Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
+func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults) (*EsRepository, error) {
 	es, err := es_int.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err

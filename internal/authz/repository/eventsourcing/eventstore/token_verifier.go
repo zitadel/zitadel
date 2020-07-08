@@ -18,30 +18,26 @@ type TokenVerifierRepo struct {
 	View                 *view.View
 }
 
-func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, appName, appID string) (userID string, clientID string, agentID string, err error) {
-	clientID, err = repo.verifierClientID(ctx, appName, appID)
-	if err != nil {
-		return "", "", "", caos_errs.ThrowPermissionDenied(nil, "APP-ptTIF2", "invalid token")
-	}
+func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, clientID string) (userID string, agentID string, err error) {
 	//TODO: use real key
 	tokenID, err := crypto.DecryptAESString(tokenString, string(repo.TokenVerificationKey[:32]))
 	if err != nil {
-		return "", "", "", caos_errs.ThrowPermissionDenied(nil, "APP-8EF0zZ", "invalid token")
+		return "", "", caos_errs.ThrowPermissionDenied(nil, "APP-8EF0zZ", "invalid token")
 	}
 	token, err := repo.View.TokenByID(tokenID)
 	if err != nil {
-		return "", "", "", caos_errs.ThrowPermissionDenied(err, "APP-BxUSiL", "invalid token")
+		return "", "", caos_errs.ThrowPermissionDenied(err, "APP-BxUSiL", "invalid token")
 	}
 	if !token.Expiration.After(time.Now().UTC()) {
-		return "", "", "", caos_errs.ThrowPermissionDenied(err, "APP-k9KS0", "invalid token")
+		return "", "", caos_errs.ThrowPermissionDenied(err, "APP-k9KS0", "invalid token")
 	}
 
 	for _, aud := range token.Audience {
 		if clientID == aud {
-			return token.UserID, clientID, token.UserAgentID, nil
+			return token.UserID, token.UserAgentID, nil
 		}
 	}
-	return "", "", "", caos_errs.ThrowPermissionDenied(nil, "APP-Zxfako", "invalid audience")
+	return "", "", caos_errs.ThrowPermissionDenied(nil, "APP-Zxfako", "invalid audience")
 }
 
 func (repo *TokenVerifierRepo) ProjectIDByClientID(ctx context.Context, clientID string) (projectID string, err error) {
@@ -52,10 +48,7 @@ func (repo *TokenVerifierRepo) ProjectIDByClientID(ctx context.Context, clientID
 	return app.ProjectID, nil
 }
 
-func (repo *TokenVerifierRepo) verifierClientID(ctx context.Context, appName, appClientID string) (string, error) {
-	if appClientID != "" {
-		return appClientID, nil
-	}
+func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (string, error) {
 	iam, err := repo.IamEvents.IamByID(ctx, repo.IamID)
 	if err != nil {
 		return "", err

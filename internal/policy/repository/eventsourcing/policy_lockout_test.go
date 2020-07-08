@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	policy_model "github.com/caos/zitadel/internal/policy/model"
@@ -81,7 +81,7 @@ func TestPasswordLockoutPolicyAggregate(t *testing.T) {
 		{
 			name: "create aggregate",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				aggCreator: models.NewAggregateCreator("Test"),
 				policy:     &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "Test"},
 			},
@@ -93,7 +93,7 @@ func TestPasswordLockoutPolicyAggregate(t *testing.T) {
 		{
 			name: "policy nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
 			res: res{
@@ -142,7 +142,7 @@ func TestPasswordLockoutPolicyCreateAggregate(t *testing.T) {
 		{
 			name: "policy update aggregate ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				new:        &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -154,7 +154,7 @@ func TestPasswordLockoutPolicyCreateAggregate(t *testing.T) {
 		{
 			name: "new policy nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -207,7 +207,7 @@ func TestPasswordLockoutPolicyUpdateAggregate(t *testing.T) {
 		{
 			name: "policy update aggregate ok",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName", State: int32(policy_model.PolicyStateActive)},
 				new:        &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "PolicyName_Changed", State: int32(policy_model.PolicyStateActive)},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -220,7 +220,7 @@ func TestPasswordLockoutPolicyUpdateAggregate(t *testing.T) {
 		{
 			name: "existing policy nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   nil,
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -234,7 +234,7 @@ func TestPasswordLockoutPolicyUpdateAggregate(t *testing.T) {
 		{
 			name: "new policy nil",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				existing:   &PasswordLockoutPolicy{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, Description: "ProjectName", State: int32(policy_model.PolicyStateActive)},
 				new:        nil,
 				aggCreator: models.NewAggregateCreator("Test"),

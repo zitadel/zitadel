@@ -10,7 +10,7 @@
 
     <div class="item card" *ngFor="let item of selection.selected; index as i"
         [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}"
-        [routerLink]="[item.projectId, 'grant', item.id]">
+        (click)="navigateToProject(item.projectId,item.id, $event)">
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
@@ -34,7 +34,8 @@
 <div class="container">
     <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
-    <div class="item card" *ngFor="let item of notPinned; index as i" [routerLink]="[item.projectId, 'grant', item.id]"
+    <div class="item card" *ngFor="let item of notPinned; index as i"
+        (click)="navigateToProject(item.projectId,item.id, $event)"
         [ngClass]="{ inactive: item.state !== ProjectState.PROJECTSTATE_ACTIVE}">
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}

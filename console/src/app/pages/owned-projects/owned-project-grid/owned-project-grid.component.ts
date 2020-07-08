@@ -109,4 +109,10 @@ export class OwnedProjectGridComponent implements OnChanges {
         const prefix = (await this.authService.GetActiveOrg()).id;
         return localStorage.setItem(`${prefix}:${key}`, value);
     }
+
+    public navigateToProject(id: string, event: any): void {
+        if (event && event.srcElement && event.srcElement.localName !== 'button') {
+            this.router.navigate(['/projects', id]);
+        }
+    }
 }
