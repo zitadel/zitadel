@@ -22,10 +22,10 @@
         "PERSONAL_INFO": "Persönliche Informationen",
         "IAM":"Administration",
         "ORGANIZATION": "Organisation",
-        "PROJECTSSECTION":"Projekte",
+        "PROJECTSSECTION":"Projektsektion",
         "PROJECT": "Projekte",
         "GRANTEDPROJECT":"Berechtigte Projekte",
-        "USERSECTION":"Benutzer",
+        "USERSECTION":"Benutzersektion",
         "USER": "Benutzer",
         "LOGOUT": "alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
@@ -230,7 +230,11 @@
         },
         "DOMAINS": {
             "TITLE":"Domains",
-            "DESCRIPTION":"Konfigurieren Sie Ihre Domains mit denen sich Ihre Nutzer einloggen können."
+            "DESCRIPTION":"Konfigurieren Sie die Domains mit denen sich Ihre Nutzer einloggen können.",
+            "DELETE": {
+                "TITLE":"Domain löschen?",
+                "DESCRIPTION":"Sie sind im Begriff eine Domain aus Ihrer Organisation zu löschen. Ihre Benutzer können diese nach dem Löschen nicht mehr für den Login nutzen."
+            }
         },
         "STATE": {
             "0": "nicht definiert",

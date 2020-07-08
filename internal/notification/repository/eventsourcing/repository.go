@@ -1,6 +1,8 @@
 package eventsourcing
 
 import (
+	"net/http"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
@@ -12,7 +14,6 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	"golang.org/x/text/language"
-	"net/http"
 )
 
 type Config struct {
@@ -51,12 +52,12 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults) (
 	}
 	org := es_org.StartOrg(es_org.OrgConfig{Eventstore: es, IAMDomain: conf.Domain}, systemDefaults)
 
-	i18n, err := i18n.NewTranslator(dir, i18n.TranslatorConfig{DefaultLanguage: conf.DefaultLanguage})
+	translator, err := i18n.NewTranslator(dir, i18n.TranslatorConfig{DefaultLanguage: conf.DefaultLanguage})
 	if err != nil {
 		return nil, err
 	}
 	eventstoreRepos := handler.EventstoreRepos{UserEvents: user, OrgEvents: org}
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults, i18n, dir)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos, systemDefaults, translator, dir)
 
 	return &EsRepository{
 		spool,

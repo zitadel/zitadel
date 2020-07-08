@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/api/auth"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	message "github.com/caos/zitadel/pkg/message"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -343,11 +344,11 @@ func userChangesToResponse(response *usr_model.UserChanges, offset uint64, limit
 	return &Changes{
 		Limit:   limit,
 		Offset:  offset,
-		Changes: userChangesToMgtAPI(response),
+		Changes: userChangesToAPI(response),
 	}
 }
 
-func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
+func userChangesToAPI(changes *usr_model.UserChanges) (_ []*Change) {
 	result := make([]*Change, len(changes.Changes))
 
 	for i, change := range changes.Changes {
@@ -358,10 +359,9 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
 			err = protojson.Unmarshal(changedData, data)
 			logging.Log("GRPC-0kRsY").OnError(err).Debug("unable to marshal changed data to struct")
 		}
-
 		result[i] = &Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
 			EditorId:   change.ModifierId,

@@ -3836,7 +3836,7 @@
           "format": "date-time"
         },
         "event_type": {
-          "type": "string"
+          "$ref": "#/definitions/v1LocalizedMessage"
         },
         "sequence": {
           "type": "string",
@@ -3994,6 +3994,17 @@
         "set_up_started": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "v1LocalizedMessage": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "localized_message": {
+          "type": "string"
         }
       }
     },
@@ -5213,9 +5224,6 @@
       "type": "object",
       "properties": {
         "user_id": {
-          "type": "string"
-        },
-        "org_id": {
           "type": "string"
         },
         "project_grant_id": {

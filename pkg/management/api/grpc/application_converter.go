@@ -7,6 +7,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/pkg/message"
+
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -335,7 +337,7 @@ func appChangesToMgtAPI(changes *proj_model.ApplicationChanges) (_ []*Change) {
 		}
 		result[i] = &Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Editor:     change.ModifierName,
 			EditorId:   change.ModifierId,

@@ -20,14 +20,14 @@ const (
 )
 
 type Renderer struct {
-	Templates map[string]*template.Template
-	i18n      *i18n.Translator
+	Templates  map[string]*template.Template
+	translator *i18n.Translator
 }
 
 func NewRenderer(dir http.FileSystem, tmplMapping map[string]string, funcs map[string]interface{}, translatorConfig i18n.TranslatorConfig) (*Renderer, error) {
 	var err error
 	r := new(Renderer)
-	r.i18n, err = i18n.NewTranslator(dir, translatorConfig)
+	r.translator, err = i18n.NewTranslator(dir, translatorConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -43,14 +43,14 @@ func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, tmpl
 }
 
 func (r *Renderer) Localize(id string, args map[string]interface{}) string {
-	return r.i18n.Localize(id, args)
+	return r.translator.Localize(id, args)
 }
 
 func (r *Renderer) LocalizeFromRequest(req *http.Request, id string, args map[string]interface{}) string {
-	return r.i18n.LocalizeFromRequest(req, id, args)
+	return r.translator.LocalizeFromRequest(req, id, args)
 }
 func (r *Renderer) Lang(req *http.Request) language.Tag {
-	return r.i18n.Lang(req)
+	return r.translator.Lang(req)
 }
 
 func (r *Renderer) loadTemplates(dir http.FileSystem, tmplMapping map[string]string, funcs map[string]interface{}) error {
