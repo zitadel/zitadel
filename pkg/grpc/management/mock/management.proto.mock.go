@@ -817,6 +817,26 @@ func (mr *MockManagementServiceClientMockRecorder) DeleteUser(arg0, arg1 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockManagementServiceClient)(nil).DeleteUser), varargs...)
 }
 
+// GetDefaultPasswordComplexityPolicy mocks base method
+func (m *MockManagementServiceClient) GetDefaultPasswordComplexityPolicy(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.PasswordComplexityPolicy, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetDefaultPasswordComplexityPolicy", varargs...)
+	ret0, _ := ret[0].(*management.PasswordComplexityPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultPasswordComplexityPolicy indicates an expected call of GetDefaultPasswordComplexityPolicy
+func (mr *MockManagementServiceClientMockRecorder) GetDefaultPasswordComplexityPolicy(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultPasswordComplexityPolicy", reflect.TypeOf((*MockManagementServiceClient)(nil).GetDefaultPasswordComplexityPolicy), varargs...)
+}
+
 // GetGrantedProjectByID mocks base method
 func (m *MockManagementServiceClient) GetGrantedProjectByID(arg0 context.Context, arg1 *management.ProjectGrantID, arg2 ...grpc.CallOption) (*management.ProjectGrantView, error) {
 	m.ctrl.T.Helper()
