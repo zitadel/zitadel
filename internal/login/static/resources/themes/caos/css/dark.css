@@ -156,7 +156,7 @@ button.primary:hover {
 }
 
 input:not([type=radio]), select {
-  background-color: #FFFFFF;
+  background-color: #252525;
   color: white;
   height: 50px;
   border: 2px solid #505050;

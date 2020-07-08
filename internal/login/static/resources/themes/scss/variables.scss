@@ -34,11 +34,10 @@ $otherUserImgDark: "/resources/images/icon-newuser-dark";
 
 // ----- LIGHT-THEME --------
 $backgroundColorLight: #f5f5f5;
-$fontColor: $backgroundColor;
 $fontColorLight: $backgroundColor;
 $primaryColorLight: $primaryColor;
 $primaryColorHoverLight: lighten($primaryColorLight, 10%);
-$inputBackgroundColor: #FFFFFF;
+$inputBackgroundColorLight: #FFFFFF;
 $buttonBackgroundColorHoverLight: $inputBackgroundColor;
 $profileImgLight: "/resources/images/icon-user-light";
 $otherUserImgLight: "/resources/images/icon-newuser-light";

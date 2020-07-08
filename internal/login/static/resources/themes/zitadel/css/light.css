@@ -86,7 +86,7 @@ html {
   width: 100%;
   font-weight: 300;
   background-color: #282828;
-  color: #282828;
+  color: #BBBBC8;
   background-repeat: no-repeat;
   background-position: bottom right;
   background-size: contain;
@@ -94,7 +94,7 @@ html {
 }
 
 h1 {
-  color: #282828;
+  color: #BBBBC8;
   font-family: Lato;
   font-weight: 300;
   font-size: 40px;
@@ -149,7 +149,7 @@ button:hover {
 }
 button.primary {
   background-color: #3574C6;
-  color: #282828;
+  color: #BBBBC8;
   border: none;
 }
 button.primary:hover {
@@ -157,8 +157,8 @@ button.primary:hover {
 }
 
 input:not([type=radio]), select {
-  background-color: #FFFFFF;
-  color: #282828;
+  background-color: #252525;
+  color: #BBBBC8;
   height: 50px;
   border: 2px solid #505050;
   border-radius: 5px;
@@ -204,7 +204,7 @@ form .actions button, form .actions a {
 form button.clean {
   border: none;
   height: auto;
-  color: #282828;
+  color: #BBBBC8;
   text-align: left;
   text-transform: unset;
   display: flex;
@@ -311,7 +311,7 @@ form button.other-user > div:nth-of-type(2) {
   text-align: center;
 }
 #qrcode svg rect.color {
-  fill: #282828;
+  fill: #BBBBC8;
 }
 #qrcode svg rect.bg-color {
   fill: #282828;
@@ -376,7 +376,7 @@ html button:hover {
 }
 html button.primary {
   background-color: #3574C6;
-  color: #282828;
+  color: #BBBBC8;
   border: none;
   box-shadow: 0px 10px 30px #3574C6;
 }
@@ -385,6 +385,10 @@ html button.primary:hover {
 }
 html button.clean {
   color: #282828;
+}
+html button.clean:hover {
+  border: none;
+  background-color: #252525;
 }
 html button.user-selection .profile-image {
   background-image: url("/resources/images/icon-user-light.png");
@@ -425,8 +429,8 @@ html button.other-user:hover .other-user-image {
     background-size: 100px 75px;
   }
 }
-html input {
-  background-color: #f5f5f5;
+html input:not([type=radio]), html select {
+  background-color: #FFFFFF;
   color: #282828;
 }
 html #qrcode svg rect.color {

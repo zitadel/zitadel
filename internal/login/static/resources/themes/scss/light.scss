@@ -36,6 +36,11 @@ html {
 
         &.clean {
             color: $fontColorLight;
+
+            &:hover {
+                border: none;
+                background-color: $buttonBackgroundColorHoverLight;
+            }
         }
 
         &.user-selection {
@@ -65,8 +70,8 @@ html {
         }
     }
 
-    input {
-        background-color: $backgroundColorLight;
+    input:not([type='radio']), select {
+        background-color: $inputBackgroundColorLight;
         color: $fontColorLight;
     }
 
