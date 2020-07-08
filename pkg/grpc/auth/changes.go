@@ -1,4 +1,4 @@
-package grpc
+package auth
 
 import "github.com/caos/zitadel/internal/api/grpc/server/middleware"
 
