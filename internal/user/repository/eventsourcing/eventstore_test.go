@@ -2623,7 +2623,7 @@ func TestRemovePhone(t *testing.T) {
 			name: "remove phone ok",
 			args: args{
 				es:     GetMockManipulateUserVerifiedPhone(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				userID: "AggregateID",
 				code:   "code",
 			},
@@ -2633,7 +2633,7 @@ func TestRemovePhone(t *testing.T) {
 			name: "empty userid",
 			args: args{
 				es:   GetMockManipulateUser(ctrl),
-				ctx:  auth.NewMockContext("orgID", "userID"),
+				ctx:  authz.NewMockContext("orgID", "userID"),
 				code: "Code",
 			},
 			res: res{
@@ -2644,7 +2644,7 @@ func TestRemovePhone(t *testing.T) {
 			name: "existing user not found",
 			args: args{
 				es:     GetMockManipulateUserNoEvents(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				userID: "AggregateID",
 				code:   "Code",
 			},

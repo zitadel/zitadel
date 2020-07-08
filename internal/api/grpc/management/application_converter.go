@@ -12,6 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/pkg/grpc/message"
 )
 
 func appFromModel(app *proj_model.Application) *management.Application {

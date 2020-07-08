@@ -1640,7 +1640,7 @@ func TestRemovePhoneAggregate(t *testing.T) {
 		{
 			name: "user phone removed aggregate ok",
 			args: args{
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
 					Phone: &model.Phone{PhoneNumber: "PhoneNumber"},
 				},

@@ -186,7 +186,7 @@ func usergrantStateFromModel(state grant_model.UserGrantState) management.UserGr
 	}
 }
 
-func projectUserGrantSearchRequestsToModel(project *ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+func projectUserGrantSearchRequestsToModel(project *management.ProjectUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
 	return &grant_model.UserGrantSearchRequest{
 		Offset:  project.Offset,
 		Limit:   project.Limit,
@@ -194,7 +194,7 @@ func projectUserGrantSearchRequestsToModel(project *ProjectUserGrantSearchReques
 	}
 }
 
-func projectGrantUserGrantSearchRequestsToModel(project *ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
+func projectGrantUserGrantSearchRequestsToModel(project *management.ProjectGrantUserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
 	return &grant_model.UserGrantSearchRequest{
 		Offset:  project.Offset,
 		Limit:   project.Limit,

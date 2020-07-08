@@ -131,7 +131,7 @@ func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*m
 }
 
 func (repo *UserRepo) RemoveMyPhone(ctx context.Context) error {
-	return repo.UserEvents.RemovePhone(ctx, auth.GetCtxData(ctx).UserID)
+	return repo.UserEvents.RemovePhone(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {

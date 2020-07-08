@@ -118,7 +118,7 @@ func (s *Server) ChangeMyPassword(ctx context.Context, request *auth.PasswordCha
 	return &empty.Empty{}, err
 }
 
-func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*PasswordComplexityPolicy, error) {
+func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*auth.PasswordComplexityPolicy, error) {
 	policy, err := s.repo.GetMyPasswordComplexityPolicy(ctx)
 	if err != nil {
 		return nil, err

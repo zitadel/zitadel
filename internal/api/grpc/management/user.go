@@ -151,7 +151,7 @@ func (s *Server) ChangeUserPhone(ctx context.Context, request *management.Update
 	return phoneFromModel(phone), nil
 }
 
-func (s *Server) RemoveUserPhone(ctx context.Context, userID *UserID) (*empty.Empty, error) {
+func (s *Server) RemoveUserPhone(ctx context.Context, userID *management.UserID) (*empty.Empty, error) {
 	err := s.user.RemovePhone(ctx, userID.Id)
 	return &empty.Empty{}, err
 }

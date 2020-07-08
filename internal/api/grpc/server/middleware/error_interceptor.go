@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/i18n"
 	_ "github.com/caos/zitadel/internal/statik"
 )
 

@@ -6,7 +6,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -80,7 +79,7 @@ func (s *Server) BulkRemoveUserGrant(ctx context.Context, in *management.UserGra
 
 func (s *Server) SearchProjectUserGrants(ctx context.Context, in *management.ProjectUserGrantSearchRequest) (*management.UserGrantSearchResponse, error) {
 	request := projectUserGrantSearchRequestsToModel(in)
-	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	request.AppendProjectIDQuery(in.ProjectId)
 	response, err := s.usergrant.SearchUserGrants(ctx, request)
 	if err != nil {
@@ -134,7 +133,7 @@ func (s *Server) SearchProjectGrantUserGrants(ctx context.Context, in *managemen
 		return nil, err
 	}
 	request := projectGrantUserGrantSearchRequestsToModel(in)
-	request.AppendMyOrgQuery(auth.GetCtxData(ctx).OrgID)
+	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
 	request.AppendProjectIDQuery(grant.ProjectID)
 	response, err := s.usergrant.SearchUserGrants(ctx, request)
 	if err != nil {
