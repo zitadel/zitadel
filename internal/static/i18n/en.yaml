@@ -115,3 +115,170 @@ Errors:
     NotFound: Token not found
   UserSession:
     NotFound: UserSession not found
+EventTypes:
+  user:
+    added: User added
+    selfregistered: User registered himself
+    initialization:
+      code:
+        added: Initialisation code generated
+        sent: Initialisation code sent
+      check:
+        succeeded: Initialisation check succeded
+        failed: Initialisation check failed
+    username:
+      reserved: Username reserved
+      released: Username released
+    email:
+      reserved: Email address reserved
+      released: Email address released
+      changed:  Email address changed
+      verified: Email address verified
+      verification:
+        failed: Email address verification failed
+      code:
+        added: Email address verification code generated
+        sent: Email address verification code sent
+    locked: User locked
+    unlocked: User unlocked
+    deactivated: User deactivated
+    reactivated: User reactivated
+    removed: User removed
+    password:
+      changed: Password changed
+      code:
+        added: Password code generated
+        sent: Password code sent
+      check:
+        succeeded: Password check succeeded
+        failed: Password check failed
+    phone:
+      changed: Phone number changed
+      verified: Phone number verified
+      verification:
+        failed: Phone number verification failed
+      code:
+        added: Phone number code generated
+        sent: Phone number code sent
+    profile:
+      changed: User profile changed
+    address:
+      changed: User address changed
+    mfa:
+      otp:
+        added: Multifactor OTP added
+        verified: Multifactor OTP verified
+        removed: Multifactor OTP removed
+        check:
+          succeeded: Multifactor OTP check succeeded
+          failed: Multifactor OTP check failed
+      init:
+        skipped: Multifactor initialisation skipped
+    signed:
+      out: User signed out
+    grant:
+      added: Authorization added
+      changed: Authorization changed
+      removed: Authorization removed
+      deactivated: Authorization deactivated
+      reactivated: Authorization reactivated
+      reserved: Authorization reserved
+      released: Authorization released
+      cascade:
+        removed: Authorization removed
+        changed: Authorization changed
+  org:
+    added: Organization added
+    changed: Organization changed
+    deactivated: Organization deactivated
+    reactivated: Organization reactivated
+    removed: Organization removed
+    domain:
+      added: Domain added
+      verified: Domain verified
+      removed: Domain removed
+      primary:
+        set: Primary domain set
+    name:
+      reserved: Organization name reserved
+      released: Organization name released
+    domain:
+      reserved: Domain reserved
+      released: Domain released
+    member:
+      added: Organization member added
+      changed: Organization member changed
+      removed: Organization member removed
+    iam:
+      policy:
+        added: System policy added
+        changed: System policy changed
+        removed: System policy removed
+  project:
+    added: Project added
+    changed: Project changed
+    deactivated: Project deactivated
+    reactivated: Project reactivated
+    removed: Project removed
+    member:
+      added: Project member added
+      changed: Project member changed
+      removed: Project member removed
+    role:
+      added: Project role added
+      changed: Project role changed
+      removed: Project role removed
+    grant:
+      added: Management access added
+      changed: Management access changed
+      removed: Management access removed
+      deactivated: Management access deactivated
+      reactivated: Management access reactivated
+      cascade:
+        changed: Management access changed
+      member:
+        added: Management access member added
+        changed: Management access member changed
+        removed: Management access member removed
+    application:
+      added: Application added
+      changed: Application changed
+      removed: Application removed
+      deactivated: Application deactivated
+      reactivated: Application reactivated
+      config:
+        oidc:
+          added: OIDC Configuration added
+          changed: OIDC Configuration chnaged
+          secret:
+            changed: OIDC secret changed
+            check:
+              succeeded: OIDC secret check succeeded
+              failed: OIDC secret check failed
+  policy:
+    password:
+      complexity:
+        added: Password complexity policy added
+        changed: Password complexity policy changed
+      age:
+        added: Password age policy added
+        changed: Password age policy changed
+      lockout:
+        added: Password lockout policy added
+        changed: Password lockout policy changed
+  iam:
+    setup:
+      started: ZITADEL setup started
+      done: ZITADEL setup done
+    global:
+      org:
+        set: Global org set
+    project:
+      iam:
+        set: ZITADEL project set
+    member:
+      added: ZITADEL member added
+      changed: ZITADEL member changed
+      removed: ZITADEL member removed
+  key_pair:
+    added: Key pair added

@@ -6,6 +6,8 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/pkg/message"
+
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -504,7 +506,7 @@ func userChangesToMgtAPI(changes *usr_model.UserChanges) (_ []*Change) {
 
 		result[i] = &Change{
 			ChangeDate: change.ChangeDate,
-			EventType:  change.EventType,
+			EventType:  message.NewLocalizedEventType(change.EventType),
 			Sequence:   change.Sequence,
 			Data:       data,
 			EditorId:   change.ModifierId,
