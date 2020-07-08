@@ -16,7 +16,6 @@ export class WarnDialogComponent implements OnInit {
     ngOnInit(): void {
     }
 
-
     public closeDialog(): void {
         this.dialogRef.close(false);
     }
