@@ -2527,10 +2527,9 @@ message ProjectGrantUserGrantID {
 
 message ProjectGrantUserGrantCreate {
     string user_id = 1;
-    string org_id = 2;
-    string project_grant_id = 3;
-    string project_id = 4 [(validate.rules).string.min_len = 1];
-    repeated string role_keys = 5;
+    string project_grant_id = 2;
+    string project_id = 3 [(validate.rules).string.min_len = 1];
+    repeated string role_keys = 4;
 }
 
 message ProjectGrantUserGrantUpdate {

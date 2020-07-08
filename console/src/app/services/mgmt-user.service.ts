@@ -259,7 +259,6 @@ export class MgmtUserService {
         roleNamesList: string[],
     ): Promise<UserGrant> {
         const req = new ProjectGrantUserGrantCreate();
-        req.setOrgId(orgId);
         req.setProjectId(projectId);
         req.setProjectGrantId(grantId);
         req.setUserId(userId);
