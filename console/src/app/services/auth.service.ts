@@ -64,6 +64,8 @@ export class AuthService {
     public async authenticate(config?: Partial<AuthConfig>, setState: boolean = true): Promise<boolean> {
         this.config.issuer = config?.issuer || this.grpcService.issuer;
         this.config.clientId = config?.clientId || this.grpcService.clientid;
+        this.config.redirectUri = config?.redirectUri || this.grpcService.redirectUri;
+        this.config.postLogoutRedirectUri = config?.postLogoutRedirectUri || this.grpcService.postLogoutRedirectUri;
         this.config.customQueryParams = config?.customQueryParams;
         this.oauthService.configure(this.config);
         // this.oauthService.setupAutomaticSilentRefresh();

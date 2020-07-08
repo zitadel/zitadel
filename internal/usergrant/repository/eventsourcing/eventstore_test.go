@@ -2,13 +2,15 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+	"reflect"
+	"testing"
+
+	"github.com/golang/mock/gomock"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/golang/mock/gomock"
-	"reflect"
-	"testing"
 )
 
 func TestUserByID(t *testing.T) {
@@ -106,7 +108,7 @@ func TestAddUserGrant(t *testing.T) {
 			name: "add grant, ok",
 			args: args{
 				es:  GetMockManipulateUserGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					ProjectID: "ProjectID",
 					UserID:    "UserID",
@@ -125,7 +127,7 @@ func TestAddUserGrant(t *testing.T) {
 			name: "invalid grant",
 			args: args{
 				es:    GetMockManipulateUserGrant(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -172,7 +174,7 @@ func TestChangeUserGrant(t *testing.T) {
 			name: "change grant, ok",
 			args: args{
 				es:  GetMockManipulateUserGrant(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					RoleKeys: []string{"KeyChanged"},
 				},
@@ -187,7 +189,7 @@ func TestChangeUserGrant(t *testing.T) {
 			name: "invalid grant",
 			args: args{
 				es:    GetMockManipulateUserGrant(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: nil,
 			},
 			res: res{
@@ -199,7 +201,7 @@ func TestChangeUserGrant(t *testing.T) {
 			name: "existing user not found",
 			args: args{
 				es:  GetMockManipulateUserGrantNoEvents(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					RoleKeys: []string{"KeyChanged"},
 				},
@@ -247,7 +249,7 @@ func TestRemoveUserGrant(t *testing.T) {
 			name: "remove grant, ok",
 			args: args{
 				es:    GetMockManipulateUserGrant(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 		},
@@ -255,7 +257,7 @@ func TestRemoveUserGrant(t *testing.T) {
 			name: "no grantID",
 			args: args{
 				es:    GetMockManipulateUserGrant(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
@@ -267,7 +269,7 @@ func TestRemoveUserGrant(t *testing.T) {
 			name: "existing grant not found",
 			args: args{
 				es:    GetMockManipulateUserGrantNoEvents(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -311,7 +313,7 @@ func TestDeactivateUserGrant(t *testing.T) {
 			name: "deactivate, ok",
 			args: args{
 				es:    GetMockManipulateUserGrant(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -325,7 +327,7 @@ func TestDeactivateUserGrant(t *testing.T) {
 			name: "no grant id",
 			args: args{
 				es:    GetMockManipulateUserGrant(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
@@ -337,7 +339,7 @@ func TestDeactivateUserGrant(t *testing.T) {
 			name: "grant not existing",
 			args: args{
 				es:    GetMockManipulateUserGrantNoEvents(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID", Sequence: 1}},
 			},
 			res: res{
@@ -387,7 +389,7 @@ func TestReactivateUserGrant(t *testing.T) {
 			name: "reactivate, ok",
 			args: args{
 				es:    GetMockManipulateUserGrantInactive(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
@@ -400,7 +402,7 @@ func TestReactivateUserGrant(t *testing.T) {
 			name: "no grant id",
 			args: args{
 				es:    GetMockManipulateUserGrant(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "", Sequence: 1}},
 			},
 			res: res{
@@ -412,7 +414,7 @@ func TestReactivateUserGrant(t *testing.T) {
 			name: "grant not existing",
 			args: args{
 				es:    GetMockManipulateUserGrantNoEvents(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				grant: &model.UserGrant{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{

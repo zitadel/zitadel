@@ -6,7 +6,7 @@ import (
 
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/key/model"
 	key_event "github.com/caos/zitadel/internal/key/repository/eventsourcing"
@@ -71,5 +71,5 @@ func (k *KeyRepository) refreshSigningKey(keyCh chan<- jose.SigningKey, errCh ch
 }
 
 func setOIDCCtx(ctx context.Context) context.Context {
-	return auth.SetCtxData(ctx, auth.CtxData{UserID: oidcUser, OrgID: iamOrg})
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: oidcUser, OrgID: iamOrg})
 }

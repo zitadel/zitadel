@@ -2,13 +2,13 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"testing"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 )
 
 func Test_isReservedValidation(t *testing.T) {
@@ -118,7 +118,7 @@ func Test_uniqueNameAggregate(t *testing.T) {
 		{
 			name: "no org name error",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				orgName:    "",
 			},
@@ -130,7 +130,7 @@ func Test_uniqueNameAggregate(t *testing.T) {
 		{
 			name: "aggregate created",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				orgName:    "asdf",
 			},
@@ -174,7 +174,7 @@ func Test_uniqueDomainAggregate(t *testing.T) {
 		{
 			name: "no org domain error",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				orgDomain:  "",
 			},
@@ -186,7 +186,7 @@ func Test_uniqueDomainAggregate(t *testing.T) {
 		{
 			name: "aggregate created",
 			args: args{
-				ctx:        auth.NewMockContext("orgID", "userID"),
+				ctx:        authz.NewMockContext("orgID", "userID"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				orgDomain:  "asdf",
 			},
@@ -230,7 +230,7 @@ func TestOrgReactivateAggregate(t *testing.T) {
 			name: "correct",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
@@ -244,7 +244,7 @@ func TestOrgReactivateAggregate(t *testing.T) {
 			name: "already active error",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
@@ -261,7 +261,7 @@ func TestOrgReactivateAggregate(t *testing.T) {
 			name: "org nil error",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				org:        nil,
 			},
 			res: res{
@@ -304,7 +304,7 @@ func TestOrgDeactivateAggregate(t *testing.T) {
 			name: "correct",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
@@ -318,7 +318,7 @@ func TestOrgDeactivateAggregate(t *testing.T) {
 			name: "already inactive error",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
 						AggregateID: "orgID",
@@ -335,7 +335,7 @@ func TestOrgDeactivateAggregate(t *testing.T) {
 			name: "org nil error",
 			args: args{
 				aggCreator: es_models.NewAggregateCreator("test"),
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				org:        nil,
 			},
 			res: res{
@@ -379,7 +379,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		{
 			name: "no existing org error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				existing:   nil,
 				updated:    &model.Org{},
@@ -392,7 +392,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		{
 			name: "no updated org error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				existing:   &model.Org{},
 				updated:    nil,
@@ -405,7 +405,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				existing:   &model.Org{},
 				updated:    &model.Org{},
@@ -418,7 +418,7 @@ func TestOrgUpdateAggregates(t *testing.T) {
 		{
 			name: "name changed",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				existing: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -475,7 +475,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 		{
 			name: "no org error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org:        nil,
 			},
@@ -487,7 +487,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 		{
 			name: "org successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -505,7 +505,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 		{
 			name: "org with domain successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -513,7 +513,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 						Sequence:    5,
 					},
 					Name: "caos",
-					Domains: []*model.OrgDomain{&model.OrgDomain{
+					Domains: []*model.OrgDomain{{
 						Domain: "caos.ch",
 					}},
 				},
@@ -526,7 +526,7 @@ func TestOrgCreatedAggregates(t *testing.T) {
 		{
 			name: "no name error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -577,7 +577,7 @@ func TestOrgDomainAddedAggregates(t *testing.T) {
 		{
 			name: "no domain error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 			},
 			res: res{
@@ -587,7 +587,7 @@ func TestOrgDomainAddedAggregates(t *testing.T) {
 		{
 			name: "domain successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -646,7 +646,7 @@ func TestOrgDomainVerifiedAggregates(t *testing.T) {
 		{
 			name: "no domain error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 			},
 			res: res{
@@ -656,7 +656,7 @@ func TestOrgDomainVerifiedAggregates(t *testing.T) {
 		{
 			name: "domain successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -711,7 +711,7 @@ func TestOrgDomainSetPrimaryAggregates(t *testing.T) {
 		{
 			name: "no domain error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 			},
 			res: res{
@@ -721,7 +721,7 @@ func TestOrgDomainSetPrimaryAggregates(t *testing.T) {
 		{
 			name: "domain successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{
@@ -779,7 +779,7 @@ func TestOrgDomainRemovedAggregates(t *testing.T) {
 		{
 			name: "no domain error",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 			},
 			res: res{
@@ -790,7 +790,7 @@ func TestOrgDomainRemovedAggregates(t *testing.T) {
 		{
 			name: "domain successful",
 			args: args{
-				ctx:        auth.NewMockContext("org", "user"),
+				ctx:        authz.NewMockContext("org", "user"),
 				aggCreator: es_models.NewAggregateCreator("test"),
 				org: &model.Org{
 					ObjectRoot: es_models.ObjectRoot{

@@ -1,9 +1,9 @@
 <div class="wrap">
     <div class="block">
         <div class="header">
-            <img *ngIf="dark; else lighttheme" src="../../../assets/images/zitadel-logo-oneline-darkdesign.svg" />
+            <img *ngIf="dark; else lighttheme" src="./assets/images/zitadel-logo-oneline-darkdesign.svg" />
             <ng-template #lighttheme>
-                <img src="../../../assets/images/zitadel-logo-oneline-lightdesign.svg" />
+                <img src="./assets/images/zitadel-logo-oneline-lightdesign.svg" />
             </ng-template>
             <p>{{'USER.SIGNEDOUT' | translate}}</p>
 

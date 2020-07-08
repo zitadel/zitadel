@@ -82,6 +82,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
     private async getData({ id }: Params): Promise<void> {
         this.projectId = id;
+        console.log(this.projectId);
 
         this.orgService.GetIam().then(iam => {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
@@ -91,6 +92,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             this.projectService.GetProjectById(id).then(proj => {
                 this.project = proj.toObject();
             }).catch(error => {
+                console.error(error);
                 this.toast.showError(error.message);
             });
         }
@@ -104,7 +106,11 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
                 this.toast.showError(error.message);
             });
         } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
-            this.toast.showInfo('You cant update this project.');
+            this.projectService.DeactivateProject(this.projectId).then(() => {
+                this.toast.showInfo('Deactivated Project');
+            }).catch(error => {
+                this.toast.showError(error.message);
+            });
         }
     }
 
