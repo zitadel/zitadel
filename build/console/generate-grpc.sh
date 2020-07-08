@@ -32,7 +32,7 @@ protoc \
   -I=tmp \
   --js_out=import_style=commonjs,binary:$GEN_PATH \
   --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:$GEN_PATH \
-  ../pkg/message/*.proto \
+  ../pkg/message/proto/*.proto \
   ../pkg/grpc/management/proto/*.proto \
   ../pkg/grpc/admin/proto/*.proto \
   ../pkg/grpc/auth/proto/*.proto
