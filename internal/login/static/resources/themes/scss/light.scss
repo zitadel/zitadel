@@ -2,7 +2,7 @@
 html {
     background-color: $backgroundColorLight;
     color: $fontColorLight;
-    @if($bodyImgLight) {
+    @if($bodyImgLight != "") {
         background-image: url($bodyImgLight);
     }
     
@@ -81,7 +81,7 @@ html {
     }
 
     footer {
-        @if($footerimgLight) {
+        @if($footerimgLight != "") {
             background-image: url($footerimgLight);
         }
     }

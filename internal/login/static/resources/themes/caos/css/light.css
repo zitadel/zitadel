@@ -89,7 +89,6 @@ html {
   color: white;
   background-repeat: no-repeat;
   background-position: bottom right;
-  background-image: url("");
 }
 
 h1 {
@@ -357,7 +356,6 @@ footer {
 html {
   background-color: white;
   color: #282828;
-  background-image: url("");
 }
 html header .logo {
   background-image: url("../logo-light.png");

@@ -19,7 +19,7 @@ html {
     color: $fontColor;
     background-repeat: no-repeat;
     background-position: bottom right;
-    @if($bodyImgDark) {
+    @if($bodyImgDark != "") {
         background-image: url($bodyImgDark);
     }
 }
@@ -271,7 +271,7 @@ form {
 }
 
 footer {
-    @if($footerimgDark) {
+    @if($footerimgDark != "") {
         background-image: url($footerimgDark);
     }
     width: 100%;
