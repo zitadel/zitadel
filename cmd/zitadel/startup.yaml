@@ -109,7 +109,7 @@ Admin:
       SQL:
         Host: $ZITADEL_EVENTSTORE_HOST
         Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'admin_api'
+        User: 'adminapi'
         Database: 'eventstore'
         Password: $CR_ADMINAPI_PASSWORD
         SSL:
@@ -124,8 +124,8 @@ Admin:
   View:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'admin_api'
-    Database: 'admin_api'
+    User: 'adminapi'
+    Database: 'adminapi'
     Password: $CR_ADMINAPI_PASSWORD
     SSL:
       Mode: $CR_SSL_MODE
