@@ -89,7 +89,8 @@ html {
   color: #BBBBC8;
   background-repeat: no-repeat;
   background-position: bottom right;
-  background-image: url("../flavor-spikes01-narrow.png");
+  background-size: contain;
+  background-image: url("../flavor-spikes01-wide.png");
 }
 
 h1 {
@@ -356,7 +357,7 @@ footer {
 html {
   background-color: #BBBBC8;
   color: #282828;
-  background-image: url("../flavor-spikes01-narrow.png");
+  background-image: url("../flavor-spikes01-wide.png");
 }
 html header .logo {
   background-image: url("../logo-light.png");

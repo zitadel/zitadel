@@ -89,6 +89,7 @@ html {
   color: white;
   background-repeat: no-repeat;
   background-position: bottom right;
+  background-size: contain;
 }
 
 h1 {
