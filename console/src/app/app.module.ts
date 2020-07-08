@@ -1,5 +1,5 @@
 import { OverlayModule } from '@angular/cdk/overlay';
-import { CommonModule, registerLocaleData } from '@angular/common';
+import { APP_BASE_HREF, CommonModule, registerLocaleData, PlatformLocation } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
@@ -42,7 +42,7 @@ registerLocaleData(localeDe);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-    return new TranslateHttpLoader(http);
+  return new TranslateHttpLoader(http, './assets/i18n/');
 }
 
 const appInitializerFn = (grpcServ: GrpcService) => {
@@ -57,12 +57,10 @@ const stateHandlerFn = (stateHandler: StatehandlerService) => {
     };
 };
 
-export let authConfig = {
-    redirectUri: window.location.origin + '/auth/callback',
+const authConfig: AuthConfig = {
     scope: 'openid profile email', // offline_access
     responseType: 'code',
     oidc: true,
-    postLogoutRedirectUri: window.location.origin + '/signedout',
 };
 
 @NgModule({

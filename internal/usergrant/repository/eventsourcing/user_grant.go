@@ -3,7 +3,7 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
@@ -50,9 +50,9 @@ func UserGrantAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 	}
 	validationQuery := es_models.NewSearchQuery().
 		AggregateTypeFilter(usr_model.UserAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
-		AggregateIDsFilter(grant.UserID, auth.GetCtxData(ctx).OrgID, grant.ProjectID)
+		AggregateIDsFilter(grant.UserID, authz.GetCtxData(ctx).OrgID, grant.ProjectID)
 
-	validation := addUserGrantValidation(auth.GetCtxData(ctx).OrgID, grant)
+	validation := addUserGrantValidation(authz.GetCtxData(ctx).OrgID, grant)
 	agg, err = agg.SetPrecondition(validationQuery, validation).AppendEvent(model.UserGrantAdded, grant)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func UserGrantAddedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 }
 
 func reservedUniqueUserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) (*es_models.Aggregate, error) {
-	grantID := auth.GetCtxData(ctx).OrgID + grant.ProjectID + grant.UserID
+	grantID := authz.GetCtxData(ctx).OrgID + grant.ProjectID + grant.UserID
 	aggregate, err := aggCreator.NewAggregate(ctx, grantID, model.UserGrantUniqueAggregate, model.UserGrantVersion, 0)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func reservedUniqueUserGrantAggregate(ctx context.Context, aggCreator *es_models
 		return nil, err
 	}
 
-	return aggregate.SetPrecondition(UserGrantUniqueQuery(auth.GetCtxData(ctx).OrgID, grant.ProjectID, grant.UserID), isEventValidation(aggregate, model.UserGrantReserved)), nil
+	return aggregate.SetPrecondition(UserGrantUniqueQuery(authz.GetCtxData(ctx).OrgID, grant.ProjectID, grant.UserID), isEventValidation(aggregate, model.UserGrantReserved)), nil
 }
 
 func releasedUniqueUserGrantAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, grant *model.UserGrant) (aggregate *es_models.Aggregate, err error) {

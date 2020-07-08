@@ -4,7 +4,6 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/caos/zitadel/internal/api"
 	http_util "github.com/caos/zitadel/internal/api/http"
 )
 
@@ -16,8 +15,8 @@ type BrowserInfo struct {
 
 func BrowserInfoFromRequest(r *http.Request) *BrowserInfo {
 	return &BrowserInfo{
-		UserAgent:      r.Header.Get(api.UserAgent),
-		AcceptLanguage: r.Header.Get(api.AcceptLanguage),
+		UserAgent:      r.Header.Get(http_util.UserAgentHeader),
+		AcceptLanguage: r.Header.Get(http_util.AcceptLanguage),
 		RemoteIP:       http_util.RemoteIPFromRequest(r),
 	}
 }

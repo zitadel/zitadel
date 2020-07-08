@@ -2,12 +2,14 @@ package server
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"net"
 
 	"github.com/caos/logging"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 	"github.com/caos/zitadel/internal/api/http"
 )
 
@@ -16,30 +18,36 @@ const (
 )
 
 type Server interface {
-	GRPCPort() string
-	GRPCServer(defaults systemdefaults.SystemDefaults) (*grpc.Server, error)
+	Gateway
+	RegisterServer(*grpc.Server)
+	AppName() string
+	MethodPrefix() string
+	AuthMethods() authz.MethodMapping
 }
 
-func StartServer(ctx context.Context, s Server, defaults systemdefaults.SystemDefaults) {
-	port := grpcPort(s.GRPCPort())
-	listener := http.CreateListener(port)
-	server := createGrpcServer(s, defaults)
-	serveServer(ctx, server, listener, port)
+func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang language.Tag) *grpc.Server {
+	return grpc.NewServer(
+		middleware.TracingStatsServer(http.Healthz, http.Readiness, http.Validation),
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(
+				middleware.ErrorHandler(lang),
+				middleware.TranslationHandler(lang),
+				grpc_middleware.ChainUnaryServer(
+					middleware.AuthorizationInterceptor(verifier, authConfig),
+				),
+			),
+		),
+	)
 }
 
-func createGrpcServer(s Server, defaults systemdefaults.SystemDefaults) *grpc.Server {
-	grpcServer, err := s.GRPCServer(defaults)
-	logging.Log("SERVE-k280HZ").OnError(err).Panic("failed to create grpc server")
-	return grpcServer
-}
-
-func serveServer(ctx context.Context, server *grpc.Server, listener net.Listener, port string) {
+func Serve(ctx context.Context, server *grpc.Server, port string) {
 	go func() {
 		<-ctx.Done()
 		server.GracefulStop()
 	}()
 
 	go func() {
+		listener := http.CreateListener(port)
 		err := server.Serve(listener)
 		logging.Log("SERVE-Ga3e94").OnError(err).Panic("grpc server serve failed")
 	}()

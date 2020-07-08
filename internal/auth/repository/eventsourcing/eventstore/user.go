@@ -4,20 +4,20 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/sdk"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-
-	"github.com/caos/zitadel/internal/api/auth"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/user/model"
 	user_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type UserRepo struct {
@@ -33,7 +33,7 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 }
 
 func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, orgMember *org_model.OrgMember, resourceOwner string) (*model.User, error) {
-	policyResourceOwner := auth.GetCtxData(ctx).OrgID
+	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
@@ -66,11 +66,11 @@ func (repo *UserRepo) Register(ctx context.Context, registerUser *model.User, or
 }
 
 func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
-	return repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	return repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
-	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (repo *UserRepo) ChangeMyProfile(ctx context.Context, profile *model.Profil
 }
 
 func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
-	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (repo *UserRepo) VerifyEmail(ctx context.Context, userID, code string) erro
 }
 
 func (repo *UserRepo) VerifyMyEmail(ctx context.Context, code string) error {
-	return repo.UserEvents.VerifyEmail(ctx, auth.GetCtxData(ctx).UserID, code)
+	return repo.UserEvents.VerifyEmail(ctx, authz.GetCtxData(ctx).UserID, code)
 }
 
 func (repo *UserRepo) ResendEmailVerificationMail(ctx context.Context, userID string) error {
@@ -112,11 +112,11 @@ func (repo *UserRepo) ResendEmailVerificationMail(ctx context.Context, userID st
 }
 
 func (repo *UserRepo) ResendMyEmailVerificationMail(ctx context.Context) error {
-	return repo.UserEvents.CreateEmailVerificationCode(ctx, auth.GetCtxData(ctx).UserID)
+	return repo.UserEvents.CreateEmailVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
-	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -131,19 +131,19 @@ func (repo *UserRepo) ChangeMyPhone(ctx context.Context, phone *model.Phone) (*m
 }
 
 func (repo *UserRepo) RemoveMyPhone(ctx context.Context) error {
-	return repo.UserEvents.RemovePhone(ctx, auth.GetCtxData(ctx).UserID)
+	return repo.UserEvents.RemovePhone(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) VerifyMyPhone(ctx context.Context, code string) error {
-	return repo.UserEvents.VerifyPhone(ctx, auth.GetCtxData(ctx).UserID, code)
+	return repo.UserEvents.VerifyPhone(ctx, authz.GetCtxData(ctx).UserID, code)
 }
 
 func (repo *UserRepo) ResendMyPhoneVerificationCode(ctx context.Context) error {
-	return repo.UserEvents.CreatePhoneVerificationCode(ctx, auth.GetCtxData(ctx).UserID)
+	return repo.UserEvents.CreatePhoneVerificationCode(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
-	user, err := repo.UserByID(ctx, auth.GetCtxData(ctx).UserID)
+	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -158,16 +158,16 @@ func (repo *UserRepo) ChangeMyAddress(ctx context.Context, address *model.Addres
 }
 
 func (repo *UserRepo) ChangeMyPassword(ctx context.Context, old, new string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return err
 	}
-	_, err = repo.UserEvents.ChangePassword(ctx, policy, auth.GetCtxData(ctx).UserID, old, new)
+	_, err = repo.UserEvents.ChangePassword(ctx, policy, authz.GetCtxData(ctx).UserID, old, new)
 	return err
 }
 
 func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func (repo *UserRepo) ChangePassword(ctx context.Context, userID, old, new strin
 }
 
 func (repo *UserRepo) MyUserMfas(ctx context.Context) ([]*model.MultiFactor, error) {
-	return repo.View.UserMfas(auth.GetCtxData(ctx).UserID)
+	return repo.View.UserMfas(authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP, error) {
@@ -184,7 +184,7 @@ func (repo *UserRepo) AddMfaOTP(ctx context.Context, userID string) (*model.OTP,
 }
 
 func (repo *UserRepo) AddMyMfaOTP(ctx context.Context) (*model.OTP, error) {
-	return repo.UserEvents.AddOTP(ctx, auth.GetCtxData(ctx).UserID)
+	return repo.UserEvents.AddOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code string) error {
@@ -192,11 +192,11 @@ func (repo *UserRepo) VerifyMfaOTPSetup(ctx context.Context, userID, code string
 }
 
 func (repo *UserRepo) VerifyMyMfaOTPSetup(ctx context.Context, code string) error {
-	return repo.UserEvents.CheckMfaOTPSetup(ctx, auth.GetCtxData(ctx).UserID, code)
+	return repo.UserEvents.CheckMfaOTPSetup(ctx, authz.GetCtxData(ctx).UserID, code)
 }
 
 func (repo *UserRepo) RemoveMyMfaOTP(ctx context.Context) error {
-	return repo.UserEvents.RemoveOTP(ctx, auth.GetCtxData(ctx).UserID)
+	return repo.UserEvents.RemoveOTP(ctx, authz.GetCtxData(ctx).UserID)
 }
 
 func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID string) error {
@@ -205,7 +205,7 @@ func (repo *UserRepo) ResendInitVerificationMail(ctx context.Context, userID str
 }
 
 func (repo *UserRepo) VerifyInitCode(ctx context.Context, userID, code, password string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (repo *UserRepo) RequestPasswordReset(ctx context.Context, loginname string
 }
 
 func (repo *UserRepo) SetPassword(ctx context.Context, userID, code, password string) error {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return err
 	}
@@ -264,7 +264,7 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView,
 }
 
 func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool) (*model.UserChanges, error) {
-	changes, err := repo.UserEvents.UserChanges(ctx, auth.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
+	changes, err := repo.UserEvents.UserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
 	}
@@ -279,7 +279,7 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 }
 
 func checkIDs(ctx context.Context, obj es_models.ObjectRoot) error {
-	if obj.AggregateID != auth.GetCtxData(ctx).UserID {
+	if obj.AggregateID != authz.GetCtxData(ctx).UserID {
 		return errors.ThrowPermissionDenied(nil, "EVENT-kFi9w", "object does not belong to user")
 	}
 	return nil

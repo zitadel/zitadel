@@ -1,171 +1,14 @@
+Log:
+  Level: $ZITADEL_LOG_LEVEL
+  Formatter:
+    Format: text
+
 Tracing:
   Type: google
   Config:
     ProjectID: $ZITADEL_TRACING_PROJECT_ID
     MetricPrefix: ZITADEL-V1
     Fraction: $ZITADEL_TRACING_FRACTION
-
-Log:
-  Level: $ZITADEL_LOG_LEVEL
-  Formatter:
-    Format: text
-
-Mgmt:
-  API:
-    GRPC:
-      ServerPort: 50010
-      GatewayPort: 50011
-      CustomHeaders:
-        - x-zitadel-
-  Repository:
-    SearchLimit: 100
-    Domain: $ZITADEL_DEFAULT_DOMAIN
-    Eventstore:
-      ServiceName: 'ManagementAPI'
-      Repository:
-        SQL:
-          Host: $ZITADEL_EVENTSTORE_HOST
-          Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'management'
-          Password: $CR_MANAGEMENT_PASSWORD
-          Database: 'eventstore'
-          SSL:
-            Mode: $CR_SSL_MODE
-            RootCert: $CR_ROOT_CERT
-            Cert: $CR_MANAGEMENT_CERT
-            Key: $CR_MANAGEMENT_KEY
-      Cache:
-        Type: 'fastcache'
-        Config:
-          MaxCacheSizeInByte: 10485760 #10mb
-    View:
-      Host: $ZITADEL_EVENTSTORE_HOST
-      Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'management'
-      Password: $CR_MANAGEMENT_PASSWORD
-      Database: 'management'
-      SSL:
-        Mode: $CR_SSL_MODE
-        RootCert: $CR_ROOT_CERT
-        Cert: $CR_MANAGEMENT_CERT
-        Key: $CR_MANAGEMENT_KEY
-    Spooler:
-      ConcurrentTasks: 4
-      BulkLimit: 100
-      FailureCountUntilSkip: 5
-
-Auth:
-  API:
-    GRPC:
-      ServerPort: 50020
-      GatewayPort: 50021
-      CustomHeaders:
-        - x-zitadel-
-    OIDC:
-      OPConfig:
-        Issuer: $ZITADEL_ISSUER
-        DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
-        Port: 50022
-      StorageConfig:
-        DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
-        DefaultAccessTokenLifetime: 12h
-        DefaultIdTokenLifetime: 12h
-        SigningKeyAlgorithm: RS256
-      UserAgentCookieConfig:
-        Name: caos.zitadel.useragent
-        Domain: $ZITADEL_COOKIE_DOMAIN
-        Key:
-          EncryptionKeyID: $ZITADEL_COOKIE_KEY
-      Cache:
-        MaxAge: $ZITADEL_CACHE_MAXAGE
-        SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-      Endpoints:
-        Auth:
-          Path: 'authorize'
-          URL: '$ZITADEL_AUTHORIZE/authorize'
-        Token:
-          Path: 'token'
-          URL: '$ZITADEL_OAUTH/token'
-        EndSession:
-          Path: 'endsession'
-          URL: '$ZITADEL_AUTHORIZE/endsession'
-        Userinfo:
-          Path: 'userinfo'
-          URL: '$ZITADEL_OAUTH/userinfo'
-        Keys:
-          Path: 'keys'
-          URL: '$ZITADEL_OAUTH/keys'
-  Repository:
-    SearchLimit: 100
-    Eventstore:
-      ServiceName: 'authAPI'
-      Repository:
-        SQL:
-          Host: $ZITADEL_EVENTSTORE_HOST
-          Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'auth'
-          Password: $CR_AUTH_PASSWORD
-          Database: 'eventstore'
-          SSL:
-            Mode: $CR_SSL_MODE
-            RootCert: $CR_ROOT_CERT
-            Cert: $CR_AUTH_CERT
-            Key: $CR_AUTH_KEY
-      Cache:
-        Type: 'fastcache'
-        Config:
-          MaxCacheSizeInByte: 10485760 #10mb
-    AuthRequest:
-      Connection:
-        Host: $ZITADEL_EVENTSTORE_HOST
-        Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'auth'
-        Password: $CR_AUTH_PASSWORD
-        Database: 'auth'
-        SSL:
-          Mode: $CR_SSL_MODE
-          RootCert: $CR_ROOT_CERT
-          Cert: $CR_AUTH_CERT
-          Key: $CR_AUTH_KEY
-    View:
-      Host: $ZITADEL_EVENTSTORE_HOST
-      Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'auth'
-      Password: $CR_AUTH_PASSWORD
-      Database: 'auth'
-      SSL:
-        Mode: $CR_SSL_MODE
-        RootCert: $CR_ROOT_CERT
-        Cert: $CR_AUTH_CERT
-        Key: $CR_AUTH_KEY
-    Spooler:
-      ConcurrentTasks: 4
-      BulkLimit: 100
-      FailureCountUntilSkip: 5
-    KeyConfig:
-      Size: 2048
-      PrivateKeyLifetime: 6h
-      PublicKeyLifetime: 30h
-      EncryptionConfig:
-        EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
-      SigningKeyRotation: 10s
-
-Login:
-  Handler:
-    Port: 50031
-    OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
-    ZitadelURL: '$ZITADEL_CONSOLE'
-    LanguageCookieName: 'caos.zitadel.login.lang'
-    DefaultLanguage: 'de'
-    CSRF:
-      CookieName: 'caos.zitadel.login.csrf'
-      Key:
-        EncryptionKeyID: $ZITADEL_CSRF_KEY
-      Development: $ZITADEL_CSRF_DEV
-    Cache:
-      MaxAge: $ZITADEL_CACHE_MAXAGE
-      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-
 
 AuthZ:
   Repository:
@@ -176,8 +19,8 @@ AuthZ:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'authz'
-          Password: $CR_AUTHZ_PASSWORD
           Database: 'eventstore'
+          Password: $CR_AUTHZ_PASSWORD
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
@@ -191,7 +34,6 @@ AuthZ:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'authz'
-      Password: $CR_AUTHZ_PASSWORD
       Database: 'authz'
       SSL:
         Mode: $CR_SSL_MODE
@@ -203,61 +45,200 @@ AuthZ:
       BulkLimit: 100
       FailureCountUntilSkip: 5
 
-Admin:
-  API:
-    GRPC:
-      ServerPort: 50040
-      GatewayPort: 50041
-      CustomHeaders:
-        - x-zitadel-
-  Repository:
-    SearchLimit: 100
-    Domain: $ZITADEL_DEFAULT_DOMAIN
-    Eventstore:
-      ServiceName: 'Admin'
-      Repository:
-        SQL:
-          Host: $ZITADEL_EVENTSTORE_HOST
-          Port: $ZITADEL_EVENTSTORE_PORT
-          User: 'adminapi'
-          Password: $CR_ADMINAPI_PASSWORD
-          Database: 'eventstore'
-          SSL:
-            Mode: $CR_SSL_MODE
-            RootCert: $CR_ROOT_CERT
-            Cert: $CR_ADMINAPI_CERT
-            Key: $CR_ADMINAPI_KEY
-      Cache:
-        Type: 'fastcache'
-        Config:
-          MaxCacheSizeInByte: 10485760 #10mb
-    View:
+Auth:
+  SearchLimit: 100
+  Eventstore:
+    ServiceName: 'authAPI'
+    Repository:
+      SQL:
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'auth'
+        Database: 'eventstore'
+        Password: $CR_AUTH_PASSWORD
+        SSL:
+          Mode: $CR_SSL_MODE
+          RootCert: $CR_ROOT_CERT
+          Cert: $CR_AUTH_CERT
+          Key: $CR_AUTH_KEY
+    Cache:
+      Type: 'fastcache'
+      Config:
+        MaxCacheSizeInByte: 10485760 #10mb
+  AuthRequest:
+    Connection:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
-      User: 'adminapi'
-      Password: $CR_ADMINAPI_PASSWORD
-      Database: 'adminapi'
+      User: 'auth'
+      Database: 'auth'
+      Password: $CR_AUTH_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_ADMINAPI_CERT
-        Key: $CR_ADMINAPI_KEY
-    Spooler:
-      ConcurrentTasks: 1
-      BulkLimit: 100
-      FailureCountUntilSkip: 5
+        Cert: $CR_AUTH_CERT
+        Key: $CR_AUTH_KEY
+  View:
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'auth'
+    Database: 'auth'
+    Password: $CR_AUTH_PASSWORD
+    SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
+      Cert: $CR_AUTH_CERT
+      Key: $CR_AUTH_KEY
+  Spooler:
+    ConcurrentTasks: 4
+    BulkLimit: 100
+    FailureCountUntilSkip: 5
+  KeyConfig:
+    Size: 2048
+    PrivateKeyLifetime: 6h
+    PublicKeyLifetime: 30h
+    EncryptionConfig:
+      EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
+    SigningKeyRotation: 10s
 
-Console:
-  Port: 50050
-  EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
-  ShortCache:
-    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
-    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
-  LongCache:
+Admin:
+  SearchLimit: 100
+  Domain: $ZITADEL_DEFAULT_DOMAIN
+  Eventstore:
+    ServiceName: 'Admin'
+    Repository:
+      SQL:
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'admin_api'
+        Database: 'eventstore'
+        Password: $CR_ADMINAPI_PASSWORD
+        SSL:
+          Mode: $CR_SSL_MODE
+          RootCert: $CR_ROOT_CERT
+          Cert: $CR_ADMINAPI_CERT
+          Key: $CR_ADMINAPI_KEY
+    Cache:
+      Type: 'fastcache'
+      Config:
+        MaxCacheSizeInByte: 10485760 #10mb
+  View:
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'admin_api'
+    Database: 'admin_api'
+    Password: $CR_ADMINAPI_PASSWORD
+    SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
+      Cert: $CR_ADMINAPI_CERT
+      Key: $CR_ADMINAPI_KEY
+  Spooler:
+    ConcurrentTasks: 1
+    BulkLimit: 100
+    FailureCountUntilSkip: 5
+
+Mgmt:
+  SearchLimit: 100
+  Domain: $ZITADEL_DEFAULT_DOMAIN
+  Eventstore:
+    ServiceName: 'ManagementAPI'
+    Repository:
+      SQL:
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'management'
+        Database: 'eventstore'
+        Password: $CR_MANAGEMENT_PASSWORD
+        SSL:
+          Mode: $CR_SSL_MODE
+          RootCert: $CR_ROOT_CERT
+          Cert: $CR_MANAGEMENT_CERT
+          Key: $CR_MANAGEMENT_KEY
+    Cache:
+      Type: 'fastcache'
+      Config:
+        MaxCacheSizeInByte: 10485760 #10mb
+  View:
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'management'
+    Database: 'management'
+    Password: $CR_MANAGEMENT_PASSWORD
+    SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
+      Cert: $CR_MANAGEMENT_CERT
+      Key: $CR_MANAGEMENT_KEY
+  Spooler:
+    ConcurrentTasks: 4
+    BulkLimit: 100
+    FailureCountUntilSkip: 5
+
+API:
+  GRPC:
+    ServerPort: 50001
+    GatewayPort: 50002
+    CustomHeaders:
+      - x-zitadel-
+  OIDC:
+    OPConfig:
+      Issuer: $ZITADEL_ISSUER
+      DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
+    StorageConfig:
+      DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+      DefaultAccessTokenLifetime: 12h
+      DefaultIdTokenLifetime: 12h
+      SigningKeyAlgorithm: RS256
+    UserAgentCookieConfig:
+      Name: caos.zitadel.useragent
+      Domain: $ZITADEL_COOKIE_DOMAIN
+      Key:
+        EncryptionKeyID: $ZITADEL_COOKIE_KEY
+    Cache:
       MaxAge: $ZITADEL_CACHE_MAXAGE
       SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-  CSPDomain: $ZITADEL_DEFAULT_DOMAIN
+    Endpoints:
+      Auth:
+        Path: 'authorize'
+        URL: '$ZITADEL_AUTHORIZE/authorize'
+      Token:
+        Path: 'token'
+        URL: '$ZITADEL_OAUTH/token'
+      EndSession:
+        Path: 'endsession'
+        URL: '$ZITADEL_AUTHORIZE/endsession'
+      Userinfo:
+        Path: 'userinfo'
+        URL: '$ZITADEL_OAUTH/userinfo'
+      Keys:
+        Path: 'keys'
+        URL: '$ZITADEL_OAUTH/keys'
 
+UI:
+  Port: 50003
+  Login:
+    Handler:
+      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/'
+      ZitadelURL: '$ZITADEL_CONSOLE'
+      LanguageCookieName: 'caos.zitadel.login.lang'
+      DefaultLanguage: 'de'
+      CSRF:
+        CookieName: 'caos.zitadel.login.csrf'
+        Key:
+          EncryptionKeyID: $ZITADEL_CSRF_KEY
+        Development: $ZITADEL_CSRF_DEV
+      Cache:
+        MaxAge: $ZITADEL_CACHE_MAXAGE
+        SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+  Console:
+    EnvOverwriteDir: $ZITADEL_CONSOLE_ENV_DIR
+    ShortCache:
+      MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
+    LongCache:
+      MaxAge: $ZITADEL_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+    CSPDomain: $ZITADEL_DEFAULT_DOMAIN
 
 Notification:
   Repository:
@@ -270,8 +251,8 @@ Notification:
           Host: $ZITADEL_EVENTSTORE_HOST
           Port: $ZITADEL_EVENTSTORE_PORT
           User: 'notification'
-          Password: $CR_NOTIFICATION_PASSWORD
           Database: 'eventstore'
+          Password: $CR_NOTIFICATION_PASSWORD
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
@@ -285,8 +266,8 @@ Notification:
       Host: $ZITADEL_EVENTSTORE_HOST
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'notification'
-      Password: $CR_NOTIFICATION_PASSWORD
       Database: 'notification'
+      Password: $CR_NOTIFICATION_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
