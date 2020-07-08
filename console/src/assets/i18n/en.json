@@ -14,9 +14,9 @@
         "USERS": "Create and manage your users.",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
         "USERS_BUTTON": "Show users",
-        "ADMIN": "Identity and Access Management",
-        "ADMIN_DESC": "Manage your organisations and administrators.",
-        "ADMIN_BUTTON": "Manage ZITADEL"
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Manage your organisations and administrators.",
+        "IAM_BUTTON": "Manage ZITADEL"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
@@ -193,7 +193,7 @@
         "EDITACCOUNT":"Edit Account",
         "ADDACCOUNT":"log in with another account"
     },
-    "Administation": {
+    "IAM": {
         "DETAIL": {
             "TITLE":"Identity and Access Management Administration",
             "DESCRIPTION":"Manage the ZITADEL settings."
@@ -247,7 +247,7 @@
         },
         "POLICY": {
             "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged policeies that enhance your security.",
+            "DESCRIPTION":"Pre-packaged policies that enhance your security.",
             "PWD_COMPLEXITY": {
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",

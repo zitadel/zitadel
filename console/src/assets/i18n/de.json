@@ -14,9 +14,9 @@
         "USERS": "Erstelle und verwalte deine Benutzer.",
         "USERS_DESC": "Überwache dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
         "USERS_BUTTON": "Benutzer anzeigen",
-        "ADMIN": "Identity and Access Management",
-        "ADMIN_DESC": "Verwalte deine Organisationen und Administratoren.",
-        "ADMIN_BUTTON": "ZITADEL verwalten"
+        "IAM": "Identity and Access Management",
+        "IAM_DESC": "Verwalte deine Organisationen und Administratoren.",
+        "IAM_BUTTON": "ZITADEL verwalten"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
