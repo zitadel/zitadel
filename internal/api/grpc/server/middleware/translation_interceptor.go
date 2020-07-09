@@ -15,7 +15,7 @@ func TranslationHandler(defaultLanguage language.Tag) func(ctx context.Context, 
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		resp, err := handler(ctx, req)
-		if loc, ok := resp.(localizers); ok {
+		if loc, ok := resp.(localizers); ok && resp != nil {
 			translateFields(ctx, loc, translator)
 		}
 		return resp, err
