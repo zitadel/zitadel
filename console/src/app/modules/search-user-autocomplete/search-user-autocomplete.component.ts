@@ -140,7 +140,7 @@ export class SearchUserAutocompleteComponent {
             this.users = [user.toObject()];
             this.selectionChanged.emit(this.users);
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 }

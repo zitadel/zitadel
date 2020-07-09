@@ -1,5 +1,5 @@
 import { OverlayModule } from '@angular/cdk/overlay';
-import { APP_BASE_HREF, CommonModule, registerLocaleData, PlatformLocation } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
@@ -29,10 +29,10 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
-import { GrpcAuthInterceptor } from './services/grpc-auth.interceptor';
-import { GRPC_INTERCEPTORS } from './services/grpc-interceptor';
-import { GrpcOrgInterceptor } from './services/grpc-org.interceptor';
 import { GrpcService } from './services/grpc.service';
+import { GrpcAuthInterceptor } from './services/interceptors/grpc-auth.interceptor';
+import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
+import { GrpcOrgInterceptor } from './services/interceptors/grpc-org.interceptor';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
@@ -42,7 +42,7 @@ registerLocaleData(localeDe);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, './assets/i18n/');
+    return new TranslateHttpLoader(http, './assets/i18n/');
 }
 
 const appInitializerFn = (grpcServ: GrpcService) => {
@@ -151,7 +151,5 @@ const authConfig: AuthConfig = {
 })
 export class AppModule {
 
-    constructor() {
-        console.log(window.location.href);
-    }
+    constructor() { }
 }

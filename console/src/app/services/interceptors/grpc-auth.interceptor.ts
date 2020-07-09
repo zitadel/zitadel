@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Metadata } from 'grpc-web';
 
-import { GrpcHandler } from './grpc-handler';
+import { GrpcHandler } from '../grpc-handler';
+import { StorageService } from '../storage.service';
 import { GrpcInterceptor } from './grpc-interceptor';
-import { StorageService } from './storage.service';
 
 const authorizationKey = 'Authorization';
 const bearerPrefix = 'Bearer ';

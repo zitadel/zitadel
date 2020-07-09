@@ -61,7 +61,7 @@ export class GrantedProjectGridComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
-        if (changes.items.currentValue && changes.items.currentValue.length > 0) {
+        if (changes.items?.currentValue && changes.items.currentValue.length > 0) {
             this.notPinned = Object.assign([], this.items);
             this.reorganizeItems();
         }

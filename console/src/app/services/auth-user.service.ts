@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Metadata } from 'grpc-web';
 import { from, Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
@@ -15,6 +15,7 @@ import {
     MyProjectOrgSearchRequest,
     MyProjectOrgSearchResponse,
     PasswordChange,
+    PasswordComplexityPolicy,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
@@ -23,6 +24,7 @@ import {
     UserEmail,
     UserPhone,
     UserProfile,
+    UserProfileView,
     UserSessionViews,
     UserView,
     VerifyMfaOtp,
@@ -57,13 +59,22 @@ export class AuthUserService {
         return responseMapper(response);
     }
 
-    public async GetMyUserProfile(): Promise<UserProfile> {
+    public async GetMyUserProfile(): Promise<UserProfileView> {
         return await this.request(
             c => c.getMyUserProfile,
             new Empty(),
             f => f,
         );
     }
+
+    public async GetMyPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
+        return await this.request(
+            c => c.getMyPasswordComplexityPolicy,
+            new Empty(),
+            f => f,
+        );
+    }
+
 
     public async GetMyUser(): Promise<UserView> {
         return await this.request(
@@ -318,6 +329,9 @@ export class AuthUserService {
                     }
                     this._roleCache = userRoles;
                     return of(this.hasRoles(userRoles, roles, each));
+                }),
+                catchError((err) => {
+                    return of(false);
                 }),
             );
         } else {

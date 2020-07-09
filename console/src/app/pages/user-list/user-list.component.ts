@@ -79,7 +79,7 @@ export class UserListComponent implements OnDestroy {
             this.dataSource.data = resp.toObject().resultList;
             this.loadingSubject.next(false);
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
             this.loadingSubject.next(false);
         });
     }

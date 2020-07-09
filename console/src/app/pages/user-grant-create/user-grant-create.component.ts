@@ -39,7 +39,6 @@ export class UserGrantCreateComponent implements OnDestroy {
         private route: ActivatedRoute,
     ) {
         this.subscription = this.route.params.subscribe((params: Params) => {
-            console.log(params);
             const { context, projectid, grantid, userid } = params;
             this.context = context;
 
@@ -76,7 +75,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                     this.toast.showInfo('User Grant added');
                     this.close();
                 }).catch(error => {
-                    this.toast.showError(error.message);
+                    this.toast.showError(error);
                 });
                 break;
             case UserGrantContext.OWNED_PROJECT:
@@ -88,7 +87,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                     this.toast.showInfo('Project User Grant added');
                     this.close();
                 }).catch(error => {
-                    this.toast.showError(error.message);
+                    this.toast.showError(error);
                 });
                 break;
             case UserGrantContext.GRANTED_PROJECT:
@@ -102,7 +101,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                     this.toast.showInfo('Project Grant User Grant added');
                     this.close();
                 }).catch(error => {
-                    this.toast.showError(error.message);
+                    this.toast.showError(error);
                 });
                 break;
 
@@ -111,12 +110,10 @@ export class UserGrantCreateComponent implements OnDestroy {
     }
 
     public selectProject(project: ProjectView.AsObject | ProjectGrantView.AsObject | any): void {
-        console.log(project);
         this.projectId = project.projectId;
     }
 
     public selectUser(user: User.AsObject): void {
-        console.log(user);
         this.userId = user.id;
     }
 

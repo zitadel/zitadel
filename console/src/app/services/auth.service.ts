@@ -4,7 +4,7 @@ import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, map, mergeMap, take, timeout } from 'rxjs/operators';
 
-import { Org, UserProfile } from '../proto/generated/auth_pb';
+import { Org, UserProfileView } from '../proto/generated/auth_pb';
 import { AuthUserService } from './auth-user.service';
 import { GrpcService } from './grpc.service';
 import { StatehandlerService } from './statehandler.service';
@@ -16,7 +16,7 @@ import { StorageKey, StorageService } from './storage.service';
 export class AuthService {
     private cachedOrgs: Org.AsObject[] = [];
     private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
-    public user!: Observable<UserProfile.AsObject>;
+    public user!: Observable<UserProfileView.AsObject>;
     private _authenticated: boolean = false;
     private readonly _authenticationChanged: BehaviorSubject<
         boolean
@@ -61,7 +61,11 @@ export class AuthService {
         return from(this.oauthService.loadUserProfile());
     }
 
-    public async authenticate(config?: Partial<AuthConfig>, setState: boolean = true): Promise<boolean> {
+    public async authenticate(
+        config?: Partial<AuthConfig>,
+        setState: boolean = true,
+        force: boolean = false,
+    ): Promise<boolean> {
         this.config.issuer = config?.issuer || this.grpcService.issuer;
         this.config.clientId = config?.clientId || this.grpcService.clientid;
         this.config.redirectUri = config?.redirectUri || this.grpcService.redirectUri;
@@ -73,7 +77,8 @@ export class AuthService {
         await this.oauthService.loadDiscoveryDocumentAndTryLogin();
 
         this._authenticated = this.oauthService.hasValidAccessToken();
-        if (!this.oauthService.hasValidIdToken() || !this.authenticated || config) {
+
+        if (!this.oauthService.hasValidIdToken() || !this.authenticated || config || force) {
             const newState = setState ? await this.statehandler.createState().toPromise() : undefined;
             this.oauthService.initCodeFlow(newState);
         }
@@ -88,7 +93,6 @@ export class AuthService {
         this._authenticationChanged.next(false);
         this.router.navigate(['/']);
     }
-
 
     public get activeOrgChanged(): Observable<Org.AsObject> {
         return this._activeOrgChanged;

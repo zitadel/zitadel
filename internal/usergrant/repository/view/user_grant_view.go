@@ -69,6 +69,20 @@ func UserGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.UserG
 	return users, nil
 }
 
+func UserGrantsByProjectAndUserID(db *gorm.DB, table, projectID, userID string) ([]*model.UserGrantView, error) {
+	users := make([]*model.UserGrantView, 0)
+	queries := []*grant_model.UserGrantSearchQuery{
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
+	}
+	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
+	_, err := query(db, &users)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func UserGrantsByProjectIDAndRole(db *gorm.DB, table, projectID, roleKey string) ([]*model.UserGrantView, error) {
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
