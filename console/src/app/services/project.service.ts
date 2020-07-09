@@ -165,6 +165,17 @@ export class ProjectService {
         );
     }
 
+    public async RemoveProjectGrant(id: string, projectId: string): Promise<Empty> {
+        const req = new ProjectGrantID();
+        req.setId(id);
+        req.setProjectId(projectId);
+        return await this.request(
+            c => c.removeProjectGrant,
+            req,
+            f => f,
+        );
+    }
+
     public async DeactivateProject(projectId: string): Promise<Project> {
         const req = new ProjectID();
         req.setId(projectId);

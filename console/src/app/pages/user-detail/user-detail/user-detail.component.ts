@@ -105,16 +105,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public resendVerification(): void {
         this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
     public resendPhoneVerification(): void {
         this.mgmtUserService.ResendPhoneVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
@@ -123,8 +123,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
             this.user.phone = '';
             this.phoneEditState = false;
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

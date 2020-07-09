@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -53,6 +54,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         UserGrantsModule,
         ProjectContributorsModule,
         FormsModule,
+        ReactiveFormsModule,
         TranslateModule,
         AvatarModule,
         ReactiveFormsModule,
@@ -73,6 +75,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatTabsModule,
         MatCheckboxModule,
         CardModule,
+        MatSelectModule,
         MatTooltipModule,
         MatSortModule,
         PipesModule,
