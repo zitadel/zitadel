@@ -99,8 +99,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 this.toast.showInfo('USER.TOAST.SAVED', true);
                 this.user = Object.assign(this.user, data.toObject());
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.toast.showError(error);
             });
     }
 
@@ -136,8 +136,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             .SaveUserEmail(this.user.id, this.user.email).then((data: UserEmail) => {
                 this.toast.showInfo('USER.TOAST.EMAILSENT', true);
                 this.user.email = data.toObject().email;
-            }).catch(data => {
-                this.toast.showError(data.message);
+            }).catch(error => {
+                this.toast.showError(error);
             });
     }
 
@@ -148,8 +148,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
                 this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                 this.user.phone = data.toObject().phone;
                 this.phoneEditState = false;
-            }).catch(data => {
-                this.toast.showError(data.message);
+            }).catch(error => {
+                this.toast.showError(error);
             });
     }
 
@@ -170,8 +170,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this.mgmtUserService.SendSetPasswordNotification(this.user.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
             .then(() => {
                 this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
-            }).catch(data => {
-                this.toast.showError(data.message);
+            }).catch(error => {
+                this.toast.showError(error);
             });
     }
 

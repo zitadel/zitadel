@@ -82,8 +82,8 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
                 this.user.email = data.toObject().email;
                 this.emailEditState = false;
-            }).catch(data => {
-                this.toast.showError(data.message);
+            }).catch(error => {
+                this.toast.showError(error);
                 this.emailEditState = false;
             });
     }
@@ -145,7 +145,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.user.phone = data.toObject().phone;
                 this.phoneEditState = false;
             }).catch(data => {
-                this.toast.showError(data.message);
+                this.toast.showError(data);
                 this.phoneEditState = false;
             });
     }
