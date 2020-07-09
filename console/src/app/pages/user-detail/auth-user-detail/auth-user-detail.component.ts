@@ -145,7 +145,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.user.phone = data.toObject().phone;
                 this.phoneEditState = false;
             }).catch(data => {
-                this.toast.showError(data.message);
+                this.toast.showError(data);
                 this.phoneEditState = false;
             });
     }
