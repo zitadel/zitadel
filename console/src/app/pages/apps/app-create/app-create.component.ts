@@ -31,7 +31,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public oidcResponseTypes: OIDCResponseType[] = [
         OIDCResponseType.OIDCRESPONSETYPE_CODE,
         OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
-        OIDCResponseType.OIDCRESPONSETYPE_TOKEN,
+        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN,
     ];
     public oidcGrantTypes: OIDCGrantType[] = [
         OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
