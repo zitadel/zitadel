@@ -19,6 +19,7 @@ type UserGrant struct {
 	State     int32    `json:"-"`
 	UserID    string   `json:"userId,omitempty"`
 	ProjectID string   `json:"projectId,omitempty"`
+	GrantID   string   `json:"grantId,omitempty"`
 	RoleKeys  []string `json:"roleKeys,omitempty"`
 }
 
@@ -40,6 +41,7 @@ func UserGrantFromModel(grant *model.UserGrant) *UserGrant {
 		ObjectRoot: grant.ObjectRoot,
 		UserID:     grant.UserID,
 		ProjectID:  grant.ProjectID,
+		GrantID:    grant.GrantID,
 		State:      int32(grant.State),
 		RoleKeys:   grant.RoleKeys,
 	}
@@ -50,6 +52,7 @@ func UserGrantToModel(grant *UserGrant) *model.UserGrant {
 		ObjectRoot: grant.ObjectRoot,
 		UserID:     grant.UserID,
 		ProjectID:  grant.ProjectID,
+		GrantID:    grant.GrantID,
 		State:      model.UserGrantState(grant.State),
 		RoleKeys:   grant.RoleKeys,
 	}
