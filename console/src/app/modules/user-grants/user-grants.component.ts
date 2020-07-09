@@ -179,5 +179,5 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         }).catch(error => {
             this.toast.showError(error);
         });
-    };
+    }
 }
