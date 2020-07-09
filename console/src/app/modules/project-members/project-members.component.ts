@@ -23,6 +23,7 @@ export class ProjectMembersComponent {
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
     public grantId: string = '';
+    public projectName: string = '';
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
     public dataSource!: ProjectMembersDataSource;
@@ -47,6 +48,7 @@ export class ProjectMembersComponent {
                 if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
                     this.projectService.GetProjectById(params.projectid).then(project => {
                         this.project = project.toObject();
+                        this.projectName = this.project.name;
                         this.dataSource = new ProjectMembersDataSource(this.projectService);
                         this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25);
                     });
@@ -54,6 +56,7 @@ export class ProjectMembersComponent {
                     console.log(params.projectid, params.grantid);
                     this.projectService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
                         this.project = project.toObject();
+                        this.projectName = this.project.projectName;
                         this.dataSource = new ProjectMembersDataSource(this.projectService);
                         this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25, this.grantId);
                     });
