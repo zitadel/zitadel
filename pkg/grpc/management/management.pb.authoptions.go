@@ -489,16 +489,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/CreateUserGrant": authz.Option{
-		Permission: "user.grant.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserGrant": authz.Option{
-		Permission: "user.grant.write",
-		CheckParam: "",
-	},
-
 	"/caos.zitadel.management.api.v1.ManagementService/DeactivateUserGrant": authz.Option{
 		Permission: "user.grant.write",
 		CheckParam: "",
@@ -510,21 +500,6 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/RemoveUserGrant": authz.Option{
-		Permission: "user.grant.delete",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/BulkCreateUserGrant": authz.Option{
-		Permission: "user.grant.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/BulkUpdateUserGrant": authz.Option{
-		Permission: "user.grant.write",
-		CheckParam: "",
-	},
-
-	"/caos.zitadel.management.api.v1.ManagementService/BulkRemoveUserGrant": authz.Option{
 		Permission: "user.grant.delete",
 		CheckParam: "",
 	},
