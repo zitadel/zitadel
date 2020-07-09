@@ -114,16 +114,16 @@ export class AuthUserDetailComponent implements OnDestroy {
     public resendVerification(): void {
         this.userService.ResendEmailVerification().then(() => {
             this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
     public resendPhoneVerification(): void {
         this.userService.ResendPhoneVerification().then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
@@ -132,8 +132,8 @@ export class AuthUserDetailComponent implements OnDestroy {
             this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
             this.user.phone = '';
             this.phoneEditState = false;
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

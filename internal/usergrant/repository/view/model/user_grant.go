@@ -27,6 +27,7 @@ type UserGrantView struct {
 	ResourceOwner string         `json:"-" gorm:"resource_owner"`
 	UserID        string         `json:"userId" gorm:"user_id"`
 	ProjectID     string         `json:"projectId" gorm:"column:project_id"`
+	GrantID       string         `json:"grantId" gorm:"column:grant_id"`
 	UserName      string         `json:"-" gorm:"column:user_name"`
 	FirstName     string         `json:"-" gorm:"column:first_name"`
 	LastName      string         `json:"-" gorm:"column:last_name"`
@@ -49,6 +50,7 @@ func UserGrantFromModel(grant *model.UserGrantView) *UserGrantView {
 		ResourceOwner: grant.ResourceOwner,
 		UserID:        grant.UserID,
 		ProjectID:     grant.ProjectID,
+		GrantID:       grant.GrantID,
 		ChangeDate:    grant.ChangeDate,
 		CreationDate:  grant.CreationDate,
 		State:         int32(grant.State),
