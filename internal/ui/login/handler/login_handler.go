@@ -12,6 +12,7 @@ const (
 
 type loginData struct {
 	LoginName string `schema:"loginName"`
+	Register  bool   `schema:"register"`
 }
 
 func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +42,10 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
+		return
+	}
+	if data.Register {
+		l.handleRegister(w, r)
 		return
 	}
 	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, data.LoginName)
