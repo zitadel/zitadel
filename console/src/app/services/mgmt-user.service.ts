@@ -21,6 +21,7 @@ import {
     ProjectGrantUserGrantUpdate,
     ProjectRoleAdd,
     ProjectUserGrantSearchRequest,
+    ProjectUserGrantUpdate,
     SetPasswordNotificationRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
@@ -36,7 +37,6 @@ import {
     UserGrantSearchQuery,
     UserGrantSearchRequest,
     UserGrantSearchResponse,
-    UserGrantUpdate,
     UserGrantView,
     UserID,
     UserPhone,
@@ -217,22 +217,22 @@ export class MgmtUserService {
         );
     }
 
-    public async CreateUserGrant(
-        projectId: string,
-        userId: string,
-        roleNamesList: string[],
-    ): Promise<UserGrant> {
-        const req = new UserGrantCreate();
-        req.setProjectId(projectId);
-        req.setUserId(userId);
-        req.setRoleKeysList(roleNamesList);
+    // public async CreateUserGrant(
+    //     projectId: string,
+    //     userId: string,
+    //     roleNamesList: string[],
+    // ): Promise<UserGrant> {
+    //     const req = new UserGrantCreate();
+    //     req.setProjectId(projectId);
+    //     req.setUserId(userId);
+    //     req.setRoleKeysList(roleNamesList);
 
-        return await this.request(
-            c => c.createUserGrant,
-            req,
-            f => f,
-        );
-    }
+    //     return await this.request(
+    //         c => c.createUserGrant,
+    //         req,
+    //         f => f,
+    //     );
+    // }
 
     public async CreateProjectUserGrant(
         projectId: string,
@@ -497,18 +497,37 @@ export class MgmtUserService {
         );
     }
 
-    public async UpdateUserGrant(
+    // public async UpdateUserGrant(
+    //     id: string,
+    //     userId: string,
+    //     roleKeysList: string[],
+    // ): Promise<UserGrant> {
+    //     const req = new UserGrantUpdate();
+    //     req.setId(id);
+    //     req.setRoleKeysList(roleKeysList);
+    //     req.setUserId(userId);
+
+    //     return await this.request(
+    //         c => c.updateUserGrant,
+    //         req,
+    //         f => f,
+    //     );
+    // }
+
+    public async UpdateProjectUserGrant(
         id: string,
+        projectId: string,
         userId: string,
         roleKeysList: string[],
     ): Promise<UserGrant> {
-        const req = new UserGrantUpdate();
+        const req = new ProjectUserGrantUpdate();
         req.setId(id);
+        req.setProjectId(projectId);
         req.setRoleKeysList(roleKeysList);
         req.setUserId(userId);
 
         return await this.request(
-            c => c.updateUserGrant,
+            c => c.updateProjectUserGrant,
             req,
             f => f,
         );
@@ -516,15 +535,15 @@ export class MgmtUserService {
 
     public async updateProjectGrantUserGrant(
         id: string,
-        roleKeysList: string[],
-        userId: string,
         projectGrantId: string,
+        userId: string,
+        roleKeysList: string[],
     ): Promise<UserGrant> {
         const req = new ProjectGrantUserGrantUpdate();
         req.setId(id);
+        req.setProjectGrantId(projectGrantId);
         req.setRoleKeysList(roleKeysList);
         req.setUserId(userId);
-        req.setProjectGrantId(projectGrantId);
 
         return await this.request(
             c => c.updateProjectGrantUserGrant,

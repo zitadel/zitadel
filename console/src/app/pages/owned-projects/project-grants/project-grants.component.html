@@ -11,8 +11,8 @@
     </div>
     <span class="fill-space"></span>
     <ng-template appHasRole [appHasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']">
-        <button [disabled]="disabled" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button"
-            mat-icon-button *ngIf="selection.hasValue()" color="warn">
+        <button (click)="deleteSelectedGrants()" [disabled]="disabled" class="icon-button" mat-icon-button
+            *ngIf="selection.hasValue()" color="warn">
             <i class="las la-trash"></i>
         </button>
     </ng-template>
@@ -46,19 +46,22 @@
 
         <ng-container matColumnDef="grantedOrgName">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORG' | translate }} </th>
-            <td class="pointer" mat-cell *matCellDef="let grant">
+            <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                *matCellDef="let grant">
                 {{grant.grantedOrgName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="creationDate">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CREATIONDATE' | translate }} </th>
-            <td class="pointer" mat-cell *matCellDef="let grant">
+            <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                *matCellDef="let grant">
                 {{grant.creationDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
         </ng-container>
 
         <ng-container matColumnDef="changeDate">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
-            <td class="pointer" mat-cell *matCellDef="let grant">
+            <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                *matCellDef="let grant">
                 {{grant.changeDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
 
         </ng-container>
@@ -66,12 +69,20 @@
         <ng-container matColumnDef="roleNamesList">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                <span class="role" *ngFor="let role of grant.roleNamesList">{{role}}</span> </td>
+                <mat-form-field class="form-field" appearance="outline" *ngIf="grant.roleKeysList">
+                    <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+                    <mat-select [(ngModel)]="grant.roleKeysList" multiple
+                        (selectionChange)="updateRoles(grant, $event)">
+                        <mat-option *ngFor="let role of memberRoleOptions" [value]="role.key">
+                            {{role.key}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr class="data-row" [routerLink]="['/projects',grant.projectId,'grant', grant.id]" mat-row
-            *matRowDef="let grant; columns: displayedColumns;" class="element-row">
+        <tr class="data-row" mat-row *matRowDef="let grant; columns: displayedColumns;" class="element-row">
         </tr>
     </table>
 

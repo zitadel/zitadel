@@ -59,9 +59,9 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
 
     public addEntry(): void {
         const newGroup = new FormGroup({
-            key: new FormControl(''),
+            key: new FormControl('', [Validators.required]),
             displayName: new FormControl(''),
-            group: new FormControl('', [Validators.required]),
+            group: new FormControl(''),
         });
 
         this.formArray.push(newGroup);
@@ -94,8 +94,8 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
 
         this.projectService.BulkAddProjectRole(this.projectId, rolesToAdd).then(() => {
             this.router.navigate(['projects', this.projectId]);
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

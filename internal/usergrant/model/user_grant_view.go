@@ -11,6 +11,7 @@ type UserGrantView struct {
 	ResourceOwner string
 	UserID        string
 	ProjectID     string
+	GrantID       string
 	UserName      string
 	FirstName     string
 	LastName      string

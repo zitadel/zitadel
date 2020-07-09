@@ -29,6 +29,7 @@ export class ProjectGrantsDataSource extends DataSource<ProjectGrant.AsObject> {
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(grants => {
+            console.log(grants);
             this.grantsSubject.next(grants);
         });
     }

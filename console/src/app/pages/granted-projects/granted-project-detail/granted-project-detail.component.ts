@@ -91,6 +91,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         if (this.projectId && this.grantId) {
             this.projectService.GetGrantedProjectByID(this.projectId, this.grantId).then(proj => {
                 this.project = proj.toObject();
+                console.log('granted-project', this.project);
             }).catch(error => {
                 this.toast.showError(error);
             });

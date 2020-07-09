@@ -242,8 +242,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 width: '400px',
             });
 
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

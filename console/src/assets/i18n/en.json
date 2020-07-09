@@ -47,7 +47,8 @@
         "DELETE": "Delete",
         "REMOVE":"Remove",
         "VERIFY":"Verify",
-        "FINISH":"Finish"
+        "FINISH":"Finish",
+        "CHANGE":"Change"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing!"
@@ -418,7 +419,8 @@
             "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
-            "ROLENAMESLIST": "Roles"
+            "ROLENAMESLIST": "Roles",
+            "NOROLES":"No roles"
         },
         "APP": {
             "TITLE": "Applications",

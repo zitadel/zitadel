@@ -66,12 +66,14 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         if (newState === UserState.USERSTATE_ACTIVE) {
             this.mgmtUserService.ReactivateUser(this.user.id).then(() => {
                 this.toast.showInfo('USER.TOAST.REACTIVATED', true);
+                this.user.state = newState;
             }).catch(error => {
                 this.toast.showError(error);
             });
         } else if (newState === UserState.USERSTATE_INACTIVE) {
             this.mgmtUserService.DeactivateUser(this.user.id).then(() => {
                 this.toast.showInfo('USER.TOAST.DEACTIVATED', true);
+                this.user.state = newState;
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -105,16 +107,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public resendVerification(): void {
         this.mgmtUserService.ResendEmailVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
     public resendPhoneVerification(): void {
         this.mgmtUserService.ResendPhoneVerification(this.user.id).then(() => {
             this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 
@@ -123,8 +125,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
             this.user.phone = '';
             this.phoneEditState = false;
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

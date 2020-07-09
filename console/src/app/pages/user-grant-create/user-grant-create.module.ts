@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { CardModule } from 'src/app/modules/card/card.module';
 import {
@@ -24,6 +26,8 @@ import { UserGrantCreateComponent } from './user-grant-create.component';
         MatIconModule,
         TranslateModule,
         CardModule,
+        MatFormFieldModule,
+        MatSelectModule,
         SearchProjectAutocompleteModule,
         SearchUserAutocompleteModule,
         ProjectRolesModule,
