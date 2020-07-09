@@ -343,14 +343,15 @@ func (es *ProjectEventstore) PrepareRemoveProjectRole(ctx context.Context, role 
 func (es *ProjectEventstore) RemoveRoleFromGrants(existing *model.Project, roleKey string) []*model.ProjectGrant {
 	grants := make([]*model.ProjectGrant, len(existing.Grants))
 	for i, grant := range existing.Grants {
+		newGrant := *grant
 		roles := make([]string, 0)
-		for _, role := range grant.RoleKeys {
+		for _, role := range newGrant.RoleKeys {
 			if role != roleKey {
 				roles = append(roles, role)
 			}
 		}
-		grant.RoleKeys = roles
-		grants[i] = grant
+		newGrant.RoleKeys = roles
+		grants[i] = &newGrant
 	}
 	return grants
 }
