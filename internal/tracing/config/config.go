@@ -17,6 +17,8 @@ type TracingConfig struct {
 var tracer = map[string]func() tracing.Config{
 	"google": func() tracing.Config { return &tracing_g.Config{} },
 	"log":    func() tracing.Config { return &tracing_log.Config{} },
+	"none":   func() tracing.Config { return &NoTracing{} },
+	"":       func() tracing.Config { return &NoTracing{} },
 }
 
 func (c *TracingConfig) UnmarshalJSON(data []byte) error {
@@ -56,4 +58,10 @@ func newTracingConfig(tracerType string, configData []byte) (tracing.Config, err
 	}
 
 	return tracingConfig, nil
+}
+
+type NoTracing struct{}
+
+func (_ *NoTracing) NewTracer() error {
+	return nil
 }
