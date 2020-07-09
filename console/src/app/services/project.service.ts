@@ -502,8 +502,10 @@ export class ProjectService {
         );
     }
 
-    public async ProjectGrantByID(id: string): Promise<ProjectGrant> {
+    public async ProjectGrantByID(id: string, projectId: string): Promise<ProjectGrantView> {
         const req = new ProjectGrantID();
+        req.setId(id);
+        req.setProjectId(projectId);
         return await this.request(
             c => c.projectGrantByID,
             req,
