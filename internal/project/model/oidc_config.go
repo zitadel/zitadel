@@ -24,7 +24,7 @@ type OIDCResponseType int32
 const (
 	OIDCResponseTypeCode OIDCResponseType = iota
 	OIDCResponseTypeIDToken
-	OIDCResponseTypeToken
+	OIDCResponseTypeIDTokenToken
 )
 
 type OIDCGrantType int32
@@ -69,7 +69,7 @@ func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
 		switch r {
 		case OIDCResponseTypeCode:
 			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
-		case OIDCResponseTypeIDToken, OIDCResponseTypeToken:
+		case OIDCResponseTypeIDToken, OIDCResponseTypeIDTokenToken:
 			if !implicit {
 				grantTypes = append(grantTypes, OIDCGrantTypeImplicit)
 			}
