@@ -85,7 +85,14 @@ func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Ev
 		}
 
 		if !rowInserted {
-			logging.LogWithFields("SQL-5aATu", "aggregate", event.AggregateType, "id", event.AggregateID).Info("wrong sequence")
+			logging.LogWithFields("SQL-5aATu",
+				"aggregate", event.AggregateType,
+				"id", event.AggregateID,
+				"previousSequence", previousSequence,
+				"aggregateId", event.AggregateID,
+				"aggregateType", event.AggregateType,
+				"eventType", event.Type).
+				Info("wrong sequence")
 			return caos_errs.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
 		}
 
