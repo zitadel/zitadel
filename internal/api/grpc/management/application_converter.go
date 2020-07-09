@@ -208,8 +208,8 @@ func oidcResponseTypesToModel(responseTypes []management.OIDCResponseType) []pro
 			oidcResponseTypes[i] = proj_model.OIDCResponseTypeCode
 		case management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN:
 			oidcResponseTypes[i] = proj_model.OIDCResponseTypeIDToken
-		case management.OIDCResponseType_OIDCRESPONSETYPE_TOKEN:
-			oidcResponseTypes[i] = proj_model.OIDCResponseTypeToken
+		case management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN_TOKEN:
+			oidcResponseTypes[i] = proj_model.OIDCResponseTypeIDTokenToken
 		}
 	}
 
@@ -225,8 +225,8 @@ func oidcResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []m
 			oidcResponseTypes[i] = management.OIDCResponseType_OIDCRESPONSETYPE_CODE
 		case proj_model.OIDCResponseTypeIDToken:
 			oidcResponseTypes[i] = management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN
-		case proj_model.OIDCResponseTypeToken:
-			oidcResponseTypes[i] = management.OIDCResponseType_OIDCRESPONSETYPE_TOKEN
+		case proj_model.OIDCResponseTypeIDTokenToken:
+			oidcResponseTypes[i] = management.OIDCResponseType_OIDCRESPONSETYPE_ID_TOKEN_TOKEN
 		}
 	}
 
