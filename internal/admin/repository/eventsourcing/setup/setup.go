@@ -50,7 +50,7 @@ const (
 	SetupUser                      = "SETUP"
 	OIDCResponseTypeCode           = "CODE"
 	OIDCResponseTypeIDToken        = "ID_TOKEN"
-	OIDCResponseTypeToken          = "TOKEN"
+	OIDCResponseTypeToken          = "ID_TOKEN TOKEN"
 	OIDCGrantTypeAuthorizationCode = "AUTHORIZATION_CODE"
 	OIDCGrantTypeImplicit          = "IMPLICIT"
 	OIDCGrantTypeRefreshToken      = "REFRESH_TOKEN"
@@ -385,7 +385,7 @@ func getOIDCResponseType(responseType string) proj_model.OIDCResponseType {
 	case OIDCResponseTypeIDToken:
 		return proj_model.OIDCResponseTypeIDToken
 	case OIDCResponseTypeToken:
-		return proj_model.OIDCResponseTypeToken
+		return proj_model.OIDCResponseTypeIDTokenToken
 	}
 	return proj_model.OIDCResponseTypeCode
 }

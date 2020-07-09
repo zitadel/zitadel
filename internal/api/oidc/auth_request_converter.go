@@ -193,10 +193,10 @@ func ResponseTypeToBusiness(responseType oidc.ResponseType) model.OIDCResponseTy
 	switch responseType {
 	case oidc.ResponseTypeCode:
 		return model.OIDCResponseTypeCode
-	case oidc.ResponseTypeIDToken:
-		return model.OIDCResponseTypeIdToken
 	case oidc.ResponseTypeIDTokenOnly:
-		return model.OIDCResponseTypeToken
+		return model.OIDCResponseTypeIdToken
+	case oidc.ResponseTypeIDToken:
+		return model.OIDCResponseTypeIdTokenToken
 	default:
 		return model.OIDCResponseTypeCode
 	}
@@ -206,7 +206,7 @@ func ResponseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
 	switch responseType {
 	case model.OIDCResponseTypeCode:
 		return oidc.ResponseTypeCode
-	case model.OIDCResponseTypeToken:
+	case model.OIDCResponseTypeIdTokenToken:
 		return oidc.ResponseTypeIDToken
 	case model.OIDCResponseTypeIdToken:
 		return oidc.ResponseTypeIDTokenOnly
