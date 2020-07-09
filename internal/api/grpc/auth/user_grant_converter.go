@@ -99,6 +99,7 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *auth.UserGrantVie
 		OrgName:   grant.OrgName,
 		ProjectId: grant.ProjectID,
 		Roles:     grant.RoleKeys,
+		GrantId:   grant.GrantID,
 	}
 }
 

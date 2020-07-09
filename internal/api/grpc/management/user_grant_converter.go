@@ -80,6 +80,7 @@ func projectGrantUserGrantCreateToModel(u *management.ProjectGrantUserGrantCreat
 		UserID:    u.UserId,
 		ProjectID: u.ProjectId,
 		RoleKeys:  u.RoleKeys,
+		GrantID:   u.ProjectGrantId,
 	}
 }
 
@@ -172,6 +173,7 @@ func userGrantViewFromModel(grant *grant_model.UserGrantView) *management.UserGr
 		ProjectId:     grant.ProjectID,
 		OrgId:         grant.ResourceOwner,
 		DisplayName:   grant.DisplayName,
+		GrantId:       grant.GrantID,
 	}
 }
 
