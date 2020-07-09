@@ -507,7 +507,7 @@
         "TOAST": {
             "REACTIVATED":"App reaktiviert!",
             "DEACTIVATED":"App deaktiviert!",
-            "OIDCUPDATED":"OIDC Config geändert!",
+            "OIDCUPDATED":"OIDC Konfiguration geändert!",
             "OIDCCLIENTSECRETREGENERATED":"OIDC Client Secret generiert!"
         }
     },
