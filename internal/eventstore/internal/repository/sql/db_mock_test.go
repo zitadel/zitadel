@@ -27,9 +27,8 @@ var (
 	expectedInsertStatement = regexp.MustCompile(`INSERT INTO eventstore\.events ` +
 		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_sequence\) ` +
 		`SELECT \$1, \$2, \$3, \$4, COALESCE\(\$5, now\(\)\), \$6, \$7, \$8, \$9, \$10 ` +
-		`WHERE EXISTS \(SELECT 1 WHERE ` +
-		`EXISTS \(SELECT 1 FROM eventstore\.events WHERE event_sequence = COALESCE\(\$11, 0\) AND aggregate_type = \$12 AND aggregate_id = \$13\) OR ` +
-		`NOT EXISTS \(SELECT 1 FROM eventstore\.events WHERE aggregate_type = \$14 AND aggregate_id = \$15\) AND COALESCE\(\$16, 0\) = 0\) ` +
+		`WHERE EXISTS \(` +
+		`SELECT 1 FROM eventstore\.events WHERE aggregate_type = \$11 AND aggregate_id = \$12 HAVING MAX\(event_sequence\) = \$13 OR \(\$14::BIGINT IS NULL AND COUNT\(\*\) = 0\)\) ` +
 		`RETURNING id, event_sequence, creation_date`).String()
 )
 
@@ -103,8 +102,7 @@ func (db *dbMock) expectInsertEvent(e *models.Event, returnedID string, returned
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
 			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, Sequence(e.PreviousSequence),
-			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,
-			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence),
+			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
 		).
 		WillReturnRows(
 			sqlmock.NewRows([]string{"id", "event_sequence", "creation_date"}).
@@ -118,8 +116,7 @@ func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
 			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, Sequence(e.PreviousSequence),
-			Sequence(e.PreviousSequence), e.AggregateType, e.AggregateID,
-			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence),
+			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
 		).
 		WillReturnError(sql.ErrTxDone)
 
