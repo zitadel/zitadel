@@ -8,3 +8,4 @@ resources:
 -  service-grpc.yaml
 -  service-http.yaml
 -  service-ui.yaml
+-  flow.yaml
