@@ -2,19 +2,17 @@ package management
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) SearchProjectGrants(ctx context.Context, in *management.ProjectGrantSearchRequest) (*management.ProjectGrantSearchResponse, error) {
 	request := projectGrantSearchRequestsToModel(in)
-	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
-	request.AppendMyResourceOwnerQuery(orgID)
-	request.AppendNotMyOrgQuery(orgID)
+	ctxData := authz.GetCtxData(ctx)
+	request.AppendMyResourceOwnerQuery(ctxData.OrgID)
 	response, err := s.project.SearchProjectGrants(ctx, request)
 	if err != nil {
 		return nil, err
