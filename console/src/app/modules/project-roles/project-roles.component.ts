@@ -33,7 +33,6 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
-        console.log(this.projectId);
         this.dataSource = new ProjectRolesDataSource(this.projectService);
         this.dataSource.loadRoles(this.projectId, 0, 25, 'asc');
 

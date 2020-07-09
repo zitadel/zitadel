@@ -42,9 +42,6 @@ export class ProjectMembersComponent implements AfterViewInit {
             this.getRoleOptions();
 
             this.route.params.subscribe(params => {
-                console.log(params);
-
-                console.log(this.projectType);
                 this.projectService.GetProjectById(params.projectid).then(project => {
                     this.project = project.toObject();
                     this.dataSource = new ProjectMembersDataSource(this.projectService);
@@ -69,13 +66,13 @@ export class ProjectMembersComponent implements AfterViewInit {
             this.projectService.GetProjectGrantMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         } else if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
             this.projectService.GetProjectMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
     }
@@ -94,7 +91,7 @@ export class ProjectMembersComponent implements AfterViewInit {
             return this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
                 this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }));
     }
@@ -103,7 +100,7 @@ export class ProjectMembersComponent implements AfterViewInit {
         this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
             this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -139,7 +136,7 @@ export class ProjectMembersComponent implements AfterViewInit {
                     })).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                 }
             }
@@ -147,12 +144,11 @@ export class ProjectMembersComponent implements AfterViewInit {
     }
 
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
-        console.log(member, selectionChange.value);
         this.projectService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
             .then((newmember: ProjectMember) => {
                 this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
     }
 }

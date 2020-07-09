@@ -137,7 +137,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }
         }).catch(error => {
             console.error(error);
-            this.toast.showError(error.message);
+            this.toast.showError(error);
             this.errorMessage = error.message;
         });
     }
@@ -147,13 +147,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.projectService.ReactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
             this.projectService.DeactivateApplication(this.projectId, this.app.id).then(() => {
                 this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
 

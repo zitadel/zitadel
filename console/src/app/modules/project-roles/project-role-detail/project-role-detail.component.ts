@@ -23,7 +23,6 @@ export class ProjectRoleDetailComponent implements OnInit {
             displayName: new FormControl(''),
             group: new FormControl(''),
         });
-        console.log(data);
 
         this.formGroup.patchValue(data.role);
     }
@@ -38,7 +37,7 @@ export class ProjectRoleDetailComponent implements OnInit {
                     this.toast.showInfo('PROJECT.TOAST.ROLECHANGED', true);
                     this.dialogRef.close(true);
                 }).catch(error => {
-                    this.toast.showError(error.message);
+                    this.toast.showError(error);
                 });
         }
     }

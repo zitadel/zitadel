@@ -67,13 +67,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             this.mgmtUserService.ReactivateUser(this.user.id).then(() => {
                 this.toast.showInfo('USER.TOAST.REACTIVATED', true);
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         } else if (newState === UserState.USERSTATE_INACTIVE) {
             this.mgmtUserService.DeactivateUser(this.user.id).then(() => {
                 this.toast.showInfo('USER.TOAST.DEACTIVATED', true);
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
     }

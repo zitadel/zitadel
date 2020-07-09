@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Metadata } from 'grpc-web';
 import { from, Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
@@ -24,6 +24,7 @@ import {
     UserEmail,
     UserPhone,
     UserProfile,
+    UserProfileView,
     UserSessionViews,
     UserView,
     VerifyMfaOtp,
@@ -58,7 +59,7 @@ export class AuthUserService {
         return responseMapper(response);
     }
 
-    public async GetMyUserProfile(): Promise<UserProfile> {
+    public async GetMyUserProfile(): Promise<UserProfileView> {
         return await this.request(
             c => c.getMyUserProfile,
             new Empty(),
@@ -328,6 +329,9 @@ export class AuthUserService {
                     }
                     this._roleCache = userRoles;
                     return of(this.hasRoles(userRoles, roles, each));
+                }),
+                catchError((err) => {
+                    return of(false);
                 }),
             );
         } else {

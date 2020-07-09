@@ -101,7 +101,7 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.userService.VerifyMyUserPhone(code).then(() => {
                     this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                 }).catch(error => {
-                    this.toast.showError(error.message);
+                    this.toast.showError(error);
                 });
             }
         });
@@ -154,7 +154,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.userService.GetMyUser().then(user => {
             this.user = user.toObject();
         }).catch(err => {
-            console.error(err);
+            this.toast.showError(err);
         });
     }
 

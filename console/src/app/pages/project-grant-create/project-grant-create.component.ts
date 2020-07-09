@@ -43,20 +43,16 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
 
     public searchOrg(domain: string): void {
-        console.log(domain);
         this.orgService.getOrgByDomainGlobal(domain).then((ret) => {
             const tmp = ret.toObject();
-            console.log(ret.toObject());
             this.authService.GetActiveOrg().then((org) => {
-                console.log(org);
                 if (tmp !== org) {
                     this.org = tmp;
                 }
             });
             this.org = ret.toObject();
-            console.log(this.org);
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -71,7 +67,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
                 this.close();
             })
             .catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
     }
 

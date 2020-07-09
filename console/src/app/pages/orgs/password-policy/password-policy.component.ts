@@ -218,7 +218,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
@@ -230,7 +230,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
@@ -245,7 +245,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                     break;
 
@@ -259,7 +259,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         ).then(() => {
                             this.router.navigate(['org']);
                         }).catch(error => {
-                            this.toast.showError(error.message);
+                            this.toast.showError(error);
                         });
                     }
                     break;
@@ -274,7 +274,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
@@ -286,7 +286,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
@@ -301,7 +301,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                     break;
 
@@ -315,7 +315,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         ).then(() => {
                             this.router.navigate(['org']);
                         }).catch(error => {
-                            this.toast.showError(error.message);
+                            this.toast.showError(error);
                         });
                     }
                     break;

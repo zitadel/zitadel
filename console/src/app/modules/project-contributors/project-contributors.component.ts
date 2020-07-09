@@ -58,7 +58,6 @@ export class ProjectContributorsComponent implements OnInit {
                 finalize(() => this.loadingSubject.next(false)),
             ).subscribe(members => {
                 this.membersSubject.next(members);
-                console.log(members);
             });
         }
     }
@@ -83,7 +82,7 @@ export class ProjectContributorsComponent implements OnInit {
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                 }
             }

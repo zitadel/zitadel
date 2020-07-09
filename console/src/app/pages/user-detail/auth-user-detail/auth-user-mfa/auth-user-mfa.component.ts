@@ -48,7 +48,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                 }
             });
         }, error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -74,7 +74,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
                 }
 
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
     }

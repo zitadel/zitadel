@@ -33,7 +33,7 @@ export class OrgGridComponent {
             this.orgList = res.toObject().resultList;
         }).catch(error => {
             console.error(error);
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 

@@ -63,15 +63,14 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
         if (this.type === ProjectType.PROJECTTYPE_GRANTED) {
             this.projectService.GetProjectGrantMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
-                console.log(this.memberRoleOptions);
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         } else if (this.type === ProjectType.PROJECTTYPE_OWNED) {
             this.projectService.GetProjectMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
     }
@@ -90,7 +89,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
             return this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }));
     }
@@ -99,7 +98,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
         this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
             this.toast.showInfo('Member removed successfully');
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -117,7 +116,6 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public async openAddMember(): Promise<any> {
         const keysList = (await this.projectService.GetProjectGrantMemberRoles()).toObject();
-        console.log(keysList);
 
         const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
             data: {
@@ -127,7 +125,6 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
         });
 
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
-            console.log(dataToAdd);
             if (dataToAdd) {
                 dataToAdd.userIds.forEach((userid: string) => {
                     this.projectService.AddProjectGrantMember(
@@ -138,7 +135,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
                     ).then(() => {
                         this.toast.showInfo('Project Grant Member successfully added!');
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                 });
 
@@ -147,13 +144,11 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     }
 
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
-        console.log(this.projectId, this.grantId, member.userId, selectionChange.value);
         this.projectService.ChangeProjectGrantMember(this.projectId, this.grantId, member.userId, selectionChange.value)
             .then((newmember: ProjectMember) => {
-                console.log(newmember.toObject());
                 this.toast.showInfo('Member updated!');
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
     }
 }
