@@ -82,8 +82,8 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
                 this.user.email = data.toObject().email;
                 this.emailEditState = false;
-            }).catch(data => {
-                this.toast.showError(data.message);
+            }).catch(error => {
+                this.toast.showError(error);
                 this.emailEditState = false;
             });
     }
