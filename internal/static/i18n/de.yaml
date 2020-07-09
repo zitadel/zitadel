@@ -246,15 +246,17 @@ EventTypes:
       removed: Applikation entfernt
       deactivated: Applikation deaktiviert
       reactivated: Applikation reaktiviert
+      oidc:
+        secret:
+          check:
+            succeeded: OIDC Client Secret Validierung erfolgreich
+            failed: OIDC Client Secret Validierung fehlgeschlagen
       config:
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert
           secret:
             changed: OIDC Client Secret geändert
-            check:
-              succeeded: OIDC Client Secret Validierung erfolgreich
-              failed: OIDC Client Secret Validierung fehlgeschlagen
   policy:
     password:
       complexity:
