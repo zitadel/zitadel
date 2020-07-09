@@ -33,7 +33,6 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
-        console.log(this.projectId);
         this.dataSource = new ProjectRolesDataSource(this.projectService);
         this.dataSource.loadRoles(this.projectId, 0, 25, 'asc');
 
@@ -85,7 +84,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         return Promise.all(this.selection.selected.map(role => {
             return this.projectService.RemoveProjectRole(role.projectId, role.key);
         })).then(() => {
-            this.toast.showInfo('Deleted');
+            this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
             indexes.forEach(index => {
                 if (index > -1) {
                     oldState.splice(index, 1);
@@ -102,7 +101,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         this.projectService
             .RemoveProjectRole(role.projectId, role.key)
             .then(() => {
-                this.toast.showInfo('Role removed');
+                this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
                 this.dataSource.rolesSubject.value.splice(index, 1);
                 this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
             })

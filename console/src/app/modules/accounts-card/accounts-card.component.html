@@ -3,8 +3,8 @@
         [name]="profile.displayName ? profile.displayName : (profile.firstName + ' '+ profile.lastName)" [size]="80">
     </app-avatar>
 
-    <span class="u-name">{{profile?.firstName}} {{profile?.lastName}}</span>
-    <span class="u-email">{{profile?.userName}}</span>
+    <span class="u-name">{{profile.displayName ? profile.displayName : profile.userName}}</span>
+    <span class="u-email">{{profile?.preferredLoginName}}</span>
     <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
     <button (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
@@ -16,7 +16,8 @@
             </app-avatar>
 
             <div class="col">
-                <span class="title">{{user.userName}}</span>
+                <span class="title">{{user.displayName ? user.displayName : user.userName}} </span>
+                <span class="loginname">{{user.loginName}}</span>
                 <span class="email">{{'USER.STATE.'+user.authState | translate}}</span>
             </div>
             <span class="fill-space"></span>

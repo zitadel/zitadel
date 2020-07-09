@@ -55,7 +55,7 @@ export class IamMembersComponent implements AfterViewInit {
             return this.adminService.RemoveIamMember(member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }));
     }
@@ -64,7 +64,7 @@ export class IamMembersComponent implements AfterViewInit {
         this.adminService.RemoveIamMember(member.userId).then(() => {
             this.toast.showInfo('Member removed successfully');
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -99,7 +99,7 @@ export class IamMembersComponent implements AfterViewInit {
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                 }
             }

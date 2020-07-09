@@ -95,7 +95,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
             this.loadingSubject.next(false);
         }).catch(error => {
             console.error(error);
-            this.toast.showError(error.message);
+            this.toast.showError(error);
             this.loadingSubject.next(false);
         });
 

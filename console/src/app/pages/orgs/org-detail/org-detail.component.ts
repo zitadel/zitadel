@@ -52,7 +52,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         this.orgService.GetMyOrg().then((org: Org) => {
             this.org = org.toObject();
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
 
         this.orgService.SearchMyOrgDomains(0, 100).then(result => {
@@ -66,13 +66,13 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             this.orgService.ReactivateMyOrg().then(() => {
                 this.toast.showInfo('Reactivated Org');
             }).catch((error) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         } else if (event.value === OrgState.ORGSTATE_INACTIVE) {
             this.orgService.DeactivateMyOrg().then(() => {
                 this.toast.showInfo('Deactivated Org');
             }).catch((error) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
     }
@@ -104,7 +104,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
                         this.domains.splice(index, 1);
                     }
                 }).catch(error => {
-                    this.toast.showError(error.message);
+                    this.toast.showError(error);
                 });
             }
         });

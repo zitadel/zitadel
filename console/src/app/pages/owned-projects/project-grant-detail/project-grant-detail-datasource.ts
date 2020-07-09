@@ -35,7 +35,6 @@ export class ProjectGrantDetailDataSource extends DataSource<ProjectMemberView.A
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(members => {
             this.membersSubject.next(members);
-            console.log(members);
         });
     }
 

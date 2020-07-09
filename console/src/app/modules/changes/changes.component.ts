@@ -105,7 +105,6 @@ export class ChangesComponent implements OnInit {
             return from(col).pipe(
                 tap((res: Changes) => {
                     let values = res.toObject().changesList;
-                    console.log(values);
                     // If prepending, reverse the batch order
                     values = false ? values.reverse() : values;
 
