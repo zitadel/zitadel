@@ -47,6 +47,11 @@ func (s *Server) RemoveUserGrant(ctx context.Context, in *management.UserGrantID
 	return &empty.Empty{}, err
 }
 
+func (s *Server) BulkRemoveUserGrant(ctx context.Context, in *management.UserGrantRemoveBulk) (*empty.Empty, error) {
+	err := s.usergrant.BulkRemoveUserGrant(ctx, userGrantRemoveBulkToModel(in)...)
+	return &empty.Empty{}, err
+}
+
 func (s *Server) SearchProjectUserGrants(ctx context.Context, in *management.ProjectUserGrantSearchRequest) (*management.UserGrantSearchResponse, error) {
 	request := projectUserGrantSearchRequestsToModel(in)
 	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)

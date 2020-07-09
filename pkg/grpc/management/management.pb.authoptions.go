@@ -504,6 +504,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/BulkRemoveUserGrant": authz.Option{
+		Permission: "user.grant.delete",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/SearchProjectUserGrants": authz.Option{
 		Permission: "project.user.grant.read",
 		CheckParam: "ProjectId",

@@ -197,6 +197,26 @@ func (mr *MockManagementServiceClientMockRecorder) BulkAddProjectRole(arg0, arg1
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkAddProjectRole", reflect.TypeOf((*MockManagementServiceClient)(nil).BulkAddProjectRole), varargs...)
 }
 
+// BulkRemoveUserGrant mocks base method
+func (m *MockManagementServiceClient) BulkRemoveUserGrant(arg0 context.Context, arg1 *management.UserGrantRemoveBulk, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BulkRemoveUserGrant", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BulkRemoveUserGrant indicates an expected call of BulkRemoveUserGrant
+func (mr *MockManagementServiceClientMockRecorder) BulkRemoveUserGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BulkRemoveUserGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).BulkRemoveUserGrant), varargs...)
+}
+
 // ChangeMyOrgMember mocks base method
 func (m *MockManagementServiceClient) ChangeMyOrgMember(arg0 context.Context, arg1 *management.ChangeOrgMemberRequest, arg2 ...grpc.CallOption) (*management.OrgMember, error) {
 	m.ctrl.T.Helper()
