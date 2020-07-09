@@ -508,7 +508,7 @@
             "REACTIVATED":"App reaktiviert!",
             "DEACTIVATED":"App deaktiviert!",
             "OIDCUPDATED":"OIDC Config geändert!",
-            "OIDCCLIENTSECRETREGENERATED":"OIDC Client Secret regeneriert!"
+            "OIDCCLIENTSECRETREGENERATED":"OIDC Client Secret generiert!"
         }
     },
     "GENDERS": {
