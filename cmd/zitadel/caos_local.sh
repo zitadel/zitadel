@@ -62,3 +62,6 @@ export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/
 
 #Org
 export ZITADEL_DEFAULT_DOMAIN=zitadel.ch
+
+#Tracing
+export TRACING_TYPE=google
