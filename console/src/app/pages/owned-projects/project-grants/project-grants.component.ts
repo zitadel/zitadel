@@ -2,10 +2,12 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, ProjectMemberView } from 'src/app/proto/generated/management_pb';
+import { ProjectGrant, ProjectRoleView } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectGrantsDataSource } from './project-grants-datasource';
 
@@ -28,17 +30,17 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     @ViewChild(MatTable) public table!: MatTable<ProjectGrant.AsObject>;
     public dataSource!: ProjectGrantsDataSource;
     public selection: SelectionModel<ProjectGrant.AsObject> = new SelectionModel<ProjectGrant.AsObject>(true, []);
-    public expandedElement: ProjectGrant.AsObject | null = null;
-    public selectedGrantMembers: ProjectMemberView.AsObject[] = [];
+    public memberRoleOptions: ProjectRoleView.AsObject[] = [];
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'grantedOrgName', 'creationDate', 'changeDate', 'roleNamesList'];
 
-    constructor(private projectService: ProjectService) { }
+    constructor(private projectService: ProjectService, private toast: ToastService) { }
 
     public ngOnInit(): void {
         this.dataSource = new ProjectGrantsDataSource(this.projectService);
         this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
+        this.getRoleOptions(this.projectId);
     }
 
     public ngAfterViewInit(): void {
@@ -68,5 +70,42 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
         this.isAllSelected() ?
             this.selection.clear() :
             this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
+    }
+
+    public getRoleOptions(projectId: string): void {
+        this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
+            this.memberRoleOptions = resp.toObject().resultList;
+            console.log(resp.toObject());
+        });
+    }
+
+    updateRoles(grant: ProjectGrant.AsObject, selectionChange: MatSelectChange): void {
+        this.projectService.UpdateProjectGrant(grant.id, grant.projectId, selectionChange.value)
+            .then((newgrant: ProjectGrant) => {
+                this.toast.showInfo('Grant updated!');
+            }).catch(error => {
+                this.toast.showError(error);
+            });
+    }
+
+    deleteSelectedGrants(): void {
+        const promises = this.selection.selected.map(grant => {
+            return this.projectService.RemoveProjectGrant(grant.id, grant.projectId);
+        });
+
+        Promise.all(promises).then(() => {
+            this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
+            const data = this.dataSource.grantsSubject.getValue();
+            this.selection.selected.forEach((item) => {
+                const index = data.findIndex(i => i.id === item.id);
+                if (index > -1) {
+                    data.splice(index, 1);
+                    this.dataSource.grantsSubject.next(data);
+                }
+            });
+            this.selection.clear();
+        }).catch(error => {
+            this.toast.showError(error);
+        });
     }
 }

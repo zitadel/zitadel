@@ -47,7 +47,8 @@
         "DELETE": "Löschen",
         "REMOVE":"Entfernen",
         "VERIFY":"Verifizieren",
-        "FINISH":"Abschliessen"
+        "FINISH":"Abschliessen",
+        "CHANGE":"Ändern"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus!"
@@ -418,7 +419,8 @@
             "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
-            "ROLENAMESLIST": "Rollen"
+            "ROLENAMESLIST": "Rollen",
+            "NOROLES":"Keine Rollen"
         },
         "APP": {
             "TITLE": "Applikationen",
