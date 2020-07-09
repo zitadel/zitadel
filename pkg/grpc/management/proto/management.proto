@@ -1134,6 +1134,18 @@ service ManagementService {
         };
     }
 
+    // remove a list of user grants in one request
+    rpc BulkRemoveUserGrant(UserGrantRemoveBulk) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/usersgrants/_bulk"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.delete"
+        };
+    }
+
     // search user grants based on a project
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc SearchProjectUserGrants(ProjectUserGrantSearchRequest) returns (UserGrantSearchResponse) {
