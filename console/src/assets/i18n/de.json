@@ -1,22 +1,22 @@
 {
-    "APP_NAME": "zitadel",
+    "APP_NAME": "ZITADEL",
     "HOME": {
-        "TITLE": "zitadel",
+        "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-        "SECURITYANDPRIVACY_DESC": "Sie können die Daten in Ihrem Zitadel Konto sehen und auswählen, welche Aktivitäten gespeichert werden, um Zitadel für sich zu personalisieren",
+        "SECURITYANDPRIVACY_DESC": "Verwalte deine Informationen und Sicherheitseinstellungen.",
         "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
         "PROTECTION": "Organisationsrichtlinien",
-        "PROTECTION_DESC": "Verwalten Sie Ihre Organisationsrichtlinien. Entdecken Sie einige vorgefertigte Lösungen, die Ihnen Zeit sparen und Sicherheit gewährleisten.",
+        "PROTECTION_DESC": "Verwalte deine Organisationsrichtlinien und entdecke die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
         "PROTECTION_BUTTON": "Erkunden",
         "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
-        "PROJECTS_DESC": "Autorisieren Sie andere, Ihre eigenen Projekte zu verwenden oder definieren sie benutzerdefinierte Rollen für berechtigte Projekte",
+        "PROJECTS_DESC": "Autorisiere andere Benutzer, deine eigenen Projekte zu verwenden oder definieren benutzerdefinierte Rollen für berechtigte Projekte",
         "PROJECTS_BUTTON": "Projekt Übersicht",
-        "USERS": "Totale Kontrolle und Überwachbarkeit",
-        "USERS_DESC": "Überwachen Sie Ihr Rollenkonzept in Echtzeit. Ergreifen Sie sofort Maßnahmen.",
+        "USERS": "Erstelle und verwalte deine Benutzer.",
+        "USERS_DESC": "Überwache dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
         "USERS_BUTTON": "Benutzer anzeigen",
         "IAM": "Identity and Access Management",
-        "IAM_DESC": "Fügen Sie neue Organisationen hinzu oder editieren Sie Ihre IAM Manager",
-        "IAM_BUTTON": "Zitadel verwalten"
+        "IAM_DESC": "Verwalte deine Organisationen und Administratoren.",
+        "IAM_BUTTON": "ZITADEL verwalten"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
@@ -27,43 +27,43 @@
         "GRANTEDPROJECT":"Berechtigte Projekte",
         "USERSECTION":"Benutzersektion",
         "USER": "Benutzer",
-        "LOGOUT": "alle Benutzer abmelden",
+        "LOGOUT": "Alle Benutzer abmelden",
         "NEWORG":"Neue Organisation",
-        "IAMADMIN":"Sie sind ein IAM Administrator. Sie haben erweiterte Berechtigungen!",
-        "SHOWORGS":"Alle organisationen anzeigen"
+        "IAMADMIN":"Du bist ein IAM Administrator. Achtung du hast erhöhte Rechte!",
+        "SHOWORGS":"Alle Organisationen anzeigen"
     },
     "ACTIONS": {
-        "SAVE": "speichern",
-        "NEW": "neu",
+        "SAVE": "Speichern",
+        "NEW": "Neu",
         "ADD":"Hinzufügen",
-        "CREATE": "create",
+        "CREATE": "Erstellen",
         "CONTINUE": "Weiter",
-        "BACK": "zurück",
-        "CLOSE": "schliessen",
-        "CANCEL":"abbrechen",
+        "BACK": "Zurück",
+        "CLOSE": "Schliessen",
+        "CANCEL":"Abbrechen",
         "INFO": "Info",
         "OK": "Ok",
-        "VIEW": "Ansehen",
-        "DELETE": "löschen",
-        "REMOVE":"entfernen",
+        "VIEW": "Öffnen",
+        "DELETE": "Löschen",
+        "REMOVE":"Entfernen",
         "VERIFY":"Verifizieren",
         "FINISH":"Abschliessen"
     },
     "ERRORS": {
-        "REQUIRED": "Das Feld ist notwendig!"
+        "REQUIRED": "Bitte fülle alle benötigten Felder aus!"
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
-        "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Zitadel optimal an Ihre Bedürfnisse anzupassen",
+        "DESCRIPTION": "Verwalte deine persönlichen Informationen und Sicherheits Einstellungen",
         "PAGES": {
             "LIST": "Benutzer",
             "TITLE": "Benutzer",
-            "DESCRIPTION": "Hier können Sie neue User anlegen sowie bereits erfasste Userdaten bearbeiten, activieren oder deaktivieren",
+            "DESCRIPTION": "Erfasse und verwalte die Benutzer in deiner Organisation",
             "DETAIL": "Detail",
             "CREATE": "Erstellen",
             "MY": "Meine Informationen",
             "LOGINNAMES":"Loginnamen",
-            "LOGINNAMESDESC":"Mit diesen Namen können Sie sich anmelden",
+            "LOGINNAMESDESC":"Mit diesen Namen kannst du dich anmelden",
             "COPY":"In die Zwischenablage kopieren",
             "COPIED":"In die Zwischenablage kopiert!",
             "NOUSER":"Kein User",
@@ -72,11 +72,11 @@
         },
         "MFA": {
             "TITLE": "Multifaktor-Authentifizierung",
-            "DESCRIPTION": "Fügen Sie einen zweiten Faktor hinzu um optimale Sicherheit zu gewährleisten!",
-            "MANAGE_DESCRIPTION": "Managen Sie die Zweifaktormethoden von dem jeweilgen Nutzer",
+            "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um deinen Account optimal zu schützen.",
+            "MANAGE_DESCRIPTION": "Verwalte die Multifaktor Merkmale deiner Benutzer.",
             "OTP": "OTP konfigurieren",
             "OTP_DIALOG_TITLE": "OTP hinzufügen",
-            "OTP_DIALOG_DESCRIPTION": "Scannen Sie den OTP code mit einer Authenticatorapp und geben Sie den erhaltenen Code unten ein!",
+            "OTP_DIALOG_DESCRIPTION": "Scanne den QR Code mit einer Authenticator-App und verifiziere den erhaltenen Code um OTP zu aktivieren.",
             "TYPE": {
                 "0":"Keine MFA definiert",
                 "1":"SMS",
@@ -84,39 +84,38 @@
             },
             "STATE": {
                 "0": "Kein Status",
-                "1":"Nicht bereit",
-                "2":"Bereit",
-                "3":"gelöscht"
+                "1": "Nicht bereit",
+                "2": "Bereit",
+                "3": "Gelöscht"
             }
         },
         "CREATE": {
-            "TITLE": "Create User",
-            "DESCRIPTION": "Geben Sie die erforderlichen Daten unten ein!",
+            "TITLE": "Neuen Benutzer erstellen",
+            "DESCRIPTION": "Gebe die erforderlichen Daten ein.",
             "NAMEANDEMAILSECTION":"Name und Email",
             "GENDERLANGSECTION":"Geschlecht und Sprache",
-            "ADDRESSANDPHONESECTION":"Addresse und Erreichbarkeit",
-            "PASSWORDSECTION":"Vordefiniertes Passwort setzen"
+            "PHONESECTION":"Telefonnummer",
+            "PASSWORDSECTION":"Setze ein initiales Passwort."
         },
         "CODEDIALOG": {
-            "TITLE":"Nummer verifizieren",
-            "DESCRIPTION":"Geben Sie ihren erhaltenen Code ein!",
+            "TITLE":"Telefonnummer verifizieren",
+            "DESCRIPTION":"Gib deinen erhaltenen Code ein um die Nummer zu bestätigen.",
             "CODE":"Code"
         },
         "DATA": {
             "STATE": "Status",
-            "STATE0": "unbekannt",
-            "STATE1": "aktiv",
-            "STATE2": "inaktiv",
-            "STATE3": "gelöscht",
-            "STATE4": "gesperrt",
-            "STATE5": "supend",
-            "STATE6": "initial"
+            "STATE0": "Unbekannt",
+            "STATE1": "Aktiv",
+            "STATE2": "Inaktiv",
+            "STATE3": "Gelöscht",
+            "STATE4": "Gesperrt",
+            "STATE5": "Suspendiert",
+            "STATE6": "Initiiert"
         },
         "PROFILE": {
             "TITLE": "Profil",
             "EMAIL": "Email",
-            "PHONE": "Phonenumber",
-            "DESCRIPTION": "Hier können Sie Ihre Daten sowie die Datenschutz- und Sicherheitseinstellungen verwalten, um Zitadel optimal an Ihre Bedürfnisse anzupassen",
+            "PHONE": "Telefonnummer",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
@@ -128,86 +127,87 @@
         },
         "PASSWORD": {
             "TITLE": "Passwort",
-            "DESCRIPTION": "Beachten Sie, dass das Password der von Ihrer Organisation definierten Richtlinie entsprechen muss.",
+            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
             "OLD": "Aktuelles Passwort",
             "NEW": "Neues Passwort",
-            "CONFIRM": "Neues Passwort Wiederholung",
-            "RESET": "Reset",
-            "SET":"Password setzen",
-            "RESENDNOTIFICATION": "Ànderung mitteilen",
-            "REQUIRED": "Das Feld ist notwendig!",
+            "CONFIRM": "Neues Passwort wiederholen",
+            "RESET": "Passwort zurücksetzen",
+            "SET":"Password neu setzen",
+            "RESENDNOTIFICATION": "Passwort Reset Link senden.",
+            "REQUIRED": "Bitte prüfe das alle notwendigen Felder befüllt sind.",
             "MINLENGTHERROR":"Passwort muss mindestens {{value}} lang sein",
-            "NOTEQUAL":"Das Password muss übereinstimmen!"
+            "NOTEQUAL":"Das Passwort muss übereinstimmen!"
         },
         "EMAIL": "Email",
         "PHONE": "Telefonnummer",
         "LOGINMETHODS": {
-            "TITLE": "Methoden zur Prüfung Ihrer Identität",
-            "DESCRIPTION": "Damit können wir bei der Anmeldung Ihre Identität bestätigen oder Sie kontaktieren, falls in Ihrem Konto verdächtige Aktivitäten festgestellt werden",
+            "TITLE": "Kontakt Informationen",
+            "DESCRIPTION": "Die Kontakt Informationen werden benötigt um dir wichtige Informationen wie Passwort und Reset Email zu senden.",
             "EMAIL": {
                 "TITLE": "Email",
-                "VALID": "validiert",
-                "RESEND": "Verifikationsmail versenden"
+                "VALID": "Validiert",
+                "RESEND": "Verifikationsmail erneut senden"
             },
             "PHONE": {
                 "TITLE": "Telefon",
-                "VALID": "validiert",
-                "RESEND": "Verifikationsnachricht versenden"
+                "VALID": "Validiert",
+                "RESEND": "Verifikationsnachricht erneute senden"
             },
-            "RESENDCODE": "Code senden",
+            "RESENDCODE": "Code erneut senden",
             "ENTERCODE":"Verifizieren",
             "ENTERCODE_DESC":"Code verifizieren"
         },
-        "ADDRESS": {
-            "TITLE": "Adresse",
-            "STREET": "Strasse/Nr",
-            "LOCALITY": "Ort",
-            "POSTAL_CODE": "Postleitzahl",
-            "REGION": "Kanton",
-            "COUNTRY": "Land"
+        "GRANTS": {
+            "TITLE": "Benutzer Grants",
+            "DESCRIPTION": "Erteile diesem Benutzer Verwaltunszugriff auf bestimmte Projekte",
+            "CREATE": {
+                "TITLE": "Benutzer Grant erstellen",
+                "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen!"
+            }
         },
         "VALIDATION": {
-            "INVALIDPATTERN": "Das Password muss aus mindestens 8 Zeichen bestehen und einen Grossbuchstaben, ein Sonderzeichen und eine Zahl enthalten. Die maximale Anzahl an Zeichen ist 72!",
-            "REQUIRED": "Das Feld ist leer",
+            "INVALIDPATTERN": "## TODO - Replace with Password Policy text - TODO ##",
+            "REQUIRED": "Das Eingagefeld ist leer",
             "MINLENGTH":"Das Password muss mindestens {{requiredLength}} Zeichen lang sein!",
-            "NOEMAIL":"Username darf keine email sein!",
+            "NOEMAIL":"Username darf keine Email Adresse sein!",
             "UPPERCASEMISSING":"Password muss einen Großbuchstaben beinhalten",
             "LOWERCASEMISSING":"Password muss einen Kleinbuchstaben beinhalten",
             "SYMBOLERROR":"Das Password muss ein Symbol beinhalten!",
             "NUMBERERROR":"Das Password muss eine Nummer beinhalten!"
         },
         "STATE": {
-            "0":"unbekannt",
-            "1":"aktiv",
-            "2":"abgelaufen"
+            "0":"Unbekannt",
+            "1":"Aktiv",
+            "2":"Abgelaufen"
         },
         "SEARCH":{
-            "FOUND":"gefunden"
+            "FOUND":"Gefunden"
         },
         "TARGET": {
-            "SELF":"Suchen Sie oben nach Usern ihrer Organisation, Zum hinzufügen externer Benutzer",
-            "EXTERNAL":"Um User Ihrer Organisation hinzuzufügen",
+            "SELF":"Um einen Benutzer aus einer anderen Organisation zu berechtigen",
+            "EXTERNAL": "Um einen Benutzer ihrer eigenen Organisation zu berechtigen",
             "CLICKHERE":"Hier klicken"
         },
-        "SIGNEDOUT":"Du bist abgemeldet. Klicke den Button um dich wieder anzumelden!",
+        "SIGNEDOUT":"Du bist abgemeldet. Klicke auf den Button um dich erneut anzumelden!",
         "SIGNEDOUT_BTN":"Anmelden",
         "EDITACCOUNT":"Account bearbeiten",
         "ADDACCOUNT":"Account hinzufügen"
     },
     "IAM": {
         "DETAIL": {
-            "TITLE":"Identity and Access Management",
-            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, manage managers and define global policies."
-        }, 
+            "TITLE":"Identity and Access Management Administration",
+            "DESCRIPTION":"Verwalte die ZITADEL Einstellungen."
+        },
         "MEMBER": {
-            "TITLE":"IAM Members"
+            "TITLE":"Manager",
+            "DESCRIPTION": "Manger können die Organisation editieren und Projekte verwalten."
         },
         "VIEWS": {
             "TITLE":"Views und Events",
-            "DESCRIPTION":"Diese Ansicht zeigt Ihre Zitadel Views, Sie können Sie zurücksetzen und fehlgeschlagene Events entfernen.",
+            "DESCRIPTION":"Diese Ansicht zeigt die ZITADEL Views, du kannst diese zurücksetzen und fehlgeschlagene Events entfernen.",
             "VIEWNAME":"Name",
             "DATABASE":"Datenbank",
-            "SEQUENCE":"SEQUENZ",
+            "SEQUENCE":"Sequenz",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen"
         }
@@ -215,64 +215,64 @@
     "ORG": {
         "PAGES": {
             "LIST": "Organisationen",
-            "LISTDESCRIPTION":"Wählen Sie die Organisation für den neuen Kontext aus!",
-            "ACTIVE":"AKTIV",
+            "LISTDESCRIPTION":"Wähle die Organisation aus.",
+            "ACTIVE":"Aktiv",
             "CREATE":"Organisation erstellen",
-            "ORGDETAIL_TITLE":"Geben Sie den Namen und die Domain für die neue Organisation ein",
+            "ORGDETAIL_TITLE":"Gib den Namen und die Domain für die neue Organisation ein.",
             "ORGDOMAIN_TITLE":"Organisations Domain Verifikation",
-            "ORGDOMAIN_VERIFICATION":"Stellen Sie Ihre Webdomain bereit und überprüfen Sie deren Besitz indem sie eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken Sie zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
-            "ORGDOMAIN_VERIFICATION_SKIP":"Sie können die Überprüfung vorerst überspringen und Ihre Organisation weiter erstellen. Um Ihre Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
+            "ORGDOMAIN_VERIFICATION":"Stelle deine Domain bereit und überprüfe deren Besitz indem du eine Bestätigungsdatei herunterladen und unter der unten angegebenen URL hochladen. Klicken zum Abschluss auf die Schaltfläche, um diese zu überprüfen.",
+            "ORGDOMAIN_VERIFICATION_SKIP":"Du kannst die Überprüfung vorerst überspringen und deine Organisation weiter erstellen. Um deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein!",
             "ORGDETAILUSER_TITLE":"Organisationsbesitzer hinzufügen",
-            "DOWNLOAD_FILE":"File download",
+            "DOWNLOAD_FILE":"Datei download",
             "SELECTORGTOOLTIP":"Wähle diese Organisation",
             "PRIMARYDOMAIN":"Primäre Domain",
             "STATE":"Status"
         },
         "DOMAINS": {
             "TITLE":"Domains",
-            "DESCRIPTION":"Konfigurieren Sie die Domains mit denen sich Ihre Nutzer einloggen können.",
+            "DESCRIPTION":"Konfiguriere die Domains mit denen sich deine Benutzer einloggen können.",
             "DELETE": {
                 "TITLE":"Domain löschen?",
-                "DESCRIPTION":"Sie sind im Begriff eine Domain aus Ihrer Organisation zu löschen. Ihre Benutzer können diese nach dem Löschen nicht mehr für den Login nutzen."
+                "DESCRIPTION":"Du bist im Begriff eine Domain aus deiner Organisation zu löschen. Deine Benutzer können diese nach dem Löschen nicht mehr für den Login nutzen."
             }
         },
         "STATE": {
-            "0": "nicht definiert",
-            "1": "aktiv",
-            "2": "inaktiv"
+            "0": "Nicht definiert",
+            "1": "Aktiv",
+            "2": "Inaktiv"
         },
         "MEMBER": {
             "TITLE":"Organisations Manager verwalten",
-            "DESCRIPTION":"Definieren Sie hier die Accounts, die Operationen auf ihrer Organisationen vornehmen dürfen."
+            "DESCRIPTION":"Definiere hier die Benutzer, die Operationen auf ihrer Organisationen vornehmen dürfen."
         },
         "POLICY": {
-            "TITLE":"Richtlinen festlegen",
-            "DESCRIPTION":"Vorgefertigte Lösungen, die Ihnen Zeit sparen und Ihre Sicherheit gewährleisten",
+            "TITLE":"Richtlinen entdecken",
+            "DESCRIPTION":"Vorgefertigte Richtlinien, die dir Zeit spart und deine Sicherheit verbessern.",
             "PWD_COMPLEXITY": {
                 "TITLE":"Passwort Komplexität",
-                "DESCRIPTION":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
-                "TITLECREATE":"Kennwortkomplexitätsrichtlinie erstellen",
-                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Kennwörter einem bestimmten Muster entsprechen",
+                "DESCRIPTION":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen",
+                "TITLECREATE":"Passwortkomplexitätsrichtlinie erstellen",
+                "DESCRIPTIONCREATE":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen",
                 "SYMBOLANDNUMBERERROR":"Das Password muss ein Symbol und eine Nummer beinhalten!",
                 "SYMBOLERROR":"Das Password muss ein Symbol beinhalten!",
                 "NUMBERERROR":"Das Password muss eine Nummer beinhalten!",
                 "PATTERNERROR":"Das vorgeschriebene Muster ist falsch!"
             },
             "PWD_AGE": {
-                "TITLE":"Passwort Maximaldauer",
-                "DESCRIPTION":"Sie können eine Maximalalter-Eigenschaft für Kennwörter festlegen. Diese Richtlinie enthält eine Warnung nach Ablauf einer bestimmten Zeit",
-                "TITLECREATE":"Password Maximaldauerrichtline festlegen",
-                "DESCRIPTIONCREATE":"Sie können eine Maximalalter-Eigenschaft für Kennwörter festlegen. Diese Richtlinie enthält eine Warnung nach Ablauf einer bestimmten Zeit"
+                "TITLE":"Passwort Maximalalter",
+                "DESCRIPTION":"Du kannst eine Maximalalter-Eigenschaft für Passwörter festlegen. Diese Richtlinie enthält eine Warnung nach Ablauf einer definierten Zeit",
+                "TITLECREATE":"Password Maximalalterrichtline festlegen",
+                "DESCRIPTIONCREATE":"Du kkannst eine Maximalalter-Eigenschaft für Passwörter festlegen. Diese Richtlinie enthält eine Warnung nach Ablauf einer bestimmten Zeit"
             },
             "PWD_LOCKOUT": {
                 "TITLE":"Passwortsperre",
-                "DESCRIPTION":"Kennwortwiederholungen sind im Standardmodus unendlich. Sie müssen diese Erweiterung installieren, wenn Sie Wiederholungsversuche anzeigen oder eine maximale Versuchsnummer festlegen möchten.",
+                "DESCRIPTION":"Kennwortwiederholungen sind im Standardmodus unendlich. Du musst diese Richtlinie installieren, wenn du Wiederholungsversuche anzeigen oder eine maximale Anzahl festlegen möchten.",
                 "TITLECREATE":"Kennwortsperrrichtlinie festlegen",
-                "DESCRIPTIONCREATE":"Kennwortwiederholungen sind im Standardmodus unendlich. Sie müssen diese Erweiterung installieren, wenn Sie Wiederholungsversuche anzeigen oder eine maximale Versuchsnummer festlegen möchten."
+                "DESCRIPTIONCREATE":"Kennwortwiederholungen sind im Standardmodus unendlich. Du musst diese Richtlinie installieren, wenn du Wiederholungsversuche anzeigen oder eine maximale Anzahl festlegen möchten."
             },
             "IAM_POLICY": {
                 "TITLE":"IAM Zugangseinstellungen",
-                "DESCRIPTION":"Definieren Sie Zugangseistellungen für Nutzer",
+                "DESCRIPTION":"Definiere die Zugangseistellungen für Benutzer",
                 "TITLECREATE":"IAM Zugangseinstellungen festlegen",
                 "DESCRIPTIONCREATE":"Emails als Benutzername sind nicht erlaubt wenn UserLoginMustBeDomain gesetzt ist."
             },
@@ -296,15 +296,15 @@
     },
     "ORG_DETAIL": {
         "TITLE": "Organisation",
-        "DESCRIPTION": "Hier können Sie Ihre Organisationskonfiguration bearbeiten und Mitglieder verwalten",
+        "DESCRIPTION": "Hier kannst du deine Organisationskonfiguration bearbeiten und Mitglieder verwalten",
         "DETAIL": {
             "TITLE": "Detail",
             "NAME": "Name",
             "DOMAIN": "Domain",
             "STATE": {
-                "0": "nicht definiert",
-                "1": "aktiv",
-                "2": "inaktiv"
+                "0": "Nicht definiert",
+                "1": "Aktiv",
+                "2": "Inaktiv"
             }
         },
         "MEMBER": {
@@ -315,7 +315,7 @@
             "EMAIL": "Email",
             "ROLES": "Rollen",
             "ADD": "Member hinzufügen",
-            "ADDDESCRIPTION": "Geben Sie die mail addressen der hinzuzufügenden Nutzer ein!"
+            "ADDDESCRIPTION": "Gib die Email Adressen der hinzuzufügenden Nutzer ein!"
         },
         "TABLE": {
             "TOTAL": "Einträge gesamt:",
@@ -328,42 +328,42 @@
     "PROJECT": {
         "PAGES": {
             "TITLE": "Projekt",
-            "DESCRIPTION": "Hier können Sie wichtige Einstellungen prüfen und die Daten einsehen, mit denen der Dienst konfiguriert worden ist",
+            "DESCRIPTION": "Hier kannst du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist",
             "LIST": "Projekte",
-            "LISTDESCRIPTION":"Hier finden Sie alle Projekte, für die Sie Aktionen anzeigen oder ausführen dürfen. Wenn Sie Ihr Projekt nicht finden können, wenden Sie sich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+            "LISTDESCRIPTION":"Hier findest du alle Projekte, für die du Aktionen anzeigen oder ausführen darfst. Wenn du dein Projekt nicht finden kannst, wenden dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
             "DETAIL": "Detail",
             "CREATE": "Projekt erstellen",
-            "CREATE_DESC": "Geben Sie den Namen ein",
+            "CREATE_DESC": "Gib den Namen ein",
             "ROLE": "Rolle",
             "NOITEMS": "Keine Projekte",
-            "ZITADELPROJECT":"Diese Einstellungen gehören zum Zitadel-Projekt. Wenn Sie etwas ändern, verhält sich Zitadel möglicherweise nicht wie beabsichtigt!",
+            "ZITADELPROJECT":"Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn du etwas ändernst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt!",
             "TYPE":{
                 "OWNED":"Eigene Projekte",
                 "GRANTED":"Berechtigte Projekte"
             },
             "PINNED":"Angepinnt",
             "ALL": "Alle",
-            "CREATEDON":"erstellt am",
-            "LASTMODIFIED":"zuletzt verändert am",
+            "CREATEDON":"Erstellt am",
+            "LASTMODIFIED":"Zuletzt verändert am",
             "ADDNEW":"Neues Projekt erstellen"
         },
         "STATE": {
             "TITLE":"Status",
-            "0": "nicht definiert",
-            "1": "aktiv",
-            "2": "inaktiv"
+            "0": "Nicht definiert",
+            "1": "Aktiv",
+            "2": "Inaktiv"
         },
         "TYPE": {
             "TITLE": "Typ",
-            "0": "unbekannter Typ",
-            "1": "in Besitz",
-            "2": "berechtigt"
+            "0": "Unbekannter Typ",
+            "1": "In Besitz",
+            "2": "Berechtigt"
         },
         "NAME": "Name",
         "MEMBER": {
             "TITLE": "Manager",
-            "TITLEDESC":"Manager können Änderungen an dieser Entität vornehmen",
-            "DESCRIPTION":"Hier finden Sie alle Manager dieses Projekts. Sie können ein neues Mitglied hinzufügen und bestehende verwalten.",
+            "TITLEDESC":"Manager können Änderungen an diesem Projekt vornehmen, wenn sie die nötigen Rollen haben.",
+            "DESCRIPTION":"Hier findest du alle Manager dieses Projekts. Du kannst ein neues Mitglied hinzufügen und bestehende verwalten.",
             "USERNAME": "Benutzername",
             "FIRSTNAME": "Vorname",
             "LASTNAME": "Nachname",
@@ -373,33 +373,33 @@
         },
         "GRANT": {
             "TITLE": "Berechtigte Organisationen",
-            "DESCRIPTION": "Gewähren Sie einer anderen Organisation Zugriff (Grant) auf dieses Projekt",
+            "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt",
             "CREATE": {
                 "TITLE": "Organisation berechtigen",
-                "SEL_USERS": "Selektieren Sie die gewünschten User für das Erstellen des Grants!",
-                "SEL_ROLES": "Selektieren Sie die gewünschten Rollen für das Erstellen des Grants!",
-                "SEL_PROJECT": "Suchen Sie nach dem Projekt",
-                "SEL_USER":"Suchen Sie nach einem User",
-                "SEL_ORG": "Suchen Sie nach der Domain",
-                "SEL_ORG_DESC":"Geben Sie die vollständige Domain ein um Resultate zu erhalten!",
+                "SEL_USERS": "Selektiere die gewünschten User für das Erstellen des Grants!",
+                "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen des Grants!",
+                "SEL_PROJECT": "Suchen nach dem Projekt",
+                "SEL_USER":"Suchen nach einem User",
+                "SEL_ORG": "Suchen nach der Domain",
+                "SEL_ORG_DESC":"Gib die vollständige Domain ein um Resultate zu erhalten!",
                 "ORG_TITLE":"Organisation",
-                "ORG_DESCRIPTION":"Sie sind im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
-                "ORG_DESCRIPTION_DESC":"Wechseln Sie den Context um die Organisation zu wechseln!",
+                "ORG_DESCRIPTION":"Du bist im Begriff einen Nutzer für die Organisation {{name}} zu berechtigen",
+                "ORG_DESCRIPTION_DESC":"Wechsel den Kontext um die Organisation zu wechseln!",
                 "SEL_ORG_FORMFIELD":"Vollständige Domain",
                 "SEL_ORG_BUTTON": "Suche Organisation",
                 "FOR_ORG":"The grant wird erstellt für:"
             },
             "DETAIL": {
                 "TITLE":"Berechtigte Manager der Organisation",
-                "DESC":"Dies sind die Manager der berechtigten Organisation. Wählen Sie die Benutzer, die Zugriff zum editieren der jeweiligen Zugänge erhalten."
+                "DESC":"Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum editieren der jeweiligen Zugänge erhalten sollen."
             },
             "SHOWDETAIL":"Zeige Details",
             "USER":"Benutzer",
             "MEMBERS":"Managers",
             "PROJECTNAME":"Projekt Name",
-            "GRANTEDORG": "Granted Organisation",
+            "GRANTEDORG": "Berechtigte Organisation",
             "GRANTEDORGDOMAIN": "Domain",
-            "GRANTEDORGNAME":"Org Name",
+            "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
             "ROLENAMESLIST": "Rollen"
@@ -410,16 +410,16 @@
         },
         "ROLE": {
             "KEY":"Key",
-            "TITLE": "Roles",
-            "DESCRIPTION":"Definieren Sie Rollen, die Sie bei der Erstellung eines Projekt-Grants vergeben können",
+            "TITLE": "Rollen",
+            "DESCRIPTION":"Definiere Rollen, die du bei der Erstellung eines Projekt-Grants vergeben kannst",
             "NAME": "Name",
-            "DISPLAY_NAME": "Display Name",
+            "DISPLAY_NAME": "Anzeige Name",
             "GROUP": "Gruppe",
             "ACTIONS": "Aktion",
             "ADDTITLE": "Rolle erstellen",
-            "ADDDESCRIPTION": "Geben Sie die Daten für die zu erstellende Rolle ein!",
+            "ADDDESCRIPTION": "Gib die Daten für die zu erstellende Rolle ein!",
             "EDITTITLE": "Rolle ändern",
-            "EDITDESCRIPTION": "Geben Sie die Daten für die zu verändernde Rolle ein!",
+            "EDITDESCRIPTION": "Gib die Daten für die zu verändernde Rolle ein!",
             "DELETE":"Rolle löschen",
             "CREATIONDATE":"Erstelldatum",
             "SELECTGROUPTOOLTIP":"Selektiere alle Rollen der Gruppe {{group}}"
@@ -430,8 +430,8 @@
             "DEACTIVATE": "Projekt deaktivieren",
             "ACTIVATE": "Projekt aktivieren",
             "DELETE": "Projekt löschen",
-            "ORGNAME":"Org Name",
-            "ORGDOMAIN":"Org Domain",
+            "ORGNAME":"Org. Name",
+            "ORGDOMAIN":"Org. Domain",
             "STATE":"Status",
             "TYPE":"Typ",
             "CREATIONDATE":"Erstelldatum",
@@ -443,15 +443,15 @@
         "LIST": "Applications",
         "PAGES": {
             "TITLE": "Applikation",
-            "DESCRIPTION": "Hier können Sie Ihre applikation bearbeiten und ihre Configuration ändern",
+            "DESCRIPTION": "Hier kannst du deine Applikation bearbeiten und deren Konfiguration anpassen.",
             "CREATE_OIDC": "OIDC Applikation",
-            "CREATE_OIDC_DESc": "Geben Sie Ihre Applikationsdaten ein!",
+            "CREATE_OIDC_DESc": "Gib deine Applikationsdaten ein!",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
-                    "0": "nicht definiert",
-                    "1": "aktiv",
-                    "2": "inaktiv"
+                    "0": "Nicht definiert",
+                    "1": "Aktiv",
+                    "2": "Inaktiv"
                 }
             }
         },
@@ -460,8 +460,8 @@
             "TITLE": "OIDC Konfiguration",
             "CLIENTID": "Client ID",
             "CLIENTSECRET": "Client Secret",
-            "CLIENTSECRET_DESCRIPTION": "Speichern Sie Ihr Clientsecret, da es verschwindet, sobald der Dialog geschlossen wird!",
-            "REGENERATESECRET": "Secret neu generieren",
+            "CLIENTSECRET_DESCRIPTION": "Speichere das Client Secret, da es verschwindet, sobald der Dialog geschlossen wird!",
+            "REGENERATESECRET": "Client Secret neu generieren",
             "REDIRECT": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",
             "RESPONSE": "Response Types",
@@ -483,11 +483,10 @@
         }
     },
     "GENDERS": {
-        "0":"unbekannt",
-        "1": "weiblich",
-        "2": "männlich",
-        "3": "anderes",
-        "4": "unbekannt"
+        "0": "Unbekannt",
+        "1": "Weiblich",
+        "2": "Männlich",
+        "3": "Anderes"
     },
     "LANGUAGES": {
         "de": "Deutsch",
@@ -497,30 +496,30 @@
         "ADD":"Manager hinzufügen"
     },
     "ROLES": {
-        "ORG_OWNER": "Org Owner",
-        "ORG_MEMBER_VIEWER": "Org Member Viewer",
-        "ORG_PROJECT_ROLE_VIEWER": "Org Project Role Viewer",
-        "ORG_EDITOR":"Org Editor",
-        "ORG_VIEWER":"Org Viewer",
-        "ORG_MEMBER_EDITOR":"Org Member Editor",
-        "ORG_PROJECT_CREATOR":"Org Project Creator",
-        "ORG_PROJECT_EDITOR":"Org Project Editor",
-        "ORG_PROJECT_VIEWER":"Org Project Viewer",
-        "ORG_PROJECT_MEMBER_EDITOR":"Org Project Member Editor",
-        "ORG_PROJECT_MEMBER_VIEWER":"Org Project Member Viewer",
-        "ORG_PROJECT_ROLE_EDITOR":"Org Project Role Editor",
-        "ORG_PROJECT_APP_EDITOR":"Org Project App Editor",
-        "ORG_PROJECT_APP_VIEWER":"Org Project App Viewer",
-        "ORG_PROJECT_GRANT_EDITOR":"Org Project Grant Editor" ,
-        "ORG_PROJECT_GRANT_VIEWER":"Org Project Grant Viewer",
-        "ORG_PROJECT_GRANT_MEMBER_EDITOR":"Org Project Grant Member Editor",
-        "ORG_PROJECT_GRANT_MEMBER_VIEWER":"Org Project Grant Member Viewer",
-        "ORG_USER_EDITOR":"Org User Editor",
-        "ORG_USER_VIEWER":"Org User Viewer",
-        "ORG_USER_GRANT_EDITOR":"Org User Grant Editor",
-        "ORG_USER_GRANT_VIEWER":"Org User Grant Viewer",
-        "ORG_POLICY_EDITOR":"Org Policy Editor",
-        "ORG_POLICY_VIEWER":"Org Policy Viewer",
+        "ORG_OWNER": "Org. Owner",
+        "ORG_MEMBER_VIEWER": "Org. Member Viewer",
+        "ORG_PROJECT_ROLE_VIEWER": "Org. Project Role Viewer",
+        "ORG_EDITOR":"Org. Editor",
+        "ORG_VIEWER":"Org. Viewer",
+        "ORG_MEMBER_EDITOR":"Org.. Member Editor",
+        "ORG_PROJECT_CREATOR":"Org.. Project Creator",
+        "ORG_PROJECT_EDITOR":"Org.. Project Editor",
+        "ORG_PROJECT_VIEWER":"Org.. Project Viewer",
+        "ORG_PROJECT_MEMBER_EDITOR":"Org.. Project Member Editor",
+        "ORG_PROJECT_MEMBER_VIEWER":"Org.. Project Member Viewer",
+        "ORG_PROJECT_ROLE_EDITOR":"Org.. Project Role Editor",
+        "ORG_PROJECT_APP_EDITOR":"Org. Project App Editor",
+        "ORG_PROJECT_APP_VIEWER":"Org. Project App Viewer",
+        "ORG_PROJECT_GRANT_EDITOR":"Org. Project Grant Editor" ,
+        "ORG_PROJECT_GRANT_VIEWER":"Org.Project Grant Viewer",
+        "ORG_PROJECT_GRANT_MEMBER_EDITOR":"Org.Project Grant Member Editor",
+        "ORG_PROJECT_GRANT_MEMBER_VIEWER":"Org.Project Grant Member Viewer",
+        "ORG_USER_EDITOR":"Org.User Editor",
+        "ORG_USER_VIEWER":"Org. User Viewer",
+        "ORG_USER_GRANT_EDITOR":"Org. User Grant Editor",
+        "ORG_USER_GRANT_VIEWER":"Org. User Grant Viewer",
+        "ORG_POLICY_EDITOR":"Org. Policy Editor",
+        "ORG_POLICY_VIEWER":"Org. Policy Viewer",
         "PROJECT_OWNER":"Project Owner",
         "PROJECT_MEMBER_EDITOR":"Project Member Editor",
         "PROJECT_APP_EDITOR":"Project App Editor",
@@ -543,15 +542,15 @@
         "ADD_BTN":"Neu",
         "PROJECT": {
             "TITLE": "Authorisierung",
-            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+            "DESCRIPTION": "Definiere die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen bei denen du eine Authorisierung besitzt!"
         },
         "USER": {
             "TITLE": "Authorisierung",
-            "DESCRIPTION": "Definieren Sie die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Sie können nur Einträge von Projekten sehen bei denen Sie eine Authorisierung besitzen!"
+            "DESCRIPTION": "Definiere die Operationen und Rechte die dem User zur Verfügung gestellt werden. Achtung: Du kannst nur Einträge von Projekten sehen bei denen du eine Authorisierung besitzt!"
         },
         "CREATE": {
             "TITLE": "Authorisierung erstellen",
-            "DESCRIPTION": "Suchen Sie nach der Organisation, dem Project und den verfügbaren Rollen!"
+            "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen!"
         },
         "DETAIL": {
             "TITLE":"Authorisierung Detail",
@@ -563,25 +562,25 @@
         "BOTTOM":"Ende",
         "ORG": {
             "TITLE":"Aktivität",
-            "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die die Organisation betreffen"
+            "DESCRIPTION":"Hier siehst du die letzten Vorkommnisse die die Organisation betreffen"
         },
         "PROJECT": {
             "TITLE":"Aktivität",
-            "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die das Project betreffen"
+            "DESCRIPTION":"Hier siehst du die letzten Vorkommnisse die das Projekt betreffen"
         },
         "USER": {
             "TITLE":"Aktivität",
-            "DESCRIPTION":"Hier sehen Sie die letzten Vorkommnisse die den Benutzer betreffen"
+            "DESCRIPTION":"Hier siehst du die letzten Vorkommnisse die den Benutzer betreffen"
         },
         "EVENTS": {
-            "org.added": "Org erstellt",
-            "org.changed":"Org editiert",
+            "org.added": "Org. erstellt",
+            "org.changed":"Org. editiert",
             "org.member.added":"Organisation Member erstellt",
             "org.member.removed":"Organisation Member gelöscht",
-            "org.domain.added":"Org Domain hinzugefügt",
-            "org.domain.verified":"Org Domain verifiziert",
+            "org.domain.added":"Org. Domain hinzugefügt",
+            "org.domain.verified":"Org. Domain verifiziert",
             "org.domain.primary.set":"Primäre domain gesetzt",
-            "org.domain.removed":"Org domain entfernt",
+            "org.domain.removed":"Org. domain entfernt",
             "org.iam.policy.added":"IAM Policy hinzugefügt",
             "project.added": "Projekt erstellt",
             "project.changed":"Projekt editiert",
@@ -591,25 +590,25 @@
             "project.role.added":"Rolle erstellt",
             "project.role.removed":"Rolle gelöscht",
             "project.application.added":"App hinzugefügt",
-            "project.application.config.oidc.added":"OIDC config hinzugefügt",
+            "project.application.config.oidc.added":"OIDC Konfiguration hinzugefügt",
             "user.added":"User hinzugefügt",
-            "user.initialization.code.added":"Init code hinzugefügt",
-            "user.phone.code.added":"User phone code hinzugefügt",
-            "user.phone.code.sent":"User phone code gesendet",
-            "user.initialization.code.sent":"Init code gesendet",
-            "user.email.verification.sended": "User email verifiziert",
-            "user.email.code.added":"Email code hinzugefügt",
-            "user.email.code.sent":"Email code gesendet",
+            "user.initialization.code.added":"Init Code hinzugefügt",
+            "user.phone.code.added":"User phone Code hinzugefügt",
+            "user.phone.code.sent":"User phone Code gesendet",
+            "user.initialization.code.sent":"Init Code gesendet",
+            "user.email.verification.sended": "User Email verifiziert",
+            "user.email.code.added":"Email Code hinzugefügt",
+            "user.email.code.sent":"Email Code gesendet",
             "user.email.verified":"Email verifiziert",
             "user.phone.verificationsended":"User phone verifikation gesendet",
-            "user.phone.code":"User phone code erstellt",
+            "user.phone.code":"User phone Code erstellt",
             "user.initialization.verification.sended":"User mail verifikation gesendet",
-            "user.initialization.code.created":"Initialisationscode gesendet",
-            "created.user.email.code":"User email code erstellt",
-            "created.user.phone.code":"Phone code erstellt",
+            "user.initialization.code.created":"InitialisationsCode gesendet",
+            "created.user.email.code":"User Email Code erstellt",
+            "created.user.phone.code":"Phone Code erstellt",
             "updated.user.password": "User password update",
             "skipped.init.mfauser": "Mfa Methode übersprungen",
-            "verified.user.email":"User email verifiziert",
+            "verified.user.email":"User Email verifiziert",
             "registered.user":"User registriert",
             "created.user":"User erstellt",
             "skipped.init.mfa.user":"User MFA init überspungen",

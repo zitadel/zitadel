@@ -89,6 +89,7 @@ html {
   color: white;
   background-repeat: no-repeat;
   background-position: bottom right;
+  background-size: contain;
 }
 
 h1 {
@@ -384,6 +385,10 @@ html button.primary:hover {
 html button.clean {
   color: #282828;
 }
+html button.clean:hover {
+  border: none;
+  background-color: #252525;
+}
 html button.user-selection .profile-image {
   background-image: url("/resources/images/icon-user-light.png");
 }
@@ -423,8 +428,8 @@ html button.other-user:hover .other-user-image {
     background-size: 100px 75px;
   }
 }
-html input {
-  background-color: white;
+html input:not([type=radio]), html select {
+  background-color: #FFFFFF;
   color: #282828;
 }
 html #qrcode svg rect.color {
