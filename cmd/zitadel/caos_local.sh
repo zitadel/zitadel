@@ -42,8 +42,8 @@ export CHAT_URL=$(gopass zitadel-secrets/zitadel/dev/google-chat-url)
 #OIDC
 export ZITADEL_ISSUER=http://localhost:50002/oauth/v2/
 export ZITADEL_ACCOUNTS=http://localhost:50003/login
-export ZITADEL_AUTHORIZE=http://localhost:50002/oauth/v2/
-export ZITADEL_OAUTH=http://localhost:50002/oauth/v2/
+export ZITADEL_AUTHORIZE=http://localhost:50002/oauth/v2
+export ZITADEL_OAUTH=http://localhost:50002/oauth/v2
 export ZITADEL_CONSOLE=http://localhost:4200
 export CAOS_OIDC_DEV=true
 export ZITADEL_COOKIE_DOMAIN=localhost

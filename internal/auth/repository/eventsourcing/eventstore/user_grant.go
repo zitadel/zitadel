@@ -129,6 +129,14 @@ func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
+func (repo *UserGrantRepo) UserGrantsByProjectAndUserID(projectID, userID string) ([]*grant_model.UserGrantView, error) {
+	grants, err := repo.View.UserGrantsByProjectAndUserID(projectID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantsToModel(grants), nil
+}
+
 func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_model.ProjectOrgSearchResponse {
 	resp := &grant_model.ProjectOrgSearchResponse{
 		TotalResult: grants.TotalResult,
