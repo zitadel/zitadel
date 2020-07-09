@@ -22,7 +22,7 @@ const routes: Routes = [
         },
     },
     {
-        path: ':projectid/members',
+        path: ':projectid/grant/:grantid/members',
         data: {
             type: ProjectType.PROJECTTYPE_GRANTED,
         },

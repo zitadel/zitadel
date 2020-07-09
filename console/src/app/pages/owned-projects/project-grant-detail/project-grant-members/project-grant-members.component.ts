@@ -126,19 +126,19 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
         dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
             if (dataToAdd) {
-                dataToAdd.userIds.forEach((userid: string) => {
-                    this.projectService.AddProjectGrantMember(
+                Promise.all(dataToAdd.userIds.map((userid: string) => {
+                    return this.projectService.AddProjectGrantMember(
                         this.projectId,
                         this.grantId,
                         userid,
                         dataToAdd.rolesKeyList,
-                    ).then(() => {
-                        this.toast.showInfo('Project Grant Member successfully added!');
-                    }).catch(error => {
-                        this.toast.showError(error);
-                    });
+                    );
+                })).then(() => {
+                    console.log('this');
+                    this.toast.showInfo('Project Grant Member successfully added!');
+                }).catch(error => {
+                    this.toast.showError(error);
                 });
-
             }
         });
     }

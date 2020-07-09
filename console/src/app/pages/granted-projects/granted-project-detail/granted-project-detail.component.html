@@ -33,9 +33,9 @@
 
         <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
             <mat-tab label="Details">
-                <app-project-contributors *ngIf="project"
+                <app-project-contributors *ngIf="project && grantId"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                    [projectType]="ProjectType.PROJECTTYPE_GRANTED" [project]="project">
+                    [projectType]="ProjectType.PROJECTTYPE_GRANTED" [project]="project" [grantId]="grantId">
                 </app-project-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
