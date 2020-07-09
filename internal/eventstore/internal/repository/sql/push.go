@@ -68,32 +68,18 @@ func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
 
 func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Event) error {
 	for _, event := range events {
-		rows, err := stmt.Query(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner, previousSequence,
-			event.AggregateType, event.AggregateID, previousSequence, previousSequence)
+		err := stmt.QueryRow(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner, previousSequence,
+			event.AggregateType, event.AggregateID, previousSequence, previousSequence).Scan(&event.ID, &previousSequence, &event.CreationDate)
 
 		if err != nil {
-			logging.Log("SQL-EXA0q").WithError(err).Info("query failed")
-			return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
-		}
-		defer rows.Close()
-
-		rowInserted := false
-		for rows.Next() {
-			rowInserted = true
-			err = rows.Scan(&event.ID, &previousSequence, &event.CreationDate)
-			logging.Log("SQL-rAvLD").OnError(err).Info("unable to scan result into event")
-		}
-
-		if !rowInserted {
-			logging.LogWithFields("SQL-5aATu",
+			logging.LogWithFields("SQL-IP3js",
 				"aggregate", event.AggregateType,
 				"id", event.AggregateID,
 				"previousSequence", previousSequence,
 				"aggregateId", event.AggregateID,
 				"aggregateType", event.AggregateType,
-				"eventType", event.Type).
-				Info("wrong sequence")
-			return caos_errs.ThrowAlreadyExists(nil, "SQL-GKcAa", "wrong sequence")
+				"eventType", event.Type).WithError(err).Info("query failed")
+			return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 		}
 
 		event.Sequence = uint64(previousSequence)
