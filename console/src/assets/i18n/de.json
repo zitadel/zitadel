@@ -201,7 +201,7 @@
             "PHONEVERIFIED":"Telefonnummer bestätigt!",
             "PHONEVERIFICATIONSENT":"Tel. Bestätigungscode gesendet!",
             "EMAILVERIFICATIONSENT":"Email Bestätigungscode gesendet!",
-            "OTPREMOVED":"OTP Faktor wurde entfernt!",
+            "OTPREMOVED":"OTP entfernt!",
             "INITIALPASSWORDSET":"Initiales Passwort gesetzt!",
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt!",
             "PASSWORDCHANGED":"Passwort geändert!",
