@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/caos/oidc/pkg/oidc"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
+	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (op.AuthRequest, error) {
@@ -54,11 +56,27 @@ func (o *OPStorage) CreateToken(ctx context.Context, authReq op.AuthRequest) (st
 	if err != nil {
 		return "", time.Time{}, err
 	}
-	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Audience, req.Request.(*model.AuthRequestOIDC).Scopes, o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	app, err := o.repo.ApplicationByClientID(ctx, req.ApplicationID)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, req.UserID)
+	scopes := append(req.Request.(*model.AuthRequestOIDC).Scopes, grantsToScopes(grants)...)
+	resp, err := o.repo.CreateToken(ctx, req.AgentID, req.ApplicationID, req.UserID, req.Audience, scopes, o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
 	return resp.ID, resp.Expiration, nil
+}
+
+func grantsToScopes(grants []*grant_model.UserGrantView) []string {
+	scopes := make([]string, 0)
+	for _, grant := range grants {
+		for _, role := range grant.RoleKeys {
+			scopes = append(scopes, fmt.Sprintf("%v:%v", grant.ResourceOwner, role))
+		}
+	}
+	return scopes
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) error {

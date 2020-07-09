@@ -79,6 +79,8 @@ func (o *OPStorage) GetUserinfoFromScopes(ctx context.Context, userID string, sc
 			userInfo.Address.Region = user.Region
 			userInfo.Address.PostalCode = user.PostalCode
 			userInfo.Address.Country = user.Country
+		default:
+			userInfo.Authorizations = append(userInfo.Authorizations, scope)
 		}
 	}
 	return userInfo, nil
