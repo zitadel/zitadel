@@ -22,14 +22,14 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	//TODO: use real key
 	tokenID, err := crypto.DecryptAESString(tokenString, string(repo.TokenVerificationKey[:32]))
 	if err != nil {
-		return "", "", caos_errs.ThrowPermissionDenied(nil, "APP-8EF0zZ", "invalid token")
+		return "", "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
 	}
 	token, err := repo.View.TokenByID(tokenID)
 	if err != nil {
-		return "", "", caos_errs.ThrowPermissionDenied(err, "APP-BxUSiL", "invalid token")
+		return "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
 	}
 	if !token.Expiration.After(time.Now().UTC()) {
-		return "", "", caos_errs.ThrowPermissionDenied(err, "APP-k9KS0", "invalid token")
+		return "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
 
 	for _, aud := range token.Audience {
@@ -37,7 +37,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 			return token.UserID, token.UserAgentID, nil
 		}
 	}
-	return "", "", caos_errs.ThrowPermissionDenied(nil, "APP-Zxfako", "invalid audience")
+	return "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
 }
 
 func (repo *TokenVerifierRepo) ProjectIDByClientID(ctx context.Context, clientID string) (projectID string, err error) {
