@@ -20,6 +20,7 @@ export class AccountsCardComponent implements OnInit {
     constructor(public authService: AuthService, private router: Router, private userService: AuthUserService) {
         this.userService.getMyUserSessions().then(sessions => {
             this.users = sessions.toObject().userSessionsList;
+            console.log(this.users);
 
             const index = this.users.findIndex(user => user.userName === this.profile.userName);
             this.users.splice(index, 1);
@@ -45,14 +46,14 @@ export class AccountsCardComponent implements OnInit {
         }
     }
 
-    public selectAccount(loginName?: string): void {
+    public selectAccount(loginHint?: string): void {
         const configWithPrompt: Partial<AuthConfig> = {
             customQueryParams: {
                 // prompt: 'select_account',
             } as any,
         };
-        if (loginName) {
-            (configWithPrompt as any).customQueryParams['login_hint'] = loginName;
+        if (loginHint) {
+            (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
         }
         this.authService.authenticate(configWithPrompt);
     }
