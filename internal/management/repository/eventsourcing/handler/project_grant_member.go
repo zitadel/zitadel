@@ -70,7 +70,7 @@ func (p *ProjectGrantMember) processProjectGrantMember(event *models.Event) (err
 		if err != nil {
 			return err
 		}
-		return p.view.DeleteProjectGrantMember(event.AggregateID, member.UserID, event.Sequence)
+		return p.view.DeleteProjectGrantMember(member.GrantID, member.UserID, event.Sequence)
 	default:
 		return p.view.ProcessedProjectGrantMemberSequence(event.Sequence)
 	}
