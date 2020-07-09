@@ -1,12 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
-import { take, tap } from 'rxjs/operators';
-import { ProjectMember, ProjectType, ProjectView, User } from 'src/app/proto/generated/management_pb';
+import { take } from 'rxjs/operators';
+import { ProjectGrantView, ProjectMember, ProjectType, ProjectView, User } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -18,10 +18,11 @@ import { ProjectMembersDataSource } from './project-members-datasource';
     templateUrl: './project-members.component.html',
     styleUrls: ['./project-members.component.scss'],
 })
-export class ProjectMembersComponent implements AfterViewInit {
-    public project!: ProjectView.AsObject;
+export class ProjectMembersComponent {
+    public project!: ProjectView.AsObject | ProjectGrantView.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
+    public grantId: string = '';
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
     @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
     public dataSource!: ProjectMembersDataSource;
@@ -42,23 +43,23 @@ export class ProjectMembersComponent implements AfterViewInit {
             this.getRoleOptions();
 
             this.route.params.subscribe(params => {
-                this.projectService.GetProjectById(params.projectid).then(project => {
-                    this.project = project.toObject();
-                    this.dataSource = new ProjectMembersDataSource(this.projectService);
-                    this.dataSource.loadMembers(this.project, this.projectType, 0, 25, 'asc');
-                });
+                this.grantId = params.grantid;
+                if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+                    this.projectService.GetProjectById(params.projectid).then(project => {
+                        this.project = project.toObject();
+                        this.dataSource = new ProjectMembersDataSource(this.projectService);
+                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25);
+                    });
+                } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+                    console.log(params.projectid, params.grantid);
+                    this.projectService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
+                        this.project = project.toObject();
+                        this.dataSource = new ProjectMembersDataSource(this.projectService);
+                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25, this.grantId);
+                    });
+                }
             });
         });
-
-    }
-
-    public ngAfterViewInit(): void {
-        this.paginator.page
-            .pipe(
-                tap(() => this.loadMembersPage()),
-            )
-            .subscribe();
-
     }
 
     public getRoleOptions(): void {
@@ -77,31 +78,23 @@ export class ProjectMembersComponent implements AfterViewInit {
         }
     }
 
-    private loadMembersPage(): void {
-        this.dataSource.loadMembers(
-            this.project,
-            this.projectType,
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
-        );
-    }
-
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
-            return this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
-                this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+            if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+                return this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
+                    this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+            } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+                return this.projectService.RemoveProjectGrantMember(this.project.projectId, this.grantId,
+                    member.userId).then(() => {
+                        this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+            }
         }));
-    }
-
-    public removeMember(member: ProjectMember.AsObject): void {
-        this.projectService.RemoveProjectMember(this.project.projectId, member.userId).then(() => {
-            this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
-        }).catch(error => {
-            this.toast.showError(error);
-        });
     }
 
     public isAllSelected(): boolean {
@@ -132,7 +125,13 @@ export class ProjectMembersComponent implements AfterViewInit {
 
                 if (users && users.length && roles && roles.length) {
                     Promise.all(users.map(user => {
-                        return this.projectService.AddProjectMember(this.project.projectId, user.id, roles);
+                        if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+                            return this.projectService.AddProjectMember(this.project.projectId, user.id, roles);
+
+                        } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+                            return this.projectService.AddProjectGrantMember(this.project.projectId, this.grantId,
+                                user.id, roles);
+                        }
                     })).then(() => {
                         this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
                     }).catch(error => {
@@ -144,11 +143,21 @@ export class ProjectMembersComponent implements AfterViewInit {
     }
 
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
-        this.projectService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
-            .then((newmember: ProjectMember) => {
-                this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
-            }).catch(error => {
-                this.toast.showError(error);
-            });
+        if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+            this.projectService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
+                .then((newmember: ProjectMember) => {
+                    this.toast.showInfo('Member changed');
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+        } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+            this.projectService.ChangeProjectGrantMember(this.project.projectId,
+                this.grantId, member.userId, selectionChange.value)
+                .then((newmember: ProjectMember) => {
+                    this.toast.showInfo('Member changed');
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+        }
     }
 }
