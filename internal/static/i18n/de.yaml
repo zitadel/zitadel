@@ -199,12 +199,11 @@ EventTypes:
       removed: Domäne entfernt
       primary:
         set: Primäre Domäne gesetzt
+      reserved: Domäne reserviert
+      released: Domäne freigegeben
     name:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben
-    domain:
-      reserved: Domäne reserviert
-      released: Domäne freigegeben
     member:
       added: Organisationsmitglied hinzugefügt
       changed: Organisationsmitglied geändert

@@ -199,12 +199,11 @@ EventTypes:
       removed: Domain removed
       primary:
         set: Primary domain set
+      reserved: Domain reserved
+      released: Domain released
     name:
       reserved: Organization name reserved
       released: Organization name released
-    domain:
-      reserved: Domain reserved
-      released: Domain released
     member:
       added: Organization member added
       changed: Organization member changed
