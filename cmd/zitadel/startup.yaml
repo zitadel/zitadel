@@ -4,7 +4,7 @@ Log:
     Format: text
 
 Tracing:
-  Type: google
+  Type: $TRACING_TYPE
   Config:
     ProjectID: $ZITADEL_TRACING_PROJECT_ID
     MetricPrefix: ZITADEL-V1
@@ -35,6 +35,7 @@ AuthZ:
       Port: $ZITADEL_EVENTSTORE_PORT
       User: 'authz'
       Database: 'authz'
+      Password: $CR_AUTHZ_PASSWORD
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT

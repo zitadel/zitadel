@@ -25,8 +25,6 @@ export class ProjectGrantMembersDataSource extends DataSource<ProjectMember.AsOb
 
         this.loadingSubject.next(true);
 
-        console.log(projectId, grantId);
-
         from(this.projectService.SearchProjectGrantMembers(projectId,
             grantId, pageSize, offset)).pipe(
                 map(resp => {

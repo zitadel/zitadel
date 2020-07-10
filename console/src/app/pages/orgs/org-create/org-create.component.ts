@@ -4,9 +4,9 @@ import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
-import { PasswordComplexityPolicy } from 'src/app/proto/generated/management_pb';
+import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { OrgService } from 'src/app/services/org.service';
+import { AuthUserService } from 'src/app/services/auth-user.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../user-detail/validators';
@@ -62,7 +62,7 @@ export class OrgCreateComponent {
         private adminService: AdminService,
         private _location: Location,
         private fb: FormBuilder,
-        private orgService: OrgService,
+        private authUserService: AuthUserService,
     ) {
         const validators: Validators[] = [Validators.required];
 
@@ -70,7 +70,7 @@ export class OrgCreateComponent {
             name: ['', [Validators.required]],
             domain: [''],
         });
-        this.orgService.GetPasswordComplexityPolicy().then(data => {
+        this.authUserService.GetMyPasswordComplexityPolicy().then(data => {
             this.policy = data.toObject();
             if (this.policy.minLength) {
                 validators.push(Validators.minLength(this.policy.minLength));

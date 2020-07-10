@@ -62,7 +62,21 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	if err != nil {
 		return nil, err
 	}
-	return grantRespToOrgResp(grants), nil
+	if len(grants.Result) > 0 {
+		return grantRespToOrgResp(grants), nil
+	}
+	user, err := repo.View.UserByID(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	org, err := repo.View.OrgByID(user.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	return &grant_model.ProjectOrgSearchResponse{Result: []*grant_model.Org{&grant_model.Org{
+		OrgID:   org.ID,
+		OrgName: org.Name,
+	}}}, nil
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
@@ -127,6 +141,14 @@ func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func (repo *UserGrantRepo) UserGrantsByProjectAndUserID(projectID, userID string) ([]*grant_model.UserGrantView, error) {
+	grants, err := repo.View.UserGrantsByProjectAndUserID(projectID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return model.UserGrantsToModel(grants), nil
 }
 
 func grantRespToOrgResp(grants *grant_model.UserGrantSearchResponse) *grant_model.ProjectOrgSearchResponse {

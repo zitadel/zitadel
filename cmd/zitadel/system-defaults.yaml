@@ -109,7 +109,6 @@ SystemDefaults:
                   - 'CODE'
                 GrantTypes:
                   - 'AUTHORIZATION_CODE'
-                  - 'IMPLICIT'
                 ApplicationType: 'NATIVE'
                 AuthMethodType: 'AUTH_TYPE_NONE'
     Owners:

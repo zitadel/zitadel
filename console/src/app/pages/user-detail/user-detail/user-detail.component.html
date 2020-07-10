@@ -16,8 +16,6 @@
                     class="state-button"
                     (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
             </ng-template>
-
-            <p class="desc">{{ 'USER.PROFILE.DESCRIPTION' | translate }}</p>
         </div>
 
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>

@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	"log"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 
@@ -211,38 +210,35 @@ func (es *OrgEventstore) OrgChanges(ctx context.Context, id string, lastSequence
 		return nil, errors.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
 	}
 
-	result := make([]*org_model.OrgChange, 0)
+	changes := make([]*org_model.OrgChange, len(events))
 
-	for _, u := range events {
-		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
 		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
 		change := &org_model.OrgChange{
 			ChangeDate: creationDate,
-			EventType:  u.Type.String(),
-			ModifierId: u.EditorUser,
-			Sequence:   u.Sequence,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
 		}
 
-		orgDummy := model.Org{}
-		if u.Data != nil {
-			if err := json.Unmarshal(u.Data, &orgDummy); err != nil {
-				log.Println("Error getting data!", err.Error())
-			}
+		if event.Data != nil {
+			org := new(model.Org)
+			err := json.Unmarshal(event.Data, org)
+			logging.Log("EVENT-XCLEm").OnError(err).Debug("unable to unmarshal data")
+			change.Data = org
 		}
-		change.Data = orgDummy
 
-		result = append(result, change)
-		if lastSequence < u.Sequence {
-			lastSequence = u.Sequence
+		changes[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
 		}
 	}
 
-	changes := &org_model.OrgChanges{
-		Changes:      result,
+	return &org_model.OrgChanges{
+		Changes:      changes,
 		LastSequence: lastSequence,
-	}
-
-	return changes, nil
+	}, nil
 }
 
 func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {

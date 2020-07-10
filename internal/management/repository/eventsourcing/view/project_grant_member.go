@@ -31,8 +31,8 @@ func (v *View) PutProjectGrantMember(project *model.ProjectGrantMemberView, sequ
 	return v.ProcessedProjectGrantMemberSequence(sequence)
 }
 
-func (v *View) DeleteProjectGrantMember(projectID, userID string, eventSequence uint64) error {
-	err := view.DeleteProjectGrantMember(v.Db, projectGrantMemberTable, projectID, userID)
+func (v *View) DeleteProjectGrantMember(grantID, userID string, eventSequence uint64) error {
+	err := view.DeleteProjectGrantMember(v.Db, projectGrantMemberTable, grantID, userID)
 	if err != nil {
 		return nil
 	}

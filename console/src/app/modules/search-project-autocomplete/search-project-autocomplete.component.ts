@@ -56,7 +56,6 @@ export class SearchProjectAutocompleteComponent {
             ).subscribe(([granted, owned]) => {
                 this.isLoading = false;
                 this.filteredProjects = [...owned.toObject().resultList, ...granted.toObject().resultList];
-                console.log(this.filteredProjects);
             });
     }
 
@@ -102,7 +101,6 @@ export class SearchProjectAutocompleteComponent {
     }
 
     public selected(event: MatAutocompleteSelectedEvent): void {
-        console.log(event.option.value);
         if (this.singleOutput) {
             this.selectionChanged.emit(event.option.value);
         } else {

@@ -1112,28 +1112,6 @@ service ManagementService {
         };
     }
 
-    rpc CreateUserGrant(UserGrantCreate) returns (UserGrant) {
-        option (google.api.http) = {
-            post: "/users/{user_id}/grants"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.grant.write"
-        };
-    }
-
-    rpc UpdateUserGrant(UserGrantUpdate) returns (UserGrant) {
-        option (google.api.http) = {
-            put: "/users/{user_id}/grants/{id}"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.grant.write"
-        };
-    }
-
     rpc DeactivateUserGrant(UserGrantID) returns (UserGrant) {
         option (google.api.http) = {
             put: "/users/{user_id}/grants/{id}/_deactivate"
@@ -1163,30 +1141,6 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "user.grant.delete"
-        };
-    }
-
-    // add a list of user grants in one request
-    rpc BulkCreateUserGrant(UserGrantCreateBulk) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            post: "/usergrants/_bulk"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.grant.write"
-        };
-    }
-
-    // update a list of user grants in one request
-    rpc BulkUpdateUserGrant(UserGrantUpdateBulk) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            put: "/usergrants/_bulk"
-            body: "*"
-        };
-
-        option (caos.zitadel.utils.v1.auth_option) = {
-            permission: "user.grant.write"
         };
     }
 
@@ -2257,7 +2211,7 @@ message OIDCConfigUpdate {
 enum OIDCResponseType {
     OIDCRESPONSETYPE_CODE = 0;
     OIDCRESPONSETYPE_ID_TOKEN = 1;
-    OIDCRESPONSETYPE_TOKEN = 2;
+    OIDCRESPONSETYPE_ID_TOKEN_TOKEN = 2;
 }
 
 enum OIDCGrantType {
@@ -2485,6 +2439,7 @@ message UserGrant {
     google.protobuf.Timestamp creation_date = 7;
     google.protobuf.Timestamp change_date = 8;
     uint64 sequence = 9;
+    string grant_id = 10;
 }
 
 message UserGrantCreateBulk {
@@ -2574,6 +2529,7 @@ message UserGrantView {
     uint64 sequence = 16;
     string resource_owner = 17;
     string display_name = 18;
+    string grant_id = 19;
 }
 
 

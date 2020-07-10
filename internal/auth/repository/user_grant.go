@@ -10,4 +10,5 @@ type UserGrantRepository interface {
 	SearchMyProjectOrgs(ctx context.Context, request *model.UserGrantSearchRequest) (*model.ProjectOrgSearchResponse, error)
 	SearchMyZitadelPermissions(ctx context.Context) ([]string, error)
 	SearchMyProjectPermissions(ctx context.Context) ([]string, error)
+	UserGrantsByProjectAndUserID(projectID, userID string) ([]*model.UserGrantView, error)
 }

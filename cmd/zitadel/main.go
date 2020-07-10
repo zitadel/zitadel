@@ -52,6 +52,7 @@ var (
 	loginEnabled        = flag.Bool("login", true, "enable login ui")
 	consoleEnabled      = flag.Bool("console", true, "enable console ui")
 	notificationEnabled = flag.Bool("notification", true, "enable notification handler")
+	localDevMode        = flag.Bool("localDevMode", false, "enable local development specific configs")
 )
 
 func main() {
@@ -85,7 +86,11 @@ func main() {
 func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository) {
 	uis := ui.Create(conf.UI)
 	if *loginEnabled {
-		uis.RegisterHandler(ui.LoginHandler, login.Start(conf.UI.Login, authRepo, ui.LoginHandler).Handler())
+		prefix := ""
+		if *localDevMode {
+			prefix = ui.LoginHandler
+		}
+		uis.RegisterHandler(ui.LoginHandler, login.Start(conf.UI.Login, authRepo, prefix).Handler())
 	}
 	if *consoleEnabled {
 		consoleHandler, err := console.Start(conf.UI.Console)
@@ -116,7 +121,7 @@ func startAPI(ctx context.Context, conf *Config, authZRepo *authz_repo.EsReposit
 	}
 	if *oidcEnabled {
 		op := oidc.NewProvider(ctx, conf.API.OIDC, authRepo)
-		apis.RegisterHandler("/oauth/v2", op.HttpHandler().Handler)
+		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	apis.Start(ctx)
 }

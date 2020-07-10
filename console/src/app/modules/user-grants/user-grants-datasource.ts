@@ -77,12 +77,12 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
         from(promise).pipe(
             map(resp => {
                 this.totalResult = resp.toObject().totalResult;
-                console.log(resp.toObject().resultList);
                 return resp.toObject().resultList;
             }),
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(grants => {
+            console.log(grants);
             this.grantsSubject.next(grants);
         });
     }

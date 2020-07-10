@@ -34,10 +34,15 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     @Input() projectId: string = '';
     @Input() grantId: string = '';
 
-    public roleOptions: ProjectRoleView.AsObject[] = [];
+    public grantRoleOptions: string[] = [];
+    public projectRoleOptions: ProjectRoleView.AsObject[] = [];
     public routerLink: any = [''];
 
+    public loadedGrantId: string = '';
     public loadedProjectId: string = '';
+
+    public UserGrantContext: any = UserGrantContext;
+
     constructor(
         private userService: MgmtUserService,
         private projectService: ProjectService,
@@ -50,24 +55,25 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         'projectId', 'creationDate', 'changeDate', 'roleNamesList'];
 
     public ngOnInit(): void {
+        console.log(this.context);
         this.dataSource = new UserGrantsDataSource(this.userService);
         const data = {
             projectId: this.projectId,
             grantId: this.grantId,
             userId: this.userId,
         };
-        console.log(this.context);
 
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
                 if (this.projectId) {
-                    this.getRoleOptions(this.projectId);
+                    this.getProjectRoleOptions(this.projectId);
                     this.routerLink = ['/grant-create', 'project', this.projectId];
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
                 if (data && data.grantId) {
                     this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
+                    this.getGrantRoleOptions(this.grantId, this.projectId);
                 }
                 break;
             case UserGrantContext.USER:
@@ -78,7 +84,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             default:
                 this.routerLink = ['/grant-create'];
         }
-        console.log(data);
         this.dataSource.loadGrants(this.context, 0, 25, data);
     }
 
@@ -114,35 +119,56 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             this.dataSource.grantsSubject.value.forEach(row => this.selection.select(row));
     }
 
-    public loadRoleOptions(projectId: string): void {
-        if (this.context === UserGrantContext.USER) {
-            this.getRoleOptions(projectId);
-        }
+    public getGrantRoleOptions(grantId: string, projectId: string): void {
+        console.log(grantId, projectId);
+
+        this.projectService.GetGrantedProjectByID(projectId, grantId).then(resp => {
+            this.loadedGrantId = projectId;
+            this.grantRoleOptions = resp.toObject().roleKeysList;
+        }).catch(error => {
+            this.toast.showError(error);
+        });
     }
 
-    public getRoleOptions(projectId: string): void {
+    public getProjectRoleOptions(projectId: string): void {
+        console.log(projectId);
         this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
-            this.roleOptions = resp.toObject().resultList;
+            this.projectRoleOptions = resp.toObject().resultList;
         });
     }
 
     updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
-        this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
-            .then((newmember: UserGrant) => {
-                this.toast.showInfo('Grant updated!');
-            }).catch(error => {
-                this.toast.showError(error.message);
-            });
+        switch (this.context) {
+            case UserGrantContext.OWNED_PROJECT:
+                if (grant.id && grant.projectId) {
+                    this.userService.UpdateProjectUserGrant(grant.id, grant.projectId, grant.userId, selectionChange.value)
+                        .then(() => {
+                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+                        }).catch(error => {
+                            this.toast.showError(error);
+                        });
+                }
+                break;
+            case UserGrantContext.GRANTED_PROJECT:
+                if (this.grantId && this.projectId) {
+                    this.userService.updateProjectGrantUserGrant(grant.id,
+                        this.grantId, grant.userId, selectionChange.value)
+                        .then(() => {
+                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+                        }).catch(error => {
+                            this.toast.showError(error);
+                        });
+                }
+                break;
+        }
     }
 
     deleteGrantSelection(): void {
         this.userService.BulkRemoveUserGrant(this.selection.selected.map(grant => grant.id)).then(() => {
-            this.toast.showInfo('Grants deleted');
+            this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
-            console.log(data);
             this.selection.selected.forEach((item) => {
-                console.log(item);
                 const index = data.findIndex(i => i.id === item.id);
                 if (index > -1) {
                     data.splice(index, 1);
@@ -151,7 +177,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             });
             this.selection.clear();
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 }

@@ -115,4 +115,8 @@ export class OwnedProjectGridComponent implements OnChanges {
             this.router.navigate(['/projects', id]);
         }
     }
+
+    public closeGridView(): void {
+        this.changedView.emit(true);
+    }
 }

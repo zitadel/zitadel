@@ -24,6 +24,7 @@ import { CreationType, MemberCreateDialogComponent } from '../../modules/add-mem
 })
 export class ProjectContributorsComponent implements OnInit {
     @Input() public project!: ProjectView.AsObject | ProjectGrantView.AsObject;
+    @Input() public grantId: string = '';
     @Input() public projectType!: ProjectType;
 
     @Input() public disabled: boolean = false;
@@ -58,7 +59,6 @@ export class ProjectContributorsComponent implements OnInit {
                 finalize(() => this.loadingSubject.next(false)),
             ).subscribe(members => {
                 this.membersSubject.next(members);
-                console.log(members);
             });
         }
     }
@@ -66,7 +66,9 @@ export class ProjectContributorsComponent implements OnInit {
     public openAddMember(): void {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
-                creationType: CreationType.PROJECT_OWNED,
+                // TODO replace
+                creationType: this.projectType === ProjectType.PROJECTTYPE_OWNED ? CreationType.PROJECT_OWNED :
+                    ProjectType.PROJECTTYPE_GRANTED ? CreationType.PROJECT_GRANTED : ProjectType.PROJECTTYPE_OWNED,
                 projectId: this.project.projectId,
             },
             width: '400px',
@@ -78,12 +80,27 @@ export class ProjectContributorsComponent implements OnInit {
                 const roles: string[] = resp.roles;
 
                 if (users && users.length && roles && roles.length) {
-                    Promise.all(users.map(user => {
-                        return this.projectService.AddProjectMember(this.project.projectId, user.id, roles);
-                    })).then(() => {
-                        this.toast.showError('members added');
-                    }).catch(error => {
-                        this.toast.showError(error.message);
+                    users.forEach(user => {
+                        switch (this.projectType) {
+                            case ProjectType.PROJECTTYPE_OWNED:
+                                return this.projectService.AddProjectMember(this.project.projectId, user.id, roles)
+                                    .then(() => {
+                                        this.toast.showInfo('members added');
+                                    }).catch(error => {
+                                        this.toast.showError(error);
+                                    });
+                            case ProjectType.PROJECTTYPE_GRANTED:
+                                return this.projectService.AddProjectGrantMember(
+                                    this.project.projectId,
+                                    this.grantId,
+                                    user.id,
+                                    roles,
+                                ).then(() => {
+                                    this.toast.showInfo('members added');
+                                }).catch(error => {
+                                    this.toast.showError(error);
+                                });
+                        }
                     });
                 }
             }
@@ -93,7 +110,7 @@ export class ProjectContributorsComponent implements OnInit {
     public showDetail(): void {
         if (this.project?.state === ProjectState.PROJECTSTATE_ACTIVE) {
             if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                this.router.navigate(['granted-projects', this.project.projectId, 'members']);
+                this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
             } else if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
                 this.router.navigate(['projects', this.project.projectId, 'members']);
             }

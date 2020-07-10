@@ -8,6 +8,7 @@ type UserGrant struct {
 	State     UserGrantState
 	UserID    string
 	ProjectID string
+	GrantID   string
 	RoleKeys  []string
 }
 

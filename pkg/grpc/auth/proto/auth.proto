@@ -610,6 +610,7 @@ message UserGrantView {
   string UserId = 3;
   repeated string Roles = 4;
   string OrgName = 5;
+  string GrantId = 6;
 }
 
 message MyProjectOrgSearchRequest {

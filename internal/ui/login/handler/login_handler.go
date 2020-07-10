@@ -12,6 +12,7 @@ const (
 
 type loginData struct {
 	LoginName string `schema:"loginName"`
+	Register  bool   `schema:"register"`
 }
 
 func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +44,10 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if data.Register {
+		l.handleRegister(w, r)
+		return
+	}
 	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, data.LoginName)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -56,9 +61,13 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
+	loginName := ""
+	if authReq != nil {
+		loginName = authReq.LoginName
+	}
 	data := userData{
 		baseData:  l.getBaseData(r, authReq, "Login", errType, errMessage),
-		LoginName: authReq.LoginName,
+		LoginName: loginName,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, nil)
 }

@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"strings"
 
 	"github.com/caos/logging"
@@ -341,16 +340,17 @@ func (es *ProjectEventstore) PrepareRemoveProjectRole(ctx context.Context, role 
 }
 
 func (es *ProjectEventstore) RemoveRoleFromGrants(existing *model.Project, roleKey string) []*model.ProjectGrant {
-	grants := make([]*model.ProjectGrant, 0)
-	for _, grant := range existing.Grants {
-		for i, role := range grant.RoleKeys {
-			if role == roleKey {
-				grant.RoleKeys[i] = grant.RoleKeys[len(grant.RoleKeys)-1]
-				grant.RoleKeys[len(grant.RoleKeys)-1] = ""
-				grant.RoleKeys = grant.RoleKeys[:len(grant.RoleKeys)-1]
-				grants = append(grants, grant)
+	grants := make([]*model.ProjectGrant, len(existing.Grants))
+	for i, grant := range existing.Grants {
+		newGrant := *grant
+		roles := make([]string, 0)
+		for _, role := range newGrant.RoleKeys {
+			if role != roleKey {
+				roles = append(roles, role)
 			}
 		}
+		newGrant.RoleKeys = roles
+		grants[i] = &newGrant
 	}
 	return grants
 }
@@ -380,48 +380,40 @@ func (es *ProjectEventstore) ProjectChanges(ctx context.Context, id string, last
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-FpQqK", "Errors.Changes.NotFound")
 	}
 
-	result := make([]*proj_model.ProjectChange, 0)
+	changes := make([]*proj_model.ProjectChange, len(events))
 
-	for _, u := range events {
-		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
 		logging.Log("EVENT-qxIR7").OnError(err).Debug("unable to parse timestamp")
 		change := &proj_model.ProjectChange{
 			ChangeDate: creationDate,
-			EventType:  u.Type.String(),
-			ModifierId: u.EditorUser,
-			Sequence:   u.Sequence,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
 		}
 
-		projectDummy := proj_model.Project{}
-		appDummy := model.Application{}
-		change.Data = projectDummy
-		if u.Data != nil {
+		if event.Data != nil {
+			var data interface{}
 			if strings.Contains(change.EventType, "application") {
-				if err := json.Unmarshal(u.Data, &appDummy); err != nil {
-					log.Println("Error getting data!", err.Error())
-				}
-				change.Data = appDummy
+				data = new(model.Application)
 			} else {
-				if err := json.Unmarshal(u.Data, &projectDummy); err != nil {
-					log.Println("Error getting data!", err.Error())
-				}
-				change.Data = projectDummy
+				data = new(model.Project)
 			}
+			err = json.Unmarshal(event.Data, data)
+			logging.Log("EVENT-NCkpN").OnError(err).Debug("unable to unmarshal data")
+			change.Data = data
 		}
 
-		result = append(result, change)
-		if lastSequence < u.Sequence {
-			lastSequence = u.Sequence
-
+		changes[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
 		}
 	}
 
-	changes := &proj_model.ProjectChanges{
-		Changes:      result,
+	return &proj_model.ProjectChanges{
+		Changes:      changes,
 		LastSequence: lastSequence,
-	}
-
-	return changes, nil
+	}, nil
 }
 
 func ChangesQuery(projID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
@@ -546,10 +538,10 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	return nil
 }
 
-func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, secId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
-	query := ChangesQuery(id, lastSequence, limit, sortAscending)
+func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
+	query := ChangesQuery(projectID, lastSequence, limit, sortAscending)
 
-	events, err := es.Eventstore.FilterEvents(context.Background(), query)
+	events, err := es.Eventstore.FilterEvents(ctx, query)
 	if err != nil {
 		logging.Log("EVENT-ZRffs").WithError(err).Warn("eventstore unavailable")
 		return nil, errors.ThrowInternal(err, "EVENT-sw6Ku", "Errors.Internal")
@@ -559,50 +551,37 @@ func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, id string, 
 	}
 
 	result := make([]*proj_model.ApplicationChange, 0)
+	for _, event := range events {
+		if !strings.Contains(event.Type.String(), "application") || event.Data == nil {
+			continue
+		}
 
-	for _, u := range events {
-		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+		app := new(model.Application)
+		err := json.Unmarshal(event.Data, app)
+		logging.Log("EVENT-GIiKD").OnError(err).Debug("unable to unmarshal data")
+		if app.AppID != appID {
+			continue
+		}
+
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
 		logging.Log("EVENT-MJzeN").OnError(err).Debug("unable to parse timestamp")
-		change := &proj_model.ApplicationChange{
+
+		result = append(result, &proj_model.ApplicationChange{
 			ChangeDate: creationDate,
-			EventType:  u.Type.String(),
-			ModifierId: u.EditorUser,
-			Sequence:   u.Sequence,
-		}
-		appendChanges := true
-
-		if change.EventType == model.ApplicationAdded.String() ||
-			change.EventType == model.ApplicationChanged.String() ||
-			change.EventType == model.OIDCConfigAdded.String() ||
-			change.EventType == model.OIDCConfigChanged.String() {
-			appDummy := model.Application{}
-			if u.Data != nil {
-				if err := json.Unmarshal(u.Data, &appDummy); err != nil {
-					log.Println("Error getting data!", err.Error())
-				}
-			}
-			change.Data = appDummy
-			if appDummy.AppID != secId {
-				appendChanges = false
-			}
-		} else {
-			appendChanges = false
-		}
-
-		if appendChanges {
-			result = append(result, change)
-			if lastSequence < u.Sequence {
-				lastSequence = u.Sequence
-			}
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
+			Data:       app,
+		})
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
 		}
 	}
 
-	changes := &proj_model.ApplicationChanges{
+	return &proj_model.ApplicationChanges{
 		Changes:      result,
 		LastSequence: lastSequence,
-	}
-
-	return changes, nil
+	}, nil
 }
 
 func (es *ProjectEventstore) DeactivateApplication(ctx context.Context, projectID, appID string) (*proj_model.Application, error) {

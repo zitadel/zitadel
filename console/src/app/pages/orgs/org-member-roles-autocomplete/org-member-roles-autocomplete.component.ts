@@ -22,7 +22,7 @@ export class OrgMemberRolesAutocompleteComponent {
         this.orgService.GetOrgMemberRoles().then(resp => {
             this.allRoles = resp.toObject().rolesList;
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
 
         this.myControl.valueChanges.subscribe(change => {
