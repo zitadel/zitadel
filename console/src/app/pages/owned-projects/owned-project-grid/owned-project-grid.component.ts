@@ -38,7 +38,6 @@ export class OwnedProjectGridComponent implements OnChanges {
     @Input() loading: boolean = false;
 
     public selection: SelectionModel<ProjectView.AsObject> = new SelectionModel<ProjectView.AsObject>(true, []);
-    public selectedIndex: number = -1;
 
     public showNewProject: boolean = false;
     public ProjectState: any = ProjectState;
