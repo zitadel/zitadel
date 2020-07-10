@@ -22,9 +22,6 @@ import { ProjectGrantMembersCreateDialogComponent } from './project-grant-member
         MatFormFieldModule,
         SearchUserAutocompleteModule,
     ],
-    entryComponents: [
-        ProjectGrantMembersCreateDialogComponent,
-    ],
 })
 export class ProjectGrantMembersCreateDialogModule { }
 

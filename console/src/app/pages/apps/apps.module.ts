@@ -60,9 +60,6 @@ import { AppsRoutingModule } from './apps-routing.module';
             },
         }),
     ],
-    entryComponents: [
-        AppSecretDialogComponent,
-    ],
     exports: [TranslateModule],
     schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
 })
