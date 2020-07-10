@@ -32,7 +32,6 @@ export class IamMembersDataSource extends DataSource<ProjectMember.AsObject> {
             from(promise).pipe(
                 map(resp => {
                     this.totalResult = resp.toObject().totalResult;
-                    console.log(this.totalResult);
                     return resp.toObject().resultList;
                 }),
                 catchError(() => of([])),

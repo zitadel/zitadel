@@ -50,5 +50,5 @@ type OIDCResponseType int32
 const (
 	OIDCResponseTypeCode OIDCResponseType = iota
 	OIDCResponseTypeIdToken
-	OIDCResponseTypeToken
+	OIDCResponseTypeIdTokenToken
 )

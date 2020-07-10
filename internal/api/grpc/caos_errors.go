@@ -2,35 +2,46 @@ package grpc
 
 import (
 	"context"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/i18n"
+
+	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/pkg/grpc/message"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/i18n"
 )
 
-func CaosToGRPCError(err error, ctx context.Context, translator *i18n.Translator) error {
+func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator) error {
 	if err == nil {
 		return nil
 	}
-	code, msg, id, ok := Extract(err)
+	code, key, id, ok := ExtractCaosError(err)
 	if !ok {
 		return status.Convert(err).Err()
 	}
+	msg := key
 	if translator != nil {
-		msg = translator.LocalizeFromCtx(ctx, msg, nil)
-		msg = msg + "(" + id + ")"
+		msg = translator.LocalizeFromCtx(ctx, key, nil)
 	}
-	return status.Error(code, msg)
+	s, err := status.New(code, key).WithDetails(&message.ErrorDetail{Id: id, Message: msg})
+	if err != nil {
+		logging.Log("GRPC-gIeRw").WithError(err).Debug("unable to add detail")
+		return status.New(code, key).Err()
+	}
+
+	return s.Err()
 }
 
-func Extract(err error) (c codes.Code, msg, id string, ok bool) {
+func ExtractCaosError(err error) (c codes.Code, msg, id string, ok bool) {
 	switch caosErr := err.(type) {
 	case *caos_errs.AlreadyExistsError:
-
 		return codes.AlreadyExists, caosErr.GetMessage(), caosErr.GetID(), true
 	case *caos_errs.DeadlineExceededError:
 		return codes.DeadlineExceeded, caosErr.GetMessage(), caosErr.GetID(), true
-	case caos_errs.InternalError:
+	case *caos_errs.InternalError:
 		return codes.Internal, caosErr.GetMessage(), caosErr.GetID(), true
 	case *caos_errs.InvalidArgumentError:
 		return codes.InvalidArgument, caosErr.GetMessage(), caosErr.GetID(), true

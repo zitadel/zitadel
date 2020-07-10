@@ -47,7 +47,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public oidcResponseTypes: OIDCResponseType[] = [
         OIDCResponseType.OIDCRESPONSETYPE_CODE,
         OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
-        OIDCResponseType.OIDCRESPONSETYPE_TOKEN,
+        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN,
     ];
     public oidcGrantTypes: OIDCGrantType[] = [
         OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
@@ -118,7 +118,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.projectService.GetApplicationById(projectid, id).then(app => {
             this.app = app.toObject();
             this.appNameForm.patchValue(this.app);
-            console.log(this.grpcService.clientid, this.app.oidcConfig?.clientId);
 
             if (this.app.state !== AppState.APPSTATE_ACTIVE) {
                 this.appNameForm.controls['name'].disable();
@@ -138,23 +137,23 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }
         }).catch(error => {
             console.error(error);
-            this.toast.showError(error.message);
+            this.toast.showError(error);
             this.errorMessage = error.message;
         });
     }
 
     public changeState(event: MatButtonToggleChange): void {
         if (event.value === AppState.APPSTATE_ACTIVE) {
-            this.projectService.ReactivateApplication(this.app.id).then(() => {
-                this.toast.showInfo('Reactivated Application');
+            this.projectService.ReactivateApplication(this.projectId, this.app.id).then(() => {
+                this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         } else if (event.value === AppState.APPSTATE_INACTIVE) {
-            this.projectService.DectivateApplication(this.app.id).then(() => {
-                this.toast.showInfo('Deactivated Application');
+            this.projectService.DeactivateApplication(this.projectId, this.app.id).then(() => {
+                this.toast.showInfo('APP.TOAST.REACTIVATED', true);
             }).catch((error: any) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
 
@@ -220,12 +219,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
                 this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
 
-                console.log(this.app.oidcConfig);
-
                 this.projectService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
                     .then((data: OIDCConfig) => {
-                        this.toast.showInfo('OIDC Config saved');
+                        this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
                     .catch(data => {
                         this.toast.showError(data.message);
@@ -235,10 +232,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public regenerateOIDCClientSecret(): void {
-        console.log(this.app.id, this.projectId);
         this.projectService.RegenerateOIDCClientSecret(this.app.id, this.projectId).then((data: OIDCConfig) => {
-            console.log(data.toObject());
-            this.toast.showInfo('OIDC Secret Regenerated');
+            this.toast.showInfo('APP.TOAST.OIDCCLIENTSECRETREGENERATED', true);
             this.dialog.open(AppSecretDialogComponent, {
                 data: {
                     clientId: data.toObject().clientId,
@@ -247,8 +242,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 width: '400px',
             });
 
-        }).catch(data => {
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

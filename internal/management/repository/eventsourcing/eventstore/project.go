@@ -4,23 +4,23 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
-	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
-
-	"github.com/caos/zitadel/internal/api/auth"
-	global_model "github.com/caos/zitadel/internal/model"
-
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/project/repository/view/model"
-
+	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_proj_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/project/repository/view/model"
+	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	usr_grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
 
 type ProjectRepo struct {
@@ -28,15 +28,38 @@ type ProjectRepo struct {
 	SearchLimit     uint64
 	ProjectEvents   *proj_event.ProjectEventstore
 	UserGrantEvents *usr_grant_event.UserGrantEventStore
+	UserEvents      *usr_event.UserEventstore
 	View            *view.View
 	Roles           []string
 }
 
 func (repo *ProjectRepo) ProjectByID(ctx context.Context, id string) (*proj_model.ProjectView, error) {
-	project, err := repo.View.ProjectByID(id)
-	if err != nil {
-		return nil, err
+	project, viewErr := repo.View.ProjectByID(id)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
 	}
+	if caos_errs.IsNotFound(viewErr) {
+		project = new(model.ProjectView)
+	}
+
+	events, esErr := repo.ProjectEvents.ProjectEventsByID(ctx, id, project.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-8yfKu", "Errors.Project.NotFound")
+	}
+
+	if esErr != nil {
+		logging.Log("EVENT-V9x1V").WithError(viewErr).Debug("error retrieving new events")
+		return model.ProjectToModel(project), nil
+	}
+
+	viewProject := *project
+	for _, event := range events {
+		err := project.AppendEvent(event)
+		if err != nil {
+			return model.ProjectToModel(&viewProject), nil
+		}
+	}
+
 	return model.ProjectToModel(project), nil
 }
 
@@ -60,9 +83,9 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 
-	permissions := auth.GetPermissionsFromCtx(ctx)
-	if !auth.HasGlobalPermission(permissions) {
-		ids := auth.GetPermissionCtxIDs(permissions)
+	permissions := authz.GetPermissionsFromCtx(ctx)
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetPermissionCtxIDs(permissions)
 		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
 	}
 
@@ -190,6 +213,13 @@ func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequ
 	if err != nil {
 		return nil, err
 	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
 	return changes, nil
 }
 
@@ -240,6 +270,13 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appI
 	changes, err := repo.ProjectEvents.ApplicationChanges(ctx, id, appId, lastSequence, limit, sortAscending)
 	if err != nil {
 		return nil, err
+	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
 	}
 	return changes, nil
 }

@@ -3,7 +3,7 @@ BASEDIR=$(dirname "$0")
 gopass sync --store zitadel-secrets
 
 # Tracing
-gopass zitadel-secrets/zitadel/developer/default/zitadel-svc-account-eventstore-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
+gopass zitadel-secrets/zitadel/developer/default/zitadel-svc-account-zitadel-local | base64 -D > "$BASEDIR/local_svc-account-tracing.json"
 export GOOGLE_APPLICATION_CREDENTIALS="$BASEDIR/local_svc-account-tracing.json"
 
 export ZITADEL_TRACING_PROJECT_ID=caos-citadel-test
@@ -40,10 +40,10 @@ export SMTP_TLS=TRUE
 export CHAT_URL=$(gopass zitadel-secrets/zitadel/dev/google-chat-url)
 
 #OIDC
-export ZITADEL_ISSUER=http://localhost:50022
-export ZITADEL_ACCOUNTS=http://localhost:50031
-export ZITADEL_AUTHORIZE=http://localhost:50022
-export ZITADEL_OAUTH=http://localhost:50022
+export ZITADEL_ISSUER=http://localhost:50002/oauth/v2
+export ZITADEL_ACCOUNTS=http://localhost:50003/login
+export ZITADEL_AUTHORIZE=http://localhost:50002/oauth/v2
+export ZITADEL_OAUTH=http://localhost:50002/oauth/v2
 export ZITADEL_CONSOLE=http://localhost:4200
 export CAOS_OIDC_DEV=true
 export ZITADEL_COOKIE_DOMAIN=localhost
@@ -55,10 +55,13 @@ export ZITADEL_CSRF_DEV=true
 export ZITADEL_CACHE_MAXAGE=12h
 export ZITADEL_CACHE_SHARED_MAXAGE=168h
 export ZITADEL_SHORT_CACHE_MAXAGE=5m
-export ZITADEL_SHORT_CACHE_SHARED_MAXAGE=15min
+export ZITADEL_SHORT_CACHE_SHARED_MAXAGE=15m
 
 #Console
 export ZITADEL_CONSOLE_ENV_DIR=../../console/src/assets/
 
 #Org
 export ZITADEL_DEFAULT_DOMAIN=zitadel.ch
+
+#Tracing
+export TRACING_TYPE=google

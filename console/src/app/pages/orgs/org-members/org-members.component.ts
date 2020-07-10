@@ -33,7 +33,6 @@ export class OrgMembersComponent implements AfterViewInit {
         private toast: ToastService) {
         this.orgService.GetMyOrg().then(org => {
             this.org = org.toObject();
-            console.log(this.org);
             this.dataSource = new ProjectMembersDataSource(this.orgService);
             this.dataSource.loadMembers(0, 25, 'asc');
         });
@@ -60,7 +59,7 @@ export class OrgMembersComponent implements AfterViewInit {
             return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }));
     }
@@ -69,7 +68,7 @@ export class OrgMembersComponent implements AfterViewInit {
         this.orgService.RemoveMyOrgMember(member.userId).then(() => {
             this.toast.showInfo('Member removed successfully');
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -104,7 +103,7 @@ export class OrgMembersComponent implements AfterViewInit {
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                 }
             }

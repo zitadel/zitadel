@@ -2,12 +2,11 @@ package setup
 
 import (
 	"context"
-	policy_model "github.com/caos/zitadel/internal/policy/model"
-	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/api/auth"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -16,6 +15,8 @@ import (
 	iam_event "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	policy_model "github.com/caos/zitadel/internal/policy/model"
+	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -49,7 +50,7 @@ const (
 	SetupUser                      = "SETUP"
 	OIDCResponseTypeCode           = "CODE"
 	OIDCResponseTypeIDToken        = "ID_TOKEN"
-	OIDCResponseTypeToken          = "TOKEN"
+	OIDCResponseTypeToken          = "ID_TOKEN TOKEN"
 	OIDCGrantTypeAuthorizationCode = "AUTHORIZATION_CODE"
 	OIDCGrantTypeImplicit          = "IMPLICIT"
 	OIDCGrantTypeRefreshToken      = "REFRESH_TOKEN"
@@ -208,7 +209,7 @@ func (setUp *initializer) org(ctx context.Context, org types.Org) (*org_model.Or
 	ctx = setSetUpContextData(ctx, "")
 	createOrg := &org_model.Org{
 		Name:    org.Name,
-		Domains: []*org_model.OrgDomain{&org_model.OrgDomain{Domain: org.Domain}},
+		Domains: []*org_model.OrgDomain{{Domain: org.Domain}},
 	}
 	return setUp.repos.OrgEvents.CreateOrg(ctx, createOrg)
 }
@@ -384,7 +385,7 @@ func getOIDCResponseType(responseType string) proj_model.OIDCResponseType {
 	case OIDCResponseTypeIDToken:
 		return proj_model.OIDCResponseTypeIDToken
 	case OIDCResponseTypeToken:
-		return proj_model.OIDCResponseTypeToken
+		return proj_model.OIDCResponseTypeIDTokenToken
 	}
 	return proj_model.OIDCResponseTypeCode
 }
@@ -434,5 +435,5 @@ func getOIDCAuthMethod(authMethod string) proj_model.OIDCAuthMethodType {
 }
 
 func setSetUpContextData(ctx context.Context, orgID string) context.Context {
-	return auth.SetCtxData(ctx, auth.CtxData{UserID: SetupUser, OrgID: orgID})
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: SetupUser, OrgID: orgID})
 }

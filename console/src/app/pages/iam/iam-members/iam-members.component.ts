@@ -5,7 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { Org, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -17,7 +17,6 @@ import { IamMembersDataSource } from './iam-members-datasource';
     styleUrls: ['./iam-members.component.scss'],
 })
 export class IamMembersComponent implements AfterViewInit {
-    public org!: Org.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
@@ -56,7 +55,7 @@ export class IamMembersComponent implements AfterViewInit {
             return this.adminService.RemoveIamMember(member.userId).then(() => {
                 this.toast.showInfo('Removed successfully');
             }).catch(error => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }));
     }
@@ -65,7 +64,7 @@ export class IamMembersComponent implements AfterViewInit {
         this.adminService.RemoveIamMember(member.userId).then(() => {
             this.toast.showInfo('Member removed successfully');
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -100,7 +99,7 @@ export class IamMembersComponent implements AfterViewInit {
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                 }
             }

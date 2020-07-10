@@ -21,9 +21,8 @@ export class OrgMemberRolesAutocompleteComponent {
     constructor(private orgService: OrgService, private toast: ToastService) {
         this.orgService.GetOrgMemberRoles().then(resp => {
             this.allRoles = resp.toObject().rolesList;
-            console.log(this.allRoles);
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
 
         this.myControl.valueChanges.subscribe(change => {

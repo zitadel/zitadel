@@ -3,6 +3,7 @@ package i18n
 import (
 	"context"
 	"encoding/json"
+	"github.com/BurntSushi/toml"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"io/ioutil"
 	"net/http"
@@ -48,6 +49,7 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 	bundle := i18n.NewBundle(defaultLanguage)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
+	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	i18nDir, err := dir.Open(i18nPath)
 	if err != nil {
 		return nil, errors.ThrowNotFound(err, "I18N-MnXRie", "path not found")
@@ -80,35 +82,15 @@ func addFileToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo)
 }
 
 func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[string]interface{}) string {
-	s, err := t.localizerFromRequest(r).Localize(&i18n.LocalizeConfig{
-		MessageID:    id,
-		TemplateData: args,
-	})
-	if err != nil {
-		logging.Log("I18N-MsF5sx").WithError(err).Warnf("missing translation")
-		return id
-	}
-	return s
+	return localize(t.localizerFromRequest(r), id, args)
 }
 
 func (t *Translator) LocalizeFromCtx(ctx context.Context, id string, args map[string]interface{}) string {
-	s, err := t.localizerFromCtx(ctx).Localize(&i18n.LocalizeConfig{
-		MessageID:    id,
-		TemplateData: args,
-	})
-	if err != nil {
-		logging.Log("I18N-MsF5sx").WithError(err).Warnf("missing translation")
-		return id
-	}
-	return s
+	return localize(t.localizerFromCtx(ctx), id, args)
 }
 
 func (t *Translator) Localize(id string, args map[string]interface{}, langs ...string) string {
-	s, _ := t.localizer(langs...).Localize(&i18n.LocalizeConfig{
-		MessageID:    id,
-		TemplateData: args,
-	})
-	return s
+	return localize(t.localizer(langs...), id, args)
 }
 
 func (t *Translator) Lang(r *http.Request) language.Tag {
@@ -155,4 +137,16 @@ func (t *Translator) langsFromCtx(ctx context.Context) []string {
 
 func getAcceptLanguageHeader(ctx context.Context) string {
 	return metautils.ExtractIncoming(ctx).Get("grpcgateway-accept-language")
+}
+
+func localize(localizer *i18n.Localizer, id string, args map[string]interface{}) string {
+	s, err := localizer.Localize(&i18n.LocalizeConfig{
+		MessageID:    id,
+		TemplateData: args,
+	})
+	if err != nil {
+		logging.Log("I18N-MsF5sx").WithError(err).Warnf("missing translation")
+		return id
+	}
+	return s
 }

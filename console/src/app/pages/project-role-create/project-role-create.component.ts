@@ -59,9 +59,9 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
 
     public addEntry(): void {
         const newGroup = new FormGroup({
-            key: new FormControl(''),
+            key: new FormControl('', [Validators.required]),
             displayName: new FormControl(''),
-            group: new FormControl('', [Validators.required]),
+            group: new FormControl(''),
         });
 
         this.formArray.push(newGroup);
@@ -84,17 +84,18 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     }
 
     public addRole(): void {
-        const promises = this.formArray.value.map((role: ProjectRoleAdd.AsObject) => {
-            role.id = this.projectId;
-            console.log(role);
-            return this.projectService.AddProjectRole(role);
+        const rolesToAdd: ProjectRoleAdd[] = this.formArray.value.map((element: any) => {
+            const role = new ProjectRoleAdd();
+            role.setKey(element.key);
+            role.setDisplayName(element.displayName);
+            role.setGroup(element.group);
+            return role;
         });
 
-        Promise.all(promises).then(() => {
+        this.projectService.BulkAddProjectRole(this.projectId, rolesToAdd).then(() => {
             this.router.navigate(['projects', this.projectId]);
-        }).catch(data => {
-            console.log(data);
-            this.toast.showError(data.message);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

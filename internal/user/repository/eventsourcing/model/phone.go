@@ -81,6 +81,11 @@ func (u *User) appendUserPhoneVerifiedEvent() {
 	u.IsPhoneVerified = true
 }
 
+func (u *User) appendUserPhoneRemovedEvent() {
+	u.Phone = nil
+	u.PhoneCode = nil
+}
+
 func (p *Phone) setData(event *es_models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, p); err != nil {

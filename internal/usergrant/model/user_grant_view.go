@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/model"
 	"time"
+
+	"github.com/caos/zitadel/internal/model"
 )
 
 type UserGrantView struct {
@@ -10,9 +11,11 @@ type UserGrantView struct {
 	ResourceOwner string
 	UserID        string
 	ProjectID     string
+	GrantID       string
 	UserName      string
 	FirstName     string
 	LastName      string
+	DisplayName   string
 	Email         string
 	ProjectName   string
 	OrgName       string
@@ -68,4 +71,8 @@ func (r *UserGrantSearchRequest) EnsureLimit(limit uint64) {
 
 func (r *UserGrantSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
+}
+
+func (r *UserGrantSearchRequest) AppendProjectIDQuery(projectID string) {
+	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyProjectID, Method: model.SearchMethodEquals, Value: projectID})
 }

@@ -33,25 +33,25 @@ export class MemberCreateDialogComponent {
         this.creationType = data.creationType;
         this.projectId = data.projectId;
 
+        console.log(this.creationType);
+
         if (this.creationType === CreationType.PROJECT_GRANTED) {
             this.projectService.GetProjectGrantMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
             }).catch(error => {
-                toastService.showError(error.message);
+                toastService.showError(error);
             });
         } else if (this.creationType === CreationType.PROJECT_OWNED) {
             this.projectService.GetProjectMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
-                console.log(this.memberRoleOptions);
             }).catch(error => {
-                toastService.showError(error.message);
+                toastService.showError(error);
             });
         } else if (this.creationType === CreationType.IAM) {
             this.adminService.GetIamMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;
-                console.log(this.memberRoleOptions);
             }).catch(error => {
-                toastService.showError(error.message);
+                toastService.showError(error);
             });
         }
     }

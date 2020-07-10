@@ -2,12 +2,13 @@ package handler
 
 import (
 	"context"
+	"time"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -66,6 +67,7 @@ func (p *User) ProcessUser(event *models.Event) (err error) {
 		es_model.UserEmailVerified,
 		es_model.UserPhoneChanged,
 		es_model.UserPhoneVerified,
+		es_model.UserPhoneRemoved,
 		es_model.UserAddressChanged,
 		es_model.UserDeactivated,
 		es_model.UserReactivated,
@@ -103,10 +105,6 @@ func (u *User) ProcessOrg(event *models.Event) (err error) {
 	default:
 		return u.view.ProcessedUserSequence(event.Sequence)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {

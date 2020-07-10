@@ -53,7 +53,6 @@ export class IamContributorsComponent implements OnInit {
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(members => {
-            console.log(members);
             this.membersSubject.next(members);
         });
     }
@@ -77,7 +76,7 @@ export class IamContributorsComponent implements OnInit {
                     })).then(() => {
                         this.toast.showError('members added');
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                 }
             }

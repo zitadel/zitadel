@@ -2,13 +2,15 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+	"testing"
+
+	"github.com/golang/mock/gomock"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	"github.com/golang/mock/gomock"
-	"testing"
 )
 
 func TestIamByID(t *testing.T) {
@@ -91,7 +93,7 @@ func TestSetUpStarted(t *testing.T) {
 			name: "setup started iam, ok",
 			args: args{
 				es:    GetMockManipulateIamNotExisting(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
 			res: res{
@@ -102,7 +104,7 @@ func TestSetUpStarted(t *testing.T) {
 			name: "setup already started",
 			args: args{
 				es:    GetMockManipulateIam(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
 			res: res{
@@ -113,7 +115,7 @@ func TestSetUpStarted(t *testing.T) {
 			name: "setup iam no id",
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -157,7 +159,7 @@ func TestSetUpDone(t *testing.T) {
 			name: "setup done iam, ok",
 			args: args{
 				es:    GetMockManipulateIam(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
 			res: res{
@@ -168,7 +170,7 @@ func TestSetUpDone(t *testing.T) {
 			name: "setup iam no id",
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 			},
 			res: res{
 				errFunc: caos_errs.IsPreconditionFailed,
@@ -178,7 +180,7 @@ func TestSetUpDone(t *testing.T) {
 			name: "iam not found",
 			args: args{
 				es:    GetMockManipulateIamNotExisting(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
 			res: res{
@@ -224,7 +226,7 @@ func TestSetGlobalOrg(t *testing.T) {
 			name: "global org set, ok",
 			args: args{
 				es:        GetMockManipulateIam(ctrl),
-				ctx:       auth.NewMockContext("orgID", "userID"),
+				ctx:       authz.NewMockContext("orgID", "userID"),
 				iamID:     "iamID",
 				globalOrg: "globalOrg",
 			},
@@ -236,7 +238,7 @@ func TestSetGlobalOrg(t *testing.T) {
 			name: "no iam id",
 			args: args{
 				es:        GetMockManipulateIam(ctrl),
-				ctx:       auth.NewMockContext("orgID", "userID"),
+				ctx:       authz.NewMockContext("orgID", "userID"),
 				globalOrg: "",
 			},
 			res: res{
@@ -247,7 +249,7 @@ func TestSetGlobalOrg(t *testing.T) {
 			name: "no global org",
 			args: args{
 				es:    GetMockManipulateIam(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
 			res: res{
@@ -258,7 +260,7 @@ func TestSetGlobalOrg(t *testing.T) {
 			name: "iam not found",
 			args: args{
 				es:        GetMockManipulateIamNotExisting(ctrl),
-				ctx:       auth.NewMockContext("orgID", "userID"),
+				ctx:       authz.NewMockContext("orgID", "userID"),
 				iamID:     "iamID",
 				globalOrg: "globalOrg",
 			},
@@ -305,7 +307,7 @@ func TestSetIamProjectID(t *testing.T) {
 			name: "iam project set, ok",
 			args: args{
 				es:           GetMockManipulateIam(ctrl),
-				ctx:          auth.NewMockContext("orgID", "userID"),
+				ctx:          authz.NewMockContext("orgID", "userID"),
 				iamID:        "iamID",
 				iamProjectID: "iamProjectID",
 			},
@@ -317,7 +319,7 @@ func TestSetIamProjectID(t *testing.T) {
 			name: "no iam id",
 			args: args{
 				es:           GetMockManipulateIam(ctrl),
-				ctx:          auth.NewMockContext("orgID", "userID"),
+				ctx:          authz.NewMockContext("orgID", "userID"),
 				iamProjectID: "",
 			},
 			res: res{
@@ -328,7 +330,7 @@ func TestSetIamProjectID(t *testing.T) {
 			name: "no global org",
 			args: args{
 				es:    GetMockManipulateIam(ctrl),
-				ctx:   auth.NewMockContext("orgID", "userID"),
+				ctx:   authz.NewMockContext("orgID", "userID"),
 				iamID: "iamID",
 			},
 			res: res{
@@ -339,7 +341,7 @@ func TestSetIamProjectID(t *testing.T) {
 			name: "iam not found",
 			args: args{
 				es:           GetMockManipulateIamNotExisting(ctrl),
-				ctx:          auth.NewMockContext("orgID", "userID"),
+				ctx:          authz.NewMockContext("orgID", "userID"),
 				iamID:        "iamID",
 				iamProjectID: "iamProjectID",
 			},
@@ -385,7 +387,7 @@ func TestAddIamMember(t *testing.T) {
 			name: "add iam member, ok",
 			args: args{
 				es:     GetMockManipulateIam(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -396,7 +398,7 @@ func TestAddIamMember(t *testing.T) {
 			name: "no userid",
 			args: args{
 				es:     GetMockManipulateIam(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -407,7 +409,7 @@ func TestAddIamMember(t *testing.T) {
 			name: "no roles",
 			args: args{
 				es:     GetMockManipulateIam(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
@@ -418,7 +420,7 @@ func TestAddIamMember(t *testing.T) {
 			name: "member already existing",
 			args: args{
 				es:     GetMockManipulateIamWithMember(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -429,7 +431,7 @@ func TestAddIamMember(t *testing.T) {
 			name: "existing iam not found",
 			args: args{
 				es:     GetMockManipulateIamNotExisting(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -477,7 +479,7 @@ func TestChangeIamMember(t *testing.T) {
 			name: "add iam member, ok",
 			args: args{
 				es:     GetMockManipulateIamWithMember(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -488,7 +490,7 @@ func TestChangeIamMember(t *testing.T) {
 			name: "no userid",
 			args: args{
 				es:     GetMockManipulateIam(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -499,7 +501,7 @@ func TestChangeIamMember(t *testing.T) {
 			name: "no roles",
 			args: args{
 				es:     GetMockManipulateIam(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
 			res: res{
@@ -510,7 +512,7 @@ func TestChangeIamMember(t *testing.T) {
 			name: "member not existing",
 			args: args{
 				es:     GetMockManipulateIam(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"Roles"}},
 			},
 			res: res{
@@ -521,7 +523,7 @@ func TestChangeIamMember(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:     GetMockManipulateIamNotExisting(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{
@@ -570,10 +572,10 @@ func TestRemoveIamMember(t *testing.T) {
 			name: "remove iam member, ok",
 			args: args{
 				es:  GetMockManipulateIamWithMember(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Iam{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					Members:    []*model.IamMember{&model.IamMember{UserID: "UserID", Roles: []string{"Roles"}}},
+					Members:    []*model.IamMember{{UserID: "UserID", Roles: []string{"Roles"}}},
 				},
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID"},
 			},
@@ -585,10 +587,10 @@ func TestRemoveIamMember(t *testing.T) {
 			name: "no userid",
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Iam{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					Members:    []*model.IamMember{&model.IamMember{UserID: "UserID", Roles: []string{"Roles"}}},
+					Members:    []*model.IamMember{{UserID: "UserID", Roles: []string{"Roles"}}},
 				},
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Roles: []string{"ChangeRoles"}},
 			},
@@ -600,7 +602,7 @@ func TestRemoveIamMember(t *testing.T) {
 			name: "member not existing",
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
-				ctx: auth.NewMockContext("orgID", "userID"),
+				ctx: authz.NewMockContext("orgID", "userID"),
 				existing: &model.Iam{
 					ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 				},
@@ -614,7 +616,7 @@ func TestRemoveIamMember(t *testing.T) {
 			name: "existing not found",
 			args: args{
 				es:     GetMockManipulateIamNotExisting(ctrl),
-				ctx:    auth.NewMockContext("orgID", "userID"),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				member: &iam_model.IamMember{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, UserID: "UserID", Roles: []string{"ChangeRoles"}},
 			},
 			res: res{

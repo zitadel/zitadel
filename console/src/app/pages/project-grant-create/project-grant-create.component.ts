@@ -35,7 +35,6 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.routeSubscription = this.route.params.subscribe(params => {
             this.projectId = params.projectid;
-            console.log(params);
         });
     }
 
@@ -43,9 +42,8 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
         this.routeSubscription.unsubscribe();
     }
 
-    public searchOrg(domain: any): void {
-        this.orgService.getOrgByDomainGlobal(domain.value).then((ret) => {
-            console.log(ret.toObject());
+    public searchOrg(domain: string): void {
+        this.orgService.getOrgByDomainGlobal(domain).then((ret) => {
             const tmp = ret.toObject();
             this.authService.GetActiveOrg().then((org) => {
                 if (tmp !== org) {
@@ -54,7 +52,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
             });
             this.org = ret.toObject();
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -66,12 +64,10 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
         this.projectService
             .CreateProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
             .then((data) => {
-                console.log(data);
                 this.close();
             })
             .catch(error => {
-                this.toast.showError(error.message);
-                console.log(error);
+                this.toast.showError(error);
             });
     }
 

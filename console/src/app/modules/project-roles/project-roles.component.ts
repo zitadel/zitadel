@@ -1,5 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
@@ -7,6 +8,7 @@ import { ProjectRole } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
 import { ProjectRolesDataSource } from './project-roles-datasource';
 
 
@@ -28,7 +30,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService) { }
+    constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
         this.dataSource = new ProjectRolesDataSource(this.projectService);
@@ -82,7 +84,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         return Promise.all(this.selection.selected.map(role => {
             return this.projectService.RemoveProjectRole(role.projectId, role.key);
         })).then(() => {
-            this.toast.showInfo('Deleted');
+            this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
             indexes.forEach(index => {
                 if (index > -1) {
                     oldState.splice(index, 1);
@@ -99,12 +101,22 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         this.projectService
             .RemoveProjectRole(role.projectId, role.key)
             .then(() => {
-                this.toast.showInfo('Role removed');
+                this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
                 this.dataSource.rolesSubject.value.splice(index, 1);
                 this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
             })
             .catch(data => {
                 this.toast.showError(data.message);
             });
+    }
+
+    public openDetailDialog(role: ProjectRole.AsObject): void {
+        this.dialog.open(ProjectRoleDetailComponent, {
+            data: {
+                role,
+                projectId: this.projectId,
+            },
+            width: '400px',
+        });
     }
 }

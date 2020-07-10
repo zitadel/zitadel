@@ -2,10 +2,11 @@ package repository
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
+
+	"github.com/caos/zitadel/internal/api/authz"
 )
 
 type UserGrantRepository interface {
-	ResolveGrants(ctx context.Context) (*auth.Grant, error)
+	ResolveGrants(ctx context.Context) (*authz.Grant, error)
 	SearchMyZitadelPermissions(ctx context.Context) ([]string, error)
 }

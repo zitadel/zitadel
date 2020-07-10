@@ -6,6 +6,7 @@ import { ManagementServicePromiseClient } from '../proto/generated/management_gr
 import {
     AddOrgDomainRequest,
     AddOrgMemberRequest,
+    Domain,
     Iam,
     Org,
     OrgDomain,
@@ -123,7 +124,7 @@ export class OrgService {
     }
 
     public async getOrgByDomainGlobal(domain: string): Promise<Org> {
-        const req = new OrgDomain();
+        const req = new Domain();
         req.setDomain(domain);
         return await this.request(
             c => c.getOrgByDomainGlobal,

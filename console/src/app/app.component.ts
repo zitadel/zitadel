@@ -10,7 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { Org, UserProfile } from './proto/generated/auth_pb';
+import { Org, UserProfileView } from './proto/generated/auth_pb';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
 import { ThemeService } from './services/theme.service';
@@ -128,7 +128,7 @@ export class AppComponent implements OnDestroy {
     public showAccount: boolean = false;
     public org!: Org.AsObject;
     public orgs: Org.AsObject[] = [];
-    public profile!: UserProfile.AsObject;
+    public profile!: UserProfileView.AsObject;
     public isDarkTheme: Observable<boolean> = of(true);
 
     public orgLoading: boolean = false;
@@ -248,7 +248,7 @@ export class AppComponent implements OnDestroy {
             this.orgs = res.toObject().resultList;
             this.orgLoading = false;
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
             this.orgLoading = false;
         });
     }
@@ -274,7 +274,6 @@ export class AppComponent implements OnDestroy {
         this.translate.setDefaultLang('en');
 
         this.authService.user.subscribe(userprofile => {
-            console.log(userprofile);
             this.profile = userprofile;
             const lang = userprofile.preferredLanguage.match(/en|de/) ? userprofile.preferredLanguage : 'en';
             this.translate.use(lang);

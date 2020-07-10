@@ -3,23 +3,26 @@
   align-items: center;
   border-bottom: 1px solid #ffffff20;
   flex-wrap: wrap;
+  padding-bottom: .5rem;
 
   a {
       display: block;
+      margin-right: 2rem;
   }
 
   h1 {
-      font-size: 1.2rem;
-      margin: 0 1rem;
-      margin-left: 2rem;
+      font-size: 2rem;
+      margin: 0;
       font-weight: normal;
+      margin-right: 1rem;
   }
 
-  .desc {
-      width: 100%;
-      display: block;
-      font-size: .9rem;
-      color: #81868a;
+  .fill-space {
+      flex: 1;
+  }
+
+  .state-button {
+      border-radius: .5rem;
   }
 }
 
@@ -74,21 +77,24 @@
         flex-wrap: wrap;
     
         .label, .name {
-          margin-right: 1rem;
+            margin-right: 1rem;
         }
     
         .actions {
             flex: 1;
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            .notify-change-pwd {
+                border-radius: .5rem;
+            }
         }
     
         .label {
-        flex: 1;
-          font-size: .9rem;
-          color: #818a8a;
-          text-transform: uppercase;
+            flex: 1;
+            font-size: .9rem;
+            color: #818a8a;
         }
     
         mat-icon {
@@ -102,7 +108,7 @@
         .verify {
           text-decoration: none;
           font-size: .8rem;
-          color: #81868a;
+          color: #8795a1;
           border-radius: .5rem;
           cursor: pointer;
           word-wrap: none;
@@ -122,10 +128,6 @@
 }
 
 .side {
-    // height: calc(100vh - 60px - 2rem);
-    // display: flex;
-    // flex-direction: column;
-
     .details {
         margin-bottom: 1rem;
         border-bottom: 1px solid #81868a40;
@@ -179,7 +181,7 @@
         }
 
         .side-section {
-            color: #81868a;
+            color: #8795a1;
         }
     }  
 
@@ -234,7 +236,7 @@
         }
 
         .side-section {
-            color: #81868a;
+            color: #8795a1;
         }
     }    
 

@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 	"encoding/json"
-	"log"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
@@ -291,38 +290,35 @@ func (es *UserEventstore) UserChanges(ctx context.Context, id string, lastSequen
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-6cAxe", "Errors.User.NoChanges")
 	}
 
-	result := make([]*usr_model.UserChange, 0)
+	result := make([]*usr_model.UserChange, len(events))
 
-	for _, u := range events {
-		creationDate, err := ptypes.TimestampProto(u.CreationDate)
+	for i, event := range events {
+		creationDate, err := ptypes.TimestampProto(event.CreationDate)
 		logging.Log("EVENT-8GTGS").OnError(err).Debug("unable to parse timestamp")
 		change := &usr_model.UserChange{
 			ChangeDate: creationDate,
-			EventType:  u.Type.String(),
-			Modifier:   u.EditorUser,
-			Sequence:   u.Sequence,
+			EventType:  event.Type.String(),
+			ModifierId: event.EditorUser,
+			Sequence:   event.Sequence,
 		}
 
-		userDummy := model.Profile{}
-		if u.Data != nil {
-			if err := json.Unmarshal(u.Data, &userDummy); err != nil {
-				log.Println("Error getting data!", err.Error())
-			}
+		if event.Data != nil {
+			user := new(model.Profile)
+			err := json.Unmarshal(event.Data, user)
+			logging.Log("EVENT-Rkg7X").OnError(err).Debug("unable to unmarshal data")
+			change.Data = user
 		}
-		change.Data = userDummy
 
-		result = append(result, change)
-		if lastSequence < u.Sequence {
-			lastSequence = u.Sequence
+		result[i] = change
+		if lastSequence < event.Sequence {
+			lastSequence = event.Sequence
 		}
 	}
 
-	changes := &usr_model.UserChanges{
+	return &usr_model.UserChanges{
 		Changes:      result,
 		LastSequence: lastSequence,
-	}
-
-	return changes, nil
+	}, nil
 }
 
 func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending bool) *es_models.SearchQuery {
@@ -895,6 +891,22 @@ func (es *UserEventstore) PhoneVerificationCodeSent(ctx context.Context, userID 
 	return nil
 }
 
+func (es *UserEventstore) RemovePhone(ctx context.Context, userID string) error {
+	existing, err := es.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	repoExisting := model.UserFromModel(existing)
+	removeAggregate := PhoneRemovedAggregate(es.AggregateCreator(), repoExisting)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoExisting.AppendEvents, removeAggregate)
+	if err != nil {
+		return err
+	}
+
+	es.userCache.cacheUser(repoExisting)
+	return nil
+}
+
 func (es *UserEventstore) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-di8ws", "Errors.User.UserIDMissing")
@@ -936,7 +948,11 @@ func (es *UserEventstore) AddOTP(ctx context.Context, userID string) (*usr_model
 	if existing.IsOTPReady() {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "EVENT-do9se", "Errors.User.Mfa.Otp.AlreadyReady")
 	}
-	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: userID})
+	accountName := existing.UserName
+	if existing.Email != nil {
+		accountName = existing.EmailAddress
+	}
+	key, err := totp.Generate(totp.GenerateOpts{Issuer: es.Multifactors.OTP.Issuer, AccountName: accountName})
 	if err != nil {
 		return nil, err
 	}
@@ -1045,17 +1061,24 @@ func (es *UserEventstore) verifyMfaOTP(otp *usr_model.OTP, code string) error {
 	return nil
 }
 
-func (es *UserEventstore) SignOut(ctx context.Context, agentID, userID string) error {
-	user, err := es.UserByID(ctx, userID)
-	if err != nil {
-		return err
-	}
-	repoUser := model.UserFromModel(user)
-	err = es_sdk.Push(ctx, es.PushAggregates, repoUser.AppendEvents, SignOutAggregate(es.AggregateCreator(), repoUser, agentID))
-	if err != nil {
-		return err
+func (es *UserEventstore) SignOut(ctx context.Context, agentID string, userIDs []string) error {
+	users := make([]*model.User, len(userIDs))
+	for i, id := range userIDs {
+		user, err := es.UserByID(ctx, id)
+		if err != nil {
+			return err
+		}
+		users[i] = model.UserFromModel(user)
 	}
 
-	es.userCache.cacheUser(repoUser)
+	aggFunc := SignOutAggregates(es.AggregateCreator(), users, agentID)
+	aggregates, err := aggFunc(ctx)
+	if err != nil {
+		return err
+	}
+	err = es_sdk.PushAggregates(ctx, es.PushAggregates, nil, aggregates...)
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -1,140 +1,149 @@
 {
-    "APP_NAME": "zitadel",
+    "APP_NAME": "ZITADEL",
     "HOME": {
-        "TITLE": "zitadel",
-        "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
+        "TITLE": "ZITADEL",
         "SECURITYANDPRIVACY": "Data protection and personalization",
-        "SECURITYANDPRIVACY_DESC": "You can view the data in your Caos account and choose which activities are saved in order to personalize Caos for you",
-        "SECURITYANDPRIVACY_BUTTON": "Personalize data",
-        "PROTECTION": "Organizational Policies",
-        "PROTECTION_DESC": "Manage your organizational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
+        "SECURITYANDPRIVACY_DESC": "Manage your Information and Security settings",
+        "SECURITYANDPRIVACY_BUTTON": "Personalize Information and Security",
+        "PROTECTION": "Organisational Policies",
+        "PROTECTION_DESC": "Manage your organisational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
         "PROTECTION_BUTTON": "Explore",
-        "PROJECTS": "Full scalability and adaptability",
-        "PROJECTS_DESC": "Authorize others to use your own projects or define custom roles on eligible projects",
+        "PROJECTS": "Create and Manage your Applications with Projects",
+        "PROJECTS_DESC": "Authorize others to use your projects or define custom roles on eligible projects.",
         "PROJECTS_BUTTON": "Project Overview",
-        "USERS": "Total control and monitorability",
+        "USERS": "Create and manage your users.",
         "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
         "USERS_BUTTON": "Show users",
         "IAM": "Identity and Access Management",
-        "IAM_DESC": "Add new organizations or elect managers to do it for you.",
-        "IAM_BUTTON": "Manage Zitadel"
+        "IAM_DESC": "Manage your organisations and administrators.",
+        "IAM_BUTTON": "Manage ZITADEL"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
-        "IAM":"IAM",
-        "ORGANIZATION": "Organization",
+        "IAM":"Administration",
+        "ORGANIZATION": "Organisation",
+        "PROJECTSSECTION":"projects section",
         "PROJECT": "Projects",
+        "GRANTEDPROJECT":"Granted Projects",
+        "USERSECTION":"user section",
         "USER": "Users",
-        "LOGOUT": "Log out",
-        "NEWORG":"New Organization"
+        "LOGOUT": "Logout all users",
+        "NEWORG":"New Organisation",
+        "IAMADMIN":"You are an IAM Administrator. Note that you have extended permissions!",
+        "SHOWORGS":"Show all organisations"
     },
     "ACTIONS": {
         "SAVE": "Save",
         "NEW": "New",
+        "ADD":"Add",
         "CREATE": "Create",
         "CONTINUE": "Continue",
-        "BACK": "back",
+        "BACK": "Back",
         "CLOSE": "Close",
+        "CANCEL":"Cancel",
         "INFO": "Info",
         "OK": "OK",
         "VIEW": "Show",
         "DELETE": "Delete",
-        "REMOVE":"remove",
+        "REMOVE":"Remove",
         "VERIFY":"Verify",
-        "FINISH":"Finish"
+        "FINISH":"Finish",
+        "CHANGE":"Change"
     },
     "ERRORS": {
-        "REQUIRED": "The field is necessary"
+        "REQUIRED": "Some required fields are missing!"
     },
     "USER": {
         "TITLE": "Personal Information",
-        "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
+        "DESCRIPTION": "Manage your Information and Security settings.",
         "PAGES": {
             "LIST": "Users",
             "TITLE": "User",
-            "DESCRIPTION": "Here you can create new users or edit data that has already been entered.",
+            "DESCRIPTION": "Create new user in your organisation and manage existing ones.",
             "DETAIL": "Detail",
             "CREATE": "Create",
             "MY": "My Informations",
             "LOGINNAMES":"Loginnames",
-            "LOGINNAMESDESC":"You can log into zitadel with these names",
+            "LOGINNAMESDESC":"These are your Login Names.",
             "COPY":"Copy to clipboard",
             "COPIED":"Copied to clipboard!",
-            "NOUSER":"No User"
+            "NOUSER":"No User",
+            "REACTIVATE":"Reactivate",
+            "DEACTIVATE":"Deactivate"
         },
         "MFA": {
             "TITLE": "Multifactor Authentication",
-            "DESCRIPTION": "Add a second factor to ensure optimal security!",
-            "MANAGE_DESCRIPTION": "Manage the second factor methods of the selected user!",
+            "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
+            "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
             "OTP": "Configure OTP",
             "OTP_DIALOG_TITLE": "Add OTP",
-            "OTP_DIALOG_DESCRIPTION": "Scan the OTP code with an authenticator app and enter the code below!",
+            "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate OTP.",
             "TYPE": {
-                "0":"No mfa defined",
-                "1":"SMS",
-                "2":"OTP"
+                "0": "No MFA defined",
+                "1": "SMS",
+                "2": "OTP"
             },
             "STATE": {
                 "0": "No State",
-                "1":"Not Ready",
-                "2":"Ready",
-                "3":"Deleted"
+                "1": "Not Ready",
+                "2": "Ready",
+                "3": "Deleted"
             }
         },
         "CREATE": {
-            "TITLE": "Create User",
-            "DESCRIPTION": "Insert some information about the user below and submit!",
+            "TITLE": "Create a new User",
+            "DESCRIPTION": "Please provide the necesary information.",
             "NAMEANDEMAILSECTION":"Name and Email",
             "GENDERLANGSECTION":"Gender and Language",
-            "ADDRESSANDPHONESECTION":"Address and reachability",
-            "PASSWORDSECTION":"Vordefiniertes Passwort setzen"
+            "PHONESECTION":"Phonenumbers",
+            "PASSWORDSECTION":"Set the initial Password."
         },
         "CODEDIALOG": {
-            "TITLE":"Verify number",
-            "DESCRIPTION":"Enter your code here!",
+            "TITLE":"Verify Phone Number",
+            "DESCRIPTION":"Enter the code you recieved by message to verify your phone.",
             "CODE":"Code"
         },
         "DATA": {
             "STATE": "Status",
-            "STATE0": "unknown",
-            "STATE1": "active",
-            "STATE2": "inactive",
-            "STATE3": "deleted",
-            "STATE4": "locked",
-            "STATE5": "supend",
-            "STATE6": "initial"
+            "STATE0": "Unknown",
+            "STATE1": "Active",
+            "STATE2": "Inactive",
+            "STATE3": "Deleted",
+            "STATE4": "Locked",
+            "STATE5": "Supend",
+            "STATE6": "Initial"
         },
         "PROFILE": {
             "TITLE": "Profile",
             "EMAIL": "Email",
             "PHONE": "Phonenumber",
-            "DESCRIPTION": "Here you can manage your data as well as data protection and security settings in order to optimally adapt Caos to your needs",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
             "NICKNAME": "Nickname",
             "DISPLAYNAME": "Displayname",
             "PREFERRED_LANGUAGE": "Language",
-            "GENDER": "Gender"
+            "GENDER": "Gender",
+            "PASSWORD":"Password"
         },
         "PASSWORD": {
             "TITLE": "Password",
-            "DESCRIPTION": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
+            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
             "OLD": "Current Password",
             "NEW": "New Password",
-            "CONFIRM": "Password Confirmation",
-            "RESET": "Reset",
-            "SET":"Set Password",
-            "RESENDNOTIFICATION": "Notify Change",
-            "REQUIRED": "The field is empty",
+            "CONFIRM": "Confirm new Password",
+            "RESET": "Reset current Password",
+            "SET":"Set new Password",
+            "RESENDNOTIFICATION": "Resend Password Reset Link",
+            "REQUIRED": "Some required fields are missing!",
             "MINLENGTHERROR":"Password has to be at least {{value}} characters long",
-            "NOTEQUAL":"The password is not equal!"
+            "NOTEQUAL":"The password provided is not equal!"
         },
         "EMAIL": "Email",
         "PHONE": "Phonenumber",
         "LOGINMETHODS": {
-            "TITLE": "Methods to check your identity",
-            "DESCRIPTION": "This allows us to confirm your identity when you register or to contact you if suspicious activity is detected in your account",
+            "TITLE": "Contact Information",
+            "DESCRIPTION": "The provided information is used to send important information, like password reset Emails to you.",
             "EMAIL": {
                 "TITLE": "Email",
                 "VALID": "validated",
@@ -145,94 +154,117 @@
                 "VALID": "validated",
                 "RESEND": "Resend verification message"
             },
-            "RESENDCODE": "Code senden",
+            "RESENDCODE": "Resend Code",
             "ENTERCODE":"Verify",
-            "ENTERCODE_DESC":"Verify number"
-        },
-        "ADDRESS": {
-            "TITLE": "Address",
-            "STREET": "Street/No",
-            "LOCALITY": "Place",
-            "POSTAL_CODE": "Postal Code",
-            "REGION": "Region",
-            "COUNTRY": "Country"
+            "ENTERCODE_DESC":"Verify Code"
         },
         "GRANTS": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Define the operations and rights that are made available to the user",
+            "TITLE": "User Grants",
+            "DESCRIPTION": "Give this user control of certain projects",
             "CREATE": {
                 "TITLE": "Create User Grant",
-                "DESCRIPTION": "Search for the organization, the project and the corresponding project roles!"
+                "DESCRIPTION": "Search for the organisation, the project and the corresponding project roles!"
             }
         },
         "VALIDATION": {
-            "INVALIDPATTERN": "The password must consist of at least 8 characters and contain a capital letter, a special character and a number. The maximum length is 72.",
+            "INVALIDPATTERN": "## TODO - Replace with Password Policy text - TODO ##",
             "REQUIRED": "The input field is empty",
             "MINLENGTH":"The password has to be at least {{requiredLength}} characters long!",
-            "NOEMAIL":"Username can not be an email",
-            "UPPERCASEMISSING":"An uppercase character is needed!",
-            "LOWERCASEMISSING":"A lowercase character is needed!",
+            "NOEMAIL":"Username can not be an email address!",
+            "UPPERCASEMISSING":"The password must include a uppercase character!",
+            "LOWERCASEMISSING":"The password must include a lowercase character!",
             "SYMBOLERROR":"The password must include a symbol!",
             "NUMBERERROR":"The password must include a number!"
         },
         "STATE": {
-            "0":"unbekannt",
-            "1":"aktiv",
-            "2":"abgelaufen"
+            "0":"Unknown",
+            "1":"Active",
+            "2":"Expired"
         },
         "SEARCH":{
-            "FOUND":"found"
+            "FOUND":"Found"
         },
         "TARGET": {
-            "SELF":"You will get users of your organization. If you want to add an external user",
-            "EXTERNAL":"To get users of your organization",
+            "SELF":"If you want to grant a user of an other organisation",
+            "EXTERNAL":"To grant a user of your organisation",
             "CLICKHERE":"Click here"
         },
         "SIGNEDOUT":"You are signed out. Click the button below to sign in again!",
         "SIGNEDOUT_BTN":"Sign In",
         "EDITACCOUNT":"Edit Account",
-        "ADDACCOUNT":"log in with another account"
+        "ADDACCOUNT":"Log in with another account",
+        "TOAST": {
+            "CREATED":"User created successfully!",
+            "SAVED":"Profile saved successfully!",
+            "EMAILSAVED":"Email saved successfully!",
+            "PHONESAVED":"Phone saved successfully!",
+            "PHONEREMOVED":"Phone has been removed!",
+            "PHONEVERIFIED":"Phone verified successfully!",
+            "PHONEVERIFICATIONSENT":"Phone verification code sent!",
+            "EMAILVERIFICATIONSENT":"Email verification code sent!",
+            "OTPREMOVED":"OTP removed!",
+            "INITIALPASSWORDSET":"Initial password set!",
+            "PASSWORDNOTIFICATIONSENT":"Password Change Notification sent",
+            "PASSWORDCHANGED":"Password changed successfully!",
+            "REACTIVATED":"User reactivated",
+            "DEACTIVATED":"User deactivated"
+        }
     },
     "IAM": {
         "DETAIL": {
-            "TITLE":"Identity and Access Management",
-            "DESCRIPTION":"This site is shows Zitadel Management preferences. You can make changes to views, elect managers and define global policies."
+            "TITLE":"Identity and Access Management Administration",
+            "DESCRIPTION":"Manage the ZITADEL settings."
         },
         "MEMBER": {
             "TITLE":"Managers",
-            "DESCRIPTION":"Managers can add and edit organizations and make changes to their corresponding projects and apps"
+            "DESCRIPTION":"Managers can add and edit organisations and make changes to their corresponding projects and apps"
+        },
+        "VIEWS": {
+            "TITLE":"Views and Events",
+            "DESCRIPTION":"This Card shows your Zitadel Views, you can clear them and remove failed events.",
+            "VIEWNAME":"Name",
+            "DATABASE":"Database",
+            "SEQUENCE":"Sequence",
+            "ACTIONS":"Actions",
+            "CLEAR":"Clear"
         }
     },
     "ORG": {
         "PAGES": {
-            "LIST": "Organizations",
-            "LISTDESCRIPTION":"Choose an organization for your new context",
-            "ACTIVE":"ACTIVE",
-            "CREATE":"Create organization",
-            "ORGDETAIL_TITLE":"Enter the name and domain of your new organization",
-            "ORGDOMAIN_TITLE":"Org Domain Ownership",
+            "LIST": "Organisations",
+            "LISTDESCRIPTION":"Choose an organisation.",
+            "ACTIVE":"Active",
+            "CREATE":"Create organisation",
+            "ORGDETAIL_TITLE":"Enter the name and domain of your new organisation.",
+            "ORGDOMAIN_TITLE":"Organisation domain ownership verification",
             "ORGDOMAIN_VERIFICATION":"Provide your web domain and verify their ownership. You need to download a verification file and upload it at the provided URL listed below. To complete, click the button to verify.",
-            "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
-            "ORGDETAILUSER_TITLE":"Configure Organization Owner",
+            "ORGDOMAIN_VERIFICATION_SKIP":"You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
+            "ORGDETAILUSER_TITLE":"Configure Organisation Owner",
             "DOWNLOAD_FILE":"Download file",
-            "SELECTORGTOOLTIP":"Select this organization"
+            "SELECTORGTOOLTIP":"Select this organisation",
+            "PRIMARYDOMAIN":"Primary Domain",
+            "STATE":"State"
         },
         "DOMAINS": {
             "TITLE":"Domains",
-            "DESCRIPTION":"Configure your domains on which your users will be registered."
+            "DESCRIPTION":"Configure your domains. This domain can be used to login with your users.",
+            "DELETE": {
+                "TITLE":"Delete domain?",
+                "DESCRIPTION":"You are about to delete one of your domains. Note that your users can no longer use this domain for their logins."
+            }
         },
         "STATE": {
-            "0": "nicht definiert",
-            "1": "aktiv",
-            "2": "inaktiv"
+            "0": "Not defined",
+            "1": "Active",
+            "2": "Deactivated"
         },
         "MEMBER": {
-            "TITLE":"Organization Managers",
-            "DESCRIPTION":"Define Accounts which can change your organizations preferences."
+            "TITLE":"Organisation Managers",
+            "DESCRIPTION":"Define Users which can change your organisations preferences."
         },
         "POLICY": {
             "TITLE":"Explore Policies",
-            "DESCRIPTION":"Pre-packaged solutions that to ensure security of your data",
+            "DESCRIPTION":"Pre-packaged policies that enhance your security.",
             "PWD_COMPLEXITY": {
                 "TITLE":"Password Complexity",
                 "DESCRIPTION":"Ensures that all set passwords correspond to a specific pattern",
@@ -244,16 +276,16 @@
                 "PATTERNERROR":"The required pattern is not fulfilled!"
             },
             "PWD_AGE": {
-                "TITLE":"Password Age",
+                "TITLE":"Maximal Password Age",
                 "DESCRIPTION":"You can set a max age property for passwords. This policy includes a warning after a specific time has elapsed",
                 "TITLECREATE":"Create Password Age Policy",
                 "DESCRIPTIONCREATE":"You can set a max age property for passwords. This policy includes a warning after a specific time has elapsed"
             },
             "PWD_LOCKOUT": {
                 "TITLE":"Password Lockout",
-                "DESCRIPTION":"Password retries are infinite in default mode. You have to install this extention if you want to show retries or set a max try number.",
+                "DESCRIPTION":"Password retries are infinite in default mode. You have to install this policy if you want to show retries or set a max amount of trials.",
                 "TITLECREATE":"Create Password Lockout Policy",
-                "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to install this extention if you want to show retries or set a max try number."
+                "DESCRIPTIONCREATE":"Password retries are infinite in default mode. You have to install this policy if you want to show retries or set a max amount of trials."
             },
             "IAM_POLICY": {
                 "TITLE":"IAM Access Preferences",
@@ -281,15 +313,15 @@
     },
     "ORG_DETAIL": {
         "TITLE": "Organisation",
-        "DESCRIPTION": "Here you can edit your organization configuration and manage members",
+        "DESCRIPTION": "Here you can edit your organisation configuration and manage members",
         "DETAIL": {
             "TITLE": "Detail",
             "NAME": "Name",
             "DOMAIN": "Domain",
             "STATE": {
-                "0": "not defined",
-                "1": "active",
-                "2": "inactive"
+                "0": "Not defined",
+                "1": "Active",
+                "2": "Inactive"
             }
         },
         "MEMBER": {
@@ -313,7 +345,7 @@
     "PROJECT": {
         "PAGES": {
             "TITLE": "Project",
-            "DESCRIPTION": "Here you can define applications, manage roles and grant other organizations to use your project",
+            "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project",
             "LIST": "Projects",
             "LISTDESCRIPTION":"Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
             "DETAIL": "Detail",
@@ -321,51 +353,74 @@
             "CREATE_DESC": "Insert your projects name",
             "ROLE": "Role",
             "NOITEMS": "No projects",
-            "ZITADELPROJECT":"This belongs to Zitadel project. If you change something, Zitadel may not behave as intended!"
+            "ZITADELPROJECT":"This belongs to ZITADEL project. If you change something, ZITADEL may not behave as intended!",
+            "TYPE":{
+                "OWNED":"Owned Projects",
+                "GRANTED":"Granted Projects"
+            },
+            "PINNED":"Pinned",
+            "ALL": "All",
+            "CREATEDON":"Created on",
+            "LASTMODIFIED":"Last modified on",
+            "ADDNEW":"Create new project"
         },
         "STATE": {
             "TITLE":"State",
-            "0": "not defined",
-            "1": "active",
-            "2": "inactive"
+            "0": "Not defined",
+            "1": "Active",
+            "2": "Inactive"
         },
         "TYPE": {
             "TITLE": "Type",
-            "0": "unknown type",
-            "1": "owned",
-            "2": "granted"
+            "0": "Unknown type",
+            "1": "Owned",
+            "2": "Granted"
         },
         "NAME": "Name",
         "MEMBER": {
             "TITLE": "Managers",
-            "TITLEDESC":"Managers can make changes on this very entity, based on their given role in zitadel.",
-            "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage persisting ones.",
+            "TITLEDESC":"Managers can make changes on this project, based on their role.",
+            "DESCRIPTION":"Here you can find all managers of this project. You can add a new member and manage existing ones.",
             "USERNAME": "Username",
             "FIRSTNAME": "Firstname",
             "LASTNAME": "Lastname",
             "EMAIL": "Email",
-            "ROLES": "Roles"
+            "ROLES": "Roles",
+            "USERID":"User Id"
         },
         "GRANT": {
-            "TITLE": "Grants",
-            "DESCRIPTION": "Allow an other organization to use your project",
+            "TITLE": "Granted organisations",
+            "DESCRIPTION": "Allow an other organisation to use your project",
             "CREATE": {
-                "TITLE": "Create Member Grant",
+                "TITLE": "Create organisation grant",
                 "SEL_USERS": "Select the users you wish to grant",
                 "SEL_PROJECT": "Search for a project",
-                "SEL_ROLES": "Select the roles you want be be added to the grant",
-                "SEL_ORG": "Search for the domain",
-                "ORG_TITLE":"Organization",
-                "ORG_DESCRIPTION":"You are about to grant a user on the organization {{name}}",
-                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user of another organization",
-                "SEL_ORG_BUTTON": "Search Organization"
+                "SEL_ROLES": "Select the roles you want to be added to the grant",
+                "SEL_USER":"Search for a user",
+                "SEL_ORG": "Set the domain",
+                "SEL_ORG_DESC":"Enter the complete domain to specify the organisation to grant!",
+                "ORG_TITLE":"Organisation",
+                "ORG_DESCRIPTION":"You are about to grant a user for the organisation {{name}}",
+                "ORG_DESCRIPTION_DESC":"Switch the context in the header above to grant a user for another organisation",
+                "SEL_ORG_FORMFIELD":"Complete Domain",
+                "SEL_ORG_BUTTON": "Search Organisation",
+                "FOR_ORG":"The grant is created for:"
             },
+            "DETAIL": {
+                "TITLE":"Managers of the granted organisation",
+                "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project."
+            },
+            "SHOWDETAIL":"Show Details",
+            "USER":"User",
+            "MEMBERS":"Managers",
             "PROJECTNAME":"Project Name",
-            "GRANTEDORG": "Granted Organization",
+            "GRANTEDORG": "Granted Organisation",
             "GRANTEDORGDOMAIN": "Domain",
+            "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
-            "ROLENAMESLIST": "Roles"
+            "ROLENAMESLIST": "Roles",
+            "NOROLES":"No roles"
         },
         "APP": {
             "TITLE": "Applications",
@@ -381,21 +436,32 @@
             "ACTIONS": "Actions",
             "ADDTITLE": "Create role",
             "ADDDESCRIPTION": "Enter the data for the new role!",
+            "EDITTITLE": "Edit role",
+            "EDITDESCRIPTION": "Enter the new data for the role!",
             "DELETE":"Delete Role",
-            "CREATIONDATE":"Created"
+            "CREATIONDATE":"Created",
+            "SELECTGROUPTOOLTIP":"Select all Roles of the group {{group}}"
         },
         "TABLE": {
             "TOTAL": "Entries total:",
             "SELECTION": "Selected Elements",
-            "DEACTIVATE": "deactivate Project",
-            "ACTIVATE": "activate Project",
-            "DELETE": "delete Project",
-            "ORGNAME":"Org Name",
-            "ORGDOMAIN":"Org Domain",
+            "DEACTIVATE": "Deactivate Project",
+            "ACTIVATE": "Activate Project",
+            "DELETE": "Delete Project",
+            "ORGNAME":"Org. Name",
+            "ORGDOMAIN":"Or.g Domain",
             "STATE":"Status",
             "TYPE":"Type",
             "CREATIONDATE":"Created At",
-            "CHANGEDATE":"Last Modified"
+            "CHANGEDATE":"Last Modified",
+            "RESOURCEOWNER":"Owner"
+        },
+        "TOAST":{
+            "MEMBERREMOVED":"Manager removed!",
+            "MEMBERSADDED": "Managers added!",
+            "MEMBERADDED": "Manager added!",
+            "ROLEREMOVED":"Role removed!",
+            "ROLECHANGED":"Role changed!"
         }
     },
     "APP": {
@@ -408,9 +474,9 @@
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
-                    "0": "not defined",
-                    "1": "active",
-                    "2": "inactive"
+                    "0": "Not defined",
+                    "1": "Active",
+                    "2": "Inactive"
                 }
             }
         },
@@ -420,7 +486,7 @@
             "CLIENTID": "Client ID",
             "CLIENTSECRET": "Client Secret",
             "CLIENTSECRET_DESCRIPTION": "Save your Client Secret as it will disappear once the dialog is closed!",
-            "REGENERATESECRET": "Regenerate Secret",
+            "REGENERATESECRET": "Regenerate Client Secret",
             "REDIRECT": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",
             "RESPONSE": "Response Types",
@@ -439,14 +505,19 @@
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
             "AUTHMETHOD2":"None"
+        },
+        "TOAST": {
+            "REACTIVATED":"App reactivated!",
+            "DEACTIVATED":"App deactivated!",
+            "OIDCUPDATED":"OIDC Config updated!",
+            "OIDCCLIENTSECRETREGENERATED":"OIDC Client Secret generated!"
         }
     },
     "GENDERS": {
-        "0":"unknown",
-        "1": "female",
-        "2": "male",
-        "3": "other",
-        "4": "unknown"
+        "0": "Unknown",
+        "1": "Female",
+        "2": "Male",
+        "3": "Other"
     },
     "LANGUAGES": {
         "de": "German",
@@ -456,30 +527,30 @@
         "ADD":"Add a manager"
     },
     "ROLES": {
-        "ORG_OWNER": "Org Owner",
-        "ORG_MEMBER_VIEWER": "Org Member Viewer",
-        "ORG_PROJECT_ROLE_VIEWER": "Org Project Role Viewer",
-        "ORG_EDITOR":"Org Editor",
-        "ORG_VIEWER":"Org Viewer",
-        "ORG_MEMBER_EDITOR":"Org Member Editor",
-        "ORG_PROJECT_CREATOR":"Org Project Creator",
-        "ORG_PROJECT_EDITOR":"Org Project Editor",
-        "ORG_PROJECT_VIEWER":"Org Project Viewer",
-        "ORG_PROJECT_MEMBER_EDITOR":"Org Project Member Editor",
-        "ORG_PROJECT_MEMBER_VIEWER":"Org Project Member Viewer",
-        "ORG_PROJECT_ROLE_EDITOR":"Org Project Role Editor",
-        "ORG_PROJECT_APP_EDITOR":"Org Project App Editor",
-        "ORG_PROJECT_APP_VIEWER":"Org Project App Viewer",
-        "ORG_PROJECT_GRANT_EDITOR":"Org Project Grant Editor" ,
-        "ORG_PROJECT_GRANT_VIEWER":"Org Project Grant Viewer",
-        "ORG_PROJECT_GRANT_MEMBER_EDITOR":"Org Project Grant Member Editor",
-        "ORG_PROJECT_GRANT_MEMBER_VIEWER":"Org Project Grant Member Viewer",
-        "ORG_USER_EDITOR":"Org User Editor",
-        "ORG_USER_VIEWER":"Org User Viewer",
-        "ORG_USER_GRANT_EDITOR":"Org User Grant Editor",
-        "ORG_USER_GRANT_VIEWER":"Org User Grant Viewer",
-        "ORG_POLICY_EDITOR":"Org Policy Editor",
-        "ORG_POLICY_VIEWER":"Org Policy Viewer",
+        "ORG_OWNER": "Org. Owner",
+        "ORG_MEMBER_VIEWER": "Org. Member Viewer",
+        "ORG_PROJECT_ROLE_VIEWER": "Org. Project Role Viewer",
+        "ORG_EDITOR":"Org. Editor",
+        "ORG_VIEWER":"Org. Viewer",
+        "ORG_MEMBER_EDITOR":"Org. Member Editor",
+        "ORG_PROJECT_CREATOR":"Org. Project Creator",
+        "ORG_PROJECT_EDITOR":"Org. Project Editor",
+        "ORG_PROJECT_VIEWER":"Org. Project Viewer",
+        "ORG_PROJECT_MEMBER_EDITOR":"Org. Project Member Editor",
+        "ORG_PROJECT_MEMBER_VIEWER":"Org. Project Member Viewer",
+        "ORG_PROJECT_ROLE_EDITOR":"Org. Project Role Editor",
+        "ORG_PROJECT_APP_EDITOR":"Org. Project App Editor",
+        "ORG_PROJECT_APP_VIEWER":"Org. Project App Viewer",
+        "ORG_PROJECT_GRANT_EDITOR":"Org. Project Grant Editor" ,
+        "ORG_PROJECT_GRANT_VIEWER":"Org. Project Grant Viewer",
+        "ORG_PROJECT_GRANT_MEMBER_EDITOR":"Org. Project Grant Member Editor",
+        "ORG_PROJECT_GRANT_MEMBER_VIEWER":"Org. Project Grant Member Viewer",
+        "ORG_USER_EDITOR":"Org. User Editor",
+        "ORG_USER_VIEWER":"Org. User Viewer",
+        "ORG_USER_GRANT_EDITOR":"Org. User Grant Editor",
+        "ORG_USER_GRANT_VIEWER":"Org. User Grant Viewer",
+        "ORG_POLICY_EDITOR":"Org. Policy Editor",
+        "ORG_POLICY_VIEWER":"Org. Policy Viewer",
         "PROJECT_OWNER":"Project Owner",
         "PROJECT_MEMBER_EDITOR":"Project Member Editor",
         "PROJECT_APP_EDITOR":"Project App Editor",
@@ -497,15 +568,36 @@
         "PROJECT_GRANT_USER_GRANT_VIEWER":"Project Grant User Grant Viewer"
     },
     "GRANTS": {
-        "DELETE":"Delete grant",
-        "ADD":"Create grant",
-        "ADD_BTN":"New"
+        "DELETE":"delete authorization",
+        "ADD":"create authorization",
+        "ADD_BTN":"New",
+        "PROJECT": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified project. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "USER": {
+            "TITLE": "Authorizations",
+            "DESCRIPTION": "Define Authorizations for the specified user. Note that you can only see entries from projects and users where you are permitted to."
+        },
+        "CREATE": {
+            "TITLE": "Create authorization",
+            "DESCRIPTION": "Search for the orgnanization, the project and the corresponding roles."
+        },
+        "DETAIL": {
+            "TITLE":"Authorization Detail",
+            "DESCRIPTION":""
+        },
+        "TOAST": {
+            "UPDATED":"Grant updated!",
+            "BULKREMOVED":"Grants removed!"
+        }
     },
     "CHANGES": {
         "LISTTITLE":"Last Changes",
+        "BOTTOM":"You've arrived at the bottom",
         "ORG": {
             "TITLE":"Activity",
-            "DESCRIPTION":"Here you can see the latest events that have affected an organization change"
+            "DESCRIPTION":"Here you can see the latest events that have affected an organisation change"
         },
         "PROJECT": {
             "TITLE":"Activity",
@@ -525,7 +617,7 @@
             "org.domain.primary.set":"set primary domain",
             "org.domain.removed":"domain removed",
             "org.iam.policy.added":"IAM policy added",
-            "project.added": "added",
+            "project.added": "project added",
             "project.changed":"changed",
             "project.deactivated":"deactivated",
             "project.member.added":"added member",
@@ -568,6 +660,7 @@
             "user.mfa.init.skipped":"MFA init skipped",
             "user.mfa.otp.added":"MFA OTP added",
             "user.mfa.otp.verified":"MFA OTP verified",
+            "user.mfa.otp.removed":"MFA OTP removed",
             "user.selfregistered":"self registered"
         }
     }

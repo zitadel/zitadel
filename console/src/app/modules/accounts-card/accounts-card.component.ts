@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig } from 'angular-oauth2-oidc';
-import { UserProfile, UserSessionView } from 'src/app/proto/generated/auth_pb';
+import { UserProfileView, UserSessionView } from 'src/app/proto/generated/auth_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { AuthService } from 'src/app/services/auth.service';
 
@@ -11,19 +11,15 @@ import { AuthService } from 'src/app/services/auth.service';
     styleUrls: ['./accounts-card.component.scss'],
 })
 export class AccountsCardComponent implements OnInit {
-    @Input() public profile!: UserProfile.AsObject;
+    @Input() public profile!: UserProfileView.AsObject;
     @Input() public iamuser: boolean = false;
 
     @Output() public close: EventEmitter<void> = new EventEmitter();
     public users: UserSessionView.AsObject[] = [];
     public loadingUsers: boolean = false;
-    constructor(public authService: AuthService, private router: Router, private userService: AuthUserService) { }
-
-    public ngOnInit(): void {
-        this.loadingUsers = true;
+    constructor(public authService: AuthService, private router: Router, private userService: AuthUserService) {
         this.userService.getMyUserSessions().then(sessions => {
             this.users = sessions.toObject().userSessionsList;
-
             const index = this.users.findIndex(user => user.userName === this.profile.userName);
             this.users.splice(index, 1);
 
@@ -31,6 +27,10 @@ export class AccountsCardComponent implements OnInit {
         }).catch(() => {
             this.loadingUsers = false;
         });
+    }
+
+    public ngOnInit(): void {
+        this.loadingUsers = true;
     }
 
     public editUserProfile(): void {
@@ -44,23 +44,29 @@ export class AccountsCardComponent implements OnInit {
         }
     }
 
-    public selectAccount(loginHint?: string, idToken?: string): void {
+    public selectAccount(loginHint?: string): void {
         const configWithPrompt: Partial<AuthConfig> = {
             customQueryParams: {
-                prompt: 'select_account',
+                // prompt: 'select_account',
             } as any,
         };
         if (loginHint) {
             (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
         }
-        if (idToken) {
-            (configWithPrompt as any).customQueryParams['id_token_hint'] = idToken;
-        }
+        this.authService.authenticate(configWithPrompt);
+    }
+
+    public selectNewAccount(): void {
+        const configWithPrompt: Partial<AuthConfig> = {
+            customQueryParams: {
+                prompt: 'login',
+            } as any,
+        };
         this.authService.authenticate(configWithPrompt);
     }
 
     public logout(): void {
-        this.router.navigate(['/']);
+        this.authService.signout();
         this.close.emit();
     }
 }

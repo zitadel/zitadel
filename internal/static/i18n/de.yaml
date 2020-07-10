@@ -54,6 +54,8 @@ Errors:
     InvalidDomain: Domäne ist ungültig
     DomainMissing: Domäne fehlt
     DomainNotOnOrg: Domäne fehlt auf Organisation
+    PrimaryDomainNotDeletable: Primäre Domäne kann nicht gelöscht werden
+    DomainNotFound: Domäne konnte nicht gefunden werden
     MemberIDMissing: Member ID fehlt
     MemberNotFound: Organisations Member konnte nicht gefunden werden
     InvalidMember: Organisations Member ist ungültig
@@ -69,6 +71,7 @@ Errors:
     Invalid: Projekt ist ungültig
     NotActive: Projekt ist nicht aktiv
     NotInactive: Projekt ist nicht deaktiviert
+    NotFound: Project konnte nicht gefunden werden
     UserIDMissing: User ID fehlt
     MemberNotFound: Member konnte nicht gefunden werden
     MemberInvalid: Member ist ungültig
@@ -108,3 +111,174 @@ Errors:
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
+  Token:
+    NotFound: Token konnte nicht gefunden werden
+  UserSession:
+    NotFound: Benutzer Sitzung konnte nicht gefunden werden
+EventTypes:
+  user:
+    added: Benutzer hinzugefügt
+    selfregistered: Benutzer hat sich selbst registriert
+    initialization: 
+      code:
+        added: Initialisierungscode generiert
+        sent: Initialiseriungscode versendet
+      check:
+        succeeded: Benutzerinitialisierung erfolgreich
+        failed: Benutzerinitialisierung fehlgeschlagen
+    username:
+      reserved: Benutzername reserviert
+      released: Benutzername freigegeben
+    email:
+      reserved: E-Mail-Adresse reserviert
+      released: E-Mail-Adresse freigegeben
+      changed: E-Mail-Adresse geändert
+      verified: E-Mail-Adresse verifiziert
+      verification:
+        failed: Verifikation der E-Mail-Adresse fehlgeschlagen
+      code:
+        added: E-Mail Code generiert
+        sent: E-Mail Code gesendet
+    locked: Benutzer gesperrt
+    unlocked: Benutzer entsperrt
+    deactivated: Benutzer deaktiviert
+    reactivated: Benutzer reaktiviert
+    removed: Benutzer entfernt
+    password:
+      changed: Passwort geändert
+      code:
+        added: Passwort Code generiert
+        sent: Passwort Code versendet
+      check:
+        succeeded: Passwortvalidierung erfolgreich
+        failed: Passwortvalidierung fehlgeschlagen
+    phone:
+      changed: Telefonnummer geändert
+      verified: Telefonnummer verifiziert
+      verification:
+        failed: Verifikation der Telefonnummer fehlgeschlagen
+      code:
+        added: Telefon Code hinzugefügt
+        sent: Telefon Code versendet
+    profile:
+      changed: Benutzerprofil geändert
+    address:
+      changed: Adresse des Benutzers geändert
+    mfa:
+      otp:
+        added: Multifaktor OTP hinzugefügt
+        verified: Multifaktor OTP verifiziert
+        removed: Multifaktor OTP entfernt
+        check:
+          succeeded: Multifaktor OTP Verifikation erfolgreich
+          failed: Multifaktor OTP Verifikation fehlgeschlagen
+      init:
+        skipped: Multifaktor Initialisierung übersprungen
+    signed:
+      out: Benutzer erfolgreich abgemeldet
+    grant:
+      added: Berechtigung hinzugefügt
+      changed: Berechtigung geändert
+      removed: Berechtigung entfernt
+      deactivated: Berechtigung deaktiviert
+      reactivated: Berechtigung reaktiviert
+      reserved: Berechtigung reserviert
+      released: Berechtigung freigegeben
+      cascade:
+        removed: Berechtigung entfernt
+        changed: Berechtigung geändert
+  org:
+    added: Organisation hinzugefügt
+    changed: Organisation geändert
+    deactivated: Organisation deaktiviert
+    reactivated: Organisation reaktiviert
+    removed: Organisation entfernt
+    domain:
+      added: Domäne hinzugefügt
+      verified: Domäne verifiziert
+      removed: Domäne entfernt
+      primary:
+        set: Primäre Domäne gesetzt
+    name:
+      reserved: Name der Organisation reserviert
+      released: Name der Organisation freigegeben
+    domain:
+      reserved: Domäne reserviert
+      released: Domäne freigegeben
+    member:
+      added: Organisationsmitglied hinzugefügt
+      changed: Organisationsmitglied geändert
+      removed: Organisationsmitglied entfernt
+    iam:
+      policy:
+        added: System Richtlinie der Organisation hinzugefügt
+        changed: System Richtlinie der Organisation geändert
+        removed: System Richtlinie der Organisation entfernt
+  project:
+    added: Projekt hinzugefügt
+    changed: Project geändert
+    deactivated: Projekt deaktiviert
+    reactivated: Projekt reaktiviert
+    removed: Projekt entfernt
+    member:
+      added: Projektmitglied hinzugefügt
+      changed: Projektmitglied geändert
+      removed: Projektmitglied entfernt
+    role:
+      added: Projektrolle hinzugefügt
+      changed: Projektrolle geändert
+      removed: Projektrolle entfernt
+    grant:
+      added: Verwaltungszugriff hinzugefügt
+      changed: Verwaltungszugriff geändert
+      removed: Verwaltungszugriff entfernt
+      deactivated: Verwaltungszugriff deaktiviert
+      reactivated: Verwaltungszugriff reaktiviert
+      cascade:
+        changed: Verwaltungszugriff geändert
+      member:
+        added: Verwaltungszugriffsmitglied hinzugefügt
+        changed: Verwaltungszugriffsmitglied geändert
+        removed: Verwaltungszugriffsmitglied entfernt
+    application:
+      added: Applikation hinzugefügt
+      changed: Applikation geändert
+      removed: Applikation entfernt
+      deactivated: Applikation deaktiviert
+      reactivated: Applikation reaktiviert
+      config:
+        oidc:
+          added: OIDC Konfiguration hinzugefügt
+          changed: OIDC Konfiguration geändert
+          secret:
+            changed: OIDC Client Secret geändert
+            check:
+              succeeded: OIDC Client Secret Validierung erfolgreich
+              failed: OIDC Client Secret Validierung fehlgeschlagen
+  policy:
+    password:
+      complexity:
+        added: Passwortkomplexitätsrichtline hinzugefügt
+        changed: Passwortkomplexitätsrichtline geändert
+      age:
+        added: Passwortaltersrichtlinie hinzugefügt
+        changed: Passwortaltersrichtlinie geändert
+      lockout:
+        added: Passwortaussperrrichtlinie hizugefügt
+        changed: Passwortaussperrrichtlinie geändert
+  iam:
+    setup:
+      started: ZITADEL Initialisierung gestartet
+      done: ZITADEL Initialisierung abgeschlossen
+    global:
+      org:
+        set: Globale Organisation von ZITADEL gesetzt
+    project:
+      iam:
+        set: ZITADEL Projekt gesetzt
+    member:
+      added: ZITADEL Mitglied hinzugefügt
+      changed: ZITADEL Mitglied geändert
+      removed: ZITADEL Mitglied entfernt
+  key_pair:
+    added: Schlüsselpaar hinzugefügt

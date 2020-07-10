@@ -25,13 +25,14 @@ import { AppComponent } from './app.component';
 import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
+import { AvatarModule } from './modules/avatar/avatar.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
-import { GrpcAuthInterceptor } from './services/grpc-auth.interceptor';
-import { GRPC_INTERCEPTORS } from './services/grpc-interceptor';
-import { GrpcOrgInterceptor } from './services/grpc-org.interceptor';
 import { GrpcService } from './services/grpc.service';
+import { GrpcAuthInterceptor } from './services/interceptors/grpc-auth.interceptor';
+import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
+import { GrpcOrgInterceptor } from './services/interceptors/grpc-org.interceptor';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
 import { StorageService } from './services/storage.service';
@@ -41,7 +42,7 @@ registerLocaleData(localeDe);
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-    return new TranslateHttpLoader(http);
+    return new TranslateHttpLoader(http, './assets/i18n/');
 }
 
 const appInitializerFn = (grpcServ: GrpcService) => {
@@ -56,13 +57,10 @@ const stateHandlerFn = (stateHandler: StatehandlerService) => {
     };
 };
 
-export const authConfig: AuthConfig = {
-    redirectUri: window.location.origin + '/auth/callback',
+const authConfig: AuthConfig = {
     scope: 'openid profile email', // offline_access
     responseType: 'code',
-    // showDebugInformation: true,
     oidc: true,
-    postLogoutRedirectUri: window.location.origin + '/signedout',
 };
 
 @NgModule({
@@ -102,6 +100,7 @@ export const authConfig: AuthConfig = {
         MatToolbarModule,
         MatMenuModule,
         MatSnackBarModule,
+        AvatarModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ],
     providers: [
@@ -150,4 +149,7 @@ export const authConfig: AuthConfig = {
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+
+    constructor() { }
+}

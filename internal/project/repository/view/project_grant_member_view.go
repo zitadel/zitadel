@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
@@ -15,6 +16,9 @@ func ProjectGrantMemberByIDs(db *gorm.DB, table, grantID, userID string) (*model
 	userIDQuery := model.ProjectGrantMemberSearchQuery{Key: proj_model.ProjectGrantMemberSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, grantIDQuery, userIDQuery)
 	err := query(db, role)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Sgr32", "Errors.Project.MemberNotExisting")
+	}
 	return role, err
 }
 

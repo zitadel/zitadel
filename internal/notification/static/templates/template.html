@@ -1,451 +1,508 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{{.Title}}</title>
     <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap');
 
-    @import url('https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap');
-
-    @font-face {
-  font-family: Ailerons;
-  src: url("https://www.caos.ch/fonts/Ailerons-Typeface.otf") format("opentype");
-}
+        @font-face {
+            font-family: Ailerons;
+            src: url("https://www.caos.ch/fonts/Ailerons-Typeface.otf") format("opentype");
+        }
 
 
-      /* -------------------------------------
+        /* -------------------------------------
           GLOBAL RESETS
       ------------------------------------- */
-      
-      img {
-        border: none;
-        -ms-interpolation-mode: bicubic;
-        max-width: 100%; 
-      }
-      body {
-        background: #222324 url('waves-bottomleft.png') bottom left no-repeat;
-        background-size: 150px;
-        font-family: 'Roboto', sans-serif;
-        font-weight: 300;
-        -webkit-font-smoothing: antialiased;
-        font-size: 14px;
-        line-height: 1.4;
-        margin: 0;
-        padding: 0;
-        -ms-text-size-adjust: 100%;
-        -webkit-text-size-adjust: 100%; 
-      }
-      table {
-        border-collapse: separate;
-        mso-table-lspace: 0pt;
-        mso-table-rspace: 0pt;
-        width: 100%; }
+
+        img {
+            border: none;
+            -ms-interpolation-mode: bicubic;
+            max-width: 100%;
+        }
+
+        body {
+            background: #222324 url('waves-bottomleft.png') bottom left no-repeat;
+            background-size: 150px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        table {
+            border-collapse: separate;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+            width: 100%;
+        }
+
         table td {
-          font-family: 'Roboto', sans-serif;
-          font-size: 14px;
-          font-weight: 300;
-          vertical-align: top;
-          color: #fff;
-      }
-      /* -------------------------------------
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            vertical-align: top;
+            color: #fff;
+        }
+
+        /* -------------------------------------
           BODY & CONTAINER
       ------------------------------------- */
-      .body {
-        background: url('waves-topright.png') top right no-repeat;
-        background-size: 150px;
-        width: 100%; 
-      }
-      /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
-      .container {
-        display: block;
-        margin: 0 auto !important;
-        /* makes it centered */
-        max-width: 580px;
-        padding: 40px;
-        width: 580px; 
-      }
-      /* This should also be a block element, so that it will fill 100% of the .container */
-      .content {
-        box-sizing: border-box;
-        display: block;
-        margin: 0 auto;
-        max-width: 580px;
-        padding: 10px; 
-      }
-      /* -------------------------------------
+        .body {
+            background: url('waves-topright.png') top right no-repeat;
+            background-size: 150px;
+            width: 100%;
+        }
+
+        /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
+        .container {
+            display: block;
+            margin: 0 auto !important;
+            /* makes it centered */
+            max-width: 580px;
+            padding: 40px;
+            width: 580px;
+        }
+
+        /* This should also be a block element, so that it will fill 100% of the .container */
+        .content {
+            box-sizing: border-box;
+            display: block;
+            margin: 0 auto;
+            max-width: 580px;
+            padding: 10px;
+        }
+
+        /* -------------------------------------
           HEADER, FOOTER, MAIN
       ------------------------------------- */
-      .main {
-        background: #191919;
-        width: 100%; 
-        border-radius: 16px;
-      }
-      .wrapper {
-        box-sizing: border-box;
-        padding: 50px; 
-      }
-      .content-block {
-        padding-bottom: 10px;
-        padding-top: 10px;
-      }
-      .footer {
-        clear: both;
-        margin-top: 10px;
-        text-align: center;
-        width: 100%; 
-      }
+        .main {
+            background: #191919;
+            width: 100%;
+            border-radius: 16px;
+        }
+
+        .wrapper {
+            box-sizing: border-box;
+            padding: 50px;
+        }
+
+        .content-block {
+            padding-bottom: 10px;
+            padding-top: 10px;
+        }
+
+        .footer {
+            clear: both;
+            margin-top: 10px;
+            text-align: center;
+            width: 100%;
+        }
+
         .footer td,
         .footer p,
         .footer span,
         .footer a {
-          color: #999999;
-          font-size: 12px;
-          text-align: center; 
-      }
-
-        .footer a{
-          color: #FE00FF;
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 400;
+            color: #999999;
+            font-size: 12px;
+            text-align: center;
         }
 
-        .footer a:hover{
-          text-decoration: underline;
+        .footer a {
+            color: #FE00FF;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 400;
         }
 
-        .apple-link{
-          margin-bottom: 10px;
-          display: inline-block;
+        .footer a:hover {
+            text-decoration: underline;
         }
 
-      /* -------------------------------------
+        .apple-link {
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* -------------------------------------
           TYPOGRAPHY
       ------------------------------------- */
-      h1,
-      h2,
-      h3,
-      h4 {
-        color: #fff;
-        font-family: 'Roboto', sans-serif;
-        font-weight: 300;
-        line-height: 1.4;
-        margin: 0;
-        margin-bottom: 30px; 
-      }
-      h1 {
-        font-size: 35px;
-        font-weight: 300;
-        text-align: center;
-        text-transform: capitalize; 
-      }
-      p,
-      ul,
-      ol {
-        font-family: 'Roboto', sans-serif;
-        font-size: 14px;
-        font-weight: 300;
-        margin: 0;
-        margin-bottom: 15px; 
-      }
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            line-height: 1.4;
+            margin: 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 35px;
+            font-weight: 300;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        p,
+        ul,
+        ol {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            margin: 0;
+            margin-bottom: 15px;
+        }
+
         p li,
         ul li,
         ol li {
-          list-style-position: inside;
-          margin-left: 5px; 
-      }
-      a {
-        color: #0FBDA6;
-        text-decoration: underline; 
-      }
-      /* -------------------------------------
+            list-style-position: inside;
+            margin-left: 5px;
+        }
+
+        a {
+            color: #0FBDA6;
+            text-decoration: underline;
+        }
+
+        /* -------------------------------------
           BUTTONS
       ------------------------------------- */
-      .btn {
-        box-sizing: border-box;
-        width: 100%; }
-        .btn > tbody > tr > td {
-          padding-bottom: 15px; }
+        .btn {
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .btn>tbody>tr>td {
+            padding-bottom: 15px;
+        }
+
         .btn table {
-          width: auto; 
-      }
+            width: auto;
+        }
+
         .btn table td {
-          background-color: #ffffff;
-          border-radius: 5px;
-          text-align: center; 
-      }
+            background-color: #ffffff;
+            border-radius: 5px;
+            text-align: center;
+        }
+
         .btn a {
-          background-color: #ffffff;
-          border: solid 1px #0FBDA6;
-          border-radius: 5px;
-          box-sizing: border-box;
-          color: #0FBDA6;
-          cursor: pointer;
-          display: inline-block;
-          font-size: 14px;
-          font-weight: 400;
-          margin: 0;
-          padding: 20px 60px;
-          text-decoration: none;
-      }
+            background-color: #ffffff;
+            border: solid 1px #0FBDA6;
+            border-radius: 5px;
+            box-sizing: border-box;
+            color: #0FBDA6;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 400;
+            margin: 0;
+            padding: 20px 60px;
+            text-decoration: none;
+        }
 
-      .btn-primary {
-        margin-top: 50px;
-      }
+        .btn-primary {
+            margin-top: 50px;
+        }
 
-      .btn-primary table td {
-        background-color: #0FBDA6; 
-      }
+        .btn-primary table td {
+            background-color: #0FBDA6;
+        }
 
-      .btn-primary a {
-        background-color: #0FBDA6;
-        border-color: #0FBDA6;
-        color: #ffffff; 
-      }
-      /* -------------------------------------
+        .btn-primary a {
+            background-color: #0FBDA6;
+            border-color: #0FBDA6;
+            color: #ffffff;
+        }
+
+        /* -------------------------------------
           OTHER STYLES THAT MIGHT BE USEFUL
       ------------------------------------- */
-      .mheader {
-        background-color: #131313;
-      }
+        .mheader {
+            background-color: #131313;
+        }
 
-      .headercell {
-        color: #FFFFFF;
-      }
+        .headercell {
+            color: #FFFFFF;
+        }
 
-      .headertitle{
-        padding: 30px 30px 70px;
-        margin: 0;
-        font-size: 42px;
-        font-family: 'Ailerons', sans-serif;
-        text-align: center;
-      }
+        .headertitle {
+            padding: 30px 30px 70px;
+            margin: 0;
+            font-size: 42px;
+            font-family: 'Ailerons', sans-serif;
+            text-align: center;
+        }
 
-      .logo{
-        height: 50px;
-        margin: 10px;
-        margin-left: 30px;
-      }
+        .logo {
+            height: 50px;
+            margin: 10px;
+            margin-left: 30px;
+        }
 
-      .hello {
-        font-size: 22px;
-      }
+        .hello {
+            font-size: 22px;
+        }
 
-    
 
-      .last {
-        margin-bottom: 0; 
-      }
-      .first {
-        margin-top: 0; 
-      }
-      .align-center {
-        text-align: center; 
-      }
-      .align-right {
-        text-align: right; 
-      }
-      .align-left {
-        text-align: left; 
-      }
-      .clear {
-        clear: both; 
-      }
-      .mt0 {
-        margin-top: 0; 
-      }
-      .mb0 {
-        margin-bottom: 0; 
-      }
-      .preheader {
-        color: transparent;
-        display: none;
-        height: 0;
-        max-height: 0;
-        max-width: 0;
-        opacity: 0;
-        overflow: hidden;
-        mso-hide: all;
-        visibility: hidden;
-        width: 0; 
-      }
-      .subject {
-        color: transparent;
-        display: none;
-        height: 0;
-        max-height: 0;
-        max-width: 0;
-        opacity: 0;
-        overflow: hidden;
-        mso-hide: all;
-        visibility: hidden;
-        width: 0; 
-      }
-      .powered-by a {
-        text-decoration: none; 
-      }
-      hr {
-        border: 0;
-        border-bottom: 1px solid #f6f6f6;
-        margin: 20px 0; 
-      }
-      /* -------------------------------------
+
+        .last {
+            margin-bottom: 0;
+        }
+
+        .first {
+            margin-top: 0;
+        }
+
+        .align-center {
+            text-align: center;
+        }
+
+        .align-right {
+            text-align: right;
+        }
+
+        .align-left {
+            text-align: left;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .mt0 {
+            margin-top: 0;
+        }
+
+        .mb0 {
+            margin-bottom: 0;
+        }
+
+        .preheader {
+            color: transparent;
+            display: none;
+            height: 0;
+            max-height: 0;
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            mso-hide: all;
+            visibility: hidden;
+            width: 0;
+        }
+
+        .subject {
+            color: transparent;
+            display: none;
+            height: 0;
+            max-height: 0;
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            mso-hide: all;
+            visibility: hidden;
+            width: 0;
+        }
+
+        .powered-by a {
+            text-decoration: none;
+        }
+
+        hr {
+            border: 0;
+            border-bottom: 1px solid #f6f6f6;
+            margin: 20px 0;
+        }
+
+        /* -------------------------------------
           RESPONSIVE AND MOBILE FRIENDLY STYLES
       ------------------------------------- */
-      @media only screen and (max-width: 620px) {
-        table[class=body] h1 {
-          font-size: 28px !important;
-          margin-bottom: 10px !important; 
+        @media only screen and (max-width: 620px) {
+            table[class=body] h1 {
+                font-size: 28px !important;
+                margin-bottom: 10px !important;
+            }
+
+            table[class=body] p,
+            table[class=body] ul,
+            table[class=body] ol,
+            table[class=body] td,
+            table[class=body] span,
+            table[class=body] a {
+                font-size: 16px !important;
+            }
+
+            table[class=body] .wrapper,
+            table[class=body] .article {
+                padding: 10px !important;
+            }
+
+            table[class=body] .content {
+                padding: 0 !important;
+            }
+
+            table[class=body] .container {
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            table[class=body] .main {
+                border-left-width: 0 !important;
+                border-radius: 0 !important;
+                border-right-width: 0 !important;
+            }
+
+            table[class=body] .btn table {
+                width: 100% !important;
+            }
+
+            table[class=body] .btn a {
+                width: 100% !important;
+            }
+
+            table[class=body] .img-responsive {
+                height: auto !important;
+                max-width: 100% !important;
+                width: auto !important;
+            }
         }
-        table[class=body] p,
-        table[class=body] ul,
-        table[class=body] ol,
-        table[class=body] td,
-        table[class=body] span,
-        table[class=body] a {
-          font-size: 16px !important; 
-        }
-        table[class=body] .wrapper,
-        table[class=body] .article {
-          padding: 10px !important; 
-        }
-        table[class=body] .content {
-          padding: 0 !important; 
-        }
-        table[class=body] .container {
-          padding: 0 !important;
-          width: 100% !important; 
-        }
-        table[class=body] .main {
-          border-left-width: 0 !important;
-          border-radius: 0 !important;
-          border-right-width: 0 !important; 
-        }
-        table[class=body] .btn table {
-          width: 100% !important; 
-        }
-        table[class=body] .btn a {
-          width: 100% !important; 
-        }
-        table[class=body] .img-responsive {
-          height: auto !important;
-          max-width: 100% !important;
-          width: auto !important; 
-        }
-      }
-      /* -------------------------------------
+
+        /* -------------------------------------
           PRESERVE THESE STYLES IN THE HEAD
       ------------------------------------- */
-      @media all {
-        .ExternalClass {
-          width: 100%; 
+        @media all {
+            .ExternalClass {
+                width: 100%;
+            }
+
+            .ExternalClass,
+            .ExternalClass p,
+            .ExternalClass span,
+            .ExternalClass font,
+            .ExternalClass td,
+            .ExternalClass div {
+                line-height: 100%;
+            }
+
+            .apple-link a {
+                color: inherit !important;
+                font-family: inherit !important;
+                font-size: inherit !important;
+                font-weight: inherit !important;
+                line-height: inherit !important;
+                text-decoration: none !important;
+            }
+
+            .btn-primary table td:hover {
+                background-color: #1ADFC5 !important;
+            }
+
+            .btn-primary a:hover {
+                background-color: #1ADFC5 !important;
+                border-color: #1ADFC5 !important;
+            }
         }
-        .ExternalClass,
-        .ExternalClass p,
-        .ExternalClass span,
-        .ExternalClass font,
-        .ExternalClass td,
-        .ExternalClass div {
-          line-height: 100%; 
-        }
-        .apple-link a {
-          color: inherit !important;
-          font-family: inherit !important;
-          font-size: inherit !important;
-          font-weight: inherit !important;
-          line-height: inherit !important;
-          text-decoration: none !important; 
-        }
-        .btn-primary table td:hover {
-          background-color: #1ADFC5 !important; 
-        }
-        .btn-primary a:hover {
-          background-color: #1ADFC5 !important;
-          border-color: #1ADFC5 !important; 
-        } 
-      }
     </style>
-  </head>
-  <body class="">
+</head>
+
+<body class="">
     <span class="preheader">{{.PreHeader}}</span>
     <span class="subject">{{.Subject}}</span>
     <table role="pheader" class="mheader" border="0" cellpadding="0" cellspacing="0">
-              <tr>
-                      <td class="mheadercell">
-                        
-                      </td>
-                      <td class="logo">
-                        <img  class="logo" src="https://caos.ch/images/LogoCaos.png" alt="CAOS AG - Logo">
-                      </td>
-                    </tr>
-            </table>
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
-      <tr>
-        <td></td>
-        <td class="container">
-          <div class="content">
+        <tr>
+            <td class="mheadercell">
 
-            <!-- START CENTERED WHITE CONTAINER -->
-            <table role="pheader" class="tableheader" border="0" cellpadding="0" cellspacing="0">
-              <tr>
-                      <td class="headercell">
-                        <p class="headertitle">Zitadel</p>
-                      </td>
-                    </tr>
-            </table>
-            <table role="presentation" class="main">
-
-              <!-- START MAIN CONTENT AREA -->
-              <tr>
-                <td class="wrapper">
-                  <table role="presentation" class="maincontent" border="0" cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td>
-                        <p class="hello">{{.Greeting}}</p>
-                        <p>{{.Text}}</p>
-                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
-                          <tbody>
-                            <tr>
-                              <td align="center">
-                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                  <tbody>
-                                    <tr>
-                                      <td> <a href="{{.URL}}" target="_blank">{{.ButtonText}}</a> </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-
-            <!-- END MAIN CONTENT AREA -->
-            </table>
-            <!-- END CENTERED WHITE CONTAINER -->
-
-            <!-- START FOOTER -->
-            <div class="footer">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td class="content-block">
-                    <span class="apple-link">CAOS AG  &nbsp;&nbsp;  |  &nbsp;&nbsp;  Teufener Strasse 19  &nbsp;&nbsp;  | &nbsp;&nbsp;   CH-9000 St.Gallen</span>
-                    <br> <a href="http://www.caos.ch">caos.ch</a>.
-                  </td>
-                </tr>
-              </table>
-            </div>
-            <!-- END FOOTER -->
-
-          </div>
-        </td>
-        <td>&nbsp;</td>
-      </tr>
+            </td>
+            <td class="logo">
+                <img class="logo" src="https://caos.ch/images/LogoCaos.png" alt="CAOS AG - Logo">
+            </td>
+        </tr>
     </table>
-  </body>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+        <tr>
+            <td></td>
+            <td class="container">
+                <div class="content">
+
+                    <!-- START CENTERED WHITE CONTAINER -->
+                    <table role="pheader" class="tableheader" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="headercell">
+                                <p class="headertitle">Zitadel</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <table role="presentation" class="main">
+
+                        <!-- START MAIN CONTENT AREA -->
+                        <tr>
+                            <td class="wrapper">
+                                <table role="presentation" class="maincontent" border="0" cellpadding="0"
+                                    cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <p class="hello">{{.Greeting}}</p>
+                                            <p>{{.Text}}</p>
+                                            <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                                class="btn btn-primary">
+                                                <tbody>
+                                                    <tr>
+                                                        <td align="center">
+                                                            <table role="presentation" border="0" cellpadding="0"
+                                                                cellspacing="0">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td> <a href="{{.URL}}" target="_blank"
+                                                                                rel="noopener noreferrer">{{.ButtonText}}</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- END MAIN CONTENT AREA -->
+                    </table>
+                    <!-- END CENTERED WHITE CONTAINER -->
+
+                    <!-- START FOOTER -->
+                    <div class="footer">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td class="content-block">
+                                    <span class="apple-link">CAOS AG &nbsp;&nbsp; | &nbsp;&nbsp; Teufener Strasse 19
+                                        &nbsp;&nbsp; | &nbsp;&nbsp; CH-9000 St.Gallen</span>
+                                    <br> <a href="http://www.caos.ch">caos.ch</a>.
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- END FOOTER -->
+
+                </div>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+</body>
+
 </html>

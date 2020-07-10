@@ -87,7 +87,7 @@ func TestApplicationValid(t *testing.T) {
 					Name:       "Name",
 					Type:       AppTypeOIDC,
 					OIDCConfig: &OIDCConfig{
-						ResponseTypes: []OIDCResponseType{OIDCResponseTypeToken},
+						ResponseTypes: []OIDCResponseType{OIDCResponseTypeIDTokenToken},
 						GrantTypes:    []OIDCGrantType{OIDCGrantTypeImplicit},
 					},
 				},
@@ -103,7 +103,7 @@ func TestApplicationValid(t *testing.T) {
 					Name:       "Name",
 					Type:       AppTypeOIDC,
 					OIDCConfig: &OIDCConfig{
-						ResponseTypes: []OIDCResponseType{OIDCResponseTypeToken},
+						ResponseTypes: []OIDCResponseType{OIDCResponseTypeIDTokenToken},
 						GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 					},
 				},
@@ -135,7 +135,7 @@ func TestApplicationValid(t *testing.T) {
 					Name:       "Name",
 					Type:       AppTypeOIDC,
 					OIDCConfig: &OIDCConfig{
-						ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode, OIDCResponseTypeToken},
+						ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode, OIDCResponseTypeIDTokenToken},
 						GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode, OIDCGrantTypeImplicit},
 					},
 				},
@@ -151,7 +151,7 @@ func TestApplicationValid(t *testing.T) {
 					Name:       "Name",
 					Type:       AppTypeOIDC,
 					OIDCConfig: &OIDCConfig{
-						ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode, OIDCResponseTypeIDToken, OIDCResponseTypeToken},
+						ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode, OIDCResponseTypeIDToken, OIDCResponseTypeIDTokenToken},
 						GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode, OIDCGrantTypeImplicit},
 					},
 				},

@@ -6,10 +6,10 @@
             {{event.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
         </span>
         <span class="editor">{{event.editor}}</span>
-        <span class="desc">{{'CHANGES.EVENTS.'+event.eventType | translate}}</span>
+        <span class="desc">{{event?.eventType?.localizedMessage }}</span>
     </li>
     <div class="sp-wrapper">
         <mat-spinner *ngIf="loading | async" diameter="25"></mat-spinner>
     </div>
-    <span class="err-container" *ngIf="errorMessage">{{errorMessage}}</span>
+    <span class="end-container" *ngIf="bottom">{{'CHANGES.BOTTOM' | translate}}</span>
 </div>

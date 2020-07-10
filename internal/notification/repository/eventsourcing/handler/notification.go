@@ -2,22 +2,22 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/auth"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/i18n"
-	"github.com/caos/zitadel/internal/notification/types"
-	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"net/http"
 	"time"
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/types"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
+	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 type Notification struct {
@@ -168,5 +168,5 @@ func (n *Notification) OnError(event *models.Event, err error) error {
 }
 
 func getSetNotifyContextData(orgID string) context.Context {
-	return auth.SetCtxData(context.Background(), auth.CtxData{UserID: NotifyUserID, OrgID: orgID})
+	return authz.SetCtxData(context.Background(), authz.CtxData{UserID: NotifyUserID, OrgID: orgID})
 }

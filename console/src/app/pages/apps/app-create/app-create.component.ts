@@ -31,7 +31,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     public oidcResponseTypes: OIDCResponseType[] = [
         OIDCResponseType.OIDCRESPONSETYPE_CODE,
         OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
-        OIDCResponseType.OIDCRESPONSETYPE_TOKEN,
+        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN,
     ];
     public oidcGrantTypes: OIDCGrantType[] = [
         OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
@@ -99,8 +99,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.oidcApp.responseTypesList = this.responseTypesList?.value;
         this.oidcApp.authMethodType = this.authMethodType?.value;
 
-        console.log(this.oidcApp);
-
         this.projectService
             .CreateOIDCApp(this.oidcApp)
             .then((data: Application) => {
@@ -119,7 +117,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             });
 
             dialogRef.afterClosed().subscribe(result => {
-                console.log('The dialog was closed');
                 this.router.navigate(['projects', this.projectId, 'apps', app.id]);
             });
         } else {

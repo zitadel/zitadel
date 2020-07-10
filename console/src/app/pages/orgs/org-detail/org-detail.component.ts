@@ -1,10 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Org, OrgDomainView, OrgMember, OrgMemberSearchResponse, OrgState } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -28,9 +30,11 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     private subscription: Subscription = new Subscription();
 
     public domains: OrgDomainView.AsObject[] = [];
+    public primaryDomain: string = '';
     public newDomain: string = '';
 
     constructor(
+        private dialog: MatDialog,
         public translate: TranslateService,
         private orgService: OrgService,
         private toast: ToastService,
@@ -48,12 +52,12 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         this.orgService.GetMyOrg().then((org: Org) => {
             this.org = org.toObject();
         }).catch(error => {
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
 
         this.orgService.SearchMyOrgDomains(0, 100).then(result => {
-            console.log(result.toObject().resultList);
             this.domains = result.toObject().resultList;
+            this.primaryDomain = this.domains.find(domain => domain.primary)?.domain ?? '';
         });
     }
 
@@ -62,13 +66,13 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             this.orgService.ReactivateMyOrg().then(() => {
                 this.toast.showInfo('Reactivated Org');
             }).catch((error) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         } else if (event.value === OrgState.ORGSTATE_INACTIVE) {
             this.orgService.DeactivateMyOrg().then(() => {
                 this.toast.showInfo('Deactivated Org');
             }).catch((error) => {
-                this.toast.showError(error.message);
+                this.toast.showError(error);
             });
         }
     }
@@ -81,15 +85,28 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
 
     public removeDomain(domain: string): void {
-        console.log(domain);
-        this.orgService.RemoveMyOrgDomain(domain).then(() => {
-            this.toast.showInfo('Removed');
-            const index = this.domains.findIndex(d => d.domain === domain);
-            if (index > -1) {
-                this.domains.splice(index, 1);
+        const dialogRef = this.dialog.open(WarnDialogComponent, {
+            data: {
+                confirmKey: 'ACTIONS.DELETE',
+                cancelKey: 'ACTIONS.CANCEL',
+                titleKey: 'ORG.DOMAINS.DELETE.TITLE',
+                descriptionKey: 'ORG.DOMAINS.DELETE.DESCRIPTION',
+            },
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.orgService.RemoveMyOrgDomain(domain).then(() => {
+                    this.toast.showInfo('Removed');
+                    const index = this.domains.findIndex(d => d.domain === domain);
+                    if (index > -1) {
+                        this.domains.splice(index, 1);
+                    }
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
             }
-        }).catch(error => {
-            this.toast.showError(error.message);
         });
     }
 }

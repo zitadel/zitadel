@@ -72,6 +72,10 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *mod
 		return nil, err
 	}
 	request.Audience = ids
+	if request.LoginHint != "" {
+		err = repo.checkLoginName(request, request.LoginHint)
+		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID).Debug("login hint invalid")
+	}
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
 		return nil, err
@@ -118,11 +122,10 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName s
 	if err != nil {
 		return err
 	}
-	user, err := repo.View.UserByLoginName(loginName)
+	err = repo.checkLoginName(request, loginName)
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, loginName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -174,6 +177,15 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id string, chec
 	return request, nil
 }
 
+func (repo *AuthRequestRepo) checkLoginName(request *model.AuthRequest, loginName string) error {
+	user, err := repo.View.UserByLoginName(loginName)
+	if err != nil {
+		return err
+	}
+	request.SetUserInfo(user.ID, loginName, user.ResourceOwner)
+	return nil
+}
+
 func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthRequest, checkLoggedIn bool) ([]model.NextStep, error) {
 	if request == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
@@ -184,12 +196,14 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *model.AuthR
 	}
 	if request.UserID == "" {
 		steps = append(steps, &model.LoginStep{})
-		if request.Prompt == model.PromptSelectAccount {
+		if request.Prompt == model.PromptSelectAccount || request.Prompt == model.PromptUnspecified {
 			users, err := repo.usersForUserSelection(request)
 			if err != nil {
 				return nil, err
 			}
-			steps = append(steps, &model.SelectUserStep{Users: users})
+			if len(users) > 0 || request.Prompt == model.PromptSelectAccount {
+				steps = append(steps, &model.SelectUserStep{Users: users})
+			}
 		}
 		return steps, nil
 	}

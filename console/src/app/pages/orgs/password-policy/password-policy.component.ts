@@ -124,7 +124,6 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                             break;
                         case PolicyComponentType.IAM_POLICY:
                             this.iamData = data.toObject();
-                            console.log(this.iamData);
                             break;
                     }
                 });
@@ -161,7 +160,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementLength(): void {
-        if (this.complexityData?.minLength) {
+        if (this.complexityData?.minLength !== undefined) {
             this.complexityData.minLength++;
         }
     }
@@ -173,7 +172,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementMaxAttempts(): void {
-        if (this.lockoutData?.maxAttempts) {
+        if (this.lockoutData?.maxAttempts !== undefined) {
             this.lockoutData.maxAttempts++;
         }
     }
@@ -185,7 +184,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementExpireWarnDays(): void {
-        if (this.ageData?.expireWarnDays) {
+        if (this.ageData?.expireWarnDays !== undefined) {
             this.ageData.expireWarnDays++;
         }
     }
@@ -197,7 +196,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementMaxAgeDays(): void {
-        if (this.ageData?.maxAgeDays) {
+        if (this.ageData?.maxAgeDays !== undefined) {
             this.ageData.maxAgeDays++;
         }
     }
@@ -219,7 +218,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
@@ -231,12 +230,11 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
                 case PolicyComponentType.COMPLEXITY:
-                    console.log(this.complexityData);
                     this.orgService.CreatePasswordComplexityPolicy(
                         this.complexityData.description,
                         this.complexityData.hasLowercase,
@@ -247,12 +245,11 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                     break;
 
                 case PolicyComponentType.IAM_POLICY:
-                    console.log(this.complexityData);
                     const orgId = this.sessionStorage.getItem('organization');
                     if (orgId) {
                         this.adminService.CreateOrgIamPolicy(
@@ -262,7 +259,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         ).then(() => {
                             this.router.navigate(['org']);
                         }).catch(error => {
-                            this.toast.showError(error.message);
+                            this.toast.showError(error);
                         });
                     }
                     break;
@@ -277,7 +274,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
@@ -289,12 +286,11 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
 
                     break;
                 case PolicyComponentType.COMPLEXITY:
-                    console.log(this.complexityData);
                     this.orgService.UpdatePasswordComplexityPolicy(
                         this.complexityData.description,
                         this.complexityData.hasLowercase,
@@ -305,12 +301,11 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     ).then(() => {
                         this.router.navigate(['org']);
                     }).catch(error => {
-                        this.toast.showError(error.message);
+                        this.toast.showError(error);
                     });
                     break;
 
                 case PolicyComponentType.IAM_POLICY:
-                    console.log(this.complexityData);
                     const orgId = this.sessionStorage.getItem('organization');
                     if (orgId) {
                         this.adminService.UpdateOrgIamPolicy(
@@ -320,7 +315,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                         ).then(() => {
                             this.router.navigate(['org']);
                         }).catch(error => {
-                            this.toast.showError(error.message);
+                            this.toast.showError(error);
                         });
                     }
                     break;

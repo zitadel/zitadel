@@ -27,9 +27,16 @@ google-credentials
 key.json
 .keys/*
 
+# dumps
+.backups
+
 cockroach-data/*
 .build/
 
 #binaries
 cmd/zitadel/zitadel
 **/statik/statik.go
+
+# buildfolders and generated js
+tmp/
+console/src/app/proto/generated/

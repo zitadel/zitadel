@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/api/auth"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_event "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	policy_event "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
@@ -42,11 +42,11 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 }
 
 func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*usr_model.User, error) {
-	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	pwPolicy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (repo *UserRepo) CreateUser(ctx context.Context, user *usr_model.User) (*us
 }
 
 func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, resourceOwner string) (*usr_model.User, error) {
-	policyResourceOwner := auth.GetCtxData(ctx).OrgID
+	policyResourceOwner := authz.GetCtxData(ctx).OrgID
 	if resourceOwner != "" {
 		policyResourceOwner = resourceOwner
 	}
@@ -62,7 +62,7 @@ func (repo *UserRepo) RegisterUser(ctx context.Context, user *usr_model.User, re
 	if err != nil {
 		return nil, err
 	}
-	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	orgPolicy, err := repo.OrgEvents.GetOrgIamPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -104,6 +104,13 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	if err != nil {
 		return nil, err
 	}
+	for _, change := range changes.Changes {
+		change.ModifierName = change.ModifierId
+		user, _ := repo.UserEvents.UserByID(ctx, change.ModifierId)
+		if user != nil {
+			change.ModifierName = user.DisplayName
+		}
+	}
 	return changes, nil
 }
 
@@ -124,7 +131,7 @@ func (repo *UserRepo) UserMfas(ctx context.Context, userID string) ([]*usr_model
 }
 
 func (repo *UserRepo) SetOneTimePassword(ctx context.Context, password *usr_model.Password) (*usr_model.Password, error) {
-	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, auth.GetCtxData(ctx).OrgID)
+	policy, err := repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +180,10 @@ func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.
 
 func (repo *UserRepo) ChangePhone(ctx context.Context, email *usr_model.Phone) (*usr_model.Phone, error) {
 	return repo.UserEvents.ChangePhone(ctx, email)
+}
+
+func (repo *UserRepo) RemovePhone(ctx context.Context, userID string) error {
+	return repo.UserEvents.RemovePhone(ctx, userID)
 }
 
 func (repo *UserRepo) CreatePhoneVerificationCode(ctx context.Context, userID string) error {

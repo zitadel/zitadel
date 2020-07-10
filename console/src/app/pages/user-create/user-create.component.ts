@@ -49,7 +49,6 @@ export class UserCreateComponent implements OnDestroy {
     ) {
         this.orgService.GetMyOrgIamPolicy().then((iampolicy) => {
             this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
-            console.log(this.userLoginMustBeDomain);
             this.initForm();
         }).catch(error => {
             console.error(error);
@@ -83,12 +82,11 @@ export class UserCreateComponent implements OnDestroy {
 
     public createUser(): void {
         this.user = this.userForm.value;
-        console.log(this.user);
 
         this.userService
             .CreateUser(this.user)
             .then((data: User) => {
-                this.toast.showInfo('User created');
+                this.toast.showInfo('USER.TOAST.CREATED', true);
                 this.router.navigate(['users', data.getId()]);
             })
             .catch(data => {

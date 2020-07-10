@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Metadata } from 'grpc-web';
 import { from, Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
+    Changes,
+    ChangesRequest,
     Gender,
     MfaOtpResponse,
     MultiFactors,
@@ -13,6 +15,7 @@ import {
     MyProjectOrgSearchRequest,
     MyProjectOrgSearchResponse,
     PasswordChange,
+    PasswordComplexityPolicy,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
     UpdateUserPhoneRequest,
@@ -21,6 +24,7 @@ import {
     UserEmail,
     UserPhone,
     UserProfile,
+    UserProfileView,
     UserSessionViews,
     UserView,
     VerifyMfaOtp,
@@ -55,13 +59,22 @@ export class AuthUserService {
         return responseMapper(response);
     }
 
-    public async GetMyUserProfile(): Promise<UserProfile> {
+    public async GetMyUserProfile(): Promise<UserProfileView> {
         return await this.request(
             c => c.getMyUserProfile,
             new Empty(),
             f => f,
         );
     }
+
+    public async GetMyPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
+        return await this.request(
+            c => c.getMyPasswordComplexityPolicy,
+            new Empty(),
+            f => f,
+        );
+    }
+
 
     public async GetMyUser(): Promise<UserView> {
         return await this.request(
@@ -121,7 +134,6 @@ export class AuthUserService {
         if (preferredLanguage) {
             req.setPreferredLanguage(preferredLanguage);
         }
-        console.log(req.toObject());
         return await this.request(
             c => c.updateMyUserProfile,
             req,
@@ -145,12 +157,20 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserEmail(email: UserEmail.AsObject): Promise<UserEmail> {
+    public async SaveMyUserEmail(email: string): Promise<UserEmail> {
         const req = new UpdateUserEmailRequest();
-        req.setEmail(email.email);
+        req.setEmail(email);
         return await this.request(
             c => c.changeMyUserEmail,
             req,
+            f => f,
+        );
+    }
+
+    public async RemoveMyUserPhone(): Promise<Empty> {
+        return await this.request(
+            c => c.removeMyUserPhone,
+            new Empty(),
             f => f,
         );
     }
@@ -185,9 +205,9 @@ export class AuthUserService {
         );
     }
 
-    public async SaveMyUserPhone(phone: UserPhone.AsObject): Promise<UserPhone> {
+    public async SaveMyUserPhone(phone: string): Promise<UserPhone> {
         const req = new UpdateUserPhoneRequest();
-        req.setPhone(phone.phone);
+        req.setPhone(phone);
         return await this.request(
             c => c.changeMyUserPhone,
             req,
@@ -282,6 +302,17 @@ export class AuthUserService {
         );
     }
 
+    public async GetMyUserChanges(limit: number, sequenceoffset: number): Promise<Changes> {
+        const req = new ChangesRequest();
+        req.setLimit(limit);
+        req.setSequenceOffset(sequenceoffset);
+        return await this.request(
+            c => c.getMyUserChanges,
+            req,
+            f => f,
+        );
+    }
+
     public isAllowed(roles: string[], each: boolean = false): Observable<boolean> {
         if (roles && roles.length > 0) {
             if (this._roleCache.length > 0) {
@@ -297,8 +328,10 @@ export class AuthUserService {
                         userRoles = ['user.resourceowner'];
                     }
                     this._roleCache = userRoles;
-                    console.log(roles);
                     return of(this.hasRoles(userRoles, roles, each));
+                }),
+                catchError((err) => {
+                    return of(false);
                 }),
             );
         } else {

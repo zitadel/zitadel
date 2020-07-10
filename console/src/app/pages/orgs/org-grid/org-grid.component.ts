@@ -31,10 +31,9 @@ export class OrgGridComponent {
     private getData(limit: number, offset: number): void {
         this.userService.SearchMyProjectOrgs(limit, offset).then(res => {
             this.orgList = res.toObject().resultList;
-            console.log(this.orgList);
         }).catch(error => {
             console.error(error);
-            this.toast.showError(error.message);
+            this.toast.showError(error);
         });
     }
 

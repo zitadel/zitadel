@@ -1,6 +1,7 @@
 package view
 
 import (
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -12,6 +13,9 @@ func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, er
 	user := new(model.UserGrantView)
 	query := repository.PrepareGetByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyGrantID), grantID)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Nqwf1", "Errors.Token.NotFound")
+	}
 	return user, err
 }
 
@@ -23,6 +27,9 @@ func UserGrantByIDs(db *gorm.DB, table, resourceOwnerID, projectID, userID strin
 	userIDQuery := model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, resourceOwnerIDQuery, projectIDQuery, userIDQuery)
 	err := query(db, user)
+	if caos_errs.IsNotFound(err) {
+		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Q1tq2", "Errors.UserGrant.NotFound")
+	}
 	return user, err
 }
 
@@ -53,6 +60,20 @@ func UserGrantsByProjectID(db *gorm.DB, table, projectID string) ([]*model.UserG
 	users := make([]*model.UserGrantView, 0)
 	queries := []*grant_model.UserGrantSearchQuery{
 		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+	}
+	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
+	_, err := query(db, &users)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func UserGrantsByProjectAndUserID(db *gorm.DB, table, projectID, userID string) ([]*model.UserGrantView, error) {
+	users := make([]*model.UserGrantView, 0)
+	queries := []*grant_model.UserGrantSearchQuery{
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+		&grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals},
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Queries: queries})
 	_, err := query(db, &users)
