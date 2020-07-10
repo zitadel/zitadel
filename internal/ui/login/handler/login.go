@@ -83,6 +83,7 @@ func csrfInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler)
 	return csrf.Protect([]byte(csrfKey),
 		csrf.Secure(!config.Development),
 		csrf.CookieName(config.CookieName),
+		csrf.Path("/"),
 		csrf.ErrorHandler(errorHandler),
 	), nil
 }
