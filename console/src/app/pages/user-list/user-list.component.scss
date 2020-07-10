@@ -50,6 +50,8 @@ h1 {
         width: 100%;
 
         td, th {
+            padding: 0 1rem;
+
             &:first-child {
                 padding-left: 0;
                 padding-right: 1rem;
@@ -59,19 +61,6 @@ h1 {
                 padding-right: 0;
             }
         }
-
-        // tr {
-        //     .avatar {
-        //         filter: grayscale(100%);
-        //         transition: filter .1s ease-in-out;
-        //     }
-    
-        //     &:hover {
-        //         .avatar {
-        //             filter: none;
-        //         }
-        //     }
-        // }
 
         .data-row {
             cursor: pointer;

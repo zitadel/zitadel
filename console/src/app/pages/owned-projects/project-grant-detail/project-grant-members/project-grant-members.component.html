@@ -69,7 +69,7 @@
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.ROLES' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let member">
                 <mat-form-field class="form-field" appearance="outline" *ngIf="projectId">
-                    <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
+                    <mat-label>{{ 'PROJECT.MEMBER.ROLES' | translate }}</mat-label>
                     <mat-select [(ngModel)]="member.rolesList" multiple [disabled]="disabled"
                         (selectionChange)="updateRoles(member, $event)">
                         <mat-option *ngFor="let role of memberRoleOptions" [value]="role">

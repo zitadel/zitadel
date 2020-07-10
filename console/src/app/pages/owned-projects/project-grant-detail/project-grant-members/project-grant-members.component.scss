@@ -30,7 +30,7 @@
 
 .table-wrapper {
     overflow: auto;
-
+    
     .spinner-container {
         display: flex;
         align-items: center;
@@ -38,8 +38,6 @@
     }
 
     table, mat-paginator {
-        width: 100%;
-
         td, th {
             padding: .5rem;
             &:first-child {

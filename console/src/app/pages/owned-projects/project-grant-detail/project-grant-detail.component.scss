@@ -2,6 +2,16 @@
     display: flex;
     padding-bottom: 3rem;
 
+    h1 {
+        font-size: 1.2rem;
+    }
+  
+    .desc {
+        display: block;
+        font-size: .9rem;
+        color: #8795a1;
+    }
+
     .left {
         width: 100px;
         display: flex;
@@ -27,17 +37,56 @@
             a {
                 display: block;
             }
-          
+
             h1 {
-                font-size: 1.2rem;
+                margin-top: 0.2rem;
+                font-size: 2rem;
             }
-          
-            .desc {
-                width: 100%;
-                display: block;
-                font-size: .9rem;
-                color: #8795a1;
+        }
+
+        .master-row {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+
+            .left-col {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 2rem;
+    
+                .row {
+                    max-width: 400px;
+                    display: flex;
+                    align-items: center;
+                    padding: .5rem 0;
+    
+                    span {
+                        font-size: .9rem;
+                    }
+    
+                    .first {
+                        color: #8795a1;
+                    }
+                }
             }
+
+            .fill-space {
+                flex: 1;
+            }
+
+            .state-button {
+                border-radius: .5rem;
+            }
+        }
+        
+        mat-form-field {
+            width: 100%;
+        }
+
+        .divider {
+            height: 1px; 
+            background-color: #ffffff20;
         }
     }
 }

@@ -408,7 +408,9 @@
             },
             "DETAIL": {
                 "TITLE":"Managers of the granted organisation",
-                "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project."
+                "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
+                "PROJECTNAME":"Project Name",
+                "RESOURCEOWNER":"Resource Owner"
             },
             "SHOWDETAIL":"Show Details",
             "USER":"User",
@@ -461,7 +463,9 @@
             "MEMBERSADDED": "Managers added!",
             "MEMBERADDED": "Manager added!",
             "ROLEREMOVED":"Role removed!",
-            "ROLECHANGED":"Role changed!"
+            "ROLECHANGED":"Role changed!",
+            "REACTIVATED":"Reaktiviert!",
+            "DEACTIVATED":"Deaktiviert!"
         }
     },
     "APP": {

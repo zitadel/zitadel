@@ -407,8 +407,12 @@
                 "FOR_ORG":"The grant wird erstellt für:"
             },
             "DETAIL": {
-                "TITLE":"Berechtigte Manager der Organisation",
-                "DESC":"Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum editieren der jeweiligen Zugänge erhalten sollen."
+                "TITLE":"Organisationsberechtigung",
+                "DESC":"Hier können Sie die Eigenschaften der gewählten Organisationsberechtigung prüfen und editieren!",
+                "MEMBERTITLE":"Berechtigte Manager der Organisation",
+                "MEMBERDESC":"Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum editieren der jeweiligen Zugänge erhalten sollen.",
+                "PROJECTNAME":"Projekt Name",
+                "RESOURCEOWNER":"Besitzer"
             },
             "SHOWDETAIL":"Zeige Details",
             "USER":"Benutzer",
@@ -461,7 +465,9 @@
             "MEMBERSADDED": "Manager hinzugefügt!",
             "MEMBERADDED": "Manager hinzugefügt!",
             "ROLEREMOVED":"Rolle entfernt!",
-            "ROLECHANGED":"Rolle verändert!"
+            "ROLECHANGED":"Rolle verändert!",
+            "REACTIVATED":"Reaktiviert!",
+            "DEACTIVATED":"Deaktiviert!"
         }
     },
     "APP": {
