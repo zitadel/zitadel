@@ -11,6 +11,8 @@ import { Org, OrgDomainView, OrgMember, OrgMemberSearchResponse, OrgState } from
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { AddDomainDialogComponent } from './add-domain-dialog/add-domain-dialog.component';
+
 
 @Component({
     selector: 'app-org-detail',
@@ -31,7 +33,6 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
     public domains: OrgDomainView.AsObject[] = [];
     public primaryDomain: string = '';
-    public newDomain: string = '';
 
     constructor(
         private dialog: MatDialog,
@@ -64,23 +65,32 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     public changeState(event: MatButtonToggleChange | any): void {
         if (event.value === OrgState.ORGSTATE_ACTIVE) {
             this.orgService.ReactivateMyOrg().then(() => {
-                this.toast.showInfo('Reactivated Org');
+                this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
             }).catch((error) => {
                 this.toast.showError(error);
             });
         } else if (event.value === OrgState.ORGSTATE_INACTIVE) {
             this.orgService.DeactivateMyOrg().then(() => {
-                this.toast.showInfo('Deactivated Org');
+                this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
             }).catch((error) => {
                 this.toast.showError(error);
             });
         }
     }
 
-    public saveNewOrgDomain(): void {
-        this.orgService.AddMyOrgDomain(this.newDomain).then(domain => {
-            this.domains.push(domain.toObject());
-            this.newDomain = '';
+    public addNewDomain(): void {
+        const dialogRef = this.dialog.open(AddDomainDialogComponent, {
+            data: {},
+            width: '400px',
+        });
+
+        dialogRef.afterClosed().subscribe(resp => {
+            if (resp) {
+                this.orgService.AddMyOrgDomain(resp).then(domain => {
+                    this.domains.push(domain.toObject());
+                    this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
+                });
+            }
         });
     }
 
@@ -98,7 +108,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe(resp => {
             if (resp) {
                 this.orgService.RemoveMyOrgDomain(domain).then(() => {
-                    this.toast.showInfo('Removed');
+                    this.toast.showInfo('ORG.TOAST.DOMAINREMOVED', true);
                     const index = this.domains.findIndex(d => d.domain === domain);
                     if (index > -1) {
                         this.domains.splice(index, 1);

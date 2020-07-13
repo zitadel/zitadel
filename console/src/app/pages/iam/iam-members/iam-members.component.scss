@@ -1,26 +1,43 @@
 .container {
+    display: flex;
     padding-bottom: 3rem;
 
-    .head {
+    .left {
+        width: 100px;
         display: flex;
-        align-items: center;
-        border-bottom: 1px solid #ffffff20;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        
+        padding: 1rem;
+        justify-content: center;
+
         a {
-            display: block;
+            margin-top: .2rem;
         }
-        
-        h1 {
-            font-size: 1.2rem;
-        }
-        
-        .desc {
-            width: 100%;
-            display: block;
-            font-size: .9rem;
-            color: #8795a1;
+    }
+
+    .right {
+        flex: 1;
+        padding-top: 1rem;
+
+        .head {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ffffff20;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+          
+            a {
+                display: block;
+            }
+          
+            h1 {
+                font-size: 1.2rem;
+            }
+          
+            .desc {
+                width: 100%;
+                display: block;
+                font-size: .9rem;
+                color: #8795a1;
+            }
         }
     }
 }

@@ -17,11 +17,11 @@
     .meta {
         position: relative;
         flex: 1 0 300px;
+        padding: 1rem;
 
 		@media only screen and (min-width: 1500px) {
 			flex-basis: 400px;
 		}
-        padding: 1rem;
         
         .meta-content {
             max-height: calc(100vh - 60px);
@@ -32,6 +32,7 @@
         &.hidden {
             flex: 0 0 0 !important;
             width: 0;
+            padding: 1px;
 
             .hide {
                 transform: rotate(180deg);

@@ -35,9 +35,10 @@ h1 {
         position: relative;
         z-index: 100;
         margin: 1rem;
-        flex-basis: 250px;
+        flex-basis: 230px;
         display: flex;
         text-decoration: none;
+        overflow: hidden;
         cursor: pointer;
         padding-top: 0;
         padding-right: 0;
@@ -45,14 +46,14 @@ h1 {
         padding-left: 1rem;
         border-radius: 0.5rem;
         box-sizing: border-box;
-        min-height: 166px;
+        min-height: 130px;
 
         * {
             box-sizing: border-box;
         }
 
         &.active {
-            border: 2px solid #db4c69;
+            border: 2px solid #38649d;
         }
 
         .selection-icon {
@@ -151,16 +152,28 @@ h1 {
         }
 
         .edit-button {
+            opacity: 0;
+            user-select: none;            
             position: absolute;
             bottom: 0;
             right: 0;
             margin: 0;
             margin-bottom: 0.25rem;
+            color: #8795a1;
+
+            &:hover {
+                opacity: 1;
+                color: white;
+            }
+
+            &.selected {
+                opacity: 1;
+            }
         }
 
 
         &:hover {
-            .selection-icon {
+            .edit-button {
                 opacity: 1;
             }
 
@@ -180,7 +193,7 @@ h1 {
                 }
             }
 
-            .selection-icon {
+            .edit-button {
                 opacity: 1;
             }
         }
@@ -188,13 +201,13 @@ h1 {
 
     .add-org-button {
         z-index: 100;
-        flex-basis: 250px;
+        flex-basis: 230px;
         cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        min-height: 166px;
+        min-height: 130px;
         border-radius: 0.5rem;
         margin: 1rem;
         box-sizing: border-box;
@@ -220,4 +233,11 @@ h1 {
             }
         }
     }
+}
+
+.n-items {
+    padding: 0 1rem;
+    font-size: .8rem;
+    color: #8795a1;
+    flex-basis: 100%;
 }

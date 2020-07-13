@@ -48,7 +48,9 @@
         "REMOVE":"Remove",
         "VERIFY":"Verify",
         "FINISH":"Finish",
-        "CHANGE":"Change"
+        "CHANGE":"Change",
+        "REACTIVATE":"Aktivieren",
+        "DEACTIVATE":"Deaktivieren"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing!"
@@ -246,11 +248,16 @@
             "STATE":"State"
         },
         "DOMAINS": {
+            "NEW":"Add Domain",
             "TITLE":"Domains",
             "DESCRIPTION":"Configure your domains. This domain can be used to login with your users.",
             "DELETE": {
                 "TITLE":"Delete domain?",
                 "DESCRIPTION":"You are about to delete one of your domains. Note that your users can no longer use this domain for their logins."
+            },
+            "ADD": {
+                "TITLE":"Add domain",
+                "DESCRIPTION":"You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
             }
         },
         "STATE": {
@@ -308,7 +315,13 @@
                 "MAXAGEDAYS":"Max Age in days",
                 "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
-            "DELETE":"Uninstall Policy"
+            "DELETE":"Uninstall / Reset Policy"
+        },
+        "TOAST": {
+            "DEACTIVATED":"Organization deactivated!",
+            "REACTIVATED":"Organization reactivated!",
+            "DOMAINADDED":"Added domain!",
+            "DOMAINREMOVED":"Removed domain!"
         }
     },
     "ORG_DETAIL": {
@@ -362,7 +375,17 @@
             "ALL": "All",
             "CREATEDON":"Created on",
             "LASTMODIFIED":"Last modified on",
-            "ADDNEW":"Create new project"
+            "ADDNEW":"Create new project",
+            "DIALOG": {
+                "REACTIVATE": {
+                    "TITLE":"Reactivate project",
+                    "DESCRIPTION":"Do you really want to ractivate your project?"
+                },
+                "DEACTIVATE": {
+                    "TITLE":"Deactivate project",
+                    "DESCRIPTION":"Do you really want to deactivate your project?"
+                }
+            }
         },
         "STATE": {
             "TITLE":"State",
@@ -408,7 +431,9 @@
             },
             "DETAIL": {
                 "TITLE":"Managers of the granted organisation",
-                "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project."
+                "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
+                "PROJECTNAME":"Project Name",
+                "RESOURCEOWNER":"Resource Owner"
             },
             "SHOWDETAIL":"Show Details",
             "USER":"User",
@@ -461,7 +486,9 @@
             "MEMBERSADDED": "Managers added!",
             "MEMBERADDED": "Manager added!",
             "ROLEREMOVED":"Role removed!",
-            "ROLECHANGED":"Role changed!"
+            "ROLECHANGED":"Role changed!",
+            "REACTIVATED":"Reaktiviert!",
+            "DEACTIVATED":"Deaktiviert!"
         }
     },
     "APP": {
