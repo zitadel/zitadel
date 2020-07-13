@@ -34,7 +34,7 @@ export class AccountsCardComponent implements OnInit {
     }
 
     public editUserProfile(): void {
-        this.router.navigate(['user/me']);
+        this.router.navigate(['users/me']);
         this.close.emit();
     }
 

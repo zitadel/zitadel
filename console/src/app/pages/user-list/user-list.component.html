@@ -78,7 +78,7 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="['/user', row.id]">
+                [routerLink]="['/users', row.id]">
             </tr>
 
         </table>

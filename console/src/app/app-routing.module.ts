@@ -27,13 +27,8 @@ const routes: Routes = [
         },
     },
     {
-        path: 'user',
-        loadChildren: () => import('./pages/user-detail/user-detail.module').then(m => m.UserDetailModule),
-        canActivate: [AuthGuard],
-    },
-    {
         path: 'users',
-        loadChildren: () => import('./pages/user-list/user-list.module').then(m => m.UserListModule),
+        loadChildren: () => import('./pages/users/users.module').then(m => m.UsersModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['user.read'],
@@ -55,7 +50,6 @@ const routes: Routes = [
             roles: ['org.read'],
         },
     },
-
     {
         path: 'grant-create/project/:projectid/grant/:grantid',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
