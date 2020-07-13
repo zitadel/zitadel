@@ -41,7 +41,8 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}, projectEvents: repos.ProjectEvents},
 		&User{handler: handler{view, bulkLimit, configs.cycleDuration("User"), errorCount}, eventstore: eventstore, orgEvents: repos.OrgEvents},
 		&UserGrant{handler: handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount}, projectEvents: repos.ProjectEvents, userEvents: repos.UserEvents, orgEvents: repos.OrgEvents},
-		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
+		NewOrg(handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}),
+		// &Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 		&OrgMember{handler: handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount}, userEvents: repos.UserEvents},
 		&OrgDomain{handler: handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount}},
 	}
@@ -50,7 +51,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 1 * time.Second
+		return 100 * time.Hour
 	}
 	return c.MinimumCycleDuration.Duration
 }

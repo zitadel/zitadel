@@ -25,7 +25,7 @@ type Org struct {
 
 func NewOrg(h handler) *Org {
 	o := &Org{h}
-	o.awaitEvents(context.Background())
+	go o.awaitEvents(context.Background())
 	return o
 }
 
