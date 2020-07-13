@@ -1,6 +1,8 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 import { Org } from 'src/app/proto/generated/auth_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -35,10 +37,10 @@ export class OrgGridComponent {
         this.selection.changed.subscribe(selection => {
             this.setPrefixedItem('pinned-orgs', JSON.stringify(
                 this.selection.selected.map(item => item.id),
-            )).then(() => {
-                const filtered = this.notPinned.filter(item => item === selection.added.find(i => i === item));
-                filtered.forEach((f, i) => {
-                    this.notPinned.splice(i, 1);
+            )).pipe(take(1)).subscribe(() => {
+                selection.added.forEach(element => {
+                    const index = this.notPinned.findIndex(item => item.id === element.id);
+                    this.notPinned.splice(index, 1);
                 });
 
                 this.notPinned.push(...selection.removed);
@@ -47,7 +49,7 @@ export class OrgGridComponent {
     }
 
     public reorganizeItems(): void {
-        this.getPrefixedItem('pinned-orgs').then(storageEntry => {
+        this.getPrefixedItem('pinned-orgs').pipe(take(1)).subscribe(storageEntry => {
             if (storageEntry) {
                 const array: string[] = JSON.parse(storageEntry);
                 const toSelect: Org.AsObject[] = this.orgList.filter((item, index) => {
@@ -68,19 +70,28 @@ export class OrgGridComponent {
         });
     }
 
-    private async getPrefixedItem(key: string): Promise<string | null> {
-        const prefix = (await this.authService.GetActiveOrg()).id;
-        return localStorage.getItem(`${prefix}:${key}`);
+    private getPrefixedItem(key: string): Observable<string | null> {
+        return this.authService.user.pipe(
+            take(1),
+            switchMap(user => {
+                return of(localStorage.getItem(`${user.id}:${key}`));
+            }),
+        );
     }
 
-    private async setPrefixedItem(key: string, value: any): Promise<void> {
-        const prefix = (await this.authService.GetActiveOrg()).id;
-        return localStorage.setItem(`${prefix}:${key}`, value);
+    private setPrefixedItem(key: string, value: any): Observable<void> {
+        return this.authService.user.pipe(
+            take(1),
+            switchMap(user => {
+                return of(localStorage.setItem(`${user.id}:${key}`, value));
+            }),
+        );
     }
 
     private getData(limit: number, offset: number): void {
         this.userService.SearchMyProjectOrgs(limit, offset).then(res => {
             this.orgList = res.toObject().resultList;
+            console.log(this.orgList);
 
             this.notPinned = Object.assign([], this.orgList);
             this.reorganizeItems();
