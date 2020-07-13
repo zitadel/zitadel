@@ -64,7 +64,7 @@ export class OrgCreateComponent {
         private fb: FormBuilder,
         private authUserService: AuthUserService,
     ) {
-        const validators: Validators[] = [Validators.required];
+        const validators: Validators[] = [];
 
         this.orgForm = this.fb.group({
             name: ['', [Validators.required]],
