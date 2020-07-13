@@ -29,7 +29,6 @@ import { ChangesModule } from '../../modules/changes/changes.module';
 import { MetaLayoutModule } from '../../modules/meta-layout/meta-layout.module';
 import { ProjectContributorsModule } from '../../modules/project-contributors/project-contributors.module';
 import { PipesModule } from '../../pipes/pipes.module';
-import { UserListModule } from '../user-list/user-list.module';
 import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
 import { OwnedProjectGridComponent } from './owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
@@ -65,7 +64,6 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatFormFieldModule,
         MatInputModule,
         ChangesModule,
-        UserListModule,
         MatChipsModule,
         MatIconModule,
         MatButtonModule,

@@ -7,7 +7,7 @@ import { AuthGuard } from '../../guards/auth.guard';
 const routes: Routes = [
     {
         path: 'all',
-        loadChildren: () => import('../../pages/user-list/user-list.module').then(m => m.UserListModule),
+        loadChildren: () => import('src/app/pages/users/user-list/user-list.module').then(m => m.UserListModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['user.read'],
@@ -15,7 +15,7 @@ const routes: Routes = [
     },
     {
         path: '',
-        loadChildren: () => import('../user-detail/user-detail.module').then(m => m.UserDetailModule),
+        loadChildren: () => import('src/app/pages/users/user-detail/user-detail.module').then(m => m.UserDetailModule),
         canActivate: [AuthGuard],
     },
 ];
