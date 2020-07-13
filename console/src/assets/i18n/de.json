@@ -248,11 +248,16 @@
             "STATE":"Status"
         },
         "DOMAINS": {
+            "NEW":"Domain hinzufügen",
             "TITLE":"Domains",
             "DESCRIPTION":"Konfiguriere die Domains mit denen sich deine Benutzer einloggen können.",
             "DELETE": {
                 "TITLE":"Domain löschen?",
                 "DESCRIPTION":"Du bist im Begriff eine Domain aus deiner Organisation zu löschen. Deine Benutzer können diese nach dem Löschen nicht mehr für den Login nutzen."
+            },
+            "ADD": {
+                "TITLE":"Domain hinzufügen",
+                "DESCRIPTION":"Du bist im Begriff eine Domain, Ihrer Organisation hinzuzufügen. Deine Benutzer können diese nach dieser erfolgreichen Aktion für den Login nutzen."
             }
         },
         "STATE": {
@@ -266,7 +271,7 @@
         },
         "POLICY": {
             "TITLE":"Richtlinen entdecken",
-            "DESCRIPTION":"Vorgefertigte Richtlinien, die dir Zeit spart und deine Sicherheit verbessern.",
+            "DESCRIPTION":"Vorgefertigte Richtlinien, die dir Zeit sparen und deine Sicherheit verbessern.",
             "PWD_COMPLEXITY": {
                 "TITLE":"Passwort Komplexität",
                 "DESCRIPTION":"Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen",
@@ -311,6 +316,12 @@
                 "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
             "DELETE":"Richtlinie entfernen"
+        },
+        "TOAST": {
+            "DEACTIVATED":"Organisation deaktiviert!",
+            "REACTIVATED":"Organisation reaktiviert!",
+            "DOMAINADDED":"Domain hinzugefügt!",
+            "DOMAINREMOVED":"Domain entfernt!"
         }
     },
     "ORG_DETAIL": {

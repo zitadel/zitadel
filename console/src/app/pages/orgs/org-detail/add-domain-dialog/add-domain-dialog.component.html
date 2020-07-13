@@ -1,0 +1,18 @@
+<span class="title" mat-dialog-title>{{'ORG.DOMAINS.ADD.TITLE' | translate}}</span>
+<div mat-dialog-content>
+    <p class="desc"> {{'ORG.DOMAINS.ADD.DESCRIPTION' | translate}}</p>
+
+    <mat-form-field label="Access Code" required="true">
+        <mat-label>Code</mat-label>
+        <input matInput [(ngModel)]="newdomain" />
+    </mat-form-field>
+</div>
+<div mat-dialog-actions class="action">
+    <button mat-button (click)="closeDialog()">
+        {{'ACTIONS.CANCEL' | translate}}
+    </button>
+
+    <button color="warn" mat-raised-button class="ok-button" [disabled]="!newdomain" (click)="closeDialogWithSuccess()">
+        {{'ACTIONS.ADD' | translate}}
+    </button>
+</div>

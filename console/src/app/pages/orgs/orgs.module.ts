@@ -20,6 +20,7 @@ import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { OrgContributorsModule } from './org-contributors/org-contributors.module';
+import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgGridComponent } from './org-grid/org-grid.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
@@ -48,6 +49,7 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         WarnDialogModule,
         MatMenuModule,
         ChangesModule,
+        AddDomainDialogModule,
         TranslateModule.forChild({
             loader: {
                 provide: TranslateLoader,
