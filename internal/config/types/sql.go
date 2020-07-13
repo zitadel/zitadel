@@ -61,6 +61,10 @@ func (s *SQL) Start() (*sql.DB, error) {
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
 	}
+	if err = client.Ping(); err != nil {
+		logging.Log("TYPES-44whs").WithError(err).Warn("inital ping failed")
+		return nil, err
+	}
 	return client, nil
 }
 
