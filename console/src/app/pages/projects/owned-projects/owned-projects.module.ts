@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,19 +15,18 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
+import { CardModule } from 'src/app/modules/card/card.module';
+import { ChangesModule } from 'src/app/modules/changes/changes.module';
+import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
-import { HttpLoaderFactory } from '../../app.module';
-import { HasRoleModule } from '../../directives/has-role/has-role.module';
-import { CardModule } from '../../modules/card/card.module';
-import { ChangesModule } from '../../modules/changes/changes.module';
-import { MetaLayoutModule } from '../../modules/meta-layout/meta-layout.module';
-import { ProjectContributorsModule } from '../../modules/project-contributors/project-contributors.module';
-import { PipesModule } from '../../pipes/pipes.module';
 import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
 import { OwnedProjectGridComponent } from './owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
@@ -79,13 +77,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatTooltipModule,
         MatSortModule,
         PipesModule,
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [HttpClient],
-            },
-        }),
+        TranslateModule,
     ],
     schemas: [NO_ERRORS_SCHEMA],
 })
