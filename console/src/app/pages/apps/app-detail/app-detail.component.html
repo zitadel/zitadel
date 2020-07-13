@@ -1,6 +1,6 @@
 <div class="max-width-container">
     <div class="head">
-        <a (click)="navigateBack()" mat-icon-button>
+        <a [routerLink]="['/projects', projectId]" mat-icon-button>
             <mat-icon class="icon">arrow_back</mat-icon>
         </a>
         <h1>{{ 'APP.PAGES.TITLE' | translate }} {{app?.name}}</h1>
@@ -16,11 +16,9 @@
             <div class="content">
                 <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
                     <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE" matTooltip="Deactivate Org">
-                        <!-- <i class="las la-toggle-off"></i> -->
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
                     </mat-button-toggle>
                     <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE" matTooltip="Activate Org">
-                        <!-- <i class="las la-toggle-on"></i> -->
                         {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
                     </mat-button-toggle>
                 </mat-button-toggle-group>
