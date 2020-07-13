@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"context"
+	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
+
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
-	"time"
 
 	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -11,13 +15,37 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 )
 
+const (
+	orgTable = "management.orgs"
+)
+
 type Org struct {
 	handler
 }
 
-const (
-	orgTable = "management.orgs"
-)
+func NewOrg(h handler) *Org {
+	o := &Org{h}
+	o.awaitEvents(context.Background())
+	return o
+}
+
+func (o *Org) awaitEvents(ctx context.Context) {
+	feed := make(chan *es_models.Event)
+	subscriber := eventstore.Subscribe(feed, model.OrgAggregate)
+	for {
+		select {
+		case <-ctx.Done():
+			subscriber.Unsubscribe()
+			return
+		case event := <-feed:
+			err := o.Reduce(event)
+			if err != nil {
+				err = o.OnError(event, err)
+				logging.Log("HANDL-FOdlj").OnError(err).Info("unable to save failed event")
+			}
+		}
+	}
+}
 
 func (o *Org) MinimumCycleDuration() time.Duration { return o.cycleDuration }
 
