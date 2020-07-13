@@ -1,0 +1,122 @@
+<div class="max-width-container">
+    <div class="head">
+        <a [routerLink]="['/projects', projectId]" mat-icon-button>
+            <mat-icon class="icon">arrow_back</mat-icon>
+        </a>
+        <h1>{{ 'APP.PAGES.TITLE' | translate }} {{app?.name}}</h1>
+
+        <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
+        <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
+    </div>
+
+    <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
+
+    <app-card title="{{ 'APP.PAGES.DETAIL.TITLE' | translate }}" *ngIf="app">
+        <form [formGroup]="appNameForm" (ngSubmit)="saveOIDCApp()">
+            <div class="content">
+                <mat-button-toggle-group formControlName="state" class="toggle" (change)="changeState($event)">
+                    <mat-button-toggle [value]="AppState.APPSTATE_INACTIVE" matTooltip="Deactivate Org">
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_INACTIVE | translate}}
+                    </mat-button-toggle>
+                    <mat-button-toggle [value]="AppState.APPSTATE_ACTIVE" matTooltip="Activate Org">
+                        {{'APP.PAGES.DETAIL.STATE.'+AppState.APPSTATE_ACTIVE | translate}}
+                    </mat-button-toggle>
+                </mat-button-toggle-group>
+
+                <mat-form-field class="formfield">
+                    <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
+                    <input matInput formControlName="name" />
+                </mat-form-field>
+            </div>
+            <div class="btn-container">
+                <button type="submit" color="primary" [disabled]="appNameForm.invalid || name?.disabled"
+                    mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+            </div>
+        </form>
+    </app-card>
+
+    <app-card title="{{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig">
+        <card-actions class="card-actions">
+            <button mat-stroked-button
+                (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
+        </card-actions>
+        <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
+            <div class="content">
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'APP.OIDC.CLIENTID' | translate }}</mat-label>
+                    <input matInput formControlName="clientId" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
+                    <mat-select formControlName="responseTypesList" multiple>
+                        <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
+                            {{ 'APP.OIDC.RESPONSE'+type | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'APP.OIDC.GRANT' | translate }}</mat-label>
+                    <mat-select formControlName="grantTypesList" multiple>
+                        <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
+                            {{ 'APP.OIDC.GRANT'+grant | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'APP.OIDC.APPTYPE' | translate }}</mat-label>
+                    <mat-select formControlName="applicationType">
+                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
+                            {{ 'APP.OIDC.APPTYPE'+type | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</mat-label>
+                    <mat-select formControlName="authMethodType">
+                        <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
+                            {{ 'APP.OIDC.AUTHMETHOD'+type | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
+                    <mat-chip-list #chipRedirectList>
+                        <mat-chip *ngFor="let redirect of redirectUrisList" [selectable]="selectable"
+                            (removed)="remove(redirect, RedirectType.REDIRECT)">
+                            {{redirect}}
+                            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                        </mat-chip>
+                        <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            [matChipInputAddOnBlur]="addOnBlur"
+                            (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
+                    </mat-chip-list>
+                </mat-form-field>
+
+                <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
+                    <mat-chip-list #chipPostRedirectList>
+                        <mat-chip *ngFor="let redirect of postLogoutRedirectUrisList" [selectable]="selectable"
+                            (removed)="remove(redirect, RedirectType.POSTREDIRECT)">
+                            {{redirect}}
+                            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                        </mat-chip>
+                        <input [matChipInputFor]="chipPostRedirectList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                            (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)">
+                    </mat-chip-list>
+                </mat-form-field>
+            </div>
+            <div class="btn-container">
+
+                <button type="submit" color="primary" [disabled]="appForm.invalid"
+                    mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+            </div>
+        </form>
+
+    </app-card>
+</div>

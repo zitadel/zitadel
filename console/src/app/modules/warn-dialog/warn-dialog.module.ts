@@ -14,8 +14,5 @@ import { WarnDialogComponent } from './warn-dialog.component';
         TranslateModule,
         MatButtonModule,
     ],
-    entryComponents: [
-        WarnDialogComponent,
-    ],
 })
 export class WarnDialogModule { }

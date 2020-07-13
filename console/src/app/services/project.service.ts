@@ -513,6 +513,29 @@ export class ProjectService {
         );
     }
 
+
+    public async DeactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
+        const req = new ProjectGrantID();
+        req.setId(id);
+        req.setProjectId(projectId);
+        return await this.request(
+            c => c.deactivateProjectGrant,
+            req,
+            f => f,
+        );
+    }
+
+    public async ReactivateProjectGrant(id: string, projectId: string): Promise<ProjectGrant> {
+        const req = new ProjectGrantID();
+        req.setId(id);
+        req.setProjectId(projectId);
+        return await this.request(
+            c => c.reactivateProjectGrant,
+            req,
+            f => f,
+        );
+    }
+
     // ********* */
 
     public async SearchProjectUserGrants(

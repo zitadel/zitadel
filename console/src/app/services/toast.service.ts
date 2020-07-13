@@ -34,7 +34,7 @@ export class ToastService {
                 this.authService.authenticate(undefined, true, true);
             });
         } else {
-            const actionObserver$ = this.showMessage(decodeURI(message), 'close', { duration: 5000 });
+            this.showMessage(decodeURI(message), 'close', { duration: 3000 });
         }
     }
 

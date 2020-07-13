@@ -12,7 +12,8 @@ const routes: Routes = [
     },
     {
         path: 'granted-projects',
-        loadChildren: () => import('./pages/granted-projects/granted-projects.module').then(m => m.GrantedProjectsModule),
+        loadChildren: () => import('./pages/projects/granted-projects/granted-projects.module')
+            .then(m => m.GrantedProjectsModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['project.read'],
@@ -20,20 +21,16 @@ const routes: Routes = [
     },
     {
         path: 'projects',
-        loadChildren: () => import('./pages/owned-projects/owned-projects.module').then(m => m.OwnedProjectsModule),
+        loadChildren: () => import('./pages/projects/owned-projects/owned-projects.module')
+            .then(m => m.OwnedProjectsModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['project.read'],
         },
     },
     {
-        path: 'user',
-        loadChildren: () => import('./pages/user-detail/user-detail.module').then(m => m.UserDetailModule),
-        canActivate: [AuthGuard],
-    },
-    {
         path: 'users',
-        loadChildren: () => import('./pages/user-list/user-list.module').then(m => m.UserListModule),
+        loadChildren: () => import('./pages/users/users.module').then(m => m.UsersModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['user.read'],
@@ -55,7 +52,6 @@ const routes: Routes = [
             roles: ['org.read'],
         },
     },
-
     {
         path: 'grant-create/project/:projectid/grant/:grantid',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')

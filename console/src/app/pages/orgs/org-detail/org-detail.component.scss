@@ -81,16 +81,6 @@ h1 {
     color: #818a8a;
 }
 
-.new-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-
-    mat-form-field {
-        flex: 1;
-    }
-}
-
 .side {
     .details {
         margin-bottom: 1rem;

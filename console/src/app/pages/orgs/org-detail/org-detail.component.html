@@ -15,16 +15,8 @@
             </div>
 
             <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN_VERIFICATION' | translate}}</p>
-            <div class="new-row">
-                <mat-form-field appearance="outline">
-                    <mat-label>new domain</mat-label>
-                    <input matInput [(ngModel)]="newDomain" />
-                </mat-form-field>
-
-                <button matTooltip="Add domain" mat-icon-button color="primary" (click)="saveNewOrgDomain()">
-                    <mat-icon>check</mat-icon>
-                </button>
-            </div>
+            <button matTooltip="Add domain" mat-raised-button color="primary"
+                (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' | translate}} </button>
         </app-card>
 
         <ng-template appHasRole [appHasRole]="['policy.read']">

@@ -28,8 +28,5 @@ import { MemberCreateDialogComponent } from './member-create-dialog.component';
         SearchRolesAutocompleteModule,
         OrgMemberRolesAutocompleteModule,
     ],
-    entryComponents: [
-        MemberCreateDialogComponent,
-    ],
 })
 export class MemberCreateDialogModule { }

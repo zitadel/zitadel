@@ -54,7 +54,7 @@
                 <div class="list">
                     <ng-container *ngIf="authService.authenticationChanged | async">
                         <a class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
-                            [routerLink]="['/user/me']">
+                            [routerLink]="['/users/me']">
                             <i class="icon las la-user-circle"></i>
                             <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
                         </a>
@@ -104,7 +104,7 @@
                             <div class="line"></div>
                         </div>
 
-                        <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/users']"
+                        <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/users/all']"
                             [routerLinkActiveOptions]="{ exact: true }">
                             <i class="icon las la-users"></i>
                             <span class="label">{{ 'MENU.USER' | translate }}</span>

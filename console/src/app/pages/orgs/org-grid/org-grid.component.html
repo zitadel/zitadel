@@ -11,9 +11,11 @@
     </div>
 
     <div class="container">
+        <p class="n-items" *ngIf="!loading && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}</p>
+
         <div matTooltip="{{'ORG.PAGES.SELECTORGTOOLTIP' | translate}}" class="item card"
-            *ngFor="let org of orgList; index as i" (click)="selectOrg(org, $event)"
-            [ngClass]="{ selected: selection.isSelected(org),active: activeOrg?.id === org?.id }">
+            *ngFor="let org of selection.selected; index as i" (click)="selectOrg(org, $event)"
+            [ngClass]="{ active: activeOrg?.id === org?.id }">
             <div class="text-part">
                 <span class="description">{{org.id}}</span>
 
@@ -23,17 +25,31 @@
                 <div class="icons">
                 </div>
             </div>
-            <button [matMenuTriggerFor]="editMenu" class="edit-button" mat-icon-button>
-                <mat-icon>more_vert</mat-icon>
+            <button [ngClass]="{ selected: selection.isSelected(org)}" (click)="selection.toggle(org)"
+                class="edit-button" mat-icon-button>
+                <mat-icon>push_pin_outline</mat-icon>
             </button>
+        </div>
+    </div>
+    <div class="container">
+        <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
-            <mat-menu #editMenu="matMenu">
-                <ng-template matMenuContent>
-                    <button (click)="routeToOrg(org)" mat-menu-item>
-                        {{'ACTIONS.VIEW' | translate}}
-                    </button>
-                </ng-template>
-            </mat-menu>
+        <div matTooltip="{{'ORG.PAGES.SELECTORGTOOLTIP' | translate}}" class="item card"
+            *ngFor="let org of notPinned; index as i" (click)="selectOrg(org, $event)"
+            [ngClass]="{ active: activeOrg?.id === org?.id }">
+            <div class="text-part">
+                <span class="description">{{org.id}}</span>
+
+                <span class="name" *ngIf="org.name">{{ org.name }}</span>
+                <span class="name" *ngIf="!org.name">No Name</span>
+                <span class="fill-space"></span>
+                <div class="icons">
+                </div>
+            </div>
+            <button [ngClass]="{ selected: selection.isSelected(org)}" (click)="selection.toggle(org)"
+                class="edit-button" mat-icon-button>
+                <mat-icon>push_pin_outline</mat-icon>
+            </button>
         </div>
 
         <ng-template appHasRole [appHasRole]="['iam.write']">

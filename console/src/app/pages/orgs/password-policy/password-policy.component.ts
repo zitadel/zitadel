@@ -3,12 +3,6 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import {
-    OrgIamPolicy,
-    PasswordAgePolicy,
-    PasswordComplexityPolicy,
-    PasswordLockoutPolicy,
-} from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { OrgService } from 'src/app/services/org.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -37,11 +31,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
     componentAction: PolicyComponentAction = PolicyComponentAction.CREATE;
 
-    policyData!: PasswordLockoutPolicy.AsObject |
-        PasswordAgePolicy.AsObject |
-        PasswordComplexityPolicy.AsObject |
-        OrgIamPolicy.AsObject;
-    policyType: PolicyComponentType = PolicyComponentType.COMPLEXITY;
+    public policyType: PolicyComponentType = PolicyComponentType.COMPLEXITY;
 
     public PolicyComponentType: any = PolicyComponentType;
     public PolicyComponentAction: any = PolicyComponentAction;
@@ -156,6 +146,32 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                 this.titleSub.next('ORG.POLICY.IAM_POLICY.TITLECREATE');
                 this.descSub.next('ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE');
                 return this.orgService.GetMyOrgIamPolicy();
+        }
+    }
+
+    public deletePolicy(): void {
+        switch (this.policyType) {
+            case PolicyComponentType.LOCKOUT:
+                this.orgService.DeletePasswordLockoutPolicy(this.lockoutData.id).then(() => {
+                    this.toast.showInfo('Successfully deleted');
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+                break;
+            case PolicyComponentType.AGE:
+                this.orgService.DeletePasswordAgePolicy(this.ageData.id).then(() => {
+                    this.toast.showInfo('Successfully deleted');
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+                break;
+            case PolicyComponentType.COMPLEXITY:
+                this.orgService.DeletePasswordComplexityPolicy(this.complexityData.id).then(() => {
+                    this.toast.showInfo('Successfully deleted');
+                }).catch(error => {
+                    this.toast.showError(error);
+                });
+                break;
         }
     }
 
