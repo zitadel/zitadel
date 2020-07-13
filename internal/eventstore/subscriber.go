@@ -9,7 +9,6 @@ import (
 var (
 	subscriberLock sync.Mutex
 	subscribers    map[models.AggregateType]map[*subscriber]chan<- *models.Event = make(map[models.AggregateType]map[*subscriber]chan<- *models.Event)
-	subscriberIdx  int
 )
 
 type subscriber struct{}
@@ -47,7 +46,6 @@ func Subscribe(feed chan<- *models.Event, aggregateTypes ...models.AggregateType
 	subscriberLock.Lock()
 	defer subscriberLock.Unlock()
 
-	subscriberIdx++
 	s := new(subscriber)
 
 	for _, aggregateType := range aggregateTypes {
