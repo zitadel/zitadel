@@ -194,12 +194,14 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 	return nil
 }
 
-func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
+func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID string, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	request.AppendProjectQuery(projectID)
 	roles, count, err := repo.View.SearchProjectRoles(request)
 	if err != nil {
 		return nil, err
 	}
+
 	return &proj_model.ProjectRoleSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
