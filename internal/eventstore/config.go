@@ -21,6 +21,5 @@ func Start(conf Config) (Eventstore, error) {
 	return &eventstore{
 		repo:             repo,
 		aggregateCreator: models.NewAggregateCreator(conf.ServiceName),
-		subscribers:      make(map[models.EventType][]*subscriber),
 	}, nil
 }
