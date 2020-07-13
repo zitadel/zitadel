@@ -71,7 +71,7 @@
             <td class="pointer" mat-cell *matCellDef="let grant">
                 <mat-form-field class="form-field" appearance="outline" *ngIf="grant.roleKeysList">
                     <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
-                    <mat-select [(ngModel)]="grant.roleKeysList" multiple
+                    <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="disabled"
                         (selectionChange)="updateRoles(grant, $event)">
                         <mat-option *ngFor="let role of memberRoleOptions" [value]="role.key">
                             {{role.key}}

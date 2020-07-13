@@ -1,12 +1,14 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
     Application,
     ApplicationSearchResponse,
@@ -69,6 +71,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         private projectService: ProjectService,
         private _location: Location,
         private orgService: OrgService,
+        private dialog: MatDialog,
     ) {
     }
 
@@ -99,16 +102,45 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
     public changeState(newState: ProjectState): void {
         if (newState === ProjectState.PROJECTSTATE_ACTIVE) {
-            this.projectService.ReactivateProject(this.projectId).then(() => {
-                this.toast.showInfo('Reactivated Project');
-            }).catch(error => {
-                this.toast.showError(error);
+            const dialogRef = this.dialog.open(WarnDialogComponent, {
+                data: {
+                    confirmKey: 'ACTIONS.REACTIVATE',
+                    cancelKey: 'ACTIONS.CANCEL',
+                    titleKey: 'PROJECT.PAGES.DIALOG.REACTIVATE.TITLE',
+                    descriptionKey: 'PROJECT.PAGES.DIALOG.REACTIVATE.DESCRIPTION',
+                },
+                width: '400px',
             });
+            dialogRef.afterClosed().subscribe(resp => {
+                if (resp) {
+                    this.projectService.ReactivateProject(this.projectId).then(() => {
+                        this.toast.showInfo('Reactivated Project');
+                        this.project.state = ProjectState.PROJECTSTATE_ACTIVE;
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
+            });
+
         } else if (newState === ProjectState.PROJECTSTATE_INACTIVE) {
-            this.projectService.DeactivateProject(this.projectId).then(() => {
-                this.toast.showInfo('Deactivated Project');
-            }).catch(error => {
-                this.toast.showError(error);
+            const dialogRef = this.dialog.open(WarnDialogComponent, {
+                data: {
+                    confirmKey: 'ACTIONS.DEACTIVATE',
+                    cancelKey: 'ACTIONS.CANCEL',
+                    titleKey: 'PROJECT.PAGES.DIALOG.DEACTIVATE.TITLE',
+                    descriptionKey: 'PROJECT.PAGES.DIALOG.DEACTIVATE.DESCRIPTION',
+                },
+                width: '400px',
+            });
+            dialogRef.afterClosed().subscribe(resp => {
+                if (resp) {
+                    this.projectService.DeactivateProject(this.projectId).then(() => {
+                        this.toast.showInfo('Deactivated Project');
+                        this.project.state = ProjectState.PROJECTSTATE_INACTIVE;
+                    }).catch(error => {
+                        this.toast.showError(error);
+                    });
+                }
             });
         }
     }

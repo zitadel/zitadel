@@ -48,7 +48,9 @@
         "REMOVE":"Entfernen",
         "VERIFY":"Verifizieren",
         "FINISH":"Abschliessen",
-        "CHANGE":"Ändern"
+        "CHANGE":"Ändern",
+        "REACTIVATE":"Aktivieren",
+        "DEACTIVATE":"Deaktivieren"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus!"
@@ -362,7 +364,17 @@
             "ALL": "Alle",
             "CREATEDON":"Erstellt am",
             "LASTMODIFIED":"Zuletzt verändert am",
-            "ADDNEW":"Neues Projekt erstellen"
+            "ADDNEW":"Neues Projekt erstellen",
+            "DIALOG": {
+                "REACTIVATE": {
+                    "TITLE":"Projekt reaktivieren",
+                    "DESCRIPTION":"Wollen Sie das Project wirklich reaktivieren?"
+                },
+                "DEACTIVATE": {
+                    "TITLE":"Projekt deaktivieren",
+                    "DESCRIPTION":"Wollen Sie das Project wirklich deaktivieren?"
+                }
+            }
         },
         "STATE": {
             "TITLE":"Status",

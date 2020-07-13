@@ -20,6 +20,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 
 import { HttpLoaderFactory } from '../../app.module';
 import { HasRoleModule } from '../../directives/has-role/has-role.module';
@@ -68,6 +69,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatChipsModule,
         MatIconModule,
         MatButtonModule,
+        WarnDialogModule,
         MatProgressSpinnerModule,
         MetaLayoutModule,
         MatProgressBarModule,

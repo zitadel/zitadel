@@ -48,7 +48,9 @@
         "REMOVE":"Remove",
         "VERIFY":"Verify",
         "FINISH":"Finish",
-        "CHANGE":"Change"
+        "CHANGE":"Change",
+        "REACTIVATE":"Aktivieren",
+        "DEACTIVATE":"Deaktivieren"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing!"
@@ -362,7 +364,17 @@
             "ALL": "All",
             "CREATEDON":"Created on",
             "LASTMODIFIED":"Last modified on",
-            "ADDNEW":"Create new project"
+            "ADDNEW":"Create new project",
+            "DIALOG": {
+                "REACTIVATE": {
+                    "TITLE":"Reactivate project",
+                    "DESCRIPTION":"Do you really want to ractivate your project?"
+                },
+                "DEACTIVATE": {
+                    "TITLE":"Deactivate project",
+                    "DESCRIPTION":"Do you really want to deactivate your project?"
+                }
+            }
         },
         "STATE": {
             "TITLE":"State",
