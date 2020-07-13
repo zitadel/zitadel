@@ -20,7 +20,7 @@ export class AccountsCardComponent implements OnInit {
     constructor(public authService: AuthService, private router: Router, private userService: AuthUserService) {
         this.userService.getMyUserSessions().then(sessions => {
             this.users = sessions.toObject().userSessionsList;
-            const index = this.users.findIndex(user => user.userName === this.profile.userName);
+            const index = this.users.findIndex(user => user.loginName === this.profile.preferredLoginName);
             this.users.splice(index, 1);
 
             this.loadingUsers = false;
