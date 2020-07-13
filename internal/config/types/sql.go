@@ -46,7 +46,6 @@ func (s *SQL) connectionString() string {
 
 	if s.SSL.Mode != sslDisabledMode {
 		fields = append(fields, []string{
-			"ssl=true",
 			"sslrootcert=" + s.SSL.RootCert,
 			"sslcert=" + s.SSL.Cert,
 			"sslkey=" + s.SSL.Key,
