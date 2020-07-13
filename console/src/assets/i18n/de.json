@@ -315,7 +315,7 @@
                 "MAXAGEDAYS":"Maximale Gültigkeit in Tagen",
                 "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
-            "DELETE":"Richtlinie entfernen"
+            "DELETE":"Richtlinie entfernen / zurücksetzen"
         },
         "TOAST": {
             "DEACTIVATED":"Organisation deaktiviert!",

@@ -7,8 +7,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpLoaderFactory } from 'src/app/app.module';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
 import { PasswordPolicyRoutingModule } from './password-policy-routing.module';
 import { PasswordPolicyComponent } from './password-policy.component';
@@ -24,6 +26,8 @@ import { PasswordPolicyComponent } from './password-policy.component';
         MatButtonModule,
         MatSlideToggleModule,
         MatIconModule,
+        HasRoleModule,
+        MatTooltipModule,
         TranslateModule.forChild({
             loader: {
                 provide: TranslateLoader,

@@ -8,8 +8,6 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { AddDomainDialogComponent } from './add-domain-dialog.component';
 
-
-
 @NgModule({
     declarations: [AddDomainDialogComponent],
     imports: [

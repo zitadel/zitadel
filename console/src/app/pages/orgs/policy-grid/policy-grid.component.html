@@ -48,10 +48,6 @@
             <button mat-icon-button disabled>
                 <i *ngIf="complexityPolicy" class="icon las la-check-circle"></i>
             </button>
-            <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn"
-                (click)="deletePolicy(PolicyComponentType.COMPLEXITY)" mat-icon-button>
-                <i class="las la-trash"></i>
-            </button>
         </div>
 
         <p *ngIf="complexityPolicy?.description; else showDescComplexity" class="desc">
@@ -107,12 +103,6 @@
                 <button mat-icon-button disabled>
                     <i *ngIf="iamPolicy" class="icon las la-check-circle"></i>
                 </button>
-                <ng-template appHasRole [appHasRole]="['iam.policy.write']">
-                    <button matTooltip="{{'ORG.POLICY.DELETE' | translate}}" color="warn"
-                        (click)="deletePolicy(PolicyComponentType.IAM_POLICY)" mat-icon-button>
-                        <i class="las la-trash"></i>
-                    </button>
-                </ng-template>
             </div>
 
             <p *ngIf="iamPolicy?.description; else showDescIAM" class="desc">

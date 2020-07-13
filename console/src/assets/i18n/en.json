@@ -315,7 +315,7 @@
                 "MAXAGEDAYS":"Max Age in days",
                 "USERLOGINMUSTBEDOMAIN":"User Login must be Domain"
             },
-            "DELETE":"Uninstall Policy"
+            "DELETE":"Uninstall / Reset Policy"
         },
         "TOAST": {
             "DEACTIVATED":"Organization deactivated!",

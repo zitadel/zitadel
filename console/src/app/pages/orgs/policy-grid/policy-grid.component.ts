@@ -47,30 +47,4 @@ export class PolicyGridComponent implements OnInit {
         this.orgService.GetMyOrgIamPolicy().then(data => this.iamPolicy = data.toObject())
             .catch(error => { });
     }
-
-    public deletePolicy(type: PolicyComponentType): void {
-        switch (type) {
-            case PolicyComponentType.LOCKOUT:
-                this.orgService.DeletePasswordLockoutPolicy(this.lockoutPolicy.id).then(() => {
-                    this.toast.showInfo('Successfully deleted');
-                }).catch(error => {
-                    this.toast.showError(error);
-                });
-                break;
-            case PolicyComponentType.AGE:
-                this.orgService.DeletePasswordAgePolicy(this.agePolicy.id).then(() => {
-                    this.toast.showInfo('Successfully deleted');
-                }).catch(error => {
-                    this.toast.showError(error);
-                });
-                break;
-            case PolicyComponentType.COMPLEXITY:
-                this.orgService.DeletePasswordLockoutPolicy(this.lockoutPolicy.id).then(() => {
-                    this.toast.showInfo('Successfully deleted');
-                }).catch(error => {
-                    this.toast.showError(error);
-                });
-                break;
-        }
-    }
 }

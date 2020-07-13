@@ -8,11 +8,11 @@
 
     .mat-table,
     mat-paginator {
-        background-color: $secondary-dark !important;
+        background-color: inherit !important;
         transition: background-color .5s ease-in-out;
 
         &.background-style {
-            background-color: $primary-dark !important;
+            background-color: inherit !important;
         }
     }
 
