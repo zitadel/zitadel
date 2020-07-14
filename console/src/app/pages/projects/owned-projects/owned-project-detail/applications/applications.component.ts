@@ -9,15 +9,15 @@ import { Application } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { ProjectApplicationsDataSource } from './project-applications-datasource';
+import { ProjectApplicationsDataSource } from './applications-datasource';
 
 
 @Component({
-    selector: 'app-project-applications',
-    templateUrl: './project-applications.component.html',
-    styleUrls: ['./project-applications.component.scss'],
+    selector: 'app-applications',
+    templateUrl: './applications.component.html',
+    styleUrls: ['./applications.component.scss'],
 })
-export class ProjectApplicationsComponent implements AfterViewInit, OnInit {
+export class ApplicationsComponent implements AfterViewInit, OnInit {
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;

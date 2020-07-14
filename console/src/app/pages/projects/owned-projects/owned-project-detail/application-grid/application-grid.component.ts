@@ -5,11 +5,11 @@ import { Application } from 'src/app/proto/generated/management_pb';
 import { ProjectService } from 'src/app/services/project.service';
 
 @Component({
-    selector: 'app-project-application-grid',
-    templateUrl: './project-application-grid.component.html',
-    styleUrls: ['./project-application-grid.component.scss'],
+    selector: 'app-application-grid',
+    templateUrl: './application-grid.component.html',
+    styleUrls: ['./application-grid.component.scss'],
 })
-export class ProjectApplicationGridComponent implements OnInit {
+export class ApplicationGridComponent implements OnInit {
     @Input() public projectId: string = '';
     @Input() public disabled: boolean = false;
     @Output() public changeView: EventEmitter<void> = new EventEmitter();
