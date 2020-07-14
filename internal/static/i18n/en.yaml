@@ -248,8 +248,8 @@ EventTypes:
       oidc:
         secret:
           check:
-            succeeded: OIDC Client Secret validation succeeded
-            failed: OIDC Client Secret validation failed
+            succeeded: OIDC Client Secret check succeeded
+            failed: OIDC Client Secret check failed
       config:
         oidc:
           added: OIDC Configuration added
