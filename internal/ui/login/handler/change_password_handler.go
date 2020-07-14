@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/caos/zitadel/internal/errors"
 	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -12,8 +13,9 @@ const (
 )
 
 type changePasswordData struct {
-	OldPassword string `schema:"old_password"`
-	NewPassword string `schema:"new_password"`
+	OldPassword             string `schema:"old_password"`
+	NewPassword             string `schema:"new_password"`
+	NewPasswordConfirmation string `schema:"new_password_confirmation"`
 }
 
 func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +23,11 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
+		return
+	}
+	if data.NewPassword != data.OldPassword {
+		err := errors.ThrowInvalidArgument(nil, "ERR-sj2Sq", "Errors.User.Password.ConfirmationWrong")
+		l.renderChangePassword(w, r, authReq, err)
 		return
 	}
 	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
