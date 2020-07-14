@@ -54,6 +54,8 @@ type ApplicationSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*ApplicationView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *ApplicationSearchRequest) EnsureLimit(limit uint64) {

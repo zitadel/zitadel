@@ -32,11 +32,15 @@ func projectFromModel(project *proj_model.Project) *management.Project {
 }
 
 func projectSearchResponseFromModel(response *proj_model.ProjectViewSearchResponse) *management.ProjectSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-iejs3").OnError(err).Debug("unable to parse timestamp")
 	return &management.ProjectSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
 		Result:      projectViewsFromModel(response.Result),
+		Sequence:    response.Sequence,
+		Timestamp:   timestamp,
 	}
 }
 
@@ -67,11 +71,16 @@ func projectViewFromModel(project *proj_model.ProjectView) *management.ProjectVi
 }
 
 func projectRoleSearchResponseFromModel(response *proj_model.ProjectRoleSearchResponse) *management.ProjectRoleSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-Lps0c").OnError(err).Debug("unable to parse timestamp")
+
 	return &management.ProjectRoleSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
 		Result:      projectRoleViewsFromModel(response.Result),
+		Sequence:    response.Sequence,
+		Timestamp:   timestamp,
 	}
 }
 

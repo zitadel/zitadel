@@ -48,12 +48,18 @@ func (repo *IamRepository) SearchIamMembers(ctx context.Context, request *iam_mo
 	if err != nil {
 		return nil, err
 	}
-	return &iam_model.IamMemberSearchResponse{
+	result := &iam_model.IamMemberSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      iam_es_model.IamMembersToModel(members),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestIamMemberSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *IamRepository) GetIamMemberRoles() []string {

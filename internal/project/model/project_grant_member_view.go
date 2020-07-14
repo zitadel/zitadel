@@ -50,6 +50,8 @@ type ProjectGrantMemberSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*ProjectGrantMemberView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *ProjectGrantMemberSearchRequest) EnsureLimit(limit uint64) {

@@ -34,7 +34,7 @@ func (p *NotifyUser) ViewModel() string {
 }
 
 func (p *NotifyUser) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestNotifyUserSequence()
+	sequence, _, err := p.view.GetLatestNotifyUserSequence()
 	if err != nil {
 		return nil, err
 	}

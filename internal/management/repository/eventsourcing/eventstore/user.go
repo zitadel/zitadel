@@ -91,12 +91,18 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	if err != nil {
 		return nil, err
 	}
-	return &usr_model.UserSearchResponse{
+	result := &usr_model.UserSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.UsersToModel(projects),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestUserSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {

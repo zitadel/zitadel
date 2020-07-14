@@ -43,6 +43,8 @@ type ProjectViewSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*ProjectView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *ProjectViewSearchRequest) AppendMyResourceOwnerQuery(orgID string) {

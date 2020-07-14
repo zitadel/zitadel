@@ -2,13 +2,14 @@ package view
 
 import (
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
 	notificationTable = "notification.notifications"
 )
 
-func (v *View) GetLatestNotificationSequence() (uint64, error) {
+func (v *View) GetLatestNotificationSequence() (uint64, time.Time, error) {
 	return v.latestSequence(notificationTable)
 }
 

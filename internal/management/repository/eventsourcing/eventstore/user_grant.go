@@ -60,10 +60,16 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 	if err != nil {
 		return nil, err
 	}
-	return &grant_model.UserGrantSearchResponse{
+	result := &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.UserGrantsToModel(grants),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestUserGrantSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }

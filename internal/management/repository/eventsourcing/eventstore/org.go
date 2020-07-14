@@ -61,12 +61,18 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgDomainSearchResponse{
+	result := &org_model.OrgDomainSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.OrgDomainsToModel(domains),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestOrgDomainSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
@@ -124,12 +130,18 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgMemberSearchResponse{
+	result := &org_model.OrgMemberSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.OrgMembersToModel(members),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestOrgMemberSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *OrgRepository) GetOrgMemberRoles() []string {

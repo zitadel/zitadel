@@ -1488,6 +1488,8 @@ message UserSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated UserView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 enum SearchMethod {
@@ -1849,6 +1851,8 @@ message OrgDomainSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated OrgDomainView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message OrgDomainSearchRequest {
@@ -1899,6 +1903,8 @@ message OrgMemberSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated OrgMemberView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message OrgMemberView {
@@ -1947,6 +1953,8 @@ message ProjectSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message ProjectView {
@@ -2079,6 +2087,8 @@ message ProjectRoleSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectRoleView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message ProjectRoleSearchRequest {
@@ -2117,6 +2127,8 @@ message ProjectMemberSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectMemberView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message ProjectMemberSearchRequest {
@@ -2243,6 +2255,8 @@ message ApplicationSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ApplicationView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message ApplicationSearchRequest {
@@ -2317,6 +2331,8 @@ message ProjectGrantSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectGrantView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message GrantedProjectSearchRequest {
@@ -2394,6 +2410,8 @@ message ProjectGrantMemberSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectGrantMemberView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message ProjectGrantMemberSearchRequest {
@@ -2528,6 +2546,8 @@ message UserGrantSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated UserGrantView result = 4;
+    uint64 sequence = 5;
+    google.protobuf.Timestamp timestamp = 6;
 }
 
 message UserGrantSearchRequest {

@@ -20,10 +20,16 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgSearchResult{
+	result := &org_model.OrgSearchResult{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.OrgsToModel(members),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestOrgSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }

@@ -32,7 +32,7 @@ func (u *UserSession) ViewModel() string {
 }
 
 func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSessionSequence()
+	sequence, _, err := u.view.GetLatestUserSessionSequence()
 	if err != nil {
 		return nil, err
 	}

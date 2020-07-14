@@ -93,12 +93,18 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectViewSearchResponse{
+	result := &proj_model.ProjectViewSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.ProjectsToModel(projects),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestProjectSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *ProjectRepo) ProjectGrantViewByID(ctx context.Context, grantID string) (project *proj_model.ProjectGrantView, err error) {
@@ -136,12 +142,18 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectMemberSearchResponse{
+	result := &proj_model.ProjectMemberSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.ProjectMembersToModel(members),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestProjectMemberSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *ProjectRepo) AddProjectRole(ctx context.Context, role *proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
@@ -202,12 +214,18 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 		return nil, err
 	}
 
-	return &proj_model.ProjectRoleSearchResponse{
+	result := &proj_model.ProjectRoleSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.ProjectRolesToModel(roles),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestProjectRoleSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ProjectChanges, error) {
@@ -260,12 +278,18 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ApplicationSearchResponse{
+	result := &proj_model.ApplicationSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.ApplicationViewsToModel(apps),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestApplicationSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, id string, appId string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {
@@ -305,12 +329,18 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectGrantViewSearchResponse{
+	result := &proj_model.ProjectGrantViewSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantsToModel(projects),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestProjectGrantSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *ProjectRepo) AddProjectGrant(ctx context.Context, grant *proj_model.ProjectGrant) (*proj_model.ProjectGrant, error) {
@@ -436,12 +466,18 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectGrantMemberSearchResponse{
+	result := &proj_model.ProjectGrantMemberSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantMembersToModel(members),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestProjectGrantMemberSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *ProjectRepo) GetProjectMemberRoles() []string {

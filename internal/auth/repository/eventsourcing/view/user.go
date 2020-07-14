@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -58,7 +59,7 @@ func (v *View) DeleteUser(userID string, eventSequence uint64) error {
 	return v.ProcessedUserSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserSequence() (uint64, error) {
+func (v *View) GetLatestUserSequence() (uint64, time.Time, error) {
 	return v.latestSequence(userTable)
 }
 

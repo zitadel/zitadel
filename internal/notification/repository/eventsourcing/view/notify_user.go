@@ -4,6 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -37,7 +38,7 @@ func (v *View) DeleteNotifyUser(userID string, eventSequence uint64) error {
 	return v.ProcessedNotifyUserSequence(eventSequence)
 }
 
-func (v *View) GetLatestNotifyUserSequence() (uint64, error) {
+func (v *View) GetLatestNotifyUserSequence() (uint64, time.Time, error) {
 	return v.latestSequence(notifyUserTable)
 }
 

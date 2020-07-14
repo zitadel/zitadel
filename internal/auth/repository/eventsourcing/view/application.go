@@ -3,6 +3,7 @@ package view
 import (
 	"context"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 
 	"github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
@@ -39,7 +40,7 @@ func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
 	return v.ProcessedApplicationSequence(eventSequence)
 }
 
-func (v *View) GetLatestApplicationSequence() (uint64, error) {
+func (v *View) GetLatestApplicationSequence() (uint64, time.Time, error) {
 	return v.latestSequence(applicationTable)
 }
 

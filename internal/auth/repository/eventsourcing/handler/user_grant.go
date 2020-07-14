@@ -55,7 +55,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 			return nil, err
 		}
 	}
-	sequence, err := u.view.GetLatestUserGrantSequence()
+	sequence, _, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return nil, err
 	}

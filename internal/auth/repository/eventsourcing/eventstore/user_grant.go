@@ -29,12 +29,18 @@ func (repo *UserGrantRepo) SearchMyUserGrants(ctx context.Context, request *gran
 	if err != nil {
 		return nil, err
 	}
-	return &grant_model.UserGrantSearchResponse{
+	result := &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.UserGrantsToModel(grants),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestUserGrantSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {

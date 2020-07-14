@@ -335,11 +335,15 @@ func updateAddressToModel(address *management.UpdateUserAddressRequest) *usr_mod
 }
 
 func userSearchResponseFromModel(response *usr_model.UserSearchResponse) *management.UserSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-aBezr").OnError(err).Debug("unable to parse timestamp")
 	return &management.UserSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
 		Result:      userViewsFromModel(response.Result),
+		Sequence:    response.Sequence,
+		Timestamp:   timestamp,
 	}
 }
 

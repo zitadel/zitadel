@@ -30,7 +30,7 @@ func (p *ProjectMember) ViewModel() string {
 }
 
 func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectMemberSequence()
+	sequence, _, err := p.view.GetLatestProjectMemberSequence()
 	if err != nil {
 		return nil, err
 	}

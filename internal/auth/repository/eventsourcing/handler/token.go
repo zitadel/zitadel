@@ -32,7 +32,7 @@ func (u *Token) ViewModel() string {
 }
 
 func (u *Token) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestTokenSequence()
+	sequence, _, err := u.view.GetLatestTokenSequence()
 	if err != nil {
 		return nil, err
 	}

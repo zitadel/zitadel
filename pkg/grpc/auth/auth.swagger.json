@@ -1230,6 +1230,14 @@
           "items": {
             "$ref": "#/definitions/v1UserGrantView"
           }
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

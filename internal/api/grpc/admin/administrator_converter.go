@@ -1,8 +1,10 @@
 package admin
 
 import (
+	"github.com/caos/logging"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/golang/protobuf/ptypes"
 )
 
 func viewsFromModel(views []*view_model.View) []*admin.View {
@@ -24,10 +26,14 @@ func failedEventsFromModel(failedEvents []*view_model.FailedEvent) []*admin.Fail
 }
 
 func viewFromModel(view *view_model.View) *admin.View {
+	timestamp, err := ptypes.TimestampProto(view.CurrentTimestamp)
+	logging.Log("GRPC-KSo03").OnError(err).Debug("unable to parse timestamp")
+
 	return &admin.View{
-		Database: view.Database,
-		ViewName: view.ViewName,
-		Sequence: view.CurrentSequence,
+		Database:  view.Database,
+		ViewName:  view.ViewName,
+		Sequence:  view.CurrentSequence,
+		Timestamp: timestamp,
 	}
 }
 

@@ -42,7 +42,7 @@ func (u *UserGrant) ViewModel() string {
 }
 
 func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserGrantSequence()
+	sequence, _, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return nil, err
 	}

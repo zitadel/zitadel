@@ -104,11 +104,15 @@ func orgMemberSearchMethodToModel(key management.SearchMethod) model.SearchMetho
 }
 
 func orgMemberSearchResponseFromModel(resp *org_model.OrgMemberSearchResponse) *management.OrgMemberSearchResponse {
+	timestamp, err := ptypes.TimestampProto(resp.Timestamp)
+	logging.Log("GRPC-Swmr6").OnError(err).Debug("date parse failed")
 	return &management.OrgMemberSearchResponse{
 		Limit:       resp.Limit,
 		Offset:      resp.Offset,
 		TotalResult: resp.TotalResult,
 		Result:      orgMembersFromView(resp.Result),
+		Sequence:    resp.Sequence,
+		Timestamp:   timestamp,
 	}
 }
 func orgMembersFromView(viewMembers []*org_model.OrgMemberView) []*management.OrgMemberView {

@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -39,7 +40,7 @@ func (v *View) DeleteOrgMember(orgID, userID string, eventSequence uint64) error
 	return v.ProcessedOrgMemberSequence(eventSequence)
 }
 
-func (v *View) GetLatestOrgMemberSequence() (uint64, error) {
+func (v *View) GetLatestOrgMemberSequence() (uint64, time.Time, error) {
 	return v.latestSequence(orgMemberTable)
 }
 

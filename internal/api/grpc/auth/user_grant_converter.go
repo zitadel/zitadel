@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"github.com/caos/logging"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/golang/protobuf/ptypes"
 )
 
 func userGrantSearchRequestsToModel(request *auth.UserGrantSearchRequest) *grant_model.UserGrantSearchRequest {
@@ -76,11 +78,16 @@ func myProjectOrgSearchKeyToModel(key auth.MyProjectOrgSearchKey) grant_model.Us
 }
 
 func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchResponse) *auth.UserGrantSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-Lsp0d").OnError(err).Debug("unable to parse timestamp")
+
 	return &auth.UserGrantSearchResponse{
 		Offset:      response.Offset,
 		Limit:       response.Limit,
 		TotalResult: response.TotalResult,
 		Result:      userGrantViewsFromModel(response.Result),
+		Sequence:    response.Sequence,
+		Timestamp:   timestamp,
 	}
 }
 

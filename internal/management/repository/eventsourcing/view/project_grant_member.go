@@ -5,6 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
+	"time"
 )
 
 const (
@@ -39,7 +40,7 @@ func (v *View) DeleteProjectGrantMember(grantID, userID string, eventSequence ui
 	return v.ProcessedProjectGrantMemberSequence(eventSequence)
 }
 
-func (v *View) GetLatestProjectGrantMemberSequence() (uint64, error) {
+func (v *View) GetLatestProjectGrantMemberSequence() (uint64, time.Time, error) {
 	return v.latestSequence(projectGrantMemberTable)
 }
 

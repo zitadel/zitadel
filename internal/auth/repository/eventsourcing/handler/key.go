@@ -28,7 +28,7 @@ func (k *Key) ViewModel() string {
 }
 
 func (k *Key) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := k.view.GetLatestKeySequence()
+	sequence, _, err := k.view.GetLatestKeySequence()
 	if err != nil {
 		return nil, err
 	}

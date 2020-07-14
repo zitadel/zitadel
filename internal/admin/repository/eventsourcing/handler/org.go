@@ -26,7 +26,7 @@ func (o *Org) ViewModel() string {
 }
 
 func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := o.view.GetLatestOrgSequence()
+	sequence, _, err := o.view.GetLatestOrgSequence()
 	if err != nil {
 		return nil, err
 	}

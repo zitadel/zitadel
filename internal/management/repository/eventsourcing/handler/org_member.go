@@ -31,7 +31,7 @@ func (m *OrgMember) ViewModel() string {
 }
 
 func (m *OrgMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestOrgMemberSequence()
+	sequence, _, err := m.view.GetLatestOrgMemberSequence()
 	if err != nil {
 		return nil, err
 	}

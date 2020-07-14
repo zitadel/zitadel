@@ -27,7 +27,7 @@ func (p *ProjectRole) ViewModel() string {
 }
 
 func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestProjectRoleSequence()
+	sequence, _, err := p.view.GetLatestProjectRoleSequence()
 	if err != nil {
 		return nil, err
 	}

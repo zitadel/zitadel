@@ -27,7 +27,7 @@ func (p *Application) ViewModel() string {
 }
 
 func (p *Application) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestApplicationSequence()
+	sequence, _, err := p.view.GetLatestApplicationSequence()
 	if err != nil {
 		return nil, err
 	}

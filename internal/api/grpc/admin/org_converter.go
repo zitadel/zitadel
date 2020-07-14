@@ -72,6 +72,19 @@ func setUpOrgResponseFromModel(setUp *admin_model.SetupOrg) *admin.OrgSetUpRespo
 	}
 }
 
+func orgSearchResponseFromModel(request *org_model.OrgSearchResult) *admin.OrgSearchResponse {
+	timestamp, err := ptypes.TimestampProto(request.Timestamp)
+	logging.Log("GRPC-shu7s").OnError(err).Debug("unable to get timestamp from time")
+	return &admin.OrgSearchResponse{
+		Result:      orgViewsFromModel(request.Result),
+		Limit:       request.Limit,
+		Offset:      request.Offset,
+		TotalResult: request.TotalResult,
+		Sequence:    request.Sequence,
+		Timestamp:   timestamp,
+	}
+}
+
 func orgViewsFromModel(orgs []*org_model.OrgView) []*admin.Org {
 	result := make([]*admin.Org, len(orgs))
 	for i, org := range orgs {

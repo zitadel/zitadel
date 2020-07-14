@@ -35,7 +35,7 @@ func (p *User) ViewModel() string {
 }
 
 func (p *User) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestUserSequence()
+	sequence, _, err := p.view.GetLatestUserSequence()
 	if err != nil {
 		return nil, err
 	}

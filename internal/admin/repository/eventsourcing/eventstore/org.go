@@ -76,12 +76,18 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgSearchResult{
+	result := &org_model.OrgSearchResult{
 		Offset:      query.Offset,
 		Limit:       query.Limit,
 		TotalResult: uint64(count),
 		Result:      model.OrgsToModel(orgs),
-	}, nil
+	}
+	sequence, timestamp, err := repo.View.GetLatestOrgSequence()
+	if err == nil {
+		result.Sequence = sequence
+		result.Timestamp = timestamp
+	}
+	return result, nil
 }
 
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
