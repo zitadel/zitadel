@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MomentModule } from 'ngx-moment';
 
-import { HasRolePipe } from './has-role.pipe';
 import { LocalizedDatePipe } from './localized-date.pipe';
 import { TimestampToDatePipe } from './timestamp-to-date.pipe';
 
@@ -11,7 +10,6 @@ import { TimestampToDatePipe } from './timestamp-to-date.pipe';
     declarations: [
         LocalizedDatePipe,
         TimestampToDatePipe,
-        HasRolePipe,
     ],
     imports: [
         CommonModule,
@@ -20,7 +18,6 @@ import { TimestampToDatePipe } from './timestamp-to-date.pipe';
     exports: [
         LocalizedDatePipe,
         TimestampToDatePipe,
-        HasRolePipe,
     ],
 })
 export class PipesModule { }

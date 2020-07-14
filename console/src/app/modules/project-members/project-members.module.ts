@@ -15,6 +15,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { ProjectMembersRoutingModule } from './project-members-routing.module';
@@ -43,6 +44,7 @@ import { ProjectMembersComponent } from './project-members.component';
         FormsModule,
         TranslateModule,
         PipesModule,
+        HasRolePipeModule,
     ],
 })
 export class ProjectMembersModule { }

@@ -22,10 +22,11 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
-import { GrantedProjectGridComponent } from './granted-project-grid/granted-project-grid.component';
+import { GrantedProjectGridComponent } from './granted-project-list/granted-project-grid/granted-project-grid.component';
 import { GrantedProjectListComponent } from './granted-project-list/granted-project-list.component';
 import { GrantedProjectsRoutingModule } from './granted-projects-routing.module';
 import { GrantedProjectsComponent } from './granted-projects.component';
@@ -64,6 +65,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         MatTooltipModule,
         MatSortModule,
         PipesModule,
+        HasRolePipeModule,
         TranslateModule,
     ],
     schemas: [NO_ERRORS_SCHEMA],

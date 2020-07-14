@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
 import { ScrollableModule } from 'src/app/directives/scrollable/scrollable.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { ChangesComponent } from './changes.component';
@@ -20,6 +21,7 @@ import { ChangesComponent } from './changes.component';
         MatProgressSpinnerModule,
         TranslateModule,
         PipesModule,
+        HasRolePipeModule,
         ScrollingModule,
     ],
     exports: [

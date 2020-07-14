@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from 'src/app/guards/role.guard';
 import { ProjectType } from 'src/app/proto/generated/management_pb';
 
-import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
 import { OwnedProjectsComponent } from './owned-projects.component';
 
 const routes: Routes = [
@@ -22,12 +21,13 @@ const routes: Routes = [
     },
     {
         path: ':id',
-        component: OwnedProjectDetailComponent,
         data: {
             animation: 'HomePage',
             roles: ['project.read'],
         },
         canActivate: [RoleGuard],
+        loadChildren: () => import('./owned-project-detail/owned-project-detail.module')
+            .then(m => m.OwnedProjectDetailModule),
     },
     {
         path: ':projectid/members',
