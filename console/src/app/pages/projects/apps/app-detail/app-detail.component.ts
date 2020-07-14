@@ -17,7 +17,6 @@ import {
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
-import { GrpcService } from 'src/app/services/grpc.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -84,7 +83,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
-        private grpcService: GrpcService,
         private orgService: OrgService,
     ) {
         this.appNameForm = this.fb.group({

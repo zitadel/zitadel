@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
@@ -10,15 +11,17 @@ const routes: Routes = [
     {
         path: 'me',
         component: AuthUserDetailComponent,
+        canActivate: [AuthGuard],
     },
     {
         path: 'me/password',
         component: PasswordComponent,
+        canActivate: [AuthGuard],
     },
     {
         path: ':id',
         component: UserDetailComponent,
-        canActivate: [RoleGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['user.read'],
         },
@@ -26,7 +29,7 @@ const routes: Routes = [
     {
         path: ':id/password',
         component: PasswordComponent,
-        canActivate: [RoleGuard],
+        canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['user.write'],
         },

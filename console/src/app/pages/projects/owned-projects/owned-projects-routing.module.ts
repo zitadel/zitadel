@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 import { ProjectType } from 'src/app/proto/generated/management_pb';
 
@@ -16,7 +15,7 @@ const routes: Routes = [
     {
         path: 'create',
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
-        canActivate: [AuthGuard, RoleGuard],
+        canActivateChild: [RoleGuard],
         data: {
             roles: ['project.write'],
         },
@@ -24,19 +23,29 @@ const routes: Routes = [
     {
         path: ':id',
         component: OwnedProjectDetailComponent,
-        data: { animation: 'HomePage' },
+        data: {
+            animation: 'HomePage',
+            roles: ['project.read'],
+        },
+        canActivate: [RoleGuard],
     },
     {
         path: ':projectid/members',
         data: {
             type: ProjectType.PROJECTTYPE_OWNED,
+            roles: ['project.member.read'],
         },
+        canActivateChild: [RoleGuard],
         loadChildren: () => import('src/app/modules/project-members/project-members.module')
             .then(m => m.ProjectMembersModule),
     },
     {
         path: ':projectid/apps',
-        data: { animation: 'AddPage' },
+        data: {
+            animation: 'AddPage',
+            roles: ['project.app.read'],
+        },
+        canActivateChild: [RoleGuard],
         loadChildren: () => import('src/app/pages/projects/apps/apps.module').then(m => m.AppsModule),
     },
     {

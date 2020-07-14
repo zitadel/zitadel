@@ -2,13 +2,11 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from 'src/app/guards/role.guard';
 
-import { AuthGuard } from '../../guards/auth.guard';
-
 const routes: Routes = [
     {
         path: 'all',
         loadChildren: () => import('src/app/pages/users/user-list/user-list.module').then(m => m.UserListModule),
-        canActivate: [AuthGuard, RoleGuard],
+        canActivate: [RoleGuard],
         data: {
             roles: ['user.read'],
         },
@@ -16,7 +14,6 @@ const routes: Routes = [
     {
         path: '',
         loadChildren: () => import('src/app/pages/users/user-detail/user-detail.module').then(m => m.UserDetailModule),
-        canActivate: [AuthGuard],
     },
 ];
 
