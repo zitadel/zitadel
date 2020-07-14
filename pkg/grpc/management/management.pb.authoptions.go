@@ -164,6 +164,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/GetDefaultPasswordComplexityPolicy": authz.Option{
+		Permission: "policy.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/CreatePasswordComplexityPolicy": authz.Option{
 		Permission: "policy.write",
 		CheckParam: "",

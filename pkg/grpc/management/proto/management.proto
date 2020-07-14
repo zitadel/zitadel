@@ -378,6 +378,16 @@ service ManagementService {
         };
     }
 
+    rpc GetDefaultPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
+        option (google.api.http) = {
+            get: "/policies/passwords/complexity/default"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
     rpc CreatePasswordComplexityPolicy(PasswordComplexityPolicyCreate) returns (PasswordComplexityPolicy) {
         option (google.api.http) = {
             post: "/policies/passwords/complexity"

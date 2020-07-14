@@ -27,6 +27,15 @@ func (s *Server) GetPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty
 	return passwordComplexityPolicyFromModel(policy), nil
 }
 
+func (s *Server) GetDefaultPasswordComplexityPolicy(ctx context.Context, _ *empty.Empty) (*management.PasswordComplexityPolicy, error) {
+	policy, err := s.policy.GetDefaultPasswordComplexityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return passwordComplexityPolicyFromModel(policy), nil
+}
+
 func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, policy *management.PasswordComplexityPolicyUpdate) (*management.PasswordComplexityPolicy, error) {
 	policyresp, err := s.policy.UpdatePasswordComplexityPolicy(ctx, passwordComplexityPolicyUpdateToModel(policy))
 	if err != nil {

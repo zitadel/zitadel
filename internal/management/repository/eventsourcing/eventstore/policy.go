@@ -20,6 +20,9 @@ func (repo *PolicyRepo) GetPasswordComplexityPolicy(ctx context.Context) (*pol_m
 	ctxData := authz.GetCtxData(ctx)
 	return repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
 }
+func (repo *PolicyRepo) GetDefaultPasswordComplexityPolicy(ctx context.Context) (*pol_model.PasswordComplexityPolicy, error) {
+	return repo.PolicyEvents.GetPasswordComplexityPolicy(ctx, "0")
+}
 func (repo *PolicyRepo) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
 	return repo.PolicyEvents.UpdatePasswordComplexityPolicy(ctx, policy)
 }
