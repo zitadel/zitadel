@@ -107,61 +107,66 @@
                         </mat-select>
                     </mat-form-field>
 
-                    <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
+                    <mat-checkbox [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}"
+                        (changed)="initPwdValidators()">
+                        {{'ORG.PAGES.USEPASSWORD' | translate}}</mat-checkbox>
 
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
-                        <input autocomplete="off" name="firstpassword" matInput formControlName="password"
-                            type="password" />
+                    <ng-container *ngIf="usePassword">
+                        <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
 
-                        <mat-error *ngIf="password?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.symbolValidator">
-                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.numberValidator">
-                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.upperCaseValidator">
-                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.lowerCaseValidator">
-                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="password?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate:password?.errors?.minlength }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
-                        <input autocomplete="off" name="confirmPassword" matInput formControlName="confirmPassword"
-                            type="password" />
+                        <mat-form-field class="formfield">
+                            <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
+                            <input autocomplete="off" name="firstpassword" matInput formControlName="password"
+                                type="password" />
+
+                            <mat-error *ngIf="password?.errors?.required">
+                                {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="password?.errors?.symbolValidator">
+                                {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="password?.errors?.numberValidator">
+                                {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="password?.errors?.upperCaseValidator">
+                                {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="password?.errors?.lowerCaseValidator">
+                                {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="password?.errors?.minlength">
+                                {{ 'USER.VALIDATION.MINLENGTH' | translate:password?.errors?.minlength }}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="formfield">
+                            <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
+                            <input autocomplete="off" name="confirmPassword" matInput formControlName="confirmPassword"
+                                type="password" />
 
 
-                        <mat-error *ngIf="confirmPassword?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
-                            {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.numberValidator">
-                            {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.notequal">
-                            {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.upperCaseValidator">
-                            {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.lowerCaseValidator">
-                            {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="confirmPassword?.errors?.minlength">
-                            {{ 'USER.VALIDATION.MINLENGTH' | translate:confirmPassword?.errors?.minlength }}
-                        </mat-error>
-                    </mat-form-field>
-
+                            <mat-error *ngIf="confirmPassword?.errors?.required">
+                                {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="confirmPassword?.errors?.symbolValidator">
+                                {{ 'USER.VALIDATION.SYMBOLERROR' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="confirmPassword?.errors?.numberValidator">
+                                {{ 'USER.VALIDATION.NUMBERERROR' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="confirmPassword?.errors?.notequal">
+                                {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="confirmPassword?.errors?.upperCaseValidator">
+                                {{ 'USER.VALIDATION.UPPERCASEMISSING' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="confirmPassword?.errors?.lowerCaseValidator">
+                                {{ 'USER.VALIDATION.LOWERCASEMISSING' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="confirmPassword?.errors?.minlength">
+                                {{ 'USER.VALIDATION.MINLENGTH' | translate:confirmPassword?.errors?.minlength }}
+                            </mat-error>
+                        </mat-form-field>
+                    </ng-container>
                 </div>
                 <div class="btn-container">
                     <button color="primary" class="continue-button" [disabled]="orgForm.invalid || userForm.invalid"
