@@ -602,8 +602,8 @@ message UserGrantSearchResponse {
   uint64 limit = 2;
   uint64 total_result = 3;
   repeated UserGrantView result = 4;
-  uint64 sequence = 5;
-  google.protobuf.Timestamp timestamp = 6;
+  uint64 processed_sequence = 5;
+  google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message UserGrantView {

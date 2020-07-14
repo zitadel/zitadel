@@ -76,12 +76,12 @@ func orgSearchResponseFromModel(request *org_model.OrgSearchResult) *admin.OrgSe
 	timestamp, err := ptypes.TimestampProto(request.Timestamp)
 	logging.Log("GRPC-shu7s").OnError(err).Debug("unable to get timestamp from time")
 	return &admin.OrgSearchResponse{
-		Result:      orgViewsFromModel(request.Result),
-		Limit:       request.Limit,
-		Offset:      request.Offset,
-		TotalResult: request.TotalResult,
-		Sequence:    request.Sequence,
-		Timestamp:   timestamp,
+		Result:            orgViewsFromModel(request.Result),
+		Limit:             request.Limit,
+		Offset:            request.Offset,
+		TotalResult:       request.TotalResult,
+		ProcessedSequence: request.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 

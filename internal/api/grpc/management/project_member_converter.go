@@ -88,12 +88,12 @@ func projectMemberSearchResponseFromModel(response *proj_model.ProjectMemberSear
 	timestamp, err := ptypes.TimestampProto(response.Timestamp)
 	logging.Log("GRPC-LSo9j").OnError(err).Debug("unable to parse timestamp")
 	return &management.ProjectMemberSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      projectMemberViewsFromModel(response.Result),
-		Timestamp:   timestamp,
-		Sequence:    response.Sequence,
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            projectMemberViewsFromModel(response.Result),
+		ViewTimestamp:     timestamp,
+		ProcessedSequence: response.Sequence,
 	}
 }
 

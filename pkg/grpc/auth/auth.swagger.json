@@ -1231,11 +1231,11 @@
             "$ref": "#/definitions/v1UserGrantView"
           }
         },
-        "sequence": {
+        "processed_sequence": {
           "type": "string",
           "format": "uint64"
         },
-        "timestamp": {
+        "view_timestamp": {
           "type": "string",
           "format": "date-time"
         }

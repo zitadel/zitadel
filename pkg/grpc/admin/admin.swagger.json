@@ -811,11 +811,11 @@
             "$ref": "#/definitions/v1IamMemberView"
           }
         },
-        "sequence": {
+        "processed_sequence": {
           "type": "string",
           "format": "uint64"
         },
-        "timestamp": {
+        "view_timestamp": {
           "type": "string",
           "format": "date-time"
         }
@@ -1010,11 +1010,11 @@
             "$ref": "#/definitions/v1Org"
           }
         },
-        "sequence": {
+        "processed_sequence": {
           "type": "string",
           "format": "uint64"
         },
-        "timestamp": {
+        "view_timestamp": {
           "type": "string",
           "format": "date-time"
         }
@@ -1172,11 +1172,11 @@
         "view_name": {
           "type": "string"
         },
-        "sequence": {
+        "processed_sequence": {
           "type": "string",
           "format": "uint64"
         },
-        "timestamp": {
+        "view_timestamp": {
           "type": "string",
           "format": "date-time"
         }

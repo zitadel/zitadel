@@ -338,12 +338,12 @@ func userSearchResponseFromModel(response *usr_model.UserSearchResponse) *manage
 	timestamp, err := ptypes.TimestampProto(response.Timestamp)
 	logging.Log("GRPC-aBezr").OnError(err).Debug("unable to parse timestamp")
 	return &management.UserSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      userViewsFromModel(response.Result),
-		Sequence:    response.Sequence,
-		Timestamp:   timestamp,
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            userViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 

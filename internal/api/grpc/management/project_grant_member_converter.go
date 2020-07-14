@@ -90,12 +90,12 @@ func projectGrantMemberSearchResponseFromModel(response *proj_model.ProjectGrant
 	timestamp, err := ptypes.TimestampProto(response.Timestamp)
 	logging.Log("GRPC-MSn6g").OnError(err).Debug("unable to parse timestamp")
 	return &management.ProjectGrantMemberSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      projectGrantMemberViewsFromModel(response.Result),
-		Sequence:    response.Sequence,
-		Timestamp:   timestamp,
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            projectGrantMemberViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 

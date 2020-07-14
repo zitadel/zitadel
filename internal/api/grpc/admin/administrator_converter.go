@@ -30,10 +30,10 @@ func viewFromModel(view *view_model.View) *admin.View {
 	logging.Log("GRPC-KSo03").OnError(err).Debug("unable to parse timestamp")
 
 	return &admin.View{
-		Database:  view.Database,
-		ViewName:  view.ViewName,
-		Sequence:  view.CurrentSequence,
-		Timestamp: timestamp,
+		Database:          view.Database,
+		ViewName:          view.ViewName,
+		ProcessedSequence: view.CurrentSequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 

@@ -290,8 +290,8 @@ message OrgSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated Org result = 4;
-    uint64 sequence = 5;
-    google.protobuf.Timestamp timestamp = 6;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 enum OrgSearchMethod {
@@ -426,8 +426,8 @@ message IamMemberSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated IamMemberView result = 4;
-    uint64 sequence = 5;
-    google.protobuf.Timestamp timestamp = 6;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message IamMemberView {
@@ -506,8 +506,8 @@ message Views {
 message View {
     string database = 1;
     string view_name = 2;
-    uint64 sequence = 3;
-    google.protobuf.Timestamp timestamp = 4;
+    uint64 processed_sequence = 3;
+    google.protobuf.Timestamp view_timestamp = 4;
 }
 
 

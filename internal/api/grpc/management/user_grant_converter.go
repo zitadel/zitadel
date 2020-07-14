@@ -134,12 +134,12 @@ func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchRespo
 	timestamp, err := ptypes.TimestampProto(response.Timestamp)
 	logging.Log("GRPC-Wd7hs").OnError(err).Debug("unable to parse timestamp")
 	return &management.UserGrantSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      userGrantViewsFromModel(response.Result),
-		Sequence:    response.Sequence,
-		Timestamp:   timestamp,
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            userGrantViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 
