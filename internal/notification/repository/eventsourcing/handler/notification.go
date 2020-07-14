@@ -42,11 +42,11 @@ func (n *Notification) ViewModel() string {
 }
 
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := n.view.GetLatestNotificationSequence()
+	sequence, err := n.view.GetLatestNotificationSequence()
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence), nil
+	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {

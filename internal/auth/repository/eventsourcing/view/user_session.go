@@ -4,7 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -39,7 +38,7 @@ func (v *View) DeleteUserSessions(userID string, eventSequence uint64) error {
 	return v.ProcessedUserSessionSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserSessionSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestUserSessionSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userSessionTable)
 }
 

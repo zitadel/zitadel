@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -67,10 +68,11 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 		TotalResult: uint64(count),
 		Result:      model.OrgDomainsToModel(domains),
 	}
-	sequence, timestamp, err := repo.View.GetLatestOrgDomainSequence()
+	sequence, err := repo.View.GetLatestOrgDomainSequence()
+	logging.Log("EVENT-SLowp").OnError(err).Warn("could not read latest org domain sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
@@ -136,10 +138,11 @@ func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_
 		TotalResult: uint64(count),
 		Result:      model.OrgMembersToModel(members),
 	}
-	sequence, timestamp, err := repo.View.GetLatestOrgMemberSequence()
+	sequence, err := repo.View.GetLatestOrgMemberSequence()
+	logging.Log("EVENT-Smu3d").OnError(err).Warn("could not read latest org member sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }

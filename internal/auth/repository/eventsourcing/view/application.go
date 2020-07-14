@@ -2,14 +2,12 @@ package view
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/view/repository"
-	"time"
-
 	"github.com/caos/zitadel/internal/errors"
 	global_model "github.com/caos/zitadel/internal/model"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -40,7 +38,7 @@ func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
 	return v.ProcessedApplicationSequence(eventSequence)
 }
 
-func (v *View) GetLatestApplicationSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(applicationTable)
 }
 

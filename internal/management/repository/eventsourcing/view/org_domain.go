@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -47,7 +46,7 @@ func (v *View) DeleteOrgDomain(orgID, domain string, eventSequence uint64) error
 	return v.ProcessedOrgDomainSequence(eventSequence)
 }
 
-func (v *View) GetLatestOrgDomainSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestOrgDomainSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgDomainTable)
 }
 

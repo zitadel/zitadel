@@ -30,13 +30,13 @@ func (p *ProjectGrantMember) ViewModel() string {
 }
 
 func (p *ProjectGrantMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := p.view.GetLatestProjectGrantMemberSequence()
+	sequence, err := p.view.GetLatestProjectGrantMemberSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(proj_es_model.ProjectAggregate, usr_es_model.UserAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectGrantMember) Reduce(event *models.Event) (err error) {

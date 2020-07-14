@@ -35,11 +35,11 @@ func (p *ProjectGrant) ViewModel() string {
 }
 
 func (p *ProjectGrant) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := p.view.GetLatestProjectGrantSequence()
+	sequence, err := p.view.GetLatestProjectGrantSequence()
 	if err != nil {
 		return nil, err
 	}
-	return proj_event.ProjectQuery(sequence), nil
+	return proj_event.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectGrant) Reduce(event *models.Event) (err error) {

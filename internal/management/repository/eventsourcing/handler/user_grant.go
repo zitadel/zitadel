@@ -42,13 +42,13 @@ func (u *UserGrant) ViewModel() string {
 }
 
 func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := u.view.GetLatestUserGrantSequence()
+	sequence, err := u.view.GetLatestUserGrantSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *UserGrant) Reduce(event *models.Event) (err error) {

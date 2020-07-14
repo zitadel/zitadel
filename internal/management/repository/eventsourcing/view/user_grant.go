@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/usergrant/repository/view"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -56,7 +55,7 @@ func (v *View) DeleteUserGrant(grantID string, eventSequence uint64) error {
 	return v.ProcessedUserGrantSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserGrantSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestUserGrantSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userGrantTable)
 }
 

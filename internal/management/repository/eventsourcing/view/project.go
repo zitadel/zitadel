@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -36,7 +35,7 @@ func (v *View) DeleteProject(projectID string, eventSequence uint64) error {
 	return v.ProcessedProjectSequence(eventSequence)
 }
 
-func (v *View) GetLatestProjectSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestProjectSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectTable)
 }
 

@@ -4,7 +4,6 @@ import (
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -31,7 +30,7 @@ func (v *View) ProcessedOrgFailedEvent(failedEvent *repository.FailedEvent) erro
 	return v.saveFailedEvent(failedEvent)
 }
 
-func (v *View) GetLatestOrgSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestOrgSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgTable)
 }
 

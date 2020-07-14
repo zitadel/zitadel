@@ -4,7 +4,6 @@ import (
 	"github.com/caos/zitadel/internal/token/repository/view"
 	"github.com/caos/zitadel/internal/token/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -43,7 +42,7 @@ func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64)
 	return v.ProcessedTokenSequence(eventSequence)
 }
 
-func (v *View) GetLatestTokenSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestTokenSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(tokenTable)
 }
 

@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -44,7 +43,7 @@ func (v *View) DeleteProjectRole(projectID, orgID, key string, eventSequence uin
 	return v.ProcessedProjectRoleSequence(eventSequence)
 }
 
-func (v *View) GetLatestProjectRoleSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestProjectRoleSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectRoleTable)
 }
 

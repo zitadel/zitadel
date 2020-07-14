@@ -82,7 +82,7 @@ func (v *View) DeleteApplicationTokens(eventSequence uint64, ids ...string) erro
 	return v.ProcessedTokenSequence(eventSequence)
 }
 
-func (v *View) GetLatestTokenSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestTokenSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(tokenTable)
 }
 

@@ -32,7 +32,7 @@ func (u *Token) ViewModel() string {
 }
 
 func (u *Token) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := u.view.GetLatestTokenSequence()
+	sequence, err := u.view.GetLatestTokenSequence()
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(user_es_model.UserAggregate, project_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *Token) Reduce(event *models.Event) (err error) {

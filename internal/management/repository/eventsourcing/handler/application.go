@@ -27,11 +27,11 @@ func (p *Application) ViewModel() string {
 }
 
 func (p *Application) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := p.view.GetLatestApplicationSequence()
+	sequence, err := p.view.GetLatestApplicationSequence()
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence), nil
+	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *Application) Reduce(event *models.Event) (err error) {

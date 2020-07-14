@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	global_view "github.com/caos/zitadel/internal/view/repository"
-	"time"
 )
 
 const (
@@ -41,7 +40,7 @@ func (v *View) DeleteIamMember(iamID, userID string, eventSequence uint64) error
 	return v.ProcessedIamMemberSequence(eventSequence)
 }
 
-func (v *View) GetLatestIamMemberSequence() (uint64, time.Time, error) {
+func (v *View) GetLatestIamMemberSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(iamMemberTable)
 }
 

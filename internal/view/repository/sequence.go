@@ -8,11 +8,6 @@ import (
 	"time"
 )
 
-type actualSequece struct {
-	ActualSequence   uint64    `gorm:"column:current_sequence"`
-	CurrentTimestamp time.Time `gorm:"column:timestamp"`
-}
-
 type CurrentSequence struct {
 	ViewName         string    `gorm:"column:view_name;primary_key"`
 	CurrentSequence  uint64    `gorm:"column:current_sequence"`
@@ -57,19 +52,19 @@ func SaveCurrentSequence(db *gorm.DB, table, viewName string, sequence uint64) e
 	return nil
 }
 
-func LatestSequence(db *gorm.DB, table, viewName string) (uint64, time.Time, error) {
-	sequence := new(actualSequece)
+func LatestSequence(db *gorm.DB, table, viewName string) (*CurrentSequence, error) {
+	sequence := new(CurrentSequence)
 	query := PrepareGetByKey(table, sequenceSearchKey(SequenceSearchKeyViewName), viewName)
 	err := query(db, sequence)
 
 	if err == nil {
-		return sequence.ActualSequence, sequence.CurrentTimestamp, nil
+		return sequence, nil
 	}
 
 	if caos_errs.IsNotFound(err) {
-		return 0, time.Time{}, nil
+		return sequence, nil
 	}
-	return 0, time.Time{}, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
+	return nil, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
 }
 
 func AllCurrentSequences(db *gorm.DB, table string) ([]*CurrentSequence, error) {

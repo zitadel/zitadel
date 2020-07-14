@@ -97,10 +97,11 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		TotalResult: uint64(count),
 		Result:      model.UsersToModel(projects),
 	}
-	sequence, timestamp, err := repo.View.GetLatestUserSequence()
+	sequence, err := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-Lcn7d").OnError(err).Warn("could not read latest user sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }

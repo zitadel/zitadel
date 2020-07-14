@@ -28,11 +28,11 @@ func (k *Key) ViewModel() string {
 }
 
 func (k *Key) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := k.view.GetLatestKeySequence()
+	sequence, err := k.view.GetLatestKeySequence()
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.KeyPairQuery(sequence), nil
+	return eventsourcing.KeyPairQuery(sequence.CurrentSequence), nil
 }
 
 func (k *Key) Reduce(event *models.Event) error {

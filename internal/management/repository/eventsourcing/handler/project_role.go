@@ -27,11 +27,11 @@ func (p *ProjectRole) ViewModel() string {
 }
 
 func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := p.view.GetLatestProjectRoleSequence()
+	sequence, err := p.view.GetLatestProjectRoleSequence()
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence), nil
+	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectRole) Reduce(event *models.Event) (err error) {

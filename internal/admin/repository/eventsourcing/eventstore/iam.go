@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
@@ -54,10 +55,11 @@ func (repo *IamRepository) SearchIamMembers(ctx context.Context, request *iam_mo
 		TotalResult: uint64(count),
 		Result:      iam_es_model.IamMembersToModel(members),
 	}
-	sequence, timestamp, err := repo.View.GetLatestIamMemberSequence()
+	sequence, err := repo.View.GetLatestIamMemberSequence()
+	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }

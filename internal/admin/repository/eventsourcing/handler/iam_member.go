@@ -31,13 +31,13 @@ func (m *IamMember) ViewModel() string {
 }
 
 func (m *IamMember) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := m.view.GetLatestIamMemberSequence()
+	sequence, err := m.view.GetLatestIamMemberSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.IamAggregate, usr_es_model.UserAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *IamMember) Reduce(event *models.Event) (err error) {

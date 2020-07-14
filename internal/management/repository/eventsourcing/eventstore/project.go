@@ -99,10 +99,11 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 		TotalResult: uint64(count),
 		Result:      model.ProjectsToModel(projects),
 	}
-	sequence, timestamp, err := repo.View.GetLatestProjectSequence()
+	sequence, err := repo.View.GetLatestProjectSequence()
+	logging.Log("EVENT-Edc56").OnError(err).Warn("could not read latest project sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
@@ -148,10 +149,11 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 		TotalResult: uint64(count),
 		Result:      model.ProjectMembersToModel(members),
 	}
-	sequence, timestamp, err := repo.View.GetLatestProjectMemberSequence()
+	sequence, err := repo.View.GetLatestProjectMemberSequence()
+	logging.Log("EVENT-3dgt6").OnError(err).Warn("could not read latest project member sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
@@ -220,10 +222,11 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 		TotalResult: uint64(count),
 		Result:      model.ProjectRolesToModel(roles),
 	}
-	sequence, timestamp, err := repo.View.GetLatestProjectRoleSequence()
+	sequence, err := repo.View.GetLatestProjectRoleSequence()
+	logging.Log("LSp0d-47suf").OnError(err).Warn("could not read latest project role sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
@@ -284,10 +287,11 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 		TotalResult: uint64(count),
 		Result:      model.ApplicationViewsToModel(apps),
 	}
-	sequence, timestamp, err := repo.View.GetLatestApplicationSequence()
+	sequence, err := repo.View.GetLatestApplicationSequence()
+	logging.Log("EVENT-SKe8s").OnError(err).Warn("could not read latest application sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
@@ -335,10 +339,11 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantsToModel(projects),
 	}
-	sequence, timestamp, err := repo.View.GetLatestProjectGrantSequence()
+	sequence, err := repo.View.GetLatestProjectGrantSequence()
+	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
@@ -472,10 +477,11 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantMembersToModel(members),
 	}
-	sequence, timestamp, err := repo.View.GetLatestProjectGrantMemberSequence()
+	sequence, err := repo.View.GetLatestProjectGrantMemberSequence()
+	logging.Log("EVENT-Du8sk").OnError(err).Warn("could not read latest project grant sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }

@@ -26,13 +26,13 @@ func (d *OrgDomain) ViewModel() string {
 }
 
 func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
-	sequence, _, err := d.view.GetLatestOrgDomainSequence()
+	sequence, err := d.view.GetLatestOrgDomainSequence()
 	if err != nil {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.OrgAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (d *OrgDomain) Reduce(event *models.Event) (err error) {

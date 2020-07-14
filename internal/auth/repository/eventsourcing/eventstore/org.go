@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es "github.com/caos/zitadel/internal/org/repository/eventsourcing"
@@ -26,10 +27,11 @@ func (repo *OrgRepository) SearchOrgs(ctx context.Context, request *org_model.Or
 		TotalResult: uint64(count),
 		Result:      model.OrgsToModel(members),
 	}
-	sequence, timestamp, err := repo.View.GetLatestOrgSequence()
+	sequence, err := repo.View.GetLatestOrgSequence()
+	logging.Log("EVENT-7Udhz").OnError(err).Warn("could not read latest org sequence")
 	if err == nil {
-		result.Sequence = sequence
-		result.Timestamp = timestamp
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
 	}
 	return result, nil
 }
