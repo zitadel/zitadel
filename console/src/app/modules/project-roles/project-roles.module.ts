@@ -16,7 +16,6 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
 import { ProjectRolesComponent } from './project-roles.component';
@@ -40,7 +39,6 @@ import { ProjectRolesComponent } from './project-roles.component';
         MatCheckboxModule,
         RouterModule,
         MatTooltipModule,
-        PipesModule,
         HasRolePipeModule,
         TranslateModule,
         MatMenuModule,

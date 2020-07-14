@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -19,12 +18,9 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
-import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
-import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
-import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { PipesModule } from 'src/app/pipes/pipes.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { OwnedProjectGridComponent } from './owned-project-list/owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
@@ -43,7 +39,6 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         CommonModule,
         OwnedProjectsRoutingModule,
         UserGrantsModule,
-        ProjectContributorsModule,
         FormsModule,
         ReactiveFormsModule,
         TranslateModule,
@@ -58,18 +53,14 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatChipsModule,
         MatIconModule,
         MatButtonModule,
-        WarnDialogModule,
         MatProgressSpinnerModule,
         MatProgressBarModule,
-        ProjectRolesModule,
         MatCheckboxModule,
         CardModule,
-        MatSelectModule,
         MatTooltipModule,
         MatSortModule,
-        PipesModule,
         HasRolePipeModule,
-        TranslateModule,
+        TimestampToDatePipeModule,
     ],
     schemas: [NO_ERRORS_SCHEMA],
 })

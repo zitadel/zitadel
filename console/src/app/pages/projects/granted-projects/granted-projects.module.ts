@@ -23,7 +23,7 @@ import { ProjectContributorsModule } from 'src/app/modules/project-contributors/
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { PipesModule } from 'src/app/pipes/pipes.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { GrantedProjectGridComponent } from './granted-project-list/granted-project-grid/granted-project-grid.component';
@@ -64,9 +64,9 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         CardModule,
         MatTooltipModule,
         MatSortModule,
-        PipesModule,
         HasRolePipeModule,
         TranslateModule,
+        TimestampToDatePipeModule,
     ],
     schemas: [NO_ERRORS_SCHEMA],
 })

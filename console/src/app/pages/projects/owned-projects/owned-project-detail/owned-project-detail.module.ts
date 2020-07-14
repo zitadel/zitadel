@@ -6,6 +6,9 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
+import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
+import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
@@ -29,6 +32,10 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
         MatButtonModule,
         MatIconModule,
         MetaLayoutModule,
+        ProjectContributorsModule,
+        WarnDialogModule,
+        ProjectRolesModule,
+
     ],
     schemas: [NO_ERRORS_SCHEMA],
 })

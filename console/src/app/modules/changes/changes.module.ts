@@ -5,10 +5,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
 import { ScrollableModule } from 'src/app/directives/scrollable/scrollable.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { PipesModule } from 'src/app/pipes/pipes.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 
 import { ChangesComponent } from './changes.component';
-
 
 
 @NgModule({
@@ -20,9 +19,9 @@ import { ChangesComponent } from './changes.component';
         ScrollableModule,
         MatProgressSpinnerModule,
         TranslateModule,
-        PipesModule,
         HasRolePipeModule,
         ScrollingModule,
+        LocalizedDatePipeModule,
     ],
     exports: [
         ChangesComponent,

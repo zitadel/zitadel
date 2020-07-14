@@ -14,7 +14,7 @@ const routes: Routes = [
     {
         path: 'create',
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
-        canActivateChild: [RoleGuard],
+        canActivate: [RoleGuard],
         data: {
             roles: ['project.write'],
         },
@@ -35,7 +35,7 @@ const routes: Routes = [
             type: ProjectType.PROJECTTYPE_OWNED,
             roles: ['project.member.read'],
         },
-        canActivateChild: [RoleGuard],
+        canActivate: [RoleGuard],
         loadChildren: () => import('src/app/modules/project-members/project-members.module')
             .then(m => m.ProjectMembersModule),
     },
@@ -45,7 +45,7 @@ const routes: Routes = [
             animation: 'AddPage',
             roles: ['project.app.read'],
         },
-        canActivateChild: [RoleGuard],
+        canActivate: [RoleGuard],
         loadChildren: () => import('src/app/pages/projects/apps/apps.module').then(m => m.AppsModule),
     },
     {

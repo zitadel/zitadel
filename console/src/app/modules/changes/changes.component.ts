@@ -119,7 +119,6 @@ export class ChangesComponent implements OnInit {
                     }
                 }),
                 catchError(err => {
-                    console.error(err);
                     this._loading.next(false);
                     this.bottom = true;
                     return of([]);

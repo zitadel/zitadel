@@ -20,16 +20,6 @@
             </ng-container>
         </div>
         <span class="fill-space"></span>
-        <div @list class="action-btns" *ngIf="selection.hasValue()">
-            <button @animate (click)="deactivateSelectedProjects()"
-                matTooltip="{{'PROJECT.TABLE.DEACTIVATE' | translate}}" class="icon-button" mat-icon-button>
-                <mat-icon svgIcon="mdi_light_off"></mat-icon>
-            </button>
-            <button @animate (click)="reactivateSelectedProjects()"
-                matTooltip="{{'PROJECT.TABLE.ACTIVATE' | translate}}" class="icon-button" mat-icon-button>
-                <mat-icon svgIcon="mdi_light_on"></mat-icon>
-            </button>
-        </div>
         <ng-template appHasRole [appHasRole]="['project.write']">
             <a class="add-button" [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
                 <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}

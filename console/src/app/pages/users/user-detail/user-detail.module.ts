@@ -16,7 +16,6 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
-import { PipesModule } from 'src/app/pipes/pipes.module';
 
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
@@ -50,7 +49,6 @@ import { UserMfaComponent } from './user-mfa/user-mfa.component';
         MatDialogModule,
         QRCodeModule,
         MetaLayoutModule,
-        PipesModule,
         HasRolePipeModule,
         MatFormFieldModule,
         UserGrantsModule,
