@@ -65,6 +65,110 @@ service ManagementService {
         };
     }
 
+    rpc GetServiceAccountById(ServiceAccountIDRequest) returns (ServiceAccountResponse){
+        option (google.api.http) = {
+            get: "/serviceaccounts/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.read"
+        };
+    }
+
+    rpc IsServiceAccountUnique(ServiceAccountUniqueRequest) returns (ServiceAccountUniqueResponse){
+        option (google.api.http) = {
+            get: "/serviceaccounts/_isunique"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.read"
+        };
+    }
+
+    rpc CreateServiceAccount(CreateServiceAccountRequest) returns (ServiceAccountResponse){
+        option (google.api.http) = {
+            post: "/serviceaccounts"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc UpdateServiceAccount(UpdateServiceAccountRequest) returns (ServiceAccountResponse){
+        option (google.api.http) = {
+            put: "/serviceaccounts/{id}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc DeactivateServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
+        option (google.api.http) = {
+            put: "/serviceaccounts/{id}/_deactivate"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc ReactivateServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
+        option (google.api.http) = {
+            put: "/serviceaccounts/{id}/_reactivate"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc LockServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
+        option (google.api.http) = {
+            put: "/serviceaccounts/{id}/_lock"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc UnlockServiceAccount(ServiceAccountIDRequest) returns (ServiceAccountResponse) {
+        option (google.api.http) = {
+            put: "/serviceaccounts/{id}/_unlock"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc DeleteServiceAccount(ServiceAccountIDRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/serviceaccounts/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.write"
+        };
+    }
+
+    rpc SerivceAccountChanges(ServiceAccountChangesRequest) returns (ServiceAccountChangesResponse) {
+        option (google.api.http) = {
+            get: "/serviceaccounts/{id}/changes"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "serviceaccount.read"
+        };
+    }
+
+
+
     rpc GetUserByID(UserID) returns (UserView) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -2571,4 +2675,40 @@ message ProjectGrantUserGrantSearchRequest {
     uint64 offset = 2;
     uint64 limit = 3;
     repeated UserGrantSearchQuery queries = 4;
+}
+
+message ServiceAccountIDRequest {
+    string id = 1;
+}
+
+message CreateServiceAccountRequest {
+    string name = 1;
+}
+
+message UpdateServiceAccountRequest {
+    string id = 1;
+    string name = 2;
+}
+
+message ServiceAccountUniqueRequest {
+
+}
+
+message ServiceAccountUniqueResponse {}
+
+message ServiceAccountChangesRequest {
+    string id = 1;
+}
+
+message ServiceAccountChangesResponse {}
+
+
+message ServiceAccountResponse {
+    string id = 1;
+    string name = 2;
+    repeated ServiceAccountKey keys = 3;
+}
+
+message ServiceAccountKey {
+    string id = 1;
 }
