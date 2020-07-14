@@ -245,6 +245,16 @@ form {
             font-size: 1.4rem;
         }
     }
+
+    ul.passwordcomplexity {
+        color: red;
+        padding: 0;
+        list-style: none;
+
+        li {
+            font-size: 12px;
+        }
+    }
 }
 
 #copy-secret {

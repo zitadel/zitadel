@@ -258,10 +258,11 @@ type errorData struct {
 
 type userData struct {
 	baseData
-	LoginName           string
-	PasswordChecked     string
-	MfaProviders        []model.MfaType
-	SelectedMfaProvider model.MfaType
+	LoginName                 string
+	PasswordChecked           string
+	PasswordPolicyDescription string
+	MfaProviders              []model.MfaType
+	SelectedMfaProvider       model.MfaType
 }
 
 type userSelectionData struct {

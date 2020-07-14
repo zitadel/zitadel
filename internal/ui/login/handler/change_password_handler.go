@@ -25,11 +25,16 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	if data.NewPassword != data.OldPassword {
+	if data.NewPassword != data.NewPasswordConfirmation {
 		err := errors.ThrowInvalidArgument(nil, "ERR-sj2Sq", "Errors.User.Password.ConfirmationWrong")
 		l.renderChangePassword(w, r, authReq, err)
 		return
 	}
+	err = l.checkPasswordComplexityPolicy(data.NewPassword, r, authReq)
+	if err != nil {
+		l.renderChangePassword(w, r, authReq, err)
+	}
+
 	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
 	if err != nil {
 		l.renderChangePassword(w, r, authReq, err)
@@ -43,9 +48,11 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
+	_, description, _ := l.getPasswordComplexityPolicy(r, authReq)
 	data := userData{
-		baseData:  l.getBaseData(r, authReq, "Change Password", errType, errMessage),
-		LoginName: authReq.LoginName,
+		baseData:                  l.getBaseData(r, authReq, "Change Password", errType, errMessage),
+		LoginName:                 authReq.LoginName,
+		PasswordPolicyDescription: description,
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePassword], data, nil)
 }
