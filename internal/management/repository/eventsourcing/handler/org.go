@@ -30,7 +30,7 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.OrgQuery(sequence), nil
+	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
 }
 
 func (o *Org) Reduce(event *es_models.Event) error {

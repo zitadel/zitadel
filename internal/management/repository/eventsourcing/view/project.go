@@ -35,7 +35,7 @@ func (v *View) DeleteProject(projectID string, eventSequence uint64) error {
 	return v.ProcessedProjectSequence(eventSequence)
 }
 
-func (v *View) GetLatestProjectSequence() (uint64, error) {
+func (v *View) GetLatestProjectSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectTable)
 }
 

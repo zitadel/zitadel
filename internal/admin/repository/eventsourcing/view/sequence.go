@@ -12,7 +12,7 @@ func (v *View) saveCurrentSequence(viewName string, sequence uint64) error {
 	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, sequence)
 }
 
-func (v *View) latestSequence(viewName string) (uint64, error) {
+func (v *View) latestSequence(viewName string) (*repository.CurrentSequence, error) {
 	return repository.LatestSequence(v.Db, sequencesTable, viewName)
 }
 

@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
@@ -56,14 +57,21 @@ func (repo *UserGrantRepo) BulkRemoveUserGrant(ctx context.Context, grantIDs ...
 
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestUserGrantSequence()
+	logging.Log("EVENT-5Viwf").OnError(err).Warn("could not read latest user grant sequence")
 	grants, count, err := repo.View.SearchUserGrants(request)
 	if err != nil {
 		return nil, err
 	}
-	return &grant_model.UserGrantSearchResponse{
+	result := &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.UserGrantsToModel(grants),
-	}, nil
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
 }
