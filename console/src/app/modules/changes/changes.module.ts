@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ScrollableModule } from 'src/app/directives/scrollable/scrollable.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { ChangesComponent } from './changes.component';
 
@@ -22,6 +23,7 @@ import { ChangesComponent } from './changes.component';
         HasRolePipeModule,
         ScrollingModule,
         LocalizedDatePipeModule,
+        TimestampToDatePipeModule,
     ],
     exports: [
         ChangesComponent,
