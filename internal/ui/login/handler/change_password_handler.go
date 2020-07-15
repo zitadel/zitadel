@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/errors"
 	"net/http"
 
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -24,15 +23,6 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
-	}
-	if data.NewPassword != data.NewPasswordConfirmation {
-		err := errors.ThrowInvalidArgument(nil, "ERR-sj2Sq", "Errors.User.Password.ConfirmationWrong")
-		l.renderChangePassword(w, r, authReq, err)
-		return
-	}
-	err = l.checkPasswordComplexityPolicy(data.NewPassword, r, authReq)
-	if err != nil {
-		l.renderChangePassword(w, r, authReq, err)
 	}
 
 	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
