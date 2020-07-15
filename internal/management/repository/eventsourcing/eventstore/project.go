@@ -89,6 +89,8 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
 	}
 
+	sequence, err := repo.View.GetLatestProjectSequence()
+	logging.Log("EVENT-Edc56").OnError(err).Warn("could not read latest project sequence")
 	projects, count, err := repo.View.SearchProjects(request)
 	if err != nil {
 		return nil, err
@@ -99,8 +101,6 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 		TotalResult: uint64(count),
 		Result:      model.ProjectsToModel(projects),
 	}
-	sequence, err := repo.View.GetLatestProjectSequence()
-	logging.Log("EVENT-Edc56").OnError(err).Warn("could not read latest project sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
@@ -139,6 +139,8 @@ func (repo *ProjectRepo) RemoveProjectMember(ctx context.Context, projectID, use
 
 func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestProjectMemberSequence()
+	logging.Log("EVENT-3dgt6").OnError(err).Warn("could not read latest project member sequence")
 	members, count, err := repo.View.SearchProjectMembers(request)
 	if err != nil {
 		return nil, err
@@ -149,8 +151,6 @@ func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj
 		TotalResult: uint64(count),
 		Result:      model.ProjectMembersToModel(members),
 	}
-	sequence, err := repo.View.GetLatestProjectMemberSequence()
-	logging.Log("EVENT-3dgt6").OnError(err).Warn("could not read latest project member sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
@@ -211,6 +211,8 @@ func (repo *ProjectRepo) RemoveProjectRole(ctx context.Context, projectID, key s
 func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID string, request *proj_model.ProjectRoleSearchRequest) (*proj_model.ProjectRoleSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.AppendProjectQuery(projectID)
+	sequence, err := repo.View.GetLatestProjectRoleSequence()
+	logging.Log("LSp0d-47suf").OnError(err).Warn("could not read latest project role sequence")
 	roles, count, err := repo.View.SearchProjectRoles(request)
 	if err != nil {
 		return nil, err
@@ -222,8 +224,6 @@ func (repo *ProjectRepo) SearchProjectRoles(ctx context.Context, projectID strin
 		TotalResult: uint64(count),
 		Result:      model.ProjectRolesToModel(roles),
 	}
-	sequence, err := repo.View.GetLatestProjectRoleSequence()
-	logging.Log("LSp0d-47suf").OnError(err).Warn("could not read latest project role sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
@@ -277,6 +277,8 @@ func (repo *ProjectRepo) RemoveApplication(ctx context.Context, projectID, appID
 
 func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_model.ApplicationSearchRequest) (*proj_model.ApplicationSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestApplicationSequence()
+	logging.Log("EVENT-SKe8s").OnError(err).Warn("could not read latest application sequence")
 	apps, count, err := repo.View.SearchApplications(request)
 	if err != nil {
 		return nil, err
@@ -287,8 +289,6 @@ func (repo *ProjectRepo) SearchApplications(ctx context.Context, request *proj_m
 		TotalResult: uint64(count),
 		Result:      model.ApplicationViewsToModel(apps),
 	}
-	sequence, err := repo.View.GetLatestApplicationSequence()
-	logging.Log("EVENT-SKe8s").OnError(err).Warn("could not read latest application sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
@@ -329,6 +329,8 @@ func (repo *ProjectRepo) ProjectGrantByID(ctx context.Context, grantID string) (
 
 func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestProjectGrantSequence()
+	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
 	projects, count, err := repo.View.SearchProjectGrants(request)
 	if err != nil {
 		return nil, err
@@ -339,8 +341,6 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantsToModel(projects),
 	}
-	sequence, err := repo.View.GetLatestProjectGrantSequence()
-	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
@@ -467,6 +467,8 @@ func (repo *ProjectRepo) RemoveProjectGrantMember(ctx context.Context, projectID
 
 func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request *proj_model.ProjectGrantMemberSearchRequest) (*proj_model.ProjectGrantMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestProjectGrantMemberSequence()
+	logging.Log("EVENT-Du8sk").OnError(err).Warn("could not read latest project grant sequence")
 	members, count, err := repo.View.SearchProjectGrantMembers(request)
 	if err != nil {
 		return nil, err
@@ -477,8 +479,6 @@ func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request 
 		TotalResult: uint64(count),
 		Result:      model.ProjectGrantMembersToModel(members),
 	}
-	sequence, err := repo.View.GetLatestProjectGrantMemberSequence()
-	logging.Log("EVENT-Du8sk").OnError(err).Warn("could not read latest project grant sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp

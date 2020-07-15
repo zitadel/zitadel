@@ -45,6 +45,8 @@ func (repo *IamRepository) RemoveIamMember(ctx context.Context, userID string) e
 
 func (repo *IamRepository) SearchIamMembers(ctx context.Context, request *iam_model.IamMemberSearchRequest) (*iam_model.IamMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestIamMemberSequence()
+	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
 	members, count, err := repo.View.SearchIamMembers(request)
 	if err != nil {
 		return nil, err
@@ -55,8 +57,6 @@ func (repo *IamRepository) SearchIamMembers(ctx context.Context, request *iam_mo
 		TotalResult: uint64(count),
 		Result:      iam_es_model.IamMembersToModel(members),
 	}
-	sequence, err := repo.View.GetLatestIamMemberSequence()
-	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp

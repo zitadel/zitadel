@@ -73,6 +73,8 @@ func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, er
 
 func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error) {
 	query.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestOrgSequence()
+	logging.Log("EVENT-LXo9w").OnError(err).Warn("could not read latest iam sequence")
 	orgs, count, err := repo.View.SearchOrgs(query)
 	if err != nil {
 		return nil, err
@@ -83,8 +85,6 @@ func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchR
 		TotalResult: uint64(count),
 		Result:      model.OrgsToModel(orgs),
 	}
-	sequence, err := repo.View.GetLatestOrgSequence()
-	logging.Log("EVENT-LXo9w").OnError(err).Warn("could not read latest iam sequence")
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
 		result.Timestamp = sequence.CurrentTimestamp
