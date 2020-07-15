@@ -8,6 +8,11 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" id="min-length" name="minLength" value="{{ .MinLength }}" />
+    <input type="hidden" id="uppercase-regex" name="hasUpperCase" value="{{ .HasUppercase }}" />
+    <input type="hidden" id="lowercase-regex" name="hasLowerCase" value="{{ .HasLowercase }}" />
+    <input type="hidden" id="hasnumebr-regex" name="hasNumber" value="{{ .HasNumber }}" />
+    <input type="hidden" id="hassymbol-regex" name="hasSymbol" value="{{ .HasSymbol }}" />
 
     <div class="fields">
         <div class="field">
@@ -43,21 +48,25 @@
             </select>
         </div>
         <div class="field">
-            <label class="label" for="password">{{t "Registration.Password"}}</label>
-            <input class="input" type="password" id="password" name="password" autocomplete="new-password" required>
+            <label class="label" for="register-password">{{t "Registration.Password"}}</label>
+            <input class="input" type="password" id="register-password" name="register-password" autocomplete="new-password" required>
+            {{ .PasswordPolicyDescription }}
         </div>
         <div class="field">
-            <label class="label" for="password2">{{t "Registration.Password2"}}</label>
-            <input class="input" type="password" id="password2" name="password2" autocomplete="new-password" required>
+            <label class="label" for="register-password-confirmation">{{t "Registration.Password2"}}</label>
+            <input class="input" type="password" id="register-password-confirmation" name="register-password-confirmation" autocomplete="new-password" required>
         </div>
     </div>
 
     {{template "error-message" .}}
 
     <div class="actions">
-        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+        <button class="primary right disabled" id="register-button" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 
+
+<script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
+<script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
 
 {{template "main-bottom" .}}

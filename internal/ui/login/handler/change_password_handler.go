@@ -12,9 +12,9 @@ const (
 )
 
 type changePasswordData struct {
-	OldPassword             string `schema:"old_password"`
-	NewPassword             string `schema:"new_password"`
-	NewPasswordConfirmation string `schema:"new_password_confirmation"`
+	OldPassword             string `schema:"change-old-password"`
+	NewPassword             string `schema:"change-new-password"`
+	NewPasswordConfirmation string `schema:"change-password-confirmation"`
 }
 
 func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {

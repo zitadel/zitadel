@@ -23,13 +23,19 @@ type registerFormData struct {
 	Lastname  string `schema:"lastname"`
 	Language  string `schema:"language"`
 	Gender    int32  `schema:"gender"`
-	Password  string `schema:"password"`
-	Password2 string `schema:"password2"`
+	Password  string `schema:"register-password"`
+	Password2 string `schema:"register-password-confirmation"`
 }
 
 type registerData struct {
 	baseData
 	registerFormData
+	PasswordPolicyDescription string
+	MinLength                 uint64
+	HasUppercase              string
+	HasLowercase              string
+	HasNumber                 string
+	HasSymbol                 string
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -88,9 +94,24 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if formData.Language == "" {
 		formData.Language = l.renderer.Lang(r).String()
 	}
+	policy, description, _ := l.getPasswordComplexityPolicy(r, authRequest)
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
-		registerFormData: *formData,
+		baseData:                  l.getBaseData(r, authRequest, "Register", errType, errMessage),
+		registerFormData:          *formData,
+		PasswordPolicyDescription: description,
+		MinLength:                 policy.MinLength,
+	}
+	if policy.HasUppercase {
+		data.HasUppercase = UpperCaseRegex
+	}
+	if policy.HasLowercase {
+		data.HasLowercase = LowerCaseRegex
+	}
+	if policy.HasSymbol {
+		data.HasSymbol = SymbolRegex
+	}
+	if policy.HasNumber {
+		data.HasNumber = NumberRegex
 	}
 	funcs := map[string]interface{}{
 		"selectedLanguage": func(l string) bool {
