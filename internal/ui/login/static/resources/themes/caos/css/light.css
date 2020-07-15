@@ -144,6 +144,7 @@ button {
 }
 button:hover {
   background-color: #f60075;
+  color: #282828;
   border: 2px solid #f60075;
 }
 button.primary {

@@ -145,6 +145,7 @@ button {
 }
 button:hover {
   background-color: #5b8fd3;
+  color: #282828;
   border: 2px solid #5b8fd3;
 }
 button.primary {
