@@ -3,10 +3,10 @@ Password:
   Description: Gib deine Benutzerdaten ein.
   Password: Passwort
   MinLength: Mindestlänge
-  HasUppercase: Das Passwort muss einen Grossbuchstaben beinhalten.
-  HasLowercase: Das Passwort muss einen Kleinbuchstaben beinhalten.
-  HasNumber: Das Passwort muss eine Nummer beinhalten.
-  HasSymbol: Das Passwort muss ein Symbol beinhalten.
+  HasUppercase: Grossbuchstaben
+  HasLowercase: Kleinbuchstaben
+  HasNumber: Nummer
+  HasSymbol: Symbol
 
 Login:
   Title: Anmeldung

@@ -30,22 +30,22 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *model.Auth
 	}
 	description := "<ul id=\"passwordcomplexity\">"
 	minLength := l.renderer.LocalizeFromRequest(r, "Password.MinLength", nil)
-	description += "<li id=\"minlength\">" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + " <i class=\"material-icons\">cancel</i></li>"
+	description += "<li id=\"minlength\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + "</li>"
 	if policy.HasUppercase {
 		uppercase := l.renderer.LocalizeFromRequest(r, "Password.HasUppercase", nil)
-		description += "<li id=\"uppercase\" class=\"invalid\">" + uppercase + " <i class=\"material-icons\">cancel</i></li>"
+		description += "<li id=\"uppercase\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + uppercase + "</li>"
 	}
 	if policy.HasLowercase {
 		lowercase := l.renderer.LocalizeFromRequest(r, "Password.HasLowercase", nil)
-		description += "<li id=\"lowercase\">" + lowercase + " <i class=\"material-icons\">cancel</i></li>"
+		description += "<li id=\"lowercase\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + lowercase + "</li>"
 	}
 	if policy.HasNumber {
 		hasnumber := l.renderer.LocalizeFromRequest(r, "Password.HasNumber", nil)
-		description += "<li id=\"number\">" + hasnumber + " <i class=\"material-icons\">cancel</i></li>"
+		description += "<li id=\"number\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + hasnumber + "</li>"
 	}
 	if policy.HasSymbol {
 		hassymbol := l.renderer.LocalizeFromRequest(r, "Password.HasSymbol", nil)
-		description += "<li id=\"symbol\">" + hassymbol + " <i class=\"material-icons\">cancel</i></li>"
+		description += "<li id=\"symbol\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + hassymbol + "</li>"
 	}
 
 	description += "</ul>"
