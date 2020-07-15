@@ -245,7 +245,8 @@
             "DOWNLOAD_FILE":"Download file",
             "SELECTORGTOOLTIP":"Select this organisation",
             "PRIMARYDOMAIN":"Primary Domain",
-            "STATE":"State"
+            "STATE":"State",
+            "USEPASSWORD":"Set initial password"
         },
         "DOMAINS": {
             "NEW":"Add Domain",
