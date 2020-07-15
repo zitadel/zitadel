@@ -26,14 +26,12 @@ import { OwnedProjectGridComponent } from './owned-project-list/owned-project-gr
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
 import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
 import { OwnedProjectsComponent } from './owned-projects.component';
-import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
     declarations: [
         OwnedProjectsComponent,
         OwnedProjectListComponent,
         OwnedProjectGridComponent,
-        ProjectGrantsComponent,
     ],
     imports: [
         CommonModule,

@@ -10,23 +10,26 @@ import { ProjectContributorsModule } from 'src/app/modules/project-contributors/
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
+import { ProjectGrantMembersModule } from '../project-grant-detail/project-grant-members/project-grant-members.module';
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
 import { ApplicationsComponent } from './applications/applications.component';
 import { OwnedProjectDetailRoutingModule } from './owned-project-detail-routing.module';
 import { OwnedProjectDetailComponent } from './owned-project-detail.component';
+import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
     declarations: [
         OwnedProjectDetailComponent,
         ApplicationGridComponent,
         ApplicationsComponent,
+        ProjectGrantsComponent,
     ],
     imports: [
         CommonModule,
         OwnedProjectDetailRoutingModule,
         TranslateModule,
-        HasRolePipeModule,
         HasRoleModule,
         MatTabsModule,
         MatButtonModule,
@@ -35,6 +38,9 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
         ProjectContributorsModule,
         WarnDialogModule,
         ProjectRolesModule,
+        HasRolePipeModule,
+        ProjectGrantMembersModule,
+        TimestampToDatePipeModule,
     ],
     schemas: [NO_ERRORS_SCHEMA],
 })
