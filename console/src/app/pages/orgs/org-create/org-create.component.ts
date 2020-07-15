@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
@@ -70,17 +70,7 @@ export class OrgCreateComponent {
             domain: [''],
         });
 
-        this.userForm = this.fb.group({
-            userName: ['', [Validators.required]],
-            firstName: ['', [Validators.required]],
-            lastName: ['', [Validators.required]],
-            email: ['', [Validators.required]],
-            gender: [''],
-            nickName: [''],
-            preferredLanguage: [''],
-            password: ['', []],
-            confirmPassword: ['', []],
-        });
+        this.initForm();
     }
 
     public createSteps: number = 2;
@@ -119,12 +109,43 @@ export class OrgCreateComponent {
         this.currentCreateStep--;
     }
 
-    public initPwdValidators(): void {
-        const validators: Validators[] = [];
+    private initForm(pwdValidators?: Validators[]): void {
+        if (pwdValidators) {
+            console.log('init with pwd');
+            this.userForm = this.fb.group({
+                userName: ['', [Validators.required]],
+                firstName: ['', [Validators.required]],
+                lastName: ['', [Validators.required]],
+                email: ['', [Validators.required]],
+                gender: [''],
+                nickName: [''],
+                preferredLanguage: [''],
+                password: ['', [...pwdValidators]],
+                confirmPassword: ['', [...pwdValidators, passwordConfirmValidator]],
+            });
+        } else {
+            console.log('init without pwd');
+            this.userForm = this.fb.group({
+                userName: ['', [Validators.required]],
+                firstName: ['', [Validators.required]],
+                lastName: ['', [Validators.required]],
+                email: ['', [Validators.required]],
+                gender: [''],
+                nickName: [''],
+                preferredLanguage: [''],
+            });
+        }
+    }
 
+    public initPwdValidators(): void {
+        const validators: Validators[] = [Validators.required];
+
+        console.log(this.usePassword);
         if (this.usePassword) {
             this.orgService.GetDefaultPasswordComplexityPolicy().then(data => {
                 this.policy = data.toObject();
+                console.log(this.policy);
+
                 if (this.policy.minLength) {
                     validators.push(Validators.minLength(this.policy.minLength));
                 }
@@ -141,9 +162,10 @@ export class OrgCreateComponent {
                     validators.push(symbolValidator);
                 }
 
-                this.userForm.controls['password'] = new FormControl(['', [...validators, passwordConfirmValidator]]);
-                this.userForm.controls['confirmPassword'] = new FormControl(['', [...validators, passwordConfirmValidator]]);
+                this.initForm(validators);
             });
+        } else {
+            this.initForm();
         }
     }
 

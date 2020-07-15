@@ -36,8 +36,7 @@
         </app-card>
 
         <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
-            <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
-                description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
+            <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}">
                 <app-detail-form
                     *ngIf="((authUserService.isAllowed(['user.write:' + user?.id, 'user.write']) | async) || false) as canwrite"
                     [disabled]="canwrite" [genders]="genders" [languages]="languages" [profile]="user"

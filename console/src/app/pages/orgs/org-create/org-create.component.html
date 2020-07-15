@@ -10,7 +10,7 @@
 
     <ng-container *ngIf="currentCreateStep == 1">
         <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}}</h1>
-        <form [formGroup]="orgForm">
+        <form [formGroup]="orgForm" (ngSubmit)="next()">
             <div class="content">
                 <mat-form-field class="formfield">
                     <mat-label>{{ 'ORG_DETAIL.DETAIL.NAME' | translate }}</mat-label>
@@ -21,6 +21,11 @@
                     <input matInput formControlName="domain" />
                 </mat-form-field>
             </div>
+
+            <button [disabled]="orgForm.invalid" color="primary" mat-raised-button class="continue-button"
+                cdkFocusInitial type="submit">
+                {{'CONTINUE' | translate}}
+            </button>
         </form>
 
         <!-- <div *ngIf="name?.touched" @openClose>
@@ -108,13 +113,13 @@
                     </mat-form-field>
 
                     <mat-checkbox [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}"
-                        (changed)="initPwdValidators()">
+                        (change)="initPwdValidators()">
                         {{'ORG.PAGES.USEPASSWORD' | translate}}</mat-checkbox>
 
                     <ng-container *ngIf="usePassword">
                         <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
 
-                        <mat-form-field class="formfield">
+                        <mat-form-field class="formfield" *ngIf="password">
                             <mat-label>{{ 'USER.PASSWORD.NEW' | translate }}</mat-label>
                             <input autocomplete="off" name="firstpassword" matInput formControlName="password"
                                 type="password" />
@@ -138,7 +143,7 @@
                                 {{ 'USER.VALIDATION.MINLENGTH' | translate:password?.errors?.minlength }}
                             </mat-error>
                         </mat-form-field>
-                        <mat-form-field class="formfield">
+                        <mat-form-field class="formfield" *ngIf="confirmPassword">
                             <mat-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</mat-label>
                             <input autocomplete="off" name="confirmPassword" matInput formControlName="confirmPassword"
                                 type="password" />
@@ -174,12 +179,5 @@
                 </div>
             </form>
         </div>
-    </ng-container>
-
-    <ng-container *ngIf="currentCreateStep == 1">
-        <button (click)="next()" color="primary" mat-raised-button class="continue-button" cdkFocusInitial
-            type="submit">
-            {{'CONTINUE' | translate}}
-        </button>
     </ng-container>
 </div>
