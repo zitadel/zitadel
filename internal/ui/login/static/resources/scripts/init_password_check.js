@@ -1,5 +1,6 @@
 function CheckInitPwPolicy() {
-    let pwNew = document.getElementById("password").value;
+    let policyElement = document.getElementById("password");
+    let pwNew = policyElement.value;
     let pwNewConfirmation = document.getElementById("passwordconfirm").value;
     let button = document.getElementById("init-button");
 
@@ -9,7 +10,7 @@ function CheckInitPwPolicy() {
         button.classList.remove("disabled");
     }
 
-    ComplexityPolicyCheck(button, pwNew);
+    ComplexityPolicyCheck(policyElement, button, pwNew);
 }
 
 let newPW = document.getElementById("password");

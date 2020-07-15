@@ -1,5 +1,6 @@
 function CheckChangePwPolicy() {
-    let pwNew = document.getElementById("change-new-password").value;
+    let policyElement = document.getElementById("change-new-password")
+    let pwNew = policyElement.value;
     let pwNewConfirmation = document.getElementById("change-password-confirmation").value;
     let oldPW = document.getElementById("change-old-password").value;
     let button = document.getElementById("change-password-button");
@@ -10,7 +11,7 @@ function CheckChangePwPolicy() {
         button.classList.remove("disabled");
     }
 
-    ComplexityPolicyCheck(button, pwNew);
+    ComplexityPolicyCheck(policyElement, button, pwNew);
 }
 
 let newPWChange = document.getElementById("change-new-password");

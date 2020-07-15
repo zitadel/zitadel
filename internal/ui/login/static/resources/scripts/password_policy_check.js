@@ -1,9 +1,9 @@
-function ComplexityPolicyCheck(button, pwNew) {
-    let minLength = document.getElementById("min-length").value;
-    let upperRegex = document.getElementById("uppercase-regex").value;
-    let lowerRegex = document.getElementById("lowercase-regex").value;
-    let numberRegex = document.getElementById("hasnumebr-regex").value;
-    let symbolRegex = document.getElementById("hassymbol-regex").value;
+function ComplexityPolicyCheck(policyElement, button, pwNew) {
+    let minLength = policyElement.dataset.minlength;
+    let upperRegex = policyElement.dataset.hasUppercase;
+    let lowerRegex = policyElement.dataset.hasLowercase;
+    let numberRegex = policyElement.dataset.hasNumber;
+    let symbolRegex = policyElement.dataset.hasSymbol;
 
     let minlengthelem = document.getElementById('minlength')
     if (pwNew.length >= minLength) {

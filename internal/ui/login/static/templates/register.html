@@ -8,11 +8,6 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
-    <input type="hidden" id="min-length" name="minLength" value="{{ .MinLength }}" />
-    <input type="hidden" id="uppercase-regex" name="hasUpperCase" value="{{ .HasUppercase }}" />
-    <input type="hidden" id="lowercase-regex" name="hasLowerCase" value="{{ .HasLowercase }}" />
-    <input type="hidden" id="hasnumebr-regex" name="hasNumber" value="{{ .HasNumber }}" />
-    <input type="hidden" id="hassymbol-regex" name="hasSymbol" value="{{ .HasSymbol }}" />
 
     <div class="fields">
         <div class="field">
@@ -49,7 +44,12 @@
         </div>
         <div class="field">
             <label class="label" for="register-password">{{t "Registration.Password"}}</label>
-            <input class="input" type="password" id="register-password" name="register-password" autocomplete="new-password" required>
+            <input data-minlength="{{ .MinLength }}"
+                   data-has-uppercase="{{ .HasUppercase }}"
+                   data-has-lowercase="{{ .HasLowercase }}"
+                   data-has-number="{{ .HasNumber }}"
+                   data-has-symbol="{{ .HasSymbol }}"
+                   class="input" type="password" id="register-password" name="register-password" autocomplete="new-password" required>
             {{ .PasswordPolicyDescription }}
         </div>
         <div class="field">

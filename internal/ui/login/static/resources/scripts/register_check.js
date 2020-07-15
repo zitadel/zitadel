@@ -1,5 +1,6 @@
 function CheckRegisterPwPolicy() {
-    let pwNew = document.getElementById("register-password").value;
+    let policyElement = document.getElementById("register-password");
+    let pwNew = policyElement.value;
     let pwNewConfirmation = document.getElementById("register-password-confirmation").value;
     let button = document.getElementById("register-button");
 
@@ -9,7 +10,7 @@ function CheckRegisterPwPolicy() {
         button.classList.remove("disabled");
     }
 
-    ComplexityPolicyCheck(button, pwNew);
+    ComplexityPolicyCheck(policyElement, button, pwNew);
 }
 
 let newPWRegister = document.getElementById("register-password");

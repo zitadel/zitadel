@@ -96,7 +96,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userID = authReq.UserID
 	}
-	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq)
+	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, userID)
 	data := initUserData{
 		baseData:                  l.getBaseData(r, nil, "Init User", errType, errMessage),
 		UserID:                    userID,
