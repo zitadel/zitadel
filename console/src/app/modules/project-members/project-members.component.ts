@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
@@ -162,5 +162,10 @@ export class ProjectMembersComponent {
                     this.toast.showError(error);
                 });
         }
+    }
+
+    public changePage(event: PageEvent): void {
+        console.log(event);
+        this.dataSource.loadMembers(this.project.projectId, this.projectType, event.pageIndex, event.pageSize, this.grantId);
     }
 }
