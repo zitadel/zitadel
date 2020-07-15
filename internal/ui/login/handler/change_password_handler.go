@@ -48,11 +48,24 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	_, description, _ := l.getPasswordComplexityPolicy(r, authReq)
-	data := userData{
+	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq)
+	data := passwordData{
 		baseData:                  l.getBaseData(r, authReq, "Change Password", errType, errMessage),
 		LoginName:                 authReq.LoginName,
 		PasswordPolicyDescription: description,
+		MinLength:                 policy.MinLength,
+	}
+	if policy.HasUppercase {
+		data.HasUppercase = UpperCaseRegex
+	}
+	if policy.HasLowercase {
+		data.HasLowercase = LowerCaseRegex
+	}
+	if policy.HasSymbol {
+		data.HasSymbol = SymbolRegex
+	}
+	if policy.HasNumber {
+		data.HasNumber = NumberRegex
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePassword], data, nil)
 }

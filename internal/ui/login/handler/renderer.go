@@ -3,11 +3,10 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/gorilla/csrf"
 	"html/template"
 	"net/http"
 	"path"
-
-	"github.com/gorilla/csrf"
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth_request/model"
@@ -258,11 +257,21 @@ type errorData struct {
 
 type userData struct {
 	baseData
+	LoginName           string
+	PasswordChecked     string
+	MfaProviders        []model.MfaType
+	SelectedMfaProvider model.MfaType
+}
+
+type passwordData struct {
+	baseData
 	LoginName                 string
-	PasswordChecked           string
 	PasswordPolicyDescription string
-	MfaProviders              []model.MfaType
-	SelectedMfaProvider       model.MfaType
+	MinLength                 uint64
+	HasUppercase              string
+	HasLowercase              string
+	HasNumber                 string
+	HasSymbol                 string
 }
 
 type userSelectionData struct {

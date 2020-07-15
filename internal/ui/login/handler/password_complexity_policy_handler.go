@@ -9,11 +9,18 @@ import (
 	"strconv"
 )
 
+const (
+	LowerCaseRegex = `[a-z]`
+	UpperCaseRegex = `[A-Z]`
+	NumberRegex    = `[0-9]`
+	SymbolRegex    = `[^A-Za-z0-9]`
+)
+
 var (
-	hasStringLowerCase = regexp.MustCompile(`[a-z]`).MatchString
-	hasStringUpperCase = regexp.MustCompile(`[A-Z]`).MatchString
-	hasNumber          = regexp.MustCompile(`[0-9]`).MatchString
-	hasSymbol          = regexp.MustCompile(`[^A-Za-z0-9]`).MatchString
+	hasStringLowerCase = regexp.MustCompile(LowerCaseRegex).MatchString
+	hasStringUpperCase = regexp.MustCompile(UpperCaseRegex).MatchString
+	hasNumber          = regexp.MustCompile(NumberRegex).MatchString
+	hasSymbol          = regexp.MustCompile(SymbolRegex).MatchString
 )
 
 func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *model.AuthRequest) (*policy_model.PasswordComplexityPolicy, string, error) {
@@ -21,24 +28,24 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *model.Auth
 	if err != nil {
 		return nil, err.Error(), err
 	}
-	description := "<ul class=\"passwordcomplexity\">"
-	minLength := l.renderer.Localize("Password.MinLength", nil)
-	description += "<li>" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + "</li>"
+	description := "<ul id=\"passwordcomplexity\">"
+	minLength := l.renderer.LocalizeFromRequest(r, "Password.MinLength", nil)
+	description += "<li id=\"minlength\">" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + " <i class=\"material-icons\">cancel</i></li>"
 	if policy.HasUppercase {
-		uppercase := l.renderer.Localize("Password.HasUppercase", nil)
-		description += "<li>" + uppercase + "</li>"
+		uppercase := l.renderer.LocalizeFromRequest(r, "Password.HasUppercase", nil)
+		description += "<li id=\"uppercase\" class=\"invalid\">" + uppercase + " <i class=\"material-icons\">cancel</i></li>"
 	}
 	if policy.HasLowercase {
-		lowercase := l.renderer.Localize("Password.HasLowercase", nil)
-		description += "<li>" + lowercase + "</li>"
+		lowercase := l.renderer.LocalizeFromRequest(r, "Password.HasLowercase", nil)
+		description += "<li id=\"lowercase\">" + lowercase + " <i class=\"material-icons\">cancel</i></li>"
 	}
 	if policy.HasNumber {
-		hasnumber := l.renderer.Localize("Password.HasNumber", nil)
-		description += "<li>" + hasnumber + "</li>"
+		hasnumber := l.renderer.LocalizeFromRequest(r, "Password.HasNumber", nil)
+		description += "<li id=\"number\">" + hasnumber + " <i class=\"material-icons\">cancel</i></li>"
 	}
 	if policy.HasSymbol {
-		hassymbol := l.renderer.Localize("Password.HasSymbol", nil)
-		description += "<li>" + hassymbol + "</li>"
+		hassymbol := l.renderer.LocalizeFromRequest(r, "Password.HasSymbol", nil)
+		description += "<li id=\"symbol\">" + hassymbol + " <i class=\"material-icons\">cancel</i></li>"
 	}
 
 	description += "</ul>"
