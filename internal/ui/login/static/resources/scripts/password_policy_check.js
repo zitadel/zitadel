@@ -1,5 +1,4 @@
 function ComplexityPolicyCheck(button, pwNew) {
-    console.log("ComplexityPolicyCheck");
     let minLength = document.getElementById("min-length").value;
     let upperRegex = document.getElementById("uppercase-regex").value;
     let lowerRegex = document.getElementById("lowercase-regex").value;

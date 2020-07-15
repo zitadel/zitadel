@@ -28,6 +28,24 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *model.Auth
 	if err != nil {
 		return nil, err.Error(), err
 	}
+	description, err := l.generatePolicyDescription(r, policy)
+	return policy, description, nil
+}
+
+func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, userID string) (*policy_model.PasswordComplexityPolicy, string, error) {
+	user, err := l.authRepo.UserByID(r.Context(), userID)
+	if err != nil {
+		return nil, "", nil
+	}
+	policy, err := l.authRepo.GetMyPasswordComplexityPolicy(setContext(r.Context(), user.ResourceOwner))
+	if err != nil {
+		return nil, err.Error(), err
+	}
+	description, err := l.generatePolicyDescription(r, policy)
+	return policy, description, nil
+}
+
+func (l *Login) generatePolicyDescription(r *http.Request, policy *policy_model.PasswordComplexityPolicy) (string, error) {
 	description := "<ul id=\"passwordcomplexity\">"
 	minLength := l.renderer.LocalizeFromRequest(r, "Password.MinLength", nil)
 	description += "<li id=\"minlength\" class=\"invalid\"><i class=\"material-icons\">clear</i>" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + "</li>"
@@ -49,7 +67,7 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *model.Auth
 	}
 
 	description += "</ul>"
-	return policy, description, nil
+	return description, nil
 }
 
 func (l *Login) checkPasswordComplexityPolicy(password string, r *http.Request, authReq *model.AuthRequest) error {

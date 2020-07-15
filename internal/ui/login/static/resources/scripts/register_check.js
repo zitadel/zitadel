@@ -1,5 +1,4 @@
 function CheckRegisterPwPolicy() {
-    console.log("CheckRegisterPwPolicy");
     let pwNew = document.getElementById("register-password").value;
     let pwNewConfirmation = document.getElementById("register-password-confirmation").value;
     let button = document.getElementById("register-button");

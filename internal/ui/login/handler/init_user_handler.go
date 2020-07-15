@@ -28,9 +28,15 @@ type initUserFormData struct {
 
 type initUserData struct {
 	baseData
-	Code        string
-	UserID      string
-	PasswordSet bool
+	Code                      string
+	UserID                    string
+	PasswordSet               bool
+	PasswordPolicyDescription string
+	MinLength                 uint64
+	HasUppercase              string
+	HasLowercase              string
+	HasNumber                 string
+	HasSymbol                 string
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
@@ -90,11 +96,26 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userID = authReq.UserID
 	}
+	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, nil, "Init User", errType, errMessage),
-		UserID:      userID,
-		Code:        code,
-		PasswordSet: passwordSet,
+		baseData:                  l.getBaseData(r, nil, "Init User", errType, errMessage),
+		UserID:                    userID,
+		Code:                      code,
+		PasswordSet:               passwordSet,
+		PasswordPolicyDescription: description,
+		MinLength:                 policy.MinLength,
+	}
+	if policy.HasUppercase {
+		data.HasUppercase = UpperCaseRegex
+	}
+	if policy.HasLowercase {
+		data.HasLowercase = LowerCaseRegex
+	}
+	if policy.HasSymbol {
+		data.HasSymbol = SymbolRegex
+	}
+	if policy.HasNumber {
+		data.HasNumber = NumberRegex
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUser], data, nil)
 }
