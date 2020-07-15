@@ -141,6 +141,7 @@
         </tr>
     </table>
 
-    <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]">
+    <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50" [length]="dataSource.totalResult"
+        [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
     </mat-paginator>
 </div>

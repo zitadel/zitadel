@@ -35,7 +35,6 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
         ProjectContributorsModule,
         WarnDialogModule,
         ProjectRolesModule,
-
     ],
     schemas: [NO_ERRORS_SCHEMA],
 })

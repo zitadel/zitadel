@@ -4,7 +4,6 @@ import { AuthUserService } from '../services/auth-user.service';
 
 @Pipe({
     name: 'hasRole',
-    pure: false,
 })
 export class HasRolePipe implements PipeTransform {
 

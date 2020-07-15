@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
@@ -59,11 +59,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     public ngOnInit(): void {
         console.log(this.context);
         this.dataSource = new UserGrantsDataSource(this.userService);
-        const data = {
-            projectId: this.projectId,
-            grantId: this.grantId,
-            userId: this.userId,
-        };
 
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
@@ -73,7 +68,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
-                if (data && data.grantId) {
+                if (this.grantId) {
                     this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
                     this.getGrantRoleOptions(this.grantId, this.projectId);
                 }
@@ -86,7 +81,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             default:
                 this.routerLink = ['/grant-create'];
         }
-        this.dataSource.loadGrants(this.context, 0, 25, data);
+        this.dataSource.loadGrants(this.context, 0, 25, {
+            projectId: this.projectId,
+            grantId: this.grantId,
+            userId: this.userId,
+        });
     }
 
     public ngAfterViewInit(): void {
@@ -180,6 +179,15 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             this.selection.clear();
         }).catch(error => {
             this.toast.showError(error);
+        });
+    }
+
+    public changePage(event: PageEvent): void {
+        console.log(event);
+        this.dataSource.loadGrants(this.context, event.pageIndex, event.pageSize, {
+            projectId: this.projectId,
+            grantId: this.grantId,
+            userId: this.userId,
         });
     }
 }

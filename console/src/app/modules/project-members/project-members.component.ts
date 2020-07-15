@@ -13,12 +13,14 @@ import { ToastService } from 'src/app/services/toast.service';
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
 import { ProjectMembersDataSource } from './project-members-datasource';
 
+
 @Component({
     selector: 'app-project-members',
     templateUrl: './project-members.component.html',
     styleUrls: ['./project-members.component.scss'],
 })
 export class ProjectMembersComponent {
+    public INITIALPAGESIZE: number = 25;
     public project!: ProjectView.AsObject | ProjectGrantView.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
@@ -50,7 +52,7 @@ export class ProjectMembersComponent {
                         this.project = project.toObject();
                         this.projectName = this.project.name;
                         this.dataSource = new ProjectMembersDataSource(this.projectService);
-                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25);
+                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE);
                     });
                 } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
                     console.log(params.projectid, params.grantid);
@@ -58,7 +60,12 @@ export class ProjectMembersComponent {
                         this.project = project.toObject();
                         this.projectName = this.project.projectName;
                         this.dataSource = new ProjectMembersDataSource(this.projectService);
-                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25, this.grantId);
+                        this.dataSource.loadMembers(this.project.projectId,
+                            this.projectType,
+                            0,
+                            this.INITIALPAGESIZE,
+                            this.grantId,
+                        );
                     });
                 }
             });
