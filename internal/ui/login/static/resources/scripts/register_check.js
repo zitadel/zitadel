@@ -2,19 +2,13 @@ function CheckRegisterPwPolicy() {
     let policyElement = document.getElementById("register-password");
     let pwNew = policyElement.value;
     let pwNewConfirmation = document.getElementById("register-password-confirmation").value;
-    let button = document.getElementById("register-button");
 
-    if (pwNew == "" || pwNewConfirmation == "" || pwNew != pwNewConfirmation) {
-        button.disabled = true;
-    } else {
-        button.disabled = false;
+    if (ComplexityPolicyCheck(policyElement, pwNew) === false) {
+        return false;
     }
 
-    ComplexityPolicyCheck(policyElement, button, pwNew);
+    return pwNew == pwNewConfirmation;
 }
 
-let newPWRegister = document.getElementById("register-password");
-newPWRegister.addEventListener('input', CheckRegisterPwPolicy);
-
-let newPWConfirmationRegister = document.getElementById("register-password-confirmation");
-newPWConfirmationRegister.addEventListener('input', CheckRegisterPwPolicy);
+let button = document.getElementById("register-button");
+disableSubmit(CheckRegisterPwPolicy, button);
