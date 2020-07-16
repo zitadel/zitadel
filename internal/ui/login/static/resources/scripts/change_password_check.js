@@ -6,9 +6,9 @@ function CheckChangePwPolicy() {
     let button = document.getElementById("change-password-button");
 
     if (oldPW == "" || pwNew == "" || pwNewConfirmation == "" || pwNew != pwNewConfirmation) {
-        button.classList.add("disabled");
+        button.disabled = true;
     } else {
-        button.classList.remove("disabled");
+        button.disabled = false;
     }
 
     ComplexityPolicyCheck(policyElement, button, pwNew);

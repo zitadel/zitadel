@@ -53,7 +53,7 @@ function ValidPolicy(element) {
 }
 
 function InvalidPolicy(element, button) {
-    button.classList.add("disabled");
+    button.disabled = true;
     element.classList.add('invalid')
     element.getElementsByTagName('i')[0].innerText = 'clear';
 }

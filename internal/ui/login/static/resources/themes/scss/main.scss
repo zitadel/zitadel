@@ -91,7 +91,7 @@ button {
         }
     }
 
-    &.disabled {
+    &:disabled {
         background-color: $inputBorderColor;
         border: 2px solid $inputBorderColor;
 

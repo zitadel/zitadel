@@ -5,9 +5,9 @@ function CheckInitPwPolicy() {
     let button = document.getElementById("init-button");
 
     if (pwNew == "" || pwNewConfirmation == "" || pwNew != pwNewConfirmation) {
-        button.classList.add("disabled");
+        button.disabled = true;
     } else {
-        button.classList.remove("disabled");
+        button.disabled = false;
     }
 
     ComplexityPolicyCheck(policyElement, button, pwNew);

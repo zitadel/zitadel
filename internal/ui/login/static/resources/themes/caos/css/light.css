@@ -155,11 +155,11 @@ button.primary {
 button.primary:hover {
   background-color: #f60075;
 }
-button.disabled {
+button:disabled {
   background-color: #505050;
   border: 2px solid #505050;
 }
-button.disabled:hover {
+button:disabled:hover {
   background-color: #505050;
   border: 2px solid #505050;
 }
