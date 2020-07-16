@@ -33,8 +33,6 @@ export class MemberCreateDialogComponent {
         this.creationType = data.creationType;
         this.projectId = data.projectId;
 
-        console.log(this.creationType);
-
         if (this.creationType === CreationType.PROJECT_GRANTED) {
             this.projectService.GetProjectGrantMemberRoles().then(resp => {
                 this.memberRoleOptions = resp.toObject().rolesList;

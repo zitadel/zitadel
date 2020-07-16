@@ -1,5 +1,5 @@
 <app-owned-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
-    [items]="ownedProjectList" (newClicked)="addProject()">
+    [items]="ownedProjectList || []" (newClicked)="addProject()">
 </app-owned-project-grid>
 
 <div *ngIf="!grid" class="view-toggle">

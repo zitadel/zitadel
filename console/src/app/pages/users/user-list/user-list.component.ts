@@ -51,7 +51,6 @@ export class UserListComponent implements OnDestroy {
     }
 
     public changePage(event: PageEvent): void {
-        console.log(event);
         this.getData(event.pageSize, event.pageIndex * event.pageSize);
     }
 
@@ -76,7 +75,6 @@ export class UserListComponent implements OnDestroy {
     private async getData(limit: number, offset: number): Promise<void> {
         this.loadingSubject.next(true);
         this.userService.SearchUsers(limit, offset).then(resp => {
-            console.log(resp.toObject());
             this.userResult = resp.toObject();
             this.dataSource.data = resp.toObject().resultList;
             this.loadingSubject.next(false);

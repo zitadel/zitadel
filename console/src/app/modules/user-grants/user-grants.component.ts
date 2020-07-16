@@ -57,7 +57,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         'projectId', 'creationDate', 'changeDate', 'roleNamesList'];
 
     public ngOnInit(): void {
-        console.log(this.context);
         this.dataSource = new UserGrantsDataSource(this.userService);
 
         switch (this.context) {
@@ -121,8 +120,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
-        console.log(grantId, projectId);
-
         this.projectService.GetGrantedProjectByID(projectId, grantId).then(resp => {
             this.loadedGrantId = projectId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
@@ -132,7 +129,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getProjectRoleOptions(projectId: string): void {
-        console.log(projectId);
         this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
             this.projectRoleOptions = resp.toObject().resultList;
@@ -183,7 +179,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public changePage(event: PageEvent): void {
-        console.log(event);
         this.dataSource.loadGrants(this.context, event.pageIndex, event.pageSize, {
             projectId: this.projectId,
             grantId: this.grantId,

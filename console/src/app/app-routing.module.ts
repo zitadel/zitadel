@@ -30,13 +30,31 @@ const routes: Routes = [
     },
     {
         path: 'users',
-        loadChildren: () => import('./pages/users/users.module').then(m => m.UsersModule),
         canActivate: [AuthGuard],
+        children: [
+            {
+                path: 'all',
+                loadChildren: () => import('src/app/pages/users/user-list/user-list.module')
+                    .then(m => m.UserListModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['user.read'],
+                },
+            },
+            {
+                path: '',
+                loadChildren: () => import('src/app/pages/users/user-detail/user-detail.module')
+                    .then(m => m.UserDetailModule),
+            },
+        ],
     },
     {
         path: 'iam',
         loadChildren: () => import('./pages/iam/iam.module').then(m => m.IamModule),
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['iam.read', 'iam.write'],
+        },
     },
     {
         path: 'org',
@@ -47,28 +65,28 @@ const routes: Routes = [
         },
     },
     {
-        path: 'grant-create/project/:projectid/grant/:grantid',
-        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
-            .then(m => m.UserGrantCreateModule),
-        canActivate: [AuthGuard],
-    },
-    {
-        path: 'grant-create/project/:projectid',
-        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
-            .then(m => m.UserGrantCreateModule),
-        canActivate: [AuthGuard],
-    },
-    {
-        path: 'grant-create/user/:userid',
-        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
-            .then(m => m.UserGrantCreateModule),
-        canActivate: [AuthGuard],
-    },
-    {
         path: 'grant-create',
-        loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
-            .then(m => m.UserGrantCreateModule),
         canActivate: [AuthGuard],
+        children: [
+            {
+                path: 'project/:projectid/grant/:grantid',
+                loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+                    .then(m => m.UserGrantCreateModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['project.grant.user.grant.write'],
+                },
+            },
+            {
+                path: 'project/:projectid',
+                loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module')
+                    .then(m => m.UserGrantCreateModule),
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['project.user.grant.write'],
+                },
+            },
+        ],
     },
     {
         path: 'signedout',

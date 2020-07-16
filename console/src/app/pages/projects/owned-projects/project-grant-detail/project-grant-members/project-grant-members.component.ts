@@ -134,7 +134,6 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
                         dataToAdd.rolesKeyList,
                     );
                 })).then(() => {
-                    console.log('this');
                     this.toast.showInfo('Project Grant Member successfully added!');
                 }).catch(error => {
                     this.toast.showError(error);

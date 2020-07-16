@@ -55,7 +55,6 @@ export class ProjectMembersComponent {
                         this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE);
                     });
                 } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                    console.log(params.projectid, params.grantid);
                     this.projectService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
                         this.project = project.toObject();
                         this.projectName = this.project.projectName;
@@ -172,7 +171,6 @@ export class ProjectMembersComponent {
     }
 
     public changePage(event: PageEvent): void {
-        console.log(event);
         this.dataSource.loadMembers(this.project.projectId, this.projectType, event.pageIndex, event.pageSize, this.grantId);
     }
 }

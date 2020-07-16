@@ -91,13 +91,11 @@ export class OrgGridComponent {
     private getData(limit: number, offset: number): void {
         this.userService.SearchMyProjectOrgs(limit, offset).then(res => {
             this.orgList = res.toObject().resultList;
-            console.log(this.orgList);
 
             this.notPinned = Object.assign([], this.orgList);
             this.reorganizeItems();
             this.loading = false;
         }).catch(error => {
-            console.error(error);
             this.toast.showError(error);
             this.loading = false;
         });

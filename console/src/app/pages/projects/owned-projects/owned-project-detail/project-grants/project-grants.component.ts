@@ -75,7 +75,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     public getRoleOptions(projectId: string): void {
         this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.memberRoleOptions = resp.toObject().resultList;
-            console.log(resp.toObject());
         });
     }
 
