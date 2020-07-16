@@ -31,7 +31,7 @@ func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence), nil
+	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectRole) Reduce(event *models.Event) (err error) {

@@ -50,6 +50,8 @@ type OrgMemberSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*OrgMemberView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *OrgMemberSearchRequest) EnsureLimit(limit uint64) {

@@ -96,26 +96,28 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userID = authReq.UserID
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, userID)
 	data := initUserData{
-		baseData:                  l.getBaseData(r, nil, "Init User", errType, errMessage),
-		UserID:                    userID,
-		Code:                      code,
-		PasswordSet:               passwordSet,
-		PasswordPolicyDescription: description,
-		MinLength:                 policy.MinLength,
+		baseData:    l.getBaseData(r, nil, "Init User", errType, errMessage),
+		UserID:      userID,
+		Code:        code,
+		PasswordSet: passwordSet,
 	}
-	if policy.HasUppercase {
-		data.HasUppercase = UpperCaseRegex
-	}
-	if policy.HasLowercase {
-		data.HasLowercase = LowerCaseRegex
-	}
-	if policy.HasSymbol {
-		data.HasSymbol = SymbolRegex
-	}
-	if policy.HasNumber {
-		data.HasNumber = NumberRegex
+	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, userID)
+	if policy != nil {
+		data.PasswordPolicyDescription = description
+		data.MinLength = policy.MinLength
+		if policy.HasUppercase {
+			data.HasUppercase = UpperCaseRegex
+		}
+		if policy.HasLowercase {
+			data.HasLowercase = LowerCaseRegex
+		}
+		if policy.HasSymbol {
+			data.HasSymbol = SymbolRegex
+		}
+		if policy.HasNumber {
+			data.HasNumber = NumberRegex
+		}
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUser], data, nil)
 }

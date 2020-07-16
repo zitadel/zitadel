@@ -50,7 +50,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(iam_es_model.IamAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *UserGrant) Reduce(event *models.Event) (err error) {

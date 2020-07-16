@@ -35,7 +35,7 @@ func (v *View) ProcessedOrgFailedEvent(failedEvent *repository.FailedEvent) erro
 	return v.saveFailedEvent(failedEvent)
 }
 
-func (v *View) GetLatestOrgSequence() (uint64, error) {
+func (v *View) GetLatestOrgSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgTable)
 }
 

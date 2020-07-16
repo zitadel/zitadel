@@ -39,7 +39,7 @@ func (v *View) DeleteOrgMember(orgID, userID string, eventSequence uint64) error
 	return v.ProcessedOrgMemberSequence(eventSequence)
 }
 
-func (v *View) GetLatestOrgMemberSequence() (uint64, error) {
+func (v *View) GetLatestOrgMemberSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgMemberTable)
 }
 

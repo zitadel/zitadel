@@ -138,11 +138,15 @@ func orgDomainSearchKeyToModel(key management.OrgDomainSearchKey) org_model.OrgD
 }
 
 func orgDomainSearchResponseFromModel(resp *org_model.OrgDomainSearchResponse) *management.OrgDomainSearchResponse {
+	timestamp, err := ptypes.TimestampProto(resp.Timestamp)
+	logging.Log("GRPC-Mxi9w").OnError(err).Debug("unable to get timestamp from time")
 	return &management.OrgDomainSearchResponse{
-		Limit:       resp.Limit,
-		Offset:      resp.Offset,
-		TotalResult: resp.TotalResult,
-		Result:      orgDomainsFromModel(resp.Result),
+		Limit:             resp.Limit,
+		Offset:            resp.Offset,
+		TotalResult:       resp.TotalResult,
+		Result:            orgDomainsFromModel(resp.Result),
+		ProcessedSequence: resp.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 func orgDomainsFromModel(viewDomains []*org_model.OrgDomainView) []*management.OrgDomainView {

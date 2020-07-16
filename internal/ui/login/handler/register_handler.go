@@ -94,25 +94,32 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if formData.Language == "" {
 		formData.Language = l.renderer.Lang(r).String()
 	}
-	policy, description, _ := l.getPasswordComplexityPolicy(r, authRequest)
+
 	data := registerData{
-		baseData:                  l.getBaseData(r, authRequest, "Register", errType, errMessage),
-		registerFormData:          *formData,
-		PasswordPolicyDescription: description,
-		MinLength:                 policy.MinLength,
+		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
+		registerFormData: *formData,
 	}
-	if policy.HasUppercase {
-		data.HasUppercase = UpperCaseRegex
+	iam, err := l.authRepo.GetIam(r.Context())
+	if iam != nil {
+		policy, description, _ := l.getPasswordComplexityPolicy(r, iam.GlobalOrgID)
+		if policy != nil {
+			data.PasswordPolicyDescription = description
+			data.MinLength = policy.MinLength
+			if policy.HasUppercase {
+				data.HasUppercase = UpperCaseRegex
+			}
+			if policy.HasLowercase {
+				data.HasLowercase = LowerCaseRegex
+			}
+			if policy.HasSymbol {
+				data.HasSymbol = SymbolRegex
+			}
+			if policy.HasNumber {
+				data.HasNumber = NumberRegex
+			}
+		}
 	}
-	if policy.HasLowercase {
-		data.HasLowercase = LowerCaseRegex
-	}
-	if policy.HasSymbol {
-		data.HasSymbol = SymbolRegex
-	}
-	if policy.HasNumber {
-		data.HasNumber = NumberRegex
-	}
+
 	funcs := map[string]interface{}{
 		"selectedLanguage": func(l string) bool {
 			if formData == nil {

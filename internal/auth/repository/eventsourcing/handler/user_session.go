@@ -36,7 +36,7 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence), nil
+	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (u *UserSession) Reduce(event *models.Event) (err error) {

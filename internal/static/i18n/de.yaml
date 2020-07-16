@@ -199,12 +199,11 @@ EventTypes:
       removed: Domäne entfernt
       primary:
         set: Primäre Domäne gesetzt
+      reserved: Domäne reserviert
+      released: Domäne freigegeben
     name:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben
-    domain:
-      reserved: Domäne reserviert
-      released: Domäne freigegeben
     member:
       added: Organisationsmitglied hinzugefügt
       changed: Organisationsmitglied geändert
@@ -246,15 +245,17 @@ EventTypes:
       removed: Applikation entfernt
       deactivated: Applikation deaktiviert
       reactivated: Applikation reaktiviert
+      oidc:
+        secret:
+          check:
+            succeeded: OIDC Client Secret Validierung erfolgreich
+            failed: OIDC Client Secret Validierung fehlgeschlagen
       config:
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert
           secret:
             changed: OIDC Client Secret geändert
-            check:
-              succeeded: OIDC Client Secret Validierung erfolgreich
-              failed: OIDC Client Secret Validierung fehlgeschlagen
   policy:
     password:
       complexity:

@@ -26,7 +26,7 @@ type ProjectRepository interface {
 	AddProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
-	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
+	SearchProjectRoles(ctx context.Context, projectId string, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ProjectChanges, error)
 	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 

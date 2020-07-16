@@ -199,12 +199,11 @@ EventTypes:
       removed: Domain removed
       primary:
         set: Primary domain set
+      reserved: Domain reserved
+      released: Domain released
     name:
       reserved: Organization name reserved
       released: Organization name released
-    domain:
-      reserved: Domain reserved
-      released: Domain released
     member:
       added: Organization member added
       changed: Organization member changed
@@ -246,15 +245,17 @@ EventTypes:
       removed: Application removed
       deactivated: Application deactivated
       reactivated: Application reactivated
+      oidc:
+        secret:
+          check:
+            succeeded: OIDC Client Secret check succeeded
+            failed: OIDC Client Secret check failed
       config:
         oidc:
           added: OIDC Configuration added
-          changed: OIDC Configuration chnaged
+          changed: OIDC Configuration changed
           secret:
             changed: OIDC secret changed
-            check:
-              succeeded: OIDC secret check succeeded
-              failed: OIDC secret check failed
   policy:
     password:
       complexity:
