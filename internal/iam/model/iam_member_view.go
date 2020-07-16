@@ -49,6 +49,8 @@ type IamMemberSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*IamMemberView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *IamMemberSearchRequest) EnsureLimit(limit uint64) {

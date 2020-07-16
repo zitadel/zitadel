@@ -32,7 +32,7 @@ func (d *OrgDomain) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.OrgAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (d *OrgDomain) Reduce(event *models.Event) (err error) {

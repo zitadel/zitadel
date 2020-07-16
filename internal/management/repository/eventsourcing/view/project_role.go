@@ -43,7 +43,7 @@ func (v *View) DeleteProjectRole(projectID, orgID, key string, eventSequence uin
 	return v.ProcessedProjectRoleSequence(eventSequence)
 }
 
-func (v *View) GetLatestProjectRoleSequence() (uint64, error) {
+func (v *View) GetLatestProjectRoleSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectRoleTable)
 }
 

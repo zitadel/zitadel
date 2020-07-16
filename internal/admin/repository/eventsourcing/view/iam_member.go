@@ -40,7 +40,7 @@ func (v *View) DeleteIamMember(iamID, userID string, eventSequence uint64) error
 	return v.ProcessedIamMemberSequence(eventSequence)
 }
 
-func (v *View) GetLatestIamMemberSequence() (uint64, error) {
+func (v *View) GetLatestIamMemberSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(iamMemberTable)
 }
 

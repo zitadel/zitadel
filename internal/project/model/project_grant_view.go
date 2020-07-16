@@ -52,6 +52,8 @@ type ProjectGrantViewSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*ProjectGrantView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *ProjectGrantViewSearchRequest) AppendMyOrgQuery(orgID string) {

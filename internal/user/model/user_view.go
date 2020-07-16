@@ -79,6 +79,8 @@ type UserSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*UserView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *UserSearchRequest) EnsureLimit(limit uint64) {
