@@ -68,17 +68,24 @@ func (s *Spooler) Start() {
 
 func (s *spooledHandler) load() {
 	errs := make(chan error)
+	defer close(errs)
 	ctx, cancel := context.WithCancel(context.Background())
 	go s.awaitError(cancel, errs)
 	hasLocked := s.lock(ctx, errs)
 
-	defer close(errs)
-
 	if <-hasLocked {
+		go func() {
+			for l := range hasLocked {
+				if !l {
+					ctx.Done()
+				}
+			}
+		}()
 		events, err := s.query(ctx)
 		if err != nil {
 			errs <- err
 		} else {
+			logging.LogWithFields("SPOOL-aqLrD", "eventCount", len(events), "lock", s.lockID, "ts", time.Now().Format("15-01-2018 15:04:05.000000"), "view", s.ViewModel()).Debug("i will load")
 			errs <- s.process(ctx, events)
 		}
 	}
@@ -148,8 +155,10 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool 
 				return
 			case <-renewTimer:
 				err := s.locker.Renew(s.lockID, s.ViewModel(), s.MinimumCycleDuration()*2)
+				logging.LogWithFields("SPOOL-C6FcM", "lock", s.lockID, "ts", time.Now().Format("15-01-2018 15:04:05.000000"), "view", s.ViewModel()).Debug("renewed")
 				if err == nil {
 					locked <- true
+					logging.LogWithFields("SPOOL-NqFkJ", "lock", s.lockID, "ts", time.Now().Format("15-01-2018 15:04:05.000000"), "view", s.ViewModel()).Debug("wont reach")
 					renewTimer = time.After(renewDuration)
 					continue
 				}
