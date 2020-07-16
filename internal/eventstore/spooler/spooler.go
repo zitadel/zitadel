@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -38,6 +39,9 @@ type spooledHandler struct {
 	lockID     string
 	queuedAt   time.Time
 	eventstore eventstore.Eventstore
+
+	isWorking bool
+	working   sync.Mutex
 }
 
 func (s *Spooler) Start() {
@@ -55,13 +59,24 @@ func (s *Spooler) Start() {
 					queue <- handler
 				}(handler, s.queue)
 
+				if handler.isWorking {
+					continue
+				}
+				handler.working.Lock()
+				handler.isWorking = true
+				handler.working.Unlock()
+
 				handler.lockID = strings.Split(handler.lockID, "--")[0] + "--" + strconv.Itoa(taskIdx)
 				handler.load()
+
+				handler.working.Lock()
+				handler.isWorking = false
+				handler.working.Unlock()
 			}
 		}(i)
 	}
 	for _, handler := range s.handlers {
-		handler := &spooledHandler{handler, s.locker, s.lockID, time.Now(), s.eventstore}
+		handler := &spooledHandler{Handler: handler, locker: s.locker, lockID: s.lockID, queuedAt: time.Now(), eventstore: s.eventstore}
 		s.queue <- handler
 	}
 }
@@ -86,7 +101,7 @@ func (s *spooledHandler) load() {
 		if err != nil {
 			errs <- err
 		} else {
-			logging.LogWithFields("SPOOL-aqLrD", "eventCount", len(events), "lock", s.lockID, "view", s.ViewModel()).Debug("i will load")
+			logging.LogWithFields("SPOOL-aqLrD", "eventCount", len(events), "lock", s.lockID, "view", s.ViewModel()).Debug("will load")
 			errs <- s.process(ctx, events)
 		}
 	}
@@ -97,7 +112,7 @@ func (s *spooledHandler) awaitError(cancel func(), errs chan error) {
 	select {
 	case err := <-errs:
 		cancel()
-		logging.Log("SPOOL-K2lst").OnError(err).WithField("view", s.ViewModel()).Debug("load canceled")
+		logging.Log("SPOOL-K2lst").OnError(err).WithField("view", s.ViewModel()).WithField("lock", s.lockID).Debug("load canceled")
 	}
 }
 
@@ -105,9 +120,10 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event) er
 	for _, event := range events {
 		select {
 		case <-ctx.Done():
-			logging.Log("SPOOL-FTKwH").WithField("view", s.ViewModel()).Debug("context canceled")
+			logging.Log("SPOOL-FTKwH").WithField("view", s.ViewModel()).WithField("lock", s.lockID).Debug("context canceled")
 			return nil
 		default:
+			logging.LogWithFields("SPOOL-Q0YGW", "seq", event.Sequence, "lock", s.lockID, "view", s.ViewModel()).Debug("reduce")
 			if err := s.Reduce(event); err != nil {
 				return s.OnError(event, err)
 			}
@@ -147,17 +163,22 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool {
 	renewTimer := time.After(0)
 	renewDuration := s.MinimumCycleDuration() - 50*time.Millisecond
-	locked := make(chan bool, 1)
+	locked := make(chan bool)
 
 	go func(locked chan bool) {
 		for {
 			select {
 			case <-ctx.Done():
+				// logging.LogWithFields("SPOOL-ymvYF", "lock", s.lockID, "view", s.ViewModel()).Debug("lock stoped")
 				return
 			case <-renewTimer:
+				// logging.LogWithFields("SPOOL-kwuFD", "lock", s.lockID, "view", s.ViewModel()).Debug("will lock")
 				err := s.locker.Renew(s.lockID, s.ViewModel(), s.MinimumCycleDuration()*2)
+				// logging.LogWithFields("SPOOL-wOURR", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("locked")
 				if err == nil {
+					// logging.LogWithFields("SPOOL-FxNmG", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("will write to chan")
 					locked <- true
+					// logging.LogWithFields("SPOOL-Acr90", "lock", s.lockID, "view", s.ViewModel(), "renewDuration", renewDuration).WithError(err).Debug("written to chan")
 					renewTimer = time.After(renewDuration)
 					continue
 				}
@@ -166,7 +187,9 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool 
 					errs <- err
 				}
 
+				// logging.LogWithFields("SPOOL-3GH43", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("will write false to chan")
 				locked <- false
+				// logging.LogWithFields("SPOOL-jq6dm", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("written false to chan")
 				return
 			}
 		}

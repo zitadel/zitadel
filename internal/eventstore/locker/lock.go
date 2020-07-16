@@ -33,7 +33,6 @@ func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel string, waitTime tim
 			return err
 		}
 		if rows, _ := rs.RowsAffected(); rows == 0 {
-			tx.Rollback()
 			return caos_errs.ThrowAlreadyExists(nil, "SPOOL-lso0e", "view already locked")
 		}
 		return nil
