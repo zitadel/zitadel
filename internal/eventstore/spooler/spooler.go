@@ -77,7 +77,8 @@ func (s *spooledHandler) load() {
 		go func() {
 			for l := range hasLocked {
 				if !l {
-					ctx.Done()
+					// we only need to break. an error is already written by the lock-routine to the errs channel
+					break
 				}
 			}
 		}()
@@ -85,7 +86,7 @@ func (s *spooledHandler) load() {
 		if err != nil {
 			errs <- err
 		} else {
-			logging.LogWithFields("SPOOL-aqLrD", "eventCount", len(events), "lock", s.lockID, "ts", time.Now().Format("15-01-2018 15:04:05.000000"), "view", s.ViewModel()).Debug("i will load")
+			logging.LogWithFields("SPOOL-aqLrD", "eventCount", len(events), "lock", s.lockID, "view", s.ViewModel()).Debug("i will load")
 			errs <- s.process(ctx, events)
 		}
 	}
@@ -155,10 +156,8 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool 
 				return
 			case <-renewTimer:
 				err := s.locker.Renew(s.lockID, s.ViewModel(), s.MinimumCycleDuration()*2)
-				logging.LogWithFields("SPOOL-C6FcM", "lock", s.lockID, "ts", time.Now().Format("15-01-2018 15:04:05.000000"), "view", s.ViewModel()).Debug("renewed")
 				if err == nil {
 					locked <- true
-					logging.LogWithFields("SPOOL-NqFkJ", "lock", s.lockID, "ts", time.Now().Format("15-01-2018 15:04:05.000000"), "view", s.ViewModel()).Debug("wont reach")
 					renewTimer = time.After(renewDuration)
 					continue
 				}
