@@ -21,6 +21,7 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
@@ -67,6 +68,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         HasRolePipeModule,
         TranslateModule,
         TimestampToDatePipeModule,
+        SharedModule,
     ],
 })
 export class GrantedProjectsModule { }

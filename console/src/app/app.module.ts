@@ -18,6 +18,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
+import { QuicklinkModule } from 'ngx-quicklink';
 
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -87,6 +88,7 @@ const authConfig: AuthConfig = {
                 deps: [HttpClient],
             },
         }),
+        QuicklinkModule,
         AccountsCardModule,
         HasRoleModule,
         BrowserAnimationsModule,

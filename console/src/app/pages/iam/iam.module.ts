@@ -19,6 +19,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
@@ -57,6 +58,7 @@ import { IamComponent } from './iam.component';
         IamContributorsModule,
         LocalizedDatePipeModule,
         TimestampToDatePipeModule,
+        SharedModule,
     ],
 })
 export class IamModule { }

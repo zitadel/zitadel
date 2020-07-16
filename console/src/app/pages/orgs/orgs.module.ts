@@ -14,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
@@ -49,6 +50,7 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         ChangesModule,
         AddDomainDialogModule,
         TranslateModule,
+        SharedModule,
     ],
 })
 export class OrgsModule { }

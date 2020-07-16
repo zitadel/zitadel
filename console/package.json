@@ -35,6 +35,7 @@
     "grpc-web": "^1.2.0",
     "moment": "^2.27.0",
     "ngx-moment": "^5.0.0",
+    "ngx-quicklink": "^0.2.3",
     "prettier-stylelint": "^0.4.2",
     "rxjs": "~6.6.0",
     "ts-protoc-gen": "^0.12.0",
