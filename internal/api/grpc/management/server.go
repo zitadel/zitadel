@@ -22,6 +22,7 @@ type Server struct {
 	policy         repository.PolicyRepository
 	org            repository.OrgRepository
 	user           repository.UserRepository
+	serviceAccount repository.Repository
 	usergrant      repository.UserGrantRepository
 	iam            repository.IamRepository
 	authZ          authz.Config

@@ -8,4 +8,5 @@ type Repository interface {
 	UserRepository
 	UserGrantRepository
 	IamRepository
+	ServiceAccountRepository
 }

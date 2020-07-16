@@ -3,12 +3,11 @@ package eventsourcing
 import (
 	"context"
 
-	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	es_spol "github.com/caos/zitadel/internal/eventstore/spooler"
+	es_iam "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/handler"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/spooler"
@@ -16,6 +15,7 @@ import (
 	es_org "github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	es_pol "github.com/caos/zitadel/internal/policy/repository/eventsourcing"
 	es_proj "github.com/caos/zitadel/internal/project/repository/eventsourcing"
+	es_svcacc "github.com/caos/zitadel/internal/service_account/repository/eventsourcing"
 	es_usr "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	es_grant "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 )
@@ -36,6 +36,7 @@ type EsRepository struct {
 	eventstore.UserGrantRepo
 	eventstore.PolicyRepo
 	eventstore.IamRepository
+	eventstore.ServiceAccountRepo
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRepository, error) {
@@ -74,6 +75,10 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	if err != nil {
 		return nil, err
 	}
+	serviceAccount, err := es_svcacc.StartServiceAccount(es_svcacc.ServiceAccountConfig{})
+	if err != nil {
+		return nil, err
+	}
 	usergrant, err := es_grant.StartUserGrant(es_grant.UserGrantConfig{
 		Eventstore: es,
 		Cache:      conf.Eventstore.Cache,
@@ -94,13 +99,14 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string) (*EsRe
 	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, eventstoreRepos)
 
 	return &EsRepository{
-		spooler:       spool,
-		OrgRepository: eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles},
-		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, view, roles},
-		UserRepo:      eventstore.UserRepo{conf.SearchLimit, user, policy, org, view},
-		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
-		PolicyRepo:    eventstore.PolicyRepo{policy},
-		IamRepository: eventstore.IamRepository{iam},
+		spooler:            spool,
+		OrgRepository:      eventstore.OrgRepository{conf.SearchLimit, org, user, view, roles},
+		ProjectRepo:        eventstore.ProjectRepo{es, conf.SearchLimit, project, usergrant, user, view, roles},
+		UserRepo:           eventstore.UserRepo{conf.SearchLimit, user, policy, org, view},
+		UserGrantRepo:      eventstore.UserGrantRepo{conf.SearchLimit, usergrant, view},
+		PolicyRepo:         eventstore.PolicyRepo{policy},
+		IamRepository:      eventstore.IamRepository{iam},
+		ServiceAccountRepo: eventstore.ServiceAccountRepo{serviceAccount},
 	}, nil
 }
 
