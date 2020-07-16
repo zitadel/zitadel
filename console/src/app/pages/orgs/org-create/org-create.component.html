@@ -22,10 +22,13 @@
                 </mat-form-field>
             </div>
 
-            <button [disabled]="orgForm.invalid" color="primary" mat-raised-button class="continue-button"
-                cdkFocusInitial type="submit">
-                {{'CONTINUE' | translate}}
-            </button>
+            <div class="btn-container">
+                <span class="fill-space"></span>
+                <button [disabled]="orgForm.invalid" color="primary" mat-raised-button class="big-button"
+                    cdkFocusInitial type="submit">
+                    {{'CONTINUE' | translate}}
+                </button>
+            </div>
         </form>
 
         <!-- <div *ngIf="name?.touched" @openClose>
@@ -174,7 +177,10 @@
                     </ng-container>
                 </div>
                 <div class="btn-container">
-                    <button color="primary" class="continue-button" [disabled]="orgForm.invalid || userForm.invalid"
+                    <button color="primary" class="back-button" type="button" (click)="previous()"
+                        mat-stroked-button>{{ 'ACTIONS.BACK' | translate }}</button>
+                    <span class="fill-space"></span>
+                    <button color="primary" class="big-button" [disabled]="orgForm.invalid || userForm.invalid"
                         type="submit" mat-raised-button>{{ 'ACTIONS.FINISH' | translate }}</button>
                 </div>
             </form>
