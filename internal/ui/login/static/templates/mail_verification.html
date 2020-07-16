@@ -21,13 +21,14 @@
     {{ template "error-message" .}}
 
     <div class="actions">
-        <button type="submit" name="resend" value="false" class="primary right" >{{t "Actions.Next"}}</button>
+        <button type="submit" id="submit-button" name="resend" value="false" class="primary right" >{{t "Actions.Next"}}</button>
         {{ if .UserID }}
         <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend"}}</button>
         {{ end }}
     </div>
 </form>
 
+<script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
 
 {{template "main-bottom" .}}
  

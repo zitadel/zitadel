@@ -34,11 +34,12 @@
     {{end}}
 
     <div class="actions">
-        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+        <button class="primary right" id="submit-button" type="submit">{{t "Actions.Next"}}</button>
     </div>
 </form>
 
 <script src="{{ resourceUrl "scripts/copy_to_clipboard.js" }}"></script>
+<script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
 
 {{template "main-bottom" .}}
  

@@ -3,9 +3,11 @@ function disableSubmit(checks, button) {
     let inputs = form.getElementsByTagName('input');
     for (i = 0; i < inputs.length; i++) {
         inputs[i].addEventListener('input', function () {
-            if (checks() === false) {
-                button.disabled = true;
-                return
+            if (checks != undefined) {
+                if (checks() === false) {
+                    button.disabled = true;
+                    return
+                }
             }
             if (checkRequired(form, inputs) === false) {
                 button.disabled = true;

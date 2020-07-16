@@ -2,19 +2,13 @@ function CheckInitPwPolicy() {
     let policyElement = document.getElementById("password");
     let pwNew = policyElement.value;
     let pwNewConfirmation = document.getElementById("passwordconfirm").value;
-    let button = document.getElementById("init-button");
 
-    if (pwNew == "" || pwNewConfirmation == "" || pwNew != pwNewConfirmation) {
-        button.disabled = true;
-    } else {
-        button.disabled = false;
+    if (ComplexityPolicyCheck(policyElement, pwNew) === false) {
+        return false;
     }
 
-    ComplexityPolicyCheck(policyElement, button, pwNew);
+    return pwNew == pwNewConfirmation;
 }
 
-let newPW = document.getElementById("password");
-newPW.addEventListener('input', CheckInitPwPolicy);
-
-let newPWConfirmation= document.getElementById("passwordconfirm");
-newPWConfirmation.addEventListener('input', CheckInitPwPolicy);
+let button = document.getElementById("init-button");
+disableSubmit(CheckInitPwPolicy, button);
