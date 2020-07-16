@@ -99,7 +99,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		baseData:         l.getBaseData(r, authRequest, "Register", errType, errMessage),
 		registerFormData: *formData,
 	}
-	iam, err := l.authRepo.GetIam(r.Context())
+	iam, _ := l.authRepo.GetIam(r.Context())
 	if iam != nil {
 		policy, description, _ := l.getPasswordComplexityPolicy(r, iam.GlobalOrgID)
 		if policy != nil {
