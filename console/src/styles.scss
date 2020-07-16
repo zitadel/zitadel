@@ -121,7 +121,7 @@ $custom-typography: mat-typography-config(
     @include angular-material-theme($light-theme);
     color: #202124;
 
-	.main-container {
+	.side, .main-container {
         background-color: white;
         transition: background-color .5s ease-in-out;
     }
@@ -149,7 +149,7 @@ $custom-typography: mat-typography-config(
     @include component-themes($dark-theme);
     @include angular-material-theme($dark-theme);
 
-	 .main-container {
+	.side, .main-container {
         background-color: #212224;
         transition: background-color .5s ease-in-out;
     }
