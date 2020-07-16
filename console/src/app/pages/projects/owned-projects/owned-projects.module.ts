@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -17,7 +17,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
-import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
@@ -47,7 +46,6 @@ import { OwnedProjectsComponent } from './owned-projects.component';
         MatPaginatorModule,
         MatFormFieldModule,
         MatInputModule,
-        ChangesModule,
         MatChipsModule,
         MatIconModule,
         MatButtonModule,
@@ -60,6 +58,5 @@ import { OwnedProjectsComponent } from './owned-projects.component';
         HasRolePipeModule,
         TimestampToDatePipeModule,
     ],
-    schemas: [NO_ERRORS_SCHEMA],
 })
 export class OwnedProjectsModule { }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -68,6 +68,5 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         TranslateModule,
         TimestampToDatePipeModule,
     ],
-    schemas: [NO_ERRORS_SCHEMA],
 })
 export class GrantedProjectsModule { }

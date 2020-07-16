@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -31,9 +31,6 @@ import { UserGrantCreateComponent } from './user-grant-create.component';
         SearchProjectAutocompleteModule,
         SearchUserAutocompleteModule,
         ProjectRolesModule,
-    ],
-    schemas: [
-        CUSTOM_ELEMENTS_SCHEMA,
     ],
 })
 export class UserGrantCreateModule { }

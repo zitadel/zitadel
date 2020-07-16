@@ -143,12 +143,12 @@
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole"
-                [allowDelete]="['user.grant.delete'] | hasRole"></app-user-grants>
+            <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole | async"
+                [allowDelete]="['user.grant.delete'] | hasRole | async"></app-user-grants>
         </app-card>
     </div>
 
-    <metainfo *ngIf="user" class="side">
+    <div *ngIf="user" class="side" metainfo>
         <div class="details">
             <div class="row" *ngIf="user?.preferredLoginName">
                 <span class="first">Preferred Loginname:</span>
@@ -157,5 +157,5 @@
         </div>
 
         <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
-    </metainfo>
+    </div>
 </app-meta-layout>

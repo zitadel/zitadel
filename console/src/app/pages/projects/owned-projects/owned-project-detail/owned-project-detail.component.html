@@ -47,11 +47,11 @@
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
                     (changeView)="grid = false" [projectId]="projectId"></app-application-grid>
                 <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
-                    <card-actions class="card-actions">
+                    <div class="card-actions" card-actions>
                         <button mat-icon-button (click)="grid = true">
                             <i matTooltip="show grid view" class="las la-th-large"></i>
                         </button>
-                    </card-actions>
+                    </div>
                     <app-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
                         [projectId]="projectId"></app-applications>
                 </app-card>
@@ -82,15 +82,15 @@
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="userGrantContext" [projectId]="projectId"
                             [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                            [allowCreate]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.write'] | hasRole)"
-                            [allowDelete]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.delete'] | hasRole)">
+                            [allowCreate]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.write'] | hasRole | async)"
+                            [allowDelete]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.delete'] | hasRole | async)">
                         </app-user-grants>
                     </app-card>
                 </ng-template>
             </ng-container>
         </ng-container>
     </div>
-    <metainfo class="side">
+    <div class="side" metainfo>
         <div class="details">
             <div class="row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
@@ -110,5 +110,5 @@
                 <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></app-changes>
             </mat-tab>
         </mat-tab-group>
-    </metainfo>
+    </div>
 </app-meta-layout>

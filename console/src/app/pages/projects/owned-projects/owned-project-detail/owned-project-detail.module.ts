@@ -1,13 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
@@ -31,13 +37,13 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
     ],
     imports: [
         CommonModule,
+        FormsModule,
         OwnedProjectDetailRoutingModule,
         TranslateModule,
         HasRoleModule,
         MatTabsModule,
         MatButtonModule,
         MatIconModule,
-        MetaLayoutModule,
         ProjectContributorsModule,
         WarnDialogModule,
         ProjectRolesModule,
@@ -45,9 +51,14 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         UserGrantsModule,
         TimestampToDatePipeModule,
         MatTableModule,
+        MatFormFieldModule,
         CardModule,
         MatPaginatorModule,
+        MatCheckboxModule,
+        MatSelectModule,
+        MatProgressSpinnerModule,
+        ChangesModule,
+        MetaLayoutModule,
     ],
-    schemas: [NO_ERRORS_SCHEMA],
 })
 export class OwnedProjectDetailModule { }
