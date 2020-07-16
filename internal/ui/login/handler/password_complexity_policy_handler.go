@@ -23,8 +23,8 @@ var (
 	hasSymbol          = regexp.MustCompile(SymbolRegex).MatchString
 )
 
-func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *model.AuthRequest) (*policy_model.PasswordComplexityPolicy, string, error) {
-	policy, err := l.authRepo.GetMyPasswordComplexityPolicy(setContext(r.Context(), authReq.UserOrgID))
+func (l *Login) getPasswordComplexityPolicy(r *http.Request, orgID string) (*policy_model.PasswordComplexityPolicy, string, error) {
+	policy, err := l.authRepo.GetMyPasswordComplexityPolicy(setContext(r.Context(), orgID))
 	if err != nil {
 		return nil, err.Error(), err
 	}
