@@ -222,8 +222,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                     .then((data: OIDCConfig) => {
                         this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
-                    .catch(data => {
-                        this.toast.showError(data.message);
+                    .catch(error => {
+                        this.toast.showError(error);
                     });
             }
         }

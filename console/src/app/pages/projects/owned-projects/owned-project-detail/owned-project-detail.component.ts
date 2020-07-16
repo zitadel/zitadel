@@ -149,7 +149,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         this.projectService.UpdateProject(this.project.projectId, this.project.name).then(() => {
             this.toast.showInfo('Project updated');
         }).catch(error => {
-            this.toast.showInfo(error.message);
+            this.toast.showError(error);
         });
     }
 

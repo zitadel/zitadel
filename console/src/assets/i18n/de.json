@@ -229,6 +229,16 @@
             "SEQUENCE":"Sequenz",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen"
+        },
+        "TOAST":{
+            "MEMBERREMOVED":"Manager entfernt!",
+            "MEMBERSADDED": "Manager hinzugefügt!",
+            "MEMBERADDED": "Manager hinzugefügt!",
+            "MEMBERCHANGED":"Manager geändert!",
+            "ROLEREMOVED":"Rolle entfernt!",
+            "ROLECHANGED":"Rolle verändert!",
+            "REACTIVATED":"Reaktiviert!",
+            "DEACTIVATED":"Deaktiviert!"
         }
     },
     "ORG": {
@@ -322,7 +332,9 @@
             "DEACTIVATED":"Organisation deaktiviert!",
             "REACTIVATED":"Organisation reaktiviert!",
             "DOMAINADDED":"Domain hinzugefügt!",
-            "DOMAINREMOVED":"Domain entfernt!"
+            "DOMAINREMOVED":"Domain entfernt!",
+            "MEMBERADDED":"Manager hinzugefügt!",
+            "MEMBERREMOVED":"Manager entfernt!"
         }
     },
     "ORG_DETAIL": {
@@ -488,6 +500,7 @@
             "MEMBERREMOVED":"Manager entfernt!",
             "MEMBERSADDED": "Manager hinzugefügt!",
             "MEMBERADDED": "Manager hinzugefügt!",
+            "MEMBERCHANGED":"Manager geändert!",
             "ROLEREMOVED":"Rolle entfernt!",
             "ROLECHANGED":"Rolle verändert!",
             "REACTIVATED":"Reaktiviert!",

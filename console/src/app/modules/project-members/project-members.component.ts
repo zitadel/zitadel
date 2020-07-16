@@ -155,7 +155,7 @@ export class ProjectMembersComponent {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
             this.projectService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
                 .then((newmember: ProjectMember) => {
-                    this.toast.showInfo('Member changed');
+                    this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -163,7 +163,7 @@ export class ProjectMembersComponent {
             this.projectService.ChangeProjectGrantMember(this.project.projectId,
                 this.grantId, member.userId, selectionChange.value)
                 .then((newmember: ProjectMember) => {
-                    this.toast.showInfo('Member changed');
+                    this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });

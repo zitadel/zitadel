@@ -108,7 +108,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         Promise.all(promises).then(() => {
             this.toast.showInfo('Reactivated selected projects successfully');
         }).catch(error => {
-            this.toast.showInfo(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -121,7 +121,7 @@ export class GrantedProjectListComponent implements OnInit, OnDestroy {
         Promise.all(promises).then(() => {
             this.toast.showInfo('Deactivated selected projects Successfully');
         }).catch(error => {
-            this.toast.showInfo(error.message);
+            this.toast.showError(error);
         });
     }
 }

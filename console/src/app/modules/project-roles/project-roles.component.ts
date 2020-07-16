@@ -93,7 +93,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             });
             this.selection.clear();
         }).catch(error => {
-            this.toast.showError(error?.message || 'Error');
+            this.toast.showError(error);
         });
     }
 
@@ -105,8 +105,8 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
                 this.dataSource.rolesSubject.value.splice(index, 1);
                 this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.toast.showError(error);
             });
     }
 

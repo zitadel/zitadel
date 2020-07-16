@@ -75,7 +75,7 @@ export class OrgContributorsComponent implements OnInit {
                     Promise.all(users.map(user => {
                         return this.orgService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
-                        this.toast.showError('members added');
+                        this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });

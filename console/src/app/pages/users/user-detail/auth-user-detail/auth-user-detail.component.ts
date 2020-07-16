@@ -69,8 +69,8 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showInfo('USER.TOAST.SAVED', true);
                 this.user = Object.assign(this.user, data.toObject());
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.toast.showError(error);
             });
     }
 
@@ -144,8 +144,8 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showInfo('USER.TOAST.PHONESAVED', true);
                 this.user.phone = data.toObject().phone;
                 this.phoneEditState = false;
-            }).catch(data => {
-                this.toast.showError(data);
+            }).catch(error => {
+                this.toast.showError(error);
                 this.phoneEditState = false;
             });
     }
@@ -153,8 +153,8 @@ export class AuthUserDetailComponent implements OnDestroy {
     private async getData(): Promise<void> {
         this.userService.GetMyUser().then(user => {
             this.user = user.toObject();
-        }).catch(err => {
-            this.toast.showError(err);
+        }).catch(error => {
+            this.toast.showError(error);
         });
     }
 

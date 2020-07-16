@@ -96,8 +96,8 @@ export class OrgCreateComponent {
             .then((data: OrgSetUpResponse) => {
                 this.router.navigate(['orgs', data.toObject().org?.id]);
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.toast.showError(error);
             });
     }
 
