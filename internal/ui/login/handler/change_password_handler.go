@@ -12,8 +12,9 @@ const (
 )
 
 type changePasswordData struct {
-	OldPassword string `schema:"old_password"`
-	NewPassword string `schema:"new_password"`
+	OldPassword             string `schema:"change-old-password"`
+	NewPassword             string `schema:"change-new-password"`
+	NewPasswordConfirmation string `schema:"change-password-confirmation"`
 }
 
 func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +24,7 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+
 	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
 	if err != nil {
 		l.renderChangePassword(w, r, authReq, err)
@@ -36,9 +38,26 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	data := userData{
+	data := passwordData{
 		baseData:  l.getBaseData(r, authReq, "Change Password", errType, errMessage),
 		LoginName: authReq.LoginName,
+	}
+	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq.UserOrgID)
+	if policy != nil {
+		data.PasswordPolicyDescription = description
+		data.MinLength = policy.MinLength
+		if policy.HasUppercase {
+			data.HasUppercase = UpperCaseRegex
+		}
+		if policy.HasLowercase {
+			data.HasLowercase = LowerCaseRegex
+		}
+		if policy.HasSymbol {
+			data.HasSymbol = SymbolRegex
+		}
+		if policy.HasNumber {
+			data.HasNumber = NumberRegex
+		}
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePassword], data, nil)
 }

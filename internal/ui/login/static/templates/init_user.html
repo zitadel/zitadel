@@ -20,7 +20,18 @@
         {{ if not .PasswordSet }}
         <div class="field">
             <label class="label" for="password">{{t "InitUser.NewPassword"}}</label>
-            <input class="input" type="password" id="password" name="password" autocomplete="new-password" autofocus required>
+            <input data-minlength="{{ .MinLength }}"
+                   data-has-uppercase="{{ .HasUppercase }}"
+                   data-has-lowercase="{{ .HasLowercase }}"
+                   data-has-number="{{ .HasNumber }}"
+                   data-has-symbol="{{ .HasSymbol }}"
+                   class="input"
+                   type="password"
+                   id="password"
+                   name="password"
+                   autocomplete="new-password"
+                   autofocus required>
+            {{ .PasswordPolicyDescription }}
         </div>
         <div class="field">
             <label class="label" for="passwordconfirm">{{t "InitUser.NewPasswordConfirm"}}</label>
@@ -32,11 +43,21 @@
     {{ template "error-message" .}}
 
     <div class="actions">
-        <button type="submit" name="resend" value="false" class="primary right" >{{t "Actions.Next"}}</button>
+        <button type="submit"
+                id="init-button"
+                name="resend"
+                value="false"
+                class="primary right"
+                {{ if not .PasswordSet }} disabled {{ end }}>{{t "Actions.Next"}}</button>
         <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend" }}</button>
     </div>
 </form>
 
+{{ if not .PasswordSet }}
+    <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+    <script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
+    <script src="{{ resourceUrl "scripts/init_password_check.js" }}"></script>
+{{ end }}
 
 {{template "main-bottom" .}}
  

@@ -1702,7 +1702,7 @@ message PasswordComplexityPolicy {
 
 message PasswordComplexityPolicyCreate {
     string description = 1 [(validate.rules).string = {max_len: 500}];
-    uint64 min_length = 2;
+    uint64 min_length = 2 [(validate.rules).uint64.gt = 0];
     bool has_lowercase = 3;
     bool has_uppercase = 4;
     bool has_number = 5;
