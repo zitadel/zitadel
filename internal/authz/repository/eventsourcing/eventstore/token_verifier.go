@@ -50,10 +50,7 @@ func (repo *TokenVerifierRepo) ProjectIDByClientID(ctx context.Context, clientID
 
 func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) error {
 	_, err := repo.View.OrgByID(orgID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (string, error) {
