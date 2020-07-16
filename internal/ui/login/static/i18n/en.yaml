@@ -16,10 +16,10 @@ Password:
   Description: Enter your logindata.
   Password: Password
   MinLength: Minimumlength
-  HasUppercase: uppercase letter
-  HasLowercase: lowercase letter
-  HasNumber: number
-  HasSymbol: symbol
+  HasUppercase: Uppercase letter
+  HasLowercase: Lowercase letter
+  HasNumber: Number
+  HasSymbol: Symbol
 
 MfaVerify:
   Title: Verify Multificator
