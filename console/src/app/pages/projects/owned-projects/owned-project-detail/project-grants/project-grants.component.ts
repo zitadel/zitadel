@@ -81,7 +81,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     updateRoles(grant: ProjectGrant.AsObject, selectionChange: MatSelectChange): void {
         this.projectService.UpdateProjectGrant(grant.id, grant.projectId, selectionChange.value)
             .then((newgrant: ProjectGrant) => {
-                this.toast.showInfo('Grant updated!');
+                this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTCHANGED', true);
             }).catch(error => {
                 this.toast.showError(error);
             });

@@ -209,7 +209,9 @@
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt!",
             "PASSWORDCHANGED":"Passwort geändert!",
             "REACTIVATED":"User reaktiviert!",
-            "DEACTIVATED":"User deaktiviert!"
+            "DEACTIVATED":"User deaktiviert!",
+            "SELECTEDREACTIVATED":"Selektierte User reaktiviert!",
+            "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!"
         }
     },
     "IAM": {
@@ -460,7 +462,15 @@
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
             "ROLENAMESLIST": "Rollen",
-            "NOROLES":"Keine Rollen"
+            "NOROLES":"Keine Rollen",
+            "TOAST":{
+                "PROJECTGRANTUSERGRANTADDED":"Project Berechtigung erstellt!",
+                "PROJECTGRANTADDED":"Projekt Berechtigung erstellt",
+                "PROJECTGRANTCHANGED":"Projekt Berechtigung geändert!",
+                "PROJECTGRANTMEMBERADDED":"Berechtigungsmanager hinzugefügt!",
+                "PROJECTGRANTMEMBERCHANGED":"Berechtigungsmanager verändert!",
+                "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt!"
+            }
         },
         "APP": {
             "TITLE": "Applikationen",
@@ -504,7 +514,9 @@
             "ROLEREMOVED":"Rolle entfernt!",
             "ROLECHANGED":"Rolle verändert!",
             "REACTIVATED":"Reaktiviert!",
-            "DEACTIVATED":"Deaktiviert!"
+            "DEACTIVATED":"Deaktiviert!",
+            "UPDATED":"Projekt gespeichert!",
+            "GRANTUPDATED":"Berechtigung verändert!"
         }
     },
     "APP": {

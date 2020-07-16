@@ -80,7 +80,7 @@ export class ProjectGrantDetailComponent {
     updateRoles(selectionChange: MatSelectChange): void {
         this.projectService.UpdateProjectGrant(this.grant.id, this.grant.projectId, selectionChange.value)
             .then((newgrant: ProjectGrant) => {
-                this.toast.showInfo('Grant updated!');
+                this.toast.showInfo('PROJECT.TOAST.GRANTUPDATED');
             }).catch(error => {
                 this.toast.showError(error);
             });

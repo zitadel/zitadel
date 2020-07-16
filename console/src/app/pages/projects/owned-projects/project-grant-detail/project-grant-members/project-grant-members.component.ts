@@ -87,7 +87,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
             return this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
-                this.toast.showInfo('Removed successfully');
+                this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -96,7 +96,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
 
     public removeMember(member: ProjectMember.AsObject): void {
         this.projectService.RemoveProjectGrantMember(this.projectId, this.grantId, member.userId).then(() => {
-            this.toast.showInfo('Member removed successfully');
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -134,7 +134,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
                         dataToAdd.rolesKeyList,
                     );
                 })).then(() => {
-                    this.toast.showInfo('Project Grant Member successfully added!');
+                    this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERADDED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -145,7 +145,7 @@ export class ProjectGrantMembersComponent implements AfterViewInit, OnInit {
     updateRoles(member: ProjectMember.AsObject, selectionChange: MatSelectChange): void {
         this.projectService.ChangeProjectGrantMember(this.projectId, this.grantId, member.userId, selectionChange.value)
             .then((newmember: ProjectMember) => {
-                this.toast.showInfo('Member updated!');
+                this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
             }).catch(error => {
                 this.toast.showError(error);
             });

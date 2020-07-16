@@ -79,7 +79,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                     this.userId,
                     this.rolesList,
                 ).then((data: UserGrant) => {
-                    this.toast.showInfo('Project User Grant added');
+                    this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTADDED', true);
                     this.close();
                 }).catch(error => {
                     this.toast.showError(error);
@@ -93,7 +93,7 @@ export class UserGrantCreateComponent implements OnDestroy {
                     this.userId,
                     this.rolesList,
                 ).then((data: UserGrant) => {
-                    this.toast.showInfo('Project Grant User Grant added');
+                    this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
                     this.close();
                 }).catch(error => {
                     this.toast.showError(error);

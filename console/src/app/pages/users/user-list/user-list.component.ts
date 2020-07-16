@@ -58,7 +58,7 @@ export class UserListComponent implements OnDestroy {
         Promise.all(this.selection.selected.map(value => {
             return this.userService.DeactivateUser(value.id);
         })).then(() => {
-            this.toast.showInfo('Selected Users deactivated');
+            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
             this.getData(10, 0);
         });
     }
@@ -67,7 +67,7 @@ export class UserListComponent implements OnDestroy {
         Promise.all(this.selection.selected.map(value => {
             return this.userService.ReactivateUser(value.id);
         })).then(() => {
-            this.toast.showInfo('Selected Users reactivated');
+            this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
             this.getData(10, 0);
         });
     }

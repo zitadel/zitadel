@@ -114,7 +114,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             dialogRef.afterClosed().subscribe(resp => {
                 if (resp) {
                     this.projectService.ReactivateProject(this.projectId).then(() => {
-                        this.toast.showInfo('Reactivated Project');
+                        this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
                         this.project.state = ProjectState.PROJECTSTATE_ACTIVE;
                     }).catch(error => {
                         this.toast.showError(error);
@@ -135,7 +135,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             dialogRef.afterClosed().subscribe(resp => {
                 if (resp) {
                     this.projectService.DeactivateProject(this.projectId).then(() => {
-                        this.toast.showInfo('Deactivated Project');
+                        this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
                         this.project.state = ProjectState.PROJECTSTATE_INACTIVE;
                     }).catch(error => {
                         this.toast.showError(error);
@@ -147,7 +147,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
     public saveProject(): void {
         this.projectService.UpdateProject(this.project.projectId, this.project.name).then(() => {
-            this.toast.showInfo('Project updated');
+            this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
         }).catch(error => {
             this.toast.showError(error);
         });

@@ -209,7 +209,9 @@
             "PASSWORDNOTIFICATIONSENT":"Password Change Notification sent",
             "PASSWORDCHANGED":"Password changed successfully!",
             "REACTIVATED":"User reactivated",
-            "DEACTIVATED":"User deactivated"
+            "DEACTIVATED":"User deactivated",
+            "SELECTEDREACTIVATED":"Selected Users reactivated",
+            "SELECTEDDEACTIVATED":"Selected Users deactivated"
         }
     },
     "IAM": {
@@ -458,7 +460,15 @@
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
             "ROLENAMESLIST": "Roles",
-            "NOROLES":"No roles"
+            "NOROLES":"No roles",
+            "TOAST": {
+                "PROJECTGRANTUSERGRANTADDED":"Project Grant created!",
+                "PROJECTGRANTADDED":"Project Grant created!",
+                "PROJECTGRANTCHANGED":"Project Grant changed!",
+                "PROJECTGRANTMEMBERADDED":"Grant Manager added!",
+                "PROJECTGRANTMEMBERCHANGED":"Grant Manager changed!",
+                "PROJECTGRANTMEMBERREMOVED":"Grant Manager removed!"
+            }
         },
         "APP": {
             "TITLE": "Applications",
@@ -501,8 +511,10 @@
             "MEMBERCHANGED":"Manager changed!",
             "ROLEREMOVED":"Role removed!",
             "ROLECHANGED":"Role changed!",
-            "REACTIVATED":"Reaktiviert!",
-            "DEACTIVATED":"Deaktiviert!"
+            "REACTIVATED":"Reactivated!",
+            "DEACTIVATED":"Deactivated!",
+            "UPDATED":"Project changed!",
+            "GRANTUPDATED":"Grant changed!"
         }
     },
     "APP": {
