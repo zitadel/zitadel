@@ -476,6 +476,7 @@
             "NAME": "Name"
         },
         "ROLE": {
+            "ADDNEWLINE":"Add additional role",
             "KEY":"Key",
             "TITLE": "Roles",
             "DESCRIPTION":"Define some roles which can be used to create project-grants",

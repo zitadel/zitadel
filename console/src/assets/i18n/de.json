@@ -478,6 +478,7 @@
             "NAME": "Name"
         },
         "ROLE": {
+            "ADDNEWLINE":"Zusätzliche Rolle hinzufügen",
             "KEY":"Key",
             "TITLE": "Rollen",
             "DESCRIPTION":"Definiere Rollen, die du bei der Erstellung eines Projekt-Grants vergeben kannst",

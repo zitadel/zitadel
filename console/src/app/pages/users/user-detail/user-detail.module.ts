@@ -24,12 +24,12 @@ import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.com
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
 import { DialogOtpComponent } from './auth-user-detail/dialog-otp/dialog-otp.component';
+import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { PasswordComponent } from './password/password.component';
-import { ThemeSettingComponent } from './theme-setting/theme-setting.component';
 import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { UserDetailComponent } from './user-detail/user-detail.component';
-import { UserMfaComponent } from './user-mfa/user-mfa.component';
+import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
 
 @NgModule({
     declarations: [
