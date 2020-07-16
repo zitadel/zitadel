@@ -19,10 +19,7 @@ func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	data := userData{
-		baseData:  l.getBaseData(r, authReq, "Password", errType, errMessage),
-		LoginName: authReq.LoginName,
-	}
+	data := l.getUserData(r, authReq, "Password", errType, errMessage)
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPassword], data, nil)
 }
 

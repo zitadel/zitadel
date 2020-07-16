@@ -68,7 +68,7 @@ func (l *Login) renderMfaInitVerify(w http.ResponseWriter, r *http.Request, auth
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data.baseData = l.getBaseData(r, authReq, "Mfa Init Verify", errType, errMessage)
-	data.LoginName = authReq.LoginName
+	data.profileData = l.getProfileData(authReq)
 	if data.MfaType == model.MfaTypeOTP {
 		code, err := generateQrCode(data.otpData.Url)
 		if err == nil {

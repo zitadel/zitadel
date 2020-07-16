@@ -100,13 +100,6 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	var loginName string
-	if authReq != nil {
-		loginName = authReq.LoginName
-	}
-	data := userData{
-		baseData:  l.getBaseData(r, authReq, "User Init Done", "", ""),
-		LoginName: loginName,
-	}
+	data := l.getUserData(r, authReq, "User Init Done", "", "")
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUserDone], data, nil)
 }

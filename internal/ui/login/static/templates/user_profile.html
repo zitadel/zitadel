@@ -1,0 +1,11 @@
+{{define "user-profile"}}
+{{if .LoginName}}
+<div class="login-profile">
+    <div class="profile-image"></div>
+    <div class="names">
+        <div class="displayname">{{.DisplayName}}</div>
+        <div class="loginname">{{.LoginName}}</div>
+    </div>
+</div>
+{{end}}
+{{end}}
