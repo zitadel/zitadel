@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
 )
@@ -33,6 +34,10 @@ type Grant struct {
 }
 
 func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ context.Context, err error) {
+	err = t.ExistsOrg(ctx, orgID)
+	if err != nil {
+		return nil, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+	}
 	userID, clientID, agentID, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return nil, err

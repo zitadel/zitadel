@@ -37,6 +37,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, ev
 			iamEvents:  repos.IamEvents,
 		},
 		&Application{handler: handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount}},
+		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 	}
 }
 
