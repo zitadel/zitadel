@@ -19,7 +19,8 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
-import { PipesModule } from 'src/app/pipes/pipes.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { IamContributorsModule } from './iam-contributors/iam-contributors.module';
 import { IamRoutingModule } from './iam-routing.module';
@@ -54,7 +55,8 @@ import { IamComponent } from './iam.component';
         TranslateModule,
         MatDialogModule,
         IamContributorsModule,
-        PipesModule,
+        LocalizedDatePipeModule,
+        TimestampToDatePipeModule,
     ],
 })
 export class IamModule { }

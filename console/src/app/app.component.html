@@ -49,7 +49,7 @@
         </mat-toolbar>
 
         <mat-drawer-container class="main-container">
-            <mat-drawer #drawer class="side" [mode]="(isHandset$ | async) ? 'over' : 'side'"
+            <mat-drawer #drawer class="sidenav" [mode]="(isHandset$ | async) ? 'over' : 'side'"
                 [opened]="!(isHandset$ | async)">
                 <div class="side-column">
                     <div class="list">
