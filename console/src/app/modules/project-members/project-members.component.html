@@ -98,7 +98,7 @@
                             <mat-form-field class="form-field" appearance="outline" *ngIf="project">
                                 <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
                                 <mat-select [(ngModel)]="member.rolesList" multiple
-                                    [disabled]="(['project.member.write:'+project.projectId] | hasRole) == false"
+                                    [disabled]="([('project.member.write:' + project.projectId)] | hasRole | async) == false"
                                     (selectionChange)="updateRoles(member, $event)">
                                     <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
                                         {{ 'ROLES.'+role | translate }}
@@ -113,8 +113,9 @@
                     </tr>
                 </table>
 
-                <mat-paginator class="background-style" #paginator [pageSize]="50"
-                    [pageSizeOptions]="[25, 50, 100, 250]">
+                <mat-paginator *ngIf="dataSource" class="background-style" #paginator [pageSize]="INITIALPAGESIZE"
+                    [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]"
+                    (page)="changePage($event)">
                 </mat-paginator>
             </div>
         </div>

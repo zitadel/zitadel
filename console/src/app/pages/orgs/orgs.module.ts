@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -14,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
@@ -49,8 +50,7 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         ChangesModule,
         AddDomainDialogModule,
         TranslateModule,
+        SharedModule,
     ],
-    exports: [],
-    schemas: [NO_ERRORS_SCHEMA],
 })
 export class OrgsModule { }

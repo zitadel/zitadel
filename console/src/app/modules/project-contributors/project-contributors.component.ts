@@ -85,7 +85,7 @@ export class ProjectContributorsComponent implements OnInit {
                             case ProjectType.PROJECTTYPE_OWNED:
                                 return this.projectService.AddProjectMember(this.project.projectId, user.id, roles)
                                     .then(() => {
-                                        this.toast.showInfo('members added');
+                                        this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                                     }).catch(error => {
                                         this.toast.showError(error);
                                     });
@@ -96,7 +96,7 @@ export class ProjectContributorsComponent implements OnInit {
                                     user.id,
                                     roles,
                                 ).then(() => {
-                                    this.toast.showInfo('members added');
+                                    this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                                 }).catch(error => {
                                     this.toast.showError(error);
                                 });

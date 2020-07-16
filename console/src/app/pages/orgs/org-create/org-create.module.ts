@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
-import { PipesModule } from 'src/app/pipes/pipes.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
 import { OrgCreateRoutingModule } from './org-create-routing.module';
 import { OrgCreateComponent } from './org-create.component';
@@ -25,7 +25,7 @@ import { OrgCreateComponent } from './org-create.component';
         MatButtonModule,
         MatIconModule,
         MatSelectModule,
-        PipesModule,
+        HasRolePipeModule,
         TranslateModule,
         MatCheckboxModule,
     ],

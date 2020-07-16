@@ -209,7 +209,9 @@
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt!",
             "PASSWORDCHANGED":"Passwort geändert!",
             "REACTIVATED":"User reaktiviert!",
-            "DEACTIVATED":"User deaktiviert!"
+            "DEACTIVATED":"User deaktiviert!",
+            "SELECTEDREACTIVATED":"Selektierte User reaktiviert!",
+            "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!"
         }
     },
     "IAM": {
@@ -229,6 +231,16 @@
             "SEQUENCE":"Sequenz",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen"
+        },
+        "TOAST":{
+            "MEMBERREMOVED":"Manager entfernt!",
+            "MEMBERSADDED": "Manager hinzugefügt!",
+            "MEMBERADDED": "Manager hinzugefügt!",
+            "MEMBERCHANGED":"Manager geändert!",
+            "ROLEREMOVED":"Rolle entfernt!",
+            "ROLECHANGED":"Rolle verändert!",
+            "REACTIVATED":"Reaktiviert!",
+            "DEACTIVATED":"Deaktiviert!"
         }
     },
     "ORG": {
@@ -322,7 +334,9 @@
             "DEACTIVATED":"Organisation deaktiviert!",
             "REACTIVATED":"Organisation reaktiviert!",
             "DOMAINADDED":"Domain hinzugefügt!",
-            "DOMAINREMOVED":"Domain entfernt!"
+            "DOMAINREMOVED":"Domain entfernt!",
+            "MEMBERADDED":"Manager hinzugefügt!",
+            "MEMBERREMOVED":"Manager entfernt!"
         }
     },
     "ORG_DETAIL": {
@@ -444,17 +458,27 @@
             "PROJECTNAME":"Projekt Name",
             "GRANTEDORG": "Berechtigte Organisation",
             "GRANTEDORGDOMAIN": "Domain",
+            "RESOURCEOWNER":"Resource Owner",
             "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
             "ROLENAMESLIST": "Rollen",
-            "NOROLES":"Keine Rollen"
+            "NOROLES":"Keine Rollen",
+            "TOAST":{
+                "PROJECTGRANTUSERGRANTADDED":"Project Berechtigung erstellt!",
+                "PROJECTGRANTADDED":"Projekt Berechtigung erstellt",
+                "PROJECTGRANTCHANGED":"Projekt Berechtigung geändert!",
+                "PROJECTGRANTMEMBERADDED":"Berechtigungsmanager hinzugefügt!",
+                "PROJECTGRANTMEMBERCHANGED":"Berechtigungsmanager verändert!",
+                "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt!"
+            }
         },
         "APP": {
             "TITLE": "Applikationen",
             "NAME": "Name"
         },
         "ROLE": {
+            "ADDNEWLINE":"Zusätzliche Rolle hinzufügen",
             "KEY":"Key",
             "TITLE": "Rollen",
             "DESCRIPTION":"Definiere Rollen, die du bei der Erstellung eines Projekt-Grants vergeben kannst",
@@ -488,10 +512,13 @@
             "MEMBERREMOVED":"Manager entfernt!",
             "MEMBERSADDED": "Manager hinzugefügt!",
             "MEMBERADDED": "Manager hinzugefügt!",
+            "MEMBERCHANGED":"Manager geändert!",
             "ROLEREMOVED":"Rolle entfernt!",
             "ROLECHANGED":"Rolle verändert!",
             "REACTIVATED":"Reaktiviert!",
-            "DEACTIVATED":"Deaktiviert!"
+            "DEACTIVATED":"Deaktiviert!",
+            "UPDATED":"Projekt gespeichert!",
+            "GRANTUPDATED":"Berechtigung verändert!"
         }
     },
     "APP": {

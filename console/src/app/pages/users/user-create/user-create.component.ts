@@ -89,8 +89,8 @@ export class UserCreateComponent implements OnDestroy {
                 this.toast.showInfo('USER.TOAST.CREATED', true);
                 this.router.navigate(['users', data.getId()]);
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.toast.showError(error);
             });
     }
 

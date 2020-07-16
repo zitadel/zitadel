@@ -1,19 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
@@ -21,54 +17,48 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
-import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
-import { GrantedProjectGridComponent } from './granted-project-list/granted-project-grid/granted-project-grid.component';
-import { GrantedProjectListComponent } from './granted-project-list/granted-project-list.component';
-import { GrantedProjectsRoutingModule } from './granted-projects-routing.module';
-import { GrantedProjectsComponent } from './granted-projects.component';
+import { ApplicationGridComponent } from './application-grid/application-grid.component';
+import { ApplicationsComponent } from './applications/applications.component';
+import { OwnedProjectDetailRoutingModule } from './owned-project-detail-routing.module';
+import { OwnedProjectDetailComponent } from './owned-project-detail.component';
+import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
     declarations: [
-        GrantedProjectsComponent,
-        GrantedProjectListComponent,
-        GrantedProjectGridComponent,
-        GrantedProjectDetailComponent,
+        OwnedProjectDetailComponent,
+        ApplicationGridComponent,
+        ApplicationsComponent,
+        ProjectGrantsComponent,
     ],
     imports: [
         CommonModule,
-        UserGrantsModule,
-        GrantedProjectsRoutingModule,
-        ProjectContributorsModule,
         FormsModule,
+        OwnedProjectDetailRoutingModule,
         TranslateModule,
-        ReactiveFormsModule,
         HasRoleModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatFormFieldModule,
-        MatInputModule,
-        ChangesModule,
-        MatIconModule,
-        MatSelectModule,
-        MatButtonModule,
-        MatProgressSpinnerModule,
-        MetaLayoutModule,
-        MatProgressBarModule,
         MatTabsModule,
+        MatButtonModule,
+        MatIconModule,
+        ProjectContributorsModule,
+        WarnDialogModule,
         ProjectRolesModule,
-        MatCheckboxModule,
-        CardModule,
-        MatTooltipModule,
-        MatSortModule,
         HasRolePipeModule,
-        TranslateModule,
+        UserGrantsModule,
         TimestampToDatePipeModule,
-        SharedModule,
+        MatTableModule,
+        MatFormFieldModule,
+        CardModule,
+        MatPaginatorModule,
+        MatCheckboxModule,
+        MatSelectModule,
+        MatProgressSpinnerModule,
+        ChangesModule,
+        MetaLayoutModule,
     ],
 })
-export class GrantedProjectsModule { }
+export class OwnedProjectDetailModule { }

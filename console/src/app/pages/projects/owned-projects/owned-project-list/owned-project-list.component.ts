@@ -108,9 +108,9 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         });
 
         Promise.all(promises).then(() => {
-            this.toast.showInfo('Reactivated selected projects successfully');
+            this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
         }).catch(error => {
-            this.toast.showInfo(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -121,9 +121,9 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         });
 
         Promise.all(promises).then(() => {
-            this.toast.showInfo('Deactivated selected projects Successfully');
+            this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
         }).catch(error => {
-            this.toast.showInfo(error.message);
+            this.toast.showError(error);
         });
     }
 }

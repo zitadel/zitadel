@@ -74,7 +74,7 @@ export class IamContributorsComponent implements OnInit {
                     Promise.all(users.map(user => {
                         return this.adminService.AddIamMember(user.id, roles);
                     })).then(() => {
-                        this.toast.showError('members added');
+                        this.toast.showInfo('IAM.TOAST.MEMBERADDED');
                     }).catch(error => {
                         this.toast.showError(error);
                     });

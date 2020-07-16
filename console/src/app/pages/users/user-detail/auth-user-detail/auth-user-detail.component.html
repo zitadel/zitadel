@@ -129,7 +129,7 @@
         <app-auth-user-mfa *ngIf="user"></app-auth-user-mfa>
     </div>
 
-    <metainfo *ngIf="user" class="side">
+    <div *ngIf="user" class="side" metainfo>
         <div class="details">
             <div class="row" *ngIf="user?.preferredLoginName">
                 <span class="first">Preferred Loginname:</span>
@@ -138,5 +138,5 @@
         </div>
 
         <app-changes [changeType]="ChangeType.MYUSER" [id]="user.id"></app-changes>
-    </metainfo>
+    </div>
 </app-meta-layout>

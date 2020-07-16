@@ -21,7 +21,7 @@ export class IamViewsComponent {
     @ViewChild(MatSort) public sort!: MatSort;
     public dataSource!: MatTableDataSource<View.AsObject>;
 
-    public displayedColumns: string[] = ['viewName', 'database', 'sequence', 'actions'];
+    public displayedColumns: string[] = ['viewName', 'database', 'sequence', 'timestamp', 'actions'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
     constructor(private adminService: AdminService) {

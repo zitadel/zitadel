@@ -57,7 +57,7 @@ export class OrgMembersComponent implements AfterViewInit {
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
             return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-                this.toast.showInfo('Removed successfully');
+                this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -66,7 +66,7 @@ export class OrgMembersComponent implements AfterViewInit {
 
     public removeMember(member: ProjectMember.AsObject): void {
         this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-            this.toast.showInfo('Member removed successfully');
+            this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -101,7 +101,7 @@ export class OrgMembersComponent implements AfterViewInit {
                     Promise.all(users.map(user => {
                         return this.orgService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
-                        this.toast.showError('members added');
+                        this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });

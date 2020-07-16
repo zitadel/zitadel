@@ -209,7 +209,9 @@
             "PASSWORDNOTIFICATIONSENT":"Password Change Notification sent",
             "PASSWORDCHANGED":"Password changed successfully!",
             "REACTIVATED":"User reactivated",
-            "DEACTIVATED":"User deactivated"
+            "DEACTIVATED":"User deactivated",
+            "SELECTEDREACTIVATED":"Selected Users reactivated",
+            "SELECTEDDEACTIVATED":"Selected Users deactivated"
         }
     },
     "IAM": {
@@ -229,6 +231,16 @@
             "SEQUENCE":"Sequence",
             "ACTIONS":"Actions",
             "CLEAR":"Clear"
+        },
+        "TOAST":{
+            "MEMBERREMOVED":"Manager removed!",
+            "MEMBERSADDED": "Managers added!",
+            "MEMBERADDED": "Manager added!",
+            "MEMBERCHANGED":"Manager changed!",
+            "ROLEREMOVED":"Role removed!",
+            "ROLECHANGED":"Role changed!",
+            "REACTIVATED":"Reaktiviert!",
+            "DEACTIVATED":"Deaktiviert!"
         }
     },
     "ORG": {
@@ -322,7 +334,9 @@
             "DEACTIVATED":"Organization deactivated!",
             "REACTIVATED":"Organization reactivated!",
             "DOMAINADDED":"Added domain!",
-            "DOMAINREMOVED":"Removed domain!"
+            "DOMAINREMOVED":"Removed domain!",
+            "MEMBERADDED":"Manager added!",
+            "MEMBERREMOVED":"Manager removed!"
         }
     },
     "ORG_DETAIL": {
@@ -442,17 +456,27 @@
             "PROJECTNAME":"Project Name",
             "GRANTEDORG": "Granted Organisation",
             "GRANTEDORGDOMAIN": "Domain",
+            "RESOURCEOWNER":"Resource Owner",
             "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Creation Date",
             "CHANGEDATE": "Last Modified",
             "ROLENAMESLIST": "Roles",
-            "NOROLES":"No roles"
+            "NOROLES":"No roles",
+            "TOAST": {
+                "PROJECTGRANTUSERGRANTADDED":"Project Grant created!",
+                "PROJECTGRANTADDED":"Project Grant created!",
+                "PROJECTGRANTCHANGED":"Project Grant changed!",
+                "PROJECTGRANTMEMBERADDED":"Grant Manager added!",
+                "PROJECTGRANTMEMBERCHANGED":"Grant Manager changed!",
+                "PROJECTGRANTMEMBERREMOVED":"Grant Manager removed!"
+            }
         },
         "APP": {
             "TITLE": "Applications",
             "NAME": "Name"
         },
         "ROLE": {
+            "ADDNEWLINE":"Add additional role",
             "KEY":"Key",
             "TITLE": "Roles",
             "DESCRIPTION":"Define some roles which can be used to create project-grants",
@@ -486,10 +510,13 @@
             "MEMBERREMOVED":"Manager removed!",
             "MEMBERSADDED": "Managers added!",
             "MEMBERADDED": "Manager added!",
+            "MEMBERCHANGED":"Manager changed!",
             "ROLEREMOVED":"Role removed!",
             "ROLECHANGED":"Role changed!",
-            "REACTIVATED":"Reaktiviert!",
-            "DEACTIVATED":"Deaktiviert!"
+            "REACTIVATED":"Reactivated!",
+            "DEACTIVATED":"Deactivated!",
+            "UPDATED":"Project changed!",
+            "GRANTUPDATED":"Grant changed!"
         }
     },
     "APP": {

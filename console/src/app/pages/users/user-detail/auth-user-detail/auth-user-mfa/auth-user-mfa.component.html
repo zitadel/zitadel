@@ -15,7 +15,8 @@
         <p class="row" *ngIf="error">{{error}}</p>
     </div>
     <div class="add-row">
-        <button (click)="addOTP()" mat-stroked-button color="primary" matTooltip="{{'ACTIONS.NEW' | translate}}">
+        <button *ngIf="otpAvailable" (click)="addOTP()" mat-stroked-button color="primary"
+            matTooltip="{{'ACTIONS.NEW' | translate}}">
             <mat-icon svgIcon="mdi_radar"></mat-icon>{{'USER.MFA.OTP' | translate}}
         </button>
     </div>

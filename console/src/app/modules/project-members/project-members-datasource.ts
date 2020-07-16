@@ -25,8 +25,7 @@ export class ProjectMembersDataSource extends DataSource<ProjectMember.AsObject>
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        console.log(grantId);
-        // TODO
+
         const promise: Promise<ProjectMemberSearchResponse> | undefined =
             projectType === ProjectType.PROJECTTYPE_OWNED ?
                 this.projectService.SearchProjectMembers(projectId, pageSize, offset) :

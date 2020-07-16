@@ -36,10 +36,10 @@
     </app-card>
 
     <app-card title="{{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig">
-        <card-actions class="card-actions">
+        <div class="card-actions" card-actions>
             <button mat-stroked-button
                 (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
-        </card-actions>
+        </div>
         <form *ngIf="appForm" [formGroup]="appForm" (ngSubmit)="saveOIDCApp()">
             <div class="content">
                 <mat-form-field appearance="outline">

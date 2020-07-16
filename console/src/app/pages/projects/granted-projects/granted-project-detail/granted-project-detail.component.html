@@ -12,17 +12,18 @@
             </div>
         </div>
 
-        <!-- <ng-template appHasRole [appHasRole]="['project.grant.user.grant.read']"> -->
-        <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
-            description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
-            <app-user-grants [context]="userGrantContext" [projectId]="projectId" [grantId]="grantId"
-                [allowCreate]="['project.grant.user.grant.write'] | hasRole"
-                [allowDelete]="['project.grant.user.grant.delete'] | hasRole">
-            </app-user-grants>
-        </app-card>
-        <!-- </ng-template> -->
+        <ng-template appHasRole [appHasRole]="['project.grant.user.grant.read']">
+            <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
+                description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
+                <app-user-grants [context]="userGrantContext" [projectId]="projectId" [grantId]="grantId"
+                    [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                    [allowCreate]="['project.grant.user.grant.write'] | hasRole | async"
+                    [allowDelete]="['project.grant.user.grant.delete'] | hasRole | async">
+                </app-user-grants>
+            </app-card>
+        </ng-template>
     </div>
-    <metainfo class="side">
+    <div class="side" metainfo>
         <div class="details">
             <div class="row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
@@ -42,5 +43,5 @@
                 <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.id"></app-changes>
             </mat-tab>
         </mat-tab-group>
-    </metainfo>
+    </div>
 </app-meta-layout>

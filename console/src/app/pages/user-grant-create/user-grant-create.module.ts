@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,7 @@ import {
     SearchProjectAutocompleteModule,
 } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.module';
 import { SearchUserAutocompleteModule } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.module';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 
 import { ProjectRolesModule } from '../../modules/project-roles/project-roles.module';
 import { UserGrantCreateRoutingModule } from './user-grant-create-routing.module';
@@ -31,9 +32,7 @@ import { UserGrantCreateComponent } from './user-grant-create.component';
         SearchProjectAutocompleteModule,
         SearchUserAutocompleteModule,
         ProjectRolesModule,
-    ],
-    schemas: [
-        CUSTOM_ELEMENTS_SCHEMA,
+        SharedModule,
     ],
 })
 export class UserGrantCreateModule { }

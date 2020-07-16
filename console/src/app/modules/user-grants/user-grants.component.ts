@@ -1,10 +1,10 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectGrant, ProjectRoleView, UserGrant } from 'src/app/proto/generated/management_pb';
+import { ProjectRoleView, UserGrant, UserGrantView } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -17,15 +17,13 @@ import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource
     styleUrls: ['./user-grants.component.scss'],
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
-    // @Input() filterValue: string = '';
-    // @Input() filter: UserGrantSearchKey = UserGrantSearchKey.USERGRANTSEARCHKEY_USER_ID;
     @Input() context: UserGrantContext = UserGrantContext.USER;
-    public grants: UserGrant.AsObject[] = [];
+    public grants: UserGrantView.AsObject[] = [];
 
     public dataSource!: UserGrantsDataSource;
-    public selection: SelectionModel<UserGrant.AsObject> = new SelectionModel<UserGrant.AsObject>(true, []);
+    public selection: SelectionModel<UserGrantView.AsObject> = new SelectionModel<UserGrantView.AsObject>(true, []);
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<ProjectGrant.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<UserGrantView.AsObject>;
 
     @Input() allowCreate: boolean = false;
     @Input() allowDelete: boolean = false;
@@ -51,19 +49,13 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         private toast: ToastService,
     ) { }
 
-    public displayedColumns: string[] = ['select',
+    @Input() public displayedColumns: string[] = ['select',
         'user',
         'org',
         'projectId', 'creationDate', 'changeDate', 'roleNamesList'];
 
     public ngOnInit(): void {
-        console.log(this.context);
         this.dataSource = new UserGrantsDataSource(this.userService);
-        const data = {
-            projectId: this.projectId,
-            grantId: this.grantId,
-            userId: this.userId,
-        };
 
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
@@ -73,7 +65,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
-                if (data && data.grantId) {
+                if (this.grantId) {
                     this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
                     this.getGrantRoleOptions(this.grantId, this.projectId);
                 }
@@ -86,7 +78,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             default:
                 this.routerLink = ['/grant-create'];
         }
-        this.dataSource.loadGrants(this.context, 0, 25, data);
+        this.dataSource.loadGrants(this.context, 0, 25, {
+            projectId: this.projectId,
+            grantId: this.grantId,
+            userId: this.userId,
+        });
     }
 
     public ngAfterViewInit(): void {
@@ -122,8 +118,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getGrantRoleOptions(grantId: string, projectId: string): void {
-        console.log(grantId, projectId);
-
         this.projectService.GetGrantedProjectByID(projectId, grantId).then(resp => {
             this.loadedGrantId = projectId;
             this.grantRoleOptions = resp.toObject().roleKeysList;
@@ -133,7 +127,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     public getProjectRoleOptions(projectId: string): void {
-        console.log(projectId);
         this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.loadedProjectId = projectId;
             this.projectRoleOptions = resp.toObject().resultList;
@@ -180,6 +173,14 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             this.selection.clear();
         }).catch(error => {
             this.toast.showError(error);
+        });
+    }
+
+    public changePage(event: PageEvent): void {
+        this.dataSource.loadGrants(this.context, event.pageIndex, event.pageSize, {
+            projectId: this.projectId,
+            grantId: this.grantId,
+            userId: this.userId,
         });
     }
 }

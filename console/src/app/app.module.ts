@@ -18,6 +18,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
+import { QuicklinkModule } from 'ngx-quicklink';
 
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -27,6 +28,7 @@ import { OutsideClickModule } from './directives/outside-click/outside-click.mod
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
+import { HasRolePipeModule } from './pipes/has-role-pipe.module';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
 import { GrpcService } from './services/grpc.service';
@@ -86,6 +88,7 @@ const authConfig: AuthConfig = {
                 deps: [HttpClient],
             },
         }),
+        QuicklinkModule,
         AccountsCardModule,
         HasRoleModule,
         BrowserAnimationsModule,
@@ -96,6 +99,7 @@ const authConfig: AuthConfig = {
         MatSidenavModule,
         MatCardModule,
         OutsideClickModule,
+        HasRolePipeModule,
         MatProgressBarModule,
         MatToolbarModule,
         MatMenuModule,

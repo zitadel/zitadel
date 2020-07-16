@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-
-import { UsersRoutingModule } from './users-routing.module';
+import { QuicklinkModule } from 'ngx-quicklink';
 
 @NgModule({
     declarations: [],
     imports: [
         CommonModule,
-        UsersRoutingModule,
+        QuicklinkModule,
+    ],
+    exports: [
+        QuicklinkModule,
     ],
 })
-export class UsersModule { }
+export class SharedModule { }

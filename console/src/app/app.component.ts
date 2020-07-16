@@ -134,10 +134,6 @@ export class AppComponent implements OnDestroy {
     public orgLoading: boolean = false;
 
     public showProjectSection: boolean = false;
-    public showOrgSection: boolean = false;
-    public showUserSection: boolean = false;
-    public iamreadwrite: boolean = false;
-
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
 
@@ -207,13 +203,10 @@ export class AppComponent implements OnDestroy {
 
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
-            this.loadPermissions();
         });
 
         this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
-                // this.userService.GetMyzitadelPermissions().pipe(take(1)).subscribe(perm => console.log(perm.toObject()));
-                this.loadPermissions();
                 this.authService.GetActiveOrg().then(org => {
                     this.org = org;
                 });
@@ -233,13 +226,6 @@ export class AppComponent implements OnDestroy {
     public ngOnDestroy(): void {
         this.authSub.unsubscribe();
         this.orgSub.unsubscribe();
-    }
-
-    public loadPermissions(): void {
-        this.userService.isAllowed(['iam.read', 'iam.write'], true).subscribe(allowed => this.iamreadwrite = allowed);
-        this.userService.isAllowed(['org.read']).subscribe(allowed => this.showOrgSection = allowed);
-        this.userService.isAllowed(['project.read']).subscribe(allowed => this.showProjectSection = allowed);
-        this.userService.isAllowed(['user.read']).subscribe(allowed => this.showUserSection = allowed);
     }
 
     public loadOrgs(): void {
