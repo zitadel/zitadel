@@ -1,6 +1,8 @@
 package spooler
 
 import (
+	"os"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
@@ -14,8 +16,11 @@ type Config struct {
 }
 
 func (c *Config) New() *Spooler {
-	lockID, err := id.SonyFlakeGenerator.Next()
-	logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
+	lockID, err := os.Hostname()
+	if err != nil {
+		lockID, err = id.SonyFlakeGenerator.Next()
+		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
+	}
 
 	return &Spooler{
 		handlers:        c.ViewHandlers,

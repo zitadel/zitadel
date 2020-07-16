@@ -46,7 +46,6 @@ func (k *Key) Reduce(event *models.Event) error {
 	default:
 		return k.view.ProcessedKeySequence(event.Sequence)
 	}
-	return nil
 }
 
 func (k *Key) OnError(event *models.Event, err error) error {

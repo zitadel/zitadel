@@ -2,6 +2,8 @@ package spooler
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -43,8 +45,9 @@ func (s *Spooler) Start() {
 	if s.concurrentTasks < 1 {
 		return
 	}
+
 	for i := 0; i < s.concurrentTasks; i++ {
-		go func() {
+		go func(taskIdx int) {
 			for handler := range s.queue {
 				go func(handler *spooledHandler, queue chan<- *spooledHandler) {
 					time.Sleep(handler.MinimumCycleDuration() - time.Since(handler.queuedAt))
@@ -52,9 +55,10 @@ func (s *Spooler) Start() {
 					queue <- handler
 				}(handler, s.queue)
 
+				handler.lockID = strings.Split(handler.lockID, "--")[0] + "--" + strconv.Itoa(taskIdx)
 				handler.load()
 			}
-		}()
+		}(i)
 	}
 	for _, handler := range s.handlers {
 		handler := &spooledHandler{handler, s.locker, s.lockID, time.Now(), s.eventstore}
