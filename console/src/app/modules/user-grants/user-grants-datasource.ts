@@ -6,6 +6,7 @@ import {
     UserGrantSearchKey,
     UserGrantSearchQuery,
     UserGrantSearchResponse,
+    UserGrantView,
 } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
@@ -18,7 +19,7 @@ export enum UserGrantContext {
 
 export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     public totalResult: number = 0;
-    public grantsSubject: BehaviorSubject<UserGrant.AsObject[]> = new BehaviorSubject<UserGrant.AsObject[]>([]);
+    public grantsSubject: BehaviorSubject<UserGrantView.AsObject[]> = new BehaviorSubject<UserGrantView.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -92,7 +93,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<UserGrant.AsObject[]> {
+    public connect(): Observable<UserGrantView.AsObject[]> {
         return this.grantsSubject.asObservable();
     }
 

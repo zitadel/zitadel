@@ -458,6 +458,7 @@
             "PROJECTNAME":"Projekt Name",
             "GRANTEDORG": "Berechtigte Organisation",
             "GRANTEDORGDOMAIN": "Domain",
+            "RESOURCEOWNER":"Resource Owner",
             "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",

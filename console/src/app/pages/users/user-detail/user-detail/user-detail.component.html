@@ -144,6 +144,7 @@
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole | async"
+                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
                 [allowDelete]="['user.grant.delete'] | hasRole | async"></app-user-grants>
         </app-card>
     </div>

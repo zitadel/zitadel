@@ -25,7 +25,6 @@
         <mat-spinner diameter="50"></mat-spinner>
     </div>
     <table mat-table multiTemplateDataRows class="full-width-table" aria-label="Elements" [dataSource]="dataSource">
-
         <ng-container matColumnDef="select">
             <th class="selection" mat-header-cell *matHeaderCellDef>
                 <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -53,7 +52,7 @@
         <ng-container matColumnDef="org">
             <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }} </th>
             <td class="pointer" mat-cell *matCellDef="let grant">
-                {{grant.orgDomain}} {{grant.orgName}} </td>
+                {{grant.orgName}} </td>
         </ng-container>
 
         <ng-container matColumnDef="projectId">
@@ -81,7 +80,8 @@
                 <ng-container *ngIf="context === UserGrantContext.USER">
                     <span class="no-roles"
                         *ngIf="grant.roleKeysList?.length === 0">{{'PROJECT.GRANT.NOROLES' | translate}}</span>
-                    <span *ngFor="let role of grant.roleKeysList">{{role}}</span>
+                    <span
+                        *ngFor="let role of grant.roleKeysList">{{ (role.length>8)? (role | slice:0:8)+'..':(role) }}</span>
                 </ng-container>
 
                 <!-- <ng-container *ngIf="context === UserGrantContext.USER">
@@ -105,7 +105,8 @@
 
                 <ng-container *ngIf="context === UserGrantContext.OWNED_PROJECT">
                     <ng-container *ngIf="loadedProjectId !== grant.projectId">
-                        <span class="role app-label" *ngFor="let role of grant.roleKeysList">{{role}}</span>
+                        <span class="role app-label"
+                            *ngFor="let role of grant.roleKeysList">{{ (role.length>6)? (role | slice:0:6)+'..':(role) }}</span>
                         <button mat-icon-button (click)="getProjectRoleOptions(grant.projectId)"
                             matTooltip="{{'ACTIONS.CHANGE' | translate}}">
                             <i class="las la-edit"></i>
