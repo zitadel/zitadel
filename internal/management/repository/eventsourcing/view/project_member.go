@@ -39,7 +39,7 @@ func (v *View) DeleteProjectMember(projectID, userID string, eventSequence uint6
 	return v.ProcessedProjectMemberSequence(eventSequence)
 }
 
-func (v *View) GetLatestProjectMemberSequence() (uint64, error) {
+func (v *View) GetLatestProjectMemberSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectMemberTable)
 }
 

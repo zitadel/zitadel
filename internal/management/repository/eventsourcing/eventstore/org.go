@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -57,16 +58,23 @@ func (repo *OrgRepository) GetMyOrgIamPolicy(ctx context.Context) (*org_model.Or
 func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_model.OrgDomainSearchRequest) (*org_model.OrgDomainSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries = append(request.Queries, &org_model.OrgDomainSearchQuery{Key: org_model.OrgDomainSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
+	sequence, err := repo.View.GetLatestOrgDomainSequence()
+	logging.Log("EVENT-SLowp").OnError(err).Warn("could not read latest org domain sequence")
 	domains, count, err := repo.View.SearchOrgDomains(request)
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgDomainSearchResponse{
+	result := &org_model.OrgDomainSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.OrgDomainsToModel(domains),
-	}, nil
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
 }
 
 func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
@@ -120,16 +128,23 @@ func (repo *OrgRepository) RemoveMyOrgMember(ctx context.Context, userID string)
 func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
 	request.Queries[len(request.Queries)-1] = &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: global_model.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID}
+	sequence, err := repo.View.GetLatestOrgMemberSequence()
+	logging.Log("EVENT-Smu3d").OnError(err).Warn("could not read latest org member sequence")
 	members, count, err := repo.View.SearchOrgMembers(request)
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgMemberSearchResponse{
+	result := &org_model.OrgMemberSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.OrgMembersToModel(members),
-	}, nil
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
 }
 
 func (repo *OrgRepository) GetOrgMemberRoles() []string {

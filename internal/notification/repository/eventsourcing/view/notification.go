@@ -8,7 +8,7 @@ const (
 	notificationTable = "notification.notifications"
 )
 
-func (v *View) GetLatestNotificationSequence() (uint64, error) {
+func (v *View) GetLatestNotificationSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(notificationTable)
 }
 

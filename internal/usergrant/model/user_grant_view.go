@@ -61,6 +61,8 @@ type UserGrantSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*UserGrantView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *UserGrantSearchRequest) EnsureLimit(limit uint64) {

@@ -41,7 +41,7 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(user_es_model.UserAggregate, project_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *Token) Reduce(event *models.Event) (err error) {

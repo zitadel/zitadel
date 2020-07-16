@@ -39,7 +39,7 @@ func (p *ProjectGrant) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return proj_event.ProjectQuery(sequence), nil
+	return proj_event.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
@@ -128,4 +128,3 @@ func (p *ProjectGrant) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-is8wa", "id", event.AggregateID).WithError(err).Warn("something went wrong in granted projecthandler")
 	return spooler.HandleError(event, err, p.view.GetLatestProjectGrantFailedEvent, p.view.ProcessedProjectGrantFailedEvent, p.view.ProcessedProjectGrantSequence, p.errorCountUntilSkip)
 }
- 
