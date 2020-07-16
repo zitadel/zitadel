@@ -84,7 +84,7 @@ export class PasswordComponent implements OnInit {
             });
         } else {
             this.passwordForm = this.fb.group({
-                currentPassword: ['', validators],
+                currentPassword: ['', Validators.required],
                 newPassword: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
@@ -125,7 +125,7 @@ export class PasswordComponent implements OnInit {
     }
 
     public get currentPassword(): AbstractControl | null {
-        return this.passwordForm.get('newPassword');
+        return this.passwordForm.get('currentPassword');
     }
 
     public get confirmPassword(): AbstractControl | null {
