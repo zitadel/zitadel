@@ -27,6 +27,10 @@ func (v *testVerifier) ProjectIDByClientID(ctx context.Context, clientID string)
 	return "", nil
 }
 
+func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {
+	return nil
+}
+
 func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, error) {
 	return "clientID", nil
 }
