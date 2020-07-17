@@ -17,6 +17,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { AvatarModule } from '../avatar/avatar.module';
+import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { UserGrantsComponent } from './user-grants.component';
 
 
@@ -41,6 +42,7 @@ import { UserGrantsComponent } from './user-grants.component';
         TranslateModule,
         HasRolePipeModule,
         TimestampToDatePipeModule,
+        RefreshTableModule,
     ],
     exports: [
         UserGrantsComponent,

@@ -1,7 +1,8 @@
 import { animate, group, query, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, HostBinding, OnDestroy, ViewChild } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
+import { Component, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -137,7 +138,15 @@ export class AppComponent implements OnDestroy {
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
 
+    public yoffset: number = 0;
+
+    @HostListener('window:scroll', ['$event']) onScroll(event: Event): void {
+        this.yoffset = this.viewPortScroller.getScrollPosition()[1];
+    }
+
     constructor(
+        public viewPortScroller: ViewportScroller,
+        @Inject('windowObject') public window: Window,
         public translate: TranslateService,
         public authService: AuthService,
         private breakpointObserver: BreakpointObserver,

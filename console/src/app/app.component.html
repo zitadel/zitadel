@@ -1,6 +1,6 @@
 <ng-container *ngIf="(authService.user | async) || {} as user">
     <ng-container *ngIf="((['iam.read','iam.write'] | hasRole)) as iamuser$">
-        <mat-toolbar class="root-header">
+        <mat-toolbar class="root-header" [ngClass]="{'zeroheight': yoffset < 20}">
             <button aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
                 <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
             </button>
@@ -47,7 +47,6 @@
                 </app-accounts-card>
             </div>
         </mat-toolbar>
-
         <mat-drawer-container class="main-container">
             <mat-drawer #drawer class="sidenav" [mode]="(isHandset$ | async) ? 'over' : 'side'"
                 [opened]="!(isHandset$ | async)">

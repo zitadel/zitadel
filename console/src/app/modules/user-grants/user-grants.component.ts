@@ -176,11 +176,16 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         });
     }
 
-    public changePage(event: PageEvent): void {
-        this.dataSource.loadGrants(this.context, event.pageIndex, event.pageSize, {
-            projectId: this.projectId,
-            grantId: this.grantId,
-            userId: this.userId,
-        });
+    public changePage(event?: PageEvent): void {
+        this.dataSource.loadGrants(
+            this.context,
+            event?.pageIndex ?? this.paginator.pageIndex,
+            event?.pageSize ?? this.paginator.pageSize,
+            {
+                projectId: this.projectId,
+                grantId: this.grantId,
+                userId: this.userId,
+            },
+        );
     }
 }

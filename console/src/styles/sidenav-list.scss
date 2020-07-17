@@ -51,6 +51,10 @@
         @include mat-elevation(3);
         background: $primary-dark !important;
         transition: background .5s ease-in-out;
+
+        &.zeroheight {
+            @include mat-elevation(0);
+        }
     }
 
     .admin-line {

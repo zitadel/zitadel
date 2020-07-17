@@ -1,7 +1,8 @@
 <app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()">
     <ng-template appHasRole [appHasRole]="['project.role.delete']" actions>
-        <button color="warn" [disabled]="disabled" matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}"
-            (click)="deleteSelectedRoles()" mat-icon-button *ngIf="selection.hasValue() && actionsVisible">
+        <button color="warn" class="icon-button" [disabled]="disabled"
+            matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" (click)="deleteSelectedRoles()" mat-icon-button
+            *ngIf="selection.hasValue() && actionsVisible">
             <i class="las la-trash"></i>
         </button>
     </ng-template>

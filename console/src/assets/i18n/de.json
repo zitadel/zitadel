@@ -50,7 +50,8 @@
         "FINISH":"Abschliessen",
         "CHANGE":"Ändern",
         "REACTIVATE":"Aktivieren",
-        "DEACTIVATE":"Deaktivieren"
+        "DEACTIVATE":"Deaktivieren",
+        "REFRESH":"Aktualisieren"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus!"

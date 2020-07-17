@@ -10,8 +10,8 @@
         </ng-container>
     </div>
     <span class="fill-space"></span>
-    <button mat-icon-button (click)="emitRefresh()">
-        <mat-icon [@rotate]="emitRefreshAfterTimeoutInMs.toString()">refresh</mat-icon>
+    <button mat-icon-button (click)="emitRefresh()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+        <mat-icon>refresh</mat-icon>
     </button>
     <ng-content select="[actions]"></ng-content>
 </div>

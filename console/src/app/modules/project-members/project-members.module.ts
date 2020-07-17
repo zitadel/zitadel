@@ -17,6 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
+import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ProjectMembersRoutingModule } from './project-members-routing.module';
 import { ProjectMembersComponent } from './project-members.component';
 
@@ -43,6 +44,7 @@ import { ProjectMembersComponent } from './project-members.component';
         FormsModule,
         TranslateModule,
         HasRolePipeModule,
+        RefreshTableModule,
     ],
 })
 export class ProjectMembersModule { }

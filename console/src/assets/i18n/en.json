@@ -50,7 +50,8 @@
         "FINISH":"Finish",
         "CHANGE":"Change",
         "REACTIVATE":"Aktivieren",
-        "DEACTIVATE":"Deaktivieren"
+        "DEACTIVATE":"Deaktivieren",
+        "REFRESH":"Refresh"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing!"

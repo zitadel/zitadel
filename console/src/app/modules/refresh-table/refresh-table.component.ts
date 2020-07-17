@@ -22,7 +22,6 @@ const rotate = animation([
     animations: [
         trigger('rotate', [
             transition('* => *', [useAnimation(rotate, { params: { time: '1s' } })]),
-            // transition('* => *', [useAnimation(rotate, { params: { time: '300ms' } })]),
         ]),
     ],
 })
