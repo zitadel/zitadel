@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -11,7 +13,6 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"time"
 )
 
 type ProjectGrantMember struct {
@@ -22,8 +23,6 @@ type ProjectGrantMember struct {
 const (
 	projectGrantMemberTable = "management.project_grant_members"
 )
-
-func (p *ProjectGrantMember) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *ProjectGrantMember) ViewModel() string {
 	return projectGrantMemberTable

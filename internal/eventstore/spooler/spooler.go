@@ -14,7 +14,7 @@ import (
 )
 
 type Spooler struct {
-	handlers   []Handler
+	handlers   []query.Handler
 	locker     Locker
 	lockID     string
 	eventstore eventstore.Eventstore
@@ -22,17 +22,12 @@ type Spooler struct {
 	queue      chan *spooledHandler
 }
 
-type Handler interface {
-	query.Handler
-	MinimumCycleDuration() time.Duration
-}
-
 type Locker interface {
 	Renew(lockerID, viewModel string, waitTime time.Duration) error
 }
 
 type spooledHandler struct {
-	Handler
+	query.Handler
 	locker     Locker
 	queuedAt   time.Time
 	eventstore eventstore.Eventstore
@@ -138,6 +133,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	if err != nil {
 		return nil, err
 	}
+	query.Limit = s.QueryLimit()
 	return s.eventstore.FilterEvents(ctx, query)
 }
 

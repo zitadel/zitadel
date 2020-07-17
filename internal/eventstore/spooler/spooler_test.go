@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/eventstore/spooler/mock"
 	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/golang/mock/gomock"
@@ -20,6 +21,7 @@ type testHandler struct {
 	processError  error
 	queryError    error
 	viewModel     string
+	bulkLimit     uint64
 }
 
 func (h *testHandler) ViewModel() string {
@@ -35,7 +37,12 @@ func (h *testHandler) Reduce(*models.Event) error {
 func (h *testHandler) OnError(event *models.Event, err error) error {
 	return err
 }
-func (h *testHandler) MinimumCycleDuration() time.Duration { return h.cycleDuration }
+func (h *testHandler) MinimumCycleDuration() time.Duration {
+	return h.cycleDuration
+}
+func (h *testHandler) QueryLimit() uint64 {
+	return h.bulkLimit
+}
 
 type eventstoreStub struct {
 	events []*models.Event
@@ -62,7 +69,7 @@ func (es *eventstoreStub) PushAggregates(ctx context.Context, in ...*models.Aggr
 
 func TestSpooler_process(t *testing.T) {
 	type fields struct {
-		currentHandler Handler
+		currentHandler query.Handler
 	}
 	type args struct {
 		timeout time.Duration
@@ -134,7 +141,7 @@ func TestSpooler_process(t *testing.T) {
 
 func TestSpooler_awaitError(t *testing.T) {
 	type fields struct {
-		currentHandler Handler
+		currentHandler query.Handler
 		err            error
 		canceled       bool
 	}
@@ -180,7 +187,7 @@ func TestSpooler_awaitError(t *testing.T) {
 // TestSpooler_load checks if load terminates
 func TestSpooler_load(t *testing.T) {
 	type fields struct {
-		currentHandler Handler
+		currentHandler query.Handler
 		locker         *testLocker
 		eventstore     eventstore.Eventstore
 	}
@@ -235,7 +242,7 @@ func TestSpooler_load(t *testing.T) {
 
 func TestSpooler_lock(t *testing.T) {
 	type fields struct {
-		currentHandler Handler
+		currentHandler query.Handler
 		locker         *testLocker
 		expectsErr     bool
 	}

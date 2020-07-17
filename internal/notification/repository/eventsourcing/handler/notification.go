@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -34,8 +33,6 @@ const (
 	notificationTable = "notification.notifications"
 	NotifyUserID      = "NOTIFICATION"
 )
-
-func (n *Notification) MinimumCycleDuration() time.Duration { return n.cycleDuration }
 
 func (n *Notification) ViewModel() string {
 	return notificationTable

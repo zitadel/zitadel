@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"time"
-
 	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
@@ -20,8 +18,6 @@ type Key struct {
 const (
 	keyTable = "auth.keys"
 )
-
-func (k *Key) MinimumCycleDuration() time.Duration { return k.cycleDuration }
 
 func (k *Key) ViewModel() string {
 	return keyTable

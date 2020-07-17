@@ -2,14 +2,14 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -23,8 +23,6 @@ type IamMember struct {
 const (
 	iamMemberTable = "adminapi.iam_members"
 )
-
-func (m *IamMember) MinimumCycleDuration() time.Duration { return m.cycleDuration }
 
 func (m *IamMember) ViewModel() string {
 	return iamMemberTable

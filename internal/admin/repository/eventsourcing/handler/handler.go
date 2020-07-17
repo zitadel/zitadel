@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 )
 
@@ -26,8 +26,8 @@ type EventstoreRepos struct {
 	UserEvents *usr_event.UserEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, repos EventstoreRepos) []spooler.Handler {
-	return []spooler.Handler{
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, repos EventstoreRepos) []query.Handler {
+	return []query.Handler{
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount}, userEvents: repos.UserEvents},
 	}
@@ -39,4 +39,12 @@ func (configs Configs) cycleDuration(viewModel string) time.Duration {
 		return 1 * time.Second
 	}
 	return c.MinimumCycleDuration.Duration
+}
+
+func (h *handler) MinimumCycleDuration() time.Duration {
+	return h.cycleDuration
+}
+
+func (h *handler) QueryLimit() uint64 {
+	return h.bulkLimit
 }

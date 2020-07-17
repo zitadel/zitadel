@@ -5,13 +5,14 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	"github.com/caos/zitadel/internal/id"
 )
 
 type Config struct {
 	Eventstore      eventstore.Eventstore
 	Locker          Locker
-	ViewHandlers    []Handler
+	ViewHandlers    []query.Handler
 	ConcurrentTasks int
 }
 
