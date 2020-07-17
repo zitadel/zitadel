@@ -28,7 +28,10 @@ func (h *testHandler) ViewModel() string {
 	return h.viewModel
 }
 func (h *testHandler) EventQuery() (*models.SearchQuery, error) {
-	return nil, h.queryError
+	if h.queryError != nil {
+		return nil, h.queryError
+	}
+	return &models.SearchQuery{}, nil
 }
 func (h *testHandler) Reduce(*models.Event) error {
 	<-time.After(h.processSleep)
