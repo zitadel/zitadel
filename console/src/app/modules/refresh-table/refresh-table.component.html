@@ -11,7 +11,7 @@
     </div>
     <span class="fill-space"></span>
     <button mat-icon-button (click)="emitRefresh()">
-        <mat-icon>refresh</mat-icon>
+        <mat-icon [@rotate]="emitRefreshAfterTimeoutInMs.toString()">refresh</mat-icon>
     </button>
     <ng-content select="[actions]"></ng-content>
 </div>

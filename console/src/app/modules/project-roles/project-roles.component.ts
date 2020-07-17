@@ -119,4 +119,8 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
             width: '400px',
         });
     }
+
+    public refreshPage(): void {
+        this.dataSource.loadRoles(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
+    }
 }

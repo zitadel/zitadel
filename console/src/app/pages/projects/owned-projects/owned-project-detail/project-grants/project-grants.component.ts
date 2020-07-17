@@ -52,11 +52,11 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
 
     }
 
-    private loadGrantsPage(): void {
+    public loadGrantsPage(pageIndex?: number, pageSize?: number): void {
         this.dataSource.loadGrants(
             this.projectId,
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
+            pageIndex ?? this.paginator.pageIndex,
+            pageSize ?? this.paginator.pageSize,
         );
     }
 

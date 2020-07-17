@@ -86,6 +86,6 @@ export class UserListComponent implements OnDestroy {
     }
 
     public refreshPage(): void {
-        console.log(this.paginator);
+        this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
     }
 }
