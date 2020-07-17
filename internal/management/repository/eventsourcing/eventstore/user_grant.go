@@ -3,7 +3,9 @@ package eventstore
 import (
 	"context"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
+	global_model "github.com/caos/zitadel/internal/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -59,10 +61,41 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestUserGrantSequence()
 	logging.Log("EVENT-5Viwf").OnError(err).Warn("could not read latest user grant sequence")
+
+	permissions := authz.GetPermissionsFromCtx(ctx)
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetPermissionCtxIDs(permissions)
+		if _, q := request.GetSearchQuery(grant_model.UserGrantSearchKeyProjectID); q != nil {
+			containsID := false
+			for _, id := range ids {
+				if id == q.Value {
+					containsID = true
+					break
+				}
+			}
+			if !containsID {
+				result := &grant_model.UserGrantSearchResponse{
+					Offset:      request.Offset,
+					Limit:       request.Limit,
+					TotalResult: uint64(0),
+					Result:      []*grant_model.UserGrantView{},
+				}
+				if err == nil {
+					result.Sequence = sequence.CurrentSequence
+					result.Timestamp = sequence.CurrentTimestamp
+				}
+				return result, nil
+			}
+		} else {
+			request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+		}
+	}
+
 	grants, count, err := repo.View.SearchUserGrants(request)
 	if err != nil {
 		return nil, err
 	}
+
 	result := &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
