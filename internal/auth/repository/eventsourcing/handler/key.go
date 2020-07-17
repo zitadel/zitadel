@@ -32,7 +32,7 @@ func (k *Key) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.KeyPairQuery(sequence), nil
+	return eventsourcing.KeyPairQuery(sequence.CurrentSequence), nil
 }
 
 func (k *Key) Reduce(event *models.Event) error {

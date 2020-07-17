@@ -21,12 +21,7 @@ func (s *Server) SearchOrgs(ctx context.Context, request *admin.OrgSearchRequest
 	if err != nil {
 		return nil, err
 	}
-	return &admin.OrgSearchResponse{
-		Result:      orgViewsFromModel(result.Result),
-		Limit:       request.Limit,
-		Offset:      request.Offset,
-		TotalResult: result.TotalResult,
-	}, nil
+	return orgSearchResponseFromModel(result), nil
 }
 
 func (s *Server) IsOrgUnique(ctx context.Context, request *admin.UniqueOrgRequest) (org *admin.UniqueOrgResponse, err error) {

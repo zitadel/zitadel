@@ -2,6 +2,11 @@ Password:
   Title: Passwort
   Description: Gib deine Benutzerdaten ein.
   Password: Passwort
+  MinLength: Mindestlänge
+  HasUppercase: Grossbuchstaben
+  HasLowercase: Kleinbuchstaben
+  HasNumber: Nummer
+  HasSymbol: Symbol
 
 Login:
   Title: Anmeldung
@@ -66,6 +71,7 @@ PasswordChange:
   Description: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
   OldPassword: Altes Passwort
   NewPassword: Neues Passwort
+  NewPasswordConfirmation: Passwort Bestätigung
 
 PasswordChangeDone:
   Title: Passwort ändern

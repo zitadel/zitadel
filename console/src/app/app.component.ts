@@ -155,7 +155,7 @@ export class AppComponent implements OnDestroy {
         update: UpdateService,
     ) {
         console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5282c1; font-size: 50px');
-        console.log('%cInserting something here could give attackers access to your caos account.', 'color: red; font-size: 18px');
+        console.log('%cInserting something here could give attackers access to your zitadel account.', 'color: red; font-size: 18px');
         console.log('%cIf you don\'t know exactly what you\'re doing, close the window and stay on the safe side', 'font-size: 16px');
         console.log('%cIf you know exactly what you are doing, you should work for us', 'font-size: 16px');
         this.setLanguage();

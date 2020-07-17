@@ -45,11 +45,11 @@ func projectMemberChangeToModel(member *management.ProjectMemberChange) *proj_mo
 	}
 }
 
-func projectMemberSearchRequestsToModel(role *management.ProjectMemberSearchRequest) *proj_model.ProjectMemberSearchRequest {
+func projectMemberSearchRequestsToModel(member *management.ProjectMemberSearchRequest) *proj_model.ProjectMemberSearchRequest {
 	return &proj_model.ProjectMemberSearchRequest{
-		Offset:  role.Offset,
-		Limit:   role.Limit,
-		Queries: projectMemberSearchQueriesToModel(role.Queries),
+		Offset:  member.Offset,
+		Limit:   member.Limit,
+		Queries: projectMemberSearchQueriesToModel(member.Queries),
 	}
 }
 
@@ -85,11 +85,15 @@ func projectMemberSearchKeyToModel(key management.ProjectMemberSearchKey) proj_m
 }
 
 func projectMemberSearchResponseFromModel(response *proj_model.ProjectMemberSearchResponse) *management.ProjectMemberSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-LSo9j").OnError(err).Debug("unable to parse timestamp")
 	return &management.ProjectMemberSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      projectMemberViewsFromModel(response.Result),
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            projectMemberViewsFromModel(response.Result),
+		ViewTimestamp:     timestamp,
+		ProcessedSequence: response.Sequence,
 	}
 }
 

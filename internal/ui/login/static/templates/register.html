@@ -43,21 +43,31 @@
             </select>
         </div>
         <div class="field">
-            <label class="label" for="password">{{t "Registration.Password"}}</label>
-            <input class="input" type="password" id="password" name="password" autocomplete="new-password" required>
+            <label class="label" for="register-password">{{t "Registration.Password"}}</label>
+            <input data-minlength="{{ .MinLength }}"
+                   data-has-uppercase="{{ .HasUppercase }}"
+                   data-has-lowercase="{{ .HasLowercase }}"
+                   data-has-number="{{ .HasNumber }}"
+                   data-has-symbol="{{ .HasSymbol }}"
+                   class="input" type="password" id="register-password" name="register-password" autocomplete="new-password" required>
+            {{ .PasswordPolicyDescription }}
         </div>
         <div class="field">
-            <label class="label" for="password2">{{t "Registration.Password2"}}</label>
-            <input class="input" type="password" id="password2" name="password2" autocomplete="new-password" required>
+            <label class="label" for="register-password-confirmation">{{t "Registration.Password2"}}</label>
+            <input class="input" type="password" id="register-password-confirmation" name="register-password-confirmation" autocomplete="new-password" required>
         </div>
     </div>
 
     {{template "error-message" .}}
 
     <div class="actions">
-        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+        <button class="primary right" id="register-button" type="submit" disabled>{{t "Actions.Next"}}</button>
     </div>
 </form>
 
+
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
+<script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
 
 {{template "main-bottom" .}}

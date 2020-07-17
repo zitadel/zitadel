@@ -78,6 +78,7 @@ button {
     outline: none;
     &:hover {
         background-color: $primaryColorHover;
+        color: $backgroundColor;
         border: 2px solid $primaryColorHover;
     }
 
@@ -87,6 +88,16 @@ button {
         border: none;
         &:hover {
             background-color: $primaryColorHover;
+        }
+    }
+
+    &:disabled {
+        background-color: $inputBorderColor;
+        border: 2px solid $inputBorderColor;
+
+        &:hover {
+            background-color: $inputBorderColor;
+            border: 2px solid $inputBorderColor;
         }
     }
 }
@@ -243,6 +254,34 @@ form {
         & > div:nth-of-type(2) {
             margin: 15px;
             font-size: 1.4rem;
+        }
+    }
+
+    ul#passwordcomplexity {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        list-style: none;
+
+        li {
+            flex: 1 0 50%;
+            display: block;
+            font-weight: 300;
+            font-size: 12px;
+            line-height: 12px;
+
+            i {
+                height: 26px;
+                padding-right: 10px;
+                vertical-align: middle;
+                color: $okColor;
+            }
+        }
+
+        li.invalid {
+            i {
+                color: $nokColor;
+            }
         }
     }
 }

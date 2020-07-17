@@ -37,7 +37,7 @@ func (v *View) DeleteNotifyUser(userID string, eventSequence uint64) error {
 	return v.ProcessedNotifyUserSequence(eventSequence)
 }
 
-func (v *View) GetLatestNotifyUserSequence() (uint64, error) {
+func (v *View) GetLatestNotifyUserSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(notifyUserTable)
 }
 

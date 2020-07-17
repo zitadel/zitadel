@@ -103,11 +103,15 @@ func iamMemberSearchMethodToModel(key admin.SearchMethod) model.SearchMethod {
 }
 
 func iamMemberSearchResponseFromModel(resp *iam_model.IamMemberSearchResponse) *admin.IamMemberSearchResponse {
+	timestamp, err := ptypes.TimestampProto(resp.Timestamp)
+	logging.Log("GRPC-5shu8").OnError(err).Debug("date parse failed")
 	return &admin.IamMemberSearchResponse{
-		Limit:       resp.Limit,
-		Offset:      resp.Offset,
-		TotalResult: resp.TotalResult,
-		Result:      iamMembersFromView(resp.Result),
+		Limit:             resp.Limit,
+		Offset:            resp.Offset,
+		TotalResult:       resp.TotalResult,
+		Result:            iamMembersFromView(resp.Result),
+		ProcessedSequence: resp.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 func iamMembersFromView(viewMembers []*iam_model.IamMemberView) []*admin.IamMemberView {

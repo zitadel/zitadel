@@ -105,8 +105,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, in *management.ProjectRo
 func (s *Server) SearchProjectRoles(ctx context.Context, in *management.ProjectRoleSearchRequest) (*management.ProjectRoleSearchResponse, error) {
 	request := projectRoleSearchRequestsToModel(in)
 	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
-	request.AppendProjectQuery(in.ProjectId)
-	response, err := s.project.SearchProjectRoles(ctx, request)
+	response, err := s.project.SearchProjectRoles(ctx, in.ProjectId, request)
 	if err != nil {
 		return nil, err
 	}
