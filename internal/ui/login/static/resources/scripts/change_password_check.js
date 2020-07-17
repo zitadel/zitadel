@@ -10,5 +10,5 @@ function CheckChangePwPolicy() {
     return pwNew == pwNewConfirmation;
 }
 
-let button = document.getElementById("change-password--button");
+let button = document.getElementById("change-password-button");
 disableSubmit(CheckChangePwPolicy, button);
