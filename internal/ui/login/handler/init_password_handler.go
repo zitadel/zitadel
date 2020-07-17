@@ -25,6 +25,7 @@ type initPasswordFormData struct {
 
 type initPasswordData struct {
 	baseData
+	profileData
 	Code                      string
 	UserID                    string
 	PasswordPolicyDescription string
@@ -93,9 +94,10 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	data := initPasswordData{
-		baseData: l.getBaseData(r, authReq, "Init Password", errType, errMessage),
-		UserID:   userID,
-		Code:     code,
+		baseData:    l.getBaseData(r, authReq, "Init Password", errType, errMessage),
+		profileData: l.getProfileData(authReq),
+		UserID:      userID,
+		Code:        code,
 	}
 	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, userID)
 	if policy != nil {

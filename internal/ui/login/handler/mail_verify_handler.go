@@ -22,6 +22,7 @@ type mailVerificationFormData struct {
 
 type mailVerificationData struct {
 	baseData
+	profileData
 	UserID string
 }
 
@@ -77,15 +78,17 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 		userID = authReq.UserID
 	}
 	data := mailVerificationData{
-		baseData: l.getBaseData(r, authReq, "Mail Verification", errType, errMessage),
-		UserID:   userID,
+		baseData:    l.getBaseData(r, authReq, "Mail Verification", errType, errMessage),
+		UserID:      userID,
+		profileData: l.getProfileData(authReq),
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
 func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	data := mailVerificationData{
-		baseData: l.getBaseData(r, authReq, "Mail Verified", "", ""),
+		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
+		profileData: l.getProfileData(authReq),
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMailVerified], data, nil)
 }
