@@ -1,22 +1,4 @@
 
-.col {
-    display: flex;
-    flex-direction: column;
-    border-bottom: 1px solid #ffffff20;
-    margin-bottom: 1rem;
-
-    .row {
-        display: flex;
-        justify-content: space-between;
-        padding: .5rem 0;
-        align-items: center;
-
-        span {
-            flex: 1;
-        }
-    }
-}
-
   .add-row {
       display: flex;
       margin: -.5rem;
