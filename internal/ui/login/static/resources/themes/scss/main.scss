@@ -115,6 +115,7 @@ input:not([type='radio']), select {
 %profile-image {
     .profile-image {
         height: 100px;
+        width: 100px;
         background-position: center;
         background-repeat: no-repeat;
         @include retina-background-image($profileImgDark, "png", false, 100px, 100px);
