@@ -42,7 +42,7 @@ AuthZ:
         Cert: $CR_AUTHZ_CERT
         Key: $CR_AUTHZ_KEY
     Spooler:
-      ConcurrentTasks: 2
+      ConcurrentTasks: 1
       BulkLimit: 100
       FailureCountUntilSkip: 5
 
@@ -90,7 +90,7 @@ Auth:
       Cert: $CR_AUTH_CERT
       Key: $CR_AUTH_KEY
   Spooler:
-    ConcurrentTasks: 2
+    ConcurrentTasks: 1
     BulkLimit: 100
     FailureCountUntilSkip: 5
   KeyConfig:
@@ -134,7 +134,7 @@ Admin:
       Cert: $CR_ADMINAPI_CERT
       Key: $CR_ADMINAPI_KEY
   Spooler:
-    ConcurrentTasks: 4
+    ConcurrentTasks: 1
     BulkLimit: 100
     FailureCountUntilSkip: 5
 
@@ -171,7 +171,7 @@ Mgmt:
       Cert: $CR_MANAGEMENT_CERT
       Key: $CR_MANAGEMENT_KEY
   Spooler:
-    ConcurrentTasks: 4
+    ConcurrentTasks: 1
     BulkLimit: 100
     FailureCountUntilSkip: 5
 
@@ -275,7 +275,7 @@ Notification:
         Cert: $CR_NOTIFICATION_CERT
         Key: $CR_NOTIFICATION_KEY
     Spooler:
-      ConcurrentTasks: 2
+      ConcurrentTasks: 1
       BulkLimit: 100
       FailureCountUntilSkip: 5
       Handlers:

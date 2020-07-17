@@ -17,17 +17,17 @@ type Config struct {
 
 func (c *Config) New() *Spooler {
 	lockID, err := os.Hostname()
-	if err != nil {
+	if err != nil || lockID == "" {
 		lockID, err = id.SonyFlakeGenerator.Next()
 		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
 	}
 
 	return &Spooler{
-		handlers:        c.ViewHandlers,
-		lockID:          lockID,
-		eventstore:      c.Eventstore,
-		locker:          c.Locker,
-		queue:           make(chan *spooledHandler),
-		concurrentTasks: c.ConcurrentTasks,
+		handlers:   c.ViewHandlers,
+		lockID:     lockID,
+		eventstore: c.Eventstore,
+		locker:     c.Locker,
+		queue:      make(chan *spooledHandler),
+		workers:    c.ConcurrentTasks,
 	}
 }

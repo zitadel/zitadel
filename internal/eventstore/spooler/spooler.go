@@ -3,8 +3,6 @@ package spooler
 import (
 	"context"
 	"strconv"
-	"strings"
-	"sync"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -16,12 +14,12 @@ import (
 )
 
 type Spooler struct {
-	handlers        []Handler
-	locker          Locker
-	lockID          string
-	eventstore      eventstore.Eventstore
-	concurrentTasks int
-	queue           chan *spooledHandler
+	handlers   []Handler
+	locker     Locker
+	lockID     string
+	eventstore eventstore.Eventstore
+	workers    int
+	queue      chan *spooledHandler
 }
 
 type Handler interface {
@@ -36,63 +34,48 @@ type Locker interface {
 type spooledHandler struct {
 	Handler
 	locker     Locker
-	lockID     string
 	queuedAt   time.Time
 	eventstore eventstore.Eventstore
-
-	isWorking bool
-	working   sync.Mutex
 }
 
 func (s *Spooler) Start() {
-	defer logging.LogWithFields("SPOOL-N0V1g", "lockerID", s.lockID, "workers", s.concurrentTasks).Info("spooler started")
-	if s.concurrentTasks < 1 {
+	defer logging.LogWithFields("SPOOL-N0V1g", "lockerID", s.lockID, "workers", s.workers).Info("spooler started")
+	if s.workers < 1 {
 		return
 	}
 
-	for i := 0; i < s.concurrentTasks; i++ {
-		go func(taskIdx int) {
-			for handler := range s.queue {
+	for i := 0; i < s.workers; i++ {
+		go func(workerIdx int) {
+			workerID := s.lockID + "--" + strconv.Itoa(workerIdx)
+			for task := range s.queue {
 				go func(handler *spooledHandler, queue chan<- *spooledHandler) {
 					time.Sleep(handler.MinimumCycleDuration() - time.Since(handler.queuedAt))
 					handler.queuedAt = time.Now()
 					queue <- handler
-				}(handler, s.queue)
+				}(task, s.queue)
 
-				if handler.isWorking {
-					continue
-				}
-				handler.working.Lock()
-				handler.isWorking = true
-				handler.working.Unlock()
-
-				handler.lockID = strings.Split(handler.lockID, "--")[0] + "--" + strconv.Itoa(taskIdx)
-				handler.load()
-
-				handler.working.Lock()
-				handler.isWorking = false
-				handler.working.Unlock()
+				task.load(workerID)
 			}
 		}(i)
 	}
 	for _, handler := range s.handlers {
-		handler := &spooledHandler{Handler: handler, locker: s.locker, lockID: s.lockID, queuedAt: time.Now(), eventstore: s.eventstore}
+		handler := &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
 		s.queue <- handler
 	}
 }
 
-func (s *spooledHandler) load() {
+func (s *spooledHandler) load(workerID string) {
 	errs := make(chan error)
 	defer close(errs)
 	ctx, cancel := context.WithCancel(context.Background())
-	go s.awaitError(cancel, errs)
-	hasLocked := s.lock(ctx, errs)
+	go s.awaitError(cancel, errs, workerID)
+	hasLocked := s.lock(ctx, errs, workerID)
 
 	if <-hasLocked {
 		go func() {
 			for l := range hasLocked {
 				if !l {
-					// we only need to break. an error is already written by the lock-routine to the errs channel
+					// we only need to break. An error is already written by the lock-routine to the errs channel
 					break
 				}
 			}
@@ -101,29 +84,27 @@ func (s *spooledHandler) load() {
 		if err != nil {
 			errs <- err
 		} else {
-			logging.LogWithFields("SPOOL-aqLrD", "eventCount", len(events), "lock", s.lockID, "view", s.ViewModel()).Debug("will load")
-			errs <- s.process(ctx, events)
+			errs <- s.process(ctx, events, workerID)
 		}
 	}
 	<-ctx.Done()
 }
 
-func (s *spooledHandler) awaitError(cancel func(), errs chan error) {
+func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID string) {
 	select {
 	case err := <-errs:
 		cancel()
-		logging.Log("SPOOL-K2lst").OnError(err).WithField("view", s.ViewModel()).WithField("lock", s.lockID).Debug("load canceled")
+		logging.Log("SPOOL-K2lst").OnError(err).WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("load canceled")
 	}
 }
 
-func (s *spooledHandler) process(ctx context.Context, events []*models.Event) error {
+func (s *spooledHandler) process(ctx context.Context, events []*models.Event, workerID string) error {
 	for _, event := range events {
 		select {
 		case <-ctx.Done():
-			logging.Log("SPOOL-FTKwH").WithField("view", s.ViewModel()).WithField("lock", s.lockID).Debug("context canceled")
+			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID).Debug("context canceled")
 			return nil
 		default:
-			logging.LogWithFields("SPOOL-Q0YGW", "seq", event.Sequence, "lock", s.lockID, "view", s.ViewModel()).Debug("reduce")
 			if err := s.Reduce(event); err != nil {
 				return s.OnError(event, err)
 			}
@@ -160,7 +141,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	return s.eventstore.FilterEvents(ctx, query)
 }
 
-func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool {
+func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID string) chan bool {
 	renewTimer := time.After(0)
 	renewDuration := s.MinimumCycleDuration() - 50*time.Millisecond
 	locked := make(chan bool)
@@ -169,16 +150,11 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool 
 		for {
 			select {
 			case <-ctx.Done():
-				// logging.LogWithFields("SPOOL-ymvYF", "lock", s.lockID, "view", s.ViewModel()).Debug("lock stoped")
 				return
 			case <-renewTimer:
-				// logging.LogWithFields("SPOOL-kwuFD", "lock", s.lockID, "view", s.ViewModel()).Debug("will lock")
-				err := s.locker.Renew(s.lockID, s.ViewModel(), s.MinimumCycleDuration()*2)
-				// logging.LogWithFields("SPOOL-wOURR", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("locked")
+				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
 				if err == nil {
-					// logging.LogWithFields("SPOOL-FxNmG", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("will write to chan")
 					locked <- true
-					// logging.LogWithFields("SPOOL-Acr90", "lock", s.lockID, "view", s.ViewModel(), "renewDuration", renewDuration).WithError(err).Debug("written to chan")
 					renewTimer = time.After(renewDuration)
 					continue
 				}
@@ -187,9 +163,7 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool 
 					errs <- err
 				}
 
-				// logging.LogWithFields("SPOOL-3GH43", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("will write false to chan")
 				locked <- false
-				// logging.LogWithFields("SPOOL-jq6dm", "lock", s.lockID, "view", s.ViewModel()).WithError(err).Debug("written false to chan")
 				return
 			}
 		}
