@@ -102,6 +102,7 @@ h1 {
 
 p {
   font-weight: 300;
+  text-align: center;
 }
 
 header {
@@ -174,6 +175,42 @@ input:not([type=radio]), select {
   padding-left: 15px;
 }
 
+form button.user-selection .profile-image, .login-profile .profile-image {
+  height: 100px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("../../../images/icon-user-dark.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  form button.user-selection .profile-image, .login-profile .profile-image {
+    background-image: url("../../../images/icon-user-dark@2x.png");
+    background-size: 100px 100px;
+  }
+}
+form button.user-selection:hover .profile-image, .login-profile:hover .profile-image {
+  background-image: url("../../../images/icon-user-dark-hover.png");
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+  form button.user-selection:hover .profile-image, .login-profile:hover .profile-image {
+    background-image: url("../../../images/icon-user-dark-hover@2x.png");
+    background-size: 100px 100px;
+  }
+}
+
+.login-profile .names {
+  padding: 10px 0;
+  text-align: center;
+}
+.login-profile .names div:first-of-type {
+  font-size: 1.3rem;
+}
+.login-profile .names div:nth-of-type(2) {
+  font-weight: 300;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #898989;
+}
+
 form .field {
   display: grid;
   padding: 10px 0;
@@ -229,26 +266,6 @@ form button.clean * {
 form .user-selection-list {
   margin-bottom: 80px;
 }
-form button.user-selection .profile-image {
-  width: 100px;
-  height: 100px;
-  background-image: url("/resources/images/icon-user-dark.png");
-}
-@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  form button.user-selection .profile-image {
-    background-image: url("/resources/images/icon-user-dark@2x.png");
-    background-size: 100px 100px;
-  }
-}
-form button.user-selection:hover .profile-image {
-  background-image: url("/resources/images/icon-user-dark-hover.png");
-}
-@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
-  form button.user-selection:hover .profile-image {
-    background-image: url("/resources/images/icon-user-dark-hover@2x.png");
-    background-size: 100px 100px;
-  }
-}
 form button.user-selection .sessionstate {
   display: inline-block;
   height: 20px;
@@ -287,22 +304,22 @@ form button.other-user .other-user-image {
   height: 75px;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url("/resources/images/icon-newuser-dark.png");
+  background-image: url("../../../images/icon-newuser-dark.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   form button.other-user .other-user-image {
-    background-image: url("/resources/images/icon-newuser-dark@2x.png");
+    background-image: url("../../../images/icon-newuser-dark@2x.png");
     background-size: 100px 75px;
   }
 }
 form button.other-user:hover .other-user-image {
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url("/resources/images/icon-newuser-dark-hover.png");
+  background-image: url("../../../images/icon-newuser-dark-hover.png");
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   form button.other-user:hover .other-user-image {
-    background-image: url("/resources/images/icon-newuser-dark-hover@2x.png");
+    background-image: url("../../../images/icon-newuser-dark-hover@2x.png");
     background-size: 100px 75px;
   }
 }

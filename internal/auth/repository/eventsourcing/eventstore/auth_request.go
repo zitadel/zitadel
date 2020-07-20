@@ -138,7 +138,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID string) 
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, user.PreferredLoginName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, user.PreferredLoginName, user.DisplayName, user.ResourceOwner)
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -182,7 +182,7 @@ func (repo *AuthRequestRepo) checkLoginName(request *model.AuthRequest, loginNam
 	if err != nil {
 		return err
 	}
-	request.SetUserInfo(user.ID, loginName, user.ResourceOwner)
+	request.SetUserInfo(user.ID, loginName, "", user.ResourceOwner)
 	return nil
 }
 

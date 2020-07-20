@@ -61,13 +61,6 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *mod
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	loginName := ""
-	if authReq != nil {
-		loginName = authReq.LoginName
-	}
-	data := userData{
-		baseData:  l.getBaseData(r, authReq, "Login", errType, errMessage),
-		LoginName: loginName,
-	}
+	data := l.getUserData(r, authReq, "Login", errType, errMessage)
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplLogin], data, nil)
 }

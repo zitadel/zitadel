@@ -25,9 +25,6 @@ func (l *Login) renderPasswordResetDone(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
-	data := userData{
-		baseData:  l.getBaseData(r, authReq, "Password Reset Done", errType, errMessage),
-		LoginName: authReq.LoginName,
-	}
+	data := l.getUserData(r, authReq, "Password Reset Done", errType, errMessage)
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplPasswordResetDone], data, nil)
 }
