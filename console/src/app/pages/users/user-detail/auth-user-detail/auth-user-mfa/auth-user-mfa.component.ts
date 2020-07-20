@@ -15,7 +15,7 @@ import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
     styleUrls: ['./auth-user-mfa.component.scss'],
 })
 export class AuthUserMfaComponent implements OnInit, OnDestroy {
-    public displayedColumns: string[] = ['type', 'state'];
+    public displayedColumns: string[] = ['type', 'state', 'actions'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
