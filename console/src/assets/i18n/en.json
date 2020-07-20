@@ -75,6 +75,8 @@
             "DEACTIVATE":"Deactivate"
         },
         "MFA": {
+            "TABLETYPE":"Typ",
+            "TABLESTATE":"Status",
             "TITLE": "Multifactor Authentication",
             "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
             "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",

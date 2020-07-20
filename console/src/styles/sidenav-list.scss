@@ -48,13 +48,9 @@
     }
 
     .root-header {
-        @include mat-elevation(3);
-        background: $primary-dark !important;
-        transition: background .5s ease-in-out;
-
-        &.zeroheight {
-            @include mat-elevation(0);
-        }
+        box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+        background-color: $primary-dark !important;
+        transition: background-color .5s ease-in-out;
     }
 
     .admin-line {

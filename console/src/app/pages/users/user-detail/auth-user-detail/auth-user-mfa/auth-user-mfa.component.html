@@ -1,12 +1,12 @@
 <app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}">
     <table class="background-style" mat-table [dataSource]="dataSource">
         <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.FIRSTNAME' | translate }} </th>
+            <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLETYPE' | translate }} </th>
             <td mat-cell *matCellDef="let mfa"> {{'USER.MFA.TYPE.'+ mfa.type | translate}} </td>
         </ng-container>
 
         <ng-container matColumnDef="state">
-            <th mat-header-cell *matHeaderCellDef> {{ 'USER.PROFILE.LASTNAME' | translate }} </th>
+            <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLESTATE' | translate }} </th>
             <td mat-cell *matCellDef="let mfa"> {{'USER.MFA.STATE.'+ mfa.state | translate}} </td>
         </ng-container>
 
