@@ -42,7 +42,7 @@ export class AvatarComponent implements OnInit {
             '#427E41',
             '#89A568',
             '#90924D',
-            '#C08C3F',
+            '#E2B032',
             '#C97358',
             '#6D5B54',
             '#6B7980',
