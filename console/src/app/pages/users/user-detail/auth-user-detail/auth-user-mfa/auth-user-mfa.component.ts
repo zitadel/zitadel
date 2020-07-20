@@ -28,7 +28,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public error: string = '';
     public otpAvailable: boolean = false;
-    constructor(private userService: AuthUserService, private toast: ToastService, private dialog: MatDialog) { }
+    constructor(private service: AuthUserService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
         this.getOTP();
@@ -39,7 +39,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public addOTP(): void {
-        this.userService.AddMfaOTP().then((otpresp) => {
+        this.service.AddMfaOTP().then((otpresp) => {
             const otp: MfaOtpResponse.AsObject = otpresp.toObject();
             const dialogRef = this.dialog.open(DialogOtpComponent, {
                 data: otp.url,
@@ -48,7 +48,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
             dialogRef.afterClosed().subscribe((code) => {
                 if (code) {
-                    this.userService.VerifyMfaOTP(code).then((res) => {
+                    (this.service as AuthUserService).VerifyMfaOTP(code).then(() => {
                         // TODO: show state
                     });
                 }
@@ -59,7 +59,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public getOTP(): void {
-        this.userService.GetMyMfas().then(mfas => {
+        this.service.GetMyMfas().then(mfas => {
             console.log(mfas.toObject().mfasList);
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
@@ -75,7 +75,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public deleteMFA(type: MfaType): void {
         if (type === MfaType.MFATYPE_OTP) {
-            this.userService.RemoveMfaOTP().then(() => {
+            this.service.RemoveMfaOTP().then(() => {
                 this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
                 const index = this.dataSource.data.findIndex(mfa => mfa.type === type);

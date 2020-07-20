@@ -217,23 +217,6 @@ export class MgmtUserService {
         );
     }
 
-    // public async CreateUserGrant(
-    //     projectId: string,
-    //     userId: string,
-    //     roleNamesList: string[],
-    // ): Promise<UserGrant> {
-    //     const req = new UserGrantCreate();
-    //     req.setProjectId(projectId);
-    //     req.setUserId(userId);
-    //     req.setRoleKeysList(roleNamesList);
-
-    //     return await this.request(
-    //         c => c.createUserGrant,
-    //         req,
-    //         f => f,
-    //     );
-    // }
-
     public async CreateProjectUserGrant(
         projectId: string,
         userId: string,

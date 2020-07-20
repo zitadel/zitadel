@@ -16,3 +16,13 @@
         }
     }
 }
+
+.centered {
+    display: flex;
+    align-items: center;
+
+    i {
+        margin-left: 1rem;
+        color: #5282c1;
+    }
+}
