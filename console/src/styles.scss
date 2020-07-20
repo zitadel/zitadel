@@ -129,7 +129,7 @@ $caos-accent-color: (
 // hue. Available color palettes: https://material.io/design/color/
 
 $light-primary: mat-palette($caos-light-brand);
-$light-accent: mat-palette($mat-pink);
+$light-accent:mat-palette($caos-accent-color);
 $light-warn: mat-palette($mat-red);
 
 $dark-primary: mat-palette($caos-dark-brand);
@@ -173,7 +173,7 @@ $custom-typography: mat-typography-config(
     }
 
     ::-webkit-scrollbar-thumb {
-        background-color: #5282c1;
+        background-color: #737C8850;
         border-radius: 8px;
     }
 }
@@ -205,7 +205,7 @@ $custom-typography: mat-typography-config(
     }
 
     ::-webkit-scrollbar-thumb {
-        background-color: #5282c1;
+        background-color: #737C8870;
         border-radius: 8px;
     }
 }
