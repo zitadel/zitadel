@@ -13,6 +13,7 @@ type Eventstore interface {
 	Health(ctx context.Context) error
 	PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) error
 	FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error)
+	LatestSequence(ctx context.Context, searchQuery *models.SearchQueryFactory) (uint64, error)
 }
 
 var _ Eventstore = (*eventstore)(nil)
@@ -48,7 +49,11 @@ func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.Sear
 	if err := searchQuery.Validate(); err != nil {
 		return nil, err
 	}
-	return es.repo.Filter(ctx, searchQuery)
+	return es.repo.Filter(ctx, models.FactoryFromSearchQuery(searchQuery))
+}
+
+func (es *eventstore) LatestSequence(ctx context.Context, queryFactory *models.SearchQueryFactory) (uint64, error) {
+	return es.repo.LatestSequence(ctx, queryFactory)
 }
 
 func (es *eventstore) Health(ctx context.Context) error {

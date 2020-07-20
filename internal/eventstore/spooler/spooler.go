@@ -133,6 +133,19 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	if err != nil {
 		return nil, err
 	}
+	factory := models.FactoryFromSearchQuery(query)
+	sequence, err := s.eventstore.LatestSequence(ctx, factory)
+	logging.Log("SPOOL-7SciK").OnError(err).Debug("unable to query latest sequence")
+	var processedSequence uint64
+	for _, filter := range query.Filters {
+		if filter.GetField() == models.Field_LatestSequence {
+			processedSequence = filter.GetValue().(uint64)
+		}
+	}
+	if sequence != 0 && processedSequence == sequence {
+		return nil, nil
+	}
+
 	query.Limit = s.QueryLimit()
 	return s.eventstore.FilterEvents(ctx, query)
 }
