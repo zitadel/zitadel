@@ -160,6 +160,7 @@ InternalAuthZ:
         - "user.grant.read"
     - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
+        - "project.read"
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.member.write"
@@ -170,6 +171,7 @@ InternalAuthZ:
         - "user.grant.delete"
     - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
+        - "project.read"
         - "project.grant.read"
         - "project.grant.member.read"
         - "user.read"

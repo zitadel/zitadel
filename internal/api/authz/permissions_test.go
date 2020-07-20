@@ -157,9 +157,10 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 		authConfig   Config
 	}
 	tests := []struct {
-		name   string
-		args   args
-		result []string
+		name         string
+		args         args
+		reuqestPerms []string
+		allPerms     []string
 	}{
 		{
 			name: "One Role existing perm",
@@ -179,7 +180,8 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			result: []string{"project.read"},
+			reuqestPerms: []string{"project.read"},
+			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
 			name: "One Role not existing perm",
@@ -199,7 +201,8 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			result: []string{},
+			reuqestPerms: []string{},
+			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
 			name: "Multiple Roles one existing",
@@ -219,7 +222,8 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			result: []string{"project.read"},
+			reuqestPerms: []string{"project.read"},
+			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
 			name: "Multiple Roles, global and specific",
@@ -239,14 +243,18 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			result: []string{"project.read", "project.read:1"},
+			reuqestPerms: []string{"project.read", "project.read:1"},
+			allPerms:     []string{"org.read", "project.read", "project.read:1"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := mapGrantToPermissions(tt.args.requiredPerm, tt.args.grant, tt.args.authConfig)
-			if !equalStringArray(result, tt.result) {
-				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
+			requestPerms, allPerms := mapGrantToPermissions(tt.args.requiredPerm, tt.args.grant, tt.args.authConfig)
+			if !equalStringArray(requestPerms, tt.reuqestPerms) {
+				t.Errorf("got wrong requestPerms, expecting: %v, actual: %v ", tt.reuqestPerms, requestPerms)
+			}
+			if !equalStringArray(allPerms, tt.allPerms) {
+				t.Errorf("got wrong allPerms, expecting: %v, actual: %v ", tt.allPerms, allPerms)
 			}
 		})
 	}
@@ -254,15 +262,17 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 
 func Test_MapRoleToPerm(t *testing.T) {
 	type args struct {
-		requiredPerm        string
-		actualRole          string
-		authConfig          Config
-		resolvedPermissions []string
+		requiredPerm string
+		actualRole   string
+		authConfig   Config
+		requestPerms []string
+		allPerms     []string
 	}
 	tests := []struct {
-		name   string
-		args   args
-		result []string
+		name         string
+		args         args
+		requestPerms []string
+		allPerms     []string
 	}{
 		{
 			name: "first perm without context id",
@@ -281,9 +291,11 @@ func Test_MapRoleToPerm(t *testing.T) {
 						},
 					},
 				},
-				resolvedPermissions: []string{},
+				requestPerms: []string{},
+				allPerms:     []string{},
 			},
-			result: []string{"project.read"},
+			requestPerms: []string{"project.read"},
+			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
 			name: "existing perm without context id",
@@ -302,9 +314,11 @@ func Test_MapRoleToPerm(t *testing.T) {
 						},
 					},
 				},
-				resolvedPermissions: []string{"project.read"},
+				requestPerms: []string{"project.read"},
+				allPerms:     []string{"org.read", "project.read"},
 			},
-			result: []string{"project.read"},
+			requestPerms: []string{"project.read"},
+			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
 			name: "first perm with context id",
@@ -323,9 +337,11 @@ func Test_MapRoleToPerm(t *testing.T) {
 						},
 					},
 				},
-				resolvedPermissions: []string{},
+				requestPerms: []string{},
+				allPerms:     []string{},
 			},
-			result: []string{"project.read:1"},
+			requestPerms: []string{"project.read:1"},
+			allPerms:     []string{"project.read:1"},
 		},
 		{
 			name: "perm with context id, existing global",
@@ -344,16 +360,21 @@ func Test_MapRoleToPerm(t *testing.T) {
 						},
 					},
 				},
-				resolvedPermissions: []string{"project.read"},
+				requestPerms: []string{"project.read"},
+				allPerms:     []string{"org.read", "project.read"},
 			},
-			result: []string{"project.read", "project.read:1"},
+			requestPerms: []string{"project.read", "project.read:1"},
+			allPerms:     []string{"org.read", "project.read", "project.read:1"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := mapRoleToPerm(tt.args.requiredPerm, tt.args.actualRole, tt.args.authConfig, tt.args.resolvedPermissions)
-			if !equalStringArray(result, tt.result) {
-				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
+			requestPerms, allPerms := mapRoleToPerm(tt.args.requiredPerm, tt.args.actualRole, tt.args.authConfig, tt.args.requestPerms, tt.args.allPerms)
+			if !equalStringArray(requestPerms, tt.requestPerms) {
+				t.Errorf("got wrong requestPerms, expecting: %v, actual: %v ", tt.requestPerms, requestPerms)
+			}
+			if !equalStringArray(allPerms, tt.allPerms) {
+				t.Errorf("got wrong allPerms, expecting: %v, actual: %v ", tt.allPerms, allPerms)
 			}
 		})
 	}
