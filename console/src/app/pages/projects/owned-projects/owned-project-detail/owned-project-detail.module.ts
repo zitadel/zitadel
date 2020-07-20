@@ -17,6 +17,7 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
@@ -59,6 +60,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatProgressSpinnerModule,
         ChangesModule,
         MetaLayoutModule,
+        RefreshTableModule,
     ],
 })
 export class OwnedProjectDetailModule { }

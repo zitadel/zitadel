@@ -18,6 +18,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
+import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
 import { ProjectRolesComponent } from './project-roles.component';
 
@@ -44,6 +45,7 @@ import { ProjectRolesComponent } from './project-roles.component';
         TranslateModule,
         MatMenuModule,
         TimestampToDatePipeModule,
+        RefreshTableModule,
     ],
     exports: [
         ProjectRolesComponent,

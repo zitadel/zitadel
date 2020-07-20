@@ -47,7 +47,6 @@
                 </app-accounts-card>
             </div>
         </mat-toolbar>
-
         <mat-drawer-container class="main-container">
             <mat-drawer #drawer class="sidenav" [mode]="(isHandset$ | async) ? 'over' : 'side'"
                 [opened]="!(isHandset$ | async)">

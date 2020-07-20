@@ -5,7 +5,7 @@ import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { Org, OrgMember, OrgMemberView, OrgState, User } from 'src/app/proto/generated/management_pb';
+import { Org, OrgMemberView, OrgState, User } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -23,7 +23,7 @@ export class OrgContributorsComponent implements OnInit {
     @Input() public org!: Org.AsObject;
     @Input() public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<OrgMember.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<OrgMemberView.AsObject>;
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
 

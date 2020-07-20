@@ -126,7 +126,7 @@
             </div>
         </app-card>
 
-        <app-auth-user-mfa *ngIf="user"></app-auth-user-mfa>
+        <app-auth-user-mfa *ngIf="user" #mfaComponent></app-auth-user-mfa>
     </div>
 
     <div *ngIf="user" class="side" metainfo>

@@ -4,9 +4,10 @@
     <div class="people">
         <div class="img-list">
             <ng-container *ngIf="totalResult < 10; else compact">
-                <ng-container *ngFor="let member of membersSubject | async">
+                <ng-container *ngFor="let member of membersSubject | async; index as i">
                     <div (click)="showDetail()" class="avatar-circle"
-                        matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
+                        matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}"
+                        [ngStyle]="{'z-index': 100 - i}">
                         <app-avatar *ngIf="member && (member.displayName || (member.firstName && member.lastName))"
                             class="avatar dontcloseonclick"
                             [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)"
