@@ -531,7 +531,7 @@
             "TITLE": "Applikation",
             "DESCRIPTION": "Hier kannst du deine Applikation bearbeiten und deren Konfiguration anpassen.",
             "CREATE_OIDC": "OIDC Applikation",
-            "CREATE_OIDC_DESc": "Gib deine Applikationsdaten ein!",
+            "CREATE_OIDC_DESC": "Gib deine Applikationsdaten Schritt für Schritt ein",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {

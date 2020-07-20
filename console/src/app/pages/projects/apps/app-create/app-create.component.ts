@@ -33,11 +33,14 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
         OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN,
     ];
-    public oidcGrantTypes: OIDCGrantType[] = [
-        OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-        OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
-        OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN,
-    ];
+    public oidcGrantTypes: {
+        type: OIDCGrantType,
+        checked: boolean,
+    }[] = [
+            { type: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, checked: false },
+            { type: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT, checked: false },
+            { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false },
+        ];
     public oidcAppTypes: OIDCApplicationType[] = [
         OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
         OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
@@ -49,9 +52,10 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
     ];
 
-    public form!: FormGroup;
-    public createSteps: number = 1;
-    public currentCreateStep: number = 1;
+    firstFormGroup!: FormGroup;
+    secondFormGroup!: FormGroup;
+    thirdFormGroup!: FormGroup;
+
     public postLogoutRedirectUrisList: string[] = [];
 
     public addOnBlur: boolean = true;
@@ -66,13 +70,27 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
         private _location: Location,
     ) {
-        this.form = this.fb.group({
+        this.firstFormGroup = this.fb.group({
             name: ['', [Validators.required]],
-            responseTypesList: ['', []],
-            grantTypesList: ['', []],
-            applicationType: ['', []],
-            authMethodType: [],
+            applicationType: ['', [Validators.required]],
         });
+        // this.secondFormGroup = this.fb.group({
+        //     responseTypesList: ['', []],
+        // });
+        this.secondFormGroup = this.fb.group({
+            authMethodType: ['', [Validators.required]],
+        });
+
+        this.secondFormGroup.valueChanges.subscribe(value => {
+            console.log(value);
+        });
+        // this.form = this.fb.group({
+        //     name: ['', [Validators.required]],
+        //     responseTypesList: ['', []],
+        //     grantTypesList: ['', []],
+        //     applicationType: ['', []],
+        //     authMethodType: [],
+        // });
     }
 
     public ngOnInit(): void {
@@ -92,22 +110,22 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this._location.back();
     }
 
-    public saveOIDCApp(): void {
-        this.oidcApp.name = this.name?.value;
-        this.oidcApp.applicationType = this.applicationType?.value;
-        this.oidcApp.grantTypesList = this.grantTypesList?.value;
-        this.oidcApp.responseTypesList = this.responseTypesList?.value;
-        this.oidcApp.authMethodType = this.authMethodType?.value;
+    // public saveOIDCApp(): void {
+    //     this.oidcApp.name = this.name?.value;
+    //     this.oidcApp.applicationType = this.applicationType?.value;
+    //     this.oidcApp.grantTypesList = this.grantTypesList?.value;
+    //     this.oidcApp.responseTypesList = this.responseTypesList?.value;
+    //     // this.oidcApp.authMethodType = this.authMethodType?.value;
 
-        this.projectService
-            .CreateOIDCApp(this.oidcApp)
-            .then((data: Application) => {
-                this.showSavedDialog(data.toObject());
-            })
-            .catch(error => {
-                this.toast.showError(error);
-            });
-    }
+    //     this.projectService
+    //         .CreateOIDCApp(this.oidcApp)
+    //         .then((data: Application) => {
+    //             this.showSavedDialog(data.toObject());
+    //         })
+    //         .catch(error => {
+    //             this.toast.showError(error);
+    //         });
+    // }
 
     public showSavedDialog(app: Application.AsObject): void {
         if (app.oidcConfig !== undefined) {
@@ -154,30 +172,34 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 this.oidcApp.postLogoutRedirectUrisList.splice(index, 1);
             }
         }
-
     }
 
     get name(): AbstractControl | null {
-        return this.form.get('name');
+        return this.firstFormGroup.get('name');
     }
-
-
-    get responseTypesList(): AbstractControl | null {
-        return this.form.get('responseTypesList');
-    }
-
-
-    get grantTypesList(): AbstractControl | null {
-        return this.form.get('grantTypesList');
-    }
-
 
     get applicationType(): AbstractControl | null {
-        return this.form.get('applicationType');
+        return this.firstFormGroup.get('applicationType');
     }
 
+    // get grantTypesList(): AbstractControl | null {
+    //     return this.secondFormGroup.get('grantTypesList');
+    // }
+
+    getCheckedOidcGrantTypes(): OIDCGrantType[] {
+        return this.oidcGrantTypes.filter(gt => gt.checked).map(gt => gt.type);
+    }
+
+    get responseTypesList(): AbstractControl | null {
+        return this.secondFormGroup.get('responseTypesList');
+    }
+
+    // get applicationType(): AbstractControl | null {
+    //     return this.form.get('applicationType');
+    // }
+
     get authMethodType(): AbstractControl | null {
-        return this.form.get('authMethodType');
+        return this.secondFormGroup.get('authMethodType');
     }
 }
 

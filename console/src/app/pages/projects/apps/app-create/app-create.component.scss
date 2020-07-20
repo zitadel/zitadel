@@ -1,5 +1,6 @@
 h1 {
     font-weight: 500;
+    font-size: 1.5rem;
 }
 
 .container {
@@ -26,50 +27,41 @@ h1 {
 	margin-right: 0.5rem;
 }
 
-.column {
-    display: flex;
-    flex-direction: column;
-
-    .formfield {
-        width: 400px;
-        input {
-            font-size: 1.5rem;
-        }
-
-        &.autocomplete {
-            margin-top: 1rem;
-        }
-    }
-
-    .slider {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        font-size: 0.8rem;
-    }
-
-    .access-token {
-        width: 400px;
-    }
-}
-
-.content {
-    display: flex;
-    margin: 0 -.5rem;
-    flex-wrap: wrap;
-
-    mat-form-field {
-        flex: 1 0 40%;
-        margin: 0 .5rem;
-    }
-
-    .full-width {
-        flex-basis: 80%;
-    }
-}
-
-.continue-button {
-    margin-top: 3rem;
+.formfield {
+    width: 400px;
     display: block;
-    padding: 0.5rem 4rem;
-    border-radius: 0.5rem;
+}
+
+.full-width {
+    width: 100%;
+}
+
+mat-horizontal-stepper {
+    background: inherit !important;
+    margin: 0 -1.5rem;
+
+    .step-title {
+        font-size: 1.2rem;
+        color: #8795a1;
+    }
+}
+
+mat-radio-button {
+    margin-right: 1rem;
+}
+
+.actions {
+    button[mat-stroked-button] {
+        float: left;
+        margin-top: 1rem;
+        border-radius: .5rem;
+    }
+
+    button[mat-raised-button] {
+        float: right;
+        margin-top: 1rem;
+        border-radius: .5rem;
+        padding: .5rem 1rem;
+        min-width: 100px;
+    }
 }

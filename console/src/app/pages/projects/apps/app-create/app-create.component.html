@@ -3,54 +3,85 @@
         <button (click)="close()" mat-icon-button>
             <mat-icon>close</mat-icon>
         </button>
-        <span class="abort">{{ 'APP.PAGES.CREATE_OIDC' | translate }}</span><span class="abort-2">Step
-            {{ currentCreateStep }} of
-            {{ createSteps }}</span>
+        <span class="abort">{{ 'APP.PAGES.CREATE_OIDC' | translate }}</span>
     </div>
 
-    <h1>{{'APP.PAGES.CREATE_OIDC_DESc' | translate}}</h1>
-    <form [formGroup]="form" (ngSubmit)="saveOIDCApp()">
-        <div class="content">
-            <mat-form-field appearance="outline" class="formfield">
-                <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
-                <input matInput formControlName="name" />
-            </mat-form-field>
+    <h1>{{'APP.PAGES.CREATE_OIDC_DESC' | translate}}</h1>
 
-            <mat-form-field appearance="outline">
-                <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
-                <mat-select formControlName="responseTypesList" multiple>
-                    <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
-                        {{ 'APP.OIDC.RESPONSE'+type | translate }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+    <mat-horizontal-stepper linear #stepper labelPosition="bottom">
+        <mat-step [stepControl]="firstFormGroup" [editable]="true">
+            <form [formGroup]="firstFormGroup">
+                <ng-template matStepLabel>Name and App Type</ng-template>
 
-            <mat-form-field appearance="outline">
-                <mat-label>{{ 'APP.OIDC.GRANT' | translate }}</mat-label>
-                <mat-select formControlName="grantTypesList" multiple>
-                    <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
-                        {{ 'APP.OIDC.GRANT'+grant | translate }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+                <p class="step-title">Insert a name first!</p>
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
+                    <input matInput formControlName="name" />
+                </mat-form-field>
 
-            <mat-form-field appearance="outline" class="formfield">
-                <mat-label>{{ 'APP.OIDC.APPTYPE' | translate }}</mat-label>
-                <mat-select formControlName="applicationType">
-                    <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
-                        {{ 'APP.OIDC.APPTYPE'+type | translate }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+                <p class="step-title">What type of application do you want to create?</p>
+                <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="example-radio-group"
+                    formControlName="applicationType">
+                    <mat-radio-button *ngFor="let type of oidcAppTypes | keyvalue" [value]="type.value">
+                        <div>{{'APP.OIDC.APPTYPE'+type.key | translate}}</div>
+                    </mat-radio-button>
+                </mat-radio-group>
+                <div class="actions">
+                    <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
 
-            <mat-form-field appearance="outline" class="formfield">
-                <mat-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</mat-label>
-                <mat-select formControlName="authMethodType">
-                    <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
-                        {{ 'APP.OIDC.AUTHMETHOD'+type | translate }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+        <mat-step [editable]="true">
+            <ng-template matStepLabel>{{'APP.OIDC.GRANT' | translate}}</ng-template>
+            <ul>
+                <li *ngFor="let granttype of oidcGrantTypes">
+                    <mat-checkbox color="primary" [(ngModel)]="granttype.checked">
+                        {{'APP.OIDC.GRANT'+granttype.type | translate}}
+                    </mat-checkbox>
+                </li>
+            </ul>
+            <div class="actions">
+                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+            </div>
+        </mat-step>
+
+        <mat-step [editable]="true">
+            <ng-template matStepLabel>{{'APP.OIDC.RESPONSE' | translate}}</ng-template>
+            <ul>
+                <li *ngFor="let responsetype of oidcResponseTypes | keyvalue">
+                    <mat-checkbox color="primary" [(ngModel)]="responsetype.checked">
+                        {{'APP.OIDC.RESPONSE'+responsetype.key | translate}}
+                    </mat-checkbox>
+                </li>
+            </ul>
+            <div class="actions">
+                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+            </div>
+        </mat-step>
+
+        <mat-step [stepControl]="secondFormGroup" [editable]="true">
+            <form [formGroup]="secondFormGroup">
+                <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHOD' | translate}}</ng-template>
+
+                <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="example-radio-group"
+                    formControlName="authMethodType">
+                    <mat-radio-button *ngFor="let type of oidcAuthMethodType | keyvalue" [value]="type.value">
+                        {{'APP.OIDC.AUTHMETHOD'+type.key | translate}}
+                    </mat-radio-button>
+                </mat-radio-group>
+                <div class="actions">
+                    <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <mat-step [editable]="true">
+            <ng-template matStepLabel>Redirect Uris</ng-template>
+
+            <p class="step-title">Specify the urls where the login will redirect to.</p>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
@@ -64,6 +95,8 @@
                 </mat-chip-list>
             </mat-form-field>
 
+            <p class="step-title">This is the redirect after logout.</p>
+
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
                 <mat-chip-list #chipPostRedirectList aria-label="uri selection">
@@ -76,11 +109,19 @@
                 </mat-chip-list>
             </mat-form-field>
 
-        </div>
+            <div class="actions">
+                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+            </div>
+        </mat-step>
 
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" cdkFocusInitial
-            type="submit">
-            {{ 'ACTIONS.SAVE' | translate }}
-        </button>
-    </form>
+
+        <mat-step>
+            <ng-template matStepLabel>Overview</ng-template>
+            <p>You are now done. Review your configuration</p>
+            <div class="actions">
+                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+                <button mat-raised-button color="primary" (click)="stepper.reset()">Reset</button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
 </div>

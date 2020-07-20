@@ -529,7 +529,7 @@
             "TITLE": "Application",
             "DESCRIPTION": "Here you can edit your application data and its configuration",
             "CREATE_OIDC": "OIDC Application",
-            "CREATE_OIDC_DESc": "Enter your application details",
+            "CREATE_OIDC_DESC": "Enter your application details step for step.",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
