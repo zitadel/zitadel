@@ -6,9 +6,20 @@
       button {
           border-radius: .5rem;
           margin: .5rem;
+          margin-top: 1rem;
 
           mat-icon {
               margin-right: .5rem;
           }
+      }
+  }
+
+  .centered {
+      display: flex;
+      align-items: center;
+
+      i {
+          margin-left: 1rem;
+          color: #5282c1;
       }
   }
