@@ -76,7 +76,7 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	case model.SearchMethodStartsWith:
 		valueText, ok := value.(string)
 		if !ok {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-idu8e", "Starts with only possible for strings")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-SLj7s", "Starts with only possible for strings")
 		}
 		query = query.Where(column+" LIKE ?", valueText+"%")
 	case model.SearchMethodStartsWithIgnoreCase:

@@ -109,6 +109,7 @@ Errors:
     IDMissing: Id fehlt
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
+    NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
   Token:

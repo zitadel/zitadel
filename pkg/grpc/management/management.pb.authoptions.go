@@ -321,7 +321,7 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": authz.Option{
 		Permission: "project.read",
-		CheckParam: "ProjectId",
+		CheckParam: "",
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID": authz.Option{

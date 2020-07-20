@@ -82,15 +82,42 @@ func (repo *ProjectRepo) ReactivateProject(ctx context.Context, id string) (*pro
 
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestProjectSequence()
+	logging.Log("EVENT-Edc56").OnError(err).Warn("could not read latest project sequence")
 
 	permissions := authz.GetPermissionsFromCtx(ctx)
 	if !authz.HasGlobalPermission(permissions) {
 		ids := authz.GetPermissionCtxIDs(permissions)
 		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
 	}
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetPermissionCtxIDs(permissions)
+		if _, q := request.GetSearchQuery(proj_model.ProjectViewSearchKeyProjectID); q != nil {
+			containsID := false
+			for _, id := range ids {
+				if id == q.Value {
+					containsID = true
+					break
+				}
+			}
+			if !containsID {
+				result := &proj_model.ProjectViewSearchResponse{
+					Offset:      request.Offset,
+					Limit:       request.Limit,
+					TotalResult: uint64(0),
+					Result:      []*proj_model.ProjectView{},
+				}
+				if err == nil {
+					result.Sequence = sequence.CurrentSequence
+					result.Timestamp = sequence.CurrentTimestamp
+				}
+				return result, nil
+			}
+		} else {
+			request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+		}
+	}
 
-	sequence, err := repo.View.GetLatestProjectSequence()
-	logging.Log("EVENT-Edc56").OnError(err).Warn("could not read latest project sequence")
 	projects, count, err := repo.View.SearchProjects(request)
 	if err != nil {
 		return nil, err
@@ -331,6 +358,57 @@ func (repo *ProjectRepo) SearchProjectGrants(ctx context.Context, request *proj_
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestProjectGrantSequence()
 	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
+	projects, count, err := repo.View.SearchProjectGrants(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &proj_model.ProjectGrantViewSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.ProjectGrantsToModel(projects),
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
+}
+
+func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *proj_model.ProjectGrantViewSearchRequest) (*proj_model.ProjectGrantViewSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestProjectGrantSequence()
+	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
+
+	permissions := authz.GetPermissionsFromCtx(ctx)
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetPermissionCtxIDs(permissions)
+		if _, q := request.GetSearchQuery(proj_model.GrantedProjectSearchKeyGrantID); q != nil {
+			containsID := false
+			for _, id := range ids {
+				if id == q.Value {
+					containsID = true
+					break
+				}
+			}
+			if !containsID {
+				result := &proj_model.ProjectGrantViewSearchResponse{
+					Offset:      request.Offset,
+					Limit:       request.Limit,
+					TotalResult: uint64(0),
+					Result:      []*proj_model.ProjectGrantView{},
+				}
+				if err == nil {
+					result.Sequence = sequence.CurrentSequence
+					result.Timestamp = sequence.CurrentTimestamp
+				}
+				return result, nil
+			}
+		} else {
+			request.Queries = append(request.Queries, &proj_model.ProjectGrantViewSearchQuery{Key: proj_model.GrantedProjectSearchKeyGrantID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+		}
+	}
+
 	projects, count, err := repo.View.SearchProjectGrants(request)
 	if err != nil {
 		return nil, err
