@@ -49,8 +49,8 @@
         "VERIFY":"Verify",
         "FINISH":"Finish",
         "CHANGE":"Change",
-        "REACTIVATE":"Aktivieren",
-        "DEACTIVATE":"Deaktivieren",
+        "REACTIVATE":"Reactivate",
+        "DEACTIVATE":"Deactivate",
         "REFRESH":"Refresh"
     },
     "ERRORS": {
