@@ -12,6 +12,10 @@ import (
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
+const (
+	projectReadPerm = "project.read"
+)
+
 type UserGrantRepo struct {
 	SearchLimit     uint64
 	UserGrantEvents *grant_event.UserGrantEventStore
@@ -117,9 +121,9 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 	sequence, err := repo.View.GetLatestUserGrantSequence()
 	logging.Log("EVENT-5Viwf").OnError(err).Warn("could not read latest user grant sequence")
 
-	permissions := authz.GetPermissionsFromCtx(ctx)
-	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetPermissionCtxIDs(permissions)
+	permissions := authz.GetAllPermissionsFromCtx(ctx)
+	if !authz.HasGlobalExplicitPermission(permissions, projectReadPerm) {
+		ids := authz.GetExplicitPermissionCtxIDs(permissions, projectReadPerm)
 		if _, q := request.GetSearchQuery(grant_model.UserGrantSearchKeyProjectID); q != nil {
 			containsID := false
 			for _, id := range ids {
@@ -165,9 +169,9 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 }
 
 func checkExplicitPermission(ctx context.Context, grantID, projectID string) error {
-	permissions := authz.GetPermissionsFromCtx(ctx)
+	permissions := authz.GetRequestPermissionsFromCtx(ctx)
 	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetPermissionCtxIDs(permissions)
+		ids := authz.GetAllPermissionCtxIDs(permissions)
 		containsID := false
 		if grantID != "" {
 			containsID = listContainsID(ids, grantID)

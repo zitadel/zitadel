@@ -48,6 +48,24 @@ InternalAuthZ:
         - "project.grant.user.grant.read"
         - "project.grant.user.grant.write"
         - "project.grant.user.grant.delete"
+    - Role: 'IAM_OWNER_VIEWER'
+      Permissions:
+        - "iam.read"
+        - "iam.policy.read"
+        - "iam.member.read"
+        - "org.read"
+        - "org.member.read"
+        - "user.read"
+        - "user.grant.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.user.grant.read"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "project.grant.user.grant.read"
     - Role: 'ORG_OWNER'
       Permissions:
         - "org.read"
@@ -87,136 +105,25 @@ InternalAuthZ:
         - "project.grant.user.grant.read"
         - "project.grant.user.grant.write"
         - "project.grant.user.grant.delete"
-    - Role: 'ORG_EDITOR'
-      Permissions:
-        - "org.read"
-        - "org.write"
-    - Role: 'ORG_VIEWER'
-      Permissions:
-        - "org.read"
-    - Role: 'ORG_MEMBER_EDITOR'
+    - Role: 'ORG_OWNER'
       Permissions:
         - "org.read"
         - "org.member.read"
-        - "org.member.write"
-        - "org.member.delete"
-    - Role: 'ORG_MEMBER_VIEWER'
-      Permissions:
-        - "org.read"
-        - "org.member.read"
+        - "user.read"
+        - "user.grant.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.user.grant.read"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "project.grant.user.grant.read"
     - Role: 'ORG_PROJECT_CREATOR'
       Permissions:
         - "project.read:self"
         - "project.write"
-    - Role: 'ORG_PROJECT_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.write"
-        - "project.member.read"
-        - "project.member.write"
-        - "project.member.delete"
-        - "project.role.read"
-        - "project.role.write"
-        - "project.role.delete"
-        - "project.app.read"
-        - "project.app.write"
-        - "project.app.delete"
-        - "project.grant.read"
-        - "project.grant.write"
-        - "project.grant.delete"
-        - "project.grant.member.read"
-        - "project.grant.member.write"
-        - "project.grant.member.delete"
-    - Role: 'ORG_PROJECT_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.member.read"
-        - "project.role.read"
-        - "project.app.read"
-        - "project.grant.read"
-        - "project.grant.member.read"
-    - Role: 'ORG_PROJECT_MEMBER_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.member.read"
-        - "project.member.write"
-        - "project.member.delete"
-        - "project.grant.member.delete"
-    - Role: 'ORG_PROJECT_MEMBER_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.member.read"
-    - Role: 'ORG_PROJECT_ROLE_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.role.read"
-        - "project.role.write"
-        - "project.role.delete"
-    - Role: 'ORG_PROJECT_ROLE_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.role.read"
-    - Role: 'ORG_PROJECT_APP_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.app.read"
-        - "project.app.write"
-        - "project.app.delete"
-    - Role: 'ORG_PROJECT_APP_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.app.read"
-    - Role: 'ORG_PROJECT_GRANT_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.write"
-        - "project.grant.member.read"
-        - "project.grant.member.write"
-        - "project.grant.member.delete"
-    - Role: 'ORG_PROJECT_GRANT_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-    - Role: 'ORG_PROJECT_GRANT_MEMBER_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.member.read"
-        - "project.grant.member.write"
-        - "project.grant.member.delete"
-    - Role: 'ORG_PROJECT_GRANT_MEMBER_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.member.read"
-    - Role: 'ORG_USER_EDITOR'
-      Permissions:
-        - "user.read"
-        - "user.write"
-        - "user.delete"
-    - Role: 'ORG_USER_VIEWER'
-      Permissions:
-        - "user.read"
-    - Role: 'ORG_USER_GRANT_EDITOR'
-      Permissions:
-        - "user.read"
-        - "user.grant.read"
-        - "user.grant.write"
-        - "user.grant.delete"
-        - "project.read"
-    - Role: 'ORG_USER_GRANT_VIEWER'
-      Permissions:
-        - "user.read"
-        - "user.grant.read"
-    - Role: 'ORG_POLICY_EDITOR'
-      Permissions:
-        - "policy.read"
-        - "policy.write"
-        - "policy.delete"
-    - Role: 'ORG_POLICY_VIEWER'
-      Permissions:
-        - "policy.read"
     - Role: 'PROJECT_OWNER'
       Permissions:
         - "project.read"
@@ -237,95 +144,33 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
-        - "project.user.grant.read"
-        - "project.user.grant.write"
-        - "project.user.grant.delete"
-    - Role: 'PROJECT_MEMBER_EDITOR'
+        - "user.read"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+    - Role: 'PROJECT_OWNER_VIEWER'
       Permissions:
         - "project.read"
         - "project.member.read"
-        - "project.member.write"
-        - "project.member.delete"
-    - Role: 'PROJECT_MEMBER_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.member.read"
-    - Role: 'PROJECT_ROLE_EDITOR'
-      Permissions:
-        - "project.read"
         - "project.role.read"
-        - "project.role.write"
-        - "project.role.delete"
-    - Role: 'PROJECT_APP_EDITOR'
-      Permissions:
-        - "project.read"
         - "project.app.read"
-        - "project.app.write"
-    - Role: 'PROJECT_APP_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.app.read"
-    - Role: 'PROJECT_GRANT_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.write"
-        - "project.grant.delete"
-    - Role: 'PROJECT_GRANT_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-    - Role: 'PROJECT_GRANT_MEMBER_EDITOR'
-      Permissions:
-        - "project.read"
         - "project.grant.read"
         - "project.grant.member.read"
-        - "project.grant.member.write"
-        - "project.grant.member.delete"
-    - Role: 'PROJECT_GRANT_MEMBER_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.member.read"
-    - Role: 'PROJECT_USER_GRANT_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.user.grant.read"
-        - "project.user.grant.write"
-        - "project.user.grant.delete"
-    - Role: 'PROJECT_USER_GRANT_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.user.grant.read"
+        - "user.read"
+        - "user.grant.read"
     - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.write"
-        - "project.grant.member.read"
-        - "project.grant.member.write"
-        - "project.grant.member.delete"
-    - Role: 'PROJECT_GRANT_MEMBER_EDITOR'
-      Permissions:
-        - "project.read"
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
-    - Role: 'PROJECT_GRANT_MEMBER_VIEWER'
+        - "user.read"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+    - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
-        - "project.read"
         - "project.grant.read"
         - "project.grant.member.read"
-    - Role: 'PROJECT_GRANT_USER_GRANT_EDITOR'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.user.grant.read"
-        - "project.grant.user.grant.write"
-        - "project.grant.user.grant.delete"
-    - Role: 'PROJECT_GRANT_USER_GRANT_VIEWER'
-      Permissions:
-        - "project.read"
-        - "project.grant.read"
-        - "project.grant.user.grant.read"
+        - "user.read"
+        - "user.grant.read"

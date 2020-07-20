@@ -85,13 +85,9 @@ func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model
 	sequence, err := repo.View.GetLatestProjectSequence()
 	logging.Log("EVENT-Edc56").OnError(err).Warn("could not read latest project sequence")
 
-	permissions := authz.GetPermissionsFromCtx(ctx)
+	permissions := authz.GetRequestPermissionsFromCtx(ctx)
 	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetPermissionCtxIDs(permissions)
-		request.Queries = append(request.Queries, &proj_model.ProjectViewSearchQuery{Key: proj_model.ProjectViewSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
-	}
-	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetPermissionCtxIDs(permissions)
+		ids := authz.GetAllPermissionCtxIDs(permissions)
 		if _, q := request.GetSearchQuery(proj_model.ProjectViewSearchKeyProjectID); q != nil {
 			containsID := false
 			for _, id := range ids {
@@ -380,9 +376,9 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 	sequence, err := repo.View.GetLatestProjectGrantSequence()
 	logging.Log("EVENT-Skw9f").OnError(err).Warn("could not read latest project grant sequence")
 
-	permissions := authz.GetPermissionsFromCtx(ctx)
+	permissions := authz.GetRequestPermissionsFromCtx(ctx)
 	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetPermissionCtxIDs(permissions)
+		ids := authz.GetAllPermissionCtxIDs(permissions)
 		if _, q := request.GetSearchQuery(proj_model.GrantedProjectSearchKeyGrantID); q != nil {
 			containsID := false
 			for _, id := range ids {

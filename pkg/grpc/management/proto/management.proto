@@ -1111,6 +1111,28 @@ service ManagementService {
         };
     }
 
+    rpc CreateUserGrant(UserGrantCreate) returns (UserGrant) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/grants"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc UpdateUserGrant(UserGrantUpdate) returns (UserGrant) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/grants/{id}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
     rpc DeactivateUserGrant(UserGrantID) returns (UserGrant) {
         option (google.api.http) = {
             put: "/users/{user_id}/grants/{id}/_deactivate"
