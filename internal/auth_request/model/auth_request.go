@@ -25,6 +25,7 @@ type AuthRequest struct {
 	levelOfAssurance LevelOfAssurance
 	UserID           string
 	LoginName        string
+	DisplayName      string
 	UserOrgID        string
 	PossibleSteps    []NextStep
 	PasswordVerified bool
@@ -96,8 +97,9 @@ func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
 	return a
 }
 
-func (a *AuthRequest) SetUserInfo(userID string, loginName string, userOrgID string) {
+func (a *AuthRequest) SetUserInfo(userID, loginName, displayName, userOrgID string) {
 	a.UserID = userID
 	a.LoginName = loginName
+	a.DisplayName = displayName
 	a.UserOrgID = userOrgID
 }

@@ -1,5 +1,4 @@
 function disableSubmit(checks, button) {
-    console.log("GUGUS");
     let form = document.getElementsByTagName('form')[0];
     let inputs = form.getElementsByTagName('input');
     for (i = 0; i < inputs.length; i++) {

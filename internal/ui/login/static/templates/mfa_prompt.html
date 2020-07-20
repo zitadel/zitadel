@@ -1,7 +1,8 @@
 {{template "main-top" .}}
 
+{{ template "user-profile" . }}
 
-<h1>{{t "MfaPrompt.Title"}}</h1>
+<p>{{t "MfaPrompt.Description"}}</p>
 
 <form action="{{ mfaPromptUrl }}" method="POST">
 

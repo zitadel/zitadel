@@ -4,8 +4,8 @@
     <div class="people">
         <div class="img-list">
             <ng-container *ngIf="totalResult < 10; else compact">
-                <ng-container *ngFor="let member of membersSubject | async">
-                    <div (click)="showDetail()" class="avatar-circle"
+                <ng-container *ngFor="let member of membersSubject | async; index as i">
+                    <div (click)="showDetail()" class="avatar-circle" [ngStyle]="{'z-index': 100 - i}"
                         matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}">
                         <app-avatar *ngIf="member && member.firstName && member.lastName; else thumbavatar"
                             class="avatar dontcloseonclick" [name]="member.firstName + ' '+ member.lastName"

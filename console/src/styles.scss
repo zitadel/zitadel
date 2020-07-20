@@ -91,16 +91,49 @@ $caos-light-brand: (
         A700: white,
     )
 );
+
+$caos-accent-color: (
+    50: #ebf4f2,
+    100: #cce3de,
+    200: #abd1c9,
+    300: #89bfb3,
+    400: #6fb1a2,
+    500: #56a392,
+    600: #4f9b8a,
+    700: #45917f,
+    800: #3c8875,
+    900: #2b7763,
+    A100: #beffed,
+    A200: #8bffde,
+    A400: #58ffd0,
+    A700: #3effc9,
+    contrast: (
+        50: $black-87-opacity,
+        100: $black-87-opacity,
+        200: $black-87-opacity,
+        300: $black-87-opacity,
+        400: $black-87-opacity,
+        500: white,
+        600: white,
+        700: white,
+        800: white,
+        900: white,
+        A100: $black-87-opacity,
+        A200: $black-87-opacity,
+        A400: $black-87-opacity,
+        A700: white,
+    )
+);
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 
 $light-primary: mat-palette($caos-light-brand);
-$light-accent: mat-palette($mat-pink);
+$light-accent:mat-palette($caos-accent-color);
 $light-warn: mat-palette($mat-red);
 
 $dark-primary: mat-palette($caos-dark-brand);
-$dark-accent: mat-palette($mat-pink, 500, 700, A700);
+$dark-accent: mat-palette($mat-pink);
 $dark-warn: mat-palette($mat-red);
 
 $light-theme: mat-light-theme($light-primary, $light-accent, $light-warn);
@@ -140,8 +173,9 @@ $custom-typography: mat-typography-config(
     }
 
     ::-webkit-scrollbar-thumb {
-        background-color: #5282c1;
+        background-color: #737C8850;
         border-radius: 8px;
+        cursor: pointer;
     }
 }
 
@@ -172,8 +206,9 @@ $custom-typography: mat-typography-config(
     }
 
     ::-webkit-scrollbar-thumb {
-        background-color: #5282c1;
+        background-color: #737C8870;
         border-radius: 8px;
+        cursor: pointer;
     }
 }
 

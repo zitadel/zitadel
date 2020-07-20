@@ -24,7 +24,6 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-
 	err = l.authRepo.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.OldPassword, data.NewPassword)
 	if err != nil {
 		l.renderChangePassword(w, r, authReq, err)
@@ -39,8 +38,8 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := passwordData{
-		baseData:  l.getBaseData(r, authReq, "Change Password", errType, errMessage),
-		LoginName: authReq.LoginName,
+		baseData:    l.getBaseData(r, authReq, "Change Password", errType, errMessage),
+		profileData: l.getProfileData(authReq),
 	}
 	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq.UserOrgID)
 	if policy != nil {
@@ -64,9 +63,6 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 
 func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
 	var errType, errMessage string
-	data := userData{
-		baseData:  l.getBaseData(r, authReq, "Password Change Done", errType, errMessage),
-		LoginName: authReq.LoginName,
-	}
+	data := l.getUserData(r, authReq, "Password Change Done", errType, errMessage)
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

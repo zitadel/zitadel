@@ -49,8 +49,9 @@
         "VERIFY":"Verify",
         "FINISH":"Finish",
         "CHANGE":"Change",
-        "REACTIVATE":"Aktivieren",
-        "DEACTIVATE":"Deaktivieren"
+        "REACTIVATE":"Reactivate",
+        "DEACTIVATE":"Deactivate",
+        "REFRESH":"Refresh"
     },
     "ERRORS": {
         "REQUIRED": "Some required fields are missing!"
@@ -74,6 +75,9 @@
             "DEACTIVATE":"Deactivate"
         },
         "MFA": {
+            "TABLETYPE":"Type",
+            "TABLESTATE":"Status",
+            "TABLEACTIONS":"Actions",
             "TITLE": "Multifactor Authentication",
             "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
             "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
