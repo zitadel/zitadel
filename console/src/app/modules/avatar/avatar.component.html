@@ -1,5 +1,5 @@
 <div class="avatar-circle dontcloseonclick"
-    [ngStyle]="{'height': size+'px', 'width': size+'px', 'fontSize': fontSize+'px', 'background-color': color}"
+    [ngStyle]="{'height': size+'px', 'width': size+'px', 'fontSize': (fontSize-1)+'px', 'background-color': color}"
     [ngClass]="{'active': active}">
     {{credentials}}
 </div>

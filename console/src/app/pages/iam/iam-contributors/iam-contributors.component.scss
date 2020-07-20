@@ -35,11 +35,9 @@
             height: 32px;
             width: 32px;
             border-radius: 50%;
-            &:not(:first-child) {
-                -webkit-box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
-                -moz-box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
-                box-shadow: -9px 0px 20px -6px rgba(0,0,0,0.75);
-            }
+            -webkit-box-shadow: 2px 0px 7px -1px rgba(33,34,36,.5);
+            -moz-box-shadow: 2px 0px 7px -1px rgba(33,34,36,.5);
+            box-shadow: 2px 0px 7px -1px rgba(33,34,36,.5);
         }
 
         .add-img {
