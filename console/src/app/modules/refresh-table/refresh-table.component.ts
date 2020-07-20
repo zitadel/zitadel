@@ -30,7 +30,6 @@ export class RefreshTableComponent implements OnInit {
     @Input() public dataSize: number = 0;
     @Input() public emitRefreshAfterTimeoutInMs: number = 0;
     @Output() public refreshed: EventEmitter<void> = new EventEmitter();
-    constructor() { }
 
     ngOnInit(): void {
         if (this.emitRefreshAfterTimeoutInMs) {

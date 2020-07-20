@@ -30,10 +30,11 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate'];
 
-    constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) { }
+    constructor(private projectService: ProjectService, private toast: ToastService, private dialog: MatDialog) {
+        this.dataSource = new ProjectRolesDataSource(this.projectService);
+    }
 
     public ngOnInit(): void {
-        this.dataSource = new ProjectRolesDataSource(this.projectService);
         this.dataSource.loadRoles(this.projectId, 0, 25, 'asc');
 
         this.selection.changed.subscribe(() => {

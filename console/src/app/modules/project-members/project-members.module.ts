@@ -5,6 +5,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -45,6 +46,7 @@ import { ProjectMembersComponent } from './project-members.component';
         TranslateModule,
         HasRolePipeModule,
         RefreshTableModule,
+        MatDialogModule,
     ],
 })
 export class ProjectMembersModule { }
