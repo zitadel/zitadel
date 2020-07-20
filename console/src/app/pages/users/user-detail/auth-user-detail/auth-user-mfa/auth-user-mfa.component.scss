@@ -25,5 +25,16 @@
   }
 
   table {
-      width: 100%;
+    width: 100%;
+
+    td, th {
+        &:first-child {
+            padding-left: 0;
+            padding-right: 1rem;
+        }
+
+        &:last-child {
+            padding-right: 0;
+        }
+    }
   }
