@@ -41,6 +41,7 @@ export class RefreshTableComponent implements OnInit {
     }
 
     emitRefresh(): void {
+        this.selection.clear();
         return this.refreshed.emit();
     }
 }

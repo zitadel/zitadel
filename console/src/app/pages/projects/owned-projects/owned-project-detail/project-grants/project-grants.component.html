@@ -1,4 +1,5 @@
-<app-refresh-table *ngIf="projectId" (refreshed)="loadGrantsPage()">
+<app-refresh-table *ngIf="projectId" (refreshed)="loadGrantsPage()" [dataSize]="dataSource.totalResult"
+    [selection]="selection">
     <ng-template appHasRole [appHasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']"
         actions>
         <button (click)="deleteSelectedGrants()" [disabled]="disabled" mat-icon-button *ngIf="selection.hasValue()"

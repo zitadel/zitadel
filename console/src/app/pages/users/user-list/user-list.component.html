@@ -2,7 +2,7 @@
     <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
     <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
-    <app-refresh-table (refreshed)="refreshPage()">
+    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource.data.length">
         <ng-template appHasRole [appHasRole]="['user.write']" actions>
             <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
                 class="icon-button" mat-icon-button *ngIf="selection.hasValue()">

@@ -1,4 +1,5 @@
-<app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()">
+<app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource.totalResult"
+    [selection]="selection">
     <ng-template appHasRole [appHasRole]="['project.role.delete']" actions>
         <button color="warn" class="icon-button" [disabled]="disabled"
             matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" (click)="deleteSelectedRoles()" mat-icon-button
