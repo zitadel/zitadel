@@ -119,6 +119,7 @@ func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberV
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName
 	member.Email = user.EmailAddress
+	member.DisplayName = user.DisplayName
 }
 
 func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {

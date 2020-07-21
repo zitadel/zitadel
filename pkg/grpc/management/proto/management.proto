@@ -1927,6 +1927,7 @@ message OrgMemberView {
     string email = 7;
     string first_name = 8;
     string last_name = 9;
+    string display_name = 10;
 }
 
 message OrgMemberSearchRequest {
@@ -2130,6 +2131,7 @@ message ProjectMemberView {
     google.protobuf.Timestamp change_date = 7;
     google.protobuf.Timestamp creation_date = 8;
     uint64 sequence = 10;
+    string display_name = 11;
 }
 
 message ProjectMemberSearchResponse {
@@ -2413,6 +2415,7 @@ message ProjectGrantMemberView {
     google.protobuf.Timestamp change_date = 7;
     google.protobuf.Timestamp creation_date = 8;
     uint64 sequence = 9;
+    string display_name = 10;
 }
 
 message ProjectGrantMemberSearchResponse {
