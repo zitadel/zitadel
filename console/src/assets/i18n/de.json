@@ -479,7 +479,8 @@
         },
         "APP": {
             "TITLE": "Applikationen",
-            "NAME": "Name"
+            "NAME": "Name",
+            "NAMEREQUIRED":"Der Name ist erforderlich."
         },
         "ROLE": {
             "ADDNEWLINE":"Zusätzliche Rolle hinzufügen",
@@ -531,7 +532,8 @@
             "TITLE": "Applikation",
             "DESCRIPTION": "Hier kannst du deine Applikation bearbeiten und deren Konfiguration anpassen.",
             "CREATE_OIDC": "OIDC Applikation",
-            "CREATE_OIDC_DESC": "Gib deine Applikationsdaten Schritt für Schritt ein",
+            "CREATE_OIDC_DESC_TITLE": "Gib deine Applikationsdaten Schritt für Schritt ein",
+            "CREATE_OIDC_DESC_SUB": "Die Felder werden mit der empfolenen Konfiguration automatisch befüllt.",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
@@ -542,6 +544,8 @@
             }
         },
         "NAME": "Name",
+        "TYPE":"Applikationstyp",
+        "GRANT":"Grant Types",
         "OIDC": {
             "TITLE": "OIDC Konfiguration",
             "CLIENTID": "Client ID",
@@ -565,7 +569,8 @@
             "AUTHMETHOD":"Auth Method",
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
-            "AUTHMETHOD2":"None"
+            "AUTHMETHOD2":"None",
+            "UNSECUREREDIRECT":"Ich hoffe du weisst was du tust"
         },
         "TOAST": {
             "REACTIVATED":"App reaktiviert!",

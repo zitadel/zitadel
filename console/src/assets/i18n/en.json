@@ -477,7 +477,8 @@
         },
         "APP": {
             "TITLE": "Applications",
-            "NAME": "Name"
+            "NAME": "Name",
+            "NAMEREQUIRED":"A name ist required."
         },
         "ROLE": {
             "ADDNEWLINE":"Add additional role",
@@ -529,7 +530,8 @@
             "TITLE": "Application",
             "DESCRIPTION": "Here you can edit your application data and its configuration",
             "CREATE_OIDC": "OIDC Application",
-            "CREATE_OIDC_DESC": "Enter your application details step for step.",
+            "CREATE_OIDC_DESC_TITLE": "Enter your application details step for step",
+            "CREATE_OIDC_DESC_SUB": "The fields are prefilled with recommended data.",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
@@ -540,6 +542,8 @@
             }
         },
         "NAME": "Name",
+        "TYPE":"Application type",
+        "GRANT":"Grant Types",
         "OIDC": {
             "TITLE": "OIDC Configuration",
             "CLIENTID": "Client ID",
@@ -563,7 +567,8 @@
             "AUTHMETHOD":"Auth Method",
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
-            "AUTHMETHOD2":"None"
+            "AUTHMETHOD2":"None",
+            "UNSECUREREDIRECT":"I sure hope you know what you are doing."
         },
         "TOAST": {
             "REACTIVATED":"App reactivated!",

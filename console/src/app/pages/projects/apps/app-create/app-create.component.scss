@@ -3,6 +3,11 @@ h1 {
     font-size: 1.5rem;
 }
 
+p.desc {
+    font-size: 14px;
+    color: #8795a1;
+}
+
 .container {
 	padding: 4rem 4rem 2rem 4rem;
 
@@ -44,10 +49,39 @@ mat-horizontal-stepper {
         font-size: 1.2rem;
         color: #8795a1;
     }
+
+    mat-chip[color='white'] {
+        background-color: #fafafa;
+    }
 }
 
-mat-radio-button {
-    margin-right: 1rem;
+mat-radio-group {
+    display: flex;
+    flex-direction: column;
+    
+    mat-radio-button {
+        margin: .5rem 0;
+    }
+}
+
+.checkbox-container {
+    display: flex;
+    flex-direction: column;
+
+    mat-checkbox {
+        margin: .5rem 0;
+    }
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+
+    .left, .right{
+        margin-bottom: .5rem;
+        font-size: 14px;
+        color: #8795a1;
+    }
 }
 
 .actions {

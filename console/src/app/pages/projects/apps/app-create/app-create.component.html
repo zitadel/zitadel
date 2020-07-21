@@ -6,7 +6,10 @@
         <span class="abort">{{ 'APP.PAGES.CREATE_OIDC' | translate }}</span>
     </div>
 
-    <h1>{{'APP.PAGES.CREATE_OIDC_DESC' | translate}}</h1>
+    <h1>{{'APP.PAGES.CREATE_OIDC_DESC_TITLE' | translate}}</h1>
+    <p class="desc">{{'APP.PAGES.CREATE_OIDC_DESC_SUB' | translate}}</p>
+
+    <mat-progress-bar color="accent" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
     <mat-horizontal-stepper linear #stepper labelPosition="bottom">
         <mat-step [stepControl]="firstFormGroup" [editable]="true">
@@ -17,6 +20,7 @@
                 <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
+                    <mat-error *ngIf="name?.errors?.required">{{'PROJECT.APP.NAMEREQUIRED' | translate}}</mat-error>
                 </mat-form-field>
 
                 <p class="step-title">What type of application do you want to create?</p>
@@ -34,24 +38,23 @@
 
         <mat-step [editable]="true">
             <ng-template matStepLabel>{{'APP.OIDC.GRANT' | translate}}</ng-template>
-            <ul>
-                <li *ngFor="let granttype of oidcGrantTypes">
-                    <mat-checkbox color="primary" [(ngModel)]="granttype.checked">
-                        {{'APP.OIDC.GRANT'+granttype.type | translate}}
-                    </mat-checkbox>
-                </li>
-            </ul>
+            <div class="checkbox-container">
+                <mat-checkbox (change)="changeGrant()" *ngFor="let granttype of oidcGrantTypes" color="primary"
+                    [(ngModel)]="granttype.checked" [disabled]="granttype.disabled">
+                    {{'APP.OIDC.GRANT'+granttype.type | translate}}
+                </mat-checkbox>
+            </div>
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
                 <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
             </div>
         </mat-step>
 
-        <mat-step [editable]="true">
+        <mat-step [editable]="true" *ngIf="!grantTypeChecked(OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE)">
             <ng-template matStepLabel>{{'APP.OIDC.RESPONSE' | translate}}</ng-template>
             <ul>
                 <li *ngFor="let responsetype of oidcResponseTypes | keyvalue">
-                    <mat-checkbox color="primary" [(ngModel)]="responsetype.checked">
+                    <mat-checkbox (change)="changeResponseType()" color="primary" [(ngModel)]="responsetype.checked">
                         {{'APP.OIDC.RESPONSE'+responsetype.key | translate}}
                     </mat-checkbox>
                 </li>
@@ -62,17 +65,21 @@
             </div>
         </mat-step>
 
-        <mat-step [stepControl]="secondFormGroup" [editable]="true">
+        <mat-step [stepControl]="secondFormGroup" [editable]="true"
+            *ngIf="applicationType?.value !== OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
             <form [formGroup]="secondFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHOD' | translate}}</ng-template>
 
                 <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="example-radio-group"
                     formControlName="authMethodType">
-                    <mat-radio-button *ngFor="let type of oidcAuthMethodType | keyvalue" [value]="type.value">
-                        {{'APP.OIDC.AUTHMETHOD'+type.key | translate}}
+                    <mat-radio-button *ngFor="let authmethod of oidcAuthMethodType" [disabled]="authmethod.disabled"
+                        [value]="authmethod.type">
+                        {{'APP.OIDC.AUTHMETHOD'+authmethod.type | translate}}
                     </mat-radio-button>
                 </mat-radio-group>
                 <div class="actions">
+                    <button mat-stroked-button color="primary"
+                        matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
                     <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
@@ -86,8 +93,9 @@
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
                 <mat-chip-list #chipRedirectList aria-label="uri selection">
-                    <mat-chip *ngFor="let uri of oidcApp.redirectUrisList" removable
-                        (removed)="removeUri(uri, 'REDIRECT')">
+                    <mat-chip *ngFor="let uri of oidcApp.redirectUrisList" selected removable
+                        [matTooltip]="!uri.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
+                        [color]="!uri.startsWith('https://') ? 'warn': 'white'" (removed)="removeUri(uri, 'REDIRECT')">
                         {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
                     <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
@@ -100,8 +108,10 @@
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
                 <mat-chip-list #chipPostRedirectList aria-label="uri selection">
-                    <mat-chip *ngFor="let uri of oidcApp.postLogoutRedirectUrisList" removable
-                        (removed)="removeUri(uri, 'POSTREDIRECT')">
+                    <mat-chip *ngFor="let uri of oidcApp.postLogoutRedirectUrisList"
+                        [matTooltip]="!uri.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
+                        removable (removed)="removeUri(uri, 'POSTREDIRECT')" selected
+                        [color]="!uri.startsWith('https://') ? 'warn': 'white'">
                         {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
                     <input [matChipInputFor]="chipPostRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
@@ -110,6 +120,7 @@
             </mat-form-field>
 
             <div class="actions">
+                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
                 <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
             </div>
         </mat-step>
@@ -118,9 +129,69 @@
         <mat-step>
             <ng-template matStepLabel>Overview</ng-template>
             <p>You are now done. Review your configuration</p>
+            <div class="row">
+                <span class="left">
+                    {{ 'APP.NAME' | translate }}
+                </span>
+                <span class="right">
+                    {{oidcApp.name}}
+                </span>
+            </div>
+            <div class="row">
+                <span class="left">
+                    {{ 'APP.TYPE' | translate }}
+                </span>
+                <span class="right">
+                    {{'APP.OIDC.APPTYPE'+oidcApp.applicationType | translate}}
+                </span>
+            </div>
+            <div class="row">
+                <span class="left">
+                    {{ 'APP.GRANT' | translate }}
+                </span>
+                <span class="right">
+                    <span *ngFor="let element of oidcApp.grantTypesList">
+                        {{'APP.OIDC.GRANT'+element | translate}}
+                    </span>
+                </span>
+            </div>
+            <div class="row">
+                <span class="left">
+                    {{ 'APP.OIDC.RESPONSE' | translate }}
+                </span>
+                <span class="right">
+                    <span *ngFor="let element of oidcApp.responseTypesList">
+                        {{'APP.OIDC.RESPONSE'+element | translate}}
+                    </span>
+                </span>
+            </div>
+
+            <div class="row">
+                <span class="left">
+                    {{ 'APP.OIDC.REDIRECT' | translate }}
+                </span>
+                <span class="right">
+                    <span *ngFor="let redirect of oidcApp.redirectUrisList">
+                        {{redirect}}
+                    </span>
+                </span>
+            </div>
+
+            <div class="row">
+                <span class="left">
+                    {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
+                </span>
+                <span class="right">
+                    <span *ngFor="let redirect of oidcApp.postLogoutRedirectUrisList">
+                        {{redirect}}
+                    </span>
+                </span>
+            </div>
+
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" (click)="stepper.reset()">Reset</button>
+                <button mat-raised-button color="primary"
+                    (click)="saveOIDCApp()">{{'ACTIONS.CREATE' | translate}}</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>
