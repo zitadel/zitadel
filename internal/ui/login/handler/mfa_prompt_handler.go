@@ -37,6 +37,17 @@ func (l *Login) handleMfaPrompt(w http.ResponseWriter, r *http.Request) {
 	l.handleLogin(w, r)
 }
 
+func (l *Login) handleMfaPromptSelection(w http.ResponseWriter, r *http.Request) {
+	data := new(mfaPromptData)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+
+	l.renderNextStep(w, r, authReq)
+}
+
 func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, mfaPromptData *model.MfaPromptStep, err error) {
 	var errType, errMessage string
 	if err != nil {

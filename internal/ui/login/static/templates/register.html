@@ -62,6 +62,9 @@
 
     <div class="actions">
         <button class="primary right" id="register-button" type="submit" disabled>{{t "Actions.Next"}}</button>
+        <a href="{{ loginNameChangeUrl .AuthReqID }}">
+            <button class="secondary" type="button">{{t "Actions.Back"}}</button>
+        </a>
     </div>
 </form>
 

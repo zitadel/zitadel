@@ -175,7 +175,8 @@ input:not([type=radio]), select {
 }
 
 form button.user-selection .profile-image, .login-profile .profile-image {
-  height: 100px;
+  height: 80px;
+  width: 80px;
   background-position: center;
   background-repeat: no-repeat;
   background-image: url("../../../images/icon-user-dark.png");
@@ -183,7 +184,7 @@ form button.user-selection .profile-image, .login-profile .profile-image {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   form button.user-selection .profile-image, .login-profile .profile-image {
     background-image: url("../../../images/icon-user-dark@2x.png");
-    background-size: 100px 100px;
+    background-size: 80px 80px;
   }
 }
 form button.user-selection:hover .profile-image, .login-profile:hover .profile-image {
@@ -192,16 +193,21 @@ form button.user-selection:hover .profile-image, .login-profile:hover .profile-i
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   form button.user-selection:hover .profile-image, .login-profile:hover .profile-image {
     background-image: url("../../../images/icon-user-dark-hover@2x.png");
-    background-size: 100px 100px;
+    background-size: 80px 80px;
   }
 }
 
+.login-profile .profile-image {
+  margin-left: auto;
+  margin-right: auto;
+}
 .login-profile .names {
   padding: 10px 0;
   text-align: center;
 }
 .login-profile .names div:first-of-type {
-  font-size: 1.3rem;
+  font-size: 40px;
+  font-weight: 300;
 }
 .login-profile .names div:nth-of-type(2) {
   font-weight: 300;
@@ -263,7 +269,7 @@ form button.clean * {
   font-weight: 300;
 }
 form .user-selection-list {
-  margin-bottom: 80px;
+  margin-bottom: 40px;
 }
 form button.user-selection .sessionstate {
   display: inline-block;
@@ -299,8 +305,8 @@ form button.user-selection > div.names .loginname {
   margin-top: 80px;
 }
 form button.other-user .other-user-image {
-  width: 100px;
-  height: 75px;
+  width: 80px;
+  height: 60px;
   background-repeat: no-repeat;
   background-position: center;
   background-image: url("../../../images/icon-newuser-dark.png");
@@ -308,7 +314,7 @@ form button.other-user .other-user-image {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   form button.other-user .other-user-image {
     background-image: url("../../../images/icon-newuser-dark@2x.png");
-    background-size: 100px 75px;
+    background-size: 80px 60px;
   }
 }
 form button.other-user:hover .other-user-image {
@@ -319,7 +325,7 @@ form button.other-user:hover .other-user-image {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   form button.other-user:hover .other-user-image {
     background-image: url("../../../images/icon-newuser-dark-hover@2x.png");
-    background-size: 100px 75px;
+    background-size: 80px 60px;
   }
 }
 form button.other-user > div:nth-of-type(2) {
