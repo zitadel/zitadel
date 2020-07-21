@@ -39,7 +39,11 @@ func FactoryFromSearchQuery(query *SearchQuery) *SearchQueryFactory {
 		case Field_AggregateType:
 			factory = factory.aggregateTypesMig(filter.value.([]AggregateType)...)
 		case Field_AggregateID:
-			factory = factory.AggregateIDs(filter.value.(string))
+			if aggregateID, ok := filter.value.(string); ok {
+				factory = factory.AggregateIDs(aggregateID)
+			} else if aggregateIDs, ok := filter.value.([]string); ok {
+				factory = factory.AggregateIDs(aggregateIDs...)
+			}
 		case Field_LatestSequence:
 			factory = factory.SequenceGreater(filter.value.(uint64))
 		case Field_ResourceOwner:
