@@ -12,8 +12,11 @@ import (
 )
 
 const (
-	queryStmtFormat  = "SELECT 1 FROM %s WHERE object_type = $1 AND (locked_until < now() OR locker_id = $2) FOR UPDATE"
-	insertStmtFormat = "INSERT INTO %s (object_type, locker_id, locked_until) VALUES ($1, $2, now()+$3) ON CONFLICT (object_type) DO UPDATE SET locked_until = now()+$4, locker_id = $5 WHERE locks.object_type = $6"
+	insertStmtFormat = "INSERT INTO %s" +
+		" (locker_id, locked_until, object_type) VALUES ($1, now()+$2, $3)" +
+		" ON CONFLICT (object_type)" +
+		" DO UPDATE set locker_id = $4, locked_until = now()+$5" +
+		" WHERE locks.object_type = $6 AND (locks.locker_id = $7 AND locks.locked_until >= now() OR locks.locked_until < now())"
 )
 
 type lock struct {
@@ -24,24 +27,20 @@ type lock struct {
 
 func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel string, waitTime time.Duration) error {
 	return crdb.ExecuteTx(context.Background(), dbClient, nil, func(tx *sql.Tx) error {
-		query := fmt.Sprintf(queryStmtFormat, lockTable)
 		insert := fmt.Sprintf(insertStmtFormat, lockTable)
-		rows, err := tx.Query(query, viewModel, lockerID)
-		if err != nil || !rows.Next() {
-			rows.Close()
-			return err
-		}
-		err = rows.Close()
-		logging.Log("LOCKE-bmpfY").OnError(err).Debug("unable to close rows")
+		result, err := tx.Exec(insert,
+			lockerID, waitTime.Seconds(), viewModel,
+			lockerID, waitTime.Seconds(),
+			viewModel, lockerID)
 
-		rs, err := tx.Exec(insert, viewModel, lockerID, waitTime.Seconds(), waitTime.Seconds(), lockerID, viewModel)
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
-		if rows, _ := rs.RowsAffected(); rows == 0 {
+		if rows, _ := result.RowsAffected(); rows == 0 {
 			return caos_errs.ThrowAlreadyExists(nil, "SPOOL-lso0e", "view already locked")
 		}
+		logging.LogWithFields("LOCKE-lOgbg", "view", viewModel, "locker", lockerID).WithField("ts", time.Now().Format(time.StampMicro)).Debug("locker changed")
 		return nil
 	})
 }
