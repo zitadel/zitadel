@@ -23,7 +23,7 @@
                     <mat-error *ngIf="name?.errors?.required">{{'PROJECT.APP.NAMEREQUIRED' | translate}}</mat-error>
                 </mat-form-field>
 
-                <p class="step-title">{{'APP.OIDC.WHATTYPE' | translate}}</p>
+                <p class="step-title">{{'APP.OIDC.TYPETITLE' | translate}}</p>
                 <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="example-radio-group"
                     formControlName="applicationType">
                     <mat-radio-button *ngFor="let type of oidcAppTypes | keyvalue" [value]="type.value">
@@ -38,7 +38,10 @@
         </mat-step>
 
         <mat-step [editable]="true">
-            <ng-template matStepLabel>{{'APP.OIDC.GRANT' | translate}}</ng-template>
+            <ng-template matStepLabel>{{'APP.OIDC.GRANTSECTION' | translate}}</ng-template>
+
+            <p class="step-title">{{'APP.OIDC.GRANTTITLE' | translate}}</p>
+
             <div class="checkbox-container">
                 <mat-checkbox (change)="changeGrant()" *ngFor="let granttype of oidcGrantTypes" color="primary"
                     [(ngModel)]="granttype.checked" [disabled]="granttype.disabled">
@@ -52,14 +55,13 @@
         </mat-step>
 
         <mat-step [editable]="true" *ngIf="!grantTypeChecked(OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE)">
-            <ng-template matStepLabel>{{'APP.OIDC.RESPONSE' | translate}}</ng-template>
-            <ul>
-                <li *ngFor="let responsetype of oidcResponseTypes | keyvalue">
-                    <mat-checkbox (change)="changeResponseType()" color="primary" [(ngModel)]="responsetype.checked">
-                        {{'APP.OIDC.RESPONSE'+responsetype.key | translate}}
-                    </mat-checkbox>
-                </li>
-            </ul>
+            <ng-template matStepLabel>{{'APP.OIDC.RESPONSESECTION' | translate}}</ng-template>
+            <div class="checkbox-container">
+                <mat-checkbox *ngFor="let responsetype of oidcResponseTypes | keyvalue" (change)="changeResponseType()"
+                    color="primary" [(ngModel)]="responsetype.checked">
+                    {{'APP.OIDC.RESPONSE'+responsetype.key | translate}}
+                </mat-checkbox>
+            </div>
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
                 <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
@@ -69,7 +71,7 @@
         <mat-step [stepControl]="secondFormGroup" [editable]="true"
             *ngIf="applicationType?.value !== OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
             <form [formGroup]="secondFormGroup">
-                <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHOD' | translate}}</ng-template>
+                <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
 
                 <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="example-radio-group"
                     formControlName="authMethodType">
@@ -88,9 +90,9 @@
         </mat-step>
 
         <mat-step [editable]="true">
-            <ng-template matStepLabel>Redirect Uris</ng-template>
+            <ng-template matStepLabel>{{'APP.OIDC.REDIRECTSECTION' | translate}}</ng-template>
 
-            <p class="step-title">Specify the urls where the login will redirect to.</p>
+            <p class="step-title">{{'APP.OIDC.REDIRECTTITLE' | translate}}</p>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
@@ -105,7 +107,7 @@
                 </mat-chip-list>
             </mat-form-field>
 
-            <p class="step-title">This is the redirect after logout.</p>
+            <p class="step-title">{{'APP.OIDC.POSTREDIRECTTITLE' | translate}}</p>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
@@ -129,8 +131,8 @@
 
 
         <mat-step>
-            <ng-template matStepLabel>Overview</ng-template>
-            <p>You are now done. Review your configuration</p>
+            <ng-template matStepLabel>{{'APP.OIDC.OVERVIEWSECTION'| translate}}</ng-template>
+            <p class="step-title">{{'APP.OIDC.OVERVIEWTITLE' | translate}}</p>
             <div class="row">
                 <span class="left">
                     {{ 'APP.NAME' | translate }}

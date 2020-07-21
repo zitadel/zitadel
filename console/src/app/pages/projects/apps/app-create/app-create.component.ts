@@ -41,7 +41,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }[] = [
             { type: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
             { type: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT, checked: false, disabled: true },
-            { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true },
+            // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true }, 
+            // TODO show when implemented
         ];
     public oidcAppTypes: OIDCApplicationType[] = [
         OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
@@ -219,14 +220,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         return this.firstFormGroup.get('applicationType');
     }
 
-    // get grantTypesList(): AbstractControl | null {
-    //     return this.secondFormGroup.get('grantTypesList');
-    // }
-
-    // get getCheckedOidcGrantTypes(): OIDCGrantType[] {
-    //     return this.oidcGrantTypes.filter(gt => gt.checked).map(gt => gt.type);
-    // }
-
     public grantTypeChecked(type: OIDCGrantType): boolean {
         return this.oidcGrantTypes.filter(gt => gt.checked).map(gt => gt.type).findIndex(t => t === type) > -1;
     }
@@ -234,10 +227,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     get responseTypesList(): AbstractControl | null {
         return this.secondFormGroup.get('responseTypesList');
     }
-
-    // get applicationType(): AbstractControl | null {
-    //     return this.form.get('applicationType');
-    // }
 
     get authMethodType(): AbstractControl | null {
         return this.secondFormGroup.get('authMethodType');
