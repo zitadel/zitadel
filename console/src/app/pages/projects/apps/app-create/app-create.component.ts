@@ -41,7 +41,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }[] = [
             { type: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
             { type: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT, checked: false, disabled: true },
-            // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true }, 
+            // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true },
             // TODO show when implemented
         ];
     public oidcAppTypes: OIDCApplicationType[] = [
