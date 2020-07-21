@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
@@ -37,6 +39,9 @@ func (k *Key) Reduce(event *models.Event) error {
 		privateKey, publicKey, err := view_model.KeysFromPairEvent(event)
 		if err != nil {
 			return err
+		}
+		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
+			return k.view.ProcessedKeySequence(event.Sequence)
 		}
 		return k.view.PutKeys(privateKey, publicKey, event.Sequence)
 	default:
