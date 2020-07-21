@@ -150,6 +150,7 @@ const authConfig: AuthConfig = {
         GrpcService,
         AuthService,
         AuthUserService,
+        { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],
 })

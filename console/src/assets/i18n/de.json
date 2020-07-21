@@ -50,7 +50,8 @@
         "FINISH":"Abschliessen",
         "CHANGE":"Ändern",
         "REACTIVATE":"Aktivieren",
-        "DEACTIVATE":"Deaktivieren"
+        "DEACTIVATE":"Deaktivieren",
+        "REFRESH":"Aktualisieren"
     },
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus!"
@@ -74,6 +75,9 @@
             "DEACTIVATE":"Deaktivieren"
         },
         "MFA": {
+            "TABLETYPE":"Typ",
+            "TABLESTATE":"Status",
+            "TABLEACTIONS":"Aktionen",
             "TITLE": "Multifaktor-Authentifizierung",
             "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um deinen Account optimal zu schützen.",
             "MANAGE_DESCRIPTION": "Verwalte die Multifaktor Merkmale deiner Benutzer.",

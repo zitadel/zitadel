@@ -10,6 +10,7 @@ import { ProjectService } from 'src/app/services/project.service';
  * (including sorting, pagination, and filtering).
  */
 export class ProjectGrantsDataSource extends DataSource<ProjectGrant.AsObject> {
+    public totalResult: number = 0;
     public grantsSubject: BehaviorSubject<ProjectGrant.AsObject[]> = new BehaviorSubject<ProjectGrant.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -24,6 +25,7 @@ export class ProjectGrantsDataSource extends DataSource<ProjectGrant.AsObject> {
         this.loadingSubject.next(true);
         from(this.projectService.SearchProjectGrants(projectId, pageSize, offset)).pipe(
             map(resp => {
+                this.totalResult = resp.toObject().totalResult;
                 return resp.toObject().resultList;
             }),
             catchError(() => of([])),

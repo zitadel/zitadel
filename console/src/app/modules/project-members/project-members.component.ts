@@ -170,7 +170,13 @@ export class ProjectMembersComponent {
         }
     }
 
-    public changePage(event: PageEvent): void {
-        this.dataSource.loadMembers(this.project.projectId, this.projectType, event.pageIndex, event.pageSize, this.grantId);
+    public changePage(event?: PageEvent): void {
+        this.dataSource.loadMembers(
+            this.project.projectId,
+            this.projectType,
+            event?.pageIndex ?? this.paginator.pageIndex,
+            event?.pageSize ?? this.paginator.pageSize,
+            this.grantId,
+        );
     }
 }
