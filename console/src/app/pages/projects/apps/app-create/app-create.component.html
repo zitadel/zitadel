@@ -14,16 +14,16 @@
     <mat-horizontal-stepper linear #stepper labelPosition="bottom">
         <mat-step [stepControl]="firstFormGroup" [editable]="true">
             <form [formGroup]="firstFormGroup">
-                <ng-template matStepLabel>Name and App Type</ng-template>
+                <ng-template matStepLabel>{{'APP.OIDC.NAMEANDTYPESECTION' | translate}}</ng-template>
 
-                <p class="step-title">Insert a name first!</p>
+                <p class="step-title">{{'APP.OIDC.TITLEFIRST' | translate}}</p>
                 <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
                     <mat-error *ngIf="name?.errors?.required">{{'PROJECT.APP.NAMEREQUIRED' | translate}}</mat-error>
                 </mat-form-field>
 
-                <p class="step-title">What type of application do you want to create?</p>
+                <p class="step-title">{{'APP.OIDC.WHATTYPE' | translate}}</p>
                 <mat-radio-group color="primary" aria-labelledby="example-radio-group-label" class="example-radio-group"
                     formControlName="applicationType">
                     <mat-radio-button *ngFor="let type of oidcAppTypes | keyvalue" [value]="type.value">
@@ -31,7 +31,8 @@
                     </mat-radio-button>
                 </mat-radio-group>
                 <div class="actions">
-                    <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+                    <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary"
+                        matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -80,7 +81,8 @@
                 <div class="actions">
                     <button mat-stroked-button color="primary"
                         matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                    <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+                    <button mat-raised-button color="primary" [disabled]="secondFormGroup.invalid"
+                        matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
         </mat-step>

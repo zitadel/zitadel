@@ -547,6 +547,10 @@
         "TYPE":"Applikationstyp",
         "GRANT":"Grant Types",
         "OIDC": {
+            "NAMEANDTYPESECTION":"Name und Typ",
+            "TITLEFIRST":"Geben Sie zuerst einen Namen ein!",
+            "WHATTYPE":"Welche Art von Applikation wollen Sie erstellen?",
+            "TYPEREQUIRED":"Der Typ ist notwendig!",
             "TITLE": "OIDC Konfiguration",
             "CLIENTID": "Client ID",
             "CLIENTSECRET": "Client Secret",
