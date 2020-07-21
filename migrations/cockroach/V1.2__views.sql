@@ -1,5 +1,3 @@
-BEGIN;
-
 CREATE TABLE management.locks (
     locker_id TEXT,
     locked_until TIMESTAMPTZ,
@@ -10,8 +8,8 @@ CREATE TABLE management.locks (
 
 CREATE TABLE management.current_sequences (
     view_name TEXT,
-
     current_sequence BIGINT,
+    timestamp TIMESTAMPTZ,
 
     PRIMARY KEY (view_name)
 );
@@ -181,6 +179,7 @@ CREATE TABLE management.user_grants (
     last_name TEXT,
     email TEXT,
     role_keys TEXT Array,
+    grant_id TEXT,
 
     grant_state SMALLINT,
     creation_date TIMESTAMPTZ,
@@ -188,6 +187,19 @@ CREATE TABLE management.user_grants (
     sequence BIGINT,
 
     PRIMARY KEY (id)
+);
+
+CREATE TABLE management.org_domains (
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+    sequence BIGINT,
+
+    domain TEXT,
+    org_id TEXT,
+    verified BOOLEAN,
+    primary_domain BOOLEAN,
+
+    PRIMARY KEY (org_id, domain)
 );
 
 CREATE TABLE auth.locks (
@@ -200,6 +212,7 @@ CREATE TABLE auth.locks (
 
 CREATE TABLE auth.current_sequences (
     view_name TEXT,
+    timestamp TIMESTAMPTZ,
 
     current_sequence BIGINT,
 
@@ -313,6 +326,7 @@ CREATE TABLE notification.locks (
 
 CREATE TABLE notification.current_sequences (
     view_name TEXT,
+    timestamp TIMESTAMPTZ,
 
     current_sequence BIGINT,
 
@@ -348,6 +362,8 @@ CREATE TABLE notification.notify_users (
     verified_phone TEXT,
     sequence BIGINT,
     password_set BOOLEAN,
+    login_names TEXT,
+    preferred_login_name TEXT,
 
     PRIMARY KEY (id)
 );
@@ -386,12 +402,29 @@ CREATE TABLE adminapi.locks (
 
 CREATE TABLE adminapi.current_sequences (
     view_name TEXT,
+    timestamp TIMESTAMPTZ,
 
     current_sequence BIGINT,
 
     PRIMARY KEY (view_name)
 );
 
+CREATE TABLE adminapi.iam_members (
+    user_id TEXT,
+
+    iam_id TEXT,
+    creation_date TIMESTAMPTZ,
+    change_date TIMESTAMPTZ,
+
+    user_name TEXT,
+    email_address TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    roles TEXT ARRAY,
+    sequence BIGINT,
+
+    PRIMARY KEY (user_id)
+);
 
 CREATE TABLE management.orgs (
     id TEXT,
@@ -479,6 +512,7 @@ CREATE TABLE auth.user_grants (
     display_name TEXT,
     email TEXT,
     role_keys TEXT Array,
+    grant_id TEXT,
 
     grant_state SMALLINT,
     creation_date TIMESTAMPTZ,
@@ -512,6 +546,7 @@ CREATE TABLE authz.locks (
 
 CREATE TABLE authz.current_sequences (
     view_name TEXT,
+    timestamp TIMESTAMPTZ,
 
     current_sequence BIGINT,
 
@@ -540,6 +575,7 @@ CREATE TABLE authz.user_grants (
     display_name TEXT,
     email TEXT,
     role_keys TEXT Array,
+    grant_id TEXT,
 
     grant_state SMALLINT,
     creation_date TIMESTAMPTZ,
@@ -573,34 +609,16 @@ CREATE TABLE authz.applications (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE management.org_domains (
+CREATE TABLE authz.orgs (
+    id TEXT,
     creation_date TIMESTAMPTZ,
     change_date TIMESTAMPTZ,
+    resource_owner TEXT,
+    org_state SMALLINT,
     sequence BIGINT,
 
     domain TEXT,
-    org_id TEXT,
-    verified BOOLEAN,
-    primary_domain BOOLEAN,
+    name TEXT,
 
-    PRIMARY KEY (org_id, domain)
+    PRIMARY KEY (id)
 );
-
-CREATE TABLE adminapi.iam_members (
-    user_id TEXT,
-
-    iam_id TEXT,
-    creation_date TIMESTAMPTZ,
-    change_date TIMESTAMPTZ,
-
-    user_name TEXT,
-    email_address TEXT,
-    first_name TEXT,
-    last_name TEXT,
-    roles TEXT ARRAY,
-    sequence BIGINT,
-
-    PRIMARY KEY (user_id)
-);
-
-COMMIT;

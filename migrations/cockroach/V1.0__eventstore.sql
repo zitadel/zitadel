@@ -1,29 +1,11 @@
-BEGIN;
-
 CREATE DATABASE eventstore;
 
-COMMIT;
-
-
-BEGIN;
-
 CREATE USER eventstore;
-
 GRANT SELECT, INSERT, UPDATE ON DATABASE eventstore TO eventstore;
-
-COMMIT;
-
-BEGIN;
 
 CREATE SEQUENCE eventstore.event_seq;
 
-COMMIT;
-
-BEGIN;
-
 CREATE TABLE eventstore.events (
-    id UUID DEFAULT gen_random_uuid(),
-    
     event_type TEXT,
     aggregate_type TEXT NOT NULL,
     aggregate_id TEXT NOT NULL,
@@ -36,14 +18,6 @@ CREATE TABLE eventstore.events (
     editor_service TEXT NOT NULL,
     resource_owner TEXT NOT NULL,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (event_sequence DESC),
+    INDEX (aggregate_type, aggregate_id)
 );
-
-CREATE TABLE eventstore.locks (
-    aggregate_type TEXT NOT NULL,
-    aggregate_id TEXT NOT NULL,
-    until TIMESTAMPTZ,
-    UNIQUE (aggregate_type, aggregate_id)
-);
-
-COMMIT;
