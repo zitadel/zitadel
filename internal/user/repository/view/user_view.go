@@ -105,12 +105,21 @@ func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, erro
 	if user.OTPState == int32(usr_model.MfaStateUnspecified) {
 		return []*usr_model.MultiFactor{}, nil
 	}
-	return []*usr_model.MultiFactor{&usr_model.MultiFactor{Type: usr_model.MfaTypeOTP, State: usr_model.MfaState(user.OTPState)}}, nil
+	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: usr_model.MfaState(user.OTPState)}}, nil
 }
 
-func PutUser(db *gorm.DB, table string, project *model.UserView) error {
+func PutUsers(db *gorm.DB, table string, users ...*model.UserView) error {
+	save := repository.PrepareSaves(table)
+	u := make([]interface{}, len(users))
+	for i, user := range users {
+		u[i] = user
+	}
+	return save(db, u...)
+}
+
+func PutUser(db *gorm.DB, table string, user *model.UserView) error {
 	save := repository.PrepareSave(table)
-	return save(db, project)
+	return save(db, user)
 }
 
 func DeleteUser(db *gorm.DB, table, userID string) error {
