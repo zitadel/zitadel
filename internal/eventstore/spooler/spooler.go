@@ -80,6 +80,7 @@ func (s *spooledHandler) load(workerID string) {
 			errs <- err
 		} else {
 			errs <- s.process(ctx, events, workerID)
+			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("ts", time.Now().Format(time.StampMicro)).Warn("process done")
 		}
 	}
 	<-ctx.Done()
@@ -152,7 +153,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 
 func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID string) chan bool {
 	renewTimer := time.After(0)
-	renewDuration := s.MinimumCycleDuration() - 50*time.Millisecond
+	renewDuration := s.MinimumCycleDuration()
 	locked := make(chan bool)
 
 	go func(locked chan bool) {
@@ -161,7 +162,9 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 			case <-ctx.Done():
 				return
 			case <-renewTimer:
+				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("ts", time.Now().Format(time.StampMicro)).Debug("renew")
 				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
+				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("ts", time.Now().Format(time.StampMicro)).WithError(err).Debug("renew done")
 				if err == nil {
 					locked <- true
 					renewTimer = time.After(renewDuration)

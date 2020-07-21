@@ -280,6 +280,6 @@ Notification:
       FailureCountUntilSkip: 5
       Handlers:
         Notification:
-          MinimumCycleDuration: 10s
+          MinimumCycleDuration: 5s
         User:
           MinimumCycleDuration: 5s
