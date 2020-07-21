@@ -11,7 +11,11 @@
 
     <mat-progress-bar color="accent" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
-    <mat-horizontal-stepper linear #stepper labelPosition="bottom">
+    <mat-checkbox class="proswitch" color="primary" [(ngModel)]="devmode">
+        {{'APP.OIDC.PROSWITCH' | translate}}
+    </mat-checkbox>
+
+    <mat-horizontal-stepper *ngIf="!devmode" linear #stepper labelPosition="bottom">
         <mat-step [stepControl]="firstFormGroup" [editable]="true">
             <form [formGroup]="firstFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.NAMEANDTYPESECTION' | translate}}</ng-template>
@@ -103,7 +107,7 @@
                         {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
                     <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
+                        [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
                 </mat-chip-list>
             </mat-form-field>
 
@@ -119,7 +123,7 @@
                         {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
                     <input [matChipInputFor]="chipPostRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
+                        [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
                 </mat-chip-list>
             </mat-form-field>
 
@@ -199,4 +203,82 @@
             </div>
         </mat-step>
     </mat-horizontal-stepper>
+
+    <div *ngIf="devmode" class="dev">
+        <form [formGroup]="form" (ngSubmit)="saveOIDCApp()">
+            <div class="content">
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
+                    <input matInput formControlName="name" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'APP.OIDC.APPTYPE' | translate }}</mat-label>
+                    <mat-select formControlName="applicationType">
+                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
+                            {{ 'APP.OIDC.APPTYPE'+type | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'APP.OIDC.GRANT' | translate }}</mat-label>
+                    <mat-select formControlName="grantTypesList" multiple>
+                        <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant.type">
+                            {{ ('APP.OIDC.GRANT' + grant.type) | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
+                    <mat-select formControlName="responseTypesList" multiple>
+                        <mat-option *ngFor="let type of oidcResponseTypes" [value]="type.type">
+                            {{ 'APP.OIDC.RESPONSE'+type.type | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="formfield">
+                    <mat-label>{{ 'APP.OIDC.AUTHMETHOD' | translate }}</mat-label>
+                    <mat-select formControlName="authMethodType">
+                        <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type.type">
+                            {{ 'APP.OIDC.AUTHMETHOD'+type.type | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
+                    <mat-chip-list #chipRedirectList aria-label="uri selection">
+                        <mat-chip *ngFor="let uri of oidcApp.redirectUrisList" removable
+                            (removed)="removeUri(uri, 'REDIRECT')">
+                            {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
+                        </mat-chip>
+                        <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
+                    </mat-chip-list>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
+                    <mat-chip-list #chipPostRedirectList aria-label="uri selection">
+                        <mat-chip *ngFor="let uri of oidcApp.postLogoutRedirectUrisList" removable
+                            (removed)="removeUri(uri, 'POSTREDIRECT')">
+                            {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
+                        </mat-chip>
+                        <input [matChipInputFor]="chipPostRedirectList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                            (matChipInputTokenEnd)="addUri($event, 'POSTREDIRECT')">
+                    </mat-chip-list>
+                </mat-form-field>
+
+            </div>
+
+            <button color="primary" mat-raised-button class="continue-button" [disabled]="form.invalid" cdkFocusInitial
+                type="submit">
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+        </form>
+    </div>
 </div>

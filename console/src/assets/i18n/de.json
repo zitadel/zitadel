@@ -547,6 +547,7 @@
         "TYPE":"Applikationstyp",
         "GRANT":"Grant Types",
         "OIDC": {
+            "PROSWITCH":"Stepper überspringen",
             "NAMEANDTYPESECTION":"Name und Typ",
             "TITLEFIRST":"Geben Sie zuerst einen Namen ein!",
             "TYPETITLE":"Welche Art von Applikation wollen Sie erstellen?",

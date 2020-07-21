@@ -545,6 +545,7 @@
         "TYPE":"Application type",
         "GRANT":"Grant Types",
         "OIDC": {
+            "PROSWITCH":"I'm a pro. Skip this stepper.",
             "NAMEANDTYPESECTION":"Name and Type",
             "TITLEFIRST":"Insert a name first!",
             "TYPETITLE":"What type of application do you want to create?",

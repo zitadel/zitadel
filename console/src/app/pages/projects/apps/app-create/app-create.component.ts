@@ -6,6 +6,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import {
     Application,
     OIDCApplicationCreate,
@@ -26,9 +27,11 @@ import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog
 })
 export class AppCreateComponent implements OnInit, OnDestroy {
     private subscription?: Subscription;
+    public devmode: boolean = false;
     public projectId: string = '';
     public loading: boolean = false;
     public oidcApp: OIDCApplicationCreate.AsObject = new OIDCApplicationCreate().toObject();
+
     public oidcResponseTypes: { type: OIDCResponseType, checked: boolean; }[] = [
         { type: OIDCResponseType.OIDCRESPONSETYPE_CODE, checked: false },
         { type: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN, checked: false },
@@ -55,17 +58,18 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false },
     ];
 
+    // stepper
     firstFormGroup!: FormGroup;
     secondFormGroup!: FormGroup;
     thirdFormGroup!: FormGroup;
+
+    // devmode
+    public form!: FormGroup;
 
     public OIDCApplicationType: any = OIDCApplicationType;
     public OIDCGrantType: any = OIDCGrantType;
     public OIDCAuthMethodType: any = OIDCAuthMethodType;
 
-    public postLogoutRedirectUrisList: string[] = [];
-
-    public addOnBlur: boolean = true;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
     constructor(
@@ -77,6 +81,24 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
         private _location: Location,
     ) {
+        this.form = this.fb.group({
+            name: ['', [Validators.required]],
+            responseTypesList: ['', [Validators.required]],
+            grantTypesList: ['', [Validators.required]],
+            applicationType: ['', [Validators.required]],
+            authMethodType: ['', [Validators.required]],
+        });
+
+        this.form.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+            this.oidcApp.name = this.formname?.value;
+            this.oidcApp.applicationType = this.formapplicationType?.value;
+            this.oidcApp.grantTypesList = this.formgrantTypesList?.value;
+            this.oidcApp.responseTypesList = this.formresponseTypesList?.value;
+            this.oidcApp.authMethodType = this.formauthMethodType?.value;
+
+            console.log(this.oidcApp);
+        });
+
         this.firstFormGroup = this.fb.group({
             name: ['', [Validators.required]],
             applicationType: ['', [Validators.required]],
@@ -230,6 +252,31 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
     get authMethodType(): AbstractControl | null {
         return this.secondFormGroup.get('authMethodType');
+    }
+
+    // devmode
+
+    get formname(): AbstractControl | null {
+        return this.form.get('name');
+    }
+
+
+    get formresponseTypesList(): AbstractControl | null {
+        return this.form.get('responseTypesList');
+    }
+
+
+    get formgrantTypesList(): AbstractControl | null {
+        return this.form.get('grantTypesList');
+    }
+
+
+    get formapplicationType(): AbstractControl | null {
+        return this.form.get('applicationType');
+    }
+
+    get formauthMethodType(): AbstractControl | null {
+        return this.form.get('authMethodType');
     }
 }
 
