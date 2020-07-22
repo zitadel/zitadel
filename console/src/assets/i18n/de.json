@@ -584,7 +584,7 @@
             "AUTHMETHOD2":"None",
             "UNSECUREREDIRECT":"Ich hoffe du weisst was du tust",
             "OVERVIEWSECTION":"Übersicht",
-            "OVERVIEWTITLE":"Du bist jetzt fertig. Sehe dir deine Konfiguration nochmal an!"
+            "OVERVIEWTITLE":"Deine Konfiguration ist bereit! Du kannst sie hier nochmals prüfen."
         },
         "TOAST": {
             "REACTIVATED":"App reaktiviert!",
