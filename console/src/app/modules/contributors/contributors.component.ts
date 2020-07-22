@@ -11,6 +11,7 @@ export class ContributorsComponent {
     @Input() description: string = '';
     @Input() disabled: boolean = false;
     @Input() totalResult: number = 0;
+    @Input() loading: boolean = false;
     @Input() membersSubject!: BehaviorSubject<any[]>;
     @Output() addClicked: EventEmitter<void> = new EventEmitter();
     @Output() showDetailClicked: EventEmitter<void> = new EventEmitter();

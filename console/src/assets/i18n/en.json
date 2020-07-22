@@ -16,7 +16,11 @@
         "USERS_BUTTON": "Show users",
         "IAM": "Identity and Access Management",
         "IAM_DESC": "Manage your organisations and administrators.",
-        "IAM_BUTTON": "Manage ZITADEL"
+        "IAM_BUTTON": "Manage ZITADEL",
+        "WELCOME":"Welcome",
+        "WELCOMESENTENCE":"Here you can find recommended Actions based on your last aquired permissions. Note that you may have to switch organization context in the header above.",
+        "DISCLAIMER":"You can only see settings of your current Organization specified in the header. Zitadel treats your data confidentially and securely.",
+        "DISCLAIMERLINK":"Further information"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",

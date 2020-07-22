@@ -16,7 +16,11 @@
         "USERS_BUTTON": "Benutzer anzeigen",
         "IAM": "Identity and Access Management",
         "IAM_DESC": "Verwalte deine Organisationen und Administratoren.",
-        "IAM_BUTTON": "ZITADEL verwalten"
+        "IAM_BUTTON": "ZITADEL verwalten",
+        "WELCOME":"Willkommen",
+        "WELCOMESENTENCE":"Hier finden Sie empfohlene Aktionen basierend auf Ihren zuletzt erworbenen Berechtigungen. Beachten Sie, dass Sie möglicherweise den Organisationskontext in der Kopfzeile wechseln müssen.",
+        "DISCLAIMER":"Sie können nur die Einstellungen Ihrer aktuellen Organisation sehen, die in der Kopfzeile angegeben sind. Zitadel behandelt Ihre Daten vertraulich und sicher.",
+        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
