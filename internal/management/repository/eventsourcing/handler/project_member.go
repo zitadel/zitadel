@@ -119,6 +119,7 @@ func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user 
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName
 	member.Email = user.EmailAddress
+	member.DisplayName = user.DisplayName
 }
 func (p *ProjectMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")

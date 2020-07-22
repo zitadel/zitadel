@@ -141,5 +141,6 @@ func orgMemberFromView(member *org_model.OrgMemberView) *management.OrgMemberVie
 		Email:        member.Email,
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
 	}
 }

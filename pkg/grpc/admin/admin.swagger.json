@@ -856,6 +856,9 @@
         },
         "last_name": {
           "type": "string"
+        },
+        "display_name": {
+          "type": "string"
         }
       }
     },

@@ -140,5 +140,6 @@ func iamMemberFromView(member *iam_model.IamMemberView) *admin.IamMemberView {
 		Email:        member.Email,
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
 	}
 }
