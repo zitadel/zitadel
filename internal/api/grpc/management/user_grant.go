@@ -27,6 +27,22 @@ func (s *Server) UserGrantByID(ctx context.Context, request *management.UserGran
 	return userGrantViewFromModel(user), nil
 }
 
+func (s *Server) CreateUserGrant(ctx context.Context, in *management.UserGrantCreate) (*management.UserGrant, error) {
+	user, err := s.usergrant.AddUserGrant(ctx, userGrantCreateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return usergrantFromModel(user), nil
+}
+
+func (s *Server) UpdateUserGrant(ctx context.Context, in *management.UserGrantUpdate) (*management.UserGrant, error) {
+	user, err := s.usergrant.ChangeUserGrant(ctx, userGrantUpdateToModel(in))
+	if err != nil {
+		return nil, err
+	}
+	return usergrantFromModel(user), nil
+}
+
 func (s *Server) DeactivateUserGrant(ctx context.Context, in *management.UserGrantID) (*management.UserGrant, error) {
 	user, err := s.usergrant.DeactivateUserGrant(ctx, in.Id)
 	if err != nil {
