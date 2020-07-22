@@ -533,7 +533,7 @@
             "DESCRIPTION": "Hier kannst du deine Applikation bearbeiten und deren Konfiguration anpassen.",
             "CREATE_OIDC": "OIDC Applikation",
             "CREATE_OIDC_DESC_TITLE": "Gib deine Applikationsdaten Schritt für Schritt ein",
-            "CREATE_OIDC_DESC_SUB": "Die Felder werden mit der empfolenen Konfiguration automatisch befüllt.",
+            "CREATE_OIDC_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
