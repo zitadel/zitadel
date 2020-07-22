@@ -563,7 +563,7 @@
             "REDIRECTSECTION": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",
             "RESPONSE": "Response Types",
-            "RESPONSESECTION": "Antworttypen",
+            "RESPONSESECTION": "Antwort Typen",
             "GRANT": "Grant Types",
             "GRANTSECTION":"Grant Typen",
             "GRANTTITLE":"Wählen Sie Ihre Grant Typen aus. Hinweis: Implizit ist nur für Browserbasierte Anwendungen verfügbar.",
