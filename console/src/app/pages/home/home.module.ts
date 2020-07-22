@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { CardModule } from 'src/app/modules/card/card.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 
 import { HomeRoutingModule } from './home-routing.module';
@@ -21,6 +22,7 @@ import { HomeComponent } from './home.component';
         MatButtonModule,
         TranslateModule,
         SharedModule,
+        CardModule,
     ],
 })
 export class HomeModule { }

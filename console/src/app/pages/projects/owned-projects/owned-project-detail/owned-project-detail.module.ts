@@ -12,10 +12,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
+import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
-import { ProjectContributorsModule } from 'src/app/modules/project-contributors/project-contributors.module';
 import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
@@ -45,7 +46,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatTabsModule,
         MatButtonModule,
         MatIconModule,
-        ProjectContributorsModule,
+        ContributorsModule,
         WarnDialogModule,
         ProjectRolesModule,
         HasRolePipeModule,
@@ -61,6 +62,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         ChangesModule,
         MetaLayoutModule,
         RefreshTableModule,
+        MemberCreateDialogModule,
     ],
 })
 export class OwnedProjectDetailModule { }

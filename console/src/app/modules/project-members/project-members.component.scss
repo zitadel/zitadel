@@ -54,12 +54,6 @@
 .table-wrapper {
     overflow: auto;
 
-    .spinner-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
     table, mat-paginator {
         width: 100%;
 

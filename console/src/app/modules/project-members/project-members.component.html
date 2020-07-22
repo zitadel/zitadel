@@ -11,7 +11,7 @@
         </div>
 
         <app-refresh-table *ngIf="project" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
-            [selection]="selection">
+            [selection]="selection" [loading]="dataSource?.loading$ | async">
             <ng-template appHasRole actions
                 [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
                 <button (click)="removeProjectMemberSelection()" color="warn"
@@ -29,9 +29,6 @@
             </ng-template>
 
             <div class="table-wrapper">
-                <div class="spinner-container" *ngIf="dataSource?.loading$ | async">
-                    <mat-spinner diameter="50"></mat-spinner>
-                </div>
                 <table mat-table class="background-style full-width-table" aria-label="Elements"
                     [dataSource]="dataSource">
                     <ng-container matColumnDef="select">
