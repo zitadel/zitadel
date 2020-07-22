@@ -564,7 +564,7 @@
             "RESPONSESECTION": "Response Types",
             "GRANT": "Grant Types",
             "GRANTSECTION":"Grant Types",
-            "GRANTTITLE":"Select your grant types. Note: implicit is only availble for browser based applications.",
+            "GRANTTITLE":"Select your grant types. Note: Implicit is only available for browser based applications.",
             "APPTYPE": "App Types",
             "RESPONSE0": "Code",
             "RESPONSE1": "Id Token",
