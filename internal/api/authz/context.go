@@ -10,8 +10,9 @@ import (
 type key int
 
 const (
-	permissionsKey key = 1
-	dataKey        key = 2
+	requestPermissionsKey key = 1
+	dataKey               key = 2
+	allPermissionsKey     key = 3
 )
 
 type CtxData struct {
@@ -59,7 +60,12 @@ func GetCtxData(ctx context.Context) CtxData {
 	return ctxData
 }
 
-func GetPermissionsFromCtx(ctx context.Context) []string {
-	ctxPermission, _ := ctx.Value(permissionsKey).([]string)
+func GetRequestPermissionsFromCtx(ctx context.Context) []string {
+	ctxPermission, _ := ctx.Value(requestPermissionsKey).([]string)
+	return ctxPermission
+}
+
+func GetAllPermissionsFromCtx(ctx context.Context) []string {
+	ctxPermission, _ := ctx.Value(allPermissionsKey).([]string)
 	return ctxPermission
 }

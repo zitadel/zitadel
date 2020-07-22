@@ -12,13 +12,14 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
-import { OrgContributorsModule } from './org-contributors/org-contributors.module';
 import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgGridComponent } from './org-grid/org-grid.component';
@@ -30,7 +31,6 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
     imports: [
         CommonModule,
         OrgsRoutingModule,
-        OrgContributorsModule,
         FormsModule,
         HasRoleModule,
         MatFormFieldModule,
@@ -46,11 +46,13 @@ import { PolicyGridComponent } from './policy-grid/policy-grid.component';
         MatTooltipModule,
         MatDialogModule,
         WarnDialogModule,
+        MemberCreateDialogModule,
         MatMenuModule,
         ChangesModule,
         AddDomainDialogModule,
         TranslateModule,
         SharedModule,
+        ContributorsModule,
     ],
 })
 export class OrgsModule { }

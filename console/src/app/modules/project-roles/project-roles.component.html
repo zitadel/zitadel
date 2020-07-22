@@ -1,5 +1,5 @@
 <app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource.totalResult"
-    [selection]="selection">
+    [selection]="selection" [loading]="dataSource.loading$ | async">
     <ng-template appHasRole [appHasRole]="['project.role.delete']" actions>
         <button color="warn" class="icon-button" [disabled]="disabled"
             matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" (click)="deleteSelectedRoles()" mat-icon-button
@@ -15,10 +15,6 @@
     </ng-template>
 
     <div class="table-wrapper">
-        <div class="spinner-container" *ngIf="dataSource.loading$ | async">
-            <mat-spinner diameter="50"></mat-spinner>
-        </div>
-
         <table [dataSource]="dataSource" mat-table class="full-width-table" matSort aria-label="Elements">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>

@@ -72,7 +72,7 @@ $caos-light-brand: (
     A500:#333333,
     A600: #000000,
     A700: #8795a1,
-    A800: #fafafa,
+    A800: white,
     A900: #fafafa,
     contrast: (
         50: #3d4852,
@@ -155,8 +155,8 @@ $custom-typography: mat-typography-config(
     color: #202124;
 
 	.sidenav, .main-container {
-        background-color: white;
-        transition: background-color .5s ease-in-out;
+        background-color: #fafafa;
+        transition: background-color .4s ease-in-out;
     }
 
     ::-webkit-scrollbar-track {
@@ -185,12 +185,8 @@ $custom-typography: mat-typography-config(
 
 	.sidenav, .main-container {
         background-color: #212224;
-        transition: background-color .5s ease-in-out;
+        transition: background-color .4s ease-in-out;
     }
-    
-    .mat-dialog-container {
-		background-color: #2d2e30;
-    } 
 
     ::-webkit-scrollbar-track {
         -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);

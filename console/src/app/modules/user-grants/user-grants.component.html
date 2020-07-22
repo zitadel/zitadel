@@ -1,4 +1,5 @@
-<app-refresh-table (refreshed)="changePage()" [dataSize]="dataSource.totalResult" [selection]="selection">
+<app-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
+    [dataSize]="dataSource.totalResult" [selection]="selection">
     <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
         (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && allowDelete">
         <i class="las la-trash"></i>
@@ -9,9 +10,6 @@
     </a>
 
     <div class="table-wrapper">
-        <div class="spinner-container" *ngIf="dataSource.loading$ | async">
-            <mat-spinner diameter="50"></mat-spinner>
-        </div>
         <table mat-table multiTemplateDataRows class="full-width-table" aria-label="Elements" [dataSource]="dataSource">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>

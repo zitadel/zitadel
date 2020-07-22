@@ -13,6 +13,9 @@
 
     <div class="actions">
         <button class="primary right" type="submit">{{if .AuthReqID }}{{t "Actions.Next"}}{{else}}{{t "Actions.Login"}}{{end}}</button>
+        <a href="{{ loginUrl }}">
+            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        </a>
     </div>
 </form>
 

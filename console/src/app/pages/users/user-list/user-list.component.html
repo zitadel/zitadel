@@ -2,7 +2,7 @@
     <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
     <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
-    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="dataSource.data.length">
+    <app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length">
         <ng-template appHasRole [appHasRole]="['user.write']" actions>
             <button (click)="deactivateSelectedUsers()" matTooltip="{{'ORG_DETAIL.TABLE.DEACTIVATE' | translate}}"
                 class="icon-button" mat-icon-button *ngIf="selection.hasValue()">
@@ -18,9 +18,6 @@
         </ng-template>
 
         <div class="table-wrapper">
-            <div class="spinner-container" *ngIf="loading$ | async">
-                <mat-spinner diameter="50"></mat-spinner>
-            </div>
             <table class="background-style" mat-table [dataSource]="dataSource">
                 <ng-container matColumnDef="select">
                     <th mat-header-cell *matHeaderCellDef>

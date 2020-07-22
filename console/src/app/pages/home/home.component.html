@@ -9,7 +9,7 @@
 
     <div class="container">
         <ng-template appHasRole [appHasRole]="['iam.write']">
-            <div class="item card">
+            <app-card class="item">
                 <div class="top">
                     <h2>
                         <i class="icon las la-gem"></i>
@@ -18,12 +18,12 @@
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
-                    <a color="primary" mat-button [routerLink]="['/iam']">{{'HOME.IAM_BUTTON' | translate}}</a>
+                    <a color="primary" mat-stroked-button [routerLink]="['/iam']">{{'HOME.IAM_BUTTON' | translate}}</a>
                 </div>
-            </div>
+            </app-card>
         </ng-template>
 
-        <div class="item card">
+        <app-card class="item">
             <div class="top">
                 <h2> <i class="icon las la-user-circle"></i>
                     {{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
@@ -31,13 +31,13 @@
             </div>
             <span class="fill-space"></span>
             <div class="footer">
-                <a color="primary" mat-button
+                <a color="primary" mat-stroked-button
                     [routerLink]="['/users/me']">{{'HOME.SECURITYANDPRIVACY_BUTTON' | translate}}</a>
             </div>
-        </div>
+        </app-card>
 
         <ng-template appHasRole [appHasRole]="['project.read']">
-            <div class="item card">
+            <app-card class="item">
                 <div class="top">
                     <h2>
                         <i class="icon las la-layer-group"></i>
@@ -46,14 +46,14 @@
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
-                    <a color="primary" mat-button
+                    <a color="primary" mat-stroked-button
                         [routerLink]="['/projects']">{{'HOME.PROJECTS_BUTTON' | translate}}</a>
                 </div>
-            </div>
+            </app-card>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['org.read']">
-            <div class="item card">
+            <app-card class="item">
                 <div class="top">
                     <h2> <i class="icon las la-archway"></i>
                         {{'HOME.PROTECTION'| translate}}</h2>
@@ -61,13 +61,14 @@
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
-                    <a color="primary" mat-button [routerLink]="['/org']">{{'HOME.PROTECTION_BUTTON' | translate}}</a>
+                    <a color="primary" mat-stroked-button
+                        [routerLink]="['/org']">{{'HOME.PROTECTION_BUTTON' | translate}}</a>
                 </div>
-            </div>
+            </app-card>
         </ng-template>
 
         <ng-template appHasRole [appHasRole]="['user.read']">
-            <div class="item card">
+            <app-card class="item">
                 <div class="top">
                     <h2>
                         <i class="las la-crosshairs"></i>
@@ -78,7 +79,7 @@
                 <div class="footer">
                     <a color="primary" mat-button [routerLink]="['/users/me']">{{'HOME.USERS_BUTTON' | translate}}</a>
                 </div>
-            </div>
+            </app-card>
         </ng-template>
     </div>
 </div>
