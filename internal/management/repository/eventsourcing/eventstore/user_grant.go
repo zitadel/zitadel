@@ -10,6 +10,7 @@ import (
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	grant_event "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 const (
@@ -121,33 +122,9 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 	sequence, err := repo.View.GetLatestUserGrantSequence()
 	logging.Log("EVENT-5Viwf").OnError(err).Warn("could not read latest user grant sequence")
 
-	permissions := authz.GetAllPermissionsFromCtx(ctx)
-	if !authz.HasGlobalExplicitPermission(permissions, projectReadPerm) {
-		ids := authz.GetExplicitPermissionCtxIDs(permissions, projectReadPerm)
-		if _, q := request.GetSearchQuery(grant_model.UserGrantSearchKeyProjectID); q != nil {
-			containsID := false
-			for _, id := range ids {
-				if id == q.Value {
-					containsID = true
-					break
-				}
-			}
-			if !containsID {
-				result := &grant_model.UserGrantSearchResponse{
-					Offset:      request.Offset,
-					Limit:       request.Limit,
-					TotalResult: uint64(0),
-					Result:      []*grant_model.UserGrantView{},
-				}
-				if err == nil {
-					result.Sequence = sequence.CurrentSequence
-					result.Timestamp = sequence.CurrentTimestamp
-				}
-				return result, nil
-			}
-		} else {
-			request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
-		}
+	result := handleSearchUserGrantPermissions(ctx, request, sequence)
+	if result != nil {
+		return result, nil
 	}
 
 	grants, count, err := repo.View.SearchUserGrants(request)
@@ -155,7 +132,7 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 		return nil, err
 	}
 
-	result := &grant_model.UserGrantSearchResponse{
+	result = &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
@@ -168,21 +145,55 @@ func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_
 	return result, nil
 }
 
-func checkExplicitPermission(ctx context.Context, grantID, projectID string) error {
-	permissions := authz.GetRequestPermissionsFromCtx(ctx)
-	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetAllPermissionCtxIDs(permissions)
+func handleSearchUserGrantPermissions(ctx context.Context, request *grant_model.UserGrantSearchRequest, sequence *repository.CurrentSequence) *grant_model.UserGrantSearchResponse {
+	permissions := authz.GetAllPermissionsFromCtx(ctx)
+	if authz.HasGlobalExplicitPermission(permissions, projectReadPerm) {
+		return nil
+	}
+
+	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectReadPerm)
+	if _, q := request.GetSearchQuery(grant_model.UserGrantSearchKeyProjectID); q != nil {
 		containsID := false
-		if grantID != "" {
-			containsID = listContainsID(ids, grantID)
-			if containsID {
-				return nil
+		for _, id := range ids {
+			if id == q.Value {
+				containsID = true
+				break
 			}
 		}
-		containsID = listContainsID(ids, projectID)
 		if !containsID {
-			return caos_errors.ThrowPermissionDenied(nil, "EVENT-Shu7e", "Errors.UserGrant.NoPermissionForProject")
+			result := &grant_model.UserGrantSearchResponse{
+				Offset:      request.Offset,
+				Limit:       request.Limit,
+				TotalResult: uint64(0),
+				Result:      []*grant_model.UserGrantView{},
+			}
+			if sequence != nil {
+				result.Sequence = sequence.CurrentSequence
+				result.Timestamp = sequence.CurrentTimestamp
+			}
+			return result
 		}
+	}
+	request.Queries = append(request.Queries, &grant_model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyProjectID, Method: global_model.SearchMethodIsOneOf, Value: ids})
+	return nil
+}
+
+func checkExplicitPermission(ctx context.Context, grantID, projectID string) error {
+	permissions := authz.GetRequestPermissionsFromCtx(ctx)
+	if authz.HasGlobalPermission(permissions) {
+		return nil
+	}
+	ids := authz.GetAllPermissionCtxIDs(permissions)
+	containsID := false
+	if grantID != "" {
+		containsID = listContainsID(ids, grantID)
+		if containsID {
+			return nil
+		}
+	}
+	containsID = listContainsID(ids, projectID)
+	if !containsID {
+		return caos_errors.ThrowPermissionDenied(nil, "EVENT-Shu7e", "Errors.UserGrant.NoPermissionForProject")
 	}
 	return nil
 }

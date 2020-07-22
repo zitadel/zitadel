@@ -159,7 +159,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         args
-		reuqestPerms []string
+		requestPerms []string
 		allPerms     []string
 	}{
 		{
@@ -180,7 +180,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			reuqestPerms: []string{"project.read"},
+			requestPerms: []string{"project.read"},
 			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
@@ -201,7 +201,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			reuqestPerms: []string{},
+			requestPerms: []string{},
 			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
@@ -222,7 +222,7 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			reuqestPerms: []string{"project.read"},
+			requestPerms: []string{"project.read"},
 			allPerms:     []string{"org.read", "project.read"},
 		},
 		{
@@ -243,15 +243,15 @@ func Test_MapGrantsToPermissions(t *testing.T) {
 					},
 				},
 			},
-			reuqestPerms: []string{"project.read", "project.read:1"},
+			requestPerms: []string{"project.read", "project.read:1"},
 			allPerms:     []string{"org.read", "project.read", "project.read:1"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			requestPerms, allPerms := mapGrantToPermissions(tt.args.requiredPerm, tt.args.grant, tt.args.authConfig)
-			if !equalStringArray(requestPerms, tt.reuqestPerms) {
-				t.Errorf("got wrong requestPerms, expecting: %v, actual: %v ", tt.reuqestPerms, requestPerms)
+			if !equalStringArray(requestPerms, tt.requestPerms) {
+				t.Errorf("got wrong requestPerms, expecting: %v, actual: %v ", tt.requestPerms, requestPerms)
 			}
 			if !equalStringArray(allPerms, tt.allPerms) {
 				t.Errorf("got wrong allPerms, expecting: %v, actual: %v ", tt.allPerms, allPerms)
