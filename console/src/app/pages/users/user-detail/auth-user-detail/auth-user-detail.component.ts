@@ -39,9 +39,11 @@ export class AuthUserDetailComponent implements OnDestroy {
         private dialog: MatDialog,
     ) {
         this.loading = true;
-        this.getData().then(() => {
+        this.userService.GetMyUser().then(user => {
+            this.user = user.toObject();
             this.loading = false;
         }).catch(error => {
+            this.toast.showError(error);
             this.loading = false;
         });
     }
@@ -148,14 +150,6 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showError(error);
                 this.phoneEditState = false;
             });
-    }
-
-    private async getData(): Promise<void> {
-        this.userService.GetMyUser().then(user => {
-            this.user = user.toObject();
-        }).catch(error => {
-            this.toast.showError(error);
-        });
     }
 
     public copytoclipboard(value: string): void {
