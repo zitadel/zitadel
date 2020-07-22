@@ -566,7 +566,7 @@
             "RESPONSESECTION": "Antworttypen",
             "GRANT": "Grant Types",
             "GRANTSECTION":"Grant Typen",
-            "GRANTTITLE":"Wählen Sie Ihre Grant-Typen aus. Hinweis: implizit ist nur für browserbasierte Anwendungen verfügbar.",
+            "GRANTTITLE":"Wählen Sie Ihre Grant Typen aus. Hinweis: Implizit ist nur für Browserbasierte Anwendungen verfügbar.",
             "APPTYPE": "App Types",
             "RESPONSE0": "Code",
             "RESPONSE1": "Id Token",
