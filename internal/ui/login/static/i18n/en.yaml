@@ -121,7 +121,8 @@ Actions:
   Resend: resend
   Skip: skip
   Register: register
-  ForgotPassword: Reset password
+  ForgotPassword: reset password
+  Cancel: cancel
 
 
 Errors:
