@@ -170,7 +170,7 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public decrementLength(): void {
-        if (this.complexityData?.minLength && this.complexityData?.minLength > 0) {
+        if (this.complexityData?.minLength && this.complexityData?.minLength > 1) {
             this.complexityData.minLength--;
         }
     }
