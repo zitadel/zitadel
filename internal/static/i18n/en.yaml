@@ -35,6 +35,7 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short
+      MinLengthNotAllowed: Given minimum length is not allowed
       HasLower: Password must contain lower case
       HasUpper: Password must contain upper case
       HasNumber: Password must contain number
@@ -109,6 +110,7 @@ Errors:
     IDMissing: Id missing
     NotActive: User grant is not active
     NotInactive: User grant is not deactivated
+    NoPermissionForProject: User has no permissions on this project
   Changes:
     NotFound: No history found
   Token:

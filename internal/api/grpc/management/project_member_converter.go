@@ -118,6 +118,7 @@ func projectMemberViewFromModel(member *proj_model.ProjectMemberView) *managemen
 		Email:        member.Email,
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
 		Roles:        member.Roles,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,

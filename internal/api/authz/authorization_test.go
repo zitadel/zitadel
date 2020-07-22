@@ -269,7 +269,7 @@ func Test_GetPermissionCtxIDs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetPermissionCtxIDs(tt.args.perms)
+			result := GetAllPermissionCtxIDs(tt.args.perms)
 			if !equalStringArray(result, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
 			}

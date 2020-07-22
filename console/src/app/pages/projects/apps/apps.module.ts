@@ -12,7 +12,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
@@ -51,6 +53,8 @@ import { AppsRoutingModule } from './apps-routing.module';
         CardModule,
         MatTooltipModule,
         TranslateModule,
+        MatStepperModule,
+        MatRadioModule,
     ],
     exports: [TranslateModule],
 })

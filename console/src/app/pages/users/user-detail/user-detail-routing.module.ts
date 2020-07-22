@@ -9,6 +9,14 @@ import { UserDetailComponent } from './user-detail/user-detail.component';
 
 const routes: Routes = [
     {
+        path: 'create',
+        loadChildren: () => import('../user-create/user-create.module').then(m => m.UserCreateModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+            roles: ['user.write'],
+        },
+    },
+    {
         path: 'me',
         component: AuthUserDetailComponent,
         canActivate: [AuthGuard],

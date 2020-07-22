@@ -16,34 +16,40 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 		return nil, nil, err
 	}
 	if grant == nil {
-		return context.WithValue(ctx, permissionsKey, []string{}), []string{}, nil
+		return context.WithValue(ctx, requestPermissionsKey, []string{}), []string{}, nil
 	}
-	permissions := mapGrantToPermissions(requiredPerm, grant, authConfig)
-	return context.WithValue(ctx, permissionsKey, permissions), permissions, nil
+	requestPermissions, allPermissions := mapGrantToPermissions(requiredPerm, grant, authConfig)
+	ctx = context.WithValue(ctx, allPermissionsKey, allPermissions)
+	return context.WithValue(ctx, requestPermissionsKey, requestPermissions), requestPermissions, nil
 }
 
-func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) []string {
-	resolvedPermissions := make([]string, 0)
+func mapGrantToPermissions(requiredPerm string, grant *Grant, authConfig Config) ([]string, []string) {
+	requestPermissions := make([]string, 0)
+	allPermissions := make([]string, 0)
 	for _, role := range grant.Roles {
-		resolvedPermissions = mapRoleToPerm(requiredPerm, role, authConfig, resolvedPermissions)
+		requestPermissions, allPermissions = mapRoleToPerm(requiredPerm, role, authConfig, requestPermissions, allPermissions)
 	}
 
-	return resolvedPermissions
+	return requestPermissions, allPermissions
 }
 
-func mapRoleToPerm(requiredPerm, actualRole string, authConfig Config, resolvedPermissions []string) []string {
+func mapRoleToPerm(requiredPerm, actualRole string, authConfig Config, requestPermissions, allPermissions []string) ([]string, []string) {
 	roleName, roleContextID := SplitPermission(actualRole)
 	perms := authConfig.getPermissionsFromRole(roleName)
 
 	for _, p := range perms {
+		permWithCtx := addRoleContextIDToPerm(p, roleContextID)
+		if !ExistsPerm(allPermissions, permWithCtx) {
+			allPermissions = append(allPermissions, permWithCtx)
+		}
+
 		if p == requiredPerm {
-			p = addRoleContextIDToPerm(p, roleContextID)
-			if !ExistsPerm(resolvedPermissions, p) {
-				resolvedPermissions = append(resolvedPermissions, p)
+			if !ExistsPerm(requestPermissions, permWithCtx) {
+				requestPermissions = append(requestPermissions, permWithCtx)
 			}
 		}
 	}
-	return resolvedPermissions
+	return requestPermissions, allPermissions
 }
 
 func addRoleContextIDToPerm(perm, roleContextID string) string {

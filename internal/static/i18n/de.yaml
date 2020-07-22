@@ -35,6 +35,7 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
+      MinLengthNotAllowed: Angegebene Mindestläng ist nicht erlaubt
       HasLower: Passwort beinhaltet keinen Kleinbuchstaben
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
@@ -109,6 +110,7 @@ Errors:
     IDMissing: Id fehlt
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
+    NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
   Token:

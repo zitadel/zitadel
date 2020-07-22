@@ -90,44 +90,9 @@
                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </mat-error>
                     </mat-form-field>
-                    <!-- <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.STREET' | translate }}</mat-label>
-                        <input matInput formControlName="streetAddress" />
-                        <mat-error *ngIf="streetAddress?.invalid && streetAddress?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.POSTAL_CODE' | translate }}</mat-label>
-                        <input matInput formControlName="postalCode" />
-                        <mat-error *ngIf="postalCode?.invalid && postalCode?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.LOCALITY' | translate }}</mat-label>
-                        <input matInput formControlName="locality" />
-                        <mat-error *ngIf="locality?.invalid && locality?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.REGION' | translate }}</mat-label>
-                        <input matInput formControlName="region" />
-                        <mat-error *ngIf="region?.invalid && region?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.ADDRESS.COUNTRY' | translate }}</mat-label>
-                        <input matInput formControlName="country" />
-                        <mat-error *ngIf="country?.invalid && country?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field> -->
                 </div>
                 <div class="btn-container">
-                    <button color="accent" [disabled]="userForm.invalid" type="submit"
+                    <button color="primary" [disabled]="userForm.invalid" type="submit"
                         mat-raised-button>{{ 'ACTIONS.CREATE' | translate }}</button>
                 </div>
             </form>

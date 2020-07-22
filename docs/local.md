@@ -31,3 +31,4 @@ cockroachdb/cockroach:v19.2.2 start --insecure
 
 #### Should show eventstore, management, admin, auth
 `show databases;`
+

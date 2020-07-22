@@ -12,6 +12,7 @@ type ProjectMemberView struct {
 	Email        string
 	FirstName    string
 	LastName     string
+	DisplayName  string
 	Roles        []string
 	CreationDate time.Time
 	ChangeDate   time.Time

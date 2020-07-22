@@ -56,6 +56,15 @@ type ProjectGrantViewSearchResponse struct {
 	Timestamp   time.Time
 }
 
+func (r *ProjectGrantViewSearchRequest) GetSearchQuery(key ProjectGrantViewSearchKey) (int, *ProjectGrantViewSearchQuery) {
+	for i, q := range r.Queries {
+		if q.Key == key {
+			return i, q
+		}
+	}
+	return -1, nil
+}
+
 func (r *ProjectGrantViewSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: model.SearchMethodEquals, Value: orgID})
 }

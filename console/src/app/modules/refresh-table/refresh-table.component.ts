@@ -29,6 +29,7 @@ export class RefreshTableComponent implements OnInit {
     @Input() public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
     @Input() public dataSize: number = 0;
     @Input() public emitRefreshAfterTimeoutInMs: number = 0;
+    @Input() public loading: boolean = false;
     @Output() public refreshed: EventEmitter<void> = new EventEmitter();
 
     ngOnInit(): void {

@@ -9,7 +9,9 @@
     </div>
 
     <div class="side" metainfo>
-        <app-iam-contributors>
-        </app-iam-contributors>
+        <app-contributors [totalResult]="totalMemberResult" [membersSubject]="membersSubject"
+            title="{{ 'PROJECT.MEMBER.TITLE' | translate }}" description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+            (addClicked)="openAddMember()" (showDetailClicked)="showDetail()" [disabled]="false">
+        </app-contributors>
     </div>
 </app-meta-layout>

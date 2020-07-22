@@ -229,7 +229,7 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 			return err
 		}
 		if roleSuffix != "" {
-			roleKeys = suffixRoles(event.AggregateID, roleKeys)
+			roleKeys = suffixRoles(roleSuffix, roleKeys)
 		}
 		if errors.IsNotFound(err) {
 			grant = &view_model.UserGrantView{
