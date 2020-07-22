@@ -14,6 +14,7 @@ import (
 
 type SystemDefaults struct {
 	DefaultLanguage       language.Tag
+	ZitadelDocs           ZitadelDocs
 	SecretGenerators      SecretGenerators
 	UserVerificationKey   *crypto.KeyConfig
 	Multifactors          MultifactorConfig
@@ -22,6 +23,11 @@ type SystemDefaults struct {
 	IamID                 string
 	SetUp                 types.IAMSetUp
 	Notifications         Notifications
+}
+
+type ZitadelDocs struct {
+	Issuer            string
+	DiscoveryEndpoint string
 }
 
 type SecretGenerators struct {

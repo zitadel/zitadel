@@ -164,13 +164,13 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementLength(): void {
-        if (this.complexityData?.minLength !== undefined) {
+        if (this.complexityData?.minLength !== undefined && this.complexityData?.minLength <= 72) {
             this.complexityData.minLength++;
         }
     }
 
     public decrementLength(): void {
-        if (this.complexityData?.minLength && this.complexityData?.minLength > 0) {
+        if (this.complexityData?.minLength && this.complexityData?.minLength > 1) {
             this.complexityData.minLength--;
         }
     }
