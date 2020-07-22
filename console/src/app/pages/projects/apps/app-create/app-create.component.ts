@@ -6,6 +6,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import {
     Application,
     OIDCApplicationCreate,
@@ -26,35 +27,49 @@ import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog
 })
 export class AppCreateComponent implements OnInit, OnDestroy {
     private subscription?: Subscription;
+    public devmode: boolean = false;
     public projectId: string = '';
+    public loading: boolean = false;
     public oidcApp: OIDCApplicationCreate.AsObject = new OIDCApplicationCreate().toObject();
-    public oidcResponseTypes: OIDCResponseType[] = [
-        OIDCResponseType.OIDCRESPONSETYPE_CODE,
-        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN,
-        OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN,
+
+    public oidcResponseTypes: { type: OIDCResponseType, checked: boolean; }[] = [
+        { type: OIDCResponseType.OIDCRESPONSETYPE_CODE, checked: false },
+        { type: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN, checked: false },
+        { type: OIDCResponseType.OIDCRESPONSETYPE_ID_TOKEN_TOKEN, checked: false },
     ];
-    public oidcGrantTypes: OIDCGrantType[] = [
-        OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE,
-        OIDCGrantType.OIDCGRANTTYPE_IMPLICIT,
-        OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN,
-    ];
+    public oidcGrantTypes: {
+        type: OIDCGrantType,
+        checked: boolean,
+        disabled: boolean,
+    }[] = [
+            { type: OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
+            { type: OIDCGrantType.OIDCGRANTTYPE_IMPLICIT, checked: false, disabled: true },
+            // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true },
+            // TODO show when implemented
+        ];
     public oidcAppTypes: OIDCApplicationType[] = [
         OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB,
         OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT,
         OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE,
     ];
-    public oidcAuthMethodType: OIDCAuthMethodType[] = [
-        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC,
-        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE,
-        OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST,
+    public oidcAuthMethodType: { type: OIDCAuthMethodType, checked: boolean, disabled: boolean; }[] = [
+        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, checked: false, disabled: false },
+        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE, checked: false, disabled: false },
+        { type: OIDCAuthMethodType.OIDCAUTHMETHODTYPE_POST, checked: false, disabled: false },
     ];
 
-    public form!: FormGroup;
-    public createSteps: number = 1;
-    public currentCreateStep: number = 1;
-    public postLogoutRedirectUrisList: string[] = [];
+    // stepper
+    firstFormGroup!: FormGroup;
+    secondFormGroup!: FormGroup;
+    thirdFormGroup!: FormGroup;
 
-    public addOnBlur: boolean = true;
+    // devmode
+    public form!: FormGroup;
+
+    public OIDCApplicationType: any = OIDCApplicationType;
+    public OIDCGrantType: any = OIDCGrantType;
+    public OIDCAuthMethodType: any = OIDCAuthMethodType;
+
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
     constructor(
@@ -68,10 +83,68 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     ) {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            responseTypesList: ['', []],
-            grantTypesList: ['', []],
-            applicationType: ['', []],
-            authMethodType: [],
+            responseTypesList: ['', [Validators.required]],
+            grantTypesList: ['', [Validators.required]],
+            applicationType: ['', [Validators.required]],
+            authMethodType: ['', [Validators.required]],
+        });
+
+        this.form.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+            this.oidcApp.name = this.formname?.value;
+            this.oidcApp.applicationType = this.formapplicationType?.value;
+            this.oidcApp.grantTypesList = this.formgrantTypesList?.value;
+            this.oidcApp.responseTypesList = this.formresponseTypesList?.value;
+            this.oidcApp.authMethodType = this.formauthMethodType?.value;
+
+            console.log(this.oidcApp);
+        });
+
+        this.firstFormGroup = this.fb.group({
+            name: ['', [Validators.required]],
+            applicationType: ['', [Validators.required]],
+        });
+        this.secondFormGroup = this.fb.group({
+            authMethodType: [OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC, [Validators.required]],
+        });
+
+        this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_BASIC;
+
+        this.firstFormGroup.valueChanges.subscribe(value => {
+            if (this.applicationType?.value === OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE) {
+                this.oidcResponseTypes[0].checked = true;
+                // this.oidcApp.responseTypesList = [this.oidcResponseTypes[0].type];
+
+                this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE);
+                this.oidcAuthMethodType[1].disabled = true;
+            }
+            if (this.applicationType?.value === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB) {
+                this.oidcResponseTypes[0].checked = true;
+                this.oidcApp.responseTypesList = [this.oidcResponseTypes[0].type];
+
+                this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE);
+                this.oidcAuthMethodType[0].disabled = true;
+                this.oidcAuthMethodType[2].disabled = true;
+            }
+            if (this.applicationType?.value === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT) {
+                this.oidcResponseTypes[0].checked = true;
+                this.oidcApp.responseTypesList = [this.oidcResponseTypes[0].type];
+
+                this.authMethodType?.setValue(OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE);
+                this.oidcAuthMethodType[0].disabled = true;
+                this.oidcAuthMethodType[2].disabled = true;
+
+                this.oidcGrantTypes[1].disabled = false;
+            }
+
+            this.changeResponseType();
+            this.changeGrant();
+
+            this.oidcApp.name = this.name?.value;
+            this.oidcApp.applicationType = this.applicationType?.value;
+        });
+
+        this.secondFormGroup.valueChanges.subscribe(value => {
+            this.oidcApp.authMethodType = this.authMethodType?.value;
         });
     }
 
@@ -93,18 +166,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     }
 
     public saveOIDCApp(): void {
-        this.oidcApp.name = this.name?.value;
-        this.oidcApp.applicationType = this.applicationType?.value;
-        this.oidcApp.grantTypesList = this.grantTypesList?.value;
-        this.oidcApp.responseTypesList = this.responseTypesList?.value;
-        this.oidcApp.authMethodType = this.authMethodType?.value;
-
+        this.loading = true;
         this.projectService
             .CreateOIDCApp(this.oidcApp)
             .then((data: Application) => {
+                this.loading = false;
                 this.showSavedDialog(data.toObject());
             })
             .catch(error => {
+                this.loading = false;
                 this.toast.showError(error);
             });
     }
@@ -154,29 +224,58 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                 this.oidcApp.postLogoutRedirectUrisList.splice(index, 1);
             }
         }
+    }
 
+    changeGrant(): void {
+        this.oidcApp.grantTypesList = this.oidcGrantTypes.filter(gt => gt.checked).map(gt => gt.type);
+    }
+
+    changeResponseType(): void {
+        this.oidcApp.responseTypesList = this.oidcResponseTypes.filter(gt => gt.checked).map(gt => gt.type);
     }
 
     get name(): AbstractControl | null {
+        return this.firstFormGroup.get('name');
+    }
+
+    get applicationType(): AbstractControl | null {
+        return this.firstFormGroup.get('applicationType');
+    }
+
+    public grantTypeChecked(type: OIDCGrantType): boolean {
+        return this.oidcGrantTypes.filter(gt => gt.checked).map(gt => gt.type).findIndex(t => t === type) > -1;
+    }
+
+    get responseTypesList(): AbstractControl | null {
+        return this.secondFormGroup.get('responseTypesList');
+    }
+
+    get authMethodType(): AbstractControl | null {
+        return this.secondFormGroup.get('authMethodType');
+    }
+
+    // devmode
+
+    get formname(): AbstractControl | null {
         return this.form.get('name');
     }
 
 
-    get responseTypesList(): AbstractControl | null {
+    get formresponseTypesList(): AbstractControl | null {
         return this.form.get('responseTypesList');
     }
 
 
-    get grantTypesList(): AbstractControl | null {
+    get formgrantTypesList(): AbstractControl | null {
         return this.form.get('grantTypesList');
     }
 
 
-    get applicationType(): AbstractControl | null {
+    get formapplicationType(): AbstractControl | null {
         return this.form.get('applicationType');
     }
 
-    get authMethodType(): AbstractControl | null {
+    get formauthMethodType(): AbstractControl | null {
         return this.form.get('authMethodType');
     }
 }

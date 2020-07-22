@@ -21,15 +21,16 @@ const (
 )
 
 type ProjectGrantMemberView struct {
-	UserID    string         `json:"userId" gorm:"column:user_id;primary_key"`
-	GrantID   string         `json:"grantId" gorm:"column:grant_id;primary_key"`
-	ProjectID string         `json:"-" gorm:"column:project_id"`
-	UserName  string         `json:"-" gorm:"column:user_name"`
-	Email     string         `json:"-" gorm:"column:email_address"`
-	FirstName string         `json:"-" gorm:"column:first_name"`
-	LastName  string         `json:"-" gorm:"column:last_name"`
-	Roles     pq.StringArray `json:"roles" gorm:"column:roles"`
-	Sequence  uint64         `json:"-" gorm:"column:sequence"`
+	UserID      string         `json:"userId" gorm:"column:user_id;primary_key"`
+	GrantID     string         `json:"grantId" gorm:"column:grant_id;primary_key"`
+	ProjectID   string         `json:"-" gorm:"column:project_id"`
+	UserName    string         `json:"-" gorm:"column:user_name"`
+	Email       string         `json:"-" gorm:"column:email_address"`
+	FirstName   string         `json:"-" gorm:"column:first_name"`
+	LastName    string         `json:"-" gorm:"column:last_name"`
+	DisplayName string         `json:"-" gorm:"column:display_name"`
+	Roles       pq.StringArray `json:"roles" gorm:"column:roles"`
+	Sequence    uint64         `json:"-" gorm:"column:sequence"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
@@ -44,6 +45,7 @@ func ProjectGrantMemberViewFromModel(member *model.ProjectGrantMemberView) *Proj
 		Email:        member.Email,
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
 		Roles:        member.Roles,
 		Sequence:     member.Sequence,
 		CreationDate: member.CreationDate,
@@ -60,6 +62,7 @@ func ProjectGrantMemberToModel(member *ProjectGrantMemberView) *model.ProjectGra
 		Email:        member.Email,
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
 		Roles:        member.Roles,
 		Sequence:     member.Sequence,
 		CreationDate: member.CreationDate,

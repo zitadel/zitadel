@@ -47,6 +47,15 @@ type ProjectViewSearchResponse struct {
 	Timestamp   time.Time
 }
 
+func (r *ProjectViewSearchRequest) GetSearchQuery(key ProjectViewSearchKey) (int, *ProjectViewSearchQuery) {
+	for i, q := range r.Queries {
+		if q.Key == key {
+			return i, q
+		}
+	}
+	return -1, nil
+}
+
 func (r *ProjectViewSearchRequest) AppendMyResourceOwnerQuery(orgID string) {
 	r.Queries = append(r.Queries, &ProjectViewSearchQuery{Key: ProjectViewSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }

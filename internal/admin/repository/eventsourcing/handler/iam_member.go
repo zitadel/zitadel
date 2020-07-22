@@ -120,6 +120,7 @@ func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_mode
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName
 	member.Email = user.EmailAddress
+	member.DisplayName = user.DisplayName
 }
 func (m *IamMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Ld9ow", "id", event.AggregateID).WithError(err).Warn("something went wrong in iammember handler")

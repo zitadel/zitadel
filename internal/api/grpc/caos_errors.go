@@ -2,16 +2,12 @@ package grpc
 
 import (
 	"context"
-
 	"github.com/caos/logging"
-
-	"github.com/caos/zitadel/pkg/grpc/message"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/pkg/grpc/message"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator) error {
@@ -25,11 +21,12 @@ func CaosToGRPCError(ctx context.Context, err error, translator *i18n.Translator
 	msg := key
 	if translator != nil {
 		msg = translator.LocalizeFromCtx(ctx, key, nil)
+		msg += " (" + id + ")"
 	}
-	s, err := status.New(code, key).WithDetails(&message.ErrorDetail{Id: id, Message: msg})
+	s, err := status.New(code, msg).WithDetails(&message.ErrorDetail{Id: id, Message: key})
 	if err != nil {
 		logging.Log("GRPC-gIeRw").WithError(err).Debug("unable to add detail")
-		return status.New(code, key).Err()
+		return status.New(code, msg).Err()
 	}
 
 	return s.Err()

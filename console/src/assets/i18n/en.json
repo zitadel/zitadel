@@ -477,7 +477,8 @@
         },
         "APP": {
             "TITLE": "Applications",
-            "NAME": "Name"
+            "NAME": "Name",
+            "NAMEREQUIRED":"A name ist required."
         },
         "ROLE": {
             "ADDNEWLINE":"Add additional role",
@@ -529,7 +530,8 @@
             "TITLE": "Application",
             "DESCRIPTION": "Here you can edit your application data and its configuration",
             "CREATE_OIDC": "OIDC Application",
-            "CREATE_OIDC_DESc": "Enter your application details",
+            "CREATE_OIDC_DESC_TITLE": "Enter your application details step by step",
+            "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
@@ -540,16 +542,29 @@
             }
         },
         "NAME": "Name",
+        "TYPE":"Application type",
+        "GRANT":"Grant Types",
         "OIDC": {
+            "PROSWITCH":"I'm a pro. Skip this wizard.",
+            "NAMEANDTYPESECTION":"Name and Type",
+            "TITLEFIRST":"Insert a name first!",
+            "TYPETITLE":"What type of application do you want to create?",
+            "REDIRECTTITLE":"Specify the urls where the login will redirect to.",
+            "POSTREDIRECTTITLE":"This is the redirect after logout.",
+            "TYPEREQUIRED":"The type is required!",
             "TITLE": "OIDC Configuration",
             "CLIENTID": "Client ID",
             "CLIENTSECRET": "Client Secret",
             "CLIENTSECRET_DESCRIPTION": "Save your Client Secret as it will disappear once the dialog is closed!",
             "REGENERATESECRET": "Regenerate Client Secret",
             "REDIRECT": "Redirect URIs",
+            "REDIRECTSECTION": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",
             "RESPONSE": "Response Types",
+            "RESPONSESECTION": "Response Types",
             "GRANT": "Grant Types",
+            "GRANTSECTION":"Grant Types",
+            "GRANTTITLE":"Select your grant types. Note: Implicit is only available for browser based applications.",
             "APPTYPE": "App Types",
             "RESPONSE0": "Code",
             "RESPONSE1": "Id Token",
@@ -561,9 +576,13 @@
             "APPTYPE1": "User Agent",
             "APPTYPE2": "Native",
             "AUTHMETHOD":"Auth Method",
+            "AUTHMETHODSECTION":"Auth Method",
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
-            "AUTHMETHOD2":"None"
+            "AUTHMETHOD2":"None",
+            "UNSECUREREDIRECT":"I sure hope you know what you are doing.",
+            "OVERVIEWSECTION":"Overview",
+            "OVERVIEWTITLE":"You are now done. Review your configuration"
         },
         "TOAST": {
             "REACTIVATED":"App reactivated!",

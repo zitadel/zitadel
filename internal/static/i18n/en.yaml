@@ -109,6 +109,7 @@ Errors:
     IDMissing: Id missing
     NotActive: User grant is not active
     NotInactive: User grant is not deactivated
+    NoPermissionForProject: User has no permissions on this project
   Changes:
     NotFound: No history found
   Token:

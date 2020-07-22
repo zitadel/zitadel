@@ -120,6 +120,7 @@ func projectGrantMemberViewFromModel(member *proj_model.ProjectGrantMemberView) 
 		Email:        member.Email,
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
 		Roles:        member.Roles,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,

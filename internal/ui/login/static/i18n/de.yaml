@@ -122,6 +122,7 @@ Actions:
   Skip: überspringen
   Register: registrieren
   ForgotPassword: Password zurücksetzen
+  Cancel: Abbrechen
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten

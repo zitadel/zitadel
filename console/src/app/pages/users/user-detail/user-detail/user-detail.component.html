@@ -9,10 +9,10 @@
             <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write', 'user.write:'+user?.id]">
-                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
+                <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
                     class="state-button"
                     (click)="changeState(UserState.USERSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
-                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
+                <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
                     class="state-button"
                     (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
             </ng-template>
