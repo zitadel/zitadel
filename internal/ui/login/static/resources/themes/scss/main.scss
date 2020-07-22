@@ -222,6 +222,10 @@ form {
 
     button.user-selection {
         @extend %profile-image;
+        .profile-image {
+            height: 80px;
+            width: 80px;
+        }
 
         .sessionstate {
             display: inline-block;

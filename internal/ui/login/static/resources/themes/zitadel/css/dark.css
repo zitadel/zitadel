@@ -272,6 +272,10 @@ form button.clean * {
 form .user-selection-list {
   margin-bottom: 40px;
 }
+form button.user-selection .profile-image {
+  width: 80px;
+  height: 80px;
+}
 form button.user-selection .sessionstate {
   display: inline-block;
   height: 20px;
