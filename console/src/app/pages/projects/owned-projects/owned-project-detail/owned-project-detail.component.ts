@@ -101,25 +101,23 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
-        if (this.projectId) {
-            this.projectService.GetProjectById(id).then(proj => {
-                this.project = proj.toObject();
-            }).catch(error => {
-                console.error(error);
-                this.toast.showError(error);
-            });
+        this.projectService.GetProjectById(id).then(proj => {
+            this.project = proj.toObject();
+        }).catch(error => {
+            console.error(error);
+            this.toast.showError(error);
+        });
 
-            from(this.projectService.SearchProjectMembers(this.project.projectId, 100, 0)).pipe(
-                map(resp => {
-                    this.totalMemberResult = resp.toObject().totalResult;
-                    return resp.toObject().resultList;
-                }),
-                catchError(() => of([])),
-                finalize(() => this.loadingSubject.next(false)),
-            ).subscribe(members => {
-                this.membersSubject.next(members);
-            });
-        }
+        from(this.projectService.SearchProjectMembers(this.projectId, 100, 0)).pipe(
+            map(resp => {
+                this.totalMemberResult = resp.toObject().totalResult;
+                return resp.toObject().resultList;
+            }),
+            catchError(() => of([])),
+            finalize(() => this.loadingSubject.next(false)),
+        ).subscribe(members => {
+            this.membersSubject.next(members);
+        });
     }
 
     public changeState(newState: ProjectState): void {
@@ -187,7 +185,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public openAddMember(): void {
         const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
             data: {
-                // TODO replace
                 creationType: CreationType.PROJECT_OWNED,
                 projectId: this.project.projectId,
             },
@@ -201,7 +198,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
                 if (users && users.length && roles && roles.length) {
                     users.forEach(user => {
-                        return this.projectService.AddProjectMember(this.project.projectId, user.id, roles)
+                        return this.projectService.AddProjectMember(this.projectId, user.id, roles)
                             .then(() => {
                                 this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                             }).catch(error => {
