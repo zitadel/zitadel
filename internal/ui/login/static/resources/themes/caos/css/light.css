@@ -441,7 +441,7 @@ html button.clean {
 }
 html button.clean:hover {
   border: none;
-  background-color: #252525;
+  background-color: #FFFFFF;
 }
 html button.user-selection .profile-image {
   background-image: url("../../../images/icon-user-light.png");
@@ -449,11 +449,11 @@ html button.user-selection .profile-image {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   html button.user-selection .profile-image {
     background-image: url("../../../images/icon-user-light@2x.png");
-    background-size: 100px 100px;
+    background-size: 80px 80px;
   }
 }
 html button.user-selection:hover {
-  background-color: #252525;
+  background-color: #FFFFFF;
 }
 html button.user-selection:hover .profile-image {
   background-image: url("../../../images/icon-user-light-hover.png");
@@ -461,7 +461,7 @@ html button.user-selection:hover .profile-image {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   html button.user-selection:hover .profile-image {
     background-image: url("../../../images/icon-user-light-hover@2x.png");
-    background-size: 100px 100px;
+    background-size: 80px 80px;
   }
 }
 html button.other-user .other-user-image {
@@ -470,7 +470,7 @@ html button.other-user .other-user-image {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   html button.other-user .other-user-image {
     background-image: url("../../../images/icon-newuser-light@2x.png");
-    background-size: 100px 75px;
+    background-size: 80px 60px;
   }
 }
 html button.other-user:hover .other-user-image {
@@ -479,7 +479,7 @@ html button.other-user:hover .other-user-image {
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
   html button.other-user:hover .other-user-image {
     background-image: url("../../../images/icon-newuser-light-hover@2x.png");
-    background-size: 100px 75px;
+    background-size: 80px 60px;
   }
 }
 html input:not([type=radio]), html select {

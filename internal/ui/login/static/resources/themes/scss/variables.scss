@@ -41,6 +41,6 @@ $fontColorLight: $backgroundColor;
 $primaryColorLight: $primaryColor;
 $primaryColorHoverLight: lighten($primaryColorLight, 10%);
 $inputBackgroundColorLight: #FFFFFF;
-$buttonBackgroundColorHoverLight: $inputBackgroundColor;
+$buttonBackgroundColorHoverLight: $inputBackgroundColorLight;
 $profileImgLight: "../../../images/icon-user-light";
 $otherUserImgLight: "../../../images/icon-newuser-light";
