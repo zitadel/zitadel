@@ -87,6 +87,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"mfaPromptUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMfaPrompt)
 		},
+		"mfaPromptChangeUrl": func(id string, provider model.MfaType) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMfaPrompt, queryAuthRequestID, id, "provider", provider))
+		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMfaInitVerify)
 		},
