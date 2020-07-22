@@ -1,0 +1,30 @@
+<div class="groups">
+    <span class="header">{{ title }}</span>
+    <span class="sub-header">{{ description }}</span>
+    <div class="people">
+        <div class="img-list">
+            <ng-container *ngIf="totalResult < 10; else compact">
+                <ng-container *ngFor="let member of membersSubject | async; index as i">
+                    <div (click)="emitShowDetail()" class="avatar-circle"
+                        matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}"
+                        [ngStyle]="{'z-index': 100 - i}">
+                        <app-avatar *ngIf="member && (member.displayName || (member.firstName && member.lastName))"
+                            class="avatar dontcloseonclick"
+                            [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)"
+                            [size]="32">
+                        </app-avatar>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #compact>
+                <div (click)="emitShowDetail()" class="avatar-circle" matTooltip="Click to show detail">
+                    <span>{{totalResult}}</span>
+                </div>
+            </ng-template>
+            <button class="add-img" (click)="emitAddMember()" [disabled]="disabled" mat-icon-button
+                aria-label="Edit contributors">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

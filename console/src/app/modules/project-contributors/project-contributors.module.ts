@@ -1,14 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 
 import { MemberCreateDialogModule } from '../add-member-dialog/member-create-dialog.module';
-import { AvatarModule } from '../avatar/avatar.module';
 import { ProjectContributorsComponent } from './project-contributors.component';
-
 
 
 @NgModule({
@@ -17,10 +13,7 @@ import { ProjectContributorsComponent } from './project-contributors.component';
         MemberCreateDialogModule,
         CommonModule,
         TranslateModule,
-        MatTooltipModule,
-        MatIconModule,
-        MatButtonModule,
-        AvatarModule,
+        ContributorsModule,
     ],
     exports: [
         ProjectContributorsComponent,
