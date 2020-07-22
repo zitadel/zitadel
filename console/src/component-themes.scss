@@ -1,9 +1,9 @@
 @import './styles/card';
 @import './styles/table';
 @import './styles/sidenav-list';
-@import './styles/morph-card';
+@import 'src/app/modules/avatar/avatar.component';
 @import './styles/changes';
-@import './styles/avatar';
+@import 'src/app/pages/projects/owned-projects/owned-project-detail/application-grid/application-grid.component';
 @import './styles/meta';
 @import './styles/theme-card';
 
@@ -12,7 +12,7 @@
     @include card-theme($theme);
     @include table-theme($theme);
     @include sidenav-list-theme($theme);
-    @include morph-card-theme($theme);
+    @include application-grid-theme($theme);
     @include changes-theme($theme);
     @include meta-theme($theme);
     @include theme-card($theme);

@@ -15,10 +15,10 @@
 
             <span class="fill-space"></span>
 
-            <button mat-stroked-button color="accent" [disabled]="isZitadel"
+            <button mat-stroked-button color="warn" [disabled]="isZitadel"
                 *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="state-button"
                 (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
-            <button mat-stroked-button color="accent" [disabled]="isZitadel"
+            <button mat-stroked-button color="warn" [disabled]="isZitadel"
                 *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="state-button"
                 (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
 
