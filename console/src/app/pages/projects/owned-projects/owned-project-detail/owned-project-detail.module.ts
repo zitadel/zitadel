@@ -12,6 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
@@ -61,6 +62,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         ChangesModule,
         MetaLayoutModule,
         RefreshTableModule,
+        MemberCreateDialogModule,
     ],
 })
 export class OwnedProjectDetailModule { }

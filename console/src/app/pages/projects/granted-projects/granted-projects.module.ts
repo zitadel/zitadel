@@ -16,6 +16,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
@@ -69,6 +70,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         TranslateModule,
         TimestampToDatePipeModule,
         SharedModule,
+        MemberCreateDialogModule,
     ],
 })
 export class GrantedProjectsModule { }
