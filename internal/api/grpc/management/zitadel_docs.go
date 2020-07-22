@@ -7,9 +7,8 @@ import (
 )
 
 func (s *Server) GetZitadelDocs(ctx context.Context, _ *empty.Empty) (*management.ZitadelDocs, error) {
-	user, err := s.usergrant.UserGrantByID(ctx, request.Id)
-	if err != nil {
-		return nil, err
-	}
-	return userGrantViewFromModel(user), nil
+	return &management.ZitadelDocs{
+		Issuer:            s.systemDefaults.ZitadelDocs.Issuer,
+		DiscoveryEndpoint: s.systemDefaults.ZitadelDocs.DiscoveryEndpoint,
+	}, nil
 }

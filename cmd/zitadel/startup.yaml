@@ -174,9 +174,6 @@ Mgmt:
     ConcurrentTasks: 4
     BulkLimit: 100
     FailureCountUntilSkip: 5
-  Endpoints:
-    Issuer: $ZITADEL_ISSUER
-    Discovery: '$ZITADEL_ISSUER/.well-known/openid-configuration'
 
 API:
   GRPC:
