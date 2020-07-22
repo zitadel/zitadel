@@ -550,7 +550,7 @@
             "PROSWITCH":"Konfigurator überspringen",
             "NAMEANDTYPESECTION":"Name und Typ",
             "TITLEFIRST":"Geben Sie zuerst einen Namen ein!",
-            "TYPETITLE":"Welche Art von Applikation wollen Sie erstellen?",
+            "TYPETITLE":"Welche Art von Applikation möchtest du erstellen?",
             "REDIRECTTITLE":"Wo soll nach dem Login weitergeleitet werden?",
             "POSTREDIRECTTITLE":"Das ist die Weiterleitung nach einem logout.",
             "TYPEREQUIRED":"Der Typ ist notwendig!",
