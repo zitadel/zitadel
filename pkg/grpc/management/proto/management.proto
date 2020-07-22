@@ -54,6 +54,12 @@ service ManagementService {
         };
     }
 
+    rpc GetZitadelDocs(google.protobuf.Empty) returns (ZitadelDocs) {
+        option (google.api.http) = {
+        get: "/zitadel/docs"
+        };
+    }
+
     // GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)
     rpc GetIam(google.protobuf.Empty) returns (Iam) {
         option (google.api.http) = {
@@ -1321,6 +1327,11 @@ service ManagementService {
             check_field_name: "ProjectGrantId"
         };
     }
+}
+
+message ZitadelDocs {
+    string issuer = 1;
+    string discovery_endpoint = 2;
 }
 
 message Iam {

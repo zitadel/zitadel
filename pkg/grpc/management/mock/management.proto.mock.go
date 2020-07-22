@@ -1137,6 +1137,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserProfile(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserProfile", reflect.TypeOf((*MockManagementServiceClient)(nil).GetUserProfile), varargs...)
 }
 
+// GetZitadelDocs mocks base method
+func (m *MockManagementServiceClient) GetZitadelDocs(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.ZitadelDocs, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetZitadelDocs", varargs...)
+	ret0, _ := ret[0].(*management.ZitadelDocs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetZitadelDocs indicates an expected call of GetZitadelDocs
+func (mr *MockManagementServiceClientMockRecorder) GetZitadelDocs(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetZitadelDocs", reflect.TypeOf((*MockManagementServiceClient)(nil).GetZitadelDocs), varargs...)
+}
+
 // Healthz mocks base method
 func (m *MockManagementServiceClient) Healthz(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
