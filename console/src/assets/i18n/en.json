@@ -531,7 +531,7 @@
             "DESCRIPTION": "Here you can edit your application data and its configuration",
             "CREATE_OIDC": "OIDC Application",
             "CREATE_OIDC_DESC_TITLE": "Enter your application details step for step",
-            "CREATE_OIDC_DESC_SUB": "The fields are prefilled with recommended data.",
+            "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
