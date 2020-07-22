@@ -5,6 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
+import { IamMemberView } from 'src/app/proto/generated/admin_pb';
 import { ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -20,9 +21,9 @@ export class IamMembersComponent implements AfterViewInit {
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
+    @ViewChild(MatTable) public table!: MatTable<IamMemberView.AsObject>;
     public dataSource!: IamMembersDataSource;
-    public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
+    public selection: SelectionModel<IamMemberView.AsObject> = new SelectionModel<IamMemberView.AsObject>(true, []);
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
@@ -32,7 +33,7 @@ export class IamMembersComponent implements AfterViewInit {
         private toast: ToastService) {
 
         this.dataSource = new IamMembersDataSource(this.adminService);
-        this.dataSource.loadMembers(0, 25, 'asc');
+        this.dataSource.loadMembers(0, 25);
     }
 
     public ngAfterViewInit(): void {
