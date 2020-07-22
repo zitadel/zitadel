@@ -25,12 +25,13 @@
         <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
             description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
             <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
-                <span>{{login}}</span>
+                <span>{{login}} </span>
                 <button color="primary" [disabled]="copied == login"
                     [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    (click)="copytoclipboard(login)" mat-icon-button>
+                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="this.copied = $event" mat-icon-button>
                     <i *ngIf="copied != login" class="las la-clipboard"></i>
                     <i *ngIf="copied == login" class="las la-clipboard-check"></i>
+
                 </button>
             </div>
         </app-card>

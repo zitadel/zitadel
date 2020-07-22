@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -27,7 +27,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
     public languages: string[] = ['de', 'en'];
 
-    public isMgmt: boolean = false;
     private subscription: Subscription = new Subscription();
     public emailEditState: boolean = false;
     public phoneEditState: boolean = false;
@@ -49,11 +48,11 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
     public ngOnInit(): void {
         this.subscription = this.route.params.subscribe(params => {
-            this.loading = true;
-            this.getData(params).then(() => {
-                this.loading = false;
-            }).catch(error => {
-                this.loading = false;
+            const { id } = params;
+            this.mgmtUserService.GetUserByID(id).then(user => {
+                this.user = user.toObject();
+            }).catch(err => {
+                console.error(err);
             });
         });
     }
@@ -157,15 +156,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this._location.back();
     }
 
-    private async getData({ id }: Params): Promise<void> {
-        this.isMgmt = true;
-        this.mgmtUserService.GetUserByID(id).then(user => {
-            this.user = user.toObject();
-        }).catch(err => {
-            console.error(err);
-        });
-    }
-
     public sendSetPasswordNotification(): void {
         this.mgmtUserService.SendSetPasswordNotification(this.user.id, NotificationType.NOTIFICATIONTYPE_EMAIL)
             .then(() => {
@@ -173,23 +163,5 @@ export class UserDetailComponent implements OnInit, OnDestroy {
             }).catch(error => {
                 this.toast.showError(error);
             });
-    }
-
-    public copytoclipboard(value: string): void {
-        const selBox = document.createElement('textarea');
-        selBox.style.position = 'fixed';
-        selBox.style.left = '0';
-        selBox.style.top = '0';
-        selBox.style.opacity = '0';
-        selBox.value = value;
-        document.body.appendChild(selBox);
-        selBox.focus();
-        selBox.select();
-        document.execCommand('copy');
-        document.body.removeChild(selBox);
-        this.copied = value;
-        setTimeout(() => {
-            this.copied = '';
-        }, 3000);
     }
 }

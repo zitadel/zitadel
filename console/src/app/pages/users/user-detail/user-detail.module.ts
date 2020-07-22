@@ -13,6 +13,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { QRCodeModule } from 'angularx-qrcode';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
@@ -70,6 +71,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
         MatPaginatorModule,
         SharedModule,
         RefreshTableModule,
+        CopyToClipboardModule,
     ],
 })
 export class UserDetailModule { }
