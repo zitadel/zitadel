@@ -405,7 +405,7 @@ func (repo *ProjectRepo) SearchGrantedProjects(ctx context.Context, request *pro
 		}
 	}
 
-	grants, count, err := repo.View.SearchProjectGrants(request)
+	projects, count, err := repo.View.SearchProjectGrants(request)
 	if err != nil {
 		return nil, err
 	}
