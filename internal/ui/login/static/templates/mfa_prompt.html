@@ -25,6 +25,9 @@
         {{if not .MfaRequired}}
         <button class="default right" name="skip" value="true" type="submit" formnovalidate>{{t "Actions.Skip"}}</button>
         {{end}}
+        <a href="{{ loginUrl }}">
+            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        </a>
     </div>
 </form>
 
