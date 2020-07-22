@@ -45,16 +45,11 @@
 
 		.item {
 			flex: 1 1 45%;
-			// box-sizing: border-box;
-			margin: 1rem;
-			border: 1px solid #ffffff20;
-			border-radius: .5rem;
+			margin: 0 1rem;
 			display: flex;
             flex-direction: column;
-            transition: border-color .1s;
 
 			.top {
-				padding: 1rem 2rem;
 				h2 {
 					margin-top: .5rem;
                     display: flex;
@@ -79,11 +74,10 @@
 			}
 
 			.footer {
-				height: 60px;
 				display: flex;
 				align-items: center;
-				padding: 0 1rem;
                 border-top: 1px solid #ffffff20;
+                padding-top: 1rem;
                 
                 a {
                     border-radius: .5rem;
