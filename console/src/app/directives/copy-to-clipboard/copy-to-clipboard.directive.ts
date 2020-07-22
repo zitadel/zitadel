@@ -7,8 +7,7 @@ export class CopyToClipboardDirective {
     @Input() valueToCopy: string = '';
     @Output() copiedValue: EventEmitter<string> = new EventEmitter();
 
-    @HostListener('document:click', ['$event.target']) onMouseEnter(targetElement: HTMLElement): void {
-        console.log(targetElement);
+    @HostListener('document:click', ['$event.target']) onMouseEnter(): void {
         this.copytoclipboard(this.valueToCopy);
     }
 

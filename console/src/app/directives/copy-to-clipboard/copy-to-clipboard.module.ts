@@ -12,5 +12,8 @@ import { CopyToClipboardDirective } from './copy-to-clipboard.directive';
     imports: [
         CommonModule,
     ],
+    exports: [
+        CopyToClipboardDirective,
+    ],
 })
 export class CopyToClipboardModule { }

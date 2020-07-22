@@ -102,7 +102,8 @@
             "NAMEANDEMAILSECTION":"Name und Email",
             "GENDERLANGSECTION":"Geschlecht und Sprache",
             "PHONESECTION":"Telefonnummer",
-            "PASSWORDSECTION":"Setze ein initiales Passwort."
+            "PASSWORDSECTION":"Setze ein initiales Passwort.",
+            "ADDRESSANDPHONESECTION":"Telefonnummer"
         },
         "CODEDIALOG": {
             "TITLE":"Telefonnummer verifizieren",
