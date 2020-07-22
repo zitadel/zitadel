@@ -45,8 +45,6 @@ html {
 
         &.user-selection {
             .profile-image {
-                height: 80px;
-                width: 80px;
                 @include retina-background-image($profileImgLight, "png", false, 80px, 80px);
             }
 
