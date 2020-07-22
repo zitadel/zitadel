@@ -2,12 +2,13 @@ package eventsourcing
 
 import (
 	"context"
+	"strings"
+
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"strings"
 )
 
 func UserByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
@@ -79,6 +80,11 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 	}
 
 	agg, err = agg.AppendEvent(model.UserAdded, user)
+	if err != nil {
+		return nil, err
+	}
+	//TODO: remove
+	agg, err = agg.AppendEvent(model.MfaInitSkipped, nil)
 	if err != nil {
 		return nil, err
 	}

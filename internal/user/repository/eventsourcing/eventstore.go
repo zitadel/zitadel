@@ -119,7 +119,8 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	}
 	user.AggregateID = id
 
-	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, true)
+	//TODO: set onetime to true
+	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, false)
 	if err != nil {
 		return nil, nil, err
 	}
