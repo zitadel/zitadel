@@ -1,3 +1,4 @@
+import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -6,7 +7,6 @@ import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-cimport { Component, OnDestroy; } from '@angular/core';
 function noEmailValidator(c: AbstractControl): any {
     const EMAIL_REGEXP: RegExp = /^((?!@).)*$/gm;
     if (!c.parent || !c) {
