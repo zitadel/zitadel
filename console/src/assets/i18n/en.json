@@ -55,10 +55,15 @@
         "CHANGE":"Change",
         "REACTIVATE":"Reactivate",
         "DEACTIVATE":"Deactivate",
-        "REFRESH":"Refresh"
+        "REFRESH":"Refresh",
+        "LOGIN":"Login"
     },
     "ERRORS": {
-        "REQUIRED": "Some required fields are missing!"
+        "REQUIRED": "Some required fields are missing!",
+        "TOKENINVALID": {
+            "TITLE":"Your auth token has expired",
+            "DESCRIPTION":"Click the button below to login again!"
+        }
     },
     "USER": {
         "TITLE": "Personal Information",

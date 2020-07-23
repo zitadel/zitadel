@@ -55,10 +55,15 @@
         "CHANGE":"Ändern",
         "REACTIVATE":"Aktivieren",
         "DEACTIVATE":"Deaktivieren",
-        "REFRESH":"Aktualisieren"
+        "REFRESH":"Aktualisieren",
+        "LOGIN":"Login"
     },
     "ERRORS": {
-        "REQUIRED": "Bitte fülle alle benötigten Felder aus!"
+        "REQUIRED": "Bitte fülle alle benötigten Felder aus!",
+        "TOKENINVALID": {
+            "TITLE":"Sie sind abgemeldet",
+            "DESCRIPTION":"Klicken Sie auf Login um nochmal einzuloggen!"
+        }
     },
     "USER": {
         "TITLE": "Persönliche Informationen",

@@ -154,7 +154,7 @@ $custom-typography: mat-typography-config(
     @include angular-material-theme($light-theme);
     color: #202124;
 
-	.sidenav, .main-container {
+	.sidenav, .main-container, .mat-dialog-container {
         background-color: #fafafa;
         transition: background-color .4s ease-in-out;
     }
@@ -183,7 +183,7 @@ $custom-typography: mat-typography-config(
     @include component-themes($dark-theme);
     @include angular-material-theme($dark-theme);
 
-	.sidenav, .main-container {
+	.sidenav, .main-container, .mat-dialog-container {
         background-color: #212224;
         transition: background-color .4s ease-in-out;
     }

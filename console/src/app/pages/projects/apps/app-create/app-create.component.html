@@ -56,23 +56,6 @@
             </div>
         </mat-step>
 
-        <!-- <mat-step [editable]="true" *ngIf="moreThanOneOption(oidcGrantTypes)">
-            <ng-template matStepLabel>{{'APP.OIDC.GRANTSECTION' | translate}}</ng-template>
-
-            <p class="step-title">{{'APP.OIDC.GRANTTITLE' | translate}}</p>
-
-            <div class="checkbox-container">
-                <mat-checkbox (change)="changeGrant()" *ngFor="let granttype of oidcGrantTypes" color="primary"
-                    [(ngModel)]="granttype.checked" [disabled]="granttype.disabled">
-                    {{'APP.OIDC.GRANT'+granttype.type | translate}}
-                </mat-checkbox>
-            </div>
-            <div class="actions">
-                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
-            </div>
-        </mat-step> -->
-
         <mat-step *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB"
             [stepControl]="secondFormGroup" [editable]="true">
             <form [formGroup]="secondFormGroup">
