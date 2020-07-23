@@ -41,7 +41,22 @@
             </form>
         </mat-step>
 
-        <mat-step [editable]="true">
+        <mat-step [editable]="true"
+            *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
+            <ng-template matStepLabel>{{'APP.OIDC.RESPONSESECTION' | translate}}</ng-template>
+            <div class="checkbox-container">
+                <mat-checkbox *ngFor="let responsetype of oidcResponseTypes" (change)="changeResponseType()"
+                    color="primary" [(ngModel)]="responsetype.checked" [disabled]="responsetype.disabled">
+                    {{'APP.OIDC.RESPONSE'+responsetype.type | translate}}
+                </mat-checkbox>
+            </div>
+            <div class="actions">
+                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+            </div>
+        </mat-step>
+
+        <!-- <mat-step [editable]="true" *ngIf="moreThanOneOption(oidcGrantTypes)">
             <ng-template matStepLabel>{{'APP.OIDC.GRANTSECTION' | translate}}</ng-template>
 
             <p class="step-title">{{'APP.OIDC.GRANTTITLE' | translate}}</p>
@@ -56,24 +71,10 @@
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
                 <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
             </div>
-        </mat-step>
+        </mat-step> -->
 
-        <mat-step [editable]="true" *ngIf="!grantTypeChecked(OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE)">
-            <ng-template matStepLabel>{{'APP.OIDC.RESPONSESECTION' | translate}}</ng-template>
-            <div class="checkbox-container">
-                <mat-checkbox *ngFor="let responsetype of oidcResponseTypes | keyvalue" (change)="changeResponseType()"
-                    color="primary" [(ngModel)]="responsetype.checked">
-                    {{'APP.OIDC.RESPONSE'+responsetype.key | translate}}
-                </mat-checkbox>
-            </div>
-            <div class="actions">
-                <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
-            </div>
-        </mat-step>
-
-        <mat-step [stepControl]="secondFormGroup" [editable]="true"
-            *ngIf="applicationType?.value !== OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+        <mat-step *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB"
+            [stepControl]="secondFormGroup" [editable]="true">
             <form [formGroup]="secondFormGroup">
                 <ng-template matStepLabel>{{'APP.OIDC.AUTHMETHODSECTION' | translate}}</ng-template>
 
@@ -157,19 +158,32 @@
                 <span class="left">
                     {{ 'APP.GRANT' | translate }}
                 </span>
-                <span class="right">
-                    <span *ngFor="let element of oidcApp.grantTypesList">
+                <span class="right" *ngIf="oidcApp.grantTypesList?.length > 0">
+                    [<span *ngFor="let element of oidcApp.grantTypesList; index as i">
                         {{'APP.OIDC.GRANT'+element | translate}}
-                    </span>
+                        {{i < oidcApp.grantTypesList.length - 1 ? ', ': ''}}
+                    </span>]
                 </span>
             </div>
             <div class="row">
                 <span class="left">
                     {{ 'APP.OIDC.RESPONSE' | translate }}
                 </span>
+                <span class="right" *ngIf="oidcApp.responseTypesList?.length > 0">
+                    [<span *ngFor="let element of oidcApp.responseTypesList; index as i">
+                        {{('APP.OIDC.RESPONSE'+element | translate)}}
+                        {{i < oidcApp.responseTypesList.length - 1 ? ', ': ''}}
+                    </span>]
+                </span>
+            </div>
+
+            <div class="row">
+                <span class="left">
+                    {{ 'APP.OIDC.AUTHMETHOD' | translate }}
+                </span>
                 <span class="right">
-                    <span *ngFor="let element of oidcApp.responseTypesList">
-                        {{'APP.OIDC.RESPONSE'+element | translate}}
+                    <span>
+                        {{'APP.OIDC.AUTHMETHOD'+oidcApp?.authMethodType | translate}}
                     </span>
                 </span>
             </div>
@@ -178,10 +192,11 @@
                 <span class="left">
                     {{ 'APP.OIDC.REDIRECT' | translate }}
                 </span>
-                <span class="right">
-                    <span *ngFor="let redirect of oidcApp.redirectUrisList">
+                <span class="right" *ngIf="oidcApp.redirectUrisList?.length > 0">
+                    [<span *ngFor="let redirect of oidcApp.redirectUrisList; index as i">
                         {{redirect}}
-                    </span>
+                        {{i < oidcApp.redirectUrisList.length - 1 ? ', ': ''}}
+                    </span>]
                 </span>
             </div>
 
@@ -189,10 +204,11 @@
                 <span class="left">
                     {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
                 </span>
-                <span class="right">
-                    <span *ngFor="let redirect of oidcApp.postLogoutRedirectUrisList">
+                <span class="right" *ngIf="oidcApp.postLogoutRedirectUrisList?.length > 0">
+                    [<span *ngFor="let redirect of oidcApp.postLogoutRedirectUrisList; index as i">
                         {{redirect}}
-                    </span>
+                        {{i < oidcApp.postLogoutRedirectUrisList.length - 1 ? ', ': ''}}
+                    </span>]
                 </span>
             </div>
 

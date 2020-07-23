@@ -1,3 +1,4 @@
+import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -5,6 +6,26 @@ import { BehaviorSubject } from 'rxjs';
     selector: 'app-contributors',
     templateUrl: './contributors.component.html',
     styleUrls: ['./contributors.component.scss'],
+    animations: [
+        trigger('list', [
+            transition(':enter', [
+                query('@animate',
+                    stagger(80, animateChild()),
+                    // { optional: true },
+                ),
+            ]),
+        ]),
+        trigger('animate', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateX(100%)' }),
+                animate('100ms', style({ opacity: 1, transform: 'translateX(0)' })),
+            ]),
+            // transition(':leave', [
+            //     style({ opacity: 1, transform: 'translateY(0)' }),
+            //     animate('100ms', style({ opacity: 0, transform: 'translateX(100%)' })),
+            // ]),
+        ]),
+    ],
 })
 export class ContributorsComponent {
     @Input() title: string = '';

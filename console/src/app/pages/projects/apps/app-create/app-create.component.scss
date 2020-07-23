@@ -14,7 +14,11 @@ p.desc {
 }
 
 .container {
-	padding: 4rem 4rem 2rem 4rem;
+    padding: 4rem 4rem 2rem 4rem;
+    
+    mat-progress-bar {
+        margin-bottom: 1rem;
+    }
 
 	.abort-container {
 		display: flex;
