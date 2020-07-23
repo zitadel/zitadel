@@ -19,7 +19,7 @@ export class ProjectApplicationsDataSource extends DataSource<Application.AsObje
         super();
     }
 
-    public loadApps(projectId: string, pageIndex: number, pageSize: number, sortDirection?: string): void {
+    public loadApps(projectId: string, pageIndex: number, pageSize: number): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);

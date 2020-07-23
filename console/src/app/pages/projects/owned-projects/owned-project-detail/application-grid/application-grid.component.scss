@@ -21,6 +21,14 @@
         margin: 0 -1rem;
         padding-bottom: 2rem;
 
+        .sp-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: calc(82px + 2rem);
+            height: calc(82px + 2rem);
+        }
+
         .app-wrap {
             outline: none;
             display: flex;
@@ -40,11 +48,24 @@
                 margin: 1rem;
                 border-radius: .5rem;
                 border: 1px solid $accent-color;
+                font-weight: 800;
                 background-color: $primary-dark;
-                transition: background-color .4s ease-in-out;
+                transition: background-color .2s ease-in-out;
+                background-image: 
+                    linear-gradient(transparent 11px, rgba($accent-color,.5) 12px, transparent 12px),
+                    linear-gradient(90deg, transparent 11px, rgba($accent-color,.5) 12px, transparent 12px);
+                    background-size: 100% 12px, 12px 100%;
+
+                &:hover {
+                    background-color: rgba($accent-color,.2);
+                }
 
                 &.add {
                     background: $accent-color;
+
+                    &:hover {
+                        background-color: rgba($accent-color,.8);
+                    }
                 }
             }
 

@@ -56,6 +56,9 @@
     .admin-line {
         background: $accent-color;
         color: white;
+        margin-right: 1rem;
+        border-top-right-radius: 50vw;
+        border-bottom-right-radius: 50vw;
 
         // &::after {
         //     content: '';

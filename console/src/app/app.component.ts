@@ -204,6 +204,21 @@ export class AppComponent implements OnDestroy {
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lock-reset.svg'),
         );
 
+        this.matIconRegistry.addSvgIcon(
+            'mdi_broom',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/broom.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_pin_outline',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin-outline.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_pin',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin.svg'),
+        );
+
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
         });

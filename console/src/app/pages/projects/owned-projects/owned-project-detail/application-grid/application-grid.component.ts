@@ -14,7 +14,7 @@ export class ApplicationGridComponent implements OnInit {
     @Input() public disabled: boolean = false;
     @Output() public changeView: EventEmitter<void> = new EventEmitter();
     public appsSubject: BehaviorSubject<Application.AsObject[]> = new BehaviorSubject<Application.AsObject[]>([]);
-    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
     constructor(private projectService: ProjectService) { }

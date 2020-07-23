@@ -26,7 +26,8 @@
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>
-            <mat-icon>push_pin_outline</mat-icon>
+            <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
+            <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
         </button>
     </div>
 
@@ -52,7 +53,8 @@
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>
-            <mat-icon>push_pin_outline</mat-icon>
+            <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
+            <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
         </button>
     </div>
     <p class="n-items" *ngIf="!loading && items.length === 0 && selection.selected.length === 0">
