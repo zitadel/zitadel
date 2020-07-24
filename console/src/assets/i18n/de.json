@@ -61,8 +61,8 @@
     "ERRORS": {
         "REQUIRED": "Bitte fülle alle benötigten Felder aus!",
         "TOKENINVALID": {
-            "TITLE":"Sie sind abgemeldet",
-            "DESCRIPTION":"Klicken Sie auf Login um nochmal einzuloggen!"
+            "TITLE":"Du bist abgemeldet",
+            "DESCRIPTION":"Klicke auf Knopf Login um dich wieder einzuloggen!"
         }
     },
     "USER": {
