@@ -57,7 +57,7 @@ export const navAnimations: Array<AnimationTriggerMetadata> = [
                 opacity: 0,
             }),
             animate(
-                '.2s',
+                '.0s',
                 style({
                     opacity: 1,
                 }),
@@ -68,7 +68,7 @@ export const navAnimations: Array<AnimationTriggerMetadata> = [
                 opacity: 1,
             }),
             animate(
-                '.2s',
+                '.0s',
                 style({
                     opacity: 0,
                 }),

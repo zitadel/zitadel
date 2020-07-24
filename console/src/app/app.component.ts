@@ -7,8 +7,8 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { from, Observable, of, Subscription } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, of, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
@@ -50,8 +50,8 @@ export class AppComponent implements OnDestroy {
 
     public showProjectSection: boolean = false;
 
-    public grantedProjectsCount$: Observable<number> = of(0);
-    public ownedProjectsCount$: Observable<number> = of(0);
+    public grantedProjectsCount: number = 0;
+    public ownedProjectsCount: number = 0;
 
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
@@ -137,11 +137,12 @@ export class AppComponent implements OnDestroy {
             'mdi_pin',
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin.svg'),
         );
+        this.getProjectCount();
 
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
 
-            this.getCounts();
+            this.getProjectCount();
         });
 
         this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
@@ -178,21 +179,6 @@ export class AppComponent implements OnDestroy {
         });
     }
 
-    public getCounts(): void {
-        this.ownedProjectsCount$ = this.authService.isAllowed(['project.read']).pipe(switchMap(() => {
-            return from(this.projectService.SearchProjects(0, 0).then(res => {
-                return res.toObject().totalResult;
-            }));
-        }));
-
-        this.grantedProjectsCount$ = this.authService.isAllowed(['project.read']).pipe(switchMap(() => {
-            return from(this.projectService.SearchGrantedProjects(0, 0).then(res => {
-                return res.toObject().totalResult;
-            }));
-        }));
-
-    }
-
     public prepareRoute(outlet: RouterOutlet): boolean {
         return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
     }
@@ -224,6 +210,16 @@ export class AppComponent implements OnDestroy {
         this.org = org;
         this.authService.setActiveOrg(org);
         this.router.navigate(['/']);
+    }
+
+    private async getProjectCount(): Promise<any> {
+        this.ownedProjectsCount = await this.projectService.SearchProjects(0, 0).then(res => {
+            return res.toObject().totalResult;
+        });
+
+        this.grantedProjectsCount = await this.projectService.SearchGrantedProjects(0, 0).then(res => {
+            return res.toObject().totalResult;
+        });
     }
 }
 

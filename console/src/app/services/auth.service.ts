@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, forkJoin, from, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, filter, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
+import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
+import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import { Org, UserProfileView } from '../proto/generated/auth_pb';
 import { AuthUserService } from './auth-user.service';
@@ -22,7 +22,7 @@ export class AuthService {
         boolean
     > = new BehaviorSubject(this.authenticated);
 
-    private zitadelPermissions: string[] = [];
+    private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
 
     constructor(
         private grpcService: GrpcService,
@@ -46,50 +46,49 @@ export class AuthService {
         ).pipe(
             take(1),
             mergeMap(token => {
-                return from(this.userService.GetMyUserProfile()).pipe(map(userprofile => userprofile.toObject()));
+                console.log(token);
+                return from(this.userService.GetMyUserProfile().then(userprofile => userprofile.toObject()));
             }),
-            // finalize(() => {
-            //     this.loadPermissions();
-            // }),
+            finalize(() => {
+                this.loadPermissions();
+            }),
         );
-        this.user.subscribe(() => {
-            console.log('user change');
-        });
+
         this.activeOrgChanged.subscribe(() => {
             console.log('org change');
             this.loadPermissions();
         });
-
-        forkJoin([this.activeOrgChanged, this.user]).pipe(switchMap(() => {
-            return this.loadPermissions();
-        }));
     }
 
-    private async loadPermissions(): Promise<any> {
+    private loadPermissions(): void {
         console.log('load permissions');
-        this.zitadelPermissions = await this.userService.getMyzitadelPermissions().then(perm => {
-            return perm.toObject().permissionsList;
-        });
+        merge([
+            // this.authenticationChanged,
+            this.activeOrgChanged.pipe(map(org => !!org)),
+        ]).pipe(
+            first(),
+            switchMap(() => from(this.userService.GetMyzitadelPermissions())),
+            map(rolesResp => rolesResp.toObject().permissionsList),
+        ).subscribe(roles => this.zitadelPermissions.next(roles));
     }
 
     public isAllowed(roles: string[], each: boolean = false): Observable<boolean> {
         if (roles && roles.length > 0) {
-            if (this.zitadelPermissions.length > 0) {
-                return of(this.hasRoles(this.zitadelPermissions, roles));
-            }
-
-            return of(this.hasRoles(this.zitadelPermissions, roles, each));
+            return this.zitadelPermissions.pipe(switchMap(zroles => {
+                return of(this.hasRoles(zroles, roles, each));
+            }));
         } else {
             return of(false);
         }
     }
 
     public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
+        // console.log('has', userRoles);
+        // console.log('needs', requestedRoles);
         return each ?
             requestedRoles.every(role => userRoles.includes(role)) :
             requestedRoles.findIndex(role => {
                 return userRoles.findIndex(i => i.includes(role)) > -1;
-                // return userRoles.includes(role);
             }) > -1;
     }
 
@@ -146,7 +145,6 @@ export class AuthService {
         if (id) {
             const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
             if (org && this.cachedOrgs.find(tmp => tmp.id === org.id)) {
-                this._activeOrgChanged.next(org);
                 return org;
             }
             return Promise.reject(new Error('no cached org'));
@@ -159,7 +157,6 @@ export class AuthService {
 
             const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
             if (org && orgs.find(tmp => tmp.id === org.id)) {
-                this._activeOrgChanged.next(org);
                 return org;
             }
 

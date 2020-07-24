@@ -171,7 +171,7 @@ export class AuthUserService {
         );
     }
 
-    public async getMyzitadelPermissions(): Promise<MyPermissions> {
+    public async GetMyzitadelPermissions(): Promise<MyPermissions> {
         return await this.request(
             c => c.getMyZitadelPermissions,
             new Empty(),

@@ -93,12 +93,12 @@
                                     <div class="c_label">
                                         <span>{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
                                             {{'MENU.PROJECT' | translate}} </span>
-                                        <span *ngIf="(ownedProjectsCount$ | async) as ownedPCount"
+                                        <span *ngIf="ownedProjectsCount as ownedPCount"
                                             class="count">{{ownedPCount}}</span>
                                     </div>
                                 </a>
 
-                                <a @navitem *ngIf="grantedProjectsCount$ | async as grantPCount" class="nav-item"
+                                <a @navitem *ngIf="grantedProjectsCount as grantPCount" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/granted-projects']">
                                     <i class="icon las la-layer-group"></i>
                                     <div class="c_label">
