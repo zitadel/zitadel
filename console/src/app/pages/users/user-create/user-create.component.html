@@ -13,6 +13,8 @@
                 <p class="desc">{{ 'USER.CREATE.DESCRIPTION' | translate }}</p>
             </div>
 
+            <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
+
             <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
                 <!-- <h2>{{ 'USER.PAGES.CREATE' | translate}}</h2> -->
                 <div class="content">

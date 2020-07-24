@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -29,6 +30,7 @@ import { UserCreateComponent } from './user-create.component';
         MatButtonModule,
         MatIconModule,
         MatProgressSpinnerModule,
+        MatProgressBarModule,
         MatCheckboxModule,
         MatTooltipModule,
         TranslateModule,

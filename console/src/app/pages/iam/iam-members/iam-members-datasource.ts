@@ -1,8 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { IamMemberSearchResponse } from 'src/app/proto/generated/admin_pb';
-import { ProjectMember } from 'src/app/proto/generated/management_pb';
+import { IamMemberView } from 'src/app/proto/generated/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 
 /**
@@ -10,9 +9,9 @@ import { AdminService } from 'src/app/services/admin.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class IamMembersDataSource extends DataSource<ProjectMember.AsObject> {
+export class IamMembersDataSource extends DataSource<IamMemberView.AsObject> {
     public totalResult: number = 0;
-    public membersSubject: BehaviorSubject<ProjectMember.AsObject[]> = new BehaviorSubject<ProjectMember.AsObject[]>([]);
+    public membersSubject: BehaviorSubject<IamMemberView.AsObject[]> = new BehaviorSubject<IamMemberView.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -21,25 +20,21 @@ export class IamMembersDataSource extends DataSource<ProjectMember.AsObject> {
     }
 
     public loadMembers(
-        pageIndex: number, pageSize: number, grantId?: string, sortDirection?: string): void {
+        pageIndex: number, pageSize: number): void {
         const offset = pageIndex * pageSize;
 
         this.loadingSubject.next(true);
-        // TODO
-        const promise: Promise<IamMemberSearchResponse> =
-            this.adminService.SearchIamMembers(pageSize, offset);
-        if (promise) {
-            from(promise).pipe(
-                map(resp => {
-                    this.totalResult = resp.toObject().totalResult;
-                    return resp.toObject().resultList;
-                }),
-                catchError(() => of([])),
-                finalize(() => this.loadingSubject.next(false)),
-            ).subscribe(members => {
-                this.membersSubject.next(members);
-            });
-        }
+
+        from(this.adminService.SearchIamMembers(pageSize, offset)).pipe(
+            map(resp => {
+                this.totalResult = resp.toObject().totalResult;
+                return resp.toObject().resultList;
+            }),
+            catchError(() => of([])),
+            finalize(() => this.loadingSubject.next(false)),
+        ).subscribe(members => {
+            this.membersSubject.next(members);
+        });
     }
 
 
@@ -48,7 +43,7 @@ export class IamMembersDataSource extends DataSource<ProjectMember.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<ProjectMember.AsObject[]> {
+    public connect(): Observable<IamMemberView.AsObject[]> {
         return this.membersSubject.asObservable();
     }
 

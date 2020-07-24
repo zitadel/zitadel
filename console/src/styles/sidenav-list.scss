@@ -48,7 +48,7 @@
     }
 
     .root-header {
-        box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.12);
         background-color: $primary-dark !important;
         transition: background-color .4s ease-in-out;
     }
@@ -56,6 +56,9 @@
     .admin-line {
         background: $accent-color;
         color: white;
+        margin-right: 1rem;
+        border-top-right-radius: 50vw;
+        border-bottom-right-radius: 50vw;
 
         // &::after {
         //     content: '';

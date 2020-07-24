@@ -16,7 +16,11 @@
         "USERS_BUTTON": "Show users",
         "IAM": "Identity and Access Management",
         "IAM_DESC": "Manage your organisations and administrators.",
-        "IAM_BUTTON": "Manage ZITADEL"
+        "IAM_BUTTON": "Manage ZITADEL",
+        "WELCOME":"Welcome",
+        "WELCOMESENTENCE":"Here you can find recommended Actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
+        "DISCLAIMER":"You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
+        "DISCLAIMERLINK":"Further information"
     },
     "MENU": {
         "PERSONAL_INFO": "Personal Information",
@@ -51,10 +55,15 @@
         "CHANGE":"Change",
         "REACTIVATE":"Reactivate",
         "DEACTIVATE":"Deactivate",
-        "REFRESH":"Refresh"
+        "REFRESH":"Refresh",
+        "LOGIN":"Login"
     },
     "ERRORS": {
-        "REQUIRED": "Some required fields are missing!"
+        "REQUIRED": "Some required fields are missing!",
+        "TOKENINVALID": {
+            "TITLE":"Your auth token has expired",
+            "DESCRIPTION":"Click the button below to login again!"
+        }
     },
     "USER": {
         "TITLE": "Personal Information",
@@ -102,7 +111,8 @@
             "NAMEANDEMAILSECTION":"Name and Email",
             "GENDERLANGSECTION":"Gender and Language",
             "PHONESECTION":"Phonenumbers",
-            "PASSWORDSECTION":"Set the initial Password."
+            "PASSWORDSECTION":"Set the initial Password.",
+            "ADDRESSANDPHONESECTION":"Phonenumber"
         },
         "CODEDIALOG": {
             "TITLE":"Verify Phone Number",

@@ -45,5 +45,11 @@
         .iamuser {
             color: $primary-color;
         }
+
+        .edit-button {
+            &:hover {
+                color: $border-selected-color;
+            }
+        }
     }
 }

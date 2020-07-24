@@ -28,10 +28,13 @@
         margin-left: 1rem;
         display: flex;
         align-items: center;
-        transition: all .15s ease-in-out;
+
+        mat-spinner {
+            margin-left: -15px;
+            margin-right: 20px;
+        }
   
         .avatar-circle {
-            transition: all .3s ease-in-out;
             float: left;
             margin: 0 8px 0 -15px;
             height: 32px;

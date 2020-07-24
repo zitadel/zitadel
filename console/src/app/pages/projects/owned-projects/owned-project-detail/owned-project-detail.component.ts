@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, from, of, Subscription } from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -72,7 +72,8 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     public totalMemberResult: number = 0;
     public membersSubject: BehaviorSubject<ProjectMemberView.AsObject[]>
         = new BehaviorSubject<ProjectMemberView.AsObject[]>([]);
-    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+    public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
     constructor(
         public translate: TranslateService,

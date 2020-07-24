@@ -6,16 +6,21 @@
     </button>
 </div>
 <div class="app-container">
+    <div class="sp-container" *ngIf="(loading$ | async)">
+        <mat-spinner color="accent" diameter="50"></mat-spinner>
+    </div>
+
     <div [routerLink]="['/projects', projectId, 'apps', app.id ]" class="app-wrap"
         *ngFor="let app of appsSubject | async">
-        <div class="morph-card">
+        <div class="morph-card" matRipple>
             {{ app.name.charAt(0)}}
         </div>
         <span class="name">{{app.name}}</span>
     </div>
+
     <ng-template appHasRole [appHasRole]="['project.app.write']">
         <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']">
-            <div class="morph-card add">
+            <div class="morph-card add" matRipple>
                 <mat-icon>add</mat-icon>
             </div>
             <span class="name">{{ 'ACTIONS.NEW' | translate }}</span>
