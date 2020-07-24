@@ -23,6 +23,21 @@ import { UpdateService } from './services/update.service';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     animations: [
+        trigger('toolbar', [
+            transition(':enter', [
+                style({
+                    transform: 'translateY(-100%)',
+                    opacity: 0,
+                }),
+                animate(
+                    '.2s ease-out',
+                    style({
+                        transform: 'translateY(0%)',
+                        opacity: 1,
+                    }),
+                ),
+            ]),
+        ]),
         trigger('accounts', [
             transition(':enter', [
                 style({
