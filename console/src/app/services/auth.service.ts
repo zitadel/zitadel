@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, filter, map, mergeMap, take, timeout } from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, from, merge, Observable, of, Subject } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import { Org, UserProfileView } from '../proto/generated/auth_pb';
 import { AuthUserService } from './auth-user.service';
@@ -21,6 +21,8 @@ export class AuthService {
     private readonly _authenticationChanged: BehaviorSubject<
         boolean
     > = new BehaviorSubject(this.authenticated);
+
+    private zitadelPermissions: string[] = [];
 
     constructor(
         private grpcService: GrpcService,
@@ -46,7 +48,49 @@ export class AuthService {
             mergeMap(token => {
                 return from(this.userService.GetMyUserProfile()).pipe(map(userprofile => userprofile.toObject()));
             }),
+            // finalize(() => {
+            //     this.loadPermissions();
+            // }),
         );
+        this.user.subscribe(() => {
+            console.log('user change');
+        });
+        this.activeOrgChanged.subscribe(() => {
+            console.log('org change');
+            this.loadPermissions();
+        });
+
+        forkJoin([this.activeOrgChanged, this.user]).pipe(switchMap(() => {
+            return this.loadPermissions();
+        }));
+    }
+
+    private async loadPermissions(): Promise<any> {
+        console.log('load permissions');
+        this.zitadelPermissions = await this.userService.getMyzitadelPermissions().then(perm => {
+            return perm.toObject().permissionsList;
+        });
+    }
+
+    public isAllowed(roles: string[], each: boolean = false): Observable<boolean> {
+        if (roles && roles.length > 0) {
+            if (this.zitadelPermissions.length > 0) {
+                return of(this.hasRoles(this.zitadelPermissions, roles));
+            }
+
+            return of(this.hasRoles(this.zitadelPermissions, roles, each));
+        } else {
+            return of(false);
+        }
+    }
+
+    public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
+        return each ?
+            requestedRoles.every(role => userRoles.includes(role)) :
+            requestedRoles.findIndex(role => {
+                return userRoles.findIndex(i => i.includes(role)) > -1;
+                // return userRoles.includes(role);
+            }) > -1;
     }
 
     public get authenticated(): boolean {
@@ -102,6 +146,7 @@ export class AuthService {
         if (id) {
             const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
             if (org && this.cachedOrgs.find(tmp => tmp.id === org.id)) {
+                this._activeOrgChanged.next(org);
                 return org;
             }
             return Promise.reject(new Error('no cached org'));
@@ -114,6 +159,7 @@ export class AuthService {
 
             const org = this.storage.getItem<Org.AsObject>(StorageKey.organization);
             if (org && orgs.find(tmp => tmp.id === org.id)) {
+                this._activeOrgChanged.next(org);
                 return org;
             }
 

@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Metadata } from 'grpc-web';
-import { from, Observable, of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
 
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
 import {
@@ -11,6 +9,7 @@ import {
     Gender,
     MfaOtpResponse,
     MultiFactors,
+    MyPermissions,
     MyProjectOrgSearchQuery,
     MyProjectOrgSearchRequest,
     MyProjectOrgSearchResponse,
@@ -38,8 +37,6 @@ import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
     providedIn: 'root',
 })
 export class AuthUserService {
-    private _roleCache: string[] = [];
-
     constructor(private readonly grpcClient: GrpcService,
         private grpcBackendService: GrpcBackendService,
     ) { }
@@ -74,7 +71,6 @@ export class AuthUserService {
             f => f,
         );
     }
-
 
     public async GetMyUser(): Promise<UserView> {
         return await this.request(
@@ -175,25 +171,12 @@ export class AuthUserService {
         );
     }
 
-    private async getMyzitadelPermissions(): Promise<any> {
+    public async getMyzitadelPermissions(): Promise<MyPermissions> {
         return await this.request(
             c => c.getMyZitadelPermissions,
             new Empty(),
             f => f,
         );
-    }
-
-    public GetMyzitadelPermissions(): Observable<any> {
-        return from(this.getMyzitadelPermissions());
-    }
-
-    public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
-        return each ?
-            requestedRoles.every(role => userRoles.includes(role)) :
-            requestedRoles.findIndex(role => {
-                return userRoles.findIndex(i => i.includes(role)) > -1;
-                // return userRoles.includes(role);
-            }) > -1;
     }
 
     public async GetMyUserPhone(): Promise<UserPhone> {
@@ -312,31 +295,4 @@ export class AuthUserService {
             f => f,
         );
     }
-
-    public isAllowed(roles: string[], each: boolean = false): Observable<boolean> {
-        if (roles && roles.length > 0) {
-            if (this._roleCache.length > 0) {
-                return of(this.hasRoles(this._roleCache, roles));
-            }
-
-            return this.GetMyzitadelPermissions().pipe(
-                switchMap(response => {
-                    let userRoles = [];
-                    if (response.toObject().permissionsList) {
-                        userRoles = response.toObject().permissionsList;
-                    } else {
-                        userRoles = ['user.resourceowner'];
-                    }
-                    this._roleCache = userRoles;
-                    return of(this.hasRoles(userRoles, roles, each));
-                }),
-                catchError((err) => {
-                    return of(false);
-                }),
-            );
-        } else {
-            return of(false);
-        }
-    }
-
 }

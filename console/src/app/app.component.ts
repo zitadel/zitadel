@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router, RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { from, Observable, of, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
@@ -141,22 +141,8 @@ export class AppComponent implements OnDestroy {
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
 
-            this.ownedProjectsCount$ = from(this.projectService.SearchProjects(0, 0).then(res => {
-                return res.toObject().totalResult;
-            }));
-
-            this.grantedProjectsCount$ = from(this.projectService.SearchGrantedProjects(0, 0).then(res => {
-                return res.toObject().totalResult;
-            }));
+            this.getCounts();
         });
-
-        this.ownedProjectsCount$ = from(this.projectService.SearchProjects(0, 0).then(res => {
-            return res.toObject().totalResult;
-        }));
-
-        this.grantedProjectsCount$ = from(this.projectService.SearchGrantedProjects(0, 0).then(res => {
-            return res.toObject().totalResult;
-        }));
 
         this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
@@ -190,6 +176,21 @@ export class AppComponent implements OnDestroy {
             this.toast.showError(error);
             this.orgLoading = false;
         });
+    }
+
+    public getCounts(): void {
+        this.ownedProjectsCount$ = this.authService.isAllowed(['project.read']).pipe(switchMap(() => {
+            return from(this.projectService.SearchProjects(0, 0).then(res => {
+                return res.toObject().totalResult;
+            }));
+        }));
+
+        this.grantedProjectsCount$ = this.authService.isAllowed(['project.read']).pipe(switchMap(() => {
+            return from(this.projectService.SearchGrantedProjects(0, 0).then(res => {
+                return res.toObject().totalResult;
+            }));
+        }));
+
     }
 
     public prepareRoute(outlet: RouterOutlet): boolean {
