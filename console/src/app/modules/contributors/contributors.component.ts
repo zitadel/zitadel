@@ -11,7 +11,6 @@ import { BehaviorSubject } from 'rxjs';
             transition(':enter', [
                 query('@animate',
                     stagger(80, animateChild()),
-                    // { optional: true },
                 ),
             ]),
         ]),
@@ -20,10 +19,6 @@ import { BehaviorSubject } from 'rxjs';
                 style({ opacity: 0, transform: 'translateX(100%)' }),
                 animate('100ms', style({ opacity: 1, transform: 'translateX(0)' })),
             ]),
-            // transition(':leave', [
-            //     style({ opacity: 1, transform: 'translateY(0)' }),
-            //     animate('100ms', style({ opacity: 0, transform: 'translateX(100%)' })),
-            // ]),
         ]),
     ],
 })
