@@ -91,7 +91,8 @@
                                     <i class="icon las la-layer-group"></i>
 
                                     <div class="c_label">
-                                        <span>{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
+                                        <span>{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
+                                            {{'MENU.PROJECT' | translate}} </span>
                                         <span *ngIf="(ownedProjectsCount$ | async) as ownedPCount"
                                             class="count">{{ownedPCount}}</span>
                                     </div>
