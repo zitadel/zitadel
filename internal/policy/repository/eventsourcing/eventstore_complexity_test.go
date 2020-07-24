@@ -73,7 +73,6 @@ func TestCreatePasswordComplexityPolicy(t *testing.T) {
 	}
 	type res struct {
 		policy  *model.PasswordComplexityPolicy
-		wantErr bool
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -86,10 +85,21 @@ func TestCreatePasswordComplexityPolicy(t *testing.T) {
 			args: args{
 				es:     GetMockPasswordComplexityPolicyNoEvents(ctrl),
 				ctx:    authz.NewMockContext("orgID", "userID"),
+				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name", MinLength: 8},
+			},
+			res: res{
+				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name", MinLength: 8},
+			},
+		},
+		{
+			name: "create policy, no minlength",
+			args: args{
+				es:     GetMockPasswordComplexityPolicyNoEvents(ctrl),
+				ctx:    authz.NewMockContext("orgID", "userID"),
 				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name"},
 			},
 			res: res{
-				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name"},
+				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -97,13 +107,13 @@ func TestCreatePasswordComplexityPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.CreatePasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
 
-			if !tt.res.wantErr && result.AggregateID == "" {
+			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.Description != tt.res.policy.Description {
+			if tt.res.errFunc == nil && result.Description != tt.res.policy.Description {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.policy.Description, result.Description)
 			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})
@@ -119,7 +129,6 @@ func TestUpdatePasswordComplexityPolicy(t *testing.T) {
 	}
 	type res struct {
 		policy  *model.PasswordComplexityPolicy
-		wantErr bool
 		errFunc func(err error) bool
 	}
 	tests := []struct {
@@ -132,10 +141,21 @@ func TestUpdatePasswordComplexityPolicy(t *testing.T) {
 			args: args{
 				es:  GetMockPasswordComplexityPolicy(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew"},
+				new: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew", MinLength: 8},
 			},
 			res: res{
-				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew"},
+				policy: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew", MinLength: 8},
+			},
+		},
+		{
+			name: "create policy, no minlength",
+			args: args{
+				es:  GetMockPasswordComplexityPolicyNoEvents(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				new: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID1", Sequence: 2}, Description: "Name"},
+			},
+			res: res{
+				errFunc: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -143,10 +163,9 @@ func TestUpdatePasswordComplexityPolicy(t *testing.T) {
 			args: args{
 				es:  GetMockPasswordComplexityPolicyNoEvents(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				new: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew"},
+				new: &model.PasswordComplexityPolicy{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}, Description: "NameNew", MinLength: 8},
 			},
 			res: res{
-				wantErr: true,
 				errFunc: caos_errs.IsNotFound,
 			},
 		},
@@ -155,13 +174,13 @@ func TestUpdatePasswordComplexityPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.args.es.UpdatePasswordComplexityPolicy(tt.args.ctx, tt.args.new)
 
-			if !tt.res.wantErr && result.AggregateID == "" {
+			if tt.res.errFunc == nil && result.AggregateID == "" {
 				t.Errorf("result has no id")
 			}
-			if !tt.res.wantErr && result.Description != tt.res.policy.Description {
+			if tt.res.errFunc == nil && result.Description != tt.res.policy.Description {
 				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.policy.Description, result.Description)
 			}
-			if tt.res.wantErr && !tt.res.errFunc(err) {
+			if tt.res.errFunc != nil && !tt.res.errFunc(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})

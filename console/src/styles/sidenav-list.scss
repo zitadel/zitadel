@@ -58,7 +58,7 @@
 
     .root-header {
         box-shadow: 0 5px 10px rgba(0,0,0,0.12);
-        background-color: rgba($primary-dark,.2) !important;
+        background-color: $primary-dark !important;
         transition: background-color .4s ease-in-out;
     }
 

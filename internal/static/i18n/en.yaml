@@ -35,6 +35,7 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short
+      MinLengthNotAllowed: Given minimum length is not allowed
       HasLower: Password must contain lower case
       HasUpper: Password must contain upper case
       HasNumber: Password must contain number
