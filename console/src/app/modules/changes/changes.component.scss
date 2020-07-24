@@ -1,3 +1,6 @@
+@import '~@angular/material/theming';
+
+
 .header {
     display: block;
     margin-bottom: 1rem;
@@ -5,42 +8,53 @@
     margin-top: 1rem;
 }
 
-.scroll-container {
-    max-height: 60vh;
-    overflow-y: scroll;
+@mixin changes-theme($theme) {
 
-    .item {
-        box-sizing: border-box;
-        padding: .5rem;
-        margin: .25rem 0;
-        border-radius: .5rem;
-        display: flex;
-        flex-direction: column;
-        .editor {
-            color: #8795a1;
+    .scroll-container {
+        max-height: 60vh;
+        overflow-y: scroll;
+
+        .item {
+            box-sizing: border-box;
+            padding: .5rem;
+            margin: .25rem 0;
+            border-radius: .5rem;
+            display: flex;
+            flex-direction: column;
+            .editor {
+                color: #8795a1;
+                font-size: 12px;
+                align-self: flex-end;
+            }
+            .seq {
+                color: #8795a1;
+                font-size: 12px;
+                align-self: flex-end;
+            }
+
+            .desc {
+                overflow-x: auto;
+                font-size: 14px;
+            }
+
+            $primary: map-get($theme, primary);
+            $primary-dark: mat-color($primary, A800);
+            
+            &.change-item-back {
+                background-color: rgba($primary-dark, 0.93);
+                transition: background-color .4s ease-in-out;
+            }
+        }
+
+        .sp-wrapper {
+            padding: .5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .end-container {
             font-size: 12px;
-            align-self: flex-end;
-        }
-        .seq {
             color: #8795a1;
-            font-size: 12px;
-            align-self: flex-end;
         }
-
-        .desc {
-            overflow-x: auto;
-            font-size: 14px;
-        }
-    }
-
-    .sp-wrapper {
-        padding: .5rem;
-        display: flex;
-        justify-content: center;
-    }
-
-    .end-container {
-        font-size: 12px;
-        color: #8795a1;
     }
 }

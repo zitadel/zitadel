@@ -120,6 +120,17 @@
                         font-weight: 500;
                         font-size: .9rem;
                     }
+
+                    .c_label {
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+
+                        .count {
+                            font-size: 12px;
+                        }
+                    }
             
                     &:hover {
                         background-color: #00000010;
