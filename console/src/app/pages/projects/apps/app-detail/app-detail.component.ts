@@ -113,9 +113,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
-        this.docs = (await this.projectService.GetZitadelDocs()).toObject();
-        console.log(this.docs);
-
         this.projectService.GetApplicationById(projectid, id).then(app => {
             this.app = app.toObject();
             this.appNameForm.patchValue(this.app);
@@ -141,6 +138,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.toast.showError(error);
             this.errorMessage = error.message;
         });
+
+        this.docs = (await this.projectService.GetZitadelDocs()).toObject();
     }
 
     public changeState(event: MatButtonToggleChange): void {
