@@ -50,7 +50,7 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 	}
 }
 
-func PrepareSaves(table string) func(db *gorm.DB, objects ...interface{}) error {
+func PrepareBulkSave(table string) func(db *gorm.DB, objects ...interface{}) error {
 	return func(db *gorm.DB, objects ...interface{}) error {
 		db = db.Table(table)
 		db = db.Begin()

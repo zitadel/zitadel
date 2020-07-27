@@ -109,7 +109,7 @@ func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, erro
 }
 
 func PutUsers(db *gorm.DB, table string, users ...*model.UserView) error {
-	save := repository.PrepareSaves(table)
+	save := repository.PrepareBulkSave(table)
 	u := make([]interface{}, len(users))
 	for i, user := range users {
 		u[i] = user

@@ -49,7 +49,7 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 }
 
 func PutKeys(db *gorm.DB, table string, privateKey, publicKey *model.KeyView) error {
-	save := repository.PrepareSaves(table)
+	save := repository.PrepareBulkSave(table)
 	return save(db, privateKey, publicKey)
 }
 
