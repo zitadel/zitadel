@@ -86,6 +86,12 @@
                     </mat-select>
                 </mat-form-field>
 
+                <p class="step-description" *ngIf="applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                    {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>
+                <p class="step-description"
+                    *ngIf="applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
+                    {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
+
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipRedirectList>

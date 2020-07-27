@@ -76,6 +76,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public isZitadel: boolean = false;
     public docs!: ZitadelDocs.AsObject;
 
+    public OIDCApplicationType: any = OIDCApplicationType;
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
