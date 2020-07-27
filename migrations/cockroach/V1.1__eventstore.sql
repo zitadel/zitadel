@@ -1,9 +1,12 @@
-CREATE DATABASE eventstore;
-
-CREATE USER eventstore;
-GRANT SELECT, INSERT, UPDATE ON DATABASE eventstore TO eventstore;
-
 CREATE SEQUENCE eventstore.event_seq;
+
+GRANT UPDATE ON TABLE eventstore.event_seq TO management;
+GRANT UPDATE ON TABLE eventstore.event_seq TO eventstore;
+GRANT UPDATE ON TABLE eventstore.event_seq TO adminapi;
+GRANT UPDATE ON TABLE eventstore.event_seq TO auth;
+GRANT UPDATE ON TABLE eventstore.event_seq TO authz;
+GRANT UPDATE ON TABLE eventstore.event_seq TO notification;
+
 
 CREATE TABLE eventstore.events (
     event_type TEXT,

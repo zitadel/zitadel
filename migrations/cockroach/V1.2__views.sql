@@ -1,9 +1,9 @@
 CREATE TABLE management.locks (
     locker_id TEXT,
-    locked_until TIMESTAMPTZ,
-    object_type TEXT,
+    locked_until TIMESTAMPTZ(3),
+    view_name TEXT,
 
-    PRIMARY KEY (object_type)
+    PRIMARY KEY (view_name)
 );
 
 CREATE TABLE management.current_sequences (
@@ -80,6 +80,7 @@ CREATE TABLE management.project_members (
     first_name TEXT,
     last_name TEXT,
     roles TEXT ARRAY,
+    display_name TEXT,
     sequence BIGINT,
 
     PRIMARY KEY (project_id, user_id)
@@ -98,6 +99,7 @@ CREATE TABLE management.project_grant_members (
     first_name TEXT,
     last_name TEXT,
     roles TEXT ARRAY,
+    display_name TEXT,
     sequence BIGINT,
 
     PRIMARY KEY (grant_id, user_id)
@@ -204,10 +206,10 @@ CREATE TABLE management.org_domains (
 
 CREATE TABLE auth.locks (
     locker_id TEXT,
-    locked_until TIMESTAMPTZ,
-    object_type TEXT,
+    locked_until TIMESTAMPTZ(3),
+    view_name TEXT,
 
-    PRIMARY KEY (object_type)
+    PRIMARY KEY (view_name)
 );
 
 CREATE TABLE auth.current_sequences (
@@ -318,10 +320,10 @@ CREATE TABLE auth.tokens (
 
 CREATE TABLE notification.locks (
     locker_id TEXT,
-    locked_until TIMESTAMPTZ,
-    object_type TEXT,
+    locked_until TIMESTAMPTZ(3),
+    view_name TEXT,
 
-    PRIMARY KEY (object_type)
+    PRIMARY KEY (view_name)
 );
 
 CREATE TABLE notification.current_sequences (
@@ -394,10 +396,10 @@ CREATE TABLE adminapi.failed_events (
 
 CREATE TABLE adminapi.locks (
     locker_id TEXT,
-    locked_until TIMESTAMPTZ,
-    object_type TEXT,
+    locked_until TIMESTAMPTZ(3),
+    view_name TEXT,
 
-    PRIMARY KEY (object_type)
+    PRIMARY KEY (view_name)
 );
 
 CREATE TABLE adminapi.current_sequences (
@@ -421,6 +423,7 @@ CREATE TABLE adminapi.iam_members (
     first_name TEXT,
     last_name TEXT,
     roles TEXT ARRAY,
+    display_name TEXT,
     sequence BIGINT,
 
     PRIMARY KEY (user_id)
@@ -452,6 +455,7 @@ CREATE TABLE management.org_members (
     first_name TEXT,
     last_name TEXT,
     roles TEXT ARRAY,
+    display_name TEXT,
     sequence BIGINT,
 
     PRIMARY KEY (org_id, user_id)
@@ -538,10 +542,10 @@ CREATE TABLE auth.orgs (
 
 CREATE TABLE authz.locks (
     locker_id TEXT,
-    locked_until TIMESTAMPTZ,
-    object_type TEXT,
+    locked_until TIMESTAMPTZ(3),
+    view_name TEXT,
 
-    PRIMARY KEY (object_type)
+    PRIMARY KEY (view_name)
 );
 
 CREATE TABLE authz.current_sequences (

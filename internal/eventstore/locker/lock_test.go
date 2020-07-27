@@ -57,7 +57,7 @@ func (db *dbMock) expectReleaseSavepoint() *dbMock {
 
 func (db *dbMock) expectRenew(lockerID, view string, affectedRows int64) *dbMock {
 	query := db.mock.
-		ExpectExec(`INSERT INTO table\.locks \(locker_id, locked_until, object_type\) VALUES \(\$1, now\(\)\+\$2, \$3\) ON CONFLICT \(object_type\) DO UPDATE SET locker_id = \$4, locked_until = now\(\)\+\$5 WHERE locks\.object_type = \$6 AND \(locks\.locker_id = \$7 AND locks\.locked_until >= now\(\) OR locks\.locked_until < now\(\)\)`).
+		ExpectExec(`INSERT INTO table\.locks \(locker_id, locked_until, view_name\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\) ON CONFLICT \(view_name\) DO UPDATE SET locker_id = \$4, locked_until = now\(\)\+\$5::INTERVAL WHERE locks\.view_name = \$6 AND \(locks\.locker_id = \$7 OR locks\.locked_until < now\(\)\)`).
 		WithArgs(lockerID, sqlmock.AnyArg(), view, lockerID, sqlmock.AnyArg(), view, lockerID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 

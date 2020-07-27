@@ -13,24 +13,24 @@ import (
 
 const (
 	insertStmtFormat = "INSERT INTO %s" +
-		" (locker_id, locked_until, object_type) VALUES ($1, now()+$2, $3)" +
-		" ON CONFLICT (object_type)" +
-		" DO UPDATE SET locker_id = $4, locked_until = now()+$5" +
-		" WHERE locks.object_type = $6 AND (locks.locker_id = $7 AND locks.locked_until >= now() OR locks.locked_until < now())"
+		" (locker_id, locked_until, view_name) VALUES ($1, now()+$2::INTERVAL, $3)" +
+		" ON CONFLICT (view_name)" +
+		" DO UPDATE SET locker_id = $4, locked_until = now()+$5::INTERVAL" +
+		" WHERE locks.view_name = $6 AND (locks.locker_id = $7 OR locks.locked_until < now())"
 )
 
 type lock struct {
 	LockerID    string    `gorm:"column:locker_id;primary_key"`
 	LockedUntil time.Time `gorm:"column:locked_until"`
-	ViewName    string    `gorm:"column:object_type;primary_key"`
+	ViewName    string    `gorm:"column:view_name;primary_key"`
 }
 
 func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel string, waitTime time.Duration) error {
 	return crdb.ExecuteTx(context.Background(), dbClient, nil, func(tx *sql.Tx) error {
 		insert := fmt.Sprintf(insertStmtFormat, lockTable)
 		result, err := tx.Exec(insert,
-			lockerID, waitTime.Seconds(), viewModel,
-			lockerID, waitTime.Seconds(),
+			lockerID, waitTime.Milliseconds()/1000, viewModel,
+			lockerID, waitTime.Milliseconds()/1000,
 			viewModel, lockerID)
 
 		if err != nil {
