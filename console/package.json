@@ -29,7 +29,7 @@
     "angular-oauth2-oidc": "^10.0.2",
     "angularx-qrcode": "^10.0.3",
     "cors": "^2.8.5",
-    "google-proto-files": "^2.1.0",
+    "google-proto-files": "^2.2.0",
     "google-protobuf": "^3.12.2",
     "grpc": "^1.24.3",
     "grpc-web": "^1.2.0",
