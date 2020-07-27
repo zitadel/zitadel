@@ -1,6 +1,9 @@
 package models
 
-import "github.com/caos/logging"
+import (
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/errors"
+)
 
 type SearchQueryFactory struct {
 	columns        Columns
@@ -23,13 +26,16 @@ type searchQuery struct {
 type Columns int32
 
 const (
-	Columns_All = iota
+	Columns_Event = iota
 	Columns_Max_Sequence
+	//insert new columns-types before this columnsCount because count is needed for validation
+	columnsCount
 )
 
+//FactoryFromSearchQuery is deprecated because it's for migration purposes. use NewSearchQueryFactory
 func FactoryFromSearchQuery(query *SearchQuery) *SearchQueryFactory {
 	factory := &SearchQueryFactory{
-		columns: Columns_All,
+		columns: Columns_Event,
 		desc:    query.Desc,
 		limit:   query.Limit,
 	}
@@ -110,8 +116,12 @@ func (factory *SearchQueryFactory) OrderAsc() *SearchQueryFactory {
 	return factory
 }
 
-func (factory *SearchQueryFactory) Build() *searchQuery {
-	//TODO: check if aggregate types > 0
+func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
+	if factory == nil ||
+		len(factory.aggregateTypes) < 1 ||
+		(factory.columns < 0 || factory.columns >= columnsCount) {
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-tGAD3", "factory invalid")
+	}
 	filters := []*Filter{
 		factory.aggregateTypeFilter(),
 	}
@@ -132,7 +142,7 @@ func (factory *SearchQueryFactory) Build() *searchQuery {
 		Limit:   factory.limit,
 		Desc:    factory.desc,
 		Filters: filters,
-	}
+	}, nil
 }
 
 func (factory *SearchQueryFactory) aggregateIDFilter() *Filter {
@@ -152,7 +162,7 @@ func (factory *SearchQueryFactory) eventTypeFilter() *Filter {
 	if len(factory.eventTypes) == 1 {
 		return NewFilter(Field_EventType, factory.eventTypes[0], Operation_Equals)
 	}
-	return NewFilter(Field_AggregateID, factory.eventTypes, Operation_In)
+	return NewFilter(Field_EventType, factory.eventTypes, Operation_In)
 }
 
 func (factory *SearchQueryFactory) aggregateTypeFilter() *Filter {

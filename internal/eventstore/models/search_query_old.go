@@ -2,12 +2,14 @@ package models
 
 import "github.com/caos/zitadel/internal/errors"
 
+//SearchQuery is deprecated. Use SearchQueryFactory
 type SearchQuery struct {
 	Limit   uint64
 	Desc    bool
 	Filters []*Filter
 }
 
+//NewSearchQuery is deprecated. Use SearchQueryFactory
 func NewSearchQuery() *SearchQuery {
 	return &SearchQuery{
 		Filters: make([]*Filter, 0, 4),
