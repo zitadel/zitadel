@@ -119,8 +119,7 @@ func (es *UserEventstore) PrepareCreateUser(ctx context.Context, user *usr_model
 	}
 	user.AggregateID = id
 
-	//TODO: set onetime to true
-	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, false)
+	err = user.HashPasswordIfExisting(pwPolicy, es.PasswordAlg, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -326,7 +325,7 @@ func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending boo
 	query := es_models.NewSearchQuery().
 		AggregateTypeFilter(model.UserAggregate)
 	if !sortAscending {
-		query.OrderDesc() //TODO: configure from param
+		query.OrderDesc()
 	}
 
 	query.LatestSequenceFilter(latestSequence).

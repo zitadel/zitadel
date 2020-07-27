@@ -83,11 +83,6 @@ func UserCreateAggregate(ctx context.Context, aggCreator *es_models.AggregateCre
 	if err != nil {
 		return nil, err
 	}
-	//TODO: remove
-	agg, err = agg.AppendEvent(model.MfaInitSkipped, nil)
-	if err != nil {
-		return nil, err
-	}
 	if user.Email != nil && user.EmailAddress != "" && user.IsEmailVerified {
 		agg, err = agg.AppendEvent(model.UserEmailVerified, nil)
 		if err != nil {
