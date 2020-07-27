@@ -26,7 +26,7 @@
     "@ngx-translate/http-loader": "^6.0.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/uuid": "^8.0.0",
-    "angular-oauth2-oidc": "^10.0.2",
+    "angular-oauth2-oidc": "^10.0.3",
     "angularx-qrcode": "^10.0.3",
     "cors": "^2.8.5",
     "google-proto-files": "^2.2.0",
