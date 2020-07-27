@@ -564,6 +564,7 @@
             "REDIRECTTITLE":"Wohin soll nach dem Login weitergeleitet werden?",
             "REDIRECTDESCRIPTIONWEB":"Der redirect muss mit https:// beginnen. http:// ist nur für Testzwecke zulässig!",
             "REDIRECTDESCRIPTIONNATIVE":"Der redirect muss mit einem eigenen Protokoll oder http://localhost beginnen!",
+            "REDIRECTNOTVALID":"Dieser redirect ist nicht zulässig!",
             "POSTREDIRECTTITLE":"Das ist die Weiterleitung nach einem logout.",
             "TYPEREQUIRED":"Der Typ ist notwendig!",
             "TITLE": "OIDC Konfiguration",

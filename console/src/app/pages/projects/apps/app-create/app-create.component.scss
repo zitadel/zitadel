@@ -64,6 +64,12 @@ mat-horizontal-stepper {
         color: #8795a1;
     }
 
+    .error {
+        font-size: 13px;
+        color: #f44336;
+        margin-top: 0;
+    }
+
 
     mat-chip[color='white'] {
         background-color: #fafafa;

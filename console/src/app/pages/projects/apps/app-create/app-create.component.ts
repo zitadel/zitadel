@@ -123,9 +123,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
 
-                        this.redirectControl = new FormControl('', [Validators.pattern('/^https:\/\//g')]);
-                        this.postRedirectControl = new FormControl('', [Validators.pattern('/^https:\/\//g')]);
-
+                        this.redirectControl = new FormControl('', [Validators.pattern(/^(http|https):\/\//)]);
+                        this.postRedirectControl = new FormControl('', [Validators.pattern(/^https:\/\//)]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
                         console.log('WEB');
@@ -143,9 +142,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.oidcApp.grantTypesList =
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
 
-                        this.redirectControl = new FormControl('', [Validators.pattern('/^https:\/\//g')]);
-                        this.postRedirectControl = new FormControl('', [Validators.pattern('/^https:\/\//g')]);
-
+                        this.redirectControl = new FormControl('', [Validators.pattern(/^https:\/\//g)]);
+                        this.postRedirectControl = new FormControl('', [Validators.pattern(/^https:\/\//g)]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
                         console.log('USERAGENT');
