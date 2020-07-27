@@ -11,6 +11,7 @@ import (
 
 type OIDCConfig struct {
 	es_models.ObjectRoot
+	Version                int32               `json:"oidcVersion,omitempty"`
 	AppID                  string              `json:"appId"`
 	ClientID               string              `json:"clientId,omitempty"`
 	ClientSecret           *crypto.CryptoValue `json:"clientSecret,omitempty"`
@@ -58,6 +59,7 @@ func OIDCConfigFromModel(config *model.OIDCConfig) *OIDCConfig {
 	return &OIDCConfig{
 		ObjectRoot:             config.ObjectRoot,
 		AppID:                  config.AppID,
+		Version:                int32(config.OIDCVersion),
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
 		RedirectUris:           config.RedirectUris,
@@ -81,6 +83,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 	return &model.OIDCConfig{
 		ObjectRoot:             config.ObjectRoot,
 		AppID:                  config.AppID,
+		OIDCVersion:            model.OIDCVersion(config.Version),
 		ClientID:               config.ClientID,
 		ClientSecret:           config.ClientSecret,
 		RedirectUris:           config.RedirectUris,

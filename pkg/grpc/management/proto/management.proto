@@ -2242,6 +2242,9 @@ message OIDCConfig {
     string client_secret = 6;
     OIDCAuthMethodType auth_method_type = 7;
     repeated string post_logout_redirect_uris = 8;
+    OIDCVersion version = 9;
+    bool none_compliant = 10;
+    repeated string compliance_problems = 11;
 }
 
 message OIDCApplicationCreate {
@@ -2253,6 +2256,11 @@ message OIDCApplicationCreate {
     OIDCApplicationType application_type = 6;
     OIDCAuthMethodType auth_method_type = 7;
     repeated string post_logout_redirect_uris = 8;
+    OIDCVersion version = 9;
+}
+
+enum OIDCVersion {
+    OIDCV1_0 = 0;
 }
 
 message OIDCConfigUpdate {

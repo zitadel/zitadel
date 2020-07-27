@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
+	"strings"
 )
 
 type OIDCConfig struct {
@@ -17,7 +18,15 @@ type OIDCConfig struct {
 	ApplicationType        OIDCApplicationType
 	AuthMethodType         OIDCAuthMethodType
 	PostLogoutRedirectUris []string
+	OIDCVersion            OIDCVersion
+	Compliance             *Compliance
 }
+
+type OIDCVersion int32
+
+const (
+	OIDCVersionV1 OIDCVersion = iota
+)
 
 type OIDCResponseType int32
 
@@ -51,6 +60,11 @@ const (
 	OIDCAuthMethodTypeNone
 )
 
+type Compliance struct {
+	NoneCompliant bool
+	Problems      []string
+}
+
 func (c *OIDCConfig) IsValid() bool {
 	grantTypes := c.getRequiredGrantTypes()
 	for _, grantType := range grantTypes {
@@ -60,6 +74,87 @@ func (c *OIDCConfig) IsValid() bool {
 		}
 	}
 	return true
+}
+
+func (c *OIDCConfig) FillCompliance() {
+	c.Compliance = GetOIDCCompliance(c.OIDCVersion, c.ApplicationType, c.GrantTypes, c.ResponseTypes, c.AuthMethodType, c.RedirectUris)
+}
+
+func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+	switch version {
+	case OIDCVersionV1:
+		return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
+	}
+	return nil
+}
+
+func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+	switch appType {
+	case OIDCApplicationTypeNative:
+		return GetOIDCNativeApplicationCompliance(grantTypes, authMethod, redirectUris)
+	case OIDCApplicationTypeWeb:
+		return GetOIDCWebApplicationComplicance(grantTypes, redirectUris)
+	case OIDCApplicationTypeUserAgent:
+		return GetOIDCUserAgentApplicationComplicance(grantTypes, authMethod, redirectUris)
+	}
+	return nil
+}
+
+func GetOIDCNativeApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+	compliance := &Compliance{NoneCompliant: false}
+	if len(grantTypes) != 1 {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.GrantType.MultipleTypes")
+	} else if !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.GrantType.NotAuthorizationCodeFlow")
+	}
+	if authMethod != OIDCAuthMethodTypeNone {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.AuthMethodType.NotNone")
+	}
+	if !onlyLocalhostIsHttp(redirectUris) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.RediredtUris.HttpOnlyForLocalhost")
+	}
+	return compliance
+}
+
+func GetOIDCWebApplicationComplicance(grantTypes []OIDCGrantType, redirectUris []string) *Compliance {
+	compliance := &Compliance{NoneCompliant: false}
+	if len(grantTypes) != 1 {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.GrantType.NotAuthorizationCodeFlow")
+	} else if !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.GrantType.NotAuthorizationCodeFlow")
+	}
+	if !urlsAreHttps(redirectUris) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.RediredtUris.NotHttps")
+	}
+	return compliance
+}
+
+func GetOIDCUserAgentApplicationComplicance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+	compliance := &Compliance{NoneCompliant: false}
+	if containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		if authMethod != OIDCAuthMethodTypeNone {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.UserAgent.AuthorizationCodeFlow.AuthMethodType.NotNone")
+		}
+	}
+	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) {
+		if authMethod != OIDCAuthMethodTypePost {
+			compliance.NoneCompliant = true
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.UserAgent.Implicit.AuthMethodType.NotPost")
+		}
+	}
+	if !urlsAreHttps(redirectUris) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.RediredtUris.NotHttps")
+	}
+	return compliance
 }
 
 func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
@@ -85,4 +180,33 @@ func (c *OIDCConfig) containsGrantType(grantType OIDCGrantType) bool {
 		}
 	}
 	return false
+}
+
+func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) bool {
+	for _, gt := range grantTypes {
+		if gt == grantType {
+			return true
+		}
+	}
+	return false
+}
+
+func urlsAreHttps(uris []string) bool {
+	for _, uri := range uris {
+		if !strings.HasPrefix(uri, "https://") {
+			return false
+		}
+	}
+	return true
+}
+
+func onlyLocalhostIsHttp(uris []string) bool {
+	for _, uri := range uris {
+		if !strings.HasPrefix(uri, "http://") {
+			if !strings.HasPrefix(uri, "http://localhost") {
+				return false
+			}
+		}
+	}
+	return true
 }
