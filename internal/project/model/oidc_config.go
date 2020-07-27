@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+const (
+	http          = "http://"
+	httpLocalhost = "http://"
+	https         = "https://"
+)
+
 type OIDCConfig struct {
 	es_models.ObjectRoot
 	AppID                  string
@@ -193,7 +199,7 @@ func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) 
 
 func urlsAreHttps(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, "https://") {
+		if !strings.HasPrefix(uri, https) {
 			return false
 		}
 	}
@@ -202,8 +208,8 @@ func urlsAreHttps(uris []string) bool {
 
 func onlyLocalhostIsHttp(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, "http://") {
-			if !strings.HasPrefix(uri, "http://localhost") {
+		if strings.HasPrefix(uri, http) {
+			if !strings.HasPrefix(uri, httpLocalhost) {
 				return false
 			}
 		}
