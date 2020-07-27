@@ -8,7 +8,7 @@ import (
 
 const (
 	http          = "http://"
-	httpLocalhost = "http://"
+	httpLocalhost = "http://localhost"
 	https         = "https://"
 )
 
@@ -74,7 +74,7 @@ type Compliance struct {
 func (c *OIDCConfig) IsValid() bool {
 	grantTypes := c.getRequiredGrantTypes()
 	for _, grantType := range grantTypes {
-		ok := c.containsGrantType(grantType)
+		ok := containsOIDCGrantType(c.GrantTypes, grantType)
 		if !ok {
 			return false
 		}
@@ -172,20 +172,12 @@ func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
 			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
 		case OIDCResponseTypeIDToken, OIDCResponseTypeIDTokenToken:
 			if !implicit {
+				implicit = true
 				grantTypes = append(grantTypes, OIDCGrantTypeImplicit)
 			}
 		}
 	}
 	return grantTypes
-}
-
-func (c *OIDCConfig) containsGrantType(grantType OIDCGrantType) bool {
-	for _, t := range c.GrantTypes {
-		if t == grantType {
-			return true
-		}
-	}
-	return false
 }
 
 func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) bool {
