@@ -246,7 +246,7 @@ func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool
 		AggregateTypeFilter(model.OrgAggregate)
 
 	if !sortAscending {
-		query.OrderDesc() //TODO: configure from param
+		query.OrderDesc()
 	}
 
 	query.LatestSequenceFilter(latestSequence).

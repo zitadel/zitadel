@@ -53,7 +53,10 @@ func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.Sear
 }
 
 func (es *eventstore) LatestSequence(ctx context.Context, queryFactory *models.SearchQueryFactory) (uint64, error) {
-	return es.repo.LatestSequence(ctx, queryFactory)
+	sequenceFactory := *queryFactory
+	sequenceFactory = *(&sequenceFactory).Columns(models.Columns_Max_Sequence)
+	sequenceFactory = *(&sequenceFactory).SequenceGreater(0)
+	return es.repo.LatestSequence(ctx, &sequenceFactory)
 }
 
 func (es *eventstore) Health(ctx context.Context) error {

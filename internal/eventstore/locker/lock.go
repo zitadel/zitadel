@@ -15,7 +15,7 @@ const (
 	insertStmtFormat = "INSERT INTO %s" +
 		" (locker_id, locked_until, object_type) VALUES ($1, now()+$2, $3)" +
 		" ON CONFLICT (object_type)" +
-		" DO UPDATE set locker_id = $4, locked_until = now()+$5" +
+		" DO UPDATE SET locker_id = $4, locked_until = now()+$5" +
 		" WHERE locks.object_type = $6 AND (locks.locker_id = $7 AND locks.locked_until >= now() OR locks.locked_until < now())"
 )
 

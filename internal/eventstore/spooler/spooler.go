@@ -162,9 +162,9 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 			case <-ctx.Done():
 				return
 			case <-renewTimer:
-				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("ts", time.Now().Format(time.StampMicro)).Debug("renew")
+				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("renew")
 				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
-				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("ts", time.Now().Format(time.StampMicro)).WithError(err).Debug("renew done")
+				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).WithError(err).Debug("renew done")
 				if err == nil {
 					locked <- true
 					renewTimer = time.After(renewDuration)
