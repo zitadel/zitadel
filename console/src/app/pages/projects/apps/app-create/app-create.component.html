@@ -81,6 +81,11 @@
             <ng-template matStepLabel>{{'APP.OIDC.REDIRECTSECTION' | translate}}</ng-template>
 
             <p class="step-title">{{'APP.OIDC.REDIRECTTITLE' | translate}}</p>
+            <p class="step-description"
+                *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>
+            <p class="step-description" *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB">
+                {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
@@ -91,11 +96,21 @@
                         {{uri}} <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
                     <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
+                        [matChipInputAddOnBlur]="true" [formControl]="redirectControl"
+                        (matChipInputTokenEnd)="addUri($event, 'REDIRECT')">
+                    <mat-error *ngIf="!redirectControl.valid">Invalid</mat-error>
+
                 </mat-chip-list>
+
             </mat-form-field>
 
             <p class="step-title">{{'APP.OIDC.POSTREDIRECTTITLE' | translate}}</p>
+            <p class="step-description"
+                *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>
+            <p class="step-description"
+                *ngIf="oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || oidcApp.applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
+                {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
