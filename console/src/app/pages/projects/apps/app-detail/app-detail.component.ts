@@ -35,7 +35,6 @@ enum RedirectType {
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
     public errorMessage: string = '';
-    public selectable: boolean = false;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -219,7 +218,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 this.projectService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
-                    .then((data: OIDCConfig) => {
+                    .then(() => {
                         this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
                     .catch(error => {

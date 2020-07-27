@@ -13,7 +13,7 @@
                 <span>{{login}}</span>
                 <button color="primary" [disabled]="copied == login"
                     [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    (click)="copytoclipboard(login)" mat-icon-button>
+                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event" mat-icon-button>
                     <i *ngIf="copied != login" class="las la-clipboard"></i>
                     <i *ngIf="copied == login" class="las la-clipboard-check"></i>
                 </button>

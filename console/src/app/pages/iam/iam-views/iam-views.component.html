@@ -41,7 +41,9 @@
             <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.ACTIONS' | translate }} </th>
             <td mat-cell *matCellDef="let role">
                 <button mat-icon-button matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"
-                    (click)="cancelView(role.viewName, role.database)"><i class="las la-redo-alt"></i></button>
+                    (click)="cancelView(role.viewName, role.database)">
+                    <mat-icon svgIcon="mdi_broom"></mat-icon>
+                </button>
             </td>
         </ng-container>
 

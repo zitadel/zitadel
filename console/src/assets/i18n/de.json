@@ -16,7 +16,11 @@
         "USERS_BUTTON": "Benutzer anzeigen",
         "IAM": "Identity and Access Management",
         "IAM_DESC": "Verwalte deine Organisationen und Administratoren.",
-        "IAM_BUTTON": "ZITADEL verwalten"
+        "IAM_BUTTON": "ZITADEL verwalten",
+        "WELCOME":"Willkommen",
+        "WELCOMESENTENCE":"Hier findest du die empfohlenen Aktionen basierend auf deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass du möglicherweise deine Organisation in der Kopfzeile wechseln musst.",
+        "DISCLAIMER":"Du kannst nur die Einstellungen deiner aktuellen Organisation sehen, die in der Kopfzeile angegeben ist. ZITADEL behandelt deine Daten vertraulich und sicher.",
+        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
@@ -51,10 +55,15 @@
         "CHANGE":"Ändern",
         "REACTIVATE":"Aktivieren",
         "DEACTIVATE":"Deaktivieren",
-        "REFRESH":"Aktualisieren"
+        "REFRESH":"Aktualisieren",
+        "LOGIN":"Login"
     },
     "ERRORS": {
-        "REQUIRED": "Bitte fülle alle benötigten Felder aus!"
+        "REQUIRED": "Bitte fülle alle benötigten Felder aus!",
+        "TOKENINVALID": {
+            "TITLE":"Du bist abgemeldet",
+            "DESCRIPTION":"Klicke auf Knopf Login um dich wieder einzuloggen!"
+        }
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
@@ -102,7 +111,8 @@
             "NAMEANDEMAILSECTION":"Name und Email",
             "GENDERLANGSECTION":"Geschlecht und Sprache",
             "PHONESECTION":"Telefonnummer",
-            "PASSWORDSECTION":"Setze ein initiales Passwort."
+            "PASSWORDSECTION":"Setze ein initiales Passwort.",
+            "ADDRESSANDPHONESECTION":"Telefonnummer"
         },
         "CODEDIALOG": {
             "TITLE":"Telefonnummer verifizieren",

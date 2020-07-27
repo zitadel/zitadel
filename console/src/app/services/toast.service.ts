@@ -1,16 +1,22 @@
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
+import { WarnDialogComponent } from '../modules/warn-dialog/warn-dialog.component';
 import { AuthService } from './auth.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ToastService {
-    constructor(private snackBar: MatSnackBar, private translate: TranslateService, private authService: AuthService) { }
+    constructor(private dialog: MatDialog,
+        private snackBar: MatSnackBar,
+        private translate: TranslateService,
+        private authService: AuthService,
+    ) { }
 
     public showInfo(message: string, i18nkey: boolean = false): void {
         if (i18nkey) {
@@ -28,10 +34,19 @@ export class ToastService {
         const { message, code, metadata } = grpcError;
         // TODO: remove check for code === 7
         if (code === 16 || (code === 7 && message === 'invalid token')) {
-            const actionObserver$ = this.showMessage(decodeURI(message), 'Login');
+            const dialogRef = this.dialog.open(WarnDialogComponent, {
+                data: {
+                    confirmKey: 'ACTIONS.LOGIN',
+                    titleKey: 'ERRORS.TOKENINVALID.TITLE',
+                    descriptionKey: 'ERRORS.TOKENINVALID.DESCRIPTION',
+                },
+                width: '400px',
+            });
 
-            actionObserver$.pipe(take(1)).subscribe(() => {
-                this.authService.authenticate(undefined, true, true);
+            dialogRef.afterClosed().pipe(take(1)).subscribe(resp => {
+                if (resp) {
+                    this.authService.authenticate(undefined, true, true);
+                }
             });
         } else {
             this.showMessage(decodeURI(message), 'close', { duration: 3000 });

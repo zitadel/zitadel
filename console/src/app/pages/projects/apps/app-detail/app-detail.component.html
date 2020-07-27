@@ -86,7 +86,9 @@
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipRedirectList>
-                        <mat-chip *ngFor="let redirect of redirectUrisList" [selectable]="selectable"
+                        <mat-chip *ngFor="let redirect of redirectUrisList" selected
+                            [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
+                            [color]="!redirect.startsWith('https://') ? 'warn': 'green'"
                             (removed)="remove(redirect, RedirectType.REDIRECT)">
                             {{redirect}}
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
@@ -100,8 +102,10 @@
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipPostRedirectList>
-                        <mat-chip *ngFor="let redirect of postLogoutRedirectUrisList" [selectable]="selectable"
-                            (removed)="remove(redirect, RedirectType.POSTREDIRECT)">
+                        <mat-chip *ngFor="let redirect of postLogoutRedirectUrisList" selected
+                            (removed)="remove(redirect, RedirectType.POSTREDIRECT)"
+                            [matTooltip]="!redirect.startsWith('https://') ? ('APP.OIDC.UNSECUREREDIRECT' | translate): ''"
+                            [color]="!redirect.startsWith('https://') ? 'warn': 'green'">
                             {{redirect}}
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                         </mat-chip>

@@ -60,7 +60,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
     public getOTP(): void {
         this.service.GetMyMfas().then(mfas => {
-            console.log(mfas.toObject().mfasList);
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
 
