@@ -42,6 +42,8 @@ With `ORBOS` you will be able to run `ZITADEL` on `GCE` or `StaticMachines` with
 
 The combination of the tools `ORBOS` and `ZITADEL` is what makes the operation easy and scalable.
 
+See our progress [here](https://github.com/caos/orbos/pull/256)
+
 ## Give me some docs
 
 This is work in progess but will change soon.
