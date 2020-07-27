@@ -38,9 +38,9 @@ Yes we have a free tier!
 ### Run your own IAM
 
 Stay tuned, we will soon publish a guide how you can deploy a `hyperconverged` system with our automation tooling called `ORBOS`.
-With `ORBOS` you will be able to run `ZITADEL` on `GCE` or `StaticMachines` within 20 minutes. To achieve this, `ORBOS` will boostrap a `kubernetes` cluster, install the platform components (logging, metrics, ingress, ...), start a secure `cockroach` cluster and run and operate the `ZITDADEL`.
+With [ORBOS](https://github.com/caos/orbos/) you will be able to run `ZITADEL` on `GCE` or `StaticMachines` within 20 minutes. To achieve this, [ORBOS](https://github.com/caos/orbos/) will boostrap a `Kubernetes` cluster, install the platform components (logging, metrics, ingress, ...), start a secure `cockroach` cluster and run and operate the `ZITDADEL`.
 
-The combination of the tools `ORBOS` and `ZITADEL` is what makes the operation easy and scalable.
+The combination of the tools [ORBOS](https://github.com/caos/orbos/) and `ZITADEL` is what makes the operation easy and scalable.
 
 See our progress [here](https://github.com/caos/orbos/pull/256)
 
