@@ -42,6 +42,7 @@ func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGran
 		UserID:     u.UserId,
 		ProjectID:  u.ProjectId,
 		RoleKeys:   u.RoleKeys,
+		GrantID:    u.GrantId,
 	}
 }
 
