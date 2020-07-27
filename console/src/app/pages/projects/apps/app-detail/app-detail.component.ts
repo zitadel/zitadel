@@ -16,6 +16,7 @@ import {
     OIDCConfig,
     OIDCGrantType,
     OIDCResponseType,
+    ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -73,6 +74,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public RedirectType: any = RedirectType;
 
     public isZitadel: boolean = false;
+    public docs!: ZitadelDocs.AsObject;
 
     constructor(
         public translate: TranslateService,
@@ -111,6 +113,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
+        this.docs = (await this.projectService.GetZitadelDocs()).toObject();
+        console.log(this.docs);
 
         this.projectService.GetApplicationById(projectid, id).then(app => {
             this.app = app.toObject();
