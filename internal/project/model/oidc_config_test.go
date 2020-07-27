@@ -5,6 +5,146 @@ import (
 	"testing"
 )
 
+func TestGetOIDCNativeApplicationCompliance(t *testing.T) {
+	type args struct {
+		grantTypes   []OIDCGrantType
+		authMethod   OIDCAuthMethodType
+		redirectUris []string
+	}
+	type result struct {
+		noneCompliant      bool
+		complianceProblems []string
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result result
+	}{
+		{
+			name: "compliant authorizationcode config",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+					"http://localhost/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: false,
+			},
+		},
+		{
+			name: "none compliant authorizationcode config, auth method not none",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypePost,
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.Native.AuthMethodType.NotNone",
+				},
+			},
+		},
+		{
+			name: "none compliant authorizationcode config, not https",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"http://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.Native.RediredtUris.HttpOnlyForLocalhost",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := GetOIDCNativeApplicationCompliance(tt.args.grantTypes, tt.args.authMethod, tt.args.redirectUris)
+			if tt.result.noneCompliant != result.NoneCompliant {
+				t.Errorf("got wrong result nonecompliant: expected: %v, actual: %v ", tt.result.noneCompliant, result.NoneCompliant)
+			}
+			if tt.result.noneCompliant {
+				if len(tt.result.complianceProblems) != len(result.Problems) {
+					t.Errorf("got wrong result compliance problems len: expected: %v, actual: %v ", len(tt.result.complianceProblems), len(result.Problems))
+				}
+				if !reflect.DeepEqual(tt.result.complianceProblems, result.Problems) {
+					t.Errorf("got wrong result compliance problems: expected: %v, actual: %v ", tt.result.complianceProblems, result.Problems)
+				}
+			}
+		})
+	}
+}
+
+func TestGetOIDCWebApplicationCompliance(t *testing.T) {
+	type args struct {
+		grantTypes   []OIDCGrantType
+		redirectUris []string
+	}
+	type result struct {
+		noneCompliant      bool
+		complianceProblems []string
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result result
+	}{
+		{
+			name: "compliant authorizationcode config",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: false,
+			},
+		},
+		{
+			name: "none compliant authorizationcode config, not https",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				redirectUris: []string{
+					"http://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.Web.RediredtUris.NotHttps",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := GetOIDCWebApplicationCompliance(tt.args.grantTypes, tt.args.redirectUris)
+			if tt.result.noneCompliant != result.NoneCompliant {
+				t.Errorf("got wrong result nonecompliant: expected: %v, actual: %v ", tt.result.noneCompliant, result.NoneCompliant)
+			}
+			if tt.result.noneCompliant {
+				if len(tt.result.complianceProblems) != len(result.Problems) {
+					t.Errorf("got wrong result compliance problems len: expected: %v, actual: %v ", len(tt.result.complianceProblems), len(result.Problems))
+				}
+				if !reflect.DeepEqual(tt.result.complianceProblems, result.Problems) {
+					t.Errorf("got wrong result compliance problems: expected: %v, actual: %v ", tt.result.complianceProblems, result.Problems)
+				}
+			}
+		})
+	}
+}
+
 func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 	type args struct {
 		grantTypes   []OIDCGrantType
