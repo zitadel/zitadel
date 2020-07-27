@@ -15,13 +15,7 @@ import {
     ProjectGrantMemberSearchQuery,
     ProjectGrantMemberSearchRequest,
     ProjectGrantMemberSearchResponse,
-    ProjectGrantUserGrantCreate,
-    ProjectGrantUserGrantID,
-    ProjectGrantUserGrantSearchRequest,
-    ProjectGrantUserGrantUpdate,
     ProjectRoleAdd,
-    ProjectUserGrantSearchRequest,
-    ProjectUserGrantUpdate,
     SetPasswordNotificationRequest,
     UpdateUserAddressRequest,
     UpdateUserEmailRequest,
@@ -37,6 +31,7 @@ import {
     UserGrantSearchQuery,
     UserGrantSearchRequest,
     UserGrantSearchResponse,
+    UserGrantUpdate,
     UserGrantView,
     UserID,
     UserPhone,
@@ -217,43 +212,24 @@ export class MgmtUserService {
         );
     }
 
-    public async CreateProjectUserGrant(
-        projectId: string,
+    public async CreateUserGrant(
         userId: string,
         roleNamesList: string[],
+        projectId?: string,
+        grantId?: string,
     ): Promise<UserGrant> {
         const req = new UserGrantCreate();
-        req.setProjectId(projectId);
+        if (projectId) { req.setProjectId(projectId); }
+        if (grantId) { req.setProjectGrantId(grantId); }
         req.setUserId(userId);
         req.setRoleKeysList(roleNamesList);
 
         return await this.request(
-            c => c.createProjectUserGrant,
+            c => c.createUserGrant,
             req,
             f => f,
         );
     }
-
-    public async CreateProjectGrantUserGrant(
-        orgId: string,
-        projectId: string,
-        grantId: string,
-        userId: string,
-        roleNamesList: string[],
-    ): Promise<UserGrant> {
-        const req = new ProjectGrantUserGrantCreate();
-        req.setProjectId(projectId);
-        req.setProjectGrantId(grantId);
-        req.setUserId(userId);
-        req.setRoleKeysList(roleNamesList);
-
-        return await this.request(
-            c => c.createProjectGrantUserGrant,
-            req,
-            f => f,
-        );
-    }
-
     public async ReactivateUser(id: string): Promise<UserPhone> {
         const req = new UserID();
         req.setId(id);
@@ -393,9 +369,13 @@ export class MgmtUserService {
     public async SearchUserGrants(
         limit: number,
         offset: number,
+        projectId?: string,
+        grantId?: string,
         queryList?: UserGrantSearchQuery[],
     ): Promise<UserGrantSearchResponse> {
         const req = new UserGrantSearchRequest();
+        if (projectId) { req.setProjectId(projectId); }
+        if (grantId) { req.setProjectGrantId(grantId); }
         req.setLimit(limit);
         req.setOffset(offset);
         if (queryList) {
@@ -408,62 +388,6 @@ export class MgmtUserService {
         );
     }
 
-    public async SearchProjectUserGrants(
-        projectId: string,
-        limit: number,
-        offset: number,
-        queryList?: UserGrantSearchQuery[],
-    ): Promise<UserGrantSearchResponse> {
-        const req = new ProjectUserGrantSearchRequest();
-        req.setProjectId(projectId);
-        req.setLimit(limit);
-        req.setOffset(offset);
-        if (queryList) {
-            req.setQueriesList(queryList);
-        }
-        return await this.request(
-            c => c.searchProjectUserGrants,
-            req,
-            f => f,
-        );
-    }
-
-    public async SearchProjectGrantUserGrants(
-        projectGrantId: string,
-        limit: number,
-        offset: number,
-        queryList?: UserGrantSearchQuery[],
-    ): Promise<UserGrantSearchResponse> {
-        const req = new ProjectGrantUserGrantSearchRequest();
-        req.setProjectGrantId(projectGrantId);
-        req.setLimit(limit);
-        req.setOffset(offset);
-        if (queryList) {
-            req.setQueriesList(queryList);
-        }
-        return await this.request(
-            c => c.searchProjectGrantUserGrants,
-            req,
-            f => f,
-        );
-    }
-
-    public async projectGrantUserGrantByID(
-        id: string,
-        userId: string,
-        projectGrantId: string,
-    ): Promise<UserGrant> {
-        const req = new ProjectGrantUserGrantID();
-        req.setId(id);
-        req.setUserId(userId);
-        req.setProjectGrantId(projectGrantId);
-
-        return await this.request(
-            c => c.projectGrantUserGrantByID,
-            req,
-            f => f,
-        );
-    }
 
     public async UserGrantByID(
         id: string,
@@ -480,56 +404,23 @@ export class MgmtUserService {
         );
     }
 
-    // public async UpdateUserGrant(
-    //     id: string,
-    //     userId: string,
-    //     roleKeysList: string[],
-    // ): Promise<UserGrant> {
-    //     const req = new UserGrantUpdate();
-    //     req.setId(id);
-    //     req.setRoleKeysList(roleKeysList);
-    //     req.setUserId(userId);
-
-    //     return await this.request(
-    //         c => c.updateUserGrant,
-    //         req,
-    //         f => f,
-    //     );
-    // }
-
-    public async UpdateProjectUserGrant(
+    public async UpdateUserGrant(
         id: string,
-        projectId: string,
+
         userId: string,
         roleKeysList: string[],
+        projectId?: string,
+        grantId?: string,
     ): Promise<UserGrant> {
-        const req = new ProjectUserGrantUpdate();
+        const req = new UserGrantUpdate();
         req.setId(id);
-        req.setProjectId(projectId);
+        if (projectId) { req.setProjectId(projectId); }
+        if (grantId) { req.setProjectGrantId(grantId); }
         req.setRoleKeysList(roleKeysList);
         req.setUserId(userId);
 
         return await this.request(
-            c => c.updateProjectUserGrant,
-            req,
-            f => f,
-        );
-    }
-
-    public async updateProjectGrantUserGrant(
-        id: string,
-        projectGrantId: string,
-        userId: string,
-        roleKeysList: string[],
-    ): Promise<UserGrant> {
-        const req = new ProjectGrantUserGrantUpdate();
-        req.setId(id);
-        req.setProjectGrantId(projectGrantId);
-        req.setRoleKeysList(roleKeysList);
-        req.setUserId(userId);
-
-        return await this.request(
-            c => c.updateProjectGrantUserGrant,
+            c => c.updateUserGrant,
             req,
             f => f,
         );
