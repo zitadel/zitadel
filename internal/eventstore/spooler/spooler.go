@@ -80,7 +80,7 @@ func (s *spooledHandler) load(workerID string) {
 			errs <- err
 		} else {
 			errs <- s.process(ctx, events, workerID)
-			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).WithField("ts", time.Now().Format(time.StampMicro)).Warn("process done")
+			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("process done")
 		}
 	}
 	<-ctx.Done()
