@@ -99,9 +99,9 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 	case OIDCApplicationTypeNative:
 		return GetOIDCNativeApplicationCompliance(grantTypes, authMethod, redirectUris)
 	case OIDCApplicationTypeWeb:
-		return GetOIDCWebApplicationComplicance(grantTypes, redirectUris)
+		return GetOIDCWebApplicationCompliance(grantTypes, redirectUris)
 	case OIDCApplicationTypeUserAgent:
-		return GetOIDCUserAgentApplicationComplicance(grantTypes, authMethod, redirectUris)
+		return GetOIDCUserAgentApplicationCompliance(grantTypes, authMethod, redirectUris)
 	}
 	return nil
 }
@@ -126,7 +126,7 @@ func GetOIDCNativeApplicationCompliance(grantTypes []OIDCGrantType, authMethod O
 	return compliance
 }
 
-func GetOIDCWebApplicationComplicance(grantTypes []OIDCGrantType, redirectUris []string) *Compliance {
+func GetOIDCWebApplicationCompliance(grantTypes []OIDCGrantType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
 	if len(grantTypes) != 1 {
 		compliance.NoneCompliant = true
@@ -142,7 +142,7 @@ func GetOIDCWebApplicationComplicance(grantTypes []OIDCGrantType, redirectUris [
 	return compliance
 }
 
-func GetOIDCUserAgentApplicationComplicance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+func GetOIDCUserAgentApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		if authMethod != OIDCAuthMethodTypeNone {

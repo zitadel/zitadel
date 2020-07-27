@@ -5,6 +5,130 @@ import (
 	"testing"
 )
 
+func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
+	type args struct {
+		grantTypes   []OIDCGrantType
+		authMethod   OIDCAuthMethodType
+		redirectUris []string
+	}
+	type result struct {
+		noneCompliant      bool
+		complianceProblems []string
+	}
+	tests := []struct {
+		name   string
+		args   args
+		result result
+	}{
+		{
+			name: "compliant implicit config",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
+				authMethod: OIDCAuthMethodTypePost,
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: false,
+			},
+		},
+		{
+			name: "none compliant implicit config, not post",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
+				authMethod: OIDCAuthMethodTypeBasic,
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.UserAgent.Implicit.AuthMethodType.NotPost",
+				},
+			},
+		},
+		{
+			name: "none compliant implicit config, not https",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
+				authMethod: OIDCAuthMethodTypePost,
+				redirectUris: []string{
+					"http://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.Web.RediredtUris.NotHttps",
+				},
+			},
+		},
+		{
+			name: "compliant authorizationcode config",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: false,
+			},
+		},
+		{
+			name: "none compliant authorizationcode config, auth method not none",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypePost,
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.UserAgent.AuthorizationCodeFlow.AuthMethodType.NotNone",
+				},
+			},
+		},
+		{
+			name: "none compliant authorizationcode config, note https",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"http://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.Web.RediredtUris.NotHttps",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := GetOIDCUserAgentApplicationCompliance(tt.args.grantTypes, tt.args.authMethod, tt.args.redirectUris)
+			if tt.result.noneCompliant != result.NoneCompliant {
+				t.Errorf("got wrong result nonecompliant: expected: %v, actual: %v ", tt.result.noneCompliant, result.NoneCompliant)
+			}
+			if tt.result.noneCompliant {
+				if len(tt.result.complianceProblems) != len(result.Problems) {
+					t.Errorf("got wrong result compliance problems len: expected: %v, actual: %v ", len(tt.result.complianceProblems), len(result.Problems))
+				}
+				if !reflect.DeepEqual(tt.result.complianceProblems, result.Problems) {
+					t.Errorf("got wrong result compliance problems: expected: %v, actual: %v ", tt.result.complianceProblems, result.Problems)
+				}
+			}
+		})
+	}
+}
+
 func TestGetRequiredGrantTypes(t *testing.T) {
 	type args struct {
 		oidcConfig OIDCConfig

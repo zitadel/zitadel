@@ -80,7 +80,7 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 	for i, rt := range config.GrantTypes {
 		grantTypes[i] = model.OIDCGrantType(rt)
 	}
-	return &model.OIDCConfig{
+	oidcConfig := &model.OIDCConfig{
 		ObjectRoot:             config.ObjectRoot,
 		AppID:                  config.AppID,
 		OIDCVersion:            model.OIDCVersion(config.Version),
@@ -93,6 +93,8 @@ func OIDCConfigToModel(config *OIDCConfig) *model.OIDCConfig {
 		AuthMethodType:         model.OIDCAuthMethodType(config.AuthMethodType),
 		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
 	}
+	oidcConfig.FillCompliance()
+	return oidcConfig
 }
 
 func (p *Project) appendAddOIDCConfigEvent(event *es_models.Event) error {
