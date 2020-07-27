@@ -266,49 +266,49 @@ func TestSQL_PushAggregates(t *testing.T) {
 			isError:           z_errors.IsInternal,
 			shouldCheckEvents: false,
 		},
-		// {
-		// 	name: "one event, release savepoint fails",
-		// 	fields: fields{
-		// 		client: mockDB(t).
-		// 			expectBegin(nil).
-		// 			expectPrepareInsert(nil).
-		// 			expectSavepoint().
-		// 			expectInsertEvent(&models.Event{
-		// 				AggregateID:      "aggID",
-		// 				AggregateType:    "aggType",
-		// 				EditorService:    "svc",
-		// 				EditorUser:       "usr",
-		// 				ResourceOwner:    "ro",
-		// 				PreviousSequence: 34,
-		// 				Type:             "eventTyp",
-		// 				Data:             []byte("{}"),
-		// 				AggregateVersion: "v0.0.1",
-		// 			}, 47).
-		// 			expectReleaseSavepoint(sql.ErrConnDone).
-		// 			expectCommit(nil).
-		// 			expectRollback(nil),
-		// 	},
-		// 	args: args{
-		// 		aggregates: []*models.Aggregate{
-		// 			{
-		// 				Events: []*models.Event{
-		// 					{
-		// 						AggregateID:      "aggID",
-		// 						AggregateType:    "aggType",
-		// 						AggregateVersion: "v0.0.1",
-		// 						EditorService:    "svc",
-		// 						EditorUser:       "usr",
-		// 						ResourceOwner:    "ro",
-		// 						Type:             "eventTyp",
-		// 						PreviousSequence: 34,
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	isError:           errors.IsInternal,
-		// 	shouldCheckEvents: false,
-		// },
+		{
+			name: "one event, release savepoint fails",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil).
+					expectPrepareInsert(nil).
+					expectSavepoint().
+					expectInsertEvent(&models.Event{
+						AggregateID:      "aggID",
+						AggregateType:    "aggType",
+						EditorService:    "svc",
+						EditorUser:       "usr",
+						ResourceOwner:    "ro",
+						PreviousSequence: 34,
+						Type:             "eventTyp",
+						Data:             []byte("{}"),
+						AggregateVersion: "v0.0.1",
+					}, 47).
+					expectReleaseSavepoint(sql.ErrConnDone).
+					expectCommit(nil).
+					expectRollback(nil),
+			},
+			args: args{
+				aggregates: []*models.Aggregate{
+					{
+						Events: []*models.Event{
+							{
+								AggregateID:      "aggID",
+								AggregateType:    "aggType",
+								AggregateVersion: "v0.0.1",
+								EditorService:    "svc",
+								EditorUser:       "usr",
+								ResourceOwner:    "ro",
+								Type:             "eventTyp",
+								PreviousSequence: 34,
+							},
+						},
+					},
+				},
+			},
+			isError:           z_errors.IsInternal,
+			shouldCheckEvents: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
