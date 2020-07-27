@@ -137,7 +137,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
                 if (grant.id && grant.projectId) {
-                    this.userService.UpdateProjectUserGrant(grant.id, grant.projectId, grant.userId, selectionChange.value)
+                    this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value, grant.projectId)
                         .then(() => {
                             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
                         }).catch(error => {
@@ -147,8 +147,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                 break;
             case UserGrantContext.GRANTED_PROJECT:
                 if (this.grantId && this.projectId) {
-                    this.userService.updateProjectGrantUserGrant(grant.id,
-                        this.grantId, grant.userId, selectionChange.value)
+                    this.userService.UpdateUserGrant(grant.id,
+                        grant.userId, selectionChange.value, this.projectId, this.grantId)
                         .then(() => {
                             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
                         }).catch(error => {

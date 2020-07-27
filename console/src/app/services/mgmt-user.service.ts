@@ -369,9 +369,9 @@ export class MgmtUserService {
     public async SearchUserGrants(
         limit: number,
         offset: number,
+        queryList?: UserGrantSearchQuery[],
         projectId?: string,
         grantId?: string,
-        queryList?: UserGrantSearchQuery[],
     ): Promise<UserGrantSearchResponse> {
         const req = new UserGrantSearchRequest();
         if (projectId) { req.setProjectId(projectId); }
@@ -406,7 +406,6 @@ export class MgmtUserService {
 
     public async UpdateUserGrant(
         id: string,
-
         userId: string,
         roleKeysList: string[],
         projectId?: string,

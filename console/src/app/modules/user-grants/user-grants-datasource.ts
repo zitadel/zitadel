@@ -60,14 +60,14 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             case UserGrantContext.OWNED_PROJECT:
                 if (data && data.projectId) {
                     this.loadingSubject.next(true);
-                    const promise1 = this.userService.SearchProjectUserGrants(data.projectId, 10, 0, queries);
+                    const promise1 = this.userService.SearchUserGrants(10, 0, queries, data.projectId);
                     this.loadResponse(promise1);
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
                 if (data && data.grantId) {
                     this.loadingSubject.next(true);
-                    const promise2 = this.userService.SearchProjectGrantUserGrants(data.grantId, 10, 0, queries);
+                    const promise2 = this.userService.SearchUserGrants(10, 0, queries, data.projectId, data.grantId);
                     this.loadResponse(promise2);
                 }
                 break;
