@@ -27,6 +27,9 @@
                     <mat-label>{{ 'APP.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
                 </mat-form-field>
+
+                <p class="docs-line" *ngIf="docs?.discoveryEndpoint">Discovery Endpoint: {{docs.discoveryEndpoint}}</p>
+                <p class="docs-line" *ngIf="docs?.issuer">Issuer: {{docs.issuer}}</p>
             </div>
             <div class="btn-container">
                 <button type="submit" color="primary" [disabled]="appNameForm.invalid || name?.disabled"
