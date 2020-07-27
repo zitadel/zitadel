@@ -77,6 +77,21 @@ func (mr *MockEventstoreMockRecorder) Health(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockEventstore)(nil).Health), arg0)
 }
 
+// LatestSequence mocks base method
+func (m *MockEventstore) LatestSequence(arg0 context.Context, arg1 *models.SearchQueryFactory) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LatestSequence", arg0, arg1)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LatestSequence indicates an expected call of LatestSequence
+func (mr *MockEventstoreMockRecorder) LatestSequence(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LatestSequence", reflect.TypeOf((*MockEventstore)(nil).LatestSequence), arg0, arg1)
+}
+
 // PushAggregates mocks base method
 func (m *MockEventstore) PushAggregates(arg0 context.Context, arg1 ...*models.Aggregate) error {
 	m.ctrl.T.Helper()
