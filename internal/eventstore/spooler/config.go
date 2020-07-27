@@ -10,10 +10,10 @@ import (
 )
 
 type Config struct {
-	Eventstore      eventstore.Eventstore
-	Locker          Locker
-	ViewHandlers    []query.Handler
-	ConcurrentTasks int
+	Eventstore        eventstore.Eventstore
+	Locker            Locker
+	ViewHandlers      []query.Handler
+	ConcurrentWorkers int
 }
 
 func (c *Config) New() *Spooler {
@@ -29,6 +29,6 @@ func (c *Config) New() *Spooler {
 		eventstore: c.Eventstore,
 		locker:     c.Locker,
 		queue:      make(chan *spooledHandler),
-		workers:    c.ConcurrentTasks,
+		workers:    c.ConcurrentWorkers,
 	}
 }
