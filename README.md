@@ -13,7 +13,7 @@
 
 ## What Is It
 
-`ZITADEL` is a Cloud Native Identity and Access Management solution. All serverside components are written in `Go` and the management interface, called `console`, is written in `Angular`.
+`ZITADEL` is a Cloud Native Identity and Access Management solution. All serverside components are written in `Go` and the management interface, called `Console`, is written in `Angular`.
 
 We optimized ZITADEL for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register there application and grant other people or companies the right to self manage a set of roles within that application.
 
