@@ -15,13 +15,13 @@
 
 `ZITADEL` is a Cloud Native Identity and Access Management solution. All serverside components are written in `Go` and the management interface, called `console`, is written in `Angular`.
 
-We optimized ZITADEL for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use a IAM where they can register there application and grant other people or companies the right to self manage a set of roles within that application.
+We optimized ZITADEL for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register there application and grant other people or companies the right to self manage a set of roles within that application.
 
 ## How Does It Work
 
 We built `ZITADEL` around the idea that the IAM should be easy to deploy and scale. That's why we tried to reduce external systems as much as possible.
-For example, `ZITADEL` is eventsourced but it does not rely on a pub/sub system to function. We instead built all the functionality right into one binary.
-`ZITADEL` only needs `kubernetes` for orchestration and `cockroachdb` as storage.
+For example, `ZITADEL` is eventsourced but it does not rely on a pub/sub system to function. Instead we built all the functionality right into one binary.
+`ZITADEL` only needs `Kubernetes` for orchestration and `CockroachDB` as storage.
 
 ## Why Another IAM
 
@@ -32,12 +32,12 @@ One feature that we often missed, was a solid `audit trail` of all IAM resources
 
 ### Use our free tier
 
-Stay tuned, we will soon publish how you can register yourself a organisation in our cloud offering `zitadel.ch`.
+Stay tuned, we will soon publish how you can register yourself an organisation in our cloud offering `zitadel.ch`.
 Yes we have a free tier!
 
 ### Run your own IAM
 
-Stay tuned, we will publish soon a guide how you can deploy a `hyperconverged` system with our automation tooling called `ORBOS`.
+Stay tuned, we will soon publish a guide how you can deploy a `hyperconverged` system with our automation tooling called `ORBOS`.
 With `ORBOS` you will be able to run `ZITADEL` on `GCE` or `StaticMachines` within 20 minutes. To achieve this, `ORBOS` will boostrap a `kubernetes` cluster, install the platform components (logging, metrics, ingress, ...), start a secure `cockroach` cluster and run and operate the `ZITDADEL`.
 
 The combination of the tools `ORBOS` and `ZITADEL` is what makes the operation easy and scalable.
