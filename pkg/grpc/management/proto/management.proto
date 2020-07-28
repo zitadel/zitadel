@@ -2515,6 +2515,7 @@ message UserGrantCreate {
     string user_id = 1;
     string project_id = 2;
     repeated string role_keys = 3;
+    string grant_id = 4;
 }
 
 message UserGrantUpdateBulk {
