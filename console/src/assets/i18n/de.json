@@ -645,6 +645,7 @@
         "ORG_POLICY_EDITOR":"Org. Policy Editor",
         "ORG_POLICY_VIEWER":"Org. Policy Viewer",
         "PROJECT_OWNER":"Project Owner",
+        "PROJECT_OWNER_VIEWER":"Project Owner Viewer",
         "PROJECT_MEMBER_EDITOR":"Project Member Editor",
         "PROJECT_APP_EDITOR":"Project App Editor",
         "PROJECT_APP_VIEWER":"Project App Viewer",

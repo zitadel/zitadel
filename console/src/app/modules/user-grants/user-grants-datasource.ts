@@ -2,7 +2,6 @@ import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import {
-    SearchMethod,
     UserGrant,
     UserGrantSearchKey,
     UserGrantSearchQuery,
@@ -78,10 +77,11 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                 if (data && data.grantId && data.projectId) {
                     this.loadingSubject.next(true);
 
-                    const grantquery: UserGrantSearchQuery = new UserGrantSearchQuery();
-                    grantquery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_ROLE_KEY);
-                    grantquery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
-                    grantquery.setValue(data.grantId);
+                    // TODO add grant id filter
+                    // const grantquery: UserGrantSearchQuery = new UserGrantSearchQuery();
+                    // grantquery.setKey(UserGrantSearchKey.);
+                    // grantquery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
+                    // grantquery.setValue(data.grantId);
 
                     const projectfilter = new UserGrantSearchQuery();
                     projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
@@ -89,9 +89,9 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
 
                     if (queries) {
                         queries.push(projectfilter);
-                        queries.push(grantquery);
+                        // queries.push(grantquery);
                     } else {
-                        queries = [projectfilter, grantquery];
+                        queries = [projectfilter, /*grantquery*/];
                     }
 
                     const promise2 = this.userService.SearchUserGrants(10, 0, queries);

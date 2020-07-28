@@ -178,7 +178,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public add(event: MatChipInputEvent, target: RedirectType): void {
-        if (target === RedirectType.POSTREDIRECT) {
+        if (target === RedirectType.POSTREDIRECT && this.postRedirectControl.valid) {
             const input = event.input;
             if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
                 this.postLogoutRedirectUrisList.push(event.value);
@@ -186,7 +186,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             if (input) {
                 input.value = '';
             }
-        } else if (target === RedirectType.REDIRECT) {
+        } else if (target === RedirectType.REDIRECT && this.redirectControl.valid) {
             const input = event.input;
             if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
                 this.redirectUrisList.push(event.value);

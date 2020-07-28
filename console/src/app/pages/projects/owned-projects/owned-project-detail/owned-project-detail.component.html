@@ -82,8 +82,8 @@
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="userGrantContext" [projectId]="projectId"
                             [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                            [allowCreate]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.write'] | hasRole) | async"
-                            [allowDelete]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.delete'] | hasRole) | async">
+                            [allowCreate]="(['user.grant.write'] | hasRole) | async"
+                            [allowDelete]="(['user.grant.delete'] | hasRole) | async">
                         </app-user-grants>
                     </app-card>
                 </ng-template>

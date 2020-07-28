@@ -108,6 +108,9 @@
                     </mat-chip-list>
                 </mat-form-field>
 
+                <p *ngIf="redirectControl.value && redirectControl.invalid" class="error">
+                    {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
+
                 <mat-form-field class="full-width" appearance="outline">
                     <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipPostRedirectList>
@@ -124,6 +127,9 @@
                             [formControl]="postRedirectControl">
                     </mat-chip-list>
                 </mat-form-field>
+
+                <p *ngIf="postRedirectControl.value && postRedirectControl.invalid" class="error">
+                    {{'APP.OIDC.REDIRECTNOTVALID' | translate}}</p>
             </div>
             <div class="btn-container">
 
