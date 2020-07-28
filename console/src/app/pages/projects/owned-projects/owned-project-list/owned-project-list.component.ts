@@ -88,7 +88,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         this.projectService.SearchProjects(limit, offset).then(res => {
             this.ownedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
-            if (this.totalResult > 5) {
+            if (this.totalResult > 10) {
                 this.grid = false;
             }
             this.dataSource.data = this.ownedProjectList;

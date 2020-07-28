@@ -44,7 +44,6 @@ export class UserMfaComponent implements OnInit, OnDestroy {
 
     public getOTP(): void {
         this.mgmtUserService.getUserMfas(this.user.id).then(mfas => {
-            console.log(mfas.toObject().mfasList);
             this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
             this.dataSource.sort = this.sort;
         }).catch(error => {

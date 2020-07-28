@@ -1,9 +1,6 @@
 @import '~@angular/material/theming';
 
 @mixin card-theme($theme) {
-    $accent: map-get($theme, accent);
-    $background: map-get($theme, background);
-    $background-color: mat-color($background, card);
     $primary: map-get($theme, primary);
     $primary-color: mat-color($primary, 500);
     $primary-dark: mat-color($primary, A800);
@@ -17,7 +14,6 @@
         box-sizing: border-box;
         border-radius: .5rem;
         outline: none;
-        // box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
 
         .selection-icon {
             opacity: 0;

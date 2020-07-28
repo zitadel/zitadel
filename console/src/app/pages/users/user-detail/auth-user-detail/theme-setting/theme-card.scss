@@ -4,7 +4,7 @@
     $primary: map-get($theme, primary);
     $primary-dark: mat-color($primary, A800);
 
-    .theme-conent, .theme-app , .crescent {
+    .theme-conent, .crescent {
         background-color: $primary-dark;
         transition: background-color .4s cubic-bezier(0.645, 0.045, 0.355, 1);
     }
