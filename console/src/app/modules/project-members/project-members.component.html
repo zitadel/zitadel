@@ -83,7 +83,7 @@
                             <mat-form-field class="form-field" appearance="outline" *ngIf="project">
                                 <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
                                 <mat-select [(ngModel)]="member.rolesList" multiple
-                                    [disabled]="([('project.member.write:' + project.projectId)] | hasRole | async) == false"
+                                    [disabled]="([('project.member.write:' + project.projectId), 'project.member.write'] | hasRole | async) == false"
                                     (selectionChange)="updateRoles(member, $event)">
                                     <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
                                         {{ 'ROLES.'+role | translate }}
