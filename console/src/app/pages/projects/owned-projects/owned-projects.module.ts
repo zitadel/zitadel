@@ -20,6 +20,7 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { OwnedProjectGridComponent } from './owned-project-list/owned-project-grid/owned-project-grid.component';
@@ -58,6 +59,7 @@ import { OwnedProjectsComponent } from './owned-projects.component';
         MatSortModule,
         HasRolePipeModule,
         TimestampToDatePipeModule,
+        LocalizedDatePipeModule,
         SharedModule,
     ],
 })

@@ -14,12 +14,12 @@
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
             <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
             <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
-                {{ item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm' }}</span>
+                {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
             <div class="icons">
             </div>
@@ -41,12 +41,12 @@
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="name" *ngIf="item.projectName">{{ item.projectName }}</span>
             <span class="description" *ngIf="item.resourceOwnerName">{{item.resourceOwnerName}}</span>
             <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
-                {{ item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm' }}</span>
+                {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
             <div class="icons">
             </div>

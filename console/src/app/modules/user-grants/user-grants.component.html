@@ -51,13 +51,13 @@
             <ng-container matColumnDef="creationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CREATIONDATE' | translate }} </th>
                 <td class="pointer" mat-cell *matCellDef="let grant">
-                    {{grant.creationDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
+                    {{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
             </ng-container>
 
             <ng-container matColumnDef="changeDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
                 <td class="pointer" mat-cell *matCellDef="let grant">
-                    {{grant.changeDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
+                    {{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
             </ng-container>
 
             <ng-container matColumnDef="roleNamesList">

@@ -1,4 +1,4 @@
-import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
+import { animate, animateChild, keyframes, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -7,17 +7,18 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: './contributors.component.html',
     styleUrls: ['./contributors.component.scss'],
     animations: [
-        trigger('list', [
-            transition(':enter', [
-                query('@animate',
-                    stagger(80, animateChild()),
-                ),
+        trigger('cardAnimation', [
+            transition('* => *', [
+                query('@animate', stagger('40ms', animateChild()), { optional: true }),
             ]),
         ]),
         trigger('animate', [
             transition(':enter', [
-                style({ opacity: 0, transform: 'translateX(100%)' }),
-                animate('100ms', style({ opacity: 1, transform: 'translateX(0)' })),
+                animate('.2s ease-in', keyframes([
+                    style({ opacity: 0, offset: 0 }),
+                    style({ opacity: .5, transform: 'scale(1.05)', offset: 0.3 }),
+                    style({ opacity: 1, transform: 'scale(1)', offset: 1 }),
+                ])),
             ]),
         ]),
     ],

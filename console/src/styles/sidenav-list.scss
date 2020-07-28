@@ -6,8 +6,8 @@
     $primary-color: mat-color($primary, 500);
     $accent-color: mat-color($accent, 500);
     $primary-dark: mat-color($primary, A900);
+    $inverse-color: mat-color($primary, A600);
     $sec-dark: mat-color($primary, A800);
-
 
     .mat-menu-item {
         &.show-all {
@@ -29,6 +29,15 @@
         &.active {
             color: $primary-color !important;
             background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
+        }
+
+        .c_label {
+            .count {
+                background-color: $primary-color;
+                padding: 3px 6px;
+                border-radius: 50vw;
+                color: white;
+            }
         }
     }
 
