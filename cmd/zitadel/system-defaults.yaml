@@ -1,5 +1,8 @@
 SystemDefaults:
   DefaultLanguage: 'de'
+  ZitadelDocs:
+    Issuer: $ZITADEL_ISSUER
+    DiscoveryEndpoint: '$ZITADEL_ISSUER/.well-known/openid-configuration'
   UserVerificationKey:
     EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
   SecretGenerators:
