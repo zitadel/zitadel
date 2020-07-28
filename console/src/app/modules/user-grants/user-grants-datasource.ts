@@ -91,7 +91,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
                         queries.push(projectfilter);
                         // queries.push(grantquery);
                     } else {
-                        queries = [projectfilter, /*grantquery*/];
+                        queries = [projectfilter /*grantquery*/];
                     }
 
                     const promise2 = this.userService.SearchUserGrants(10, 0, queries);
