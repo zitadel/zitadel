@@ -13,9 +13,9 @@
 
 ## What Is It
 
-`ZITADEL` is a Cloud Native Identity and Access Management solution. All serverside components are written in `Go` and the management interface, called `Console`, is written in `Angular`.
+`ZITADEL` is a Cloud Native Identity and Access Management solution. All server side components are written in `Go` and the management interface, called `Console`, is written in `Angular`.
 
-We optimized ZITADEL for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register there application and grant other people or companies the right to self manage a set of roles within that application.
+We optimized ZITADEL for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register their application and grant other people or companies the right to self manage a set of roles within that application.
 
 ## How Does It Work
 
@@ -38,7 +38,7 @@ Yes we have a free tier!
 ### Run your own IAM
 
 Stay tuned, we will soon publish a guide how you can deploy a `hyperconverged` system with our automation tooling called `ORBOS`.
-With [ORBOS](https://github.com/caos/orbos/) you will be able to run `ZITADEL` on `GCE` or `StaticMachines` within 20 minutes. To achieve this, [ORBOS](https://github.com/caos/orbos/) will boostrap a `Kubernetes` cluster, install the platform components (logging, metrics, ingress, ...), start a secure `cockroach` cluster and run and operate the `ZITDADEL`.
+With [ORBOS](https://github.com/caos/orbos/) you will be able to run `ZITADEL` on `GCE` or `StaticMachines` within 20 minutes. To achieve this, [ORBOS](https://github.com/caos/orbos/) will bootstrap a `Kubernetes` cluster, install the platform components (logging, metrics, ingress, ...), start a secure `cockroach` cluster and run and operate the `ZITADEL`.
 
 The combination of the tools [ORBOS](https://github.com/caos/orbos/) and `ZITADEL` is what makes the operation easy and scalable.
 
