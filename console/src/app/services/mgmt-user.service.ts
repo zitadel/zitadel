@@ -220,7 +220,7 @@ export class MgmtUserService {
     ): Promise<UserGrant> {
         const req = new UserGrantCreate();
         if (projectId) { req.setProjectId(projectId); }
-        if (grantId) { req.setProjectGrantId(grantId); }
+        if (grantId) { req.setGrantId(grantId); }
         req.setUserId(userId);
         req.setRoleKeysList(roleNamesList);
 
@@ -370,12 +370,8 @@ export class MgmtUserService {
         limit: number,
         offset: number,
         queryList?: UserGrantSearchQuery[],
-        projectId?: string,
-        grantId?: string,
     ): Promise<UserGrantSearchResponse> {
         const req = new UserGrantSearchRequest();
-        if (projectId) { req.setProjectId(projectId); }
-        if (grantId) { req.setProjectGrantId(grantId); }
         req.setLimit(limit);
         req.setOffset(offset);
         if (queryList) {
@@ -413,11 +409,14 @@ export class MgmtUserService {
     ): Promise<UserGrant> {
         const req = new UserGrantUpdate();
         req.setId(id);
-        if (projectId) { req.setProjectId(projectId); }
-        if (grantId) { req.setProjectGrantId(grantId); }
         req.setRoleKeysList(roleKeysList);
         req.setUserId(userId);
-
+        if (projectId) {
+            req.setProjectId(projectId);
+        }
+        if (grantId) {
+            req.setGrantId(grantId);
+        }
         return await this.request(
             c => c.updateUserGrant,
             req,

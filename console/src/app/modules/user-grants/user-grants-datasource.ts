@@ -2,6 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import {
+    SearchMethod,
     UserGrant,
     UserGrantSearchKey,
     UserGrantSearchQuery,
@@ -60,14 +61,40 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             case UserGrantContext.OWNED_PROJECT:
                 if (data && data.projectId) {
                     this.loadingSubject.next(true);
-                    const promise1 = this.userService.SearchUserGrants(10, 0, queries, data.projectId);
+                    const projectfilter = new UserGrantSearchQuery();
+                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
+                    projectfilter.setValue(data.projectId);
+                    if (queries) {
+                        queries.push(projectfilter);
+                    } else {
+                        queries = [projectfilter];
+                    }
+
+                    const promise1 = this.userService.SearchUserGrants(10, 0, queries);
                     this.loadResponse(promise1);
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
-                if (data && data.grantId) {
+                if (data && data.grantId && data.projectId) {
                     this.loadingSubject.next(true);
-                    const promise2 = this.userService.SearchUserGrants(10, 0, queries, data.projectId, data.grantId);
+
+                    const grantquery: UserGrantSearchQuery = new UserGrantSearchQuery();
+                    grantquery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_ROLE_KEY);
+                    grantquery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
+                    grantquery.setValue(data.grantId);
+
+                    const projectfilter = new UserGrantSearchQuery();
+                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
+                    projectfilter.setValue(data.projectId);
+
+                    if (queries) {
+                        queries.push(projectfilter);
+                        queries.push(grantquery);
+                    } else {
+                        queries = [projectfilter, grantquery];
+                    }
+
+                    const promise2 = this.userService.SearchUserGrants(10, 0, queries);
                     this.loadResponse(promise2);
                 }
                 break;
