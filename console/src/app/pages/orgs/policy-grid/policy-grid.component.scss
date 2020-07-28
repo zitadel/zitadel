@@ -19,7 +19,10 @@ h1 {
         min-height: 250px;
         padding: 1rem;
 
-
+        @media only screen and (max-width: 450px) {
+            flex-basis: 100%;
+        }
+        
         .avatar {
             height: 60px;
             width: 60px;
