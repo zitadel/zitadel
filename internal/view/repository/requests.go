@@ -50,6 +50,26 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 	}
 }
 
+func PrepareBulkSave(table string) func(db *gorm.DB, objects ...interface{}) error {
+	return func(db *gorm.DB, objects ...interface{}) error {
+		db = db.Table(table)
+		db = db.Begin()
+		if err := db.Error; err != nil {
+			return caos_errs.ThrowInternal(err, "REPOS-Fl0Is", "unable to begin")
+		}
+		for _, object := range objects {
+			err := db.Save(object).Error
+			if err != nil {
+				return caos_errs.ThrowInternal(err, "VIEW-oJJSm", "unable to put object to view")
+			}
+		}
+		if err := db.Commit().Error; err != nil {
+			return caos_errs.ThrowInternal(err, "REPOS-IfhUE", "unable to commit")
+		}
+		return nil
+	}
+}
+
 func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
 	return func(db *gorm.DB, object interface{}) error {
 		err := db.Table(table).Save(object).Error

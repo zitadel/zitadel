@@ -1,14 +1,15 @@
 package handler
 
 import (
+	"time"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/query"
 	iam_events "github.com/caos/zitadel/internal/iam/repository/eventsourcing"
-	"time"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore/spooler"
 )
 
 type Configs map[string]*Config
@@ -28,8 +29,8 @@ type EventstoreRepos struct {
 	IamEvents *iam_events.IamEventstore
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []spooler.Handler {
-	return []spooler.Handler{
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, eventstore eventstore.Eventstore, repos EventstoreRepos, systemDefaults sd.SystemDefaults) []query.Handler {
+	return []query.Handler{
 		&UserGrant{
 			handler:    handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount},
 			eventstore: eventstore,
@@ -47,4 +48,12 @@ func (configs Configs) cycleDuration(viewModel string) time.Duration {
 		return 1 * time.Second
 	}
 	return c.MinimumCycleDuration.Duration
+}
+
+func (h *handler) MinimumCycleDuration() time.Duration {
+	return h.cycleDuration
+}
+
+func (h *handler) QueryLimit() uint64 {
+	return h.bulkLimit
 }

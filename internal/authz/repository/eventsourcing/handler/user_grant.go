@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -30,8 +30,6 @@ type UserGrant struct {
 const (
 	userGrantTable = "authz.user_grants"
 )
-
-func (u *UserGrant) MinimumCycleDuration() time.Duration { return u.cycleDuration }
 
 func (u *UserGrant) ViewModel() string {
 	return userGrantTable

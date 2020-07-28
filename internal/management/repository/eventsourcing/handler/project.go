@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
@@ -21,8 +19,6 @@ type Project struct {
 const (
 	projectTable = "management.projects"
 )
-
-func (p *Project) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *Project) ViewModel() string {
 	return projectTable

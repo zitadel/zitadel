@@ -2,9 +2,10 @@ package eventsourcing
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/crypto"
 	"testing"
 	"time"
+
+	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"

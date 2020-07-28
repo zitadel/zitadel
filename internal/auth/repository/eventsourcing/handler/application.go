@@ -2,13 +2,13 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
-	"time"
 )
 
 type Application struct {
@@ -19,8 +19,6 @@ type Application struct {
 const (
 	applicationTable = "auth.applications"
 )
-
-func (p *Application) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *Application) ViewModel() string {
 	return applicationTable

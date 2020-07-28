@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"time"
-
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -24,8 +22,6 @@ type UserSession struct {
 const (
 	userSessionTable = "auth.user_sessions"
 )
-
-func (u *UserSession) MinimumCycleDuration() time.Duration { return u.cycleDuration }
 
 func (u *UserSession) ViewModel() string {
 	return userSessionTable

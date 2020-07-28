@@ -1,8 +1,9 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/view/repository"
 	"time"
+
+	"github.com/caos/zitadel/internal/view/repository"
 
 	"github.com/jinzhu/gorm"
 
@@ -48,12 +49,8 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 }
 
 func PutKeys(db *gorm.DB, table string, privateKey, publicKey *model.KeyView) error {
-	save := repository.PrepareSave(table)
-	err := save(db, privateKey)
-	if err != nil {
-		return err
-	}
-	return save(db, publicKey)
+	save := repository.PrepareBulkSave(table)
+	return save(db, privateKey, publicKey)
 }
 
 func DeleteKey(db *gorm.DB, table, keyID string, private bool) error {

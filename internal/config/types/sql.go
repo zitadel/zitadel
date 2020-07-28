@@ -38,6 +38,7 @@ func (s *SQL) connectionString() string {
 		"port=" + s.Port,
 		"user=" + s.User,
 		"dbname=" + s.Database,
+		"application_name=zitadel",
 		"sslmode=" + s.SSL.Mode,
 	}
 	if s.Password != "" {

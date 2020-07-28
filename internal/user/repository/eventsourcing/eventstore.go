@@ -325,7 +325,7 @@ func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending boo
 	query := es_models.NewSearchQuery().
 		AggregateTypeFilter(model.UserAggregate)
 	if !sortAscending {
-		query.OrderDesc() //TODO: configure from param
+		query.OrderDesc()
 	}
 
 	query.LatestSequenceFilter(latestSequence).
