@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,6 +23,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { nativeValidator } from '../appTypeValidator';
 
 enum RedirectType {
     REDIRECT = 'redirect',
@@ -78,6 +79,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     public OIDCApplicationType: any = OIDCApplicationType;
 
+    public redirectControl: FormControl = new FormControl('');
+    public postRedirectControl: FormControl = new FormControl('');
+
+
     constructor(
         public translate: TranslateService,
         private route: ActivatedRoute,
@@ -128,9 +133,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }
             if (this.app.oidcConfig?.redirectUrisList) {
                 this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
+
+                this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
             }
             if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
                 this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
+                this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
             }
             if (this.app.oidcConfig) {
                 this.appForm.patchValue(this.app.oidcConfig);

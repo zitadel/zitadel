@@ -85,11 +85,11 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
-
-                <p class="step-description" *ngIf="applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
+                <p class="step-description"
+                    *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE">
                     {{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</p>
                 <p class="step-description"
-                    *ngIf="applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType === OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
+                    *ngIf="applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB || applicationType?.value == OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT">
                     {{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</p>
 
                 <mat-form-field class="full-width" appearance="outline">
@@ -103,7 +103,7 @@
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                         </mat-chip>
                         <input [matChipInputFor]="chipRedirectList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="addOnBlur"
+                            [matChipInputAddOnBlur]="addOnBlur" [formControl]="redirectControl"
                             (matChipInputTokenEnd)="add($event, RedirectType.REDIRECT)">
                     </mat-chip-list>
                 </mat-form-field>
@@ -120,7 +120,8 @@
                         </mat-chip>
                         <input [matChipInputFor]="chipPostRedirectList"
                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-                            (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)">
+                            (matChipInputTokenEnd)="add($event, RedirectType.POSTREDIRECT)"
+                            [formControl]="postRedirectControl">
                     </mat-chip-list>
                 </mat-form-field>
             </div>
