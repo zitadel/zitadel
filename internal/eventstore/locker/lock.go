@@ -17,6 +17,7 @@ const (
 		" ON CONFLICT (view_name)" +
 		" DO UPDATE SET locker_id = $4, locked_until = now()+$5::INTERVAL" +
 		" WHERE locks.view_name = $6 AND (locks.locker_id = $7 OR locks.locked_until < now())"
+	millisecondsAsSeconds = int64(time.Second / time.Millisecond)
 )
 
 type lock struct {
@@ -29,14 +30,15 @@ func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel string, waitTime tim
 	return crdb.ExecuteTx(context.Background(), dbClient, nil, func(tx *sql.Tx) error {
 		insert := fmt.Sprintf(insertStmtFormat, lockTable)
 		result, err := tx.Exec(insert,
-			lockerID, waitTime.Milliseconds()/1000, viewModel,
-			lockerID, waitTime.Milliseconds()/1000,
+			lockerID, waitTime.Milliseconds()/millisecondsAsSeconds, viewModel,
+			lockerID, waitTime.Milliseconds()/millisecondsAsSeconds,
 			viewModel, lockerID)
 
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
+
 		if rows, _ := result.RowsAffected(); rows == 0 {
 			return caos_errs.ThrowAlreadyExists(nil, "SPOOL-lso0e", "view already locked")
 		}
