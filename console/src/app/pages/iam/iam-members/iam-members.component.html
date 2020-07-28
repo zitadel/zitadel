@@ -30,7 +30,7 @@
                         <i class="las la-trash"></i>
                     </button>
                 </ng-template>
-                <ng-template appHasRole [appHasRole]="['org.member.write']">
+                <ng-template appHasRole [appHasRole]="['iam.member.write']">
                     <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()"
                         color="primary" mat-raised-button>
                         <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
