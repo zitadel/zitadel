@@ -9,18 +9,20 @@ GRANT UPDATE ON TABLE eventstore.event_seq TO notification;
 
 
 CREATE TABLE eventstore.events (
+    id UUID DEFAULT gen_random_uuid(),
     event_type TEXT,
     aggregate_type TEXT NOT NULL,
     aggregate_id TEXT NOT NULL,
     aggregate_version TEXT NOT NULL,
     event_sequence BIGINT NOT NULL DEFAULT nextval('eventstore.event_seq'),
-    previous_sequence BIGINT UNIQUE,
+    previous_sequence BIGINT,
     creation_date TIMESTAMPTZ NOT NULL DEFAULT now(),
     event_data JSONB,
     editor_user TEXT NOT NULL, 
     editor_service TEXT NOT NULL,
     resource_owner TEXT NOT NULL,
 
-    PRIMARY KEY (event_sequence DESC),
-    INDEX (aggregate_type, aggregate_id)
+    CONSTRAINT event_sequence_pk PRIMARY KEY (event_sequence DESC),
+    INDEX agg_type_agg_id (aggregate_type, aggregate_id),
+    CONSTRAINT previous_sequence_unique UNIQUE (previous_sequence DESC)
 );
