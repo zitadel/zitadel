@@ -96,7 +96,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 	request.EnsureLimit(repo.SearchLimit)
 	sequence, err := repo.View.GetLatestUserSequence()
 	logging.Log("EVENT-Lcn7d").OnError(err).Warn("could not read latest user sequence")
-	projects, count, err := repo.View.SearchUsers(request)
+	users, count, err := repo.View.SearchUsers(request)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSe
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
-		Result:      model.UsersToModel(projects),
+		Result:      model.UsersToModel(users),
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
@@ -214,4 +214,25 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 
 func (repo *UserRepo) ChangeAddress(ctx context.Context, address *usr_model.Address) (*usr_model.Address, error) {
 	return repo.UserEvents.ChangeAddress(ctx, address)
+}
+
+func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestUserMembershipSequence()
+	logging.Log("EVENT-Dn7sf").OnError(err).Warn("could not read latest user sequence")
+	memberships, count, err := repo.View.SearchUserMemberships(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &usr_model.UserMembershipSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      model.UserMembershipsToModel(memberships),
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
 }

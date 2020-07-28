@@ -373,7 +373,7 @@ service ManagementService {
         };
     }
 
-    rpc SearchUserMembership(UserMembMembershipershipSearchRequest) returns (UserMembershipSearchResponse) {
+    rpc SearchUserMemberships(UserMembershipSearchRequest) returns (UserMembershipSearchResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/memberships/_search"
             body: "*"
@@ -2681,10 +2681,16 @@ enum UserMembershipSearchKey {
 }
 
 message UserMembershipView {
-    MemberType member_type = 1;
-    string aggregate_id = 2;
-    string object_id = 3;
-    repeated string roles = 4;
+    string user_id = 1;
+    MemberType member_type = 2;
+    string aggregate_id = 3;
+    string object_id = 4;
+    repeated string roles = 5;
+    string display_name = 6;
+    google.protobuf.Timestamp creation_date = 7;
+    google.protobuf.Timestamp change_date = 8;
+    uint64 sequence = 9;
+    string resource_owner = 10;
 }
 
 enum MemberType {

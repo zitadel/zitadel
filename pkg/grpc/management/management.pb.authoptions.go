@@ -159,7 +159,7 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
-	"/caos.zitadel.management.api.v1.ManagementService/SearchUserMembership": authz.Option{
+	"/caos.zitadel.management.api.v1.ManagementService/SearchUserMemberships": authz.Option{
 		Permission: "user.membership.read",
 		CheckParam: "",
 	},
