@@ -31,6 +31,7 @@ import {
     UserGrantSearchQuery,
     UserGrantSearchRequest,
     UserGrantSearchResponse,
+    UserGrantUpdate,
     UserGrantView,
     UserID,
     UserPhone,
@@ -399,29 +400,25 @@ export class MgmtUserService {
         );
     }
 
-    // public async UpdateUserGrant(
-    //     id: string,
-    //     userId: string,
-    //     roleKeysList: string[],
-    //     projectId?: string,
-    //     grantId?: string,
-    // ): Promise<UserGrant> {
-    //     const req = new UserGrantUpdate();
-    //     req.setId(id);
-    //     req.setRoleKeysList(roleKeysList);
-    //     req.setUserId(userId);
-    //     if (projectId) {
-    //         req.setProjectId(projectId);
-    //     }
-    //     if (grantId) {
-    //         req.setGrantId(grantId);
-    //     }
-    //     return await this.request(
-    //         c => c.updateUserGrant,
-    //         req,
-    //         f => f,
-    //     );
-    // }
+    public async UpdateUserGrant(
+        id: string,
+        userId: string,
+        roleKeysList: string[],
+        grantId?: string,
+    ): Promise<UserGrant> {
+        const req = new UserGrantUpdate();
+        req.setId(id);
+        req.setRoleKeysList(roleKeysList);
+        req.setUserId(userId);
+        if (grantId) {
+            req.setGrantId(grantId);
+        }
+        return await this.request(
+            c => c.updateUserGrant,
+            req,
+            f => f,
+        );
+    }
 
     public async RemoveUserGrant(
         id: string,

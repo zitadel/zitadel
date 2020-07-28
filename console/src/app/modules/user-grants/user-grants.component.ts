@@ -144,12 +144,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
                 if (grant.id && grant.projectId) {
-                    // this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value, grant.projectId)
-                    //     .then(() => {
-                    //         this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-                    //     }).catch(error => {
-                    //         this.toast.showError(error);
-                    //     });
+                    this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
+                        .then(() => {
+                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+                        }).catch(error => {
+                            this.toast.showError(error);
+                        });
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
@@ -158,13 +158,13 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                     projectQuery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
                     projectQuery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
                     projectQuery.setValue(this.projectId);
-                    // this.userService.UpdateUserGrant(
-                    //     grant.id, grant.userId, selectionChange.value, this.projectId, this.grantId)
-                    //     .then(() => {
-                    //         this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-                    //     }).catch(error => {
-                    //         this.toast.showError(error);
-                    //     });
+                    this.userService.UpdateUserGrant(
+                        grant.id, grant.userId, selectionChange.value, this.grantId)
+                        .then(() => {
+                            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+                        }).catch(error => {
+                            this.toast.showError(error);
+                        });
                 }
                 break;
         }
