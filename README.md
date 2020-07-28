@@ -15,7 +15,7 @@
 
 `ZITADEL` is a Cloud Native Identity and Access Management solution. All server side components are written in `Go` and the management interface, called `Console`, is written in `Angular`.
 
-We optimized ZITADEL for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register their application and grant other people or companies the right to self manage a set of roles within that application.
+We optimized `ZITADEL` for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register their application and grant other people or companies the right to self manage a set of roles within that application.
 
 ## How Does It Work
 
@@ -32,13 +32,13 @@ One feature that we often missed, was a solid `audit trail` of all IAM resources
 
 ### Use our free tier
 
-Stay tuned, we will soon publish how you can register yourself an organisation in our cloud offering `zitadel.ch`.
+Stay tuned, we will publish how you can register an organisation in our cloud offering `zitadel.ch` soon.
 Yes we have a free tier!
 
 ### Run your own IAM
 
 Stay tuned, we will soon publish a guide how you can deploy a `hyperconverged` system with our automation tooling called `ORBOS`.
-With [ORBOS](https://github.com/caos/orbos/) you will be able to run `ZITADEL` on `GCE` or `StaticMachines` within 20 minutes. To achieve this, [ORBOS](https://github.com/caos/orbos/) will bootstrap a `Kubernetes` cluster, install the platform components (logging, metrics, ingress, ...), start a secure `cockroach` cluster and run and operate the `ZITADEL`.
+With [ORBOS](https://github.com/caos/orbos/) you will be able to run `ZITADEL` on `GCE` or `StaticProvider` within 20 minutes. To achieve this, [ORBOS](https://github.com/caos/orbos/) will bootstrap and maintain a `Kubernetes` cluster, essential platform components (logging, metrics, ingress, ...), a secure `CockroachDB` cluster and `ZITADEL` itself.
 
 The combination of the tools [ORBOS](https://github.com/caos/orbos/) and `ZITADEL` is what makes the operation easy and scalable.
 
