@@ -21,6 +21,7 @@ debug
 # IDE
 .idea
 .vscode
+.DS_STORE
 
 # credential
 google-credentials

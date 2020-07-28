@@ -2,14 +2,14 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
-	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -23,8 +23,6 @@ type OrgMember struct {
 const (
 	orgMemberTable = "management.org_members"
 )
-
-func (m *OrgMember) MinimumCycleDuration() time.Duration { return m.cycleDuration }
 
 func (m *OrgMember) ViewModel() string {
 	return orgMemberTable

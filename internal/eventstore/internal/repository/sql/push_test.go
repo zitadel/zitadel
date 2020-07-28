@@ -3,11 +3,12 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"reflect"
 	"runtime"
 	"testing"
 
-	"github.com/caos/zitadel/internal/errors"
+	z_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 )
 
@@ -36,7 +37,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 				client: mockDB(t).
 					expectBegin(nil).
 					expectSavepoint().
-					expectPrepareInsert().
+					expectPrepareInsert(nil).
 					expectReleaseSavepoint(nil).
 					expectCommit(nil),
 			},
@@ -45,18 +46,32 @@ func TestSQL_PushAggregates(t *testing.T) {
 			isError:           noErr,
 		},
 		{
+			name: "prepare fails",
+			fields: fields{
+				client: mockDB(t).
+					expectBegin(nil).
+					expectSavepoint().
+					expectPrepareInsert(sql.ErrConnDone).
+					expectReleaseSavepoint(nil).
+					expectCommit(nil),
+			},
+			args:              args{aggregates: []*models.Aggregate{}},
+			shouldCheckEvents: false,
+			isError:           func(err error) bool { return errors.Is(err, sql.ErrConnDone) },
+		},
+		{
 			name: "no aggregates release fails",
 			fields: fields{
 				client: mockDB(t).
 					expectBegin(nil).
 					expectSavepoint().
-					expectPrepareInsert().
+					expectPrepareInsert(nil).
 					expectReleaseSavepoint(sql.ErrConnDone).
 					expectCommit(nil),
 			},
 
 			args:              args{aggregates: []*models.Aggregate{}},
-			isError:           errors.IsInternal,
+			isError:           z_errors.IsInternal,
 			shouldCheckEvents: false,
 		},
 		{
@@ -65,13 +80,13 @@ func TestSQL_PushAggregates(t *testing.T) {
 				client: mockDB(t).
 					expectBegin(nil).
 					expectSavepoint().
-					expectPrepareInsert().
-					expectFilterEventsError(errors.CreateCaosError(nil, "SQL-IzJOf", "err")).
+					expectPrepareInsert(nil).
+					expectFilterEventsError(z_errors.CreateCaosError(nil, "SQL-IzJOf", "err")).
 					expectRollback(nil),
 			},
 
 			args:              args{aggregates: []*models.Aggregate{aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(1), nil)}},
-			isError:           errors.IsPreconditionFailed,
+			isError:           z_errors.IsPreconditionFailed,
 			shouldCheckEvents: false,
 		},
 		{
@@ -80,7 +95,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 				client: mockDB(t).
 					expectBegin(nil).
 					expectSavepoint().
-					expectPrepareInsert().
+					expectPrepareInsert(nil).
 					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
@@ -90,8 +105,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 						PreviousSequence: 34,
 						Type:             "eventTyp",
 						AggregateVersion: "v0.0.1",
-					},
-						"asdfölk-234", 45).
+					}, 45).
 					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
@@ -101,7 +115,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 						PreviousSequence: 45,
 						Type:             "eventTyp",
 						AggregateVersion: "v0.0.1",
-					}, "asdfölk-233", 46).
+					}, 46).
 					expectReleaseSavepoint(nil).
 					expectCommit(nil),
 			},
@@ -141,7 +155,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 				client: mockDB(t).
 					expectBegin(nil).
 					expectSavepoint().
-					expectPrepareInsert().
+					expectPrepareInsert(nil).
 					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
@@ -151,7 +165,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 						PreviousSequence: 34,
 						Type:             "eventTyp",
 						AggregateVersion: "v0.0.1",
-					}, "asdfölk-233", 47).
+					}, 47).
 					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID2",
 						AggregateType:    "aggType2",
@@ -161,7 +175,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 						PreviousSequence: 40,
 						Type:             "eventTyp",
 						AggregateVersion: "v0.0.1",
-					}, "asdfölk-233", 48).
+					}, 48).
 					expectReleaseSavepoint(nil).
 					expectCommit(nil),
 			},
@@ -206,6 +220,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 				client: mockDB(t).
 					expectBegin(nil).
 					expectSavepoint().
+					expectPrepareInsert(nil).
 					expectInsertEventError(&models.Event{
 						AggregateID:      "aggID",
 						AggregateType:    "aggType",
@@ -248,7 +263,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 					},
 				},
 			},
-			isError:           errors.IsInternal,
+			isError:           z_errors.IsInternal,
 			shouldCheckEvents: false,
 		},
 		{
@@ -256,7 +271,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 			fields: fields{
 				client: mockDB(t).
 					expectBegin(nil).
-					expectPrepareInsert().
+					expectPrepareInsert(nil).
 					expectSavepoint().
 					expectInsertEvent(&models.Event{
 						AggregateID:      "aggID",
@@ -268,7 +283,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 						Type:             "eventTyp",
 						Data:             []byte("{}"),
 						AggregateVersion: "v0.0.1",
-					}, "asdfölk-233", 47).
+					}, 47).
 					expectReleaseSavepoint(sql.ErrConnDone).
 					expectCommit(nil).
 					expectRollback(nil),
@@ -291,7 +306,7 @@ func TestSQL_PushAggregates(t *testing.T) {
 					},
 				},
 			},
-			isError:           errors.IsInternal,
+			isError:           z_errors.IsInternal,
 			shouldCheckEvents: false,
 		},
 	}
@@ -359,42 +374,42 @@ func Test_precondtion(t *testing.T) {
 			name: "precondition fails",
 			fields: fields{
 				client: mockDB(t).
-					expectBegin(nil).expectFilterEventsLimit(5, 0),
+					expectBegin(nil).expectFilterEventsLimit("test", 5, 0),
 			},
 			args: args{
-				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.ThrowPreconditionFailed(nil, "SQL-LBIKm", "err"))),
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5).AggregateTypeFilter("test"), validationFunc(z_errors.ThrowPreconditionFailed(nil, "SQL-LBIKm", "err"))),
 			},
-			isErr: errors.IsPreconditionFailed,
+			isErr: z_errors.IsPreconditionFailed,
 		},
 		{
 			name: "precondition with filter error",
 			fields: fields{
 				client: mockDB(t).
-					expectBegin(nil).expectFilterEventsError(errors.ThrowInternal(nil, "SQL-ac9EW", "err")),
+					expectBegin(nil).expectFilterEventsError(z_errors.ThrowInternal(nil, "SQL-ac9EW", "err")),
 			},
 			args: args{
-				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(errors.CreateCaosError(nil, "SQL-LBIKm", "err"))),
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5).AggregateTypeFilter("test"), validationFunc(z_errors.CreateCaosError(nil, "SQL-LBIKm", "err"))),
 			},
-			isErr: errors.IsPreconditionFailed,
+			isErr: z_errors.IsPreconditionFailed,
 		},
 		{
 			name: "precondition no events",
 			fields: fields{
 				client: mockDB(t).
-					expectBegin(nil).expectFilterEventsLimit(5, 0),
+					expectBegin(nil).expectFilterEventsLimit("test", 5, 0),
 			},
 			args: args{
-				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(nil)),
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5).AggregateTypeFilter("test"), validationFunc(nil)),
 			},
 		},
 		{
 			name: "precondition with events",
 			fields: fields{
 				client: mockDB(t).
-					expectBegin(nil).expectFilterEventsLimit(5, 3),
+					expectBegin(nil).expectFilterEventsLimit("test", 5, 3),
 			},
 			args: args{
-				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5), validationFunc(nil)),
+				aggregate: aggregateWithPrecondition(&models.Aggregate{}, models.NewSearchQuery().SetLimit(5).AggregateTypeFilter("test"), validationFunc(nil)),
 			},
 		},
 	}

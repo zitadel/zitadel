@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -27,8 +26,6 @@ type ProjectGrant struct {
 const (
 	grantedProjectTable = "management.project_grants"
 )
-
-func (p *ProjectGrant) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *ProjectGrant) ViewModel() string {
 	return grantedProjectTable

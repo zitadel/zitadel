@@ -23,6 +23,7 @@ import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
@@ -65,6 +66,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MetaLayoutModule,
         RefreshTableModule,
         MemberCreateDialogModule,
+        LocalizedDatePipeModule,
     ],
 })
 export class OwnedProjectDetailModule { }

@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -24,8 +23,6 @@ type Token struct {
 const (
 	tokenTable = "auth.tokens"
 )
-
-func (u *Token) MinimumCycleDuration() time.Duration { return u.cycleDuration }
 
 func (u *Token) ViewModel() string {
 	return tokenTable
