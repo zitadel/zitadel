@@ -404,15 +404,12 @@ export class MgmtUserService {
         id: string,
         userId: string,
         roleKeysList: string[],
-        grantId?: string,
     ): Promise<UserGrant> {
         const req = new UserGrantUpdate();
         req.setId(id);
         req.setRoleKeysList(roleKeysList);
         req.setUserId(userId);
-        if (grantId) {
-            req.setGrantId(grantId);
-        }
+
         return await this.request(
             c => c.updateUserGrant,
             req,

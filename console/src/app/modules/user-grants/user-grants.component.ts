@@ -159,7 +159,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                     projectQuery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
                     projectQuery.setValue(this.projectId);
                     this.userService.UpdateUserGrant(
-                        grant.id, grant.userId, selectionChange.value, this.grantId)
+                        grant.id, grant.userId, selectionChange.value)
                         .then(() => {
                             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
                         }).catch(error => {
