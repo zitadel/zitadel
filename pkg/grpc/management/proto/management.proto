@@ -373,6 +373,17 @@ service ManagementService {
         };
     }
 
+    rpc SearchUserMembership(UserMembMembershipershipSearchRequest) returns (UserMembershipSearchResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/memberships/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.membership.read"
+        };
+    }
+
     // returns default policy if nothing other set on organisation
     rpc GetPasswordComplexityPolicy(google.protobuf.Empty) returns (PasswordComplexityPolicy) {
         option (google.api.http) = {
@@ -2639,4 +2650,46 @@ message ProjectGrantUserGrantSearchRequest {
     uint64 offset = 2;
     uint64 limit = 3;
     repeated UserGrantSearchQuery queries = 4;
+}
+
+message UserMembershipSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated UserMembershipView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
+}
+
+message UserMembershipSearchRequest {
+    string user_id = 1;
+    uint64 offset = 2;
+    uint64 limit = 3;
+    repeated UserMembershipSearchQuery queries = 4;
+}
+
+message UserMembershipSearchQuery {
+    UserMembershipSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2 [(validate.rules).enum = {in: [0]}];
+    string value = 3;
+}
+
+enum UserMembershipSearchKey {
+    USERMEMBERSHIPSEARCHKEY_UNSPECIFIED = 0;
+    USERMEMBERSHIPSEARCHKEY_TYPE = 1;
+    USERMEMBERSHIPSEARCHKEY_OBJECT_ID = 2;
+}
+
+message UserMembershipView {
+    MemberType member_type = 1;
+    string aggregate_id = 2;
+    string object_id = 3;
+    repeated string roles = 4;
+}
+
+enum MemberType {
+    MEMBERTYPE_UNSPECIFIED = 0;
+    MEMBERTYPE_ORGANISATION = 1;
+    MEMBERTYPE_PROJECT = 2;
+    MEMBERTYPE_PROJECT_GRANT = 3;
 }

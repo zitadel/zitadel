@@ -2017,6 +2017,26 @@ func (mr *MockManagementServiceClientMockRecorder) SearchUserGrants(arg0, arg1 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserGrants", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchUserGrants), varargs...)
 }
 
+// SearchUserMembership mocks base method
+func (m *MockManagementServiceClient) SearchUserMembership(arg0 context.Context, arg1 *management.UserMembershipSearchRequest, arg2 ...grpc.CallOption) (*management.UserMembershipSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchUserMembership", varargs...)
+	ret0, _ := ret[0].(*management.UserMembershipSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchUserMembership indicates an expected call of SearchUserMembership
+func (mr *MockManagementServiceClientMockRecorder) SearchUserMembership(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserMembership", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchUserMembership), varargs...)
+}
+
 // SearchUsers mocks base method
 func (m *MockManagementServiceClient) SearchUsers(arg0 context.Context, arg1 *management.UserSearchRequest, arg2 ...grpc.CallOption) (*management.UserSearchResponse, error) {
 	m.ctrl.T.Helper()

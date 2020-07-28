@@ -194,3 +194,7 @@ func (s *Server) GetUserMfas(ctx context.Context, userID *management.UserID) (*m
 	}
 	return &management.MultiFactors{Mfas: mfasFromModel(mfas)}, nil
 }
+
+func (s *Server) SearchUserMembership(ctx context.Context, request *management.UserMembMembershipershipSearchRequest) (*management.UserMembershipSearchResponse, error) {
+
+}
