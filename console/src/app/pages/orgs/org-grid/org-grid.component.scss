@@ -197,6 +197,10 @@ h1 {
                 opacity: 1;
             }
         }
+
+        @media only screen and (max-width: 450px) {
+            flex-basis: 100%;
+        }
     }
 
     .add-org-button {
@@ -231,6 +235,10 @@ h1 {
                     color: gray;
                 }
             }
+        }
+
+        @media only screen and (max-width: 450px) {
+            flex-basis: 100%;
         }
     }
 }

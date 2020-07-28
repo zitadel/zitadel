@@ -3,7 +3,11 @@ h1 {
 }
 
 .container {
-	padding: 4rem 4rem 2rem 4rem;
+    padding: 4rem 4rem 2rem 4rem;
+    
+    @media only screen and (max-width: 450px) {
+        padding: 4rem 1rem 2rem 1rem;
+    }
 
 	.abort-container {
 		display: flex;
@@ -17,7 +21,8 @@ h1 {
 
 		.abort-2 {
 			font-size: 1.2rem;
-			margin-left: 2rem;
+            margin-left: 2rem;
+            white-space: nowrap;
 		}
     }
     

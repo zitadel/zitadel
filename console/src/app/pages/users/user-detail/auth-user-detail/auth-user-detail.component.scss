@@ -149,6 +149,10 @@ h1 {
 
     .theme-card {
         max-width: 300px;
+
+        @media only screen and (max-width: 450px) {
+            max-width: none;
+        }
     }
 
     .pwd-row {

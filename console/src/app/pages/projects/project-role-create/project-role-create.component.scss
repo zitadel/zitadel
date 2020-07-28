@@ -2,6 +2,10 @@
 .container {
 	padding: 4rem 4rem 2rem 4rem;
 
+    @media only screen and (max-width: 450px) {
+        padding: 4rem 1rem 2rem 1rem;
+    }
+
 	.abort-container {
 		display: flex;
 		align-items: center;
@@ -14,7 +18,8 @@
 
 		.abort-2 {
 			font-size: 1.2rem;
-			margin-left: 2rem;
+            margin-left: 2rem;
+            white-space: nowrap;
 		}
     }
     
@@ -29,13 +34,18 @@
 }
 
 .content {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
     display: flex;
     margin: 0 -.5rem;
     flex-wrap: wrap;
-    // align-items: center;
+    border-bottom: 1px solid #ffffff20;
 
     mat-form-field {
         margin: 0 .5rem;
+        @media only screen and (max-width: 450px) {
+            flex-basis: 100%;
+        }
     }
 }
 
@@ -44,4 +54,9 @@
     display: block;
     padding: 0.5rem 4rem;
     border-radius: 0.5rem;
+
+    @media only screen and (max-width: 450px) {
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+    }
 }
