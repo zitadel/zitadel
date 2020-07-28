@@ -2636,6 +2636,7 @@ enum UserGrantSearchKey {
     USERGRANTSEARCHKEY_USER_ID = 2;
     USERGRANTSEARCHKEY_ORG_ID = 3;
     USERGRANTSEARCHKEY_ROLE_KEY = 4;
+    USERGRANTSEARCHKEY_GRANT_ID = 5;
 }
 
 message ProjectUserGrantSearchRequest {
