@@ -9,21 +9,48 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![codecov](https://codecov.io/gh/caos/zitadel/branch/master/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
 
-> This project is in alpha state. The API will continue breaking until version 1.0.0 is released
+> This project is in a alpha state. The application will continue breaking until version 1.0.0 is released
 
 ## What Is It
 
-It will be an IAM ;-)
+`ZITADEL` is a Cloud Native Identity and Access Management solution. All server side components are written in `Go` and the management interface, called `Console`, is written in `Angular`.
+
+We optimized ZITADEL for the usage as `service provider IAM`. By `service provider` we think of companies who build services for e.g SaaS cases. Often these companies would like to use an IAM where they can register their application and grant other people or companies the right to self manage a set of roles within that application.
 
 ## How Does It Work
 
+We built `ZITADEL` around the idea that the IAM should be easy to deploy and scale. That's why we tried to reduce external systems as much as possible.
+For example, `ZITADEL` is eventsourced but it does not rely on a pub/sub system to function. Instead we built all the functionality right into one binary.
+`ZITADEL` only needs `Kubernetes` for orchestration and `CockroachDB` as storage.
+
 ## Why Another IAM
+
+In the past we already built a closed sourced IAM and tested multiple others. With most of them we had some issues, either technology, feature, pricing or transparency related in nature. For example we find the idea that security related features like `MFA` should not be hidden behind a paywall or a feature price.
+One feature that we often missed, was a solid `audit trail` of all IAM resources. Most systems we saw so far either rely on simple log files or use a short retention for this.
 
 ## How To Use It
 
+### Use our free tier
+
+Stay tuned, we will soon publish how you can register yourself an organisation in our cloud offering `zitadel.ch`.
+Yes we have a free tier!
+
+### Run your own IAM
+
+Stay tuned, we will soon publish a guide how you can deploy a `hyperconverged` system with our automation tooling called `ORBOS`.
+With [ORBOS](https://github.com/caos/orbos/) you will be able to run `ZITADEL` on `GCE` or `StaticMachines` within 20 minutes. To achieve this, [ORBOS](https://github.com/caos/orbos/) will bootstrap a `Kubernetes` cluster, install the platform components (logging, metrics, ingress, ...), start a secure `cockroach` cluster and run and operate the `ZITADEL`.
+
+The combination of the tools [ORBOS](https://github.com/caos/orbos/) and `ZITADEL` is what makes the operation easy and scalable.
+
+See our progress [here](https://github.com/caos/orbos/pull/256)
+
+## Give me some docs
+
+This is work in progess but will change soon.
+
 ## How To Contribute
 
-TBD
+TBA
 
 ## Security
 
@@ -34,5 +61,3 @@ See the policy [here](./SECURITY.md)
 See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-
