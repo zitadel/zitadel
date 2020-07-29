@@ -5,7 +5,7 @@
 <div class="row-lyt">
     <div class="p-item card">
         <div class="avatar">
-            <mat-icon svgIcon="mdi_textbox_password"></mat-icon>
+            <mat-icon class="icon" svgIcon="mdi_textbox_password"></mat-icon>
         </div>
         <div class="title">
             <span>{{'ORG.POLICY.PWD_COMPLEXITY.TITLE' | translate}}</span>
@@ -32,7 +32,8 @@
 
     <ng-template appHasRole [appHasRole]="['iam.policy.read']">
         <div class="p-item card">
-            <div class="avatar"><i class="icon las la-gem"></i>
+            <div class="avatar">
+                <i class="icon las la-gem"></i>
             </div>
             <div class="title">
                 <span>{{'ORG.POLICY.IAM_POLICY.TITLE' | translate}}</span>

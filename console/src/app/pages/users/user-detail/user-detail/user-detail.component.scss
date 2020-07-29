@@ -108,31 +108,11 @@
       margin-bottom: .5rem;
       align-items: center;
 
-      button {
-        display: none;
-        visibility: hidden;
-      }
-
-      &:hover {
-        button {
-          display: inline-block;
-          visibility: visible;
-
-          mat-icon {
-            font-size: 1.2rem;
-          }
-        }
-      }
-
       .first {
         flex: 1;
         font-size: .8rem;
         margin-right: .5rem;
         white-space: nowrap;
-      }
-
-      .fill-space {
-        flex: 1;
       }
 
       .second {
@@ -142,77 +122,10 @@
         margin-left: 1rem;
         text-align: right;
       }
-
-      a {
-        &:hover {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .side-section {
-      color: #8795a1;
     }
   }
 
-  .details {
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #81868a40;
-    padding-bottom: 1rem;
-
-    .row {
-      display: flex;
-      margin-bottom: .5rem;
-      align-items: center;
-
-      button {
-        display: none;
-        visibility: hidden;
-      }
-
-      &:hover {
-        button {
-          display: inline-block;
-          visibility: visible;
-
-          mat-icon {
-            font-size: 1.2rem;
-          }
-        }
-      }
-
-      .first {
-        flex: 1;
-        font-size: .8rem;
-        margin-right: .5rem;
-      }
-
-      .fill-space {
-        flex: 1;
-      }
-
-      .second {
-        font-size: .8rem;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        margin-left: 1rem;
-      }
-
-      a {
-        &:hover {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .side-section {
-      color: #8795a1;
-    }
-  }
-
-  app-changes {
+  .changes {
     flex: 1;
     min-height: 0;
   }

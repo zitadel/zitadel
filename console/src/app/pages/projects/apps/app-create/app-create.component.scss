@@ -16,7 +16,7 @@ p.desc {
 .container {
   padding: 4rem 4rem 2rem 4rem;
 
-  mat-progress-bar {
+  .progress-bar {
     margin-bottom: 1rem;
   }
 
@@ -51,7 +51,7 @@ p.desc {
   width: 100%;
 }
 
-mat-horizontal-stepper {
+.stepper {
   background: inherit !important;
   margin: 0 -1.5rem;
 
@@ -71,16 +71,16 @@ mat-horizontal-stepper {
     margin-top: 0;
   }
 
-  mat-chip[color='white'] {
+  .chip[color='white'] {
     background-color: #fafafa;
   }
 }
 
-mat-radio-group {
+.radio-group {
   display: flex;
   flex-direction: column;
 
-  mat-radio-button {
+  .radio-button {
     margin: .5rem 0;
   }
 }
@@ -89,7 +89,7 @@ mat-radio-group {
   display: flex;
   flex-direction: column;
 
-  mat-checkbox {
+  .checkbox {
     margin: .5rem 0;
   }
 }

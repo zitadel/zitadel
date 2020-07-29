@@ -3,12 +3,12 @@
   display: flex;
   margin: -.5rem;
 
-  button {
+  .button {
     border-radius: .5rem;
     margin: .5rem;
     margin-top: 1rem;
 
-    mat-icon {
+    .icon {
       margin-right: .5rem;
     }
   }

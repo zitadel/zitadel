@@ -115,7 +115,7 @@
                         </mat-select>
                     </mat-form-field>
 
-                    <mat-checkbox [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}"
+                    <mat-checkbox class="checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}"
                         (change)="initPwdValidators()">
                         {{'ORG.PAGES.USEPASSWORD' | translate}}</mat-checkbox>
 

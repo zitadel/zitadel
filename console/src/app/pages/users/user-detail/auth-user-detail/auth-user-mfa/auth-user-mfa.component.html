@@ -33,9 +33,9 @@
         </table>
     </app-refresh-table>
     <div class="add-row">
-        <button *ngIf="otpAvailable" (click)="addOTP()" mat-stroked-button color="primary"
+        <button class="button" *ngIf="otpAvailable" (click)="addOTP()" mat-stroked-button color="primary"
             matTooltip="{{'ACTIONS.NEW' | translate}}">
-            <mat-icon svgIcon="mdi_radar"></mat-icon>{{'USER.MFA.OTP' | translate}}
+            <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>{{'USER.MFA.OTP' | translate}}
         </button>
     </div>
     <div class="table-wrapper">
