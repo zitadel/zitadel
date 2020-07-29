@@ -29,8 +29,7 @@
             </ng-template>
 
             <div class="table-wrapper">
-                <table mat-table class="background-style full-width-table" aria-label="Elements"
-                    [dataSource]="dataSource">
+                <table mat-table class="background-style table" aria-label="Elements" [dataSource]="dataSource">
                     <ng-container matColumnDef="select">
                         <th class="selection" mat-header-cell *matHeaderCellDef>
                             <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -98,9 +97,9 @@
                     </tr>
                 </table>
 
-                <mat-paginator *ngIf="dataSource" class="background-style" #paginator [pageSize]="INITIALPAGESIZE"
-                    [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]"
-                    (page)="changePage($event)">
+                <mat-paginator class="paginator" *ngIf="dataSource" class="background-style" #paginator
+                    [pageSize]="INITIALPAGESIZE" [length]="dataSource.totalResult"
+                    [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
                 </mat-paginator>
             </div>
         </app-refresh-table>

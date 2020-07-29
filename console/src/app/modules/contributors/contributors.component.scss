@@ -29,9 +29,14 @@
       display: flex;
       align-items: center;
 
-      mat-spinner {
+      .spinner {
         margin-left: -15px;
         margin-right: 20px;
+      }
+
+      .add-img {
+        float: left;
+        margin: 0 8px 0 -15px;
       }
 
       .avatar-circle {
@@ -43,14 +48,6 @@
         -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
         -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
         box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-      }
-
-      .add-img {
-        float: left;
-        margin: 0 8px 0 -15px;
-      }
-
-      .avatar-circle {
         cursor: pointer;
         display: flex;
         align-items: center;

@@ -11,7 +11,7 @@
         <mat-spinner diameter="50"></mat-spinner>
     </div>
 
-    <table *ngIf="dataSource" [dataSource]="dataSource" mat-table class="full-width-table background-style" matSort
+    <table *ngIf="dataSource" [dataSource]="dataSource" mat-table class="table background-style" matSort
         aria-label="Elements">
         <ng-container matColumnDef="viewName">
             <th mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
@@ -50,6 +50,6 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator class="background-style" #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 100, 250]">
+    <mat-paginator class="paginator background-style" #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 100, 250]">
     </mat-paginator>
 </div>

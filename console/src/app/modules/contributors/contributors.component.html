@@ -3,7 +3,7 @@
     <span class="sub-header">{{ description }}</span>
     <div class="people">
         <div class="img-list" [@cardAnimation]="totalResult">
-            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
 
             <ng-container *ngIf="totalResult < 10; else compact">
                 <ng-container *ngFor="let member of membersSubject | async; index as i">

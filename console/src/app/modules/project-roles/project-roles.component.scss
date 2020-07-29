@@ -10,8 +10,8 @@
 .table-wrapper {
   overflow: auto;
 
-  table,
-  mat-paginator {
+  .table,
+  .paginator {
     width: 100%;
     background-color: #2d2e30;
 

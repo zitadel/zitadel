@@ -151,6 +151,10 @@ $custom-typography:
 @include component-themes($dark-theme);
 @include angular-material-theme($dark-theme);
 
+.mat-dialog-container {
+  border-radius: .5rem !important;
+}
+
 .light-theme {
   @include component-themes($light-theme);
   @include angular-material-theme($light-theme);
@@ -214,10 +218,6 @@ $custom-typography:
     cursor: pointer;
   }
 }
-
-.mat-dialog-container {
-  border-radius: .5rem !important;
-}
 // @include mat-checkbox-theme($candy-app-theme);
 
 /* You can add global styles to this file, and also import other style files */
@@ -271,11 +271,6 @@ body {
   @media only screen and (max-width: 500px) {
     padding-left: 1.5rem;
   }
-}
-
-.mat-dialog-container {
-  border-radius: .5rem;
-  background-color: #212224;
 }
 
 i {

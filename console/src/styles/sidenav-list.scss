@@ -53,10 +53,6 @@
     .active {
       color: $primary-color !important;
       background-color: rgba($color: $primary-color, $alpha: .1) !important;
-
-      mat-icon {
-        color: $primary-color !important;
-      }
     }
   }
 
@@ -72,16 +68,6 @@
     margin-right: 1rem;
     border-top-right-radius: 50vw;
     border-bottom-right-radius: 50vw;
-
-    // &::after {
-    //     content: '';
-    //     position: absolute;
-    //     width: 0;
-    //     bottom: 0;
-    //     right: 0;
-    //     border-bottom: 20px solid $primary-dark;
-    //     border-left: 20px solid transparent;
-    // }
 
     &::before {
       content: '';

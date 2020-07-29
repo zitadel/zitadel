@@ -54,8 +54,8 @@
 .table-wrapper {
   overflow: auto;
 
-  table,
-  mat-paginator {
+  .table,
+  .paginator {
     width: 100%;
 
     td,

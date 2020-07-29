@@ -87,7 +87,7 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr class="data-row" mat-row *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="['/granted-projects', row.id]"></tr>
+                [routerLink]="['/granted-projects', row.projectId, 'grant', row.id]"></tr>
 
         </table>
         <mat-paginator class="paginator background-style" [length]="totalResult" [pageSize]="10"
