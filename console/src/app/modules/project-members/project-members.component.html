@@ -97,7 +97,7 @@
                     </tr>
                 </table>
 
-                <mat-paginator class="paginator" *ngIf="dataSource" class="background-style" #paginator
+                <mat-paginator *ngIf="dataSource" class="paginator background-style" #paginator
                     [pageSize]="INITIALPAGESIZE" [length]="dataSource.totalResult"
                     [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
                 </mat-paginator>

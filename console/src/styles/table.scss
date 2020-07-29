@@ -6,7 +6,6 @@
   $primary-dark: mat-color($primary, A900);
   $secondary-dark: mat-color($primary, A800);
   $foreground: map-get($theme, foreground);
-  /* stylelint-enable */
 
   .mat-table,
   .mat-paginator {
@@ -17,6 +16,7 @@
       background-color: inherit !important;
     }
   }
+  /* stylelint-enable */
 
   .app-label {
     font-size: 12px;
