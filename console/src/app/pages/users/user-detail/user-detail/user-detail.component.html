@@ -9,10 +9,10 @@
             <span class="fill-space"></span>
 
             <ng-template appHasRole [appHasRole]="['user.write', 'user.write:'+user?.id]">
-                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
+                <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_ACTIVE"
                     class="state-button"
                     (click)="changeState(UserState.USERSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
-                <button mat-stroked-button color="accent" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
+                <button mat-stroked-button color="warn" *ngIf="user?.state === UserState.USERSTATE_INACTIVE"
                     class="state-button"
                     (click)="changeState(UserState.USERSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
             </ng-template>
@@ -25,23 +25,21 @@
         <app-card title="{{ 'USER.PAGES.LOGINNAMES' | translate }}"
             description="{{ 'USER.PAGES.LOGINNAMESDESC' | translate }}" *ngIf="user">
             <div class="login-name-row" *ngFor="let login of user?.loginNamesList">
-                <span>{{login}}</span>
+                <span>{{login}} </span>
                 <button color="primary" [disabled]="copied == login"
                     [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    (click)="copytoclipboard(login)" mat-icon-button>
+                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event" mat-icon-button>
                     <i *ngIf="copied != login" class="las la-clipboard"></i>
                     <i *ngIf="copied == login" class="las la-clipboard-check"></i>
+
                 </button>
             </div>
         </app-card>
 
         <ng-template appHasRole [appHasRole]="['user.read', 'user.read:'+user?.id]">
-            <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}"
-                description="{{'USER.PROFILE.DESCRIPTION' | translate}}">
-                <app-detail-form
-                    *ngIf="((authUserService.isAllowed(['user.write:' + user?.id, 'user.write']) | async) || false) as canwrite"
-                    [disabled]="canwrite" [genders]="genders" [languages]="languages" [profile]="user"
-                    (submitData)="saveProfile($event)">
+            <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}">
+                <app-detail-form [disabled]="(['user.write:' + user?.id, 'user.write'] | hasRole | async) == false"
+                    [genders]="genders" [languages]="languages" [profile]="user" (submitData)="saveProfile($event)">
                 </app-detail-form>
             </app-card>
         </ng-template>
@@ -144,12 +142,13 @@
 
         <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-            <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole"
-                [allowDelete]="['user.grant.delete'] | hasRole"></app-user-grants>
+            <app-user-grants [userId]="user.id" [allowCreate]="['user.grant.write'] | hasRole | async"
+                [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                [allowDelete]="['user.grant.delete'] | hasRole | async"></app-user-grants>
         </app-card>
     </div>
 
-    <metainfo *ngIf="user" class="side">
+    <div *ngIf="user" class="side" metainfo>
         <div class="details">
             <div class="row" *ngIf="user?.preferredLoginName">
                 <span class="first">Preferred Loginname:</span>
@@ -158,5 +157,5 @@
         </div>
 
         <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
-    </metainfo>
+    </div>
 </app-meta-layout>

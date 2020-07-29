@@ -51,7 +51,7 @@ func (v *View) DeleteUserGrant(grantID string, eventSequence uint64) error {
 	return v.ProcessedUserGrantSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserGrantSequence() (uint64, error) {
+func (v *View) GetLatestUserGrantSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userGrantTable)
 }
 

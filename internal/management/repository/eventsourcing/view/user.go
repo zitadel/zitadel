@@ -35,6 +35,14 @@ func (v *View) UserMfas(userID string) ([]*usr_model.MultiFactor, error) {
 	return view.UserMfas(v.Db, userTable, userID)
 }
 
+func (v *View) PutUsers(user []*model.UserView, sequence uint64) error {
+	err := view.PutUsers(v.Db, userTable, user...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserSequence(sequence)
+}
+
 func (v *View) PutUser(user *model.UserView, sequence uint64) error {
 	err := view.PutUser(v.Db, userTable, user)
 	if err != nil {
@@ -54,7 +62,7 @@ func (v *View) DeleteUser(userID string, eventSequence uint64) error {
 	return v.ProcessedUserSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserSequence() (uint64, error) {
+func (v *View) GetLatestUserSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userTable)
 }
 

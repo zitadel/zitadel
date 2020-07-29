@@ -39,6 +39,7 @@ export class UserCreateComponent implements OnDestroy {
     private sub: Subscription = new Subscription();
 
     public userLoginMustBeDomain: boolean = false;
+    public loading: boolean = false;
 
     constructor(
         private router: Router,
@@ -47,12 +48,15 @@ export class UserCreateComponent implements OnDestroy {
         private fb: FormBuilder,
         private orgService: OrgService,
     ) {
+        this.loading = true;
         this.orgService.GetMyOrgIamPolicy().then((iampolicy) => {
             this.userLoginMustBeDomain = iampolicy.toObject().userLoginMustBeDomain;
             this.initForm();
+            this.loading = false;
         }).catch(error => {
             console.error(error);
             this.initForm();
+            this.loading = false;
         });
     }
 
@@ -83,14 +87,17 @@ export class UserCreateComponent implements OnDestroy {
     public createUser(): void {
         this.user = this.userForm.value;
 
+        this.loading = true;
         this.userService
             .CreateUser(this.user)
             .then((data: User) => {
+                this.loading = false;
                 this.toast.showInfo('USER.TOAST.CREATED', true);
                 this.router.navigate(['users', data.getId()]);
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.loading = false;
+                this.toast.showError(error);
             });
     }
 

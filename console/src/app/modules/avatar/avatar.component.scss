@@ -1,15 +1,19 @@
-:host {
-    display: block;
-}
 
-.avatar-circle {
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-transform: uppercase;
+@import '~@angular/material/theming';
 
-    &.active:hover  {
-        border: 2px solid #8795a1;
+@mixin avatar-theme($theme) {
+    $primary: map-get($theme, primary);
+    $primary-color: mat-color($primary, 500);
+
+    .avatar-circle {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        background-color: $primary-color;
+        box-sizing: border-box;
+        outline: none;
+        color: white;
     }
 }

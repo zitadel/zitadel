@@ -4,6 +4,7 @@ $headerFont: Lato;
 
 // ----- LAYOUT ------------
 $inputHeight: 50px;
+$headerSize: 40px;
 $retina: "only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx)";
 
 @mixin retina-background-image($file, $type, $hover, $width, $height) {
@@ -28,8 +29,10 @@ $labelColor: #898989;
 $inputBorderColor: #505050;
 $inputBackgroundColor: #252525;
 $buttonBackgroundColorHover: $inputBackgroundColor;
-$profileImgDark: "/resources/images/icon-user-dark";
-$otherUserImgDark: "/resources/images/icon-newuser-dark";
+$profileImgDark: "../../../images/icon-user-dark";
+$otherUserImgDark: "../../../images/icon-newuser-dark";
+$nokColor: #F20D6B;
+$okColor: #0DF279;
 
 
 // ----- LIGHT-THEME --------
@@ -38,6 +41,6 @@ $fontColorLight: $backgroundColor;
 $primaryColorLight: $primaryColor;
 $primaryColorHoverLight: lighten($primaryColorLight, 10%);
 $inputBackgroundColorLight: #FFFFFF;
-$buttonBackgroundColorHoverLight: $inputBackgroundColor;
-$profileImgLight: "/resources/images/icon-user-light";
-$otherUserImgLight: "/resources/images/icon-newuser-light";
+$buttonBackgroundColorHoverLight: $inputBackgroundColorLight;
+$profileImgLight: "../../../images/icon-user-light";
+$otherUserImgLight: "../../../images/icon-newuser-light";

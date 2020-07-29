@@ -30,6 +30,9 @@ func (v *verifierMock) ResolveGrants(ctx context.Context) (*authz.Grant, error) 
 func (v *verifierMock) ProjectIDByClientID(ctx context.Context, clientID string) (string, error) {
 	return "", nil
 }
+func (v *verifierMock) ExistsOrg(ctx context.Context, orgID string) error {
+	return nil
+}
 func (v *verifierMock) VerifierClientID(ctx context.Context, appName string) (string, error) {
 	return "", nil
 }

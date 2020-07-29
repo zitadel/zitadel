@@ -13,7 +13,7 @@
                 <span>{{login}}</span>
                 <button color="primary" [disabled]="copied == login"
                     [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    (click)="copytoclipboard(login)" mat-icon-button>
+                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event" mat-icon-button>
                     <i *ngIf="copied != login" class="las la-clipboard"></i>
                     <i *ngIf="copied == login" class="las la-clipboard-check"></i>
                 </button>
@@ -126,10 +126,10 @@
             </div>
         </app-card>
 
-        <app-auth-user-mfa *ngIf="user"></app-auth-user-mfa>
+        <app-auth-user-mfa *ngIf="user" #mfaComponent></app-auth-user-mfa>
     </div>
 
-    <metainfo *ngIf="user" class="side">
+    <div *ngIf="user" class="side" metainfo>
         <div class="details">
             <div class="row" *ngIf="user?.preferredLoginName">
                 <span class="first">Preferred Loginname:</span>
@@ -138,5 +138,5 @@
         </div>
 
         <app-changes [changeType]="ChangeType.MYUSER" [id]="user.id"></app-changes>
-    </metainfo>
+    </div>
 </app-meta-layout>

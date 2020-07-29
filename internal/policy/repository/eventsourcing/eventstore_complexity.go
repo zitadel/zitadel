@@ -30,6 +30,9 @@ func (es *PolicyEventstore) GetPasswordComplexityPolicy(ctx context.Context, id 
 
 func (es *PolicyEventstore) CreatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
 	ctxData := authz.GetCtxData(ctx)
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
 	existingPolicy, err := es.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
@@ -58,6 +61,9 @@ func (es *PolicyEventstore) CreatePasswordComplexityPolicy(ctx context.Context, 
 
 func (es *PolicyEventstore) UpdatePasswordComplexityPolicy(ctx context.Context, policy *pol_model.PasswordComplexityPolicy) (*pol_model.PasswordComplexityPolicy, error) {
 	ctxData := authz.GetCtxData(ctx)
+	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
 	existingPolicy, err := es.GetPasswordComplexityPolicy(ctx, ctxData.OrgID)
 	if err != nil {
 		return nil, err

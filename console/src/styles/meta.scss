@@ -5,7 +5,7 @@
     $primary-color: mat-color($primary, 500);
     $primary-dark: mat-color($primary, A800);
 
-    $lighter-color: mat-color($primary, 300);
+    $lighter-color: rgba(mat-color($primary, 300),.5);
 
     .meta-wrapper {
         .meta {

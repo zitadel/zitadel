@@ -68,6 +68,15 @@ export class OrgService {
         );
     }
 
+    public async GetDefaultPasswordComplexityPolicy(): Promise<PasswordComplexityPolicy> {
+        const req: Empty = new Empty();
+        return await this.request(
+            c => c.getDefaultPasswordComplexityPolicy,
+            req,
+            f => f,
+        );
+    }
+
     public async GetMyOrg(): Promise<Org> {
         return await this.request(
             c => c.getMyOrg,

@@ -2,13 +2,13 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
-	"time"
 )
 
 type Application struct {
@@ -20,8 +20,6 @@ const (
 	applicationTable = "management.applications"
 )
 
-func (p *Application) MinimumCycleDuration() time.Duration { return p.cycleDuration }
-
 func (p *Application) ViewModel() string {
 	return applicationTable
 }
@@ -31,7 +29,7 @@ func (p *Application) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence), nil
+	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *Application) Reduce(event *models.Event) (err error) {

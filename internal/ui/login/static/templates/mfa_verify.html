@@ -1,7 +1,7 @@
 {{template "main-top" .}}
 
+{{ template "user-profile" . }}
 
-<h1>{{t "MfaVerify.Title"}}</h1>
 <p>{{t "MfaVerify.Description"}}</p>
 
 <form action="{{ mfaVerifyUrl }}" method="POST">
@@ -21,10 +21,14 @@
     {{ template "error-message" .}}
 
     <div class="actions">
-        <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+        <button class="primary right" id="submit-button" type="submit" disabled>{{t "Actions.Next"}}</button>
+        <a href="{{ loginUrl }}">
+            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        </a>
     </div>
 </form>
 
-
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 {{template "main-bottom" .}}
  

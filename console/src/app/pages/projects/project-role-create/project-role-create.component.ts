@@ -84,6 +84,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     }
 
     public addRole(): void {
+        console.log(this.formArray.value);
         const rolesToAdd: ProjectRoleAdd[] = this.formArray.value.map((element: any) => {
             const role = new ProjectRoleAdd();
             role.setKey(element.key);

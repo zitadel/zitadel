@@ -15,6 +15,11 @@ Password:
   Title: Password
   Description: Enter your logindata.
   Password: Password
+  MinLength: Minimumlength
+  HasUppercase: Uppercase letter
+  HasLowercase: Lowercase letter
+  HasNumber: Number
+  HasSymbol: Symbol
 
 MfaVerify:
   Title: Verify Multificator
@@ -66,6 +71,7 @@ PasswordChange:
   Description: Change your password. Enter your old and new password.
   OldPassword: Old Password
   NewPassword: New Password
+  NewPasswordConfirmation: Passwort confirmation
 
 PasswordChangeDone:
   Title: Change Password
@@ -115,7 +121,8 @@ Actions:
   Resend: resend
   Skip: skip
   Register: register
-  ForgotPassword: Reset password
+  ForgotPassword: reset password
+  Cancel: cancel
 
 
 Errors:

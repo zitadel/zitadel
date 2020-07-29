@@ -28,9 +28,16 @@ type initUserFormData struct {
 
 type initUserData struct {
 	baseData
-	Code        string
-	UserID      string
-	PasswordSet bool
+	profileData
+	Code                      string
+	UserID                    string
+	PasswordSet               bool
+	PasswordPolicyDescription string
+	MinLength                 uint64
+	HasUppercase              string
+	HasLowercase              string
+	HasNumber                 string
+	HasSymbol                 string
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
@@ -67,10 +74,10 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 	}
 	err = l.authRepo.VerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, data.Code, data.Password)
 	if err != nil {
-		l.renderInitUser(w, r, nil, data.UserID, "", data.PasswordSet, err)
+		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return
 	}
-	l.renderInitUserDone(w, r, nil)
+	l.renderInitUserDone(w, r, authReq)
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, userID string, showPassword bool) {
@@ -91,22 +98,33 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 		userID = authReq.UserID
 	}
 	data := initUserData{
-		baseData:    l.getBaseData(r, nil, "Init User", errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, "Init User", errType, errMessage),
+		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
 		PasswordSet: passwordSet,
+	}
+	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, userID)
+	if policy != nil {
+		data.PasswordPolicyDescription = description
+		data.MinLength = policy.MinLength
+		if policy.HasUppercase {
+			data.HasUppercase = UpperCaseRegex
+		}
+		if policy.HasLowercase {
+			data.HasLowercase = LowerCaseRegex
+		}
+		if policy.HasSymbol {
+			data.HasSymbol = SymbolRegex
+		}
+		if policy.HasNumber {
+			data.HasNumber = NumberRegex
+		}
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUser], data, nil)
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest) {
-	var loginName string
-	if authReq != nil {
-		loginName = authReq.LoginName
-	}
-	data := userData{
-		baseData:  l.getBaseData(r, authReq, "User Init Done", "", ""),
-		LoginName: loginName,
-	}
+	data := l.getUserData(r, authReq, "User Init Done", "", "")
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplInitUserDone], data, nil)
 }

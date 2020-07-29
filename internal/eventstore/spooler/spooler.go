@@ -2,6 +2,7 @@ package spooler
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,17 +14,12 @@ import (
 )
 
 type Spooler struct {
-	handlers        []Handler
-	locker          Locker
-	lockID          string
-	eventstore      eventstore.Eventstore
-	concurrentTasks int
-	queue           chan *spooledHandler
-}
-
-type Handler interface {
-	query.Handler
-	MinimumCycleDuration() time.Duration
+	handlers   []query.Handler
+	locker     Locker
+	lockID     string
+	eventstore eventstore.Eventstore
+	workers    int
+	queue      chan *spooledHandler
 }
 
 type Locker interface {
@@ -31,69 +27,78 @@ type Locker interface {
 }
 
 type spooledHandler struct {
-	Handler
+	query.Handler
 	locker     Locker
-	lockID     string
 	queuedAt   time.Time
 	eventstore eventstore.Eventstore
 }
 
 func (s *Spooler) Start() {
-	defer logging.LogWithFields("SPOOL-N0V1g", "lockerID", s.lockID, "workers", s.concurrentTasks).Info("spooler started")
-	if s.concurrentTasks < 1 {
+	defer logging.LogWithFields("SPOOL-N0V1g", "lockerID", s.lockID, "workers", s.workers).Info("spooler started")
+	if s.workers < 1 {
 		return
 	}
-	for i := 0; i < s.concurrentTasks; i++ {
-		go func() {
-			for handler := range s.queue {
+
+	for i := 0; i < s.workers; i++ {
+		go func(workerIdx int) {
+			workerID := s.lockID + "--" + strconv.Itoa(workerIdx)
+			for task := range s.queue {
 				go func(handler *spooledHandler, queue chan<- *spooledHandler) {
 					time.Sleep(handler.MinimumCycleDuration() - time.Since(handler.queuedAt))
 					handler.queuedAt = time.Now()
 					queue <- handler
-				}(handler, s.queue)
+				}(task, s.queue)
 
-				handler.load()
+				task.load(workerID)
 			}
-		}()
+		}(i)
 	}
 	for _, handler := range s.handlers {
-		handler := &spooledHandler{handler, s.locker, s.lockID, time.Now(), s.eventstore}
+		handler := &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore}
 		s.queue <- handler
 	}
 }
 
-func (s *spooledHandler) load() {
+func (s *spooledHandler) load(workerID string) {
 	errs := make(chan error)
-	ctx, cancel := context.WithCancel(context.Background())
-	go s.awaitError(cancel, errs)
-	hasLocked := s.lock(ctx, errs)
-
 	defer close(errs)
+	ctx, cancel := context.WithCancel(context.Background())
+	go s.awaitError(cancel, errs, workerID)
+	hasLocked := s.lock(ctx, errs, workerID)
 
 	if <-hasLocked {
+		go func() {
+			for l := range hasLocked {
+				if !l {
+					// we only need to break. An error is already written by the lock-routine to the errs channel
+					break
+				}
+			}
+		}()
 		events, err := s.query(ctx)
 		if err != nil {
 			errs <- err
 		} else {
-			errs <- s.process(ctx, events)
+			errs <- s.process(ctx, events, workerID)
+			logging.Log("SPOOL-0pV8o").WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("process done")
 		}
 	}
 	<-ctx.Done()
 }
 
-func (s *spooledHandler) awaitError(cancel func(), errs chan error) {
+func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID string) {
 	select {
 	case err := <-errs:
 		cancel()
-		logging.Log("SPOOL-K2lst").OnError(err).WithField("view", s.ViewModel()).Debug("load canceled")
+		logging.Log("SPOOL-K2lst").OnError(err).WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("load canceled")
 	}
 }
 
-func (s *spooledHandler) process(ctx context.Context, events []*models.Event) error {
+func (s *spooledHandler) process(ctx context.Context, events []*models.Event, workerID string) error {
 	for _, event := range events {
 		select {
 		case <-ctx.Done():
-			logging.Log("SPOOL-FTKwH").WithField("view", s.ViewModel()).Debug("context canceled")
+			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID).Debug("context canceled")
 			return nil
 		default:
 			if err := s.Reduce(event); err != nil {
@@ -129,13 +134,27 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	if err != nil {
 		return nil, err
 	}
+	factory := models.FactoryFromSearchQuery(query)
+	sequence, err := s.eventstore.LatestSequence(ctx, factory)
+	logging.Log("SPOOL-7SciK").OnError(err).Debug("unable to query latest sequence")
+	var processedSequence uint64
+	for _, filter := range query.Filters {
+		if filter.GetField() == models.Field_LatestSequence {
+			processedSequence = filter.GetValue().(uint64)
+		}
+	}
+	if sequence != 0 && processedSequence == sequence {
+		return nil, nil
+	}
+
+	query.Limit = s.QueryLimit()
 	return s.eventstore.FilterEvents(ctx, query)
 }
 
-func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool {
+func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID string) chan bool {
 	renewTimer := time.After(0)
-	renewDuration := s.MinimumCycleDuration() - 50*time.Millisecond
-	locked := make(chan bool, 1)
+	renewDuration := s.MinimumCycleDuration()
+	locked := make(chan bool)
 
 	go func(locked chan bool) {
 		for {
@@ -143,7 +162,9 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error) chan bool 
 			case <-ctx.Done():
 				return
 			case <-renewTimer:
-				err := s.locker.Renew(s.lockID, s.ViewModel(), s.MinimumCycleDuration()*2)
+				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("renew")
+				err := s.locker.Renew(workerID, s.ViewModel(), s.MinimumCycleDuration()*2)
+				logging.Log("SPOOL-K2lst").WithField("view", s.ViewModel()).WithField("worker", workerID).WithError(err).Debug("renew done")
 				if err == nil {
 					locked <- true
 					renewTimer = time.After(renewDuration)

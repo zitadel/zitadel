@@ -46,7 +46,7 @@ func (v *View) DeleteOrgDomain(orgID, domain string, eventSequence uint64) error
 	return v.ProcessedOrgDomainSequence(eventSequence)
 }
 
-func (v *View) GetLatestOrgDomainSequence() (uint64, error) {
+func (v *View) GetLatestOrgDomainSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgDomainTable)
 }
 

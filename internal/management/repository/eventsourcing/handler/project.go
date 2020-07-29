@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
@@ -22,8 +20,6 @@ const (
 	projectTable = "management.projects"
 )
 
-func (p *Project) MinimumCycleDuration() time.Duration { return p.cycleDuration }
-
 func (p *Project) ViewModel() string {
 	return projectTable
 }
@@ -33,7 +29,7 @@ func (p *Project) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return proj_event.ProjectQuery(sequence), nil
+	return proj_event.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *Project) Reduce(event *models.Event) (err error) {

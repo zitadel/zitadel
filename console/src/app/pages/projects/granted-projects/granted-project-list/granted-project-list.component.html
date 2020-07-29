@@ -72,7 +72,7 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CREATIONDATE' | translate }} </th>
                 <td mat-cell *matCellDef="let project">
                     <span
-                        *ngIf="project.creationDate">{{project.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'}}</span>
+                        *ngIf="project.creationDate">{{project.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
                 </td>
             </ng-container>
 
@@ -81,7 +81,7 @@
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CHANGEDATE' | translate }} </th>
                 <td mat-cell *matCellDef="let project">
                     <span
-                        *ngIf="project.changeDate">{{project.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'}}</span>
+                        *ngIf="project.changeDate">{{project.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
                 </td>
             </ng-container>
 

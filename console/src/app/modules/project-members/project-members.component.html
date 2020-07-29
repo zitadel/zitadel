@@ -1,49 +1,34 @@
-<div class="max-width-container">
-    <div class="container">
-        <div class="left">
-            <a *ngIf="project" [routerLink]="[ '/projects', project.projectId]" mat-icon-button>
-                <mat-icon class="icon">arrow_back</mat-icon>
-            </a>
+<div class="container">
+    <div class="left">
+        <a *ngIf="project" [routerLink]="[ '/projects', project.projectId]" mat-icon-button>
+            <mat-icon class="icon">arrow_back</mat-icon>
+        </a>
+    </div>
+    <div class="right">
+        <div class="head">
+            <h1>{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}</h1>
+            <p class="desc">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</p>
         </div>
-        <div class="right">
-            <div class="head">
-                <h1>{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}</h1>
-                <p class="desc">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</p>
-            </div>
 
-            <div class="table-header-row" *ngIf="project">
-                <div class="col">
-                    <ng-container *ngIf="!selection.hasValue()">
-                        <span class="desc">{{'ORG_DETAIL.TABLE.TOTAL' | translate}}</span>
-                        <span class="count">{{dataSource?.membersSubject.value.length}}</span>
-                    </ng-container>
-                    <ng-container *ngIf="selection.hasValue()">
-                        <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
-                        <span class="count">{{selection?.selected?.length}}</span>
-                    </ng-container>
-                </div>
-                <span class="fill-space"></span>
-                <ng-template appHasRole
-                    [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
-                    <button (click)="removeProjectMemberSelection()" color="warn"
-                        matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button
-                        *ngIf="selection.hasValue()">
-                        <i class="las la-trash"></i>
-                    </button>
-                </ng-template>
-                <ng-template appHasRole
-                    [appHasRole]="['project.member.write:'+project.projectId,'project.member.write']">
-                    <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()"
-                        color="primary" mat-raised-button>
-                        <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-                    </a>
-                </ng-template>
-            </div>
+        <app-refresh-table *ngIf="project" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
+            [selection]="selection" [loading]="dataSource?.loading$ | async">
+            <ng-template appHasRole actions
+                [appHasRole]="['project.member.delete:' + project.projectId, 'project.member.delete']">
+                <button (click)="removeProjectMemberSelection()" color="warn"
+                    matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="icon-button" mat-icon-button
+                    *ngIf="selection.hasValue()">
+                    <i class="las la-trash"></i>
+                </button>
+            </ng-template>
+            <ng-template appHasRole actions
+                [appHasRole]="['project.member.write:'+project.projectId,'project.member.write']">
+                <a color="primary" [disabled]="disabled" class="add-button" (click)="openAddMember()" color="primary"
+                    mat-raised-button>
+                    <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+                </a>
+            </ng-template>
 
             <div class="table-wrapper">
-                <div class="spinner-container" *ngIf="dataSource?.loading$ | async">
-                    <mat-spinner diameter="50"></mat-spinner>
-                </div>
                 <table mat-table class="background-style full-width-table" aria-label="Elements"
                     [dataSource]="dataSource">
                     <ng-container matColumnDef="select">
@@ -98,7 +83,7 @@
                             <mat-form-field class="form-field" appearance="outline" *ngIf="project">
                                 <mat-label>{{ 'PROJECT.GRANT.TITLE' | translate }}</mat-label>
                                 <mat-select [(ngModel)]="member.rolesList" multiple
-                                    [disabled]="(['project.member.write:'+project.projectId] | hasRole) == false"
+                                    [disabled]="([('project.member.write:' + project.projectId)] | hasRole | async) == false"
                                     (selectionChange)="updateRoles(member, $event)">
                                     <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
                                         {{ 'ROLES.'+role | translate }}
@@ -113,10 +98,11 @@
                     </tr>
                 </table>
 
-                <mat-paginator class="background-style" #paginator [pageSize]="50"
-                    [pageSizeOptions]="[25, 50, 100, 250]">
+                <mat-paginator *ngIf="dataSource" class="background-style" #paginator [pageSize]="INITIALPAGESIZE"
+                    [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]"
+                    (page)="changePage($event)">
                 </mat-paginator>
             </div>
-        </div>
+        </app-refresh-table>
     </div>
 </div>

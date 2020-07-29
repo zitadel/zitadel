@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -28,8 +27,6 @@ const (
 	userTable = "auth.users"
 )
 
-func (p *User) MinimumCycleDuration() time.Duration { return p.cycleDuration }
-
 func (p *User) ViewModel() string {
 	return userTable
 }
@@ -41,7 +38,7 @@ func (p *User) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(es_model.UserAggregate, org_es_model.OrgAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *User) Reduce(event *models.Event) (err error) {

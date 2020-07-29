@@ -1,3 +1,4 @@
+import { animate, animateChild, keyframes, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Component, Input, OnInit } from '@angular/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, scan, take, tap } from 'rxjs/operators';
@@ -16,6 +17,22 @@ export enum ChangeType {
     selector: 'app-changes',
     templateUrl: './changes.component.html',
     styleUrls: ['./changes.component.scss'],
+    animations: [
+        trigger('cardAnimation', [
+            transition('* => *', [
+                query('@animate', stagger('50ms', animateChild()), { optional: true }),
+            ]),
+        ]),
+        trigger('animate', [
+            transition(':enter', [
+                animate('.2s ease-in', keyframes([
+                    style({ opacity: 0 }),
+                    style({ opacity: .5, transform: 'scale(1.02)' }),
+                    style({ opacity: 1, transform: 'scale(1)' }),
+                ])),
+            ]),
+        ]),
+    ],
 })
 export class ChangesComponent implements OnInit {
     @Input() public changeType: ChangeType = ChangeType.USER;
@@ -119,7 +136,6 @@ export class ChangesComponent implements OnInit {
                     }
                 }),
                 catchError(err => {
-                    console.error(err);
                     this._loading.next(false);
                     this.bottom = true;
                     return of([]);

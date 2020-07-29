@@ -5,6 +5,7 @@ import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -18,6 +19,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
+import { QuicklinkModule } from 'ngx-quicklink';
 
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -26,7 +28,9 @@ import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
+import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
+import { HasRolePipeModule } from './pipes/has-role-pipe.module';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
 import { GrpcService } from './services/grpc.service';
@@ -86,6 +90,7 @@ const authConfig: AuthConfig = {
                 deps: [HttpClient],
             },
         }),
+        QuicklinkModule,
         AccountsCardModule,
         HasRoleModule,
         BrowserAnimationsModule,
@@ -96,11 +101,14 @@ const authConfig: AuthConfig = {
         MatSidenavModule,
         MatCardModule,
         OutsideClickModule,
+        HasRolePipeModule,
         MatProgressBarModule,
         MatToolbarModule,
         MatMenuModule,
         MatSnackBarModule,
         AvatarModule,
+        WarnDialogModule,
+        MatDialogModule,
         ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ],
     providers: [
@@ -146,6 +154,7 @@ const authConfig: AuthConfig = {
         GrpcService,
         AuthService,
         AuthUserService,
+        { provide: 'windowObject', useValue: window },
     ],
     bootstrap: [AppComponent],
 })

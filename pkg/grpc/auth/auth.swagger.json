@@ -1172,6 +1172,14 @@
           "items": {
             "$ref": "#/definitions/v1UserGrantView"
           }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

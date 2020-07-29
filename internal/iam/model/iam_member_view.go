@@ -12,6 +12,7 @@ type IamMemberView struct {
 	Email        string
 	FirstName    string
 	LastName     string
+	DisplayName  string
 	Roles        []string
 	CreationDate time.Time
 	ChangeDate   time.Time
@@ -49,6 +50,8 @@ type IamMemberSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*IamMemberView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *IamMemberSearchRequest) EnsureLimit(limit uint64) {

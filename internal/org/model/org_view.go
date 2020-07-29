@@ -48,6 +48,8 @@ type OrgSearchResult struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*OrgView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *OrgSearchRequest) EnsureLimit(limit uint64) {

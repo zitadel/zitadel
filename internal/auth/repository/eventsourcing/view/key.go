@@ -55,7 +55,7 @@ func (v *View) DeleteKeyPair(keyID string, eventSequence uint64) error {
 	return v.ProcessedKeySequence(eventSequence)
 }
 
-func (v *View) GetLatestKeySequence() (uint64, error) {
+func (v *View) GetLatestKeySequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(keyTable)
 }
 

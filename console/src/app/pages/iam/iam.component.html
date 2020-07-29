@@ -8,8 +8,11 @@
         </app-card>
     </div>
 
-    <metainfo class="side">
-        <app-iam-contributors>
-        </app-iam-contributors>
-    </metainfo>
+    <div class="side" metainfo>
+        <app-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
+            [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+            description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+            (showDetailClicked)="showDetail()" [disabled]="false">
+        </app-contributors>
+    </div>
 </app-meta-layout>

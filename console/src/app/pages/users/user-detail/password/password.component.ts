@@ -84,7 +84,7 @@ export class PasswordComponent implements OnInit {
             });
         } else {
             this.passwordForm = this.fb.group({
-                currentPassword: ['', validators],
+                currentPassword: ['', Validators.required],
                 newPassword: ['', validators],
                 confirmPassword: ['', [...validators, passwordConfirmValidator]],
             });
@@ -96,8 +96,8 @@ export class PasswordComponent implements OnInit {
             this.mgmtUserService.SetInitialPassword(userId, this.password.value).then((data: any) => {
                 this.toast.showInfo('USER.TOAST.INITIALPASSWORDSET', true);
                 window.history.back();
-            }).catch(data => {
-                this.toast.showError(data.message);
+            }).catch(error => {
+                this.toast.showError(error);
             });
         }
     }
@@ -110,8 +110,8 @@ export class PasswordComponent implements OnInit {
                 .ChangeMyPassword(this.currentPassword.value, this.newPassword.value).then((data: any) => {
                     this.toast.showInfo('USER.TOAST.PASSWORDCHANGED', true);
                     window.history.back();
-                }).catch(data => {
-                    this.toast.showError(data.message);
+                }).catch(error => {
+                    this.toast.showError(error);
                 });
         }
     }
@@ -125,7 +125,7 @@ export class PasswordComponent implements OnInit {
     }
 
     public get currentPassword(): AbstractControl | null {
-        return this.passwordForm.get('newPassword');
+        return this.passwordForm.get('currentPassword');
     }
 
     public get confirmPassword(): AbstractControl | null {

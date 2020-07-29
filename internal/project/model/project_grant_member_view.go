@@ -13,6 +13,7 @@ type ProjectGrantMemberView struct {
 	Email        string
 	FirstName    string
 	LastName     string
+	DisplayName  string
 	Roles        []string
 	CreationDate time.Time
 	ChangeDate   time.Time
@@ -50,6 +51,8 @@ type ProjectGrantMemberSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*ProjectGrantMemberView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *ProjectGrantMemberSearchRequest) EnsureLimit(limit uint64) {

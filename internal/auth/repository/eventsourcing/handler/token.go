@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -25,8 +24,6 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (u *Token) MinimumCycleDuration() time.Duration { return u.cycleDuration }
-
 func (u *Token) ViewModel() string {
 	return tokenTable
 }
@@ -41,7 +38,7 @@ func (u *Token) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(user_es_model.UserAggregate, project_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *Token) Reduce(event *models.Event) (err error) {

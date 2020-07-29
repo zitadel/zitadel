@@ -87,11 +87,15 @@ func projectGrantMemberSearchKeyToModel(key management.ProjectGrantMemberSearchK
 }
 
 func projectGrantMemberSearchResponseFromModel(response *proj_model.ProjectGrantMemberSearchResponse) *management.ProjectGrantMemberSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-MSn6g").OnError(err).Debug("unable to parse timestamp")
 	return &management.ProjectGrantMemberSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      projectGrantMemberViewsFromModel(response.Result),
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            projectGrantMemberViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 
@@ -116,6 +120,7 @@ func projectGrantMemberViewFromModel(member *proj_model.ProjectGrantMemberView) 
 		Email:        member.Email,
 		FirstName:    member.FirstName,
 		LastName:     member.LastName,
+		DisplayName:  member.DisplayName,
 		Roles:        member.Roles,
 		CreationDate: creationDate,
 		ChangeDate:   changeDate,

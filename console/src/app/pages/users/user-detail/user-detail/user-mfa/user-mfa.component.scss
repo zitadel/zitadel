@@ -1,0 +1,43 @@
+
+.col {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ffffff20;
+    margin-bottom: 1rem;
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        padding: .5rem 0;
+        align-items: center;
+
+        span {
+            flex: 1;
+        }
+    }
+}
+
+.centered {
+    display: flex;
+    align-items: center;
+
+    i {
+        margin-left: 1rem;
+        color: #5282c1;
+    }
+}
+
+table {
+    width: 100%;
+
+    td, th {
+        &:first-child {
+            padding-left: 0;
+            padding-right: 1rem;
+        }
+
+        &:last-child {
+            padding-right: 0;
+        }
+    }
+}

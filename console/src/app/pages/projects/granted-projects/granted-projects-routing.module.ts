@@ -25,6 +25,7 @@ const routes: Routes = [
         path: ':projectid/grant/:grantid/members',
         data: {
             type: ProjectType.PROJECTTYPE_GRANTED,
+            roles: ['project.grant.member.read'],
         },
         loadChildren: () => import('src/app/modules/project-members/project-members.module')
             .then(m => m.ProjectMembersModule),
@@ -37,7 +38,10 @@ const routes: Routes = [
     {
         path: ':projectid/roles/create',
         loadChildren: () => import('../project-role-create/project-role-create.module').then(m => m.ProjectRoleCreateModule),
-
+        canActivate: [RoleGuard],
+        data: {
+            roles: ['project.write'],
+        },
     },
     {
         path: ':projectid/grants/create',

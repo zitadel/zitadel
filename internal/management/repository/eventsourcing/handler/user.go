@@ -2,19 +2,17 @@ package handler
 
 import (
 	"context"
-	"time"
-
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -28,8 +26,6 @@ const (
 	userTable = "management.users"
 )
 
-func (p *User) MinimumCycleDuration() time.Duration { return p.cycleDuration }
-
 func (p *User) ViewModel() string {
 	return userTable
 }
@@ -41,7 +37,7 @@ func (p *User) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(es_model.UserAggregate, org_es_model.OrgAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *User) Reduce(event *models.Event) (err error) {
@@ -122,12 +118,8 @@ func (u *User) fillLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	for _, user := range users {
 		user.SetLoginNames(policy, org.Domains)
-		err := u.view.PutUser(user, 0)
-		if err != nil {
-			return err
-		}
 	}
-	return nil
+	return u.view.PutUsers(users, event.Sequence)
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
@@ -148,12 +140,8 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *models.Event) error {
 	}
 	for _, user := range users {
 		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
-		err := u.view.PutUser(user, 0)
-		if err != nil {
-			return err
-		}
 	}
-	return nil
+	return u.view.PutUsers(users, event.Sequence)
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {

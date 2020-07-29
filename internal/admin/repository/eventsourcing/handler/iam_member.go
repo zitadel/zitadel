@@ -2,14 +2,14 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -24,8 +24,6 @@ const (
 	iamMemberTable = "adminapi.iam_members"
 )
 
-func (m *IamMember) MinimumCycleDuration() time.Duration { return m.cycleDuration }
-
 func (m *IamMember) ViewModel() string {
 	return iamMemberTable
 }
@@ -37,7 +35,7 @@ func (m *IamMember) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(model.IamAggregate, usr_es_model.UserAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (m *IamMember) Reduce(event *models.Event) (err error) {
@@ -120,6 +118,7 @@ func (m *IamMember) fillUserData(member *iam_model.IamMemberView, user *usr_mode
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName
 	member.Email = user.EmailAddress
+	member.DisplayName = user.DisplayName
 }
 func (m *IamMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Ld9ow", "id", event.AggregateID).WithError(err).Warn("something went wrong in iammember handler")

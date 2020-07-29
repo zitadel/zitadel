@@ -3,6 +3,12 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import {
+    OrgIamPolicy,
+    PasswordAgePolicy,
+    PasswordComplexityPolicy,
+    PasswordLockoutPolicy,
+} from 'src/app/proto/generated/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { OrgService } from 'src/app/services/org.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -39,31 +45,10 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     public lockoutForm!: FormGroup;
     public ageForm!: FormGroup;
 
-    public complexityData: any = {
-        minLength: 8,
-        description: '',
-        hasNumber: true,
-        hasSymbol: true,
-        hasLowercase: true,
-        hasUppercase: true,
-    };
-
-    public lockoutData: any = {
-        description: '',
-        maxAttempts: 5,
-        showLockOutFailures: true,
-    };
-
-    public ageData: any = {
-        description: '',
-        expireWarnDays: 80,
-        maxAgeDays: 90,
-    };
-
-    public iamData: any = {
-        description: '',
-        userLoginMustBeDomain: false,
-    };
+    public complexityData!: PasswordComplexityPolicy.AsObject;
+    public lockoutData!: PasswordLockoutPolicy.AsObject;
+    public ageData!: PasswordAgePolicy.AsObject;
+    public iamData!: OrgIamPolicy.AsObject;
 
     private sub: Subscription = new Subscription();
 
@@ -102,19 +87,21 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
             if (this.componentAction === PolicyComponentAction.MODIFY) {
                 this.getData(params).then(data => {
-                    switch (this.policyType) {
-                        case PolicyComponentType.LOCKOUT:
-                            this.lockoutData = data.toObject();
-                            break;
-                        case PolicyComponentType.AGE:
-                            this.ageData = data.toObject();
-                            break;
-                        case PolicyComponentType.COMPLEXITY:
-                            this.complexityData = data.toObject();
-                            break;
-                        case PolicyComponentType.IAM_POLICY:
-                            this.iamData = data.toObject();
-                            break;
+                    if (data) {
+                        switch (this.policyType) {
+                            case PolicyComponentType.LOCKOUT:
+                                this.lockoutData = data.toObject() as PasswordLockoutPolicy.AsObject;
+                                break;
+                            case PolicyComponentType.AGE:
+                                this.ageData = data.toObject() as PasswordAgePolicy.AsObject;
+                                break;
+                            case PolicyComponentType.COMPLEXITY:
+                                this.complexityData = data.toObject() as PasswordComplexityPolicy.AsObject;
+                                break;
+                            case PolicyComponentType.IAM_POLICY:
+                                this.iamData = data.toObject() as OrgIamPolicy.AsObject;
+                                break;
+                        }
                     }
                 });
             }
@@ -128,7 +115,8 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
         this.sub.unsubscribe();
     }
 
-    private async getData(params: any): Promise<any> {
+    private async getData(params: any):
+        Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
         switch (params.policytype) {
             case PolicyComponentType.LOCKOUT:
                 this.titleSub.next('ORG.POLICY.PWD_LOCKOUT.TITLE');
@@ -176,13 +164,13 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
     }
 
     public incrementLength(): void {
-        if (this.complexityData?.minLength !== undefined) {
+        if (this.complexityData?.minLength !== undefined && this.complexityData?.minLength <= 72) {
             this.complexityData.minLength++;
         }
     }
 
     public decrementLength(): void {
-        if (this.complexityData?.minLength && this.complexityData?.minLength > 0) {
+        if (this.complexityData?.minLength && this.complexityData?.minLength > 1) {
             this.complexityData.minLength--;
         }
     }
@@ -270,8 +258,8 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     if (orgId) {
                         this.adminService.CreateOrgIamPolicy(
                             orgId,
-                            this.complexityData.description,
-                            this.complexityData.userLoginMustBeDomain,
+                            this.iamData.description,
+                            this.iamData.userLoginMustBeDomain,
                         ).then(() => {
                             this.router.navigate(['org']);
                         }).catch(error => {
@@ -326,8 +314,8 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
                     if (orgId) {
                         this.adminService.UpdateOrgIamPolicy(
                             orgId,
-                            this.complexityData.description,
-                            this.complexityData.userLoginMustBeDomain,
+                            this.iamData.description,
+                            this.iamData.userLoginMustBeDomain,
                         ).then(() => {
                             this.router.navigate(['org']);
                         }).catch(error => {

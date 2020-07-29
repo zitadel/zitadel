@@ -13,10 +13,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
+import { SharedModule } from 'src/app/modules/shared/shared.module';
 
 import { UserListRoutingModule } from './user-list-routing.module';
 import { UserListComponent } from './user-list.component';
-
 
 
 @NgModule({
@@ -39,6 +40,8 @@ import { UserListComponent } from './user-list.component';
         MatCheckboxModule,
         MatTooltipModule,
         TranslateModule,
+        SharedModule,
+        RefreshTableModule,
     ],
     exports: [
         UserListComponent,

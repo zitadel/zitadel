@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -35,8 +34,6 @@ const (
 	userGrantTable = "management.user_grants"
 )
 
-func (u *UserGrant) MinimumCycleDuration() time.Duration { return u.cycleDuration }
-
 func (u *UserGrant) ViewModel() string {
 	return userGrantTable
 }
@@ -48,7 +45,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(grant_es_model.UserGrantAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *UserGrant) Reduce(event *models.Event) (err error) {

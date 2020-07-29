@@ -6,8 +6,8 @@
     $primary-color: mat-color($primary, 500);
     $accent-color: mat-color($accent, 500);
     $primary-dark: mat-color($primary, A900);
+    $inverse-color: mat-color($primary, A600);
     $sec-dark: mat-color($primary, A800);
-
 
     .mat-menu-item {
         &.show-all {
@@ -30,6 +30,15 @@
             color: $primary-color !important;
             background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
         }
+
+        .c_label {
+            .count {
+                background-color: $primary-color;
+                padding: 3px 6px;
+                border-radius: 50vw;
+                color: white;
+            }
+        }
     }
 
     .mat-menu-content, .mat-menu-panel {
@@ -48,14 +57,17 @@
     }
 
     .root-header {
-        @include mat-elevation(3);
-        background: $primary-dark !important;
-        transition: background .5s ease-in-out;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.12);
+        background-color: $primary-dark !important;
+        transition: background-color .4s ease-in-out;
     }
 
     .admin-line {
         background: $accent-color;
         color: white;
+        margin-right: 1rem;
+        border-top-right-radius: 50vw;
+        border-bottom-right-radius: 50vw;
 
         // &::after {
         //     content: '';
@@ -75,6 +87,7 @@
             left: 0;
             border-bottom: 20px solid $primary-dark;
             border-right: 20px solid transparent;
+            transition: border-color .4s ease-in-out;
         }
     }
 }

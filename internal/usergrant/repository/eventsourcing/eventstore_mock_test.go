@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"encoding/json"
+
 	mock_cache "github.com/caos/zitadel/internal/cache/mock"
 	"github.com/caos/zitadel/internal/eventstore/mock"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"

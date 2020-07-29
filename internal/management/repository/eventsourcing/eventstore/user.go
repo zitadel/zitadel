@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
 
@@ -23,13 +24,19 @@ type UserRepo struct {
 }
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
-	user, err := repo.View.UserByID(id)
-	if err != nil {
-		return nil, err
+	user, viewErr := repo.View.UserByID(id)
+	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+		return nil, viewErr
 	}
-	events, err := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
-	if err != nil {
-		logging.Log("EVENT-PSoc3").WithError(err).Debug("error retrieving new events")
+	if caos_errs.IsNotFound(viewErr) {
+		user = new(model.UserView)
+	}
+	events, esErr := repo.UserEvents.UserEventsByID(ctx, id, user.Sequence)
+	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
 		return model.UserToModel(user), nil
 	}
 	userCopy := *user
@@ -87,16 +94,23 @@ func (repo *UserRepo) UnlockUser(ctx context.Context, id string) (*usr_model.Use
 
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest) (*usr_model.UserSearchResponse, error) {
 	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestUserSequence()
+	logging.Log("EVENT-Lcn7d").OnError(err).Warn("could not read latest user sequence")
 	projects, count, err := repo.View.SearchUsers(request)
 	if err != nil {
 		return nil, err
 	}
-	return &usr_model.UserSearchResponse{
+	result := &usr_model.UserSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: uint64(count),
 		Result:      model.UsersToModel(projects),
-	}, nil
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*usr_model.UserChanges, error) {

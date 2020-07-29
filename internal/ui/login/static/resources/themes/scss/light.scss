@@ -45,26 +45,26 @@ html {
 
         &.user-selection {
             .profile-image {
-                @include retina-background-image($profileImgLight, "png", false, 100px, 100px);
+                @include retina-background-image($profileImgLight, "png", false, 80px, 80px);
             }
 
             &:hover {
-                background-color: $buttonBackgroundColorHover;
+                background-color: $buttonBackgroundColorHoverLight;
 
                 .profile-image {
-                    @include retina-background-image($profileImgLight, "png", true, 100px, 100px);
+                    @include retina-background-image($profileImgLight, "png", true, 80px, 80px);
                 }
             }
         }
 
         &.other-user {
             .other-user-image {
-                @include retina-background-image($otherUserImgLight, "png", false, 100px, 75px);
+                @include retina-background-image($otherUserImgLight, "png", false, 80px, 60px);
             }
 
             &:hover {
                 .other-user-image {
-                    @include retina-background-image($otherUserImgLight, "png", true, 100px, 75px);
+                    @include retina-background-image($otherUserImgLight, "png", true, 80px, 60px);
                 }
             }
         }

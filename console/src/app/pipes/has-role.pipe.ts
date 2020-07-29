@@ -1,16 +1,16 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import { AuthUserService } from '../services/auth-user.service';
+import { AuthService } from '../services/auth.service';
 
 @Pipe({
     name: 'hasRole',
-    pure: false,
 })
 export class HasRolePipe implements PipeTransform {
 
-    constructor(private authUserService: AuthUserService) { }
+    constructor(private authService: AuthService) { }
 
-    public transform(values: string[], each: boolean = false): any {
-        return this.authUserService.isAllowed(values, each);
+    public transform(values: string[], each: boolean = false): Observable<boolean> {
+        return this.authService.isAllowed(values, each);
     }
 }

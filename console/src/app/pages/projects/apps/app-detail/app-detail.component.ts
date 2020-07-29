@@ -17,7 +17,6 @@ import {
     OIDCGrantType,
     OIDCResponseType,
 } from 'src/app/proto/generated/management_pb';
-import { GrpcService } from 'src/app/services/grpc.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -36,7 +35,6 @@ enum RedirectType {
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
     public errorMessage: string = '';
-    public selectable: boolean = false;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -84,7 +82,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
-        private grpcService: GrpcService,
         private orgService: OrgService,
     ) {
         this.appNameForm = this.fb.group({
@@ -221,11 +218,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 this.projectService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
-                    .then((data: OIDCConfig) => {
+                    .then(() => {
                         this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
-                    .catch(data => {
-                        this.toast.showError(data.message);
+                    .catch(error => {
+                        this.toast.showError(error);
                     });
             }
         }

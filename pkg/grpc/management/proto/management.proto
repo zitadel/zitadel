@@ -54,6 +54,12 @@ service ManagementService {
         };
     }
 
+    rpc GetZitadelDocs(google.protobuf.Empty) returns (ZitadelDocs) {
+        option (google.api.http) = {
+        get: "/zitadel/docs"
+        };
+    }
+
     // GetIam returns some needed settings of the iam (Global Organisation ID, Zitadel Project ID)
     rpc GetIam(google.protobuf.Empty) returns (Iam) {
         option (google.api.http) = {
@@ -733,7 +739,6 @@ service ManagementService {
 
         option (caos.zitadel.utils.v1.auth_option) = {
             permission: "project.read"
-            check_field_name: "ProjectId"
         };
     }
 
@@ -1123,6 +1128,28 @@ service ManagementService {
         };
     }
 
+    rpc CreateUserGrant(UserGrantCreate) returns (UserGrant) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/grants"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
+    rpc UpdateUserGrant(UserGrantUpdate) returns (UserGrant) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/grants/{id}"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "user.grant.write"
+        };
+    }
+
     rpc DeactivateUserGrant(UserGrantID) returns (UserGrant) {
         option (google.api.http) = {
             put: "/users/{user_id}/grants/{id}/_deactivate"
@@ -1170,6 +1197,7 @@ service ManagementService {
     // search user grants based on a project
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc SearchProjectUserGrants(ProjectUserGrantSearchRequest) returns (UserGrantSearchResponse) {
+        option deprecated = true;
         option (google.api.http) = {
             post: "/projects/{project_id}/users/grants/_search"
             body: "*"
@@ -1184,6 +1212,7 @@ service ManagementService {
     // get user grant based on a project
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc ProjectUserGrantByID(ProjectUserGrantID) returns (UserGrantView) {
+        option deprecated = true;
         option (google.api.http) = {
             get: "/projects/{project_id}/users/{user_id}/grants/{id}"
         };
@@ -1197,6 +1226,7 @@ service ManagementService {
     // create user grant based on a project
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc CreateProjectUserGrant(UserGrantCreate) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             post: "/projects/{project_id}/users/{user_id}/grants"
             body: "*"
@@ -1211,6 +1241,7 @@ service ManagementService {
     // update user grant based on a project
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc UpdateProjectUserGrant(ProjectUserGrantUpdate) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             put: "/projects/{project_id}/users/{user_id}/grants/{id}"
             body: "*"
@@ -1225,6 +1256,7 @@ service ManagementService {
     // deactivate user grant based on a project
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc DeactivateProjectUserGrant(ProjectUserGrantID) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             put: "/projects/{project_id}/users/{user_id}/grants/{id}/_deactivate"
             body: "*"
@@ -1239,6 +1271,7 @@ service ManagementService {
     // reactivate user grant based on a project
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc ReactivateProjectUserGrant(ProjectUserGrantID) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             put: "/projects/{project_id}/users/{user_id}/grants/{id}/_reactivate"
             body: "*"
@@ -1253,6 +1286,7 @@ service ManagementService {
     // search user grants based on a projectgrant
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc SearchProjectGrantUserGrants(ProjectGrantUserGrantSearchRequest) returns (UserGrantSearchResponse) {
+        option deprecated = true;
         option (google.api.http) = {
             post: "/projectgrants/{project_grant_id}/users/grants/_search"
             body: "*"
@@ -1267,6 +1301,7 @@ service ManagementService {
     // get user grant based on a projectgrant
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc ProjectGrantUserGrantByID(ProjectGrantUserGrantID) returns (UserGrantView) {
+        option deprecated = true;
         option (google.api.http) = {
             get: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
         };
@@ -1280,6 +1315,7 @@ service ManagementService {
     // create user grant based on a projectgrant
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc CreateProjectGrantUserGrant(ProjectGrantUserGrantCreate) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             post: "/projectgrants/{project_grant_id}/users/{user_id}/grants"
             body: "*"
@@ -1294,6 +1330,7 @@ service ManagementService {
     // update user grant based on a projectgrant
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc UpdateProjectGrantUserGrant(ProjectGrantUserGrantUpdate) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}"
             body: "*"
@@ -1308,6 +1345,7 @@ service ManagementService {
     // deactivate user grant based on a projectgrant
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc DeactivateProjectGrantUserGrant(ProjectGrantUserGrantID) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_deactivate"
             body: "*"
@@ -1322,6 +1360,7 @@ service ManagementService {
     // reactivate user grant based on a projectgrant
     // This request is required that the user authorizations of zitadel can be differentiated
     rpc ReactivateProjectGrantUserGrant(ProjectGrantUserGrantID) returns (UserGrant) {
+        option deprecated = true;
         option (google.api.http) = {
             put: "/projectgrants/{project_grant_id}/users/{user_id}/grants/{id}/_reactivate"
             body: "*"
@@ -1332,6 +1371,11 @@ service ManagementService {
             check_field_name: "ProjectGrantId"
         };
     }
+}
+
+message ZitadelDocs {
+    string issuer = 1;
+    string discovery_endpoint = 2;
 }
 
 message Iam {
@@ -1509,6 +1553,8 @@ message UserSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated UserView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 enum SearchMethod {
@@ -1870,6 +1916,8 @@ message OrgDomainSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated OrgDomainView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message OrgDomainSearchRequest {
@@ -1920,6 +1968,8 @@ message OrgMemberSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated OrgMemberView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message OrgMemberView {
@@ -1932,6 +1982,7 @@ message OrgMemberView {
     string email = 7;
     string first_name = 8;
     string last_name = 9;
+    string display_name = 10;
 }
 
 message OrgMemberSearchRequest {
@@ -1968,6 +2019,8 @@ message ProjectSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message ProjectView {
@@ -2100,6 +2153,8 @@ message ProjectRoleSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectRoleView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message ProjectRoleSearchRequest {
@@ -2131,6 +2186,7 @@ message ProjectMemberView {
     google.protobuf.Timestamp change_date = 7;
     google.protobuf.Timestamp creation_date = 8;
     uint64 sequence = 10;
+    string display_name = 11;
 }
 
 message ProjectMemberSearchResponse {
@@ -2138,6 +2194,8 @@ message ProjectMemberSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectMemberView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message ProjectMemberSearchRequest {
@@ -2264,6 +2322,8 @@ message ApplicationSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ApplicationView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message ApplicationSearchRequest {
@@ -2338,6 +2398,8 @@ message ProjectGrantSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectGrantView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message GrantedProjectSearchRequest {
@@ -2408,6 +2470,7 @@ message ProjectGrantMemberView {
     google.protobuf.Timestamp change_date = 7;
     google.protobuf.Timestamp creation_date = 8;
     uint64 sequence = 9;
+    string display_name = 10;
 }
 
 message ProjectGrantMemberSearchResponse {
@@ -2415,6 +2478,8 @@ message ProjectGrantMemberSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated ProjectGrantMemberView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message ProjectGrantMemberSearchRequest {
@@ -2461,6 +2526,7 @@ message UserGrantCreate {
     string user_id = 1;
     string project_id = 2;
     repeated string role_keys = 3;
+    string grant_id = 4;
 }
 
 message UserGrantUpdateBulk {
@@ -2471,6 +2537,7 @@ message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
     repeated string role_keys = 3;
+    string grant_id = 4;
 }
 
 message UserGrantRemoveBulk {
@@ -2549,6 +2616,8 @@ message UserGrantSearchResponse {
     uint64 limit = 2;
     uint64 total_result = 3;
     repeated UserGrantView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
 }
 
 message UserGrantSearchRequest {

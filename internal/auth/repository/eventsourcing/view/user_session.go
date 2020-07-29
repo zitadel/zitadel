@@ -38,7 +38,7 @@ func (v *View) DeleteUserSessions(userID string, eventSequence uint64) error {
 	return v.ProcessedUserSessionSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserSessionSequence() (uint64, error) {
+func (v *View) GetLatestUserSessionSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userSessionTable)
 }
 

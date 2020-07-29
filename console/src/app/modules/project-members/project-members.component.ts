@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
@@ -13,12 +13,14 @@ import { ToastService } from 'src/app/services/toast.service';
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
 import { ProjectMembersDataSource } from './project-members-datasource';
 
+
 @Component({
     selector: 'app-project-members',
     templateUrl: './project-members.component.html',
     styleUrls: ['./project-members.component.scss'],
 })
 export class ProjectMembersComponent {
+    public INITIALPAGESIZE: number = 25;
     public project!: ProjectView.AsObject | ProjectGrantView.AsObject;
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
@@ -50,15 +52,19 @@ export class ProjectMembersComponent {
                         this.project = project.toObject();
                         this.projectName = this.project.name;
                         this.dataSource = new ProjectMembersDataSource(this.projectService);
-                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25);
+                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE);
                     });
                 } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-                    console.log(params.projectid, params.grantid);
                     this.projectService.GetGrantedProjectByID(params.projectid, params.grantid).then(project => {
                         this.project = project.toObject();
                         this.projectName = this.project.projectName;
                         this.dataSource = new ProjectMembersDataSource(this.projectService);
-                        this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, 25, this.grantId);
+                        this.dataSource.loadMembers(this.project.projectId,
+                            this.projectType,
+                            0,
+                            this.INITIALPAGESIZE,
+                            this.grantId,
+                        );
                     });
                 }
             });
@@ -149,7 +155,7 @@ export class ProjectMembersComponent {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
             this.projectService.ChangeProjectMember(this.project.projectId, member.userId, selectionChange.value)
                 .then((newmember: ProjectMember) => {
-                    this.toast.showInfo('Member changed');
+                    this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
@@ -157,10 +163,20 @@ export class ProjectMembersComponent {
             this.projectService.ChangeProjectGrantMember(this.project.projectId,
                 this.grantId, member.userId, selectionChange.value)
                 .then((newmember: ProjectMember) => {
-                    this.toast.showInfo('Member changed');
+                    this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
                 }).catch(error => {
                     this.toast.showError(error);
                 });
         }
+    }
+
+    public changePage(event?: PageEvent): void {
+        this.dataSource.loadMembers(
+            this.project.projectId,
+            this.projectType,
+            event?.pageIndex ?? this.paginator.pageIndex,
+            event?.pageSize ?? this.paginator.pageSize,
+            this.grantId,
+        );
     }
 }
