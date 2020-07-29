@@ -7,24 +7,12 @@ h1 {
   margin-bottom: 2rem;
 }
 
-.content {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -.5rem;
-
-  mat-form-field {
-    flex: 1 1 33%;
-    margin: 0 .5rem;
-  }
-}
-
 .view-toggle {
   width: 100%;
   display: flex;
   justify-content: flex-end;
 
-  button {
+  .icon-button {
     display: block;
     border-radius: .5rem;
   }
@@ -75,8 +63,8 @@ h1 {
     justify-content: center;
   }
 
-  table,
-  mat-paginator {
+  .table,
+  .paginator {
     width: 100%;
     background-color: #2d2e30;
 

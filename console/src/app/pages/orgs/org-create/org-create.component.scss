@@ -33,7 +33,7 @@ h1 {
     flex-wrap: wrap;
     margin: 0 -.5rem;
 
-    mat-form-field {
+    .formfield {
       flex: 1 1 33%;
       margin: 0 .5rem;
     }
@@ -107,7 +107,7 @@ h1 {
         flex-wrap: nowrap;
       }
 
-      mat-form-field {
+      .formfield {
         flex: 1 0 33%;
         margin: 0 .5rem;
       }

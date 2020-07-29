@@ -123,45 +123,18 @@ mat-radio-group {
 }
 
 .dev {
-  .column {
-    display: flex;
-    flex-direction: column;
-
-    .formfield {
-      width: 400px;
-
-      input {
-        font-size: 1.5rem;
-      }
-
-      &.autocomplete {
-        margin-top: 1rem;
-      }
-    }
-
-    .slider {
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-      font-size: .8rem;
-    }
-
-    .access-token {
-      width: 400px;
-    }
-  }
-
   .content {
     display: flex;
     margin: 0 -.5rem;
     flex-wrap: wrap;
 
-    mat-form-field {
+    .formfield {
       flex: 1 0 40%;
       margin: 0 .5rem;
-    }
 
-    .full-width {
-      flex-basis: 80%;
+      &.full-width {
+        flex-basis: 80%;
+      }
     }
   }
 

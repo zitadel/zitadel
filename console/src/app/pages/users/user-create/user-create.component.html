@@ -7,16 +7,13 @@
         </div>
         <div class="right">
             <div class="head">
-
-                <h1>{{ 'USER.CREATE.TITLE' | translate }}</h1>
-
+                <h1 class="h1">{{ 'USER.CREATE.TITLE' | translate }}</h1>
                 <p class="desc">{{ 'USER.CREATE.DESCRIPTION' | translate }}</p>
             </div>
 
             <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
 
             <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
-                <!-- <h2>{{ 'USER.PAGES.CREATE' | translate}}</h2> -->
                 <div class="content">
                     <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
                     <mat-form-field class="formfield">

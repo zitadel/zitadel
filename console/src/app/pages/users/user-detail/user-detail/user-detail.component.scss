@@ -32,37 +32,6 @@
   }
 }
 
-.content {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -.5rem;
-
-  &.nowrap {
-    flex-wrap: nowrap;
-  }
-
-  &.center {
-    align-items: center;
-  }
-
-  mat-form-field {
-    flex: 1 1 33%;
-    margin: 0 .5rem;
-  }
-}
-
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 -.5rem;
-
-  button {
-    border-radius: .5rem;
-    margin: 0 .5rem;
-  }
-}
-
 .method-col {
   display: flex;
   flex-direction: column;
@@ -98,7 +67,7 @@
       color: #818a8a;
     }
 
-    mat-icon {
+    .icon {
       margin-right: .5rem;
     }
 

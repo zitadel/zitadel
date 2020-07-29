@@ -1,10 +1,12 @@
 @import '~@angular/material/theming';
 
 @mixin table-theme($theme) {
+  /* stylelint disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat-color($primary, a900);
-  $secondary-dark: mat-color($primary, a800);
+  $primary-dark: mat-color($primary, A900);
+  $secondary-dark: mat-color($primary, A800);
   $foreground: map-get($theme, foreground);
+  /* stylelint enable */
 
   .mat-table,
   mat-paginator {

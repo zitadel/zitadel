@@ -5,11 +5,7 @@
   flex-wrap: wrap;
   margin: 0 -.5rem;
 
-  &.nowrap {
-    flex-wrap: nowrap;
-  }
-
-  mat-form-field {
+  .formfield {
     flex: 1 1 33%;
     margin: 0 .5rem;
   }
@@ -19,7 +15,7 @@
   display: flex;
   justify-content: flex-end;
 
-  button {
+  .submit-button {
     border-radius: .5rem;
   }
 }

@@ -35,66 +35,6 @@
   border-radius: .5rem;
 }
 
-.org {
-  height: 120px;
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-
-  .name {
-    margin-top: 0;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  span {
-    font-size: .8rem;
-  }
-}
-
-.margin-right {
-  margin-right: .5rem;
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-
-  .formfield {
-    width: 400px;
-
-    input {
-      font-size: 1.5rem;
-    }
-
-    &.autocomplete {
-      margin-top: 1rem;
-    }
-  }
-
-  .slider {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-size: .8rem;
-  }
-
-  .access-token {
-    width: 400px;
-  }
-}
-
-.content {
-  display: flex;
-  margin: 0 -.5rem;
-  flex-wrap: wrap;
-
-  mat-form-field {
-    flex: 1 0 40%;
-    margin: 0 .5rem;
-  }
-}
-
 .btn-container {
   display: flex;
   justify-content: space-between;

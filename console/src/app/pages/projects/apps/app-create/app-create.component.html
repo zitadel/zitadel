@@ -235,7 +235,7 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'APP.OIDC.GRANT' | translate }}</mat-label>
                     <mat-select formControlName="grantTypesList" multiple>
                         <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant.type">
@@ -244,7 +244,7 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'APP.OIDC.RESPONSE' | translate }}</mat-label>
                     <mat-select formControlName="responseTypesList" multiple>
                         <mat-option *ngFor="let type of oidcResponseTypes" [value]="type.type">
@@ -262,7 +262,7 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="full-width">
+                <mat-form-field appearance="outline" class="formfield full-width">
                     <mat-label>{{ 'APP.OIDC.REDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipRedirectList aria-label="uri selection">
                         <mat-chip *ngFor="let uri of oidcApp.redirectUrisList" removable
@@ -274,7 +274,7 @@
                     </mat-chip-list>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="full-width">
+                <mat-form-field appearance="outline" class="formfield full-width">
                     <mat-label>{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}</mat-label>
                     <mat-chip-list #chipPostRedirectList aria-label="uri selection">
                         <mat-chip *ngFor="let uri of oidcApp.postLogoutRedirectUrisList" removable

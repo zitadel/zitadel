@@ -33,10 +33,6 @@
       margin-right: 1rem;
     }
 
-    button {
-      border-radius: .5rem;
-    }
-
     .desc {
       font-size: .9rem;
       color: #8795a1;
@@ -46,18 +42,6 @@
       font-size: 14px;
       color: rgb(201, 51, 71);
     }
-  }
-}
-
-.content {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -.5rem;
-
-  mat-form-field {
-    flex: 1 1 33%;
-    margin: 0 .5rem;
   }
 }
 
@@ -72,30 +56,10 @@
       margin-bottom: .5rem;
       align-items: center;
 
-      button {
-        display: none;
-        visibility: hidden;
-      }
-
-      &:hover {
-        button {
-          display: inline-block;
-          visibility: visible;
-
-          mat-icon {
-            font-size: 1.2rem;
-          }
-        }
-      }
-
       .first {
         flex: 1;
         font-size: .8rem;
         margin-right: .5rem;
-      }
-
-      .fill-space {
-        flex: 1;
       }
 
       .second {
@@ -104,17 +68,6 @@
         overflow: hidden;
         margin-left: 1rem;
       }
-
-      a {
-        &:hover {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .side-section {
-      color: #8795a1;
     }
   }
 

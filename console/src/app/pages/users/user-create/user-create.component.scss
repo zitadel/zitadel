@@ -23,11 +23,7 @@
       border-bottom: 1px solid #ffffff20;
       flex-wrap: wrap;
 
-      a {
-        display: block;
-      }
-
-      h1 {
+      .h1 {
         font-size: 1.2rem;
       }
 
@@ -68,11 +64,7 @@
         font-size: .9rem;
       }
 
-      &.nowrap {
-        flex-wrap: nowrap;
-      }
-
-      mat-form-field {
+      .formfield {
         flex: 1 0 33%;
         margin: 0 .5rem;
       }

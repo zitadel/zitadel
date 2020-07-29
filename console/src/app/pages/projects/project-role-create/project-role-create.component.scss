@@ -29,10 +29,6 @@
   }
 }
 
-.margin-right {
-  margin-right: .5rem;
-}
-
 .content {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -41,7 +37,7 @@
   flex-wrap: wrap;
   border-bottom: 1px solid #ffffff20;
 
-  mat-form-field {
+  .formfield {
     margin: 0 .5rem;
 
     @media only screen and (max-width: 450px) {

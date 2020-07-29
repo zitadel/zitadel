@@ -2,7 +2,7 @@
   display: flex;
   padding-bottom: 3rem;
 
-  h1 {
+  .h1 {
     font-size: 1.2rem;
   }
 
@@ -38,7 +38,7 @@
         display: block;
       }
 
-      h1 {
+      .h1 {
         margin-top: .2rem;
         font-size: 2rem;
       }
@@ -80,7 +80,7 @@
       }
     }
 
-    mat-form-field {
+    .formfield {
       width: 100%;
     }
 

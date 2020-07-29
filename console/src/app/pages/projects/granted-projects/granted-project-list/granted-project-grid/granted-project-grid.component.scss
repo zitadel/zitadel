@@ -106,19 +106,6 @@
         flex: 1;
       }
 
-      .icons {
-        margin-top: 1rem;
-        transition: all .3s;
-        opacity: 0;
-
-        .icon {
-          margin-right: 3px;
-          font-size: 1.3rem;
-          height: 1.4rem;
-          color: #8795a1;
-        }
-      }
-
       span {
         margin: 2px 0;
       }
@@ -133,10 +120,6 @@
       margin: 0;
       margin-bottom: .25rem;
       color: #8795a1;
-
-      &:hover {
-        color: white;
-      }
 
       &.selected {
         opacity: 1;

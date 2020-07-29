@@ -1,8 +1,10 @@
 @import '~@angular/material/theming';
 
 @mixin theme-card($theme) {
+  /* stylelint disable */
   $primary: map-get($theme, primary);
-  $primary-dark: mat-color($primary, a800);
+  $primary-dark: mat-color($primary, A800);
+  /* stylelint enable */
 
   .theme-conent,
   .crescent {

@@ -28,10 +28,6 @@
   }
 }
 
-.margin-right {
-  margin-right: .5rem;
-}
-
 .block {
   display: block;
 }
@@ -50,27 +46,6 @@
     &.autocomplete {
       margin-top: 1rem;
     }
-  }
-
-  .slider {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-size: .8rem;
-  }
-
-  .access-token {
-    width: 400px;
-  }
-}
-
-.content {
-  display: flex;
-  margin: 0 -.5rem;
-  flex-wrap: wrap;
-
-  mat-form-field {
-    flex: 1 0 40%;
-    margin: 0 .5rem;
   }
 }
 

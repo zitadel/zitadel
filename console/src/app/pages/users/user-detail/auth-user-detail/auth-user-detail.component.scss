@@ -1,28 +1,5 @@
-h1 {
+.h1 {
   margin-top: 0;
-}
-
-.avatar-section {
-  display: flex;
-  align-items: center;
-
-  span {
-    color: #8795a1;
-    text-transform: uppercase;
-    margin-right: 3rem;
-    font-size: .9rem;
-  }
-
-  img {
-    height: 80px;
-    width: 80px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 50%;
-    margin: .5rem;
-    border: 2px solid #8795a1;
-  }
 }
 
 .sub {
@@ -51,22 +28,6 @@ h1 {
       visibility: visible;
       opacity: 1;
     }
-  }
-}
-
-.content {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -.5rem;
-
-  &.nowrap {
-    flex-wrap: nowrap;
-  }
-
-  mat-form-field {
-    flex: 1;
-    margin: 0 .5rem;
   }
 }
 
@@ -112,7 +73,7 @@ h1 {
       color: #8795a1;
     }
 
-    mat-icon {
+    .icon {
       margin-right: .5rem;
     }
 
@@ -142,9 +103,9 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  margin: -.5rem;
+  margin: -1.5rem -.5rem;
 
-  app-card {
+  .app-card {
     flex: 1;
     margin: .5rem;
   }
@@ -154,20 +115,6 @@ h1 {
 
     @media only screen and (max-width: 450px) {
       max-width: none;
-    }
-  }
-
-  .pwd-row {
-    display: flex;
-    align-items: center;
-
-    span {
-      flex: 1;
-    }
-
-    .title {
-      color: #8795a1;
-      font-size: .9rem;
     }
   }
 }
@@ -183,31 +130,11 @@ h1 {
       margin-bottom: .5rem;
       align-items: center;
 
-      button {
-        display: none;
-        visibility: hidden;
-      }
-
-      &:hover {
-        button {
-          display: inline-block;
-          visibility: visible;
-
-          mat-icon {
-            font-size: 1.2rem;
-          }
-        }
-      }
-
       .first {
         flex: 1;
         font-size: .8rem;
         margin-right: .5rem;
         white-space: nowrap;
-      }
-
-      .fill-space {
-        flex: 1;
       }
 
       .second {
@@ -217,78 +144,11 @@ h1 {
         margin-left: 1rem;
         text-align: right;
       }
-
-      a {
-        &:hover {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-      }
     }
 
-    .side-section {
-      color: #8795a1;
+    .changes {
+      flex: 1;
+      min-height: 0;
     }
-  }
-
-  .details {
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #81868a40;
-    padding-bottom: 1rem;
-
-    .row {
-      display: flex;
-      margin-bottom: .5rem;
-      align-items: center;
-
-      button {
-        display: none;
-        visibility: hidden;
-      }
-
-      &:hover {
-        button {
-          display: inline-block;
-          visibility: visible;
-
-          mat-icon {
-            font-size: 1.2rem;
-          }
-        }
-      }
-
-      .first {
-        flex: 1;
-        font-size: .8rem;
-        margin-right: .5rem;
-      }
-
-      .fill-space {
-        flex: 1;
-      }
-
-      .second {
-        font-size: .8rem;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        margin-left: 1rem;
-      }
-
-      a {
-        &:hover {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .side-section {
-      color: #8795a1;
-    }
-  }
-
-  app-changes {
-    flex: 1;
-    min-height: 0;
   }
 }
