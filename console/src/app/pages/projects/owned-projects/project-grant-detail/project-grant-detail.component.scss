@@ -1,45 +1,45 @@
 
 .master-row {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
 
-    .left-col {
+  .left-col {
     flex: 1;
     display: flex;
     flex-direction: column;
     margin-bottom: 2rem;
 
     .row {
-        max-width: 400px;
-        display: flex;
-        align-items: center;
-        padding: .5rem 0;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      padding: .5rem 0;
 
-        span {
+      span {
         font-size: .9rem;
-        }
+      }
 
-        .first {
+      .first {
         color: #8795a1;
-        }
+      }
     }
-    }
+  }
 
-    .fill-space {
+  .fill-space {
     flex: 1;
-    }
+  }
 
-    .state-button {
+  .state-button {
     border-radius: .5rem;
-    }
+  }
 }
 
 .formfield {
-    width: 100%;
+  width: 100%;
 }
 
 .divider {
-    height: 1px;
-    background-color: #ffffff20;
+  height: 1px;
+  background-color: #ffffff20;
 }
