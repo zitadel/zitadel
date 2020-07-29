@@ -69,6 +69,15 @@ func (r *UserMembershipSearchRequest) EnsureLimit(limit uint64) {
 	}
 }
 
+func (r *UserMembershipSearchRequest) GetSearchQuery(key UserMembershipSearchKey) (int, *UserMembershipSearchQuery) {
+	for i, q := range r.Queries {
+		if q.Key == key {
+			return i, q
+		}
+	}
+	return -1, nil
+}
+
 func (r *UserMembershipSearchRequest) AppendResourceOwnerQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserMembershipSearchQuery{Key: UserMembershipSearchKeyResourceOwner, Method: model.SearchMethodEquals, Value: orgID})
 }
