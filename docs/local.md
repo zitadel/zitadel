@@ -31,4 +31,3 @@ cockroachdb/cockroach:latest start --insecure
 
 #### Should show eventstore, management, admin, auth
 `show databases;`
-

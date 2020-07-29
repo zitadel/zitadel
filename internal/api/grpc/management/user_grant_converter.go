@@ -58,6 +58,7 @@ func userGrantUpdateToModel(u *management.UserGrantUpdate) *grant_model.UserGran
 	return &grant_model.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: u.Id},
 		RoleKeys:   u.RoleKeys,
+		GrantID:    u.GrantId,
 	}
 }
 
