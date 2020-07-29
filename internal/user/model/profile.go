@@ -22,3 +22,9 @@ type Profile struct {
 func (p *Profile) IsValid() bool {
 	return p.FirstName != "" && p.LastName != ""
 }
+
+func (p *Profile) SetNamesAsDisplayname() {
+	if p.DisplayName == "" && p.FirstName != "" && p.LastName != "" {
+		p.DisplayName = p.FirstName + " " + p.LastName
+	}
+}
