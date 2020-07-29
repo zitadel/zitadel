@@ -1,6 +1,8 @@
 package eventstore
 
 const (
-	orgReadPerm     = "org.read"
-	projectReadPerm = "project.read"
+	projectReadPerm            = "project.read"
+	orgMemberReadPerm          = "org.member.read"
+	projectMemberReadPerm      = "project.member.read"
+	projectGrantMemberReadPerm = "project.member.read"
 )

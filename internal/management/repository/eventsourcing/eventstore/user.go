@@ -247,9 +247,10 @@ func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_mo
 
 func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_model.UserMembershipSearchRequest, sequence *repository.CurrentSequence) *usr_model.UserMembershipSearchResponse {
 	permissions := authz.GetAllPermissionsFromCtx(ctx)
-	orgPerm := authz.HasGlobalExplicitPermission(permissions, orgReadPerm)
-	projectPerm := authz.HasGlobalExplicitPermission(permissions, projectReadPerm)
-	if orgPerm && projectPerm {
+	orgPerm := authz.HasGlobalExplicitPermission(permissions, orgMemberReadPerm)
+	projectPerm := authz.HasGlobalExplicitPermission(permissions, projectMemberReadPerm)
+	projectGrantPerm := authz.HasGlobalExplicitPermission(permissions, projectGrantMemberReadPerm)
+	if orgPerm && projectPerm && projectGrantPerm {
 		return nil
 	}
 
@@ -257,7 +258,8 @@ func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_mo
 		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: int32(usr_model.MemberTypeOrganisation)})
 	}
 
-	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectReadPerm)
+	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectMemberReadPerm)
+	ids = append(ids, authz.GetExplicitPermissionCtxIDs(permissions, projectGrantMemberReadPerm)...)
 	if _, q := request.GetSearchQuery(usr_model.UserMembershipSearchKeyObjectID); q != nil {
 		containsID := false
 		for _, id := range ids {
