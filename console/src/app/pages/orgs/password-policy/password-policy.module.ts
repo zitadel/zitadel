@@ -9,6 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 
 import { PasswordPolicyRoutingModule } from './password-policy-routing.module';
 import { PasswordPolicyComponent } from './password-policy.component';
@@ -27,6 +28,7 @@ import { PasswordPolicyComponent } from './password-policy.component';
         HasRoleModule,
         MatTooltipModule,
         TranslateModule,
+        DetailLayoutModule,
     ],
 })
 export class PasswordPolicyModule { }
