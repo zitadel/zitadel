@@ -108,11 +108,7 @@ func ProjectRemovedAggregate(ctx context.Context, aggCreator *es_models.Aggregat
 	if err != nil {
 		return nil, err
 	}
-	agg, err = agg.AppendEvent(model.ProjectRemoved, existing)
-	if err != nil {
-		return nil, err
-	}
-	return agg, nil
+	return agg.AppendEvent(model.ProjectRemoved, existing)
 }
 
 func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {

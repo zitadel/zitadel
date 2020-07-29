@@ -46,10 +46,6 @@ func (p *Project) Reduce(event *models.Event) (err error) {
 		}
 		err = project.AppendEvent(event)
 	case es_model.ProjectRemoved:
-		err := project.AppendEvent(event)
-		if err != nil {
-			return err
-		}
 		return p.view.DeleteProject(event.AggregateID, event.Sequence)
 	default:
 		return p.view.ProcessedProjectSequence(event.Sequence)

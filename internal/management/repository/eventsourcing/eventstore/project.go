@@ -102,14 +102,7 @@ func (repo *ProjectRepo) RemoveProject(ctx context.Context, projectID string) er
 			aggregates = append(aggregates, agg)
 		}
 	}
-	if err != nil {
-		return err
-	}
-	err = es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
 }
 
 func (repo *ProjectRepo) SearchProjects(ctx context.Context, request *proj_model.ProjectViewSearchRequest) (*proj_model.ProjectViewSearchResponse, error) {
