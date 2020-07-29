@@ -1,11 +1,11 @@
 @import '~@angular/material/theming';
 
 @mixin meta-theme($theme) {
-  /* stylelint disable */
+  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat-color($primary, 500);
   $primary-dark: mat-color($primary, A800);
-  /* stylelint enable */
+  /* stylelint-enable */
 
   $lighter-color: rgba(mat-color($primary, 300), .5);
 

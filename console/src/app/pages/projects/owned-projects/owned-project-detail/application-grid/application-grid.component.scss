@@ -1,12 +1,12 @@
 @import '~@angular/material/theming';
 
 @mixin application-grid-theme($theme) {
-  /* stylelint disable */
+  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-dark: mat-color($primary, A900);
   $accent: map-get($theme, accent);
   $accent-color: mat-color($accent, 500);
-  /* stylelint enable */
+  /* stylelint-enable */
 
   .app-grid-header {
     display: flex;

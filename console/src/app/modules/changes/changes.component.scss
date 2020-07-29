@@ -36,10 +36,10 @@
         overflow-x: auto;
         font-size: 14px;
       }
-      /* stylelint disable */
+      /* stylelint-disable */
       $primary: map-get($theme, primary);
       $primary-dark: mat-color($primary, A800);
-      /* stylelint enable */
+      /* stylelint-enable */
 
       &.change-item-back {
         background-color: rgba($primary-dark, .93);

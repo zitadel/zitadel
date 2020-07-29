@@ -1,7 +1,7 @@
 @import '~@angular/material/theming';
 
 @mixin sidenav-list-theme($theme) {
-  /* stylelint disable */
+  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
   $primary-color: mat-color($primary, 500);
@@ -9,7 +9,7 @@
   $primary-dark: mat-color($primary, A900);
   $inverse-color: mat-color($primary, A600);
   $sec-dark: mat-color($primary, A800);
-  /* stylelint enable */
+  /* stylelint-enable */
 
   .mat-menu-item {
     &.show-all {
