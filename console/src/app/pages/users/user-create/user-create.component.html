@@ -1,100 +1,87 @@
-<div class="max-width-container">
-    <div class="container">
-        <div class="left">
-            <a [routerLink]="[ '/users']" mat-icon-button>
-                <mat-icon class="icon">arrow_back</mat-icon>
-            </a>
+<app-detail-layout [backRouterLink]="[ '/users/all']" title="{{ 'USER.CREATE.TITLE' | translate }}"
+    description="{{ 'USER.CREATE.DESCRIPTION' | translate }}">
+    <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
+
+    <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
+        <div class="content">
+            <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.EMAIL' | translate }}</mat-label>
+                <input matInput formControlName="email" required />
+                <mat-error *ngIf="email?.invalid && email?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.USERNAME' | translate }}</mat-label>
+                <input matInput formControlName="userName" required />
+                <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+                <mat-error *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
+                    {{ 'USER.VALIDATION.NOEMAIL' | translate }}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</mat-label>
+                <input matInput formControlName="firstName" required />
+                <mat-error *ngIf="firstName?.invalid && firstName?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</mat-label>
+                <input matInput formControlName="lastName" required />
+                <mat-error *ngIf="lastName?.invalid && lastName?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</mat-label>
+                <input matInput formControlName="nickName" />
+                <mat-error *ngIf="nickName?.invalid && nickName?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
+
+            <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
+
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.GENDER' | translate }}</mat-label>
+                <mat-select formControlName="gender">
+                    <mat-option *ngFor="let gender of genders" [value]="gender">
+                        {{ 'GENDERS.'+gender | translate }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="gender?.invalid && gender?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</mat-label>
+                <mat-select formControlName="preferredLanguage">
+                    <mat-option *ngFor="let language of languages" [value]="language">
+                        {{ 'LANGUAGES.'+language | translate }}
+                    </mat-option>
+                    <mat-error *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
+                        {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                    </mat-error>
+                </mat-select>
+            </mat-form-field>
+
+            <p class="section">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
+
+            <mat-form-field class="formfield">
+                <mat-label>{{ 'USER.PROFILE.PHONE' | translate }}</mat-label>
+                <input matInput formControlName="phone" />
+                <mat-error *ngIf="phone?.invalid && phone?.errors?.required">
+                    {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </mat-error>
+            </mat-form-field>
         </div>
-        <div class="right">
-            <div class="head">
-                <h1 class="h1">{{ 'USER.CREATE.TITLE' | translate }}</h1>
-                <p class="desc">{{ 'USER.CREATE.DESCRIPTION' | translate }}</p>
-            </div>
-
-            <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
-
-            <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
-                <div class="content">
-                    <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.EMAIL' | translate }}</mat-label>
-                        <input matInput formControlName="email" required />
-                        <mat-error *ngIf="email?.invalid && email?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.USERNAME' | translate }}</mat-label>
-                        <input matInput formControlName="userName" required />
-                        <mat-error *ngIf="userName?.invalid && userName?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                        <mat-error *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
-                            {{ 'USER.VALIDATION.NOEMAIL' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</mat-label>
-                        <input matInput formControlName="firstName" required />
-                        <mat-error *ngIf="firstName?.invalid && firstName?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</mat-label>
-                        <input matInput formControlName="lastName" required />
-                        <mat-error *ngIf="lastName?.invalid && lastName?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</mat-label>
-                        <input matInput formControlName="nickName" />
-                        <mat-error *ngIf="nickName?.invalid && nickName?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-
-                    <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
-
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.GENDER' | translate }}</mat-label>
-                        <mat-select formControlName="gender">
-                            <mat-option *ngFor="let gender of genders" [value]="gender">
-                                {{ 'GENDERS.'+gender | translate }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="gender?.invalid && gender?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</mat-label>
-                        <mat-select formControlName="preferredLanguage">
-                            <mat-option *ngFor="let language of languages" [value]="language">
-                                {{ 'LANGUAGES.'+language | translate }}
-                            </mat-option>
-                            <mat-error *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
-                                {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                            </mat-error>
-                        </mat-select>
-                    </mat-form-field>
-
-                    <p class="section">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
-
-                    <mat-form-field class="formfield">
-                        <mat-label>{{ 'USER.PROFILE.PHONE' | translate }}</mat-label>
-                        <input matInput formControlName="phone" />
-                        <mat-error *ngIf="phone?.invalid && phone?.errors?.required">
-                            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-                <div class="btn-container">
-                    <button color="primary" [disabled]="userForm.invalid" type="submit"
-                        mat-raised-button>{{ 'ACTIONS.CREATE' | translate }}</button>
-                </div>
-            </form>
+        <div class="btn-container">
+            <button color="primary" [disabled]="userForm.invalid" type="submit"
+                mat-raised-button>{{ 'ACTIONS.CREATE' | translate }}</button>
         </div>
-    </div>
-</div>
+    </form>
+</app-detail-layout>

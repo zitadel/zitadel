@@ -8,6 +8,6 @@ import { RouterLink } from '@angular/router';
 })
 export class DetailLayoutComponent {
     @Input() backRouterLink!: RouterLink;
-    @Input() title: string = '';
-    @Input() description: string = '';
+    @Input() title: string | null = '';
+    @Input() description: string | null = '';
 }

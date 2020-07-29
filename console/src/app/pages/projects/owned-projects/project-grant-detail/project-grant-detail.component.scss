@@ -1,93 +1,45 @@
-.container {
-  display: flex;
-  padding-bottom: 3rem;
 
-  .h1 {
-    font-size: 1.2rem;
-  }
-
-  .desc {
-    display: block;
-    font-size: .9rem;
-    color: #8795a1;
-  }
-
-  .left {
-    width: 100px;
+.master-row {
     display: flex;
-    padding: 1rem;
-    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
 
-    a {
-      margin-top: .2rem;
-    }
-  }
-
-  .right {
+    .left-col {
     flex: 1;
-    padding-top: 1rem;
-    overflow-x: auto;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
 
-    .head {
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid #ffffff20;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-
-      a {
-        display: block;
-      }
-
-      .h1 {
-        margin-top: .2rem;
-        font-size: 2rem;
-      }
-    }
-
-    .master-row {
-      display: flex;
-      flex-wrap: wrap;
-      width: 100%;
-
-      .left-col {
-        flex: 1;
+    .row {
+        max-width: 400px;
         display: flex;
-        flex-direction: column;
-        margin-bottom: 2rem;
+        align-items: center;
+        padding: .5rem 0;
 
-        .row {
-          max-width: 400px;
-          display: flex;
-          align-items: center;
-          padding: .5rem 0;
-
-          span {
-            font-size: .9rem;
-          }
-
-          .first {
-            color: #8795a1;
-          }
+        span {
+        font-size: .9rem;
         }
-      }
 
-      .fill-space {
-        flex: 1;
-      }
-
-      .state-button {
-        border-radius: .5rem;
-      }
+        .first {
+        color: #8795a1;
+        }
+    }
     }
 
-    .formfield {
-      width: 100%;
+    .fill-space {
+    flex: 1;
     }
 
-    .divider {
-      height: 1px;
-      background-color: #ffffff20;
+    .state-button {
+    border-radius: .5rem;
     }
-  }
+}
+
+.formfield {
+    width: 100%;
+}
+
+.divider {
+    height: 1px;
+    background-color: #ffffff20;
 }
