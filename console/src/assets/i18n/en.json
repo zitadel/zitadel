@@ -461,6 +461,8 @@
             "DETAIL": {
                 "TITLE":"Managers of the granted organisation",
                 "DESC":"These are the Managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
+                "MEMBERTITLE":"Managers",
+                "MEMBERDESC":"These are the Managers of the granted organization. Add users here, who should gain access to edit data of the project.",
                 "PROJECTNAME":"Project Name",
                 "RESOURCEOWNER":"Resource Owner"
             },
