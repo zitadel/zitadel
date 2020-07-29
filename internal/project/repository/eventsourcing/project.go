@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
@@ -97,6 +98,21 @@ func projectStateAggregate(aggCreator *es_models.AggregateCreator, project *mode
 		}
 		return agg.AppendEvent(state, nil)
 	}
+}
+
+func ProjectRemovedAggregate(ctx context.Context, aggCreator *es_models.AggregateCreator, existing *model.Project) (*es_models.Aggregate, error) {
+	if existing == nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Cj7lb", "Errors.Internal")
+	}
+	agg, err := ProjectAggregate(ctx, aggCreator, existing)
+	if err != nil {
+		return nil, err
+	}
+	agg, err = agg.AppendEvent(model.ProjectRemoved, existing)
+	if err != nil {
+		return nil, err
+	}
+	return agg, nil
 }
 
 func ProjectMemberAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Project, member *model.ProjectMember) func(ctx context.Context) (*es_models.Aggregate, error) {
