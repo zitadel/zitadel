@@ -5,6 +5,7 @@
   "extends": "stylelint-config-standard",
   "rules": {
     "at-rule-no-unknown": null,
+    "no-descending-specificity": false,
     "at-rule-empty-line-before": [
       "always",
       {
@@ -32,7 +33,7 @@
     "max-line-length": 125,
     "no-empty-source": null,
     "number-leading-zero": "never",
-    "scss/at-rule-no-unknown": true,
+    "scss/at-rule-no-unknown": null,
     "scss/at-else-if-parentheses-space-before": "always",
     "scss/at-function-parentheses-space-before": "never",
     "scss/at-if-closing-brace-newline-after": "always-last-in-chain",
