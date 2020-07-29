@@ -1,92 +1,95 @@
 .container {
+  display: flex;
+  padding-bottom: 3rem;
+
+  .left {
+    width: 100px;
     display: flex;
-    padding-bottom: 3rem;
+    padding: 1rem;
+    justify-content: center;
 
-    .left {
-        width: 100px;
-        display: flex;
-        padding: 1rem;
-        justify-content: center;
-
-        a {
-            margin-top: .2rem;
-        }
+    a {
+      margin-top: .2rem;
     }
+  }
 
-    .right {
-        flex: 1;
-        padding-top: 1rem;
-        padding-right: 1rem;
+  .right {
+    flex: 1;
+    padding-top: 1rem;
+    padding-right: 1rem;
 
-        .head {
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #ffffff20;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-          
-            a {
-                display: block;
-            }
-          
-            h1 {
-                font-size: 1.2rem;
-            }
-          
-            .desc {
-                width: 100%;
-                display: block;
-                font-size: .9rem;
-                color: #8795a1;
-            }
-        }
+    .head {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ffffff20;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+
+      a {
+        display: block;
+      }
+
+      h1 {
+        font-size: 1.2rem;
+      }
+
+      .desc {
+        width: 100%;
+        display: block;
+        font-size: .9rem;
+        color: #8795a1;
+      }
     }
+  }
 }
 
 .icon-button {
-    margin-right: .5rem;
+  margin-right: .5rem;
 }
 
 .add-button {
-    border-radius: .5rem;
+  border-radius: .5rem;
 }
 
 .table-wrapper {
-    overflow: auto;
+  overflow: auto;
 
-    table, mat-paginator {
-        width: 100%;
+  table,
+  mat-paginator {
+    width: 100%;
 
-        td, th {
-            padding: .5rem;
-            &:first-child {
-                padding-left: 0;
-                padding-right: 1rem;
-            }
+    td,
+    th {
+      padding: .5rem;
 
-            &:last-child {
-                padding-right: 0;
-            }
-        }
+      &:first-child {
+        padding-left: 0;
+        padding-right: 1rem;
+      }
 
-        .action {
-            width: 40px;
-        }
-
-        .data-row {
-            &:hover {
-                background-color: #ffffff05;
-            }
-        }
-
-        .selection {
-            width: 50px;
-            max-width: 50px;
-        }
+      &:last-child {
+        padding-right: 0;
+      }
     }
+
+    .action {
+      width: 40px;
+    }
+
+    .data-row {
+      &:hover {
+        background-color: #ffffff05;
+      }
+    }
+
+    .selection {
+      width: 50px;
+      max-width: 50px;
+    }
+  }
 }
 
 .pointer {
-    outline: none;
-    cursor: pointer;
+  outline: none;
+  cursor: pointer;
 }

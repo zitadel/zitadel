@@ -1,0 +1,47 @@
+{
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "at-rule-no-unknown": null,
+    "at-rule-empty-line-before": [
+      "always",
+      {
+        "except": [
+          "blockless-after-same-name-blockless",
+          "first-nested"
+        ],
+        "ignore": [
+          "after-comment"
+        ],
+        "ignoreAtRules": [
+          "else"
+        ]
+      }
+    ],
+    "block-closing-brace-newline-after": [
+      "always",
+      {
+        "ignoreAtRules": [
+          "if",
+          "else"
+        ]
+      }
+    ],
+    "max-line-length": 125,
+    "no-empty-source": null,
+    "number-leading-zero": "never",
+    "scss/at-rule-no-unknown": true,
+    "scss/at-else-if-parentheses-space-before": "always",
+    "scss/at-function-parentheses-space-before": "never",
+    "scss/at-if-closing-brace-newline-after": "always-last-in-chain",
+    "scss/at-import-no-partial-leading-underscore": true,
+    "scss/at-mixin-argumentless-call-parentheses": "always",
+    "scss/at-mixin-parentheses-space-before": "never",
+    "scss/dollar-variable-colon-newline-after": "always-multi-line",
+    "scss/dollar-variable-colon-space-after": "always-single-line",
+    "scss/double-slash-comment-whitespace-inside": "always",
+    "scss/no-duplicate-dollar-variables": true
+  }
+}

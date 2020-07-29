@@ -1,93 +1,95 @@
 @import '~@angular/material/theming';
 
 @mixin sidenav-list-theme($theme) {
-    $primary: map-get($theme, primary);
-    $accent: map-get($theme, accent);
-    $primary-color: mat-color($primary, 500);
-    $accent-color: mat-color($accent, 500);
-    $primary-dark: mat-color($primary, A900);
-    $inverse-color: mat-color($primary, A600);
-    $sec-dark: mat-color($primary, A800);
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $primary-color: mat-color($primary, 500);
+  $accent-color: mat-color($accent, 500);
+  $primary-dark: mat-color($primary, a900);
+  $inverse-color: mat-color($primary, a600);
+  $sec-dark: mat-color($primary, a800);
 
-    .mat-menu-item {
-        &.show-all {
-            height: 2rem;
-            line-height: 2rem;
-            color: mat-color($primary, A700);
-        } 
+  .mat-menu-item {
+    &.show-all {
+      height: 2rem;
+      line-height: 2rem;
+      color: mat-color($primary, a700);
+    }
+  }
+
+  .nav-item {
+    color: inherit;
+
+    &:hover {
+      background-color: $sec-dark;
+      border-top-right-radius: 1.5rem;
+      border-bottom-right-radius: 1.5rem;
     }
 
-    .nav-item {
-        color: inherit;
-
-        &:hover {
-            background-color: $sec-dark;
-            border-top-right-radius: 1.5rem;
-            border-bottom-right-radius: 1.5rem;
-        }
-
-        &.active {
-            color: $primary-color !important;
-            background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
-        }
-
-        .c_label {
-            .count {
-                background-color: $primary-color;
-                padding: 3px 6px;
-                border-radius: 50vw;
-                color: white;
-            }
-        }
+    &.active {
+      color: $primary-color !important;
+      background-color: rgba($color: $primary-color, $alpha: .1) !important;
     }
 
-    .mat-menu-content, .mat-menu-panel {
-        background-color: $primary-dark;
-        border-radius: .5rem;
-        @include mat-elevation(5);
-
-        .active {
-            color: $primary-color !important;
-            background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
-
-            mat-icon {
-                color: $primary-color !important;
-            }
-        }
-    }
-
-    .root-header {
-        box-shadow: 0 5px 10px rgba(0,0,0,0.12);
-        background-color: $primary-dark !important;
-        transition: background-color .4s ease-in-out;
-    }
-
-    .admin-line {
-        background: $accent-color;
+    .c_label {
+      .count {
+        background-color: $primary-color;
+        padding: 3px 6px;
+        border-radius: 50vw;
         color: white;
-        margin-right: 1rem;
-        border-top-right-radius: 50vw;
-        border-bottom-right-radius: 50vw;
-
-        // &::after {
-        //     content: '';
-        //     position: absolute;
-        //     width: 0;
-        //     bottom: 0;
-        //     right: 0;
-        //     border-bottom: 20px solid $primary-dark;
-        //     border-left: 20px solid transparent;
-        // }
-
-        &::before {
-            content: '';
-            position: absolute;
-            width: 0;
-            bottom: 0;
-            left: 0;
-            border-bottom: 20px solid $primary-dark;
-            border-right: 20px solid transparent;
-            transition: border-color .4s ease-in-out;
-        }
+      }
     }
+  }
+
+  .mat-menu-content,
+  .mat-menu-panel {
+    background-color: $primary-dark;
+    border-radius: .5rem;
+
+    @include mat-elevation(5);
+
+    .active {
+      color: $primary-color !important;
+      background-color: rgba($color: $primary-color, $alpha: .1) !important;
+
+      mat-icon {
+        color: $primary-color !important;
+      }
+    }
+  }
+
+  .root-header {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+    background-color: $primary-dark !important;
+    transition: background-color .4s ease-in-out;
+  }
+
+  .admin-line {
+    background: $accent-color;
+    color: white;
+    margin-right: 1rem;
+    border-top-right-radius: 50vw;
+    border-bottom-right-radius: 50vw;
+
+    // &::after {
+    //     content: '';
+    //     position: absolute;
+    //     width: 0;
+    //     bottom: 0;
+    //     right: 0;
+    //     border-bottom: 20px solid $primary-dark;
+    //     border-left: 20px solid transparent;
+    // }
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 0;
+      bottom: 0;
+      left: 0;
+      border-bottom: 20px solid $primary-dark;
+      border-right: 20px solid transparent;
+      transition: border-color .4s ease-in-out;
+    }
+  }
 }

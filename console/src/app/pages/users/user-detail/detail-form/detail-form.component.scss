@@ -1,25 +1,25 @@
 
 .content {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: 0 -.5rem; 
-  
-    &.nowrap{
-      flex-wrap: nowrap;
-    }
-  
-    mat-form-field {
-      flex: 1 1 33%;
-      margin: 0 .5rem;
-    }
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -.5rem;
+
+  &.nowrap {
+    flex-wrap: nowrap;
   }
 
+  mat-form-field {
+    flex: 1 1 33%;
+    margin: 0 .5rem;
+  }
+}
+
 .btn-container {
-    display: flex;
-    justify-content: flex-end;
-    
-    button {
-        border-radius: .5rem;
-    }
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    border-radius: .5rem;
+  }
 }

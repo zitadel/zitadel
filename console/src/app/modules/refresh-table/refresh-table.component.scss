@@ -1,31 +1,32 @@
 
 .table-header-row {
+  display: flex;
+  align-items: center;
+
+  .col {
     display: flex;
-    align-items: center;
+    flex-direction: column;
 
-    .col {
-        display: flex;
-        flex-direction: column;
-
-        .desc {
-            font-size: .8rem;
-            color: #8795a1;
-        }
-        .count {
-            font-size: 2rem;
-        }
+    .desc {
+      font-size: .8rem;
+      color: #8795a1;
     }
 
-    mat-spinner {
-        margin-top: 2px;
-        margin-bottom: 1px;
+    .count {
+      font-size: 2rem;
     }
+  }
 
-    .fill-space {
-        flex: 1;
-    }
+  mat-spinner {
+    margin-top: 2px;
+    margin-bottom: 1px;
+  }
 
-    .icon-button {
-        margin-right: .5rem;
-    }
+  .fill-space {
+    flex: 1;
+  }
+
+  .icon-button {
+    margin-right: .5rem;
+  }
 }

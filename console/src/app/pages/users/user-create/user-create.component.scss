@@ -1,82 +1,81 @@
 
 .container {
+  display: flex;
+  padding-bottom: 3rem;
+
+  .left {
+    width: 100px;
     display: flex;
-    padding-bottom: 3rem;
+    padding: 1rem;
+    justify-content: center;
 
-    .left {
-        width: 100px;
+    a {
+      margin-top: .2rem;
+    }
+  }
+
+  .right {
+    flex: 1;
+
+    .head {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ffffff20;
+      flex-wrap: wrap;
+
+      a {
+        display: block;
+      }
+
+      h1 {
+        font-size: 1.2rem;
+      }
+
+      .desc {
+        width: 100%;
+        display: block;
+        font-size: .9rem;
+        color: #8795a1;
+      }
+    }
+
+    .form {
+      padding-top: 1rem;
+
+      .btn-container {
         display: flex;
-        padding: 1rem;
-        justify-content: center;
+        justify-content: flex-end;
 
-        a {
-            margin-top: .2rem;
+        button {
+          margin-top: 3rem;
+          display: block;
+          padding: .5rem 4rem;
+          border-radius: .5rem;
         }
+      }
     }
 
-    .right {
-        flex: 1;
-        .head {
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #ffffff20;
-            flex-wrap: wrap;
-          
-            a {
-                display: block;
-            }
-          
-            h1 {
-                font-size: 1.2rem;
-            }
-          
-            .desc {
-                width: 100%;
-                display: block;
-                font-size: .9rem;
-                color: #8795a1;
-            }
-        }
+    .content {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      margin: 0 -.5rem;
 
-        .form {
-            padding-top: 1rem;
+      .section {
+        padding: .5rem;
+        flex-basis: 100%;
+        color: #8795a1;
+        font-size: .9rem;
+      }
 
-            .btn-container {
-                display: flex;
-                justify-content: flex-end;
-                button {
-                    margin-top: 3rem;
-                    display: block;
-                    padding: 0.5rem 4rem;
-                    border-radius: 0.5rem;
-                }
-            }
-        }
-          
-        .content {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            margin: 0 -.5rem; 
+      &.nowrap {
+        flex-wrap: nowrap;
+      }
 
-            .section {
-                padding: .5rem;
-                flex-basis: 100%;
-                color: #8795a1;
-                font-size: .9rem;
-            }
-        
-            &.nowrap{
-                flex-wrap: nowrap;
-            }
-        
-            mat-form-field {
-                flex: 1 0 33%;
-                margin: 0 .5rem;
-            }
-        }
+      mat-form-field {
+        flex: 1 0 33%;
+        margin: 0 .5rem;
+      }
     }
+  }
 }
-
-
-

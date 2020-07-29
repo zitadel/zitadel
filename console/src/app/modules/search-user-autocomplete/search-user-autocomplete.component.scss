@@ -1,47 +1,48 @@
 .full-width {
-    width: 100%;
+  width: 100%;
 }
 
 .target-desc {
-    color: #8795a1;
-    font-size: .8rem;
-    margin: 0;
-    margin-bottom: 1rem;
+  color: #8795a1;
+  font-size: .8rem;
+  margin: 0;
+  margin-bottom: 1rem;
 
-    a {
-        color: #4072b4;
-        &:hover {
-            cursor: pointer;
-            color: #6992c9;
-            text-decoration: underline;
-        }
+  a {
+    color: #4072b4;
+
+    &:hover {
+      cursor: pointer;
+      color: #6992c9;
+      text-decoration: underline;
     }
+  }
 }
 
 .line {
-    width: 100%;
-    display: flex;
+  width: 100%;
+  display: flex;
 
-    mat-form-field {
-        flex: 1;
-    }
+  mat-form-field {
+    flex: 1;
+  }
 
-    button {
-        margin-top: 1rem;
-    }
+  button {
+    margin-top: 1rem;
+  }
 }
 
 .sm-dlt {
-    cursor: pointer;
-    font-size: .8rem;
+  cursor: pointer;
+  font-size: .8rem;
 }
 
 .found-user-row {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .found-label {
-    font-size: .9rem;
-    color: #8795a1;
+  font-size: .9rem;
+  color: #8795a1;
 }

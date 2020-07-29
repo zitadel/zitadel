@@ -2,18 +2,18 @@
 @import '~@angular/material/theming';
 
 @mixin avatar-theme($theme) {
-    $primary: map-get($theme, primary);
-    $primary-color: mat-color($primary, 500);
+  $primary: map-get($theme, primary);
+  $primary-color: mat-color($primary, 500);
 
-    .avatar-circle {
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-transform: uppercase;
-        background-color: $primary-color;
-        box-sizing: border-box;
-        outline: none;
-        color: white;
-    }
+  .avatar-circle {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    background-color: $primary-color;
+    box-sizing: border-box;
+    outline: none;
+    color: white;
+  }
 }

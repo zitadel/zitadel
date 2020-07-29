@@ -8,12 +8,12 @@
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 
 @mixin component-themes($theme) {
-    @include avatar-theme($theme);
-    @include card-theme($theme);
-    @include table-theme($theme);
-    @include sidenav-list-theme($theme);
-    @include application-grid-theme($theme);
-    @include changes-theme($theme);
-    @include meta-theme($theme);
-    @include theme-card($theme);
+  @include avatar-theme($theme);
+  @include card-theme($theme);
+  @include table-theme($theme);
+  @include sidenav-list-theme($theme);
+  @include application-grid-theme($theme);
+  @include changes-theme($theme);
+  @include meta-theme($theme);
+  @include theme-card($theme);
 }
