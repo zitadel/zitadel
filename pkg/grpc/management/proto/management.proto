@@ -2537,7 +2537,6 @@ message UserGrantUpdate {
     string user_id = 1;
     string id = 2;
     repeated string role_keys = 3;
-    string grant_id = 4;
 }
 
 message UserGrantRemoveBulk {
