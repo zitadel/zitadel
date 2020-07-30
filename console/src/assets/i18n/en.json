@@ -152,7 +152,6 @@
             "SET":"Set new Password",
             "RESENDNOTIFICATION": "Resend Password Reset Link",
             "REQUIRED": "Some required fields are missing!",
-            "MINLENGTHCHARSLEFT":"The password is not long enough {{value}}/{{minLength}}",
             "MINLENGTHERROR":"The Password has to be at least {{value}} characters long",
             "NOTEQUAL":"The password provided is not equal!"
         },
