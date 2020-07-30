@@ -31,7 +31,7 @@ func UserMembershipsByAggregateID(db *gorm.DB, table, aggregateID string) ([]*mo
 	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{
 		Queries: []*usr_model.UserMembershipSearchQuery{aggregateIDQuery},
 	})
-	_, err := query(db, memberships)
+	_, err := query(db, &memberships)
 	return memberships, err
 }
 
