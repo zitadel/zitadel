@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/model"
@@ -55,4 +57,40 @@ func OIDCIDPConfigToModel(config *OIDCIDPConfig) *model.OIDCIDPConfig {
 		Issuer:       config.Issuer,
 		Scopes:       config.Scopes,
 	}
+}
+
+func (iam *Iam) appendAddOIDCIdpConfigEvent(event *es_models.Event) error {
+	config := new(OIDCIDPConfig)
+	err := config.setData(event)
+	if err != nil {
+		return err
+	}
+	config.ObjectRoot.CreationDate = event.CreationDate
+	if i, a := GetIDPConfig(iam.IDPs, config.IDPConfigID); a != nil {
+		iam.IDPs[i].Type = int32(model.IDPConfigTypeOIDC)
+		iam.IDPs[i].OIDCIDPConfig = config
+	}
+	return nil
+}
+
+func (iam *Iam) OIDCIDPConfig(event *es_models.Event) error {
+	config := new(OIDCIDPConfig)
+	err := config.setData(event)
+	if err != nil {
+		return err
+	}
+
+	if i, a := GetIDPConfig(iam.IDPs, config.IDPConfigID); a != nil {
+		iam.IDPs[i].OIDCIDPConfig.setData(event)
+	}
+	return nil
+}
+
+func (o *OIDCIDPConfig) setData(event *es_models.Event) error {
+	o.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, o); err != nil {
+		logging.Log("EVEN-Msh8s").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }

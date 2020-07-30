@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"github.com/caos/logging"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/iam/model"
 )
@@ -15,7 +17,7 @@ type IDPConfig struct {
 	OIDCIDPConfig *OIDCIDPConfig `json:"-"`
 }
 
-func GetIDPConfif(idps []*IDPConfig, id string) (int, *IDPConfig) {
+func GetIDPConfig(idps []*IDPConfig, id string) (int, *IDPConfig) {
 	for i, idp := range idps {
 		if idp.IDPConfigID == id {
 			return i, idp
@@ -80,4 +82,64 @@ func IDPConfigToModel(idp *IDPConfig) *model.IDPConfig {
 		converted.OIDCConfig = OIDCIDPConfigToModel(idp.OIDCIDPConfig)
 	}
 	return converted
+}
+
+func (iam *Iam) appendAddIdpConfigEvent(event *es_models.Event) error {
+	idp := new(IDPConfig)
+	err := idp.setData(event)
+	if err != nil {
+		return err
+	}
+	idp.ObjectRoot.CreationDate = event.CreationDate
+	iam.IDPs = append(iam.IDPs, idp)
+	return nil
+}
+
+func (iam *Iam) appendChangeIdpConfigEvent(event *es_models.Event) error {
+	idp := new(IDPConfig)
+	err := idp.setData(event)
+	if err != nil {
+		return err
+	}
+	if i, a := GetIDPConfig(iam.IDPs, idp.IDPConfigID); a != nil {
+		iam.IDPs[i].setData(event)
+	}
+	return nil
+}
+
+func (iam *Iam) appendRemoveIdpConfigEvent(event *es_models.Event) error {
+	idp := new(IDPConfig)
+	err := idp.setData(event)
+	if err != nil {
+		return err
+	}
+	if i, a := GetIDPConfig(iam.IDPs, idp.IDPConfigID); a != nil {
+		iam.IDPs[i] = iam.IDPs[len(iam.IDPs)-1]
+		iam.IDPs[len(iam.IDPs)-1] = nil
+		iam.IDPs = iam.IDPs[:len(iam.IDPs)-1]
+	}
+	return nil
+}
+
+func (iam *Iam) appendIdpConfigStateEvent(event *es_models.Event, state model.IDPConfigState) error {
+	idp := new(IDPConfig)
+	err := idp.setData(event)
+	if err != nil {
+		return err
+	}
+
+	if i, a := GetIDPConfig(iam.IDPs, idp.IDPConfigID); a != nil {
+		a.State = int32(state)
+		iam.IDPs[i] = a
+	}
+	return nil
+}
+
+func (c *IDPConfig) setData(event *es_models.Event) error {
+	c.ObjectRoot.AppendEvent(event)
+	if err := json.Unmarshal(event.Data, c); err != nil {
+		logging.Log("EVEN-Msj9w").WithError(err).Error("could not unmarshal event data")
+		return err
+	}
+	return nil
 }

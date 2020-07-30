@@ -73,7 +73,18 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 		err = i.appendChangeMemberEvent(event)
 	case IamMemberRemoved:
 		err = i.appendRemoveMemberEvent(event)
+	case IdpConfigAdded:
+		return i.appendAddIdpConfigEvent(event)
+	case IdpConfigChanged:
+		return i.appendChangeIdpConfigEvent(event)
+	case IdpConfigRemoved:
+		return i.appendRemoveIdpConfigEvent(event)
+	case IdpConfigDeactivated:
+		return i.appendIdpConfigStateEvent(event, model.IDPConfigStateInactive)
+	case IdpConfigReactivated:
+		return i.appendIdpConfigStateEvent(event, model.IDPConfigStateActive)
 	}
+
 	return err
 }
 
