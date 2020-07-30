@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
@@ -28,6 +29,7 @@ import { OrgCreateComponent } from './org-create.component';
         HasRolePipeModule,
         TranslateModule,
         MatCheckboxModule,
+        MatProgressSpinnerModule,
     ],
 })
 export class OrgCreateModule { }
