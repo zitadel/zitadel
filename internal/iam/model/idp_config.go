@@ -11,10 +11,13 @@ type IDPConfig struct {
 	Type        IDPConfigType
 	Name        string
 	LogoSrc     string
-	OIDCConfig  OIDCIDPConfig
+	State       IDPConfigState
+	OIDCConfig  *OIDCIDPConfig
 }
 
 type OIDCIDPConfig struct {
+	es_models.ObjectRoot
+	IDPConfigID        string
 	ClientID           string
 	ClientSecret       *crypto.CryptoValue
 	ClientSecretString string

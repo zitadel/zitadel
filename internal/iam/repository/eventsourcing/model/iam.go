@@ -19,6 +19,7 @@ type Iam struct {
 	GlobalOrgID  string       `json:"globalOrgId,omitempty"`
 	IamProjectID string       `json:"iamProjectId,omitempty"`
 	Members      []*IamMember `json:"-"`
+	IDPs         []*IDPConfig `json:"-"`
 }
 
 func IamFromModel(iam *model.Iam) *Iam {
