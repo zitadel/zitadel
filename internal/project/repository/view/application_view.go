@@ -42,7 +42,7 @@ func ApplicationByProjectIDAndAppName(db *gorm.DB, table, projectID, appName str
 	return app, err
 }
 
-func SearchApplications(db *gorm.DB, table string, req *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, int, error) {
+func SearchApplications(db *gorm.DB, table string, req *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {
 	apps := make([]*model.ApplicationView, 0)
 	query := repository.PrepareSearchQuery(table, model.ApplicationSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &apps)

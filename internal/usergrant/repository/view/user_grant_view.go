@@ -33,7 +33,7 @@ func UserGrantByIDs(db *gorm.DB, table, resourceOwnerID, projectID, userID strin
 	return user, err
 }
 
-func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearchRequest) ([]*model.UserGrantView, int, error) {
+func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearchRequest) ([]*model.UserGrantView, uint64, error) {
 	users := make([]*model.UserGrantView, 0)
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &users)

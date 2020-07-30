@@ -15,7 +15,7 @@ func (v *View) ProjectByID(projectID string) (*model.ProjectView, error) {
 	return view.ProjectByID(v.Db, projectTable, projectID)
 }
 
-func (v *View) SearchProjects(request *proj_model.ProjectViewSearchRequest) ([]*model.ProjectView, int, error) {
+func (v *View) SearchProjects(request *proj_model.ProjectViewSearchRequest) ([]*model.ProjectView, uint64, error) {
 	return view.SearchProjects(v.Db, projectTable, request)
 }
 
