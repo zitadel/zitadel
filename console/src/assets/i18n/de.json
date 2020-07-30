@@ -153,7 +153,7 @@
             "RESENDNOTIFICATION": "Passwort Reset Link senden.",
             "REQUIRED": "Bitte prüfe das alle notwendigen Felder befüllt sind.",
             "MINLENGTHCHARSLEFT":"Das Password entspricht nicht der Mindestlänge {{value}}/{{minLength}}",
-            "MINLENGTHERROR":"Passwort muss mindestens {{value}} lang sein",
+            "MINLENGTHERROR":"Das Passwort muss mindestens {{value}} Zeichen lang sein",
             "NOTEQUAL":"Das Passwort muss übereinstimmen!"
         },
         "EMAIL": "Email",

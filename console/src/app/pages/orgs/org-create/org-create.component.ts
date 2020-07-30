@@ -110,7 +110,6 @@ export class OrgCreateComponent {
     }
 
     private initForm(): void {
-        console.log('init without pwd');
         this.userForm = this.fb.group({
             userName: ['', [Validators.required]],
             firstName: ['', [Validators.required]],
@@ -125,11 +124,9 @@ export class OrgCreateComponent {
     public initPwdValidators(): void {
         const validators: Validators[] = [Validators.required];
 
-        console.log(this.usePassword);
         if (this.usePassword) {
             this.orgService.GetDefaultPasswordComplexityPolicy().then(data => {
                 this.policy = data.toObject();
-                console.log(this.policy);
 
                 if (this.policy.minLength) {
                     validators.push(Validators.minLength(this.policy.minLength));
