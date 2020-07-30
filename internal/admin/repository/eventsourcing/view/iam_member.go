@@ -16,7 +16,7 @@ func (v *View) IamMemberByIDs(orgID, userID string) (*model.IamMemberView, error
 	return view.IamMemberByIDs(v.Db, iamMemberTable, orgID, userID)
 }
 
-func (v *View) SearchIamMembers(request *iam_model.IamMemberSearchRequest) ([]*model.IamMemberView, int, error) {
+func (v *View) SearchIamMembers(request *iam_model.IamMemberSearchRequest) ([]*model.IamMemberView, uint64, error) {
 	return view.SearchIamMembers(v.Db, iamMemberTable, request)
 }
 

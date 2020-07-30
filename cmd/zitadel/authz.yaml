@@ -21,6 +21,7 @@ InternalAuthZ:
         - "user.grant.read"
         - "user.grant.write"
         - "user.grant.delete"
+        - "user.membership.read"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -57,6 +58,7 @@ InternalAuthZ:
         - "org.member.read"
         - "user.read"
         - "user.grant.read"
+        - "user.membership.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"
@@ -79,6 +81,7 @@ InternalAuthZ:
         - "user.grant.read"
         - "user.grant.write"
         - "user.grant.delete"
+        - "user.membership.read"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -111,6 +114,7 @@ InternalAuthZ:
         - "org.member.read"
         - "user.read"
         - "user.grant.read"
+        - "user.membership.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"
@@ -180,6 +184,7 @@ InternalAuthZ:
         - "user.grant.read"
         - "user.grant.write"
         - "user.grant.delete"
+        - "user.membership.read"
     - Role: 'PROJECT_OWNER_VIEWER'
       Permissions:
         - "project.read"
@@ -190,6 +195,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "user.read"
         - "user.grant.read"
+        - "user.membership.read"
     - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
         - "project.read"
@@ -201,6 +207,7 @@ InternalAuthZ:
         - "user.grant.read"
         - "user.grant.write"
         - "user.grant.delete"
+        - "user.membership.read"
     - Role: 'PROJECT_GRANT_OWNER'
       Permissions:
         - "project.read"
@@ -208,3 +215,4 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "user.read"
         - "user.grant.read"
+        - "user.membership.read"
