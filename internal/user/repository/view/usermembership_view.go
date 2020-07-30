@@ -14,7 +14,7 @@ func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID strin
 	memberships := new(model.UserMembershipView)
 	userIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyUserID, Value: userID, Method: global_model.SearchMethodEquals}
 	aggregateIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyAggregateID, Value: aggregateID, Method: global_model.SearchMethodEquals}
-	objectIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyUserID, Value: objectID, Method: global_model.SearchMethodEquals}
+	objectIDQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyObjectID, Value: objectID, Method: global_model.SearchMethodEquals}
 	memberTypeQuery := &model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Value: int32(membertype), Method: global_model.SearchMethodEquals}
 
 	query := repository.PrepareGetByQuery(table, userIDQuery, aggregateIDQuery, objectIDQuery, memberTypeQuery)
@@ -35,7 +35,7 @@ func UserMembershipsByAggregateID(db *gorm.DB, table, aggregateID string) ([]*mo
 	return memberships, err
 }
 
-func SearchUserMemberships(db *gorm.DB, table string, req *usr_model.UserMembershipSearchRequest) ([]*model.UserMembershipView, int, error) {
+func SearchUserMemberships(db *gorm.DB, table string, req *usr_model.UserMembershipSearchRequest) ([]*model.UserMembershipView, uint64, error) {
 	users := make([]*model.UserMembershipView, 0)
 	query := repository.PrepareSearchQuery(table, model.UserMembershipSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &users)
@@ -64,7 +64,7 @@ func DeleteUserMembership(db *gorm.DB, table, userID, aggregateID, objectID stri
 		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyUserID), Value: userID},
 		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyAggregateID), Value: aggregateID},
 		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyObjectID), Value: objectID},
-		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyAggregateID), Value: membertype},
+		repository.Key{Key: model.UserMembershipSearchKey(usr_model.UserMembershipSearchKeyMemberType), Value: membertype},
 	)
 	return delete(db)
 }

@@ -255,7 +255,7 @@ func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_mo
 	}
 
 	if !orgPerm {
-		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: int32(usr_model.MemberTypeOrganisation)})
+		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: global_model.SearchMethodNotEquals, Value: usr_model.MemberTypeOrganisation})
 	}
 
 	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectMemberReadPerm)

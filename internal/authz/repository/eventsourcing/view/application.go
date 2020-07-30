@@ -23,7 +23,7 @@ func (v *View) ApplicationByProjecIDAndAppName(projectID, appName string) (*mode
 	return view.ApplicationByProjectIDAndAppName(v.Db, applicationTable, projectID, appName)
 }
 
-func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, int, error) {
+func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {
 	return view.SearchApplications(v.Db, applicationTable, request)
 }
 

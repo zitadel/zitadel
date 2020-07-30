@@ -53,22 +53,28 @@ func (m *UserMembership) Reduce(event *models.Event) (err error) {
 
 func (m *UserMembership) processOrg(event *models.Event) (err error) {
 	member := new(usr_es_model.UserMembershipView)
-	member.AppendEvent(event)
+	err = member.AppendEvent(event)
+	if err != nil {
+		return err
+	}
 	switch event.Type {
 	case org_es_model.OrgMemberAdded:
-		m.fillOrgDisplayName(member)
+		err = m.fillOrgDisplayName(member)
 	case org_es_model.OrgMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation)
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case org_es_model.OrgMemberRemoved:
-		err = m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event.Sequence)
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event.Sequence)
 	case org_es_model.OrgChanged:
-		m.updateOrgDisplayName(event)
+		err = m.updateOrgDisplayName(event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
+	}
+	if err != nil {
+		return err
 	}
 	return m.view.PutUserMembership(member, event.Sequence)
 }
@@ -103,27 +109,30 @@ func (m *UserMembership) processProject(event *models.Event) (err error) {
 	member.AppendEvent(event)
 	switch event.Type {
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded:
-		m.fillProjectDisplayName(member)
+		err = m.fillProjectDisplayName(member)
 	case proj_es_model.ProjectMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject)
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case proj_es_model.ProjectMemberRemoved:
-		err = m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject, event.Sequence)
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject, event.Sequence)
 	case proj_es_model.ProjectGrantMemberChanged:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant)
 		if err != nil {
 			return err
 		}
-		member.AppendEvent(event)
+		err = member.AppendEvent(event)
 	case proj_es_model.ProjectGrantMemberRemoved:
-		err = m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event.Sequence)
+		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event.Sequence)
 	case proj_es_model.ProjectChanged:
-		m.updateProjectDisplayName(event)
+		err = m.updateProjectDisplayName(event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event.Sequence)
+	}
+	if err != nil {
+		return err
 	}
 	return m.view.PutUserMembership(member, event.Sequence)
 }

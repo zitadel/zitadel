@@ -15,7 +15,7 @@ func (v *View) OrgByID(orgID string) (*model.OrgView, error) {
 	return org_view.OrgByID(v.Db, orgTable, orgID)
 }
 
-func (v *View) SearchOrgs(query *org_model.OrgSearchRequest) ([]*model.OrgView, int, error) {
+func (v *View) SearchOrgs(query *org_model.OrgSearchRequest) ([]*model.OrgView, uint64, error) {
 	return org_view.SearchOrgs(v.Db, orgTable, query)
 }
 
