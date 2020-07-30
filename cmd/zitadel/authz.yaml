@@ -105,7 +105,7 @@ InternalAuthZ:
         - "project.grant.user.grant.read"
         - "project.grant.user.grant.write"
         - "project.grant.user.grant.delete"
-    - Role: 'ORG_OWNER'
+    - Role: 'ORG_OWNER_VIEWER'
       Permissions:
         - "org.read"
         - "org.member.read"
@@ -120,6 +120,38 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+    - Role: 'ORG_USER_PERMISSION_EDITOR'
+      Permissions:
+        - "org.read"
+        - "org.member.read"
+        - "user.read"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.grant.read"
+        - "project.grant.member.read"
+    - Role: 'ORG_PROJECT_PERMISSION_EDITOR'
+      Permissions:
+        - "org.read"
+        - "org.member.read"
+        - "user.read"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.grant.delete"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.grant.read"
+        - "project.grant.write"
+        - "project.grant.delete"
+        - "project.grant.member.read"
     - Role: 'ORG_PROJECT_CREATOR'
       Permissions:
         - "project.read:self"
