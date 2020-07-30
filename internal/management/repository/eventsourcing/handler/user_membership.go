@@ -106,7 +106,10 @@ func (m *UserMembership) updateOrgDisplayName(event *models.Event) error {
 
 func (m *UserMembership) processProject(event *models.Event) (err error) {
 	member := new(usr_es_model.UserMembershipView)
-	member.AppendEvent(event)
+	err = member.AppendEvent(event)
+	if err != nil {
+		return err
+	}
 	switch event.Type {
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded:
 		err = m.fillProjectDisplayName(member)
