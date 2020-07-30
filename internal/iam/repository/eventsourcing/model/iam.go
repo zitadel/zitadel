@@ -83,6 +83,10 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 		return i.appendIdpConfigStateEvent(event, model.IDPConfigStateInactive)
 	case IdpConfigReactivated:
 		return i.appendIdpConfigStateEvent(event, model.IDPConfigStateActive)
+	case OidcIdpConfigAdded:
+		return i.appendAddOIDCIdpConfigEvent(event)
+	case OidcIdpConfigChanged:
+		return i.appendChangeIdpConfigEvent(event)
 	}
 
 	return err
