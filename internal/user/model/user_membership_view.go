@@ -10,7 +10,7 @@ type UserMembershipView struct {
 	UserID      string
 	MemberType  MemberType
 	AggregateID string
-	// differs from aggregate id if obejct is sub of an aggregate
+	//ObjectID differs from aggregate id if obejct is sub of an aggregate
 	ObjectID string
 
 	Roles         []string
