@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
@@ -27,11 +28,13 @@ function passwordConfirmValidator(c: AbstractControl): any {
     templateUrl: './password.component.html',
     styleUrls: ['./password.component.scss'],
 })
-export class PasswordComponent implements OnInit {
+export class PasswordComponent implements OnDestroy {
     userId: string = '';
 
     public policy!: PasswordComplexityPolicy.AsObject;
     public passwordForm!: FormGroup;
+
+    private formSub: Subscription = new Subscription();
 
     constructor(
         activatedRoute: ActivatedRoute,
@@ -73,7 +76,8 @@ export class PasswordComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
+    public ngOnDestroy(): void {
+        this.formSub.unsubscribe();
     }
 
     setupForm(validators: Validators[]): void {

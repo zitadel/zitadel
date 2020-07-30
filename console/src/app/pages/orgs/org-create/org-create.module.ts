@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
 import { OrgCreateRoutingModule } from './org-create-routing.module';
@@ -28,6 +29,7 @@ import { OrgCreateComponent } from './org-create.component';
         HasRolePipeModule,
         TranslateModule,
         MatCheckboxModule,
+        PasswordComplexityViewModule,
     ],
 })
 export class OrgCreateModule { }

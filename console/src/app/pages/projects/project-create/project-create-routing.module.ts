@@ -7,7 +7,7 @@ const routes: Routes = [
     {
         path: '',
         component: ProjectCreateComponent,
-        data: { animation: 'DetailPage' },
+        data: { animation: 'AddPage' },
     },
 ];
 

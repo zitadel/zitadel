@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "prodbuild": "ng build --prod",
-    "lint": "ng lint && stylelint './projects/**/*.scss' --syntax scss",
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
     "postinstall": "../build/console/generate-grpc.sh"
   },
   "private": true,
@@ -44,8 +44,8 @@
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
-    "@angular/cli": "~10.0.4",
     "@angular-devkit/build-angular": "~0.1000.4",
+    "@angular/cli": "~10.0.4",
     "@angular/compiler-cli": "~10.0.2",
     "@angular/language-service": "~10.0.5",
     "@types/jasmine": "~3.5.11",
@@ -61,6 +61,9 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "prettier": "^2.0.5",
     "protractor": "~7.0.0",
+    "stylelint": "^13.6.1",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-scss": "^3.18.0",
     "ts-node": "~8.10.2",
     "tslint": "~6.1.0",
     "typescript": "^3.9.7"

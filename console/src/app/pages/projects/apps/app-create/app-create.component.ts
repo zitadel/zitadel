@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -19,6 +19,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { nativeValidator, webValidator } from '../appTypeValidator';
 
 @Component({
     selector: 'app-app-create',
@@ -73,6 +74,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             // TODO show when implemented
         ];
 
+    public redirectControl: FormControl = new FormControl('');
+    public postRedirectControl: FormControl = new FormControl('');
+
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
     constructor(
@@ -119,6 +123,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.oidcApp.grantTypesList =
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+
+                        this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
+                        this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
                         console.log('WEB');
@@ -136,6 +143,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.oidcApp.grantTypesList =
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE];
 
+                        this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
+                        this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
                         console.log('USERAGENT');
@@ -147,6 +156,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                             [OIDCGrantType.OIDCGRANTTYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDCGRANTTYPE_IMPLICIT];
 
                         this.oidcApp.authMethodType = OIDCAuthMethodType.OIDCAUTHMETHODTYPE_NONE;
+
+                        this.redirectControl = new FormControl('', [webValidator as ValidatorFn]);
+                        this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
                         break;
                 }
 
@@ -213,15 +225,17 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         const value = event.value.trim();
 
         if (value !== '') {
-            if (target === 'REDIRECT') {
+            if (target === 'REDIRECT' && this.redirectControl.valid) {
                 this.oidcApp.redirectUrisList.push(value);
-            } else if (target === 'POSTREDIRECT') {
+                if (input) {
+                    input.value = '';
+                }
+            } else if (target === 'POSTREDIRECT' && this.redirectControl.valid) {
                 this.oidcApp.postLogoutRedirectUrisList.push(value);
+                if (input) {
+                    input.value = '';
+                }
             }
-        }
-
-        if (input) {
-            input.value = '';
         }
     }
 

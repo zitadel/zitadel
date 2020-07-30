@@ -1,8 +1,7 @@
 <app-meta-layout>
     <div class="enlarged-container">
-        <h1>{{org?.name}}</h1>
-        <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}
-        </p>
+        <h1 class="h1">{{org?.name}}</h1>
+        <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
         <app-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
             description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
             <div *ngFor="let domain of domains" class="domain">

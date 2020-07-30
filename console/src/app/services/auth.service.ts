@@ -61,7 +61,6 @@ export class AuthService {
     }
 
     private loadPermissions(): void {
-        console.log('load permissions');
         merge([
             // this.authenticationChanged,
             this.activeOrgChanged.pipe(map(org => !!org)),
@@ -83,8 +82,6 @@ export class AuthService {
     }
 
     public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
-        // console.log('has', userRoles);
-        // console.log('needs', requestedRoles);
         return each ?
             requestedRoles.every(role => userRoles.includes(role)) :
             requestedRoles.findIndex(role => {

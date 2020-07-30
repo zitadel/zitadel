@@ -4,31 +4,31 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-import { ProjectMembersComponent } from './project-members.component';
+import { OrgMembersComponent } from './org-members.component';
 
-describe('ProjectMembersComponent', () => {
-  let component: ProjectMembersComponent;
-  let fixture: ComponentFixture<ProjectMembersComponent>;
+describe('OrgMembersComponent', () => {
+    let component: OrgMembersComponent;
+    let fixture: ComponentFixture<OrgMembersComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ProjectMembersComponent],
-      imports: [
-        NoopAnimationsModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatTableModule,
-      ],
-    }).compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [OrgMembersComponent],
+            imports: [
+                NoopAnimationsModule,
+                MatPaginatorModule,
+                MatSortModule,
+                MatTableModule,
+            ],
+        }).compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ProjectMembersComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(OrgMembersComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should compile', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should compile', () => {
+        expect(component).toBeTruthy();
+    });
 });

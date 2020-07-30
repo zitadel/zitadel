@@ -20,11 +20,15 @@ const routes: Routes = [
         path: 'me',
         component: AuthUserDetailComponent,
         canActivate: [AuthGuard],
+        data: {
+            animation: 'HomePage',
+        },
     },
     {
         path: 'me/password',
         component: PasswordComponent,
         canActivate: [AuthGuard],
+        data: { animation: 'AddPage' },
     },
     {
         path: ':id',
@@ -32,6 +36,7 @@ const routes: Routes = [
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['user.read'],
+            animation: 'HomePage',
         },
     },
     {
@@ -40,6 +45,7 @@ const routes: Routes = [
         canActivate: [AuthGuard, RoleGuard],
         data: {
             roles: ['user.write'],
+            animation: 'AddPage',
         },
     },
 ];

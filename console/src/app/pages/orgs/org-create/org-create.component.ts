@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
@@ -49,6 +49,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
 export class OrgCreateComponent {
     public orgForm!: FormGroup;
     public userForm!: FormGroup;
+    public pwdForm!: FormGroup;
 
     public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
@@ -90,7 +91,6 @@ export class OrgCreateComponent {
         registerUserRequest.setGender(this.gender?.value);
         registerUserRequest.setPassword(this.password?.value);
         registerUserRequest.setPreferredLanguage(this.preferredLanguage?.value);
-
         this.adminService
             .SetUpOrg(createOrgRequest, registerUserRequest)
             .then((data: OrgSetUpResponse) => {
@@ -109,42 +109,24 @@ export class OrgCreateComponent {
         this.currentCreateStep--;
     }
 
-    private initForm(pwdValidators?: Validators[]): void {
-        if (pwdValidators) {
-            console.log('init with pwd');
-            this.userForm = this.fb.group({
-                userName: ['', [Validators.required]],
-                firstName: ['', [Validators.required]],
-                lastName: ['', [Validators.required]],
-                email: ['', [Validators.required]],
-                gender: [''],
-                nickName: [''],
-                preferredLanguage: [''],
-                password: ['', [...pwdValidators]],
-                confirmPassword: ['', [...pwdValidators, passwordConfirmValidator]],
-            });
-        } else {
-            console.log('init without pwd');
-            this.userForm = this.fb.group({
-                userName: ['', [Validators.required]],
-                firstName: ['', [Validators.required]],
-                lastName: ['', [Validators.required]],
-                email: ['', [Validators.required]],
-                gender: [''],
-                nickName: [''],
-                preferredLanguage: [''],
-            });
-        }
+    private initForm(): void {
+        this.userForm = this.fb.group({
+            userName: ['', [Validators.required]],
+            firstName: ['', [Validators.required]],
+            lastName: ['', [Validators.required]],
+            email: ['', [Validators.required]],
+            gender: [''],
+            nickName: [''],
+            preferredLanguage: [''],
+        });
     }
 
     public initPwdValidators(): void {
         const validators: Validators[] = [Validators.required];
 
-        console.log(this.usePassword);
         if (this.usePassword) {
             this.orgService.GetDefaultPasswordComplexityPolicy().then(data => {
                 this.policy = data.toObject();
-                console.log(this.policy);
 
                 if (this.policy.minLength) {
                     validators.push(Validators.minLength(this.policy.minLength));
@@ -162,10 +144,20 @@ export class OrgCreateComponent {
                     validators.push(symbolValidator);
                 }
 
-                this.initForm(validators);
+                // this.initForm(validators);
+                const pwdValidators = [...validators] as ValidatorFn[];
+                const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+                this.pwdForm = this.fb.group({
+                    password: ['', pwdValidators],
+                    confirmPassword: ['', confirmPwdValidators],
+                });
+
             });
         } else {
-            this.initForm();
+            this.pwdForm = this.fb.group({
+                password: ['', []],
+                confirmPassword: ['', []],
+            });
         }
     }
 
@@ -206,11 +198,11 @@ export class OrgCreateComponent {
     }
 
     public get password(): AbstractControl | null {
-        return this.userForm.get('password');
+        return this.pwdForm.get('password');
     }
 
     public get confirmPassword(): AbstractControl | null {
-        return this.userForm.get('confirmPassword');
+        return this.pwdForm.get('confirmPassword');
     }
 
     public close(): void {

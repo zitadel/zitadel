@@ -1,67 +1,62 @@
 .groups {
-    padding-top: 1rem;
+  padding-top: 1rem;
 
-    .header {
-      display: block;
-      margin-bottom: 1rem;
-      font-weight: 400;
+  .header {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 400;
+  }
+
+  .sub-header {
+    font-size: .8rem;
+    color: #8795a1;
+  }
+
+  .people {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+
+    .owner {
+      margin-right: 1rem;
     }
 
-    .sub-header {
-        font-size: .8rem;
-        color: #8795a1;
-    }
-  
-    .people {
+    .img-list {
+      width: 100%;
+      margin-top: .5rem;
+      margin-left: 1rem;
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-  
-      .owner {
-        margin-right: 1rem;
+
+      .spinner {
+        margin-left: -15px;
+        margin-right: 20px;
       }
-  
-      .img-list {
-        width: 100%;
-        margin-top: 0.5rem;
-        margin-left: 1rem;
+
+      .add-img {
+        float: left;
+        margin: 0 8px 0 -15px;
+      }
+
+      .avatar-circle {
+        float: left;
+        margin: 0 8px 0 -15px;
+        height: 32px;
+        width: 32px;
+        border-radius: 50%;
+        -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+        -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+        box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+        cursor: pointer;
         display: flex;
         align-items: center;
+        justify-content: center;
+      }
 
-        mat-spinner {
-            margin-left: -15px;
-            margin-right: 20px;
-        }
-  
-        .avatar-circle {
-            float: left;
-            margin: 0 8px 0 -15px;
-            height: 32px;
-            width: 32px;
-            border-radius: 50%;
-            -webkit-box-shadow: 2px 0px 7px -1px rgba(33,34,36,.5);
-            -moz-box-shadow: 2px 0px 7px -1px rgba(33,34,36,.5);
-            box-shadow: 2px 0px 7px -1px rgba(33,34,36,.5);
-        }
-
-        .add-img {
-            float: left;
-            margin: 0 8px 0 -15px;
-        }
-
-        .avatar-circle {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: indianred;
-        }
-  
-        .margin-neg {
-          margin-left: -1rem;
-        }
+      .margin-neg {
+        margin-left: -1rem;
       }
     }
   }
-  
+}
