@@ -144,7 +144,7 @@
         },
         "PASSWORD": {
             "TITLE": "Passwort",
-            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
+            "DESCRIPTION": "Gib das neue Password unter Einhaltung der Richtlinie für die Komplexität ein.",
             "OLD": "Aktuelles Passwort",
             "NEW": "Neues Passwort",
             "CONFIRM": "Neues Passwort wiederholen",
@@ -152,6 +152,7 @@
             "SET":"Password neu setzen",
             "RESENDNOTIFICATION": "Passwort Reset Link senden.",
             "REQUIRED": "Bitte prüfe das alle notwendigen Felder befüllt sind.",
+            "MINLENGTHCHARSLEFT":"Das Password entspricht nicht der Mindestlänge {{value}}/{{minLength}}",
             "MINLENGTHERROR":"Passwort muss mindestens {{value}} lang sein",
             "NOTEQUAL":"Das Passwort muss übereinstimmen!"
         },

@@ -144,7 +144,7 @@
         },
         "PASSWORD": {
             "TITLE": "Password",
-            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
+            "DESCRIPTION": "Enter the new password according to the policy below.",
             "OLD": "Current Password",
             "NEW": "New Password",
             "CONFIRM": "Confirm new Password",
@@ -152,6 +152,7 @@
             "SET":"Set new Password",
             "RESENDNOTIFICATION": "Resend Password Reset Link",
             "REQUIRED": "Some required fields are missing!",
+            "MINLENGTHCHARSLEFT":"The password is not long enough {{value}}/{{minLength}}",
             "MINLENGTHERROR":"Password has to be at least {{value}} characters long",
             "NOTEQUAL":"The password provided is not equal!"
         },
