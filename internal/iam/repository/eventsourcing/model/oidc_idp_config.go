@@ -73,7 +73,7 @@ func (iam *Iam) appendAddOIDCIdpConfigEvent(event *es_models.Event) error {
 	return nil
 }
 
-func (iam *Iam) OIDCIDPConfig(event *es_models.Event) error {
+func (iam *Iam) appendChangeOIDCIdpConfigEvent(event *es_models.Event) error {
 	config := new(OIDCIDPConfig)
 	err := config.setData(event)
 	if err != nil {

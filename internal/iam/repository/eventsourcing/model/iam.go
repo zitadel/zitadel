@@ -86,7 +86,7 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 	case OidcIdpConfigAdded:
 		return i.appendAddOIDCIdpConfigEvent(event)
 	case OidcIdpConfigChanged:
-		return i.appendChangeIdpConfigEvent(event)
+		return i.appendChangeOIDCIdpConfigEvent(event)
 	}
 
 	return err

@@ -102,7 +102,7 @@ func TestAppendAddOIDCIdpConfigEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.config)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendAddIdpConfigEvent(tt.args.event)
+			tt.args.iam.appendAddOIDCIdpConfigEvent(tt.args.event)
 			if len(tt.args.iam.IDPs) != 1 {
 				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.iam.IDPs))
 			}
@@ -143,7 +143,7 @@ func TestAppendChangeOIDCIdpConfigEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.config)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendChangeIdpConfigEvent(tt.args.event)
+			tt.args.iam.appendChangeOIDCIdpConfigEvent(tt.args.event)
 			if len(tt.args.iam.IDPs) != 1 {
 				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.iam.IDPs))
 			}
