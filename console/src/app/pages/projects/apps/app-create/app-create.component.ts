@@ -102,8 +102,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             this.oidcApp.responseTypesList = this.formresponseTypesList?.value;
             this.oidcApp.grantTypesList = this.formgrantTypesList?.value;
             this.oidcApp.authMethodType = this.formauthMethodType?.value;
-
-            console.log(this.oidcApp);
         });
 
         this.firstFormGroup = this.fb.group({
@@ -113,10 +111,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
         this.firstFormGroup.valueChanges.subscribe(value => {
             if (this.firstFormGroup.valid) {
-                console.log('change firstform', value);
                 switch (value.applicationType) {
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_NATIVE:
-                        console.log('NATIVE');
                         this.oidcResponseTypes[0].checked = true;
                         this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
 
@@ -128,8 +124,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_WEB:
-                        console.log('WEB');
-
                         this.oidcAuthMethodType[0].disabled = false;
                         this.oidcAuthMethodType[1].disabled = true; // NONE DISABLED
                         this.oidcAuthMethodType[2].disabled = false; // POST POSSIBLE
@@ -147,8 +141,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
                         this.postRedirectControl = new FormControl('', [webValidator as ValidatorFn]);
                         break;
                     case OIDCApplicationType.OIDCAPPLICATIONTYPE_USER_AGENT:
-                        console.log('USERAGENT');
-
                         this.oidcResponseTypes[0].checked = true;
                         this.oidcApp.responseTypesList = [OIDCResponseType.OIDCRESPONSETYPE_CODE];
 

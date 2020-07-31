@@ -12,11 +12,11 @@
         <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}}</h1>
         <form [formGroup]="orgForm" (ngSubmit)="next()">
             <div class="content">
-                <mat-form-field class="formfield">
+                <mat-form-field class="formfield" appearance="outline">
                     <mat-label>{{ 'ORG_DETAIL.DETAIL.NAME' | translate }}</mat-label>
                     <input matInput formControlName="name" />
                 </mat-form-field>
-                <mat-form-field class="formfield">
+                <mat-form-field class="formfield" appearance="outline">
                     <mat-label>{{ 'ORG_DETAIL.DETAIL.DOMAIN' | translate }}</mat-label>
                     <input matInput formControlName="domain" />
                 </mat-form-field>
@@ -122,7 +122,8 @@
                     <ng-container *ngIf="usePassword && pwdForm">
                         <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
 
-                        <app-password-complexity-view [policy]="this.policy" [password]="password">
+                        <app-password-complexity-view class="complexity-view" [policy]="this.policy"
+                            [password]="password">
                         </app-password-complexity-view>
 
                         <form [formGroup]="pwdForm" class="form">
