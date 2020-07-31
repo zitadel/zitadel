@@ -47,14 +47,17 @@ func (idp *IDPConfig) IsValid(includeConfig bool) bool {
 	if !includeConfig {
 		return true
 	}
-	if idp.Type == IDPConfigTypeOIDC && !idp.OIDCConfig.IsValid() {
+	if idp.Type == IDPConfigTypeOIDC && !idp.OIDCConfig.IsValid(true) {
 		return false
 	}
 	return true
 }
 
-func (oi *OIDCIDPConfig) IsValid() bool {
-	return oi.ClientID != "" && oi.ClientSecretString != "" && oi.Issuer != ""
+func (oi *OIDCIDPConfig) IsValid(withSecret bool) bool {
+	if withSecret {
+		return oi.ClientID != "" && oi.Issuer != "" && oi.ClientSecretString != ""
+	}
+	return oi.ClientID != "" && oi.Issuer != ""
 }
 
 func (oi *OIDCIDPConfig) CryptSecret(crypt crypto.Crypto) error {

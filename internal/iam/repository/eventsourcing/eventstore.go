@@ -333,3 +333,38 @@ func (es *IamEventstore) ReactivateIdpConfiguration(ctx context.Context, iamID, 
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Snd4f", "Errors.Internal")
 }
+
+func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
+	if config == nil || !config.IsValid(false) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-*5ki8", "Errors.Iam.OIDCConfigInvalid")
+	}
+	existing, err := es.IamByID(ctx, config.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	var idp *iam_model.IDPConfig
+	if _, idp = existing.GetIDP(config.IDPConfigID); idp == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-pso0s", "Errors.Iam.IdpNoExisting")
+	}
+	if idp.Type != iam_model.IDPConfigTypeOIDC {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fms8w", "Errors.Iam.IdpIsNotOIDC")
+	}
+	if config.ClientSecretString != "" {
+		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
+	} else {
+		config.ClientSecret = nil
+	}
+	repoIam := model.IamFromModel(existing)
+	repoConfig := model.OIDCIDPConfigFromModel(config)
+
+	iamAggregate := OIDCIdpConfigurationChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoConfig)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	if _, a := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); a != nil {
+		return model.OIDCIDPConfigToModel(a.OIDCIDPConfig), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
+}

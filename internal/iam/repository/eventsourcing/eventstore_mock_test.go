@@ -94,7 +94,7 @@ func GetMockManipulateIamWithMember(ctrl *gomock.Controller) *IamEventstore {
 
 func GetMockManipulateIamWithOIDCIdp(ctrl *gomock.Controller) *IamEventstore {
 	idpData, _ := json.Marshal(model.IDPConfig{IDPConfigID: "IDPConfigID", Name: "Name"})
-	oidcData, _ := json.Marshal(model.OIDCIDPConfig{ClientID: "ClientID"})
+	oidcData, _ := json.Marshal(model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"})
 	events := []*es_models.Event{
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IamSetupStarted},
 		&es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: model.IdpConfigAdded, Data: idpData},

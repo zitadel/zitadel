@@ -102,8 +102,10 @@ Errors:
     IDMissing: Id fehlt
     GlobalOrgMissing: Globale Organisation fehlt
     IamProjectIDMisisng: Iam Project ID fehlt
-    IdpInvalid: IDP Konfiguration ist invalid
+    IdpInvalid: IDP Konfiguration ist ungültig
     IdpNotExisting: IDP Konfiguration existiert nicht
+    OIDCConfigInvalid: OIDC IDP Konfiguration ist ungültig
+    IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
   Policy:
     AlreadyExists: Policy existiert bereits
   UserGrant:

@@ -104,6 +104,8 @@ Errors:
     IamProjectIDMisisng: Iam project id missing
     IdpInvalid: IDP configuration is invalid
     IdpNotExisting: IDP configuration does not exist
+    OIDCConfigInvalid: OIDC IDP configuration is invalid
+    IdpIsNotOIDC: IDP configuration is not of type oidc
   Policy:
     AlreadyExists: Policy already exists
   UserGrant:

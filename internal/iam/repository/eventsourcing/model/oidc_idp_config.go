@@ -25,7 +25,7 @@ func (c *OIDCIDPConfig) Changes(changed *OIDCIDPConfig) map[string]interface{} {
 	if c.ClientID != changed.ClientID {
 		changes["clientId"] = changed.ClientID
 	}
-	if !reflect.DeepEqual(c.ClientSecret, changed.ClientSecret) {
+	if c.ClientSecret != nil {
 		changes["clientSecret"] = changed.ClientSecret
 	}
 	if c.Issuer != changed.Issuer {
