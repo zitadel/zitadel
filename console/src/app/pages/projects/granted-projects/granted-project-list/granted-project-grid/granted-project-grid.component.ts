@@ -2,8 +2,9 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
+import { Org } from 'src/app/proto/generated/auth_pb';
 import { ProjectGrantView, ProjectState, ProjectType } from 'src/app/proto/generated/management_pb';
-import { AuthService } from 'src/app/services/auth.service';
+import { StorageKey, StorageService } from 'src/app/services/storage.service';
 
 @Component({
     selector: 'app-granted-project-grid',
@@ -41,7 +42,7 @@ export class GrantedProjectGridComponent implements OnChanges {
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
 
-    constructor(private authService: AuthService, private router: Router) {
+    constructor(private storage: StorageService, private router: Router) {
         this.selection.changed.subscribe(selection => {
             this.setPrefixedItem('pinned-granted-projects', JSON.stringify(
                 this.selection.selected.map(item => item.projectId),
@@ -90,13 +91,13 @@ export class GrantedProjectGridComponent implements OnChanges {
     }
 
     private async getPrefixedItem(key: string): Promise<string | null> {
-        const prefix = (await this.authService.GetActiveOrg()).id;
-        return localStorage.getItem(`${prefix}:${key}`);
+        const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
+        return localStorage.getItem(`${org.id}:${key}`);
     }
 
     private async setPrefixedItem(key: string, value: any): Promise<void> {
-        const prefix = (await this.authService.GetActiveOrg()).id;
-        return localStorage.setItem(`${prefix}:${key}`, value);
+        const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
+        return localStorage.setItem(`${org.id}:${key}`, value);
     }
 
     public navigateToProject(projectId: string, id: string, event: any): void {

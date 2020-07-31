@@ -89,8 +89,12 @@ export class OrgCreateComponent {
         registerUserRequest.setLastName(this.lastName?.value);
         registerUserRequest.setNickName(this.nickName?.value);
         registerUserRequest.setGender(this.gender?.value);
-        registerUserRequest.setPassword(this.password?.value);
         registerUserRequest.setPreferredLanguage(this.preferredLanguage?.value);
+
+        if (this.usePassword && this.password) {
+            registerUserRequest.setPassword(this.password?.value);
+        }
+
         this.adminService
             .SetUpOrg(createOrgRequest, registerUserRequest)
             .then((data: OrgSetUpResponse) => {

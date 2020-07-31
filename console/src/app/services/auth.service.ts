@@ -45,8 +45,7 @@ export class AuthService {
             ),
         ).pipe(
             take(1),
-            mergeMap(token => {
-                console.log(token);
+            mergeMap(() => {
                 return from(this.userService.GetMyUserProfile().then(userprofile => userprofile.toObject()));
             }),
             finalize(() => {
@@ -55,7 +54,6 @@ export class AuthService {
         );
 
         this.activeOrgChanged.subscribe(() => {
-            console.log('org change');
             this.loadPermissions();
         });
     }
