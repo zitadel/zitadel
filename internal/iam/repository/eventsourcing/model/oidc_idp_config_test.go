@@ -46,18 +46,16 @@ func TestOIDCIdpConfigChanges(t *testing.T) {
 			name: "no changes",
 			args: args{
 				existing: &OIDCIDPConfig{
-					IDPConfigID:  "IDPConfigID",
-					ClientID:     "ClientID",
-					ClientSecret: &crypto.CryptoValue{KeyID: "KeyID"},
-					Issuer:       "Issuer",
-					Scopes:       []string{"scope1"},
+					IDPConfigID: "IDPConfigID",
+					ClientID:    "ClientID",
+					Issuer:      "Issuer",
+					Scopes:      []string{"scope1"},
 				},
 				new: &OIDCIDPConfig{
-					IDPConfigID:  "IDPConfigID",
-					ClientID:     "ClientID",
-					ClientSecret: &crypto.CryptoValue{KeyID: "KeyID"},
-					Issuer:       "Issuer",
-					Scopes:       []string{"scope1"},
+					IDPConfigID: "IDPConfigID",
+					ClientID:    "ClientID",
+					Issuer:      "Issuer",
+					Scopes:      []string{"scope1"},
 				},
 			},
 			res: res{
