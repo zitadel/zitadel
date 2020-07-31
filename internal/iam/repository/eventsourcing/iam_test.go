@@ -509,3 +509,535 @@ func TestIamMemberRemovedAggregate(t *testing.T) {
 		})
 	}
 }
+
+func TestIdpConfigAddedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Iam
+		new        *model.IDPConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add oidc idp configuration",
+			args: args{
+				ctx:      authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
+				new: &model.IDPConfig{
+					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID:   "IDPConfigID",
+					Name:          "Name",
+					OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"},
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   2,
+				eventTypes: []models.EventType{model.IdpConfigAdded, model.OidcIdpConfigAdded},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := IdpConfigurationAddedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestIdpConnfigurationChangedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Iam
+		new        *model.IDPConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change idp configuration",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IamProjectID: "IamProjectID",
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "IDPName"},
+					}},
+				new: &model.IDPConfig{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID: "IDPConfigID",
+					Name:        "NameChanged",
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.IdpConfigChanged},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := IdpConfigurationChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestIdpConfigurationRemovedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Iam
+		new        *model.IDPConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove idp config",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IamProjectID: "IamProjectID",
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name"},
+					}},
+				new: &model.IDPConfig{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.IdpConfigRemoved},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := IdpConfigurationRemovedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestIdpConfigurationDeactivatedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Iam
+		new        *model.IDPConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "deactivate idp config",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IamProjectID: "IamProjectID",
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name"},
+					}},
+				new: &model.IDPConfig{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.IdpConfigDeactivated},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := IdpConfigurationDeactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestIdpConfigurationReactivatedAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Iam
+		new        *model.IDPConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "deactivate app",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IamProjectID: "IamProjectID",
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name"},
+					}},
+				new: &model.IDPConfig{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.IdpConfigReactivated},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp config nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := IdpConfigurationReactivatedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestOIDCConfigchangAggregate(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		existing   *model.Iam
+		new        *model.OIDCIDPConfig
+		aggCreator *models.AggregateCreator
+	}
+	type res struct {
+		eventLen   int
+		eventTypes []models.EventType
+		wantErr    bool
+		errFunc    func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change oidc config",
+			args: args{
+				ctx: authz.NewMockContext("orgID", "userID"),
+				existing: &model.Iam{
+					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
+					IamProjectID: "IamProjectID",
+					IDPs: []*model.IDPConfig{
+						{IDPConfigID: "IDPConfigID", Name: "Name", OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}},
+					}},
+				new: &model.OIDCIDPConfig{
+					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
+					IDPConfigID: "IDPConfigID",
+					ClientID:    "ClientIDChanged",
+				},
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				eventLen:   1,
+				eventTypes: []models.EventType{model.OidcIdpConfigChanged},
+			},
+		},
+		{
+			name: "existing iam nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "oidc config nil",
+			args: args{
+				ctx:        authz.NewMockContext("orgID", "userID"),
+				existing:   &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
+				new:        nil,
+				aggCreator: models.NewAggregateCreator("Test"),
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			agg, err := OIDCIdpConfigurationChangedAggregate(tt.args.aggCreator, tt.args.existing, tt.args.new)(tt.args.ctx)
+
+			if !tt.res.wantErr && len(agg.Events) != tt.res.eventLen {
+				t.Errorf("got wrong event len: expected: %v, actual: %v ", tt.res.eventLen, len(agg.Events))
+			}
+			for i := 0; i < tt.res.eventLen; i++ {
+				if !tt.res.wantErr && agg.Events[i].Type != tt.res.eventTypes[i] {
+					t.Errorf("got wrong event type: expected: %v, actual: %v ", tt.res.eventTypes[i], agg.Events[i].Type.String())
+				}
+				if !tt.res.wantErr && agg.Events[i].Data == nil {
+					t.Errorf("should have data in event")
+				}
+			}
+
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

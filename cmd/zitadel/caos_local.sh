@@ -21,6 +21,7 @@ gopass zitadel-secrets/zitadel/developer/default/keys.yaml > "$BASEDIR/local_key
 export ZITADEL_KEY_PATH="$BASEDIR/local_keys.yaml"
 
 export ZITADEL_USER_VERIFICATION_KEY=UserVerificationKey_1
+export ZITADEL_IDP_CONFIG_VERIFICATION_KEY=IdpConfigVerificationKey_1
 export ZITADEL_OTP_VERIFICATION_KEY=OTPVerificationKey_1
 export ZITADEL_OIDC_KEYS_ID=OIDCKey_1
 export ZITADEL_COOKIE_KEY=CookieKey_1

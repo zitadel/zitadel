@@ -5,6 +5,8 @@ SystemDefaults:
     DiscoveryEndpoint: '$ZITADEL_ISSUER/.well-known/openid-configuration'
   UserVerificationKey:
     EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
+  IDPConfigVerificationKey:
+    EncryptionKeyID: $ZITADEL_IDP_CONFIG_VERIFICATION_KEY
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecretGenerator:

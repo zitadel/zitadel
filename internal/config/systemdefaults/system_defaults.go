@@ -13,16 +13,17 @@ import (
 )
 
 type SystemDefaults struct {
-	DefaultLanguage       language.Tag
-	ZitadelDocs           ZitadelDocs
-	SecretGenerators      SecretGenerators
-	UserVerificationKey   *crypto.KeyConfig
-	Multifactors          MultifactorConfig
-	VerificationLifetimes VerificationLifetimes
-	DefaultPolicies       DefaultPolicies
-	IamID                 string
-	SetUp                 types.IAMSetUp
-	Notifications         Notifications
+	DefaultLanguage          language.Tag
+	ZitadelDocs              ZitadelDocs
+	SecretGenerators         SecretGenerators
+	UserVerificationKey      *crypto.KeyConfig
+	IDPConfigVerificationKey *crypto.KeyConfig
+	Multifactors             MultifactorConfig
+	VerificationLifetimes    VerificationLifetimes
+	DefaultPolicies          DefaultPolicies
+	IamID                    string
+	SetUp                    types.IAMSetUp
+	Notifications            Notifications
 }
 
 type ZitadelDocs struct {

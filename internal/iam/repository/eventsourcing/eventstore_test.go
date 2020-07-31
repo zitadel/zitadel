@@ -637,3 +637,511 @@ func TestRemoveIamMember(t *testing.T) {
 		})
 	}
 }
+
+func TestAddIdpConfiguration(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *IamEventstore
+		ctx context.Context
+		idp *iam_model.IDPConfig
+	}
+	type res struct {
+		result  *iam_model.IDPConfig
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "add idp, ok",
+			args: args{
+				es:  GetMockManipulateIamWithCrypto(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					Type:        iam_model.IDPConfigTypeOIDC,
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID:           "ClientID",
+						ClientSecretString: "ClientSecret",
+						Issuer:             "Issuer",
+						Scopes:             []string{"scope"},
+					},
+				},
+			},
+			res: res{
+				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					Name: "Name",
+					Type: iam_model.IDPConfigTypeOIDC,
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+						Issuer:   "Issuer",
+						Scopes:   []string{"scope"},
+					},
+				},
+			},
+		},
+		{
+			name: "invalid idp config",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID:           "ClientID",
+						ClientSecretString: "ClientSecret",
+						Issuer:             "Issuer",
+						Scopes:             []string{"scope"},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.AddIdpConfiguration(tt.args.ctx, tt.args.idp)
+
+			if !tt.res.wantErr && result.IDPConfigID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.OIDCConfig.IDPConfigID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.OIDCConfig == nil && result.OIDCConfig.ClientSecret == nil {
+				t.Errorf("result has no client secret")
+			}
+			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
+			}
+			if !tt.res.wantErr && result.OIDCConfig.ClientID != tt.res.result.OIDCConfig.ClientID {
+				t.Errorf("got wrong result key: expected: %v, actual: %v ", tt.res.result.OIDCConfig.ClientID, result.OIDCConfig.ClientID)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestChangeIdpConfiguration(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *IamEventstore
+		ctx context.Context
+		idp *iam_model.IDPConfig
+	}
+	type res struct {
+		result  *iam_model.IDPConfig
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "change idp, ok",
+			args: args{
+				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "NameChanged",
+				},
+			},
+			res: res{
+				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "NameChanged",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+		},
+		{
+			name: "invalid idp",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp not existing",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing project not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ChangeIdpConfiguration(tt.args.ctx, tt.args.idp)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+				t.Errorf("got wrong result AppID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
+			}
+			if !tt.res.wantErr && result.Name != tt.res.result.Name {
+				t.Errorf("got wrong result name: expected: %v, actual: %v ", tt.res.result.Name, result.Name)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestRemoveIdpConfiguration(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *IamEventstore
+		ctx context.Context
+		idp *iam_model.IDPConfig
+	}
+	type res struct {
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "remove idp, ok",
+			args: args{
+				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+				},
+			},
+		},
+		{
+			name: "no IDPConfigID",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp not existing",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing idp not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.es.RemoveIdpConfiguration(tt.args.ctx, tt.args.idp)
+
+			if !tt.res.wantErr && err != nil {
+				t.Errorf("should not get err")
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+func TestDeactivateIdpConfiguration(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *IamEventstore
+		ctx context.Context
+		idp *iam_model.IDPConfig
+	}
+	type res struct {
+		result  *iam_model.IDPConfig
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "deactivate, ok",
+			args: args{
+				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+				},
+			},
+			res: res{
+				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					State:       iam_model.IDPConfigStateInactive,
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+		},
+		{
+			name: "no idp id",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp not existing",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.DeactivateIdpConfiguration(tt.args.ctx, tt.args.idp.AggregateID, tt.args.idp.IDPConfigID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
+			}
+			if !tt.res.wantErr && result.State != tt.res.result.State {
+				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestReactivateIdpConfiguration(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	type args struct {
+		es  *IamEventstore
+		ctx context.Context
+		idp *iam_model.IDPConfig
+	}
+	type res struct {
+		result  *iam_model.IDPConfig
+		wantErr bool
+		errFunc func(err error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "reactivate, ok",
+			args: args{
+				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+				},
+			},
+			res: res{
+				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					State:       iam_model.IDPConfigStateActive,
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+		},
+		{
+			name: "no idp id",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "idp not existing",
+			args: args{
+				es:  GetMockManipulateIam(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "existing iam not found",
+			args: args{
+				es:  GetMockManipulateIamNotExisting(ctrl),
+				ctx: authz.NewMockContext("orgID", "userID"),
+				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IDPConfigID",
+					Name:        "Name",
+					OIDCConfig: &iam_model.OIDCIDPConfig{
+						ClientID: "ClientID",
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+				errFunc: caos_errs.IsNotFound,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := tt.args.es.ReactivateIdpConfiguration(tt.args.ctx, tt.args.idp.AggregateID, tt.args.idp.IDPConfigID)
+
+			if !tt.res.wantErr && result.AggregateID == "" {
+				t.Errorf("result has no id")
+			}
+			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
+				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
+			}
+			if !tt.res.wantErr && result.State != tt.res.result.State {
+				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
+			}
+			if tt.res.wantErr && !tt.res.errFunc(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}

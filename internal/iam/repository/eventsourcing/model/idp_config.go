@@ -17,6 +17,11 @@ type IDPConfig struct {
 	OIDCIDPConfig *OIDCIDPConfig `json:"-"`
 }
 
+type IDPConfigID struct {
+	es_models.ObjectRoot
+	IDPConfigID string `json:"idpConfigId"`
+}
+
 func GetIDPConfig(idps []*IDPConfig, id string) (int, *IDPConfig) {
 	for i, idp := range idps {
 		if idp.IDPConfigID == id {

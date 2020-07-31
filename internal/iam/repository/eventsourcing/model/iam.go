@@ -24,6 +24,7 @@ type Iam struct {
 
 func IamFromModel(iam *model.Iam) *Iam {
 	members := IamMembersFromModel(iam.Members)
+	idps := IDPConfigsFromModel(iam.IDPs)
 	converted := &Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
@@ -31,12 +32,14 @@ func IamFromModel(iam *model.Iam) *Iam {
 		GlobalOrgID:  iam.GlobalOrgID,
 		IamProjectID: iam.IamProjectID,
 		Members:      members,
+		IDPs:         idps,
 	}
 	return converted
 }
 
 func IamToModel(iam *Iam) *model.Iam {
 	members := IamMembersToModel(iam.Members)
+	idps := IDPConfigsToModel(iam.IDPs)
 	converted := &model.Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
@@ -44,6 +47,7 @@ func IamToModel(iam *Iam) *model.Iam {
 		GlobalOrgID:  iam.GlobalOrgID,
 		IamProjectID: iam.IamProjectID,
 		Members:      members,
+		IDPs:         idps,
 	}
 	return converted
 }

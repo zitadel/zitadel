@@ -4,17 +4,21 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/cache/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_int "github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/id"
 )
 
 type IamEventstore struct {
 	es_int.Eventstore
-	iamCache *IamCache
+	iamCache     *IamCache
+	idGenerator  id.Generator
+	secretCrypto crypto.Crypto
 }
 
 type IamConfig struct {
@@ -28,9 +32,15 @@ func StartIam(conf IamConfig, systemDefaults sd.SystemDefaults) (*IamEventstore,
 		return nil, err
 	}
 
+	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
+	if err != nil {
+		return nil, err
+	}
 	return &IamEventstore{
-		Eventstore: conf.Eventstore,
-		iamCache:   iamCache,
+		Eventstore:   conf.Eventstore,
+		iamCache:     iamCache,
+		idGenerator:  id.SonyFlakeGenerator,
+		secretCrypto: aesCrypto,
 	}, nil
 }
 
@@ -187,4 +197,139 @@ func (es *IamEventstore) RemoveIamMember(ctx context.Context, member *iam_model.
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
 	es.iamCache.cacheIam(repoIam)
 	return err
+}
+
+func (es *IamEventstore) AddIdpConfiguration(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+	if idp == nil || !idp.IsValid(true) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Ms89d", "Errors.Iam.IdpInvalid")
+	}
+	existing, err := es.IamByID(ctx, idp.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	id, err := es.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	idp.IDPConfigID = id
+
+	if idp.OIDCConfig != nil {
+		idp.OIDCConfig.IDPConfigID = id
+		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
+	}
+	repoIam := model.IamFromModel(existing)
+	repoIdp := model.IDPConfigFromModel(idp)
+
+	addAggregate := IdpConfigurationAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IDPConfigToModel(i), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-Scj8s", "Errors.Internal")
+}
+
+func (es *IamEventstore) ChangeIdpConfiguration(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+	if idp == nil || !idp.IsValid(false) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Cms8o", "Errors.Iam.IdpInvalid")
+	}
+	existing, err := es.IamByID(ctx, idp.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Cmlos", "Errors.Iam.IdpNotExisting")
+	}
+	repoIam := model.IamFromModel(existing)
+	repoIdp := model.IDPConfigFromModel(idp)
+
+	iamAggregate := IdpConfigurationChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IDPConfigToModel(i), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-Xmlo0", "Errors.Internal")
+}
+
+func (es *IamEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_model.IDPConfig) error {
+	if idp.IDPConfigID == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Mdlos", "Errors.Iam.IDMissing")
+	}
+	existing, err := es.IamByID(ctx, idp.IDPConfigID)
+	if err != nil {
+		return err
+	}
+	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Wus8d", "Errors.Iam.IdpNotExisting")
+	}
+	repoIam := model.IamFromModel(existing)
+	repoIdp := model.IDPConfigFromModel(idp)
+	projectAggregate := IdpConfigurationRemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
+	if err != nil {
+		return err
+	}
+	es.iamCache.cacheIam(repoIam)
+	return nil
+}
+
+func (es *IamEventstore) DeactivateIdpConfiguration(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	if idpID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fbs8o", "Errors.Iam.IDMissing")
+	}
+	existing, err := es.IamByID(ctx, iamID)
+	if err != nil {
+		return nil, err
+	}
+	idp := &iam_model.IDPConfig{IDPConfigID: idpID}
+	if _, app := existing.GetIDP(idp.IDPConfigID); app == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Mci32", "Errors.Iam.IdpNotExisting")
+	}
+	repoIam := model.IamFromModel(existing)
+	repoIdp := model.IDPConfigFromModel(idp)
+
+	iamAggregate := IdpConfigurationDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IDPConfigToModel(i), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-Xnc8d", "Errors.Internal")
+}
+
+func (es *IamEventstore) ReactivateIdpConfiguration(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+	if idpID == "" {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Wkjsf", "Errors.Iam.IDMissing")
+	}
+	existing, err := es.IamByID(ctx, iamID)
+	if err != nil {
+		return nil, err
+	}
+	idp := &iam_model.IDPConfig{IDPConfigID: idpID}
+	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Sjc78", "Errors.Iam.IdpNotExisting")
+	}
+	repoIam := model.IamFromModel(existing)
+	repoIdp := model.IDPConfigFromModel(idp)
+
+	iamAggregate := IdpConfigurationReactivatedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
+	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
+	if err != nil {
+		return nil, err
+	}
+	es.iamCache.cacheIam(repoIam)
+	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IDPConfigToModel(i), nil
+	}
+	return nil, caos_errs.ThrowInternal(nil, "EVENT-Snd4f", "Errors.Internal")
 }

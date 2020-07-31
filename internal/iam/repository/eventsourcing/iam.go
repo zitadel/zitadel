@@ -122,3 +122,109 @@ func IamMemberRemovedAggregate(aggCreator *es_models.AggregateCreator, existing 
 		return agg.AppendEvent(model.IamMemberRemoved, member)
 	}
 }
+
+func IdpConfigurationAddedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-MSn7d", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigAdded, idp)
+		if idp.OIDCIDPConfig != nil {
+			agg.AppendEvent(model.OidcIdpConfigAdded, idp.OIDCIDPConfig)
+		}
+		return agg, nil
+	}
+}
+
+func IdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Amc7s", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		var changes map[string]interface{}
+		for _, i := range existing.IDPs {
+			if i.IDPConfigID == idp.IDPConfigID {
+				changes = i.Changes(idp)
+			}
+		}
+		agg.AppendEvent(model.IdpConfigChanged, changes)
+
+		return agg, nil
+	}
+}
+
+func IdpConfigurationRemovedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-se23g", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigRemoved, &model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
+
+		return agg, nil
+	}
+}
+
+func IdpConfigurationDeactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slfi3", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigDeactivated, &model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
+
+		return agg, nil
+	}
+}
+
+func IdpConfigurationReactivatedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, idp *model.IDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if idp == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slf32", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		agg.AppendEvent(model.IdpConfigReactivated, &model.IDPConfigID{IDPConfigID: idp.IDPConfigID})
+
+		return agg, nil
+	}
+}
+
+func OIDCIdpConfigurationChangedAggregate(aggCreator *es_models.AggregateCreator, existing *model.Iam, config *model.OIDCIDPConfig) func(ctx context.Context) (*es_models.Aggregate, error) {
+	return func(ctx context.Context) (*es_models.Aggregate, error) {
+		if config == nil {
+			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-slf32", "Errors.Internal")
+		}
+		agg, err := IamAggregate(ctx, aggCreator, existing)
+		if err != nil {
+			return nil, err
+		}
+		var changes map[string]interface{}
+		for _, idp := range existing.IDPs {
+			if idp.IDPConfigID == config.IDPConfigID {
+				if idp.OIDCIDPConfig != nil {
+					changes = idp.OIDCIDPConfig.Changes(config)
+				}
+			}
+		}
+		agg.AppendEvent(model.OidcIdpConfigChanged, changes)
+
+		return agg, nil
+	}
+}

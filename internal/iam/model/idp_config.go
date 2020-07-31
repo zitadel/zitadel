@@ -39,3 +39,29 @@ const (
 	IDPConfigStateInactive
 	IDPConfigStateRemoved
 )
+
+func (idp *IDPConfig) IsValid(includeConfig bool) bool {
+	if idp.Name == "" || idp.AggregateID == "" {
+		return false
+	}
+	if !includeConfig {
+		return true
+	}
+	if idp.Type == IDPConfigTypeOIDC && !idp.OIDCConfig.IsValid() {
+		return false
+	}
+	return true
+}
+
+func (oi *OIDCIDPConfig) IsValid() bool {
+	return oi.ClientID != "" && oi.ClientSecretString != "" && oi.Issuer != ""
+}
+
+func (oi *OIDCIDPConfig) CryptSecret(crypt crypto.Crypto) error {
+	cryptedSecret, err := crypto.Crypt([]byte(oi.ClientSecretString), crypt)
+	if err != nil {
+		return err
+	}
+	oi.ClientSecret = cryptedSecret
+	return nil
+}
