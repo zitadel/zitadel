@@ -283,5 +283,20 @@ EventTypes:
       added: ZITADEL Mitglied hinzugefügt
       changed: ZITADEL Mitglied geändert
       removed: ZITADEL Mitglied entfernt
+    idp:
+      config:
+        added: IDP Konfiguration hinzugefügt
+        changed: IDP Konfiguration geändert
+        removed: IDP Konfiguration gelöscht
+        deactivated: IDP Konfiguration deaktiviert
+        reactivated: IDP Konfiguration reaktiviert
+      oidc:
+        config:
+          added: OIDC IDP Konfiguration hinzugefügt
+          changed: OIDC IDP Konfiguration geändert
+      saml:
+        config:
+          added: SAML IDP Konfiguration hinzugefügt
+          changed: SAML IDP Konfiguration geändert
   key_pair:
     added: Schlüsselpaar hinzugefügt

@@ -283,5 +283,20 @@ EventTypes:
       added: ZITADEL member added
       changed: ZITADEL member changed
       removed: ZITADEL member removed
+    idp:
+      config:
+        added: IDP configuration added
+        changed: IDP configuration changed
+        removed: IDP configuration removed
+        deactivated: IDP configuration deactivated
+        reactivated: IDP configuration reactivated
+      oidc:
+        config:
+          added: OIDC IDP configuration added
+          changed: OIDC IDP configuration changed
+      saml:
+        config:
+          added: SAML IDP configuration added
+          changed: SAML IDP configuration changed
   key_pair:
     added: Key pair added
