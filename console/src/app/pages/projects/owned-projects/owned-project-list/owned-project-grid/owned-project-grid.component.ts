@@ -89,7 +89,6 @@ export class OwnedProjectGridComponent implements OnChanges {
                 const array: string[] = JSON.parse(storageEntry);
                 const toSelect: ProjectView.AsObject[] = this.items.filter((item, index) => {
                     if (array.includes(item.projectId)) {
-                        // this.notPinned.splice(index, 1);
                         return true;
                     }
                 });
@@ -112,7 +111,6 @@ export class OwnedProjectGridComponent implements OnChanges {
 
     private async setPrefixedItem(key: string, value: any): Promise<void> {
         const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
-        // const prefix = (await this.authService.GetActiveOrg()).id;
         return localStorage.setItem(`${org.id}:${key}`, value);
     }
 
