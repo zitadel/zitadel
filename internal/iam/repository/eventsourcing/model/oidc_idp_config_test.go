@@ -9,8 +9,8 @@ import (
 
 func TestOIDCIdpConfigChanges(t *testing.T) {
 	type args struct {
-		existing *OIDCIDPConfig
-		new      *OIDCIDPConfig
+		existing *OidcIdpConfig
+		new      *OidcIdpConfig
 	}
 	type res struct {
 		changesLen int
@@ -23,15 +23,15 @@ func TestOIDCIdpConfigChanges(t *testing.T) {
 		{
 			name: "all possible values change",
 			args: args{
-				existing: &OIDCIDPConfig{
-					IDPConfigID:  "IDPConfigID",
+				existing: &OidcIdpConfig{
+					IdpConfigID:  "IdpConfigID",
 					ClientID:     "ClientID",
 					ClientSecret: &crypto.CryptoValue{KeyID: "KeyID"},
 					Issuer:       "Issuer",
 					Scopes:       []string{"scope1"},
 				},
-				new: &OIDCIDPConfig{
-					IDPConfigID:  "IDPConfigID",
+				new: &OidcIdpConfig{
+					IdpConfigID:  "IdpConfigID",
 					ClientID:     "ClientID2",
 					ClientSecret: &crypto.CryptoValue{KeyID: "KeyID2"},
 					Issuer:       "Issuer2",
@@ -45,14 +45,14 @@ func TestOIDCIdpConfigChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &OIDCIDPConfig{
-					IDPConfigID: "IDPConfigID",
+				existing: &OidcIdpConfig{
+					IdpConfigID: "IdpConfigID",
 					ClientID:    "ClientID",
 					Issuer:      "Issuer",
 					Scopes:      []string{"scope1"},
 				},
-				new: &OIDCIDPConfig{
-					IDPConfigID: "IDPConfigID",
+				new: &OidcIdpConfig{
+					IdpConfigID: "IdpConfigID",
 					ClientID:    "ClientID",
 					Issuer:      "Issuer",
 					Scopes:      []string{"scope1"},
@@ -76,7 +76,7 @@ func TestOIDCIdpConfigChanges(t *testing.T) {
 func TestAppendAddOIDCIdpConfigEvent(t *testing.T) {
 	type args struct {
 		iam    *Iam
-		config *OIDCIDPConfig
+		config *OidcIdpConfig
 		event  *es_models.Event
 	}
 	tests := []struct {
@@ -87,11 +87,11 @@ func TestAppendAddOIDCIdpConfigEvent(t *testing.T) {
 		{
 			name: "append add oidc idp config event",
 			args: args{
-				iam:    &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID"}}},
-				config: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"},
+				iam:    &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID"}}},
+				config: &OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}}}},
+			result: &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", OIDCIDPConfig: &OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"}}}},
 		},
 	}
 	for _, tt := range tests {
@@ -100,7 +100,7 @@ func TestAppendAddOIDCIdpConfigEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.config)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendAddOIDCIdpConfigEvent(tt.args.event)
+			tt.args.iam.appendAddOidcIdpConfigEvent(tt.args.event)
 			if len(tt.args.iam.IDPs) != 1 {
 				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.iam.IDPs))
 			}
@@ -117,7 +117,7 @@ func TestAppendAddOIDCIdpConfigEvent(t *testing.T) {
 func TestAppendChangeOIDCIdpConfigEvent(t *testing.T) {
 	type args struct {
 		iam    *Iam
-		config *OIDCIDPConfig
+		config *OidcIdpConfig
 		event  *es_models.Event
 	}
 	tests := []struct {
@@ -128,11 +128,11 @@ func TestAppendChangeOIDCIdpConfigEvent(t *testing.T) {
 		{
 			name: "append change oidc idp config event",
 			args: args{
-				iam:    &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}}}},
-				config: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID Changed"},
+				iam:    &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", OIDCIDPConfig: &OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"}}}},
+				config: &OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID Changed"},
 				event:  &es_models.Event{},
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", OIDCIDPConfig: &OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID Changed"}}}},
+			result: &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", OIDCIDPConfig: &OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID Changed"}}}},
 		},
 	}
 	for _, tt := range tests {
@@ -141,7 +141,7 @@ func TestAppendChangeOIDCIdpConfigEvent(t *testing.T) {
 				data, _ := json.Marshal(tt.args.config)
 				tt.args.event.Data = data
 			}
-			tt.args.iam.appendChangeOIDCIdpConfigEvent(tt.args.event)
+			tt.args.iam.appendChangeOidcIdpConfigEvent(tt.args.event)
 			if len(tt.args.iam.IDPs) != 1 {
 				t.Errorf("got wrong result should have one app actual: %v ", len(tt.args.iam.IDPs))
 			}

@@ -64,6 +64,34 @@ func (repo *IamRepository) SearchIamMembers(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
+func (repo *IamRepository) AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+	idp.AggregateID = repo.SystemDefaults.IamID
+	return repo.IamEventstore.AddIdpConfiguration(ctx, idp)
+}
+
+func (repo *IamRepository) ChangeIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
+	idp.AggregateID = repo.SystemDefaults.IamID
+	return repo.IamEventstore.ChangeIdpConfiguration(ctx, idp)
+}
+
+func (repo *IamRepository) DeactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
+	return repo.IamEventstore.DeactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+}
+
+func (repo *IamRepository) ReactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error) {
+	return repo.IamEventstore.ReactivateIdpConfiguration(ctx, repo.SystemDefaults.IamID, idpConfigID)
+}
+
+func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID string) error {
+	idp := iam_model.NewIdpConfig(repo.SystemDefaults.IamID, idpConfigID)
+	return repo.IamEventstore.RemoveIdpConfiguration(ctx, idp)
+}
+
+func (repo *IamRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {
+	oidcConfig.AggregateID = repo.SystemDefaults.IamID
+	return repo.IamEventstore.ChangeIdpOidcConfiguration(ctx, oidcConfig)
+}
+
 func (repo *IamRepository) GetIamMemberRoles() []string {
 	roles := make([]string, 0)
 	for _, roleMap := range repo.Roles {

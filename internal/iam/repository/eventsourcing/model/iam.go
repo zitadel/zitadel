@@ -19,12 +19,12 @@ type Iam struct {
 	GlobalOrgID  string       `json:"globalOrgId,omitempty"`
 	IamProjectID string       `json:"iamProjectId,omitempty"`
 	Members      []*IamMember `json:"-"`
-	IDPs         []*IDPConfig `json:"-"`
+	IDPs         []*IdpConfig `json:"-"`
 }
 
 func IamFromModel(iam *model.Iam) *Iam {
 	members := IamMembersFromModel(iam.Members)
-	idps := IDPConfigsFromModel(iam.IDPs)
+	idps := IdpConfigsFromModel(iam.IDPs)
 	converted := &Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
@@ -39,7 +39,7 @@ func IamFromModel(iam *model.Iam) *Iam {
 
 func IamToModel(iam *Iam) *model.Iam {
 	members := IamMembersToModel(iam.Members)
-	idps := IDPConfigsToModel(iam.IDPs)
+	idps := IdpConfigsToModel(iam.IDPs)
 	converted := &model.Iam{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: iam.SetUpStarted,
@@ -84,13 +84,13 @@ func (i *Iam) AppendEvent(event *es_models.Event) (err error) {
 	case IdpConfigRemoved:
 		return i.appendRemoveIdpConfigEvent(event)
 	case IdpConfigDeactivated:
-		return i.appendIdpConfigStateEvent(event, model.IDPConfigStateInactive)
+		return i.appendIdpConfigStateEvent(event, model.IdpConfigStateInactive)
 	case IdpConfigReactivated:
-		return i.appendIdpConfigStateEvent(event, model.IDPConfigStateActive)
+		return i.appendIdpConfigStateEvent(event, model.IdpConfigStateActive)
 	case OidcIdpConfigAdded:
-		return i.appendAddOIDCIdpConfigEvent(event)
+		return i.appendAddOidcIdpConfigEvent(event)
 	case OidcIdpConfigChanged:
-		return i.appendChangeOIDCIdpConfigEvent(event)
+		return i.appendChangeOidcIdpConfigEvent(event)
 	}
 
 	return err

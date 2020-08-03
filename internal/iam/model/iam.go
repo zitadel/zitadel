@@ -11,7 +11,7 @@ type Iam struct {
 	SetUpDone    bool
 	SetUpStarted bool
 	Members      []*IamMember
-	IDPs         []*IDPConfig
+	IDPs         []*IdpConfig
 }
 
 func (iam *Iam) GetMember(userID string) (int, *IamMember) {
@@ -23,7 +23,7 @@ func (iam *Iam) GetMember(userID string) (int, *IamMember) {
 	return -1, nil
 }
 
-func (iam *Iam) GetIDP(idpID string) (int, *IDPConfig) {
+func (iam *Iam) GetIDP(idpID string) (int, *IdpConfig) {
 	for i, idp := range iam.IDPs {
 		if idp.IDPConfigID == idpID {
 			return i, idp

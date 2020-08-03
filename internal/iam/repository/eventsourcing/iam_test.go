@@ -514,7 +514,7 @@ func TestIdpConfigAddedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IDPConfig
+		new        *model.IdpConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -533,11 +533,11 @@ func TestIdpConfigAddedAggregate(t *testing.T) {
 			args: args{
 				ctx:      authz.NewMockContext("orgID", "userID"),
 				existing: &model.Iam{ObjectRoot: models.ObjectRoot{AggregateID: "AggregateID"}, IamProjectID: "IamProjectID"},
-				new: &model.IDPConfig{
+				new: &model.IdpConfig{
 					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID:   "IDPConfigID",
+					IDPConfigID:   "IdpConfigID",
 					Name:          "Name",
-					OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"},
+					OIDCIDPConfig: &model.OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"},
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
 			},
@@ -601,7 +601,7 @@ func TestIdpConnfigurationChangedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IDPConfig
+		new        *model.IdpConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -622,12 +622,12 @@ func TestIdpConnfigurationChangedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IDPConfig{
-						{IDPConfigID: "IDPConfigID", Name: "IDPName"},
+					IDPs: []*model.IdpConfig{
+						{IDPConfigID: "IdpConfigID", Name: "IDPName"},
 					}},
-				new: &model.IDPConfig{
+				new: &model.IdpConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					Name:        "NameChanged",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -690,7 +690,7 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IDPConfig
+		new        *model.IdpConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -711,12 +711,12 @@ func TestIdpConfigurationRemovedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IDPConfig{
-						{IDPConfigID: "IDPConfigID", Name: "Name"},
+					IDPs: []*model.IdpConfig{
+						{IDPConfigID: "IdpConfigID", Name: "Name"},
 					}},
-				new: &model.IDPConfig{
+				new: &model.IdpConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -779,7 +779,7 @@ func TestIdpConfigurationDeactivatedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IDPConfig
+		new        *model.IdpConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -800,12 +800,12 @@ func TestIdpConfigurationDeactivatedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IDPConfig{
-						{IDPConfigID: "IDPConfigID", Name: "Name"},
+					IDPs: []*model.IdpConfig{
+						{IDPConfigID: "IdpConfigID", Name: "Name"},
 					}},
-				new: &model.IDPConfig{
+				new: &model.IdpConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -868,7 +868,7 @@ func TestIdpConfigurationReactivatedAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.IDPConfig
+		new        *model.IdpConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -889,12 +889,12 @@ func TestIdpConfigurationReactivatedAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IDPConfig{
-						{IDPConfigID: "IDPConfigID", Name: "Name"},
+					IDPs: []*model.IdpConfig{
+						{IDPConfigID: "IdpConfigID", Name: "Name"},
 					}},
-				new: &model.IDPConfig{
+				new: &model.IdpConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),
@@ -957,7 +957,7 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		existing   *model.Iam
-		new        *model.OIDCIDPConfig
+		new        *model.OidcIdpConfig
 		aggCreator *models.AggregateCreator
 	}
 	type res struct {
@@ -978,12 +978,12 @@ func TestOIDCConfigchangAggregate(t *testing.T) {
 				existing: &model.Iam{
 					ObjectRoot:   models.ObjectRoot{AggregateID: "AggregateID"},
 					IamProjectID: "IamProjectID",
-					IDPs: []*model.IDPConfig{
-						{IDPConfigID: "IDPConfigID", Name: "Name", OIDCIDPConfig: &model.OIDCIDPConfig{IDPConfigID: "IDPConfigID", ClientID: "ClientID"}},
+					IDPs: []*model.IdpConfig{
+						{IDPConfigID: "IdpConfigID", Name: "Name", OIDCIDPConfig: &model.OidcIdpConfig{IdpConfigID: "IdpConfigID", ClientID: "ClientID"}},
 					}},
-				new: &model.OIDCIDPConfig{
+				new: &model.OidcIdpConfig{
 					ObjectRoot:  models.ObjectRoot{AggregateID: "AggregateID"},
-					IDPConfigID: "IDPConfigID",
+					IdpConfigID: "IdpConfigID",
 					ClientID:    "ClientIDChanged",
 				},
 				aggCreator: models.NewAggregateCreator("Test"),

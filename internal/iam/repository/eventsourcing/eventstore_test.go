@@ -643,10 +643,10 @@ func TestAddIdpConfiguration(t *testing.T) {
 	type args struct {
 		es  *IamEventstore
 		ctx context.Context
-		idp *iam_model.IDPConfig
+		idp *iam_model.IdpConfig
 	}
 	type res struct {
-		result  *iam_model.IDPConfig
+		result  *iam_model.IdpConfig
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -660,11 +660,11 @@ func TestAddIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamWithCrypto(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
 					Type:        iam_model.IDPConfigTypeOIDC,
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID:           "ClientID",
 						ClientSecretString: "ClientSecret",
 						Issuer:             "Issuer",
@@ -673,10 +673,10 @@ func TestAddIdpConfiguration(t *testing.T) {
 				},
 			},
 			res: res{
-				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+				result: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
 					Name: "Name",
 					Type: iam_model.IDPConfigTypeOIDC,
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 						Issuer:   "Issuer",
 						Scopes:   []string{"scope"},
@@ -689,7 +689,7 @@ func TestAddIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -701,10 +701,10 @@ func TestAddIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID:           "ClientID",
 						ClientSecretString: "ClientSecret",
 						Issuer:             "Issuer",
@@ -749,10 +749,10 @@ func TestChangeIdpConfiguration(t *testing.T) {
 	type args struct {
 		es  *IamEventstore
 		ctx context.Context
-		idp *iam_model.IDPConfig
+		idp *iam_model.IdpConfig
 	}
 	type res struct {
-		result  *iam_model.IDPConfig
+		result  *iam_model.IdpConfig
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -766,16 +766,16 @@ func TestChangeIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "NameChanged",
 				},
 			},
 			res: res{
-				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				result: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "NameChanged",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -786,8 +786,8 @@ func TestChangeIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 				},
 			},
 			res: res{
@@ -800,10 +800,10 @@ func TestChangeIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -818,10 +818,10 @@ func TestChangeIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -857,7 +857,7 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 	type args struct {
 		es  *IamEventstore
 		ctx context.Context
-		idp *iam_model.IDPConfig
+		idp *iam_model.IdpConfig
 	}
 	type res struct {
 		wantErr bool
@@ -873,17 +873,17 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 				},
 			},
 		},
 		{
-			name: "no IDPConfigID",
+			name: "no IdpConfigID",
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -895,8 +895,8 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 				},
 			},
 			res: res{
@@ -909,8 +909,8 @@ func TestRemoveIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 				},
 			},
 			res: res{
@@ -937,10 +937,10 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 	type args struct {
 		es  *IamEventstore
 		ctx context.Context
-		idp *iam_model.IDPConfig
+		idp *iam_model.IdpConfig
 	}
 	type res struct {
-		result  *iam_model.IDPConfig
+		result  *iam_model.IdpConfig
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -954,17 +954,17 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
 				},
 			},
 			res: res{
-				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				result: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					State:       iam_model.IDPConfigStateInactive,
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					State:       iam_model.IdpConfigStateInactive,
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -975,7 +975,7 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -987,10 +987,10 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -1005,10 +1005,10 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -1027,7 +1027,7 @@ func TestDeactivateIdpConfiguration(t *testing.T) {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
-				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
+				t.Errorf("got wrong result IdpConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
 			if !tt.res.wantErr && result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
@@ -1044,10 +1044,10 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 	type args struct {
 		es  *IamEventstore
 		ctx context.Context
-		idp *iam_model.IDPConfig
+		idp *iam_model.IdpConfig
 	}
 	type res struct {
-		result  *iam_model.IDPConfig
+		result  *iam_model.IdpConfig
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -1061,17 +1061,17 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
 				},
 			},
 			res: res{
-				result: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				result: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					State:       iam_model.IDPConfigStateActive,
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					State:       iam_model.IdpConfigStateActive,
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -1082,7 +1082,7 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1}},
 			},
 			res: res{
 				wantErr: true,
@@ -1094,10 +1094,10 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -1112,10 +1112,10 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				idp: &iam_model.IDPConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
-					IDPConfigID: "IDPConfigID",
+				idp: &iam_model.IdpConfig{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 1},
+					IDPConfigID: "IdpConfigID",
 					Name:        "Name",
-					OIDCConfig: &iam_model.OIDCIDPConfig{
+					OIDCConfig: &iam_model.OidcIdpConfig{
 						ClientID: "ClientID",
 					},
 				},
@@ -1134,7 +1134,7 @@ func TestReactivateIdpConfiguration(t *testing.T) {
 				t.Errorf("result has no id")
 			}
 			if !tt.res.wantErr && result.IDPConfigID != tt.res.result.IDPConfigID {
-				t.Errorf("got wrong result IDPConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
+				t.Errorf("got wrong result IdpConfigID: expected: %v, actual: %v ", tt.res.result.IDPConfigID, result.IDPConfigID)
 			}
 			if !tt.res.wantErr && result.State != tt.res.result.State {
 				t.Errorf("got wrong result state: expected: %v, actual: %v ", tt.res.result.State, result.State)
@@ -1151,10 +1151,10 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 	type args struct {
 		es     *IamEventstore
 		ctx    context.Context
-		config *iam_model.OIDCIDPConfig
+		config *iam_model.OidcIdpConfig
 	}
 	type res struct {
-		result  *iam_model.OIDCIDPConfig
+		result  *iam_model.OidcIdpConfig
 		wantErr bool
 		errFunc func(err error) bool
 	}
@@ -1168,18 +1168,18 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamWithOIDCIdp(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				config: &iam_model.OIDCIDPConfig{
+				config: &iam_model.OidcIdpConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					ClientID:    "ClientIDChange",
 					Issuer:      "Issuer",
 					Scopes:      []string{"scope"},
 				},
 			},
 			res: res{
-				result: &iam_model.OIDCIDPConfig{
+				result: &iam_model.OidcIdpConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					ClientID:    "ClientIDChange",
 				},
 			},
@@ -1189,9 +1189,9 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				config: &iam_model.OIDCIDPConfig{
+				config: &iam_model.OidcIdpConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 				},
 			},
 			res: res{
@@ -1204,9 +1204,9 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIam(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				config: &iam_model.OIDCIDPConfig{
+				config: &iam_model.OidcIdpConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					ClientID:    "ClientID",
 					Issuer:      "Issuer",
 					Scopes:      []string{"scope"},
@@ -1222,9 +1222,9 @@ func TestChangeOIDCIDPConfig(t *testing.T) {
 			args: args{
 				es:  GetMockManipulateIamNotExisting(ctrl),
 				ctx: authz.NewMockContext("orgID", "userID"),
-				config: &iam_model.OIDCIDPConfig{
+				config: &iam_model.OidcIdpConfig{
 					ObjectRoot:  es_models.ObjectRoot{AggregateID: "AggregateID", Sequence: 0},
-					IDPConfigID: "IDPConfigID",
+					IDPConfigID: "IdpConfigID",
 					ClientID:    "ClientID",
 					Issuer:      "Issuer",
 					Scopes:      []string{"scope"},

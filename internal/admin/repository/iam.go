@@ -12,4 +12,11 @@ type IamRepository interface {
 	RemoveIamMember(ctx context.Context, userID string) error
 
 	GetIamMemberRoles() []string
+
+	AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error)
+	ChangeIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error)
+	DeactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error)
+	ReactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error)
+	RemoveIdpConfig(ctx context.Context, idpConfigID string) error
+	ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error)
 }

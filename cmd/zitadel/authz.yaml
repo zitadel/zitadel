@@ -48,6 +48,9 @@ InternalAuthZ:
         - "project.grant.user.grant.read"
         - "project.grant.user.grant.write"
         - "project.grant.user.grant.delete"
+        - "iam.idp.read"
+        - "iam.idp.write"
+        - "iam.idp.delete"
     - Role: 'IAM_OWNER_VIEWER'
       Permissions:
         - "iam.read"
@@ -66,6 +69,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+        - "iam.idp.read"
     - Role: 'ORG_OWNER'
       Permissions:
         - "org.read"

@@ -199,7 +199,7 @@ func (es *IamEventstore) RemoveIamMember(ctx context.Context, member *iam_model.
 	return err
 }
 
-func (es *IamEventstore) AddIdpConfiguration(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+func (es *IamEventstore) AddIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
 	if idp == nil || !idp.IsValid(true) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Ms89d", "Errors.Iam.IdpInvalid")
 	}
@@ -218,7 +218,7 @@ func (es *IamEventstore) AddIdpConfiguration(ctx context.Context, idp *iam_model
 		err = idp.OIDCConfig.CryptSecret(es.secretCrypto)
 	}
 	repoIam := model.IamFromModel(existing)
-	repoIdp := model.IDPConfigFromModel(idp)
+	repoIdp := model.IdpConfigFromModel(idp)
 
 	addAggregate := IdpConfigurationAddedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, addAggregate)
@@ -226,13 +226,13 @@ func (es *IamEventstore) AddIdpConfiguration(ctx context.Context, idp *iam_model
 		return nil, err
 	}
 	es.iamCache.cacheIam(repoIam)
-	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
-		return model.IDPConfigToModel(i), nil
+	if _, i := model.GetIdpConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IdpConfigToModel(i), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Scj8s", "Errors.Internal")
 }
 
-func (es *IamEventstore) ChangeIdpConfiguration(ctx context.Context, idp *iam_model.IDPConfig) (*iam_model.IDPConfig, error) {
+func (es *IamEventstore) ChangeIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
 	if idp == nil || !idp.IsValid(false) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Cms8o", "Errors.Iam.IdpInvalid")
 	}
@@ -244,7 +244,7 @@ func (es *IamEventstore) ChangeIdpConfiguration(ctx context.Context, idp *iam_mo
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Cmlos", "Errors.Iam.IdpNotExisting")
 	}
 	repoIam := model.IamFromModel(existing)
-	repoIdp := model.IDPConfigFromModel(idp)
+	repoIdp := model.IdpConfigFromModel(idp)
 
 	iamAggregate := IdpConfigurationChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
@@ -252,13 +252,13 @@ func (es *IamEventstore) ChangeIdpConfiguration(ctx context.Context, idp *iam_mo
 		return nil, err
 	}
 	es.iamCache.cacheIam(repoIam)
-	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
-		return model.IDPConfigToModel(i), nil
+	if _, i := model.GetIdpConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IdpConfigToModel(i), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Xmlo0", "Errors.Internal")
 }
 
-func (es *IamEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_model.IDPConfig) error {
+func (es *IamEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_model.IdpConfig) error {
 	if idp.IDPConfigID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Mdlos", "Errors.Iam.IDMissing")
 	}
@@ -270,7 +270,7 @@ func (es *IamEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_mo
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Wus8d", "Errors.Iam.IdpNotExisting")
 	}
 	repoIam := model.IamFromModel(existing)
-	repoIdp := model.IDPConfigFromModel(idp)
+	repoIdp := model.IdpConfigFromModel(idp)
 	projectAggregate := IdpConfigurationRemovedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, projectAggregate)
 	if err != nil {
@@ -280,7 +280,7 @@ func (es *IamEventstore) RemoveIdpConfiguration(ctx context.Context, idp *iam_mo
 	return nil
 }
 
-func (es *IamEventstore) DeactivateIdpConfiguration(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+func (es *IamEventstore) DeactivateIdpConfiguration(ctx context.Context, iamID, idpID string) (*iam_model.IdpConfig, error) {
 	if idpID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Fbs8o", "Errors.Iam.IDMissing")
 	}
@@ -288,12 +288,12 @@ func (es *IamEventstore) DeactivateIdpConfiguration(ctx context.Context, iamID, 
 	if err != nil {
 		return nil, err
 	}
-	idp := &iam_model.IDPConfig{IDPConfigID: idpID}
+	idp := &iam_model.IdpConfig{IDPConfigID: idpID}
 	if _, app := existing.GetIDP(idp.IDPConfigID); app == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Mci32", "Errors.Iam.IdpNotExisting")
 	}
 	repoIam := model.IamFromModel(existing)
-	repoIdp := model.IDPConfigFromModel(idp)
+	repoIdp := model.IdpConfigFromModel(idp)
 
 	iamAggregate := IdpConfigurationDeactivatedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
@@ -301,13 +301,13 @@ func (es *IamEventstore) DeactivateIdpConfiguration(ctx context.Context, iamID, 
 		return nil, err
 	}
 	es.iamCache.cacheIam(repoIam)
-	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
-		return model.IDPConfigToModel(i), nil
+	if _, i := model.GetIdpConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IdpConfigToModel(i), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Xnc8d", "Errors.Internal")
 }
 
-func (es *IamEventstore) ReactivateIdpConfiguration(ctx context.Context, iamID, idpID string) (*iam_model.IDPConfig, error) {
+func (es *IamEventstore) ReactivateIdpConfiguration(ctx context.Context, iamID, idpID string) (*iam_model.IdpConfig, error) {
 	if idpID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Wkjsf", "Errors.Iam.IDMissing")
 	}
@@ -315,12 +315,12 @@ func (es *IamEventstore) ReactivateIdpConfiguration(ctx context.Context, iamID, 
 	if err != nil {
 		return nil, err
 	}
-	idp := &iam_model.IDPConfig{IDPConfigID: idpID}
+	idp := &iam_model.IdpConfig{IDPConfigID: idpID}
 	if _, i := existing.GetIDP(idp.IDPConfigID); i == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Sjc78", "Errors.Iam.IdpNotExisting")
 	}
 	repoIam := model.IamFromModel(existing)
-	repoIdp := model.IDPConfigFromModel(idp)
+	repoIdp := model.IdpConfigFromModel(idp)
 
 	iamAggregate := IdpConfigurationReactivatedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoIdp)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
@@ -328,13 +328,13 @@ func (es *IamEventstore) ReactivateIdpConfiguration(ctx context.Context, iamID, 
 		return nil, err
 	}
 	es.iamCache.cacheIam(repoIam)
-	if _, i := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
-		return model.IDPConfigToModel(i), nil
+	if _, i := model.GetIdpConfig(repoIam.IDPs, idp.IDPConfigID); i != nil {
+		return model.IdpConfigToModel(i), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Snd4f", "Errors.Internal")
 }
 
-func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config *iam_model.OIDCIDPConfig) (*iam_model.OIDCIDPConfig, error) {
+func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {
 	if config == nil || !config.IsValid(false) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-*5ki8", "Errors.Iam.OIDCConfigInvalid")
 	}
@@ -342,7 +342,7 @@ func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config 
 	if err != nil {
 		return nil, err
 	}
-	var idp *iam_model.IDPConfig
+	var idp *iam_model.IdpConfig
 	if _, idp = existing.GetIDP(config.IDPConfigID); idp == nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-pso0s", "Errors.Iam.IdpNoExisting")
 	}
@@ -355,7 +355,7 @@ func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config 
 		config.ClientSecret = nil
 	}
 	repoIam := model.IamFromModel(existing)
-	repoConfig := model.OIDCIDPConfigFromModel(config)
+	repoConfig := model.OidcIdpConfigFromModel(config)
 
 	iamAggregate := OIDCIdpConfigurationChangedAggregate(es.Eventstore.AggregateCreator(), repoIam, repoConfig)
 	err = es_sdk.Push(ctx, es.PushAggregates, repoIam.AppendEvents, iamAggregate)
@@ -363,8 +363,8 @@ func (es *IamEventstore) ChangeIdpOidcConfiguration(ctx context.Context, config 
 		return nil, err
 	}
 	es.iamCache.cacheIam(repoIam)
-	if _, a := model.GetIDPConfig(repoIam.IDPs, idp.IDPConfigID); a != nil {
-		return model.OIDCIDPConfigToModel(a.OIDCIDPConfig), nil
+	if _, a := model.GetIdpConfig(repoIam.IDPs, idp.IDPConfigID); a != nil {
+		return model.OidcIdpConfigToModel(a.OIDCIDPConfig), nil
 	}
 	return nil, caos_errs.ThrowInternal(nil, "EVENT-Sldk8", "Errors.Internal")
 }

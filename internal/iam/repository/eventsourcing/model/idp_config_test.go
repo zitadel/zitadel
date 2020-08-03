@@ -9,8 +9,8 @@ import (
 
 func TestIdpConfigChanges(t *testing.T) {
 	type args struct {
-		existing *IDPConfig
-		new      *IDPConfig
+		existing *IdpConfig
+		new      *IdpConfig
 	}
 	type res struct {
 		changesLen int
@@ -23,8 +23,8 @@ func TestIdpConfigChanges(t *testing.T) {
 		{
 			name: "idp config name changes",
 			args: args{
-				existing: &IDPConfig{IDPConfigID: "IDPConfigID", Name: "Name"},
-				new:      &IDPConfig{IDPConfigID: "IDPConfigID", Name: "NameChanged"},
+				existing: &IdpConfig{IDPConfigID: "IdpConfigID", Name: "Name"},
+				new:      &IdpConfig{IDPConfigID: "IdpConfigID", Name: "NameChanged"},
 			},
 			res: res{
 				changesLen: 2,
@@ -33,8 +33,8 @@ func TestIdpConfigChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &IDPConfig{IDPConfigID: "IDPConfigID", Name: "Name"},
-				new:      &IDPConfig{IDPConfigID: "IDPConfigID", Name: "Name"},
+				existing: &IdpConfig{IDPConfigID: "IdpConfigID", Name: "Name"},
+				new:      &IdpConfig{IDPConfigID: "IdpConfigID", Name: "Name"},
 			},
 			res: res{
 				changesLen: 1,
@@ -54,7 +54,7 @@ func TestIdpConfigChanges(t *testing.T) {
 func TestAppendAddIdpConfigEvent(t *testing.T) {
 	type args struct {
 		iam   *Iam
-		idp   *IDPConfig
+		idp   *IdpConfig
 		event *es_models.Event
 	}
 	tests := []struct {
@@ -66,10 +66,10 @@ func TestAppendAddIdpConfigEvent(t *testing.T) {
 			name: "append add idp config event",
 			args: args{
 				iam:   &Iam{},
-				idp:   &IDPConfig{Name: "IdpConfig"},
+				idp:   &IdpConfig{Name: "IdpConfig"},
 				event: &es_models.Event{},
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{Name: "IdpConfig"}}},
+			result: &Iam{IDPs: []*IdpConfig{&IdpConfig{Name: "IdpConfig"}}},
 		},
 	}
 	for _, tt := range tests {
@@ -92,7 +92,7 @@ func TestAppendAddIdpConfigEvent(t *testing.T) {
 func TestAppendChangeIdpConfigEvent(t *testing.T) {
 	type args struct {
 		project *Iam
-		app     *IDPConfig
+		app     *IdpConfig
 		event   *es_models.Event
 	}
 	tests := []struct {
@@ -103,11 +103,11 @@ func TestAppendChangeIdpConfigEvent(t *testing.T) {
 		{
 			name: "append change idp config event",
 			args: args{
-				project: &Iam{IDPs: []*IDPConfig{&IDPConfig{Name: "IdpConfig"}}},
-				app:     &IDPConfig{Name: "IdpConfig Change"},
+				project: &Iam{IDPs: []*IdpConfig{&IdpConfig{Name: "IdpConfig"}}},
+				app:     &IdpConfig{Name: "IdpConfig Change"},
 				event:   &es_models.Event{},
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{Name: "IdpConfig Change"}}},
+			result: &Iam{IDPs: []*IdpConfig{&IdpConfig{Name: "IdpConfig Change"}}},
 		},
 	}
 	for _, tt := range tests {
@@ -130,7 +130,7 @@ func TestAppendChangeIdpConfigEvent(t *testing.T) {
 func TestAppendRemoveIDPEvent(t *testing.T) {
 	type args struct {
 		iam   *Iam
-		idp   *IDPConfig
+		idp   *IdpConfig
 		event *es_models.Event
 	}
 	tests := []struct {
@@ -141,11 +141,11 @@ func TestAppendRemoveIDPEvent(t *testing.T) {
 		{
 			name: "append remove idp config event",
 			args: args{
-				iam:   &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", Name: "IdpConfig"}}},
-				idp:   &IDPConfig{IDPConfigID: "IDPConfigID", Name: "IdpConfig"},
+				iam:   &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", Name: "IdpConfig"}}},
+				idp:   &IdpConfig{IDPConfigID: "IdpConfigID", Name: "IdpConfig"},
 				event: &es_models.Event{},
 			},
-			result: &Iam{IDPs: []*IDPConfig{}},
+			result: &Iam{IDPs: []*IdpConfig{}},
 		},
 	}
 	for _, tt := range tests {
@@ -165,9 +165,9 @@ func TestAppendRemoveIDPEvent(t *testing.T) {
 func TestAppendAppStateEvent(t *testing.T) {
 	type args struct {
 		iam   *Iam
-		idp   *IDPConfig
+		idp   *IdpConfig
 		event *es_models.Event
-		state model.IDPConfigState
+		state model.IdpConfigState
 	}
 	tests := []struct {
 		name   string
@@ -177,22 +177,22 @@ func TestAppendAppStateEvent(t *testing.T) {
 		{
 			name: "append deactivate application event",
 			args: args{
-				iam:   &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", Name: "IdpConfig", State: int32(model.IDPConfigStateActive)}}},
-				idp:   &IDPConfig{IDPConfigID: "IDPConfigID"},
+				iam:   &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", Name: "IdpConfig", State: int32(model.IdpConfigStateActive)}}},
+				idp:   &IdpConfig{IDPConfigID: "IdpConfigID"},
 				event: &es_models.Event{},
-				state: model.IDPConfigStateInactive,
+				state: model.IdpConfigStateInactive,
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", Name: "IdpConfig", State: int32(model.IDPConfigStateInactive)}}},
+			result: &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", Name: "IdpConfig", State: int32(model.IdpConfigStateInactive)}}},
 		},
 		{
 			name: "append reactivate application event",
 			args: args{
-				iam:   &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", Name: "IdpConfig", State: int32(model.IDPConfigStateInactive)}}},
-				idp:   &IDPConfig{IDPConfigID: "IDPConfigID"},
+				iam:   &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", Name: "IdpConfig", State: int32(model.IdpConfigStateInactive)}}},
+				idp:   &IdpConfig{IDPConfigID: "IdpConfigID"},
 				event: &es_models.Event{},
-				state: model.IDPConfigStateActive,
+				state: model.IdpConfigStateActive,
 			},
-			result: &Iam{IDPs: []*IDPConfig{&IDPConfig{IDPConfigID: "IDPConfigID", Name: "IdpConfig", State: int32(model.IDPConfigStateActive)}}},
+			result: &Iam{IDPs: []*IdpConfig{&IdpConfig{IDPConfigID: "IdpConfigID", Name: "IdpConfig", State: int32(model.IdpConfigStateActive)}}},
 		},
 	}
 	for _, tt := range tests {

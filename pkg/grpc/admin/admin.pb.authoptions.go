@@ -98,4 +98,34 @@ var AdminService_AuthMethods = authz.MethodMapping{
 		Permission: "iam.write",
 		CheckParam: "",
 	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/CreateOidcIdp": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/DeactivateIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/ReactivateIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/RemoveIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.admin.api.v1.AdminService/UpdateOidcIdpConfig": authz.Option{
+		Permission: "iam.idp.write",
+		CheckParam: "",
+	},
 }
