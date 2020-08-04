@@ -284,6 +284,29 @@ func (es *ProjectEventstore) RemoveProjectMember(ctx context.Context, member *pr
 	return err
 }
 
+func (es *ProjectEventstore) PrepareRemoveProjectMember(ctx context.Context, member *proj_model.ProjectMember) (*model.ProjectMember, *es_models.Aggregate, error) {
+	if member.UserID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-tCXHE", "Errors.Project.MemberInvalid")
+	}
+	existing, err := es.ProjectByID(ctx, member.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, m := existing.GetMember(member.UserID); m == nil {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-wPcg5", "Errors.Project.MemberNotExisting")
+	}
+	repoProject := model.ProjectFromModel(existing)
+	repoMember := model.ProjectMemberFromModel(member)
+
+	projectAggregate := ProjectMemberRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, repoMember)
+	agg, err := projectAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return repoMember, agg, err
+}
+
 func (es *ProjectEventstore) AddProjectRoles(ctx context.Context, roles ...*proj_model.ProjectRole) (*proj_model.ProjectRole, error) {
 	if roles == nil || len(roles) == 0 {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-uOJAs", "Errors.Project.MinimumOneRoleNeeded")
@@ -565,6 +588,27 @@ func (es *ProjectEventstore) RemoveApplication(ctx context.Context, app *proj_mo
 	}
 	es.projectCache.cacheProject(repoProject)
 	return nil
+}
+
+func (es *ProjectEventstore) PrepareRemoveApplication(ctx context.Context, app *proj_model.Application) (*model.Application, *es_models.Aggregate, error) {
+	if app.AppID == "" {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-xu0Wy", "Errors.Project.IDMissing")
+	}
+	existing, err := es.ProjectByID(ctx, app.AggregateID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, app := existing.GetApp(app.AppID); app == nil {
+		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-gaOD2", "Errors.Project.AppNotExisting")
+	}
+	repoProject := model.ProjectFromModel(existing)
+	appRepo := model.AppFromModel(app)
+	projectAggregate := ApplicationRemovedAggregate(es.Eventstore.AggregateCreator(), repoProject, appRepo)
+	agg, err := projectAggregate(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return appRepo, agg, nil
 }
 
 func (es *ProjectEventstore) ApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool) (*proj_model.ApplicationChanges, error) {

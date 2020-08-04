@@ -53,6 +53,14 @@ func (p *ProjectRole) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		return p.view.DeleteProjectRole(event.AggregateID, event.ResourceOwner, role.Key, event.Sequence)
+	case es_model.ProjectRemoved:
+		projectRoles, err := p.view.ProjectRolesByProjectID(event.AggregateID)
+		if err != nil {
+			logging.LogWithFields("HANDL-SZhAD", "id", event.AggregateID).WithError(err).Warn("could not update existing projects")
+		}
+		for _, existing := range projectRoles {
+			p.view.DeleteProjectRole(existing.ProjectID, existing.OrgID, existing.Key, event.Sequence)
+		}
 	default:
 		return p.view.ProcessedProjectRoleSequence(event.Sequence)
 	}

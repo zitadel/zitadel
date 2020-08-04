@@ -89,6 +89,7 @@ func (repo *ProjectRepo) RemoveProject(ctx context.Context, projectID string) er
 	}
 	aggregates = append(aggregates, agg)
 
+	// remove user_grants
 	usergrants, err := repo.View.UserGrantsByProjectID(projectID)
 	if err != nil {
 		return err
@@ -102,6 +103,7 @@ func (repo *ProjectRepo) RemoveProject(ctx context.Context, projectID string) er
 			aggregates = append(aggregates, agg)
 		}
 	}
+
 	return es_sdk.PushAggregates(ctx, repo.Eventstore.PushAggregates, project.AppendEvents, aggregates...)
 }
 

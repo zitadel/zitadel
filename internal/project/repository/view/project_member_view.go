@@ -22,6 +22,19 @@ func ProjectMemberByIDs(db *gorm.DB, table, projectID, userID string) (*model.Pr
 	return role, err
 }
 
+func ProjectMembersByProjectID(db *gorm.DB, table, projectID string) ([]*model.ProjectMemberView, error) {
+	members := make([]*model.ProjectMemberView, 0)
+	queries := []*proj_model.ProjectMemberSearchQuery{
+		&proj_model.ProjectMemberSearchQuery{Key: proj_model.ProjectMemberSearchKeyProjectID, Value: projectID, Method: global_model.SearchMethodEquals},
+	}
+	query := repository.PrepareSearchQuery(table, model.ProjectMemberSearchRequest{Queries: queries})
+	_, err := query(db, &members)
+	if err != nil {
+		return nil, err
+	}
+	return members, nil
+}
+
 func SearchProjectMembers(db *gorm.DB, table string, req *proj_model.ProjectMemberSearchRequest) ([]*model.ProjectMemberView, int, error) {
 	roles := make([]*model.ProjectMemberView, 0)
 	query := repository.PrepareSearchQuery(table, model.ProjectMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})

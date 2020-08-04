@@ -15,6 +15,10 @@ func (v *View) ProjectGrantMemberByIDs(projectID, userID string) (*model.Project
 	return view.ProjectGrantMemberByIDs(v.Db, projectGrantMemberTable, projectID, userID)
 }
 
+func (v *View) ProjectGrantMembersByProjectID(projectID string) ([]*model.ProjectGrantMemberView, error) {
+	return view.ProjectGrantMembersByProjectID(v.Db, projectGrantMemberTable, projectID)
+}
+
 func (v *View) SearchProjectGrantMembers(request *proj_model.ProjectGrantMemberSearchRequest) ([]*model.ProjectGrantMemberView, int, error) {
 	return view.SearchProjectGrantMembers(v.Db, projectGrantMemberTable, request)
 }

@@ -57,6 +57,14 @@ func (p *Application) Reduce(event *models.Event) (err error) {
 			return err
 		}
 		return p.view.DeleteApplication(app.ID, event.Sequence)
+	case es_model.ProjectRemoved:
+		applications, err := p.view.ApplicationsByProjectID(event.AggregateID)
+		if err != nil {
+			logging.LogWithFields("HANDL-b2nET", "id", event.AggregateID).WithError(err).Warn("could not update existing projects")
+		}
+		for _, existing := range applications {
+			p.view.DeleteApplication(existing.ID, event.Sequence)
+		}
 	default:
 		return p.view.ProcessedApplicationSequence(event.Sequence)
 	}

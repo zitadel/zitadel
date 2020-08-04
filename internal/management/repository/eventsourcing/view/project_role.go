@@ -15,6 +15,10 @@ func (v *View) ProjectRoleByIDs(projectID, orgID, key string) (*model.ProjectRol
 	return view.ProjectRoleByIDs(v.Db, projectRoleTable, projectID, orgID, key)
 }
 
+func (v *View) ProjectRolesByProjectID(projectID string) ([]*model.ProjectRoleView, error) {
+	return view.ProjectRolesByProjectID(v.Db, projectRoleTable, projectID)
+}
+
 func (v *View) ResourceOwnerProjectRolesByKey(projectID, resourceowner, key string) ([]*model.ProjectRoleView, error) {
 	return view.ResourceOwnerProjectRolesByKey(v.Db, projectRoleTable, projectID, resourceowner, key)
 }
