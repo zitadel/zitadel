@@ -27,7 +27,7 @@ func (v *View) ResourceOwnerProjectRoles(projectID, resourceowner string) ([]*mo
 	return view.ResourceOwnerProjectRoles(v.Db, projectRoleTable, projectID, resourceowner)
 }
 
-func (v *View) SearchProjectRoles(request *proj_model.ProjectRoleSearchRequest) ([]*model.ProjectRoleView, int, error) {
+func (v *View) SearchProjectRoles(request *proj_model.ProjectRoleSearchRequest) ([]*model.ProjectRoleView, uint64, error) {
 	return view.SearchProjectRoles(v.Db, projectRoleTable, request)
 }
 

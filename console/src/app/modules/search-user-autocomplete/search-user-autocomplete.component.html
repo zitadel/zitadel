@@ -29,7 +29,7 @@
     </mat-form-field>
 
     <div *ngIf="target == UserTarget.EXTERNAL" class="line">
-        <mat-form-field appearance="outline">
+        <mat-form-field class="form-field" appearance="outline">
             <mat-label>Global User Email</mat-label>
             <input matInput type="text" [formControl]="globalEmailControl" />
         </mat-form-field>

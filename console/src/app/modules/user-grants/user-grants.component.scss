@@ -1,47 +1,49 @@
 
 .add-button {
-    border-radius: .5rem;
+  border-radius: .5rem;
 }
 
 .table-wrapper {
-    overflow: auto;
+  overflow: auto;
 
-    table, mat-paginator {
-        width: 100%;
-        background-color: #2d2e30;
+  .table,
+  .paginator {
+    width: 100%;
+    background-color: #2d2e30;
 
-        td, th {
-            padding-left: .5rem;
-            padding-right: .5rem;
+    td,
+    th {
+      padding-left: .5rem;
+      padding-right: .5rem;
 
-            &:first-child {
-                padding-left: 0;
-                padding-right: .5rem;
-            }
+      &:first-child {
+        padding-left: 0;
+        padding-right: .5rem;
+      }
 
-            &:last-child {
-                padding-right: 0;
-            }
-        }
-
-        .selection {
-            width: 50px;
-            max-width: 50px;
-        }
-
-        .role {
-            display: inline-block;
-            margin: .25rem;
-        }
+      &:last-child {
+        padding-right: 0;
+      }
     }
+
+    .selection {
+      width: 50px;
+      max-width: 50px;
+    }
+
+    .role {
+      display: inline-block;
+      margin: .25rem;
+    }
+  }
 }
 
 .pointer {
-    outline: none;
-    cursor: pointer;
+  outline: none;
+  cursor: pointer;
 }
 
 .no-roles {
-    font-size: 14px;
-    color: #8795a1;
+  font-size: 14px;
+  color: #8795a1;
 }

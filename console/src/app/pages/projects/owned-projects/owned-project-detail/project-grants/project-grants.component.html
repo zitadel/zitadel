@@ -16,7 +16,7 @@
     </ng-template>
 
     <div class="table-wrapper">
-        <table mat-table multiTemplateDataRows class="full-width-table" aria-label="Elements" [dataSource]="dataSource">
+        <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
 
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>
@@ -74,7 +74,7 @@
             </tr>
         </table>
 
-        <mat-paginator #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]"
+        <mat-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]"
             [length]="dataSource.totalResult" (page)="loadGrantsPage($event.pageIndex, $event.pageSize)">
         </mat-paginator>
     </div>

@@ -65,7 +65,7 @@ func ResourceOwnerProjectRoles(db *gorm.DB, table, projectID, resourceOwner stri
 	return roles, nil
 }
 
-func SearchProjectRoles(db *gorm.DB, table string, req *proj_model.ProjectRoleSearchRequest) ([]*model.ProjectRoleView, int, error) {
+func SearchProjectRoles(db *gorm.DB, table string, req *proj_model.ProjectRoleSearchRequest) ([]*model.ProjectRoleView, uint64, error) {
 	roles := make([]*model.ProjectRoleView, 0)
 	query := repository.PrepareSearchQuery(table, model.ProjectRoleSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &roles)

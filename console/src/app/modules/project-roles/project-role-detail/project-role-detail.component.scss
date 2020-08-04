@@ -1,25 +1,26 @@
 .title {
-    font-size: 1.2rem;
-}
-  
-.desc {
-    color: #8795a1;
-    font-size: .9rem;
+  font-size: 1.2rem;
 }
 
-.full-width, .formfield {
-    width: 100%;
+.desc {
+  color: #8795a1;
+  font-size: .9rem;
+}
+
+.full-width,
+.formfield {
+  width: 100%;
 }
 
 .action {
-    display: flex;
-    justify-content: flex-end;
-  
-    .ok-button {
-      margin-left: 0.5rem;
-    }
-  
-    button {
-      border-radius: 0.5rem;
-    }
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+
+  button {
+    border-radius: .5rem;
+  }
 }

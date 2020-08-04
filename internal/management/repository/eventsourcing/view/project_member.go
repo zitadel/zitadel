@@ -19,7 +19,7 @@ func (v *View) ProjectMembersByProjectID(projectID string) ([]*model.ProjectMemb
 	return view.ProjectMembersByProjectID(v.Db, projectMemberTable, projectID)
 }
 
-func (v *View) SearchProjectMembers(request *proj_model.ProjectMemberSearchRequest) ([]*model.ProjectMemberView, int, error) {
+func (v *View) SearchProjectMembers(request *proj_model.ProjectMemberSearchRequest) ([]*model.ProjectMemberView, uint64, error) {
 	return view.SearchProjectMembers(v.Db, projectMemberTable, request)
 }
 

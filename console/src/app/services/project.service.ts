@@ -56,6 +56,7 @@ import {
     UserGrantCreate,
     UserGrantSearchQuery,
     UserGrantSearchResponse,
+    ZitadelDocs,
 } from '../proto/generated/management_pb';
 import { GrpcBackendService } from './grpc-backend.service';
 import { GrpcService, RequestFactory, ResponseMapper } from './grpc.service';
@@ -106,6 +107,16 @@ export class ProjectService {
         }
         return await this.request(
             c => c.searchGrantedProjects,
+            req,
+            f => f,
+        );
+    }
+
+
+    public async GetZitadelDocs(): Promise<ZitadelDocs> {
+        const req = new Empty();
+        return await this.request(
+            c => c.getZitadelDocs,
             req,
             f => f,
         );

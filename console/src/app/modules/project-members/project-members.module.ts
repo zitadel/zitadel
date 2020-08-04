@@ -16,12 +16,12 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ProjectMembersRoutingModule } from './project-members-routing.module';
 import { ProjectMembersComponent } from './project-members.component';
-
 
 @NgModule({
     declarations: [ProjectMembersComponent],
@@ -46,6 +46,7 @@ import { ProjectMembersComponent } from './project-members.component';
         TranslateModule,
         HasRolePipeModule,
         RefreshTableModule,
+        DetailLayoutModule,
         MatDialogModule,
     ],
 })

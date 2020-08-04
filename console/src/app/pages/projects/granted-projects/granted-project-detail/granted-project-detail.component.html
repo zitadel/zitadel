@@ -4,7 +4,7 @@
             <a [routerLink]="[ '/granted-projects' ]" mat-icon-button>
                 <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.projectName}}</h1>
+            <h1 class="h1">{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.projectName}}</h1>
 
             <div class="full-width">
                 <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
@@ -12,11 +12,12 @@
             </div>
         </div>
 
-        <ng-template appHasRole [appHasRole]="['project.grant.user.grant.read']">
+        <ng-template appHasRole
+            [appHasRole]="['project.grant.user.grant.read', 'project.grant.user.grant.read:'+grantId]">
             <app-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
                 description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                 <app-user-grants [context]="userGrantContext" [projectId]="projectId" [grantId]="grantId"
-                    [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
+                    [displayedColumns]="['select','user', 'projectId', 'creationDate', 'changeDate', 'roleNamesList']"
                     [allowCreate]="['project.grant.user.grant.write'] | hasRole | async"
                     [allowDelete]="['project.grant.user.grant.delete'] | hasRole | async">
                 </app-user-grants>

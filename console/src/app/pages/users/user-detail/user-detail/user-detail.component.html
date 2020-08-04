@@ -56,7 +56,7 @@
                             color="primary"
                             *ngIf="user.state === UserState.USERSTATE_INITIAL">{{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
                         <a [routerLink]="['password']" mat-icon-button>
-                            <mat-icon>chevron_right</mat-icon>
+                            <mat-icon class="icon">chevron_right</mat-icon>
                         </a>
                     </div>
                 </div>
@@ -66,11 +66,12 @@
                     <ng-container *ngIf="!emailEditState; else emailEdit">
                         <div class="actions">
                             <span class="name">{{user?.email}}</span>
-                            <mat-icon *ngIf="user?.isEmailVerified" color="primary" aria-hidden="false"
+                            <mat-icon class="icon" *ngIf="user?.isEmailVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
                             <ng-container *ngIf="user?.email && !user?.isEmailVerified">
-                                <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
+                                <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
+                                    highlight_off
                                 </mat-icon>
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
                                     (click)="resendVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
@@ -79,7 +80,7 @@
 
                         <div class="actions">
                             <button (click)="emailEditState = true" mat-icon-button>
-                                <mat-icon>edit</mat-icon>
+                                <mat-icon class="icon">edit</mat-icon>
                             </button>
                         </div>
                     </ng-container>
@@ -89,7 +90,7 @@
                             <input matInput [(ngModel)]="user.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
-                            <mat-icon>close</mat-icon>
+                            <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button [disabled]="!user.email" class="submit-button" type="button" color="primary"
                             (click)="saveEmail()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
@@ -102,11 +103,12 @@
                     <ng-container *ngIf="!phoneEditState; else phoneEdit">
                         <div class="actions">
                             <span class="name">{{user?.phone}}</span>
-                            <mat-icon *ngIf="user?.isPhoneVerified" color="primary" aria-hidden="false"
+                            <mat-icon class="icon" *ngIf="user?.isPhoneVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
                             <ng-container *ngIf="user?.phone && !user?.isPhoneVerified">
-                                <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
+                                <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
+                                    highlight_off
                                 </mat-icon>
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
                                     (click)="resendPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
@@ -115,7 +117,7 @@
 
                         <div class="actions">
                             <button (click)="phoneEditState = true" mat-icon-button>
-                                <mat-icon>edit</mat-icon>
+                                <mat-icon class="icon">edit</mat-icon>
                             </button>
                         </div>
                     </ng-container>
@@ -126,7 +128,7 @@
                             <input matInput [(ngModel)]="user.phone" />
                         </mat-form-field>
                         <button (click)="phoneEditState = false" mat-icon-button>
-                            <mat-icon>close</mat-icon>
+                            <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button *ngIf="user.phone" color="warn" (click)="deletePhone()" mat-icon-button>
                             <i class="las la-trash"></i>
@@ -156,6 +158,6 @@
             </div>
         </div>
 
-        <app-changes [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
+        <app-changes class="changes" [changeType]="ChangeType.USER" [id]="user.id"></app-changes>
     </div>
 </app-meta-layout>

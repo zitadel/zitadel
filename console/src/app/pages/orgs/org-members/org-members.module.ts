@@ -13,6 +13,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 
 import { OrgMembersRoutingModule } from './org-members-routing.module';
 import { OrgMembersComponent } from './org-members.component';
@@ -37,6 +38,7 @@ import { OrgMembersComponent } from './org-members.component';
         MatProgressSpinnerModule,
         FormsModule,
         TranslateModule,
+        DetailLayoutModule,
     ],
 })
 export class OrgMembersModule { }

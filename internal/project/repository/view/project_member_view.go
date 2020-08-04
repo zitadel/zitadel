@@ -35,7 +35,7 @@ func ProjectMembersByProjectID(db *gorm.DB, table, projectID string) ([]*model.P
 	return members, nil
 }
 
-func SearchProjectMembers(db *gorm.DB, table string, req *proj_model.ProjectMemberSearchRequest) ([]*model.ProjectMemberView, int, error) {
+func SearchProjectMembers(db *gorm.DB, table string, req *proj_model.ProjectMemberSearchRequest) ([]*model.ProjectMemberView, uint64, error) {
 	roles := make([]*model.ProjectMemberView, 0)
 	query := repository.PrepareSearchQuery(table, model.ProjectMemberSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &roles)

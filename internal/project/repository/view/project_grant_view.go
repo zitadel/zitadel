@@ -55,7 +55,7 @@ func ProjectGrantsByProjectIDAndRoleKey(db *gorm.DB, table, projectID, roleKey s
 	return projectGrants, err
 }
 
-func SearchProjectGrants(db *gorm.DB, table string, req *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, int, error) {
+func SearchProjectGrants(db *gorm.DB, table string, req *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, uint64, error) {
 	projectGrants := make([]*model.ProjectGrantView, 0)
 	query := repository.PrepareSearchQuery(table, model.ProjectGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &projectGrants)

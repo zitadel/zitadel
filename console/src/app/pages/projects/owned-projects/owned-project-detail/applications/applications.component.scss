@@ -1,46 +1,48 @@
 
-
 .table-wrapper {
-    overflow: auto;
+  overflow: auto;
 
-    table, mat-paginator {
-        width: 100%;
-        background-color: #2d2e30;
+  .table,
+  .paginator {
+    width: 100%;
+    background-color: #2d2e30;
 
-        td, th {
-            &:first-child {
-                padding-left: 0;
-                padding-right: 1rem;
-            }
+    td,
+    th {
+      &:first-child {
+        padding-left: 0;
+        padding-right: 1rem;
+      }
 
-            &:last-child {
-                padding-right: 0;
-            }
-        }
-
-        .data-row {
-            cursor: pointer;
-            &:hover {
-                background-color: #ffffff05;
-            }
-        }
-
-        .selection {
-            width: 50px;
-            max-width: 50px;
-        }
-
-        .margin-neg {
-            margin-left: -1rem;
-        }
+      &:last-child {
+        padding-right: 0;
+      }
     }
+
+    .data-row {
+      cursor: pointer;
+
+      &:hover {
+        background-color: #ffffff05;
+      }
+    }
+
+    .selection {
+      width: 50px;
+      max-width: 50px;
+    }
+
+    .margin-neg {
+      margin-left: -1rem;
+    }
+  }
 }
 
 .pointer {
-    outline: none;
-    cursor: pointer;
+  outline: none;
+  cursor: pointer;
 }
 
 tr {
-    outline: none;
+  outline: none;
 }

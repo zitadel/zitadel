@@ -24,8 +24,6 @@
                         item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="fill-space"></span>
-            <div class="icons">
-            </div>
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>
@@ -53,8 +51,6 @@
                         item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="fill-space"></span>
-            <div class="icons">
-            </div>
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>

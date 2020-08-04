@@ -1,8 +1,7 @@
 <span class="header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
 
-<div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)"
-    [@cardAnimation]="data && (data | async)?.length">
-    <li class="item change-item-back" *ngFor="let event of data | async" @animate>
+<div class="scroll-container" appScrollable (scrollPosition)="scrollHandler($event)">
+    <li class="item change-item-back" *ngFor="let event of data | async">
         <span class="seq">
             {{event.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'}}
         </span>

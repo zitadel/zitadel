@@ -21,8 +21,6 @@
             <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
-            <div class="icons">
-            </div>
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>
@@ -48,8 +46,6 @@
             <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{ item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
-            <div class="icons">
-            </div>
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>

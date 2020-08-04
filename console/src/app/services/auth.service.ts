@@ -45,8 +45,7 @@ export class AuthService {
             ),
         ).pipe(
             take(1),
-            mergeMap(token => {
-                console.log(token);
+            mergeMap(() => {
                 return from(this.userService.GetMyUserProfile().then(userprofile => userprofile.toObject()));
             }),
             finalize(() => {
@@ -55,13 +54,11 @@ export class AuthService {
         );
 
         this.activeOrgChanged.subscribe(() => {
-            console.log('org change');
             this.loadPermissions();
         });
     }
 
     private loadPermissions(): void {
-        console.log('load permissions');
         merge([
             // this.authenticationChanged,
             this.activeOrgChanged.pipe(map(org => !!org)),
@@ -83,8 +80,6 @@ export class AuthService {
     }
 
     public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
-        // console.log('has', userRoles);
-        // console.log('needs', requestedRoles);
         return each ?
             requestedRoles.every(role => userRoles.includes(role)) :
             requestedRoles.findIndex(role => {

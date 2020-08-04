@@ -79,13 +79,14 @@
             <app-card class="item">
                 <div class="top">
                     <h2>
-                        <i class="las la-crosshairs"></i>
+                        <i class="las la-users"></i>
                         {{'HOME.USERS'| translate}}</h2>
                     <p>{{'HOME.USERS_DESC'| translate}}</p>
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
-                    <a color="primary" mat-button [routerLink]="['/users/all']">{{'HOME.USERS_BUTTON' | translate}}</a>
+                    <a color="primary" mat-stroked-button
+                        [routerLink]="['/users/all']">{{'HOME.USERS_BUTTON' | translate}}</a>
                 </div>
             </app-card>
         </ng-template>

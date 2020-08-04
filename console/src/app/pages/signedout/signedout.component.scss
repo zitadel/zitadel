@@ -1,37 +1,36 @@
 .wrap {
-    height: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .header {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 
-    .header {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        h1 {
-            font-size: 3rem;
-        }
-        p {
-            color: #8795a1;
-            text-align: center;
-            font-size: 1rem;
-            margin: 0;
-            margin-bottom: 3rem;
-        }
-        
-        img {
-            height: 100px;
-            margin-bottom: 2rem;
-        }
-
-        button {
-            border-radius: .5rem;
-            display: block;
-            padding: 0.5rem 4rem;
-            border-radius: 0.5rem;
-        }
+    h1 {
+      font-size: 3rem;
     }
-}
 
+    p {
+      color: #8795a1;
+      text-align: center;
+      font-size: 1rem;
+      margin: 0;
+      margin-bottom: 3rem;
+    }
+
+    img {
+      height: 100px;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      border-radius: .5rem;
+      display: block;
+      padding: .5rem 4rem;
+    }
+  }
+}
