@@ -78,12 +78,12 @@
 }
 
 body {
-  margin: 0;
+  margin: 0 0 100px 0;
 }
 
 html {
-  height: 100%;
   width: 100%;
+  min-height: 100%;
   font-weight: 300;
   background-color: #282828;
   color: white;
@@ -97,6 +97,13 @@ h1 {
   font-family: Aileron;
   font-weight: 300;
   font-size: 40px;
+}
+
+h2 {
+  color: white;
+  font-family: Aileron;
+  font-weight: 300;
+  font-size: 30px;
 }
 
 p {
@@ -358,6 +365,13 @@ form ul#passwordcomplexity li i {
 form ul#passwordcomplexity li.invalid i {
   color: #F20D6B;
 }
+form #loginname {
+  display: flex;
+}
+form #loginname .loginname-suffix {
+  padding-left: 5px;
+  line-height: 50px;
+}
 
 #copy-secret {
   visibility: hidden;
@@ -383,8 +397,6 @@ footer {
   background-image: url("../gradientdeco-full.svg");
   width: 100%;
   background-size: cover;
-  height: 44vw;
-  position: fixed;
   bottom: 0;
   z-index: -1;
 }

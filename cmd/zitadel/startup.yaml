@@ -48,6 +48,7 @@ AuthZ:
 
 Auth:
   SearchLimit: 100
+  Domain: $ZITADEL_DEFAULT_DOMAIN
   Eventstore:
     ServiceName: 'authAPI'
     Repository:

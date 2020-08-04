@@ -32,6 +32,7 @@ type OrgConfig struct {
 func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEventstore {
 	policy := defaults.DefaultPolicies.OrgIam
 	policy.Default = true
+	policy.IamDomain = conf.IAMDomain
 	return &OrgEventstore{
 		Eventstore:          conf.Eventstore,
 		idGenerator:         id.SonyFlakeGenerator,

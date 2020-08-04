@@ -175,15 +175,15 @@ func (es *UserEventstore) PrepareRegisterUser(ctx context.Context, user *usr_mod
 	if err != nil {
 		return nil, nil, err
 	}
-	err = user.GenerateEmailCodeIfNeeded(es.EmailVerificationCode)
+	err = user.GenerateInitCodeIfNeeded(es.InitializeUserCode)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	repoUser := model.UserFromModel(user)
-	repoEmailCode := model.EmailCodeFromModel(user.EmailCode)
+	repoInitCode := model.InitCodeFromModel(user.InitCode)
 
-	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoEmailCode, orgIamPolicy.UserLoginMustBeDomain)
+	aggregates, err := UserRegisterAggregate(ctx, es.AggregateCreator(), repoUser, resourceOwner, repoInitCode, orgIamPolicy.UserLoginMustBeDomain)
 	return repoUser, aggregates, err
 }
 

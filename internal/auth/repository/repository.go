@@ -14,4 +14,5 @@ type Repository interface {
 	UserSessionRepository
 	UserGrantRepository
 	PolicyRepository
+	OrgRepository
 }
