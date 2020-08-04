@@ -78,7 +78,7 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 			args: args{
 				appType:    OIDCApplicationTypeUserAgent,
 				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
-				authMethod: OIDCAuthMethodTypePost,
+				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
 					"https://zitadel.ch/auth/callback",
 				},
@@ -271,7 +271,7 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			name: "compliant implicit config",
 			args: args{
 				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
-				authMethod: OIDCAuthMethodTypePost,
+				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
 					"https://zitadel.ch/auth/callback",
 				},
@@ -281,7 +281,7 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			},
 		},
 		{
-			name: "none compliant implicit config, not post",
+			name: "none compliant implicit config, not none",
 			args: args{
 				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
 				authMethod: OIDCAuthMethodTypeBasic,
@@ -292,7 +292,7 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.UserAgent.Implicit.AuthMethodType.NotPost",
+					"Application.OIDC.UserAgent.Implicit.AuthMethodType.NotNone",
 				},
 			},
 		},
@@ -300,7 +300,7 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			name: "none compliant implicit config, not https",
 			args: args{
 				grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit},
-				authMethod: OIDCAuthMethodTypePost,
+				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
 					"http://zitadel.ch/auth/callback",
 				},

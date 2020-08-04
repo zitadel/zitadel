@@ -151,9 +151,9 @@ func GetOIDCUserAgentApplicationCompliance(grantTypes []OIDCGrantType, authMetho
 		}
 	}
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) {
-		if authMethod != OIDCAuthMethodTypePost {
+		if authMethod != OIDCAuthMethodTypeNone {
 			compliance.NoneCompliant = true
-			compliance.Problems = append(compliance.Problems, "Application.OIDC.UserAgent.Implicit.AuthMethodType.NotPost")
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.UserAgent.Implicit.AuthMethodType.NotNone")
 		}
 	}
 	if !urlsAreHttps(redirectUris) {
