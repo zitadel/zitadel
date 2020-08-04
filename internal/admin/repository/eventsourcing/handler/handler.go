@@ -30,6 +30,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, re
 	return []query.Handler{
 		&Org{handler: handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount}},
 		&IamMember{handler: handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount}, userEvents: repos.UserEvents},
+		&IdpConfig{handler: handler{view, bulkLimit, configs.cycleDuration("IdpConfig"), errorCount}},
 	}
 }
 

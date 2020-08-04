@@ -297,6 +297,26 @@ func (mr *MockAdminServiceClientMockRecorder) Healthz(arg0, arg1 interface{}, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Healthz", reflect.TypeOf((*MockAdminServiceClient)(nil).Healthz), varargs...)
 }
 
+// IdpByID mocks base method
+func (m *MockAdminServiceClient) IdpByID(arg0 context.Context, arg1 *admin.IdpID, arg2 ...grpc.CallOption) (*admin.IdpView, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "IdpByID", varargs...)
+	ret0, _ := ret[0].(*admin.IdpView)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IdpByID indicates an expected call of IdpByID
+func (mr *MockAdminServiceClientMockRecorder) IdpByID(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdpByID", reflect.TypeOf((*MockAdminServiceClient)(nil).IdpByID), varargs...)
+}
+
 // IsOrgUnique mocks base method
 func (m *MockAdminServiceClient) IsOrgUnique(arg0 context.Context, arg1 *admin.UniqueOrgRequest, arg2 ...grpc.CallOption) (*admin.UniqueOrgResponse, error) {
 	m.ctrl.T.Helper()
@@ -435,6 +455,26 @@ func (mr *MockAdminServiceClientMockRecorder) SearchIamMembers(arg0, arg1 interf
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchIamMembers", reflect.TypeOf((*MockAdminServiceClient)(nil).SearchIamMembers), varargs...)
+}
+
+// SearchIdps mocks base method
+func (m *MockAdminServiceClient) SearchIdps(arg0 context.Context, arg1 *admin.IdpSearchRequest, arg2 ...grpc.CallOption) (*admin.IdpSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchIdps", varargs...)
+	ret0, _ := ret[0].(*admin.IdpSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchIdps indicates an expected call of SearchIdps
+func (mr *MockAdminServiceClientMockRecorder) SearchIdps(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchIdps", reflect.TypeOf((*MockAdminServiceClient)(nil).SearchIdps), varargs...)
 }
 
 // SearchOrgs mocks base method

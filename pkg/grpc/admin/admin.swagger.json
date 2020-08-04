@@ -89,6 +89,32 @@
         ]
       }
     },
+    "/idps/_search": {
+      "post": {
+        "operationId": "SearchIdps",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpSearchResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IdpSearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/idps/{idp_id}/oidcconfig": {
       "put": {
         "operationId": "UpdateOidcIdpConfig",
@@ -122,6 +148,28 @@
       }
     },
     "/idps/{id}": {
+      "get": {
+        "operationId": "IdpByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IdpView"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "delete": {
         "operationId": "RemoveIdpConfig",
         "responses": {
@@ -1078,6 +1126,79 @@
         }
       }
     },
+    "v1IdpSearchKey": {
+      "type": "string",
+      "enum": [
+        "IDPSEARCHKEY_UNSPECIFIED",
+        "IDPSEARCHKEY_IDP_CONFIG_ID",
+        "IDPSEARCHKEY_NAME"
+      ],
+      "default": "IDPSEARCHKEY_UNSPECIFIED"
+    },
+    "v1IdpSearchQuery": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/v1IdpSearchKey"
+        },
+        "method": {
+          "$ref": "#/definitions/v1SearchMethod"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1IdpSearchRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IdpSearchQuery"
+          }
+        }
+      }
+    },
+    "v1IdpSearchResponse": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "limit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total_result": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1IdpView"
+          }
+        },
+        "processed_sequence": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "view_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1IdpState": {
       "type": "string",
       "enum": [
@@ -1098,6 +1219,38 @@
         },
         "logo_src": {
           "type": "string"
+        }
+      }
+    },
+    "v1IdpView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/v1IdpState"
+        },
+        "creation_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "change_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "logo_src": {
+          "type": "string"
+        },
+        "oidc_config": {
+          "$ref": "#/definitions/v1OidcIdpConfigView"
+        },
+        "sequence": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -1157,6 +1310,23 @@
           "type": "string"
         },
         "client_secret": {
+          "type": "string"
+        },
+        "issuer": {
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1OidcIdpConfigView": {
+      "type": "object",
+      "properties": {
+        "client_id": {
           "type": "string"
         },
         "issuer": {

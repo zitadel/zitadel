@@ -235,6 +235,16 @@ service AdminService {
         };
     }
 
+    rpc IdpByID(IdpID) returns (IdpView) {
+        option (google.api.http) = {
+            get: "/idps/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.read"
+        };
+    }
+
     rpc CreateOidcIdp(OidcIdpConfigCreate) returns (Idp) {
         option (google.api.http) = {
             post: "/oidcidps"
@@ -300,6 +310,16 @@ service AdminService {
         };
     }
 
+    rpc SearchIdps(IdpSearchRequest) returns (IdpSearchResponse) {
+        option (google.api.http) = {
+            post: "/idps/_search"
+            body: "*"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "iam.idp.read"
+        };
+    }
 }
 
 message OrgID {
@@ -627,4 +647,50 @@ message OidcIdpConfigUpdate {
     string client_secret = 3;
     string issuer = 4;
     repeated string scopes = 5;
+}
+
+message IdpSearchResponse {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    uint64 total_result = 3;
+    repeated IdpView result = 4;
+    uint64 processed_sequence = 5;
+    google.protobuf.Timestamp view_timestamp = 6;
+}
+
+message IdpView {
+    string id = 1;
+    IdpState state = 2;
+    google.protobuf.Timestamp creation_date = 3;
+    google.protobuf.Timestamp change_date = 4;
+    string name = 5;
+    string logo_src = 6;
+    oneof idp_config_view {
+        OidcIdpConfigView oidc_config = 7;
+    }
+    uint64 sequence = 8;
+}
+
+message OidcIdpConfigView {
+    string client_id = 1;
+    string issuer = 2;
+    repeated string scopes = 3;
+}
+
+message IdpSearchRequest {
+    uint64 offset = 1;
+    uint64 limit = 2;
+    repeated IdpSearchQuery queries = 3;
+}
+
+message IdpSearchQuery {
+    IdpSearchKey key = 1 [(validate.rules).enum = {not_in: [0]}];
+    SearchMethod method = 2;
+    string value = 3;
+}
+
+enum IdpSearchKey {
+    IDPSEARCHKEY_UNSPECIFIED = 0;
+    IDPSEARCHKEY_IDP_CONFIG_ID = 1;
+    IDPSEARCHKEY_NAME = 2;
 }

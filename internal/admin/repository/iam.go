@@ -13,6 +13,8 @@ type IamRepository interface {
 
 	GetIamMemberRoles() []string
 
+	SearchIdpConfigs(ctx context.Context, request *iam_model.IdpConfigSearchRequest) (*iam_model.IdpConfigSearchResponse, error)
+	IdpConfigByID(ctx context.Context, id string) (*iam_model.IdpConfigView, error)
 	AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error)
 	ChangeIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error)
 	DeactivateIdpConfig(ctx context.Context, idpConfigID string) (*iam_model.IdpConfig, error)

@@ -64,6 +64,13 @@ func (repo *IamRepository) SearchIamMembers(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
+func (repo *IamRepository) IdpConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IdpConfigView, error) {
+	idp, err := repo.View.IdpConfigByID(idpConfigID)
+	if err != nil {
+		return nil, err
+	}
+	return iam_es_model.IdpConfigViewToModel(idp), nil
+}
 func (repo *IamRepository) AddOidcIdpConfig(ctx context.Context, idp *iam_model.IdpConfig) (*iam_model.IdpConfig, error) {
 	idp.AggregateID = repo.SystemDefaults.IamID
 	return repo.IamEventstore.AddIdpConfiguration(ctx, idp)
@@ -90,6 +97,27 @@ func (repo *IamRepository) RemoveIdpConfig(ctx context.Context, idpConfigID stri
 func (repo *IamRepository) ChangeOidcIdpConfig(ctx context.Context, oidcConfig *iam_model.OidcIdpConfig) (*iam_model.OidcIdpConfig, error) {
 	oidcConfig.AggregateID = repo.SystemDefaults.IamID
 	return repo.IamEventstore.ChangeIdpOidcConfiguration(ctx, oidcConfig)
+}
+
+func (repo *IamRepository) SearchIdpConfigs(ctx context.Context, request *iam_model.IdpConfigSearchRequest) (*iam_model.IdpConfigSearchResponse, error) {
+	request.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestIdpConfigSequence()
+	logging.Log("EVENT-Dk8si").OnError(err).Warn("could not read latest idp config sequence")
+	idps, count, err := repo.View.SearchIdpConfigs(request)
+	if err != nil {
+		return nil, err
+	}
+	result := &iam_model.IdpConfigSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(count),
+		Result:      iam_es_model.IdpConfigViewsToModel(idps),
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
 }
 
 func (repo *IamRepository) GetIamMemberRoles() []string {

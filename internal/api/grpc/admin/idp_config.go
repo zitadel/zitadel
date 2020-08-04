@@ -7,6 +7,14 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
 
+func (s *Server) IdpByID(ctx context.Context, id *admin.IdpID) (*admin.IdpView, error) {
+	config, err := s.iam.IdpConfigByID(ctx, id.Id)
+	if err != nil {
+		return nil, err
+	}
+	return idpViewFromModel(config), nil
+}
+
 func (s *Server) CreateOidcIdp(ctx context.Context, oidcIdpConfig *admin.OidcIdpConfigCreate) (*admin.Idp, error) {
 	config, err := s.iam.AddOidcIdpConfig(ctx, createOidcIdpToModel(oidcIdpConfig))
 	if err != nil {
@@ -50,4 +58,12 @@ func (s *Server) UpdateOidcIdpConfig(ctx context.Context, request *admin.OidcIdp
 		return nil, err
 	}
 	return oidcIdpConfigFromModel(config), nil
+}
+
+func (s *Server) SearchIdps(ctx context.Context, request *admin.IdpSearchRequest) (*admin.IdpSearchResponse, error) {
+	response, err := s.iam.SearchIdpConfigs(ctx, idpConfigSearchRequestToModel(request))
+	if err != nil {
+		return nil, err
+	}
+	return idpConfigSearchResponseFromModel(response), nil
 }

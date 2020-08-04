@@ -63,7 +63,7 @@ func iamMemberSearchQueriesToModel(queries []*admin.IamMemberSearchQuery) []*iam
 func iamMemberSearchQueryToModel(query *admin.IamMemberSearchQuery) *iam_model.IamMemberSearchQuery {
 	return &iam_model.IamMemberSearchQuery{
 		Key:    iamMemberSearchKeyToModel(query.Key),
-		Method: iamMemberSearchMethodToModel(query.Method),
+		Method: searchMethodToModel(query.Method),
 		Value:  query.Value,
 	}
 }
@@ -83,7 +83,7 @@ func iamMemberSearchKeyToModel(key admin.IamMemberSearchKey) iam_model.IamMember
 	}
 }
 
-func iamMemberSearchMethodToModel(key admin.SearchMethod) model.SearchMethod {
+func searchMethodToModel(key admin.SearchMethod) model.SearchMethod {
 	switch key {
 	case admin.SearchMethod_SEARCHMETHOD_CONTAINS:
 		return model.SearchMethodContains
