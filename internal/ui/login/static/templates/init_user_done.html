@@ -1,8 +1,9 @@
 {{template "main-top" .}}
 
+{{ template "user-profile" . }}
 
-<h1>{{t "InitUserDone.Title"}}</h1>
 <p>{{t "InitUserDone.Description"}}</p>
+
 <form action="{{ loginUrl }}" method="POST">
 
     {{ .CSRF }}
@@ -11,6 +12,9 @@
 
     <div class="actions">
         <button class="primary right" type="submit">{{t "Actions.Next"}}</button>
+        <a href="{{ loginUrl }}">
+            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        </a>
     </div>
 </form>
 

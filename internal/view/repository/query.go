@@ -26,9 +26,9 @@ type ColumnKey interface {
 	ToColumnName() string
 }
 
-func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, res interface{}) (int, error) {
-	return func(db *gorm.DB, res interface{}) (int, error) {
-		count := 0
+func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, res interface{}) (uint64, error) {
+	return func(db *gorm.DB, res interface{}) (uint64, error) {
+		var count uint64 = 0
 		query := db.Table(table)
 		if column := request.GetSortingColumn(); column != nil {
 			order := "DESC"
@@ -76,7 +76,7 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method model.Sea
 	case model.SearchMethodStartsWith:
 		valueText, ok := value.(string)
 		if !ok {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-idu8e", "Starts with only possible for strings")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-SLj7s", "Starts with only possible for strings")
 		}
 		query = query.Where(column+" LIKE ?", valueText+"%")
 	case model.SearchMethodStartsWithIgnoreCase:

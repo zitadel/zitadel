@@ -88,7 +88,7 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         this.projectService.SearchProjects(limit, offset).then(res => {
             this.ownedProjectList = res.toObject().resultList;
             this.totalResult = res.toObject().totalResult;
-            if (this.totalResult > 5) {
+            if (this.totalResult > 10) {
                 this.grid = false;
             }
             this.dataSource.data = this.ownedProjectList;
@@ -108,9 +108,9 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         });
 
         Promise.all(promises).then(() => {
-            this.toast.showInfo('Reactivated selected projects successfully');
+            this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
         }).catch(error => {
-            this.toast.showInfo(error.message);
+            this.toast.showError(error);
         });
     }
 
@@ -121,9 +121,9 @@ export class OwnedProjectListComponent implements OnInit, OnDestroy {
         });
 
         Promise.all(promises).then(() => {
-            this.toast.showInfo('Deactivated selected projects Successfully');
+            this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
         }).catch(error => {
-            this.toast.showInfo(error.message);
+            this.toast.showError(error);
         });
     }
 }

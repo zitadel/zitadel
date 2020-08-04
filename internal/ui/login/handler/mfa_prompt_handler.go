@@ -18,37 +18,48 @@ type mfaPromptData struct {
 
 func (l *Login) handleMfaPrompt(w http.ResponseWriter, r *http.Request) {
 	data := new(mfaPromptData)
-	authSession, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	if !data.Skip {
 		mfaVerifyData := new(mfaVerifyData)
 		mfaVerifyData.MfaType = data.MfaProvider
-		l.handleMfaCreation(w, r, authSession, mfaVerifyData)
+		l.handleMfaCreation(w, r, authReq, mfaVerifyData)
 		return
 	}
-	err = l.authRepo.SkipMfaInit(setContext(r.Context(), authSession.UserOrgID), authSession.UserID)
+	err = l.authRepo.SkipMfaInit(setContext(r.Context(), authReq.UserOrgID), authReq.UserID)
 	if err != nil {
-		l.renderError(w, r, authSession, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	l.handleLogin(w, r)
 }
 
-func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, mfaPromptData *model.MfaPromptStep, err error) {
+func (l *Login) handleMfaPromptSelection(w http.ResponseWriter, r *http.Request) {
+	data := new(mfaPromptData)
+	authReq, err := l.getAuthRequestAndParseData(r, data)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+
+	l.renderNextStep(w, r, authReq)
+}
+
+func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, mfaPromptData *model.MfaPromptStep, err error) {
 	var errType, errMessage string
 	if err != nil {
 		errMessage = l.getErrorMessage(r, err)
 	}
 	data := mfaData{
-		baseData:  l.getBaseData(r, authSession, "Mfa Prompt", errType, errMessage),
-		LoginName: authSession.LoginName,
+		baseData:    l.getBaseData(r, authReq, "Mfa Prompt", errType, errMessage),
+		profileData: l.getProfileData(authReq),
 	}
 
 	if mfaPromptData == nil {
-		l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-XU0tj", "Errors.User.Mfa.NoProviders"))
+		l.renderError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-XU0tj", "Errors.User.Mfa.NoProviders"))
 		return
 	}
 
@@ -59,19 +70,19 @@ func (l *Login) renderMfaPrompt(w http.ResponseWriter, r *http.Request, authSess
 		data := &mfaVerifyData{
 			MfaType: mfaPromptData.MfaProviders[0],
 		}
-		l.handleMfaCreation(w, r, authSession, data)
+		l.handleMfaCreation(w, r, authReq, data)
 		return
 	}
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplMfaPrompt], data, nil)
 }
 
-func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authSession *model.AuthRequest, data *mfaVerifyData) {
+func (l *Login) handleMfaCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {
 	switch data.MfaType {
 	case model.MfaTypeOTP:
-		l.handleOtpCreation(w, r, authSession, data)
+		l.handleOtpCreation(w, r, authReq, data)
 		return
 	}
-	l.renderError(w, r, authSession, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "Errors.User.Mfa.NoProviders"))
+	l.renderError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "Errors.User.Mfa.NoProviders"))
 }
 
 func (l *Login) handleOtpCreation(w http.ResponseWriter, r *http.Request, authReq *model.AuthRequest, data *mfaVerifyData) {

@@ -16,7 +16,11 @@
         "USERS_BUTTON": "Benutzer anzeigen",
         "IAM": "Identity and Access Management",
         "IAM_DESC": "Verwalte deine Organisationen und Administratoren.",
-        "IAM_BUTTON": "ZITADEL verwalten"
+        "IAM_BUTTON": "ZITADEL verwalten",
+        "WELCOME":"Willkommen",
+        "WELCOMESENTENCE":"Hier findest du die empfohlenen Aktionen basierend auf deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass du möglicherweise deine Organisation in der Kopfzeile wechseln musst.",
+        "DISCLAIMER":"Du kannst nur die Einstellungen deiner aktuellen Organisation sehen, die in der Kopfzeile angegeben ist. ZITADEL behandelt deine Daten vertraulich und sicher.",
+        "DISCLAIMERLINK":"Mehr Informationen zur Sicherheit"
     },
     "MENU": {
         "PERSONAL_INFO": "Persönliche Informationen",
@@ -50,10 +54,16 @@
         "FINISH":"Abschliessen",
         "CHANGE":"Ändern",
         "REACTIVATE":"Aktivieren",
-        "DEACTIVATE":"Deaktivieren"
+        "DEACTIVATE":"Deaktivieren",
+        "REFRESH":"Aktualisieren",
+        "LOGIN":"Login"
     },
     "ERRORS": {
-        "REQUIRED": "Bitte fülle alle benötigten Felder aus!"
+        "REQUIRED": "Bitte fülle alle benötigten Felder aus!",
+        "TOKENINVALID": {
+            "TITLE":"Du bist abgemeldet",
+            "DESCRIPTION":"Klicke auf Knopf Login um dich wieder einzuloggen!"
+        }
     },
     "USER": {
         "TITLE": "Persönliche Informationen",
@@ -74,6 +84,9 @@
             "DEACTIVATE":"Deaktivieren"
         },
         "MFA": {
+            "TABLETYPE":"Typ",
+            "TABLESTATE":"Status",
+            "TABLEACTIONS":"Aktionen",
             "TITLE": "Multifaktor-Authentifizierung",
             "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um deinen Account optimal zu schützen.",
             "MANAGE_DESCRIPTION": "Verwalte die Multifaktor Merkmale deiner Benutzer.",
@@ -98,7 +111,8 @@
             "NAMEANDEMAILSECTION":"Name und Email",
             "GENDERLANGSECTION":"Geschlecht und Sprache",
             "PHONESECTION":"Telefonnummer",
-            "PASSWORDSECTION":"Setze ein initiales Passwort."
+            "PASSWORDSECTION":"Setze ein initiales Passwort.",
+            "ADDRESSANDPHONESECTION":"Telefonnummer"
         },
         "CODEDIALOG": {
             "TITLE":"Telefonnummer verifizieren",
@@ -130,7 +144,7 @@
         },
         "PASSWORD": {
             "TITLE": "Passwort",
-            "DESCRIPTION": "## TODO - Replace with Password Policy text - TODO ##",
+            "DESCRIPTION": "Gib das neue Password unter Einhaltung der Richtlinie für die Komplexität ein.",
             "OLD": "Aktuelles Passwort",
             "NEW": "Neues Passwort",
             "CONFIRM": "Neues Passwort wiederholen",
@@ -138,7 +152,7 @@
             "SET":"Password neu setzen",
             "RESENDNOTIFICATION": "Passwort Reset Link senden.",
             "REQUIRED": "Bitte prüfe das alle notwendigen Felder befüllt sind.",
-            "MINLENGTHERROR":"Passwort muss mindestens {{value}} lang sein",
+            "MINLENGTHERROR":"Das Passwort muss mindestens {{value}} Zeichen lang sein",
             "NOTEQUAL":"Das Passwort muss übereinstimmen!"
         },
         "EMAIL": "Email",
@@ -209,7 +223,9 @@
             "PASSWORDNOTIFICATIONSENT":"Passwortänderung mittgeteilt!",
             "PASSWORDCHANGED":"Passwort geändert!",
             "REACTIVATED":"User reaktiviert!",
-            "DEACTIVATED":"User deaktiviert!"
+            "DEACTIVATED":"User deaktiviert!",
+            "SELECTEDREACTIVATED":"Selektierte User reaktiviert!",
+            "SELECTEDDEACTIVATED":"Selektierte User deaktiviert!"
         }
     },
     "IAM": {
@@ -229,6 +245,16 @@
             "SEQUENCE":"Sequenz",
             "ACTIONS":"Aktionen",
             "CLEAR":"Aufräumen"
+        },
+        "TOAST":{
+            "MEMBERREMOVED":"Manager entfernt!",
+            "MEMBERSADDED": "Manager hinzugefügt!",
+            "MEMBERADDED": "Manager hinzugefügt!",
+            "MEMBERCHANGED":"Manager geändert!",
+            "ROLEREMOVED":"Rolle entfernt!",
+            "ROLECHANGED":"Rolle verändert!",
+            "REACTIVATED":"Reaktiviert!",
+            "DEACTIVATED":"Deaktiviert!"
         }
     },
     "ORG": {
@@ -245,7 +271,8 @@
             "DOWNLOAD_FILE":"Datei download",
             "SELECTORGTOOLTIP":"Wähle diese Organisation",
             "PRIMARYDOMAIN":"Primäre Domain",
-            "STATE":"Status"
+            "STATE":"Status",
+            "USEPASSWORD":"Initiales Password setzen"
         },
         "DOMAINS": {
             "NEW":"Domain hinzufügen",
@@ -321,7 +348,9 @@
             "DEACTIVATED":"Organisation deaktiviert!",
             "REACTIVATED":"Organisation reaktiviert!",
             "DOMAINADDED":"Domain hinzugefügt!",
-            "DOMAINREMOVED":"Domain entfernt!"
+            "DOMAINREMOVED":"Domain entfernt!",
+            "MEMBERADDED":"Manager hinzugefügt!",
+            "MEMBERREMOVED":"Manager entfernt!"
         }
     },
     "ORG_DETAIL": {
@@ -443,17 +472,28 @@
             "PROJECTNAME":"Projekt Name",
             "GRANTEDORG": "Berechtigte Organisation",
             "GRANTEDORGDOMAIN": "Domain",
+            "RESOURCEOWNER":"Resource Owner",
             "GRANTEDORGNAME":"Org. Name",
             "CREATIONDATE": "Erstelldatum",
             "CHANGEDATE": "Letzte Änderung",
             "ROLENAMESLIST": "Rollen",
-            "NOROLES":"Keine Rollen"
+            "NOROLES":"Keine Rollen",
+            "TOAST":{
+                "PROJECTGRANTUSERGRANTADDED":"Project Berechtigung erstellt!",
+                "PROJECTGRANTADDED":"Projekt Berechtigung erstellt",
+                "PROJECTGRANTCHANGED":"Projekt Berechtigung geändert!",
+                "PROJECTGRANTMEMBERADDED":"Berechtigungsmanager hinzugefügt!",
+                "PROJECTGRANTMEMBERCHANGED":"Berechtigungsmanager verändert!",
+                "PROJECTGRANTMEMBERREMOVED":"Berechtigungsmanager entfernt!"
+            }
         },
         "APP": {
             "TITLE": "Applikationen",
-            "NAME": "Name"
+            "NAME": "Name",
+            "NAMEREQUIRED":"Der Name ist erforderlich."
         },
         "ROLE": {
+            "ADDNEWLINE":"Zusätzliche Rolle hinzufügen",
             "KEY":"Key",
             "TITLE": "Rollen",
             "DESCRIPTION":"Definiere Rollen, die du bei der Erstellung eines Projekt-Grants vergeben kannst",
@@ -487,10 +527,13 @@
             "MEMBERREMOVED":"Manager entfernt!",
             "MEMBERSADDED": "Manager hinzugefügt!",
             "MEMBERADDED": "Manager hinzugefügt!",
+            "MEMBERCHANGED":"Manager geändert!",
             "ROLEREMOVED":"Rolle entfernt!",
             "ROLECHANGED":"Rolle verändert!",
             "REACTIVATED":"Reaktiviert!",
-            "DEACTIVATED":"Deaktiviert!"
+            "DEACTIVATED":"Deaktiviert!",
+            "UPDATED":"Projekt gespeichert!",
+            "GRANTUPDATED":"Berechtigung verändert!"
         }
     },
     "APP": {
@@ -499,7 +542,8 @@
             "TITLE": "Applikation",
             "DESCRIPTION": "Hier kannst du deine Applikation bearbeiten und deren Konfiguration anpassen.",
             "CREATE_OIDC": "OIDC Applikation",
-            "CREATE_OIDC_DESc": "Gib deine Applikationsdaten ein!",
+            "CREATE_OIDC_DESC_TITLE": "Gib deine Applikationsdaten Schritt für Schritt ein",
+            "CREATE_OIDC_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert",
             "DETAIL": {
                 "TITLE": "Detail",
                 "STATE": {
@@ -510,16 +554,32 @@
             }
         },
         "NAME": "Name",
+        "TYPE":"Applikationstyp",
+        "GRANT":"Grant Types",
         "OIDC": {
+            "PROSWITCH":"Konfigurator überspringen",
+            "NAMEANDTYPESECTION":"Name und Typ",
+            "TITLEFIRST":"Geben Sie zuerst einen Namen ein!",
+            "TYPETITLE":"Welche Art von Applikation möchtest du erstellen?",
+            "REDIRECTTITLE":"Wohin soll nach dem Login weitergeleitet werden?",
+            "REDIRECTDESCRIPTIONWEB":"Der redirect muss mit https:// beginnen. http:// ist nur für Testzwecke zulässig!",
+            "REDIRECTDESCRIPTIONNATIVE":"Die Weiterleitung muss mit einem eigenen Protokoll oder http://localhost beginnen!",
+            "REDIRECTNOTVALID":"Diese Weiterleitung ist nicht zulässig!",
+            "POSTREDIRECTTITLE":"Das ist die Weiterleitung nach einem logout.",
+            "TYPEREQUIRED":"Der Typ ist notwendig!",
             "TITLE": "OIDC Konfiguration",
             "CLIENTID": "Client ID",
             "CLIENTSECRET": "Client Secret",
             "CLIENTSECRET_DESCRIPTION": "Speichere das Client Secret, da es verschwindet, sobald der Dialog geschlossen wird!",
             "REGENERATESECRET": "Client Secret neu generieren",
             "REDIRECT": "Redirect URIs",
+            "REDIRECTSECTION": "Redirect URIs",
             "POSTLOGOUTREDIRECT":"Post logout URIs",
             "RESPONSE": "Response Types",
+            "RESPONSESECTION": "Antwort Typen",
             "GRANT": "Grant Types",
+            "GRANTSECTION":"Grant Typen",
+            "GRANTTITLE":"Wählen Sie Ihre Grant Typen aus. Hinweis: Implizit ist nur für Browserbasierte Anwendungen verfügbar.",
             "APPTYPE": "App Types",
             "RESPONSE0": "Code",
             "RESPONSE1": "Id Token",
@@ -531,9 +591,13 @@
             "APPTYPE1": "User Agent",
             "APPTYPE2": "Native",
             "AUTHMETHOD":"Auth Method",
+            "AUTHMETHODSECTION":"Authentifizierungsmethode",
             "AUTHMETHOD0":"Basic",
             "AUTHMETHOD1":"Post",
-            "AUTHMETHOD2":"None"
+            "AUTHMETHOD2":"None",
+            "UNSECUREREDIRECT":"Ich hoffe du weisst was du tust",
+            "OVERVIEWSECTION":"Übersicht",
+            "OVERVIEWTITLE":"Deine Konfiguration ist bereit! Du kannst sie hier nochmals prüfen."
         },
         "TOAST": {
             "REACTIVATED":"App reaktiviert!",
@@ -581,6 +645,7 @@
         "ORG_POLICY_EDITOR":"Org. Policy Editor",
         "ORG_POLICY_VIEWER":"Org. Policy Viewer",
         "PROJECT_OWNER":"Project Owner",
+        "PROJECT_OWNER_VIEWER":"Project Owner Viewer",
         "PROJECT_MEMBER_EDITOR":"Project Member Editor",
         "PROJECT_APP_EDITOR":"Project App Editor",
         "PROJECT_APP_VIEWER":"Project App Viewer",

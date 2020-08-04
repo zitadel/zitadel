@@ -2,10 +2,12 @@ import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import {
+    SearchMethod,
     UserGrant,
     UserGrantSearchKey,
     UserGrantSearchQuery,
     UserGrantSearchResponse,
+    UserGrantView,
 } from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 
@@ -18,7 +20,7 @@ export enum UserGrantContext {
 
 export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
     public totalResult: number = 0;
-    public grantsSubject: BehaviorSubject<UserGrant.AsObject[]> = new BehaviorSubject<UserGrant.AsObject[]>([]);
+    public grantsSubject: BehaviorSubject<UserGrantView.AsObject[]> = new BehaviorSubject<UserGrantView.AsObject[]>([]);
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -59,14 +61,40 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             case UserGrantContext.OWNED_PROJECT:
                 if (data && data.projectId) {
                     this.loadingSubject.next(true);
-                    const promise1 = this.userService.SearchProjectUserGrants(data.projectId, 10, 0, queries);
+                    const projectfilter = new UserGrantSearchQuery();
+                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
+                    projectfilter.setValue(data.projectId);
+                    if (queries) {
+                        queries.push(projectfilter);
+                    } else {
+                        queries = [projectfilter];
+                    }
+
+                    const promise1 = this.userService.SearchUserGrants(10, 0, queries);
                     this.loadResponse(promise1);
                 }
                 break;
             case UserGrantContext.GRANTED_PROJECT:
-                if (data && data.grantId) {
+                if (data && data.grantId && data.projectId) {
                     this.loadingSubject.next(true);
-                    const promise2 = this.userService.SearchProjectGrantUserGrants(data.grantId, 10, 0, queries);
+
+                    const grantquery: UserGrantSearchQuery = new UserGrantSearchQuery();
+                    grantquery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_GRANT_ID);
+                    grantquery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
+                    grantquery.setValue(data.grantId);
+
+                    const projectfilter = new UserGrantSearchQuery();
+                    projectfilter.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
+                    projectfilter.setValue(data.projectId);
+
+                    if (queries) {
+                        queries.push(projectfilter);
+                        queries.push(grantquery);
+                    } else {
+                        queries = [projectfilter, grantquery];
+                    }
+
+                    const promise2 = this.userService.SearchUserGrants(10, 0, queries);
                     this.loadResponse(promise2);
                 }
                 break;
@@ -82,7 +110,6 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
             catchError(() => of([])),
             finalize(() => this.loadingSubject.next(false)),
         ).subscribe(grants => {
-            console.log(grants);
             this.grantsSubject.next(grants);
         });
     }
@@ -93,7 +120,7 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
      * the returned stream emits new items.
      * @returns A stream of the items to be rendered.
      */
-    public connect(): Observable<UserGrant.AsObject[]> {
+    public connect(): Observable<UserGrantView.AsObject[]> {
         return this.grantsSubject.asObservable();
     }
 

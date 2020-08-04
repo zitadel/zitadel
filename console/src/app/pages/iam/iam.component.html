@@ -1,6 +1,6 @@
 <app-meta-layout>
     <div class="enlarged-container">
-        <h1>{{'IAM.DETAIL.TITLE' | translate}}</h1>
+        <h1 class="h1">{{'IAM.DETAIL.TITLE' | translate}}</h1>
         <p class="sub">{{'IAM.DETAIL.DESCRIPTION' | translate}} </p>
 
         <app-card title="{{ 'IAM.VIEWS.TITLE' | translate }}" description="{{ 'IAM.VIEWS.DESCRIPTION' | translate }}">
@@ -8,8 +8,11 @@
         </app-card>
     </div>
 
-    <metainfo class="side">
-        <app-iam-contributors>
-        </app-iam-contributors>
-    </metainfo>
+    <div class="side" metainfo>
+        <app-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
+            [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+            description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+            (showDetailClicked)="showDetail()" [disabled]="false">
+        </app-contributors>
+    </div>
 </app-meta-layout>

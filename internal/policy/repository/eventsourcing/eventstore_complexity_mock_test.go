@@ -14,7 +14,7 @@ func GetMockedEventstoreComplexity(ctrl *gomock.Controller, mockEs *mock.MockEve
 	return &PolicyEventstore{
 		Eventstore:  mockEs,
 		policyCache: GetMockCacheComplexity(ctrl),
-		idGenerator: GetSonyFlacke(),
+		idGenerator: GetSonyFlake(),
 	}
 }
 

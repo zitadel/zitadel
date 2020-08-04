@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -11,7 +13,6 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"time"
 )
 
 type ProjectGrantMember struct {
@@ -22,8 +23,6 @@ type ProjectGrantMember struct {
 const (
 	projectGrantMemberTable = "management.project_grant_members"
 )
-
-func (p *ProjectGrantMember) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *ProjectGrantMember) ViewModel() string {
 	return projectGrantMemberTable
@@ -36,7 +35,7 @@ func (p *ProjectGrantMember) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(proj_es_model.ProjectAggregate, usr_es_model.UserAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectGrantMember) Reduce(event *models.Event) (err error) {
@@ -119,6 +118,7 @@ func (p *ProjectGrantMember) fillUserData(member *view_model.ProjectGrantMemberV
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName
 	member.Email = user.EmailAddress
+	member.DisplayName = user.DisplayName
 }
 
 func (p *ProjectGrantMember) OnError(event *models.Event, err error) error {

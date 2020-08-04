@@ -1,58 +1,46 @@
-<div class="max-width-container">
-    <div class="container">
-        <div class="left">
-            <a *ngIf="projectid" [routerLink]="[ '/projects', projectid]" mat-icon-button>
-                <mat-icon class="icon">arrow_back</mat-icon>
-            </a>
-        </div>
-        <div class="right">
-            <div class="head">
-                <h1>{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}</h1>
-                <p class="desc">{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}</p>
-            </div>
-            <div class="master-row">
-                <div class="left-col">
-                    <div class="row">
-                        <span class="first">{{'PROJECT.GRANT.DETAIL.PROJECTNAME' | translate}}</span>
-                        <span class="fill-space"></span>
-                        <span>{{grant?.projectName}}</span>
-                    </div>
-                    <div class="row">
-                        <span class="first">{{'PROJECT.GRANT.DETAIL.RESOURCEOWNER' | translate}}</span>
-                        <span class="fill-space"></span>
-                        <span>{{grant?.resourceOwnerName}}</span>
-                    </div>
-                </div>
-
+<app-detail-layout [backRouterLink]="[ '/projects', projectid]" title="{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}"
+    description="{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}">
+    <div class="master-row">
+        <div class="left-col">
+            <div class="row">
+                <span class="first">{{'PROJECT.GRANT.DETAIL.PROJECTNAME' | translate}}</span>
                 <span class="fill-space"></span>
-
-                <div>
-                    <button mat-stroked-button color="accent"
-                        *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE" class="state-button"
-                        (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
-                    <button mat-stroked-button color="accent"
-                        *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE" class="state-button"
-                        (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
-                </div>
+                <span>{{grant?.projectName}}</span>
             </div>
+            <div class="row">
+                <span class="first">{{'PROJECT.GRANT.DETAIL.RESOURCEOWNER' | translate}}</span>
+                <span class="fill-space"></span>
+                <span>{{grant?.resourceOwnerName}}</span>
+            </div>
+        </div>
 
-            <mat-form-field class="form-field" appearance="outline" *ngIf="grant && grant.roleKeysList">
-                <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
-                <mat-select [(ngModel)]="grant.roleKeysList" multiple (selectionChange)="updateRoles($event)">
-                    <mat-option *ngFor="let role of memberRoleOptions" [value]="role.key">
-                        {{role.key}}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+        <span class="fill-space"></span>
 
-            <div class="divider"></div>
-
-            <h1>{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
-            <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
-
-            <app-project-grant-members *ngIf="this.projectid && this.grantid" [disabled]="isZitadel"
-                [projectId]="projectid" [grantId]="grantid" [type]="projectType">
-            </app-project-grant-members>
+        <div>
+            <button mat-stroked-button color="warn" *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE"
+                class="state-button"
+                (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
+            <button mat-stroked-button color="warn"
+                *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE" class="state-button"
+                (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
         </div>
     </div>
-</div>
+
+    <mat-form-field class="formfield" appearance="outline" *ngIf="grant && grant.roleKeysList">
+        <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+        <mat-select [(ngModel)]="grant.roleKeysList" multiple (selectionChange)="updateRoles($event)">
+            <mat-option *ngFor="let role of memberRoleOptions" [value]="role.key">
+                {{role.key}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <div class="divider"></div>
+
+    <h1 class="h1">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
+    <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
+
+    <app-project-grant-members *ngIf="this.projectid && this.grantid" [disabled]="isZitadel" [projectId]="projectid"
+        [grantId]="grantid" [type]="projectType">
+    </app-project-grant-members>
+</app-detail-layout>

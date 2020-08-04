@@ -1,105 +1,106 @@
 
 .card {
-    border-radius: .5rem;
-    z-index: 200;
-    border: 1px solid #ffffff30;
-    width: 350px;
+  border-radius: .5rem;
+  z-index: 200;
+  border: 1px solid #ffffff30;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+
+  .avatar {
+    font-size: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .u-name {
+    font-size: 1rem;
+    line-height: 1rem;
+  }
+
+  .u-email {
+    font-size: .8rem;
+    margin-top: 0;
+  }
+
+  .iamuser {
+    font-size: 1rem;
+  }
+
+  button {
+    border-radius: 50vh;
+    margin: .5rem;
+
+    .mat-button-wrapper {
+      font-size: .8rem;
+    }
+  }
+
+  .l-accounts {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 1rem 0;
+    width: 100%;
+    border-top: 1px solid #ffffff30;
+    border-bottom: 1px solid #ffffff30;
+    padding: .5rem 0;
 
-    .avatar {
-        font-size: 80px;
-        margin-bottom: 1rem;
-    }
+    .row {
+      padding: .5rem;
+      display: flex;
+      align-items: center;
+      color: inherit;
+      text-decoration: none;
 
-    .u-name {
-        font-size: 1rem;
-        line-height: 1rem;
-    }
+      &:hover {
+        cursor: pointer;
+        background-color: #ffffff10;
+      }
 
-    .u-email {
-        font-size: .8rem;
-        margin-top: 0;
-    }
+      .small-avatar {
+        height: 35px;
+        width: 35px;
+        line-height: 35px;
+        font-size: 35px;
+        border-radius: 50%;
+        margin: 0 1rem;
+      }
 
-    .iamuser {
-        font-size: 1rem;
-    }
+      .icon-wrapper {
+        height: 35px;
+        width: 35px;
+        border-radius: 50%;
+        margin: 0 1rem;
+        text-align: center;
 
-    button {
-        border-radius: 1rem;
-        margin: .5rem;
-
-        .mat-button-wrapper {
-            font-size: .8rem;
+        i {
+          margin: auto;
+          vertical-align: middle;
         }
-    }
+      }
 
-    .l-accounts {
+      .col {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        width: 100%;
-        border-top: 1px solid #ffffff30;
-        border-bottom: 1px solid #ffffff30;
-        padding: .5rem 0;
 
-        .row {
-            padding: .5rem;
-            display: flex;
-            align-items: center;
-            color: inherit;
-            text-decoration: none;
-
-            &:hover {
-                cursor: pointer;
-                background-color: #ffffff10;
-            }
-
-            .small-avatar {
-                height: 35px;
-                width: 35px;
-                line-height: 35px;
-                font-size: 35px;
-                border-radius: 50%;
-                margin: 0 1rem;
-            }
-
-            .icon-wrapper {
-                height: 35px;
-                width: 35px;
-                border-radius: 50%;
-                margin: 0 1rem;
-                text-align: center;
-
-                i {
-                    margin: auto;
-                    vertical-align: middle;
-                }
-            }
-
-            .col {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-
-                .title {
-                    font-weight: 500;
-                    font-size: .9rem;
-                    line-height: 1rem;
-                }
-
-                .email, .loginname {
-                    color: #8795a1;
-                    font-size: .8rem;
-                    line-height: 1rem;
-                }
-            }
-
-            .fill-space {
-                flex: 1;
-            }
+        .title {
+          font-weight: 500;
+          font-size: .9rem;
+          line-height: 1rem;
         }
+
+        .email,
+        .loginname {
+          color: #8795a1;
+          font-size: .8rem;
+          line-height: 1rem;
+        }
+      }
+
+      .fill-space {
+        flex: 1;
+      }
     }
+  }
 }

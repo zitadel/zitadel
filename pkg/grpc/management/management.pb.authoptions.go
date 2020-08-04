@@ -209,6 +209,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/SearchUserMemberships": authz.Option{
+		Permission: "user.membership.read",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/GetPasswordComplexityPolicy": authz.Option{
 		Permission: "policy.read",
 		CheckParam: "",
@@ -371,7 +376,7 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": authz.Option{
 		Permission: "project.read",
-		CheckParam: "ProjectId",
+		CheckParam: "",
 	},
 
 	"/caos.zitadel.management.api.v1.ManagementService/GetGrantedProjectByID": authz.Option{
@@ -541,6 +546,16 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 
 	"/caos.zitadel.management.api.v1.ManagementService/UserGrantByID": authz.Option{
 		Permission: "user.grant.read",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/CreateUserGrant": authz.Option{
+		Permission: "user.grant.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/UpdateUserGrant": authz.Option{
+		Permission: "user.grant.write",
 		CheckParam: "",
 	},
 

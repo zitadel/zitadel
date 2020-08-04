@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { ToastService } from 'src/app/services/toast.service';
     styleUrls: ['./user-list.component.scss'],
 })
 export class UserListComponent implements OnDestroy {
+    @ViewChild(MatPaginator) public paginator!: MatPaginator;
     public dataSource: MatTableDataSource<User.AsObject> = new MatTableDataSource<User.AsObject>();
     public userResult!: UserSearchResponse.AsObject;
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -51,14 +52,14 @@ export class UserListComponent implements OnDestroy {
     }
 
     public changePage(event: PageEvent): void {
-        this.getData(event.pageSize, event.pageIndex);
+        this.getData(event.pageSize, event.pageIndex * event.pageSize);
     }
 
     public deactivateSelectedUsers(): void {
         Promise.all(this.selection.selected.map(value => {
             return this.userService.DeactivateUser(value.id);
         })).then(() => {
-            this.toast.showInfo('Selected Users deactivated');
+            this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
             this.getData(10, 0);
         });
     }
@@ -67,7 +68,7 @@ export class UserListComponent implements OnDestroy {
         Promise.all(this.selection.selected.map(value => {
             return this.userService.ReactivateUser(value.id);
         })).then(() => {
-            this.toast.showInfo('Selected Users reactivated');
+            this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
             this.getData(10, 0);
         });
     }
@@ -82,5 +83,9 @@ export class UserListComponent implements OnDestroy {
             this.toast.showError(error);
             this.loadingSubject.next(false);
         });
+    }
+
+    public refreshPage(): void {
+        this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
     }
 }

@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"time"
-
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -25,8 +23,6 @@ const (
 	userSessionTable = "auth.user_sessions"
 )
 
-func (u *UserSession) MinimumCycleDuration() time.Duration { return u.cycleDuration }
-
 func (u *UserSession) ViewModel() string {
 	return userSessionTable
 }
@@ -36,7 +32,7 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence), nil
+	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (u *UserSession) Reduce(event *models.Event) (err error) {

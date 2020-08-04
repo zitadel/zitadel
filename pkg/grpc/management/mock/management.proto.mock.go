@@ -537,6 +537,26 @@ func (mr *MockManagementServiceClientMockRecorder) CreateUser(arg0, arg1 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateUser), varargs...)
 }
 
+// CreateUserGrant mocks base method
+func (m *MockManagementServiceClient) CreateUserGrant(arg0 context.Context, arg1 *management.UserGrantCreate, arg2 ...grpc.CallOption) (*management.UserGrant, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateUserGrant", varargs...)
+	ret0, _ := ret[0].(*management.UserGrant)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUserGrant indicates an expected call of CreateUserGrant
+func (mr *MockManagementServiceClientMockRecorder) CreateUserGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).CreateUserGrant), varargs...)
+}
+
 // DeactivateApplication mocks base method
 func (m *MockManagementServiceClient) DeactivateApplication(arg0 context.Context, arg1 *management.ApplicationID, arg2 ...grpc.CallOption) (*management.Application, error) {
 	m.ctrl.T.Helper()
@@ -1215,6 +1235,26 @@ func (mr *MockManagementServiceClientMockRecorder) GetUserProfile(arg0, arg1 int
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserProfile", reflect.TypeOf((*MockManagementServiceClient)(nil).GetUserProfile), varargs...)
+}
+
+// GetZitadelDocs mocks base method
+func (m *MockManagementServiceClient) GetZitadelDocs(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*management.ZitadelDocs, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetZitadelDocs", varargs...)
+	ret0, _ := ret[0].(*management.ZitadelDocs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetZitadelDocs indicates an expected call of GetZitadelDocs
+func (mr *MockManagementServiceClientMockRecorder) GetZitadelDocs(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetZitadelDocs", reflect.TypeOf((*MockManagementServiceClient)(nil).GetZitadelDocs), varargs...)
 }
 
 // Healthz mocks base method
@@ -2117,6 +2157,26 @@ func (mr *MockManagementServiceClientMockRecorder) SearchUserGrants(arg0, arg1 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserGrants", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchUserGrants), varargs...)
 }
 
+// SearchUserMemberships mocks base method
+func (m *MockManagementServiceClient) SearchUserMemberships(arg0 context.Context, arg1 *management.UserMembershipSearchRequest, arg2 ...grpc.CallOption) (*management.UserMembershipSearchResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchUserMemberships", varargs...)
+	ret0, _ := ret[0].(*management.UserMembershipSearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchUserMemberships indicates an expected call of SearchUserMemberships
+func (mr *MockManagementServiceClientMockRecorder) SearchUserMemberships(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchUserMemberships", reflect.TypeOf((*MockManagementServiceClient)(nil).SearchUserMemberships), varargs...)
+}
+
 // SearchUsers mocks base method
 func (m *MockManagementServiceClient) SearchUsers(arg0 context.Context, arg1 *management.UserSearchRequest, arg2 ...grpc.CallOption) (*management.UserSearchResponse, error) {
 	m.ctrl.T.Helper()
@@ -2455,6 +2515,26 @@ func (mr *MockManagementServiceClientMockRecorder) UpdateUserAddress(arg0, arg1 
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserAddress", reflect.TypeOf((*MockManagementServiceClient)(nil).UpdateUserAddress), varargs...)
+}
+
+// UpdateUserGrant mocks base method
+func (m *MockManagementServiceClient) UpdateUserGrant(arg0 context.Context, arg1 *management.UserGrantUpdate, arg2 ...grpc.CallOption) (*management.UserGrant, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateUserGrant", varargs...)
+	ret0, _ := ret[0].(*management.UserGrant)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateUserGrant indicates an expected call of UpdateUserGrant
+func (mr *MockManagementServiceClientMockRecorder) UpdateUserGrant(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserGrant", reflect.TypeOf((*MockManagementServiceClient)(nil).UpdateUserGrant), varargs...)
 }
 
 // UpdateUserProfile mocks base method

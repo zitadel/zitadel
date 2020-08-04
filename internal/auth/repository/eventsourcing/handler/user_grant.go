@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -42,8 +42,6 @@ const (
 	userGrantTable = "auth.user_grants"
 )
 
-func (u *UserGrant) MinimumCycleDuration() time.Duration { return u.cycleDuration }
-
 func (u *UserGrant) ViewModel() string {
 	return userGrantTable
 }
@@ -61,7 +59,7 @@ func (u *UserGrant) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(grant_es_model.UserGrantAggregate, iam_es_model.IamAggregate, org_es_model.OrgAggregate, usr_es_model.UserAggregate, proj_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (u *UserGrant) Reduce(event *models.Event) (err error) {
@@ -231,7 +229,7 @@ func (u *UserGrant) processMember(event *models.Event, rolePrefix, roleSuffix st
 			return err
 		}
 		if roleSuffix != "" {
-			roleKeys = suffixRoles(event.AggregateID, roleKeys)
+			roleKeys = suffixRoles(roleSuffix, roleKeys)
 		}
 		if errors.IsNotFound(err) {
 			grant = &view_model.UserGrantView{

@@ -11,7 +11,7 @@
         <mat-spinner diameter="50"></mat-spinner>
     </div>
 
-    <table *ngIf="dataSource" [dataSource]="dataSource" mat-table class="full-width-table background-style" matSort
+    <table *ngIf="dataSource" [dataSource]="dataSource" mat-table class="table background-style" matSort
         aria-label="Elements">
         <ng-container matColumnDef="viewName">
             <th mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'IAM.VIEWS.VIEWNAME' | translate }} </th>
@@ -26,7 +26,14 @@
         <ng-container matColumnDef="sequence">
             <th mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'IAM.VIEWS.SEQUENCE' | translate }} </th>
             <td mat-cell *matCellDef="let role">
-                <span class="role app-label">{{role.sequence}}</span>
+                <span class="role app-label">{{role?.processedSequence}}</span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="timestamp">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'IAM.VIEWS.SEQUENCE' | translate }} </th>
+            <td mat-cell *matCellDef="let role">
+                <span>{{role?.viewTimestamp | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             </td>
         </ng-container>
 
@@ -34,13 +41,15 @@
             <th mat-header-cell *matHeaderCellDef> {{ 'IAM.VIEWS.ACTIONS' | translate }} </th>
             <td mat-cell *matCellDef="let role">
                 <button mat-icon-button matTooltip="{{'IAM.VIEWS.CLEAR' | translate}}"
-                    (click)="cancelView(role.viewName, role.database)"><i class="las la-redo-alt"></i></button>
+                    (click)="cancelView(role.viewName, role.database)">
+                    <mat-icon svgIcon="mdi_broom"></mat-icon>
+                </button>
             </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator class="background-style" #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 100, 250]">
+    <mat-paginator class="paginator background-style" #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 100, 250]">
     </mat-paginator>
 </div>

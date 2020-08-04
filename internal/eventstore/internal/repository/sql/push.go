@@ -17,7 +17,7 @@ const (
 		"SELECT $1, $2, $3, $4, COALESCE($5, now()), $6, $7, $8, $9, $10 " +
 		"WHERE EXISTS (" +
 		"SELECT 1 FROM eventstore.events WHERE aggregate_type = $11 AND aggregate_id = $12 HAVING MAX(event_sequence) = $13 OR ($14::BIGINT IS NULL AND COUNT(*) = 0)) " +
-		"RETURNING id, event_sequence, creation_date"
+		"RETURNING event_sequence, creation_date"
 )
 
 func (db *SQL) PushAggregates(ctx context.Context, aggregates ...*models.Aggregate) (err error) {
@@ -55,7 +55,7 @@ func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
 	if aggregate.Precondition == nil {
 		return nil
 	}
-	events, err := filter(tx, aggregate.Precondition.Query)
+	events, err := filter(tx, models.FactoryFromSearchQuery(aggregate.Precondition.Query))
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "SQL-oBPxB", "filter failed")
 	}
@@ -69,12 +69,11 @@ func precondtion(tx *sql.Tx, aggregate *models.Aggregate) error {
 func insertEvents(stmt *sql.Stmt, previousSequence Sequence, events []*models.Event) error {
 	for _, event := range events {
 		err := stmt.QueryRow(event.Type, event.AggregateType, event.AggregateID, event.AggregateVersion, event.CreationDate, Data(event.Data), event.EditorUser, event.EditorService, event.ResourceOwner, previousSequence,
-			event.AggregateType, event.AggregateID, previousSequence, previousSequence).Scan(&event.ID, &previousSequence, &event.CreationDate)
+			event.AggregateType, event.AggregateID, previousSequence, previousSequence).Scan(&previousSequence, &event.CreationDate)
 
 		if err != nil {
 			logging.LogWithFields("SQL-IP3js",
 				"aggregate", event.AggregateType,
-				"id", event.AggregateID,
 				"previousSequence", previousSequence,
 				"aggregateId", event.AggregateID,
 				"aggregateType", event.AggregateType,

@@ -25,6 +25,13 @@ type PasswordComplexityPolicy struct {
 	HasSymbol    bool
 }
 
+func (p *PasswordComplexityPolicy) IsValid() error {
+	if p.MinLength == 0 || p.MinLength > 72 {
+		return caos_errs.ThrowInvalidArgument(nil, "MODEL-Lsp0e", "Errors.User.PasswordComplexityPolicy.MinLengthNotAllowed")
+	}
+	return nil
+}
+
 func (p *PasswordComplexityPolicy) Check(password string) error {
 	if p.MinLength != 0 && uint64(len(password)) < p.MinLength {
 		return caos_errs.ThrowInvalidArgument(nil, "MODEL-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength")

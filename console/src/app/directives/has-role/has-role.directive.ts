@@ -1,5 +1,5 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
-import { AuthUserService } from 'src/app/services/auth-user.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 
 @Directive({
@@ -10,7 +10,7 @@ export class HasRoleDirective {
     private hasView: boolean = false;
     @Input() public set appHasRole(roles: string[]) {
         if (roles && roles.length > 0) {
-            this.userService.isAllowed(roles).subscribe(isAllowed => {
+            this.authService.isAllowed(roles).subscribe(isAllowed => {
                 if (isAllowed && !this.hasView) {
                     this.viewContainerRef.clear();
                     this.viewContainerRef.createEmbeddedView(this.templateRef);
@@ -23,7 +23,7 @@ export class HasRoleDirective {
     }
 
     constructor(
-        private userService: AuthUserService,
+        private authService: AuthService,
         protected templateRef: TemplateRef<any>,
         protected viewContainerRef: ViewContainerRef,
     ) { }

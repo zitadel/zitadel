@@ -1,0 +1,81 @@
+<app-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"
+    [dataSize]="dataSource.totalResult" [selection]="selection">
+    <ng-template appHasRole [appHasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']"
+        actions>
+        <button (click)="deleteSelectedGrants()" [disabled]="disabled" mat-icon-button *ngIf="selection.hasValue()"
+            color="warn">
+            <i class="las la-trash"></i>
+        </button>
+    </ng-template>
+    <ng-template appHasRole [appHasRole]="['project.grant.member.write:'+projectId,'project.grant.member.write']"
+        actions>
+        <a [disabled]="disabled" color="primary" class="rounded-button" color="primary" mat-raised-button
+            [routerLink]="[ '/projects', projectId, 'grants', 'create']">
+            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+        </a>
+    </ng-template>
+
+    <div class="table-wrapper">
+        <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
+
+            <ng-container matColumnDef="select">
+                <th class="selection" mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td class="selection" mat-cell *matCellDef="let row">
+                    <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="grantedOrgName">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORG' | translate }} </th>
+                <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                    *matCellDef="let grant">
+                    {{grant.grantedOrgName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="creationDate">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CREATIONDATE' | translate }} </th>
+                <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                    *matCellDef="let grant">
+                    {{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="changeDate">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
+                <td [routerLink]="['/projects',grant.projectId,'grant', grant.id]" class="pointer" mat-cell
+                    *matCellDef="let grant">
+                    {{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
+
+            </ng-container>
+
+            <ng-container matColumnDef="roleNamesList">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }} </th>
+                <td class="pointer" mat-cell *matCellDef="let grant">
+                    <mat-form-field class="form-field" appearance="outline" *ngIf="grant.roleKeysList">
+                        <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
+                        <mat-select [(ngModel)]="grant.roleKeysList" multiple [disabled]="disabled"
+                            (selectionChange)="updateRoles(grant, $event)">
+                            <mat-option *ngFor="let role of memberRoleOptions" [value]="role.key">
+                                {{role.key}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr class="data-row" mat-row *matRowDef="let grant; columns: displayedColumns;" class="element-row">
+            </tr>
+        </table>
+
+        <mat-paginator class="paginator" #paginator [pageSize]="50" [pageSizeOptions]="[25, 50, 100, 250]"
+            [length]="dataSource.totalResult" (page)="loadGrantsPage($event.pageIndex, $event.pageSize)">
+        </mat-paginator>
+    </div>
+</app-refresh-table>

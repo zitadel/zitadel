@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 import { ProjectType } from 'src/app/proto/generated/management_pb';
 
-import { OwnedProjectDetailComponent } from './owned-project-detail/owned-project-detail.component';
 import { OwnedProjectsComponent } from './owned-projects.component';
 
 const routes: Routes = [
@@ -16,42 +14,60 @@ const routes: Routes = [
     {
         path: 'create',
         loadChildren: () => import('../project-create/project-create.module').then(m => m.ProjectCreateModule),
-        canActivate: [AuthGuard, RoleGuard],
+        canActivate: [RoleGuard],
         data: {
             roles: ['project.write'],
         },
     },
     {
         path: ':id',
-        component: OwnedProjectDetailComponent,
-        data: { animation: 'HomePage' },
-    },
-    {
-        path: ':projectid/members',
         data: {
-            type: ProjectType.PROJECTTYPE_OWNED,
+            animation: 'HomePage',
+            roles: ['project.read'],
         },
-        loadChildren: () => import('src/app/modules/project-members/project-members.module')
-            .then(m => m.ProjectMembersModule),
+        canActivate: [RoleGuard],
+        loadChildren: () => import('./owned-project-detail/owned-project-detail.module')
+            .then(m => m.OwnedProjectDetailModule),
     },
     {
-        path: ':projectid/apps',
-        data: { animation: 'AddPage' },
-        loadChildren: () => import('src/app/pages/projects/apps/apps.module').then(m => m.AppsModule),
-    },
-    {
-        path: ':projectid/roles/create',
-        loadChildren: () => import('../project-role-create/project-role-create.module').then(m => m.ProjectRoleCreateModule),
-    },
-    {
-        path: ':projectid/grants/create',
-        loadChildren: () => import('../project-grant-create/project-grant-create.module')
-            .then(m => m.ProjectGrantCreateModule),
-    },
-    {
-        path: ':projectid/grant/:grantid',
-        loadChildren: () => import('./project-grant-detail/project-grant-detail.module')
-            .then(m => m.ProjectGrantDetailModule),
+        path: ':projectid',
+        children: [
+            {
+                path: 'members',
+                data: {
+                    type: ProjectType.PROJECTTYPE_OWNED,
+                    roles: ['project.member.read'],
+                },
+                canActivate: [RoleGuard],
+                loadChildren: () => import('src/app/modules/project-members/project-members.module')
+                    .then(m => m.ProjectMembersModule),
+            },
+            {
+                path: 'apps',
+                data: {
+                    animation: 'AddPage',
+                    roles: ['project.app.read'],
+                },
+                canActivate: [RoleGuard],
+                loadChildren: () => import('src/app/pages/projects/apps/apps.module')
+                    .then(m => m.AppsModule),
+            },
+            {
+                path: 'roles/create',
+                loadChildren: () => import('../project-role-create/project-role-create.module')
+                    .then(m => m.ProjectRoleCreateModule),
+            },
+            {
+                path: 'grants/create',
+                loadChildren: () => import('../project-grant-create/project-grant-create.module')
+                    .then(m => m.ProjectGrantCreateModule),
+            },
+            {
+                path: 'grant/:grantid',
+                loadChildren: () => import('./project-grant-detail/project-grant-detail.module')
+                    .then(m => m.ProjectGrantDetailModule),
+            },
+        ],
     },
 ];
 

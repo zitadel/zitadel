@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,13 +16,14 @@ import {
     OIDCConfig,
     OIDCGrantType,
     OIDCResponseType,
+    ZitadelDocs,
 } from 'src/app/proto/generated/management_pb';
-import { GrpcService } from 'src/app/services/grpc.service';
 import { OrgService } from 'src/app/services/org.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import { nativeValidator } from '../appTypeValidator';
 
 enum RedirectType {
     REDIRECT = 'redirect',
@@ -36,7 +37,6 @@ enum RedirectType {
 })
 export class AppDetailComponent implements OnInit, OnDestroy {
     public errorMessage: string = '';
-    public selectable: boolean = false;
     public removable: boolean = true;
     public addOnBlur: boolean = true;
     public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -75,6 +75,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public RedirectType: any = RedirectType;
 
     public isZitadel: boolean = false;
+    public docs!: ZitadelDocs.AsObject;
+
+    public OIDCApplicationType: any = OIDCApplicationType;
+
+    public redirectControl: FormControl = new FormControl('');
+    public postRedirectControl: FormControl = new FormControl('');
+
 
     constructor(
         public translate: TranslateService,
@@ -84,7 +91,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         private fb: FormBuilder,
         private _location: Location,
         private dialog: MatDialog,
-        private grpcService: GrpcService,
         private orgService: OrgService,
     ) {
         this.appNameForm = this.fb.group({
@@ -114,7 +120,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.isZitadel = iam.toObject().iamProjectId === this.projectId;
         });
 
-
         this.projectService.GetApplicationById(projectid, id).then(app => {
             this.app = app.toObject();
             this.appNameForm.patchValue(this.app);
@@ -128,9 +133,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }
             if (this.app.oidcConfig?.redirectUrisList) {
                 this.redirectUrisList = this.app.oidcConfig.redirectUrisList;
+
+                this.redirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
             }
             if (this.app.oidcConfig?.postLogoutRedirectUrisList) {
                 this.postLogoutRedirectUrisList = this.app.oidcConfig.postLogoutRedirectUrisList;
+                this.postRedirectControl = new FormControl('', [nativeValidator as ValidatorFn]);
             }
             if (this.app.oidcConfig) {
                 this.appForm.patchValue(this.app.oidcConfig);
@@ -140,6 +148,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.toast.showError(error);
             this.errorMessage = error.message;
         });
+
+        this.docs = (await this.projectService.GetZitadelDocs()).toObject();
     }
 
     public changeState(event: MatButtonToggleChange): void {
@@ -168,7 +178,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
 
     public add(event: MatChipInputEvent, target: RedirectType): void {
-        if (target === RedirectType.POSTREDIRECT) {
+        if (target === RedirectType.POSTREDIRECT && this.postRedirectControl.valid) {
             const input = event.input;
             if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
                 this.postLogoutRedirectUrisList.push(event.value);
@@ -176,7 +186,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             if (input) {
                 input.value = '';
             }
-        } else if (target === RedirectType.REDIRECT) {
+        } else if (target === RedirectType.REDIRECT && this.redirectControl.valid) {
             const input = event.input;
             if (event.value !== '' && event.value !== ' ' && event.value !== '/') {
                 this.redirectUrisList.push(event.value);
@@ -221,11 +231,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 this.projectService
                     .UpdateOIDCAppConfig(this.projectId, this.app.id, this.app.oidcConfig)
-                    .then((data: OIDCConfig) => {
+                    .then(() => {
                         this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
                     })
-                    .catch(data => {
-                        this.toast.showError(data.message);
+                    .catch(error => {
+                        this.toast.showError(error);
                     });
             }
         }

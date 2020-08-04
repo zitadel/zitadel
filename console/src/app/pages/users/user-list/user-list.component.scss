@@ -1,76 +1,47 @@
 h1 {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .sub {
-    color: #8795a1;
-    margin-bottom: 2rem;
+  color: #8795a1;
+  margin-bottom: 2rem;
 }
 
-.table-header-row {
-    display: flex;
-    align-items: center;
-
-    .col {
-        display: flex;
-        flex-direction: column;
-
-        .desc {
-            font-size: .8rem;
-            color: #8795a1;
-        }
-        .count {
-            font-size: 2rem;
-        }
-    }
-
-    .fill-space {
-        flex: 1;
-    }
-
-    .icon-button {
-        margin-right: .5rem;
-    }
-
-    .add-button {
-        border-radius: .5rem;
-    }
+.add-button {
+  border-radius: .5rem;
 }
 
 .table-wrapper {
-    overflow: auto;
+  overflow: auto;
 
-    .spinner-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+  .table,
+  .paginator {
+    width: 100%;
+
+    td,
+    th {
+      padding: 0 1rem;
+
+      &:first-child {
+        padding-left: 0;
+        padding-right: 1rem;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
     }
 
-    table, mat-paginator {
-        width: 100%;
+    .data-row {
+      cursor: pointer;
 
-        td, th {
-            padding: 0 1rem;
-
-            &:first-child {
-                padding-left: 0;
-                padding-right: 1rem;
-            }
-
-            &:last-child {
-                padding-right: 0;
-            }
-        }
-
-        .data-row {
-            cursor: pointer;
-            &:hover {
-                background-color: #ffffff05;
-            }
-        }
+      &:hover {
+        background-color: #ffffff05;
+      }
     }
+  }
 }
 
 tr {
-    outline: none;
+  outline: none;
 }

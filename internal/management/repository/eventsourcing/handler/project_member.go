@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
@@ -11,7 +13,6 @@ import (
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_event "github.com/caos/zitadel/internal/user/repository/eventsourcing"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"time"
 )
 
 type ProjectMember struct {
@@ -22,8 +23,6 @@ type ProjectMember struct {
 const (
 	projectMemberTable = "management.project_members"
 )
-
-func (p *ProjectMember) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *ProjectMember) ViewModel() string {
 	return projectMemberTable
@@ -36,7 +35,7 @@ func (p *ProjectMember) EventQuery() (*models.SearchQuery, error) {
 	}
 	return es_models.NewSearchQuery().
 		AggregateTypeFilter(proj_es_model.ProjectAggregate, usr_es_model.UserAggregate).
-		LatestSequenceFilter(sequence), nil
+		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectMember) Reduce(event *models.Event) (err error) {
@@ -119,6 +118,7 @@ func (p *ProjectMember) fillUserData(member *view_model.ProjectMemberView, user 
 	member.FirstName = user.FirstName
 	member.LastName = user.LastName
 	member.Email = user.EmailAddress
+	member.DisplayName = user.DisplayName
 }
 func (p *ProjectMember) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-u73es", "id", event.AggregateID).WithError(err).Warn("something went wrong in projectmember handler")

@@ -15,7 +15,7 @@ func (v *View) ApplicationByID(appID string) (*model.ApplicationView, error) {
 	return view.ApplicationByID(v.Db, applicationTable, appID)
 }
 
-func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, int, error) {
+func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {
 	return view.SearchApplications(v.Db, applicationTable, request)
 }
 
@@ -35,7 +35,7 @@ func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
 	return v.ProcessedApplicationSequence(eventSequence)
 }
 
-func (v *View) GetLatestApplicationSequence() (uint64, error) {
+func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(applicationTable)
 }
 

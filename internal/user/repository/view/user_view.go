@@ -59,7 +59,7 @@ func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
 	return users, err
 }
 
-func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([]*model.UserView, int, error) {
+func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	users := make([]*model.UserView, 0)
 	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &users)
@@ -105,12 +105,21 @@ func UserMfas(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, erro
 	if user.OTPState == int32(usr_model.MfaStateUnspecified) {
 		return []*usr_model.MultiFactor{}, nil
 	}
-	return []*usr_model.MultiFactor{&usr_model.MultiFactor{Type: usr_model.MfaTypeOTP, State: usr_model.MfaState(user.OTPState)}}, nil
+	return []*usr_model.MultiFactor{{Type: usr_model.MfaTypeOTP, State: usr_model.MfaState(user.OTPState)}}, nil
 }
 
-func PutUser(db *gorm.DB, table string, project *model.UserView) error {
+func PutUsers(db *gorm.DB, table string, users ...*model.UserView) error {
+	save := repository.PrepareBulkSave(table)
+	u := make([]interface{}, len(users))
+	for i, user := range users {
+		u[i] = user
+	}
+	return save(db, u...)
+}
+
+func PutUser(db *gorm.DB, table string, user *model.UserView) error {
 	save := repository.PrepareSave(table)
-	return save(db, project)
+	return save(db, user)
 }
 
 func DeleteUser(db *gorm.DB, table, userID string) error {

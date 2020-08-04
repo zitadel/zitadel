@@ -98,12 +98,37 @@ func HasGlobalPermission(perms []string) bool {
 	return false
 }
 
-func GetPermissionCtxIDs(perms []string) []string {
+func HasGlobalExplicitPermission(perms []string, permToCheck string) bool {
+	for _, perm := range perms {
+		p, ctxID := SplitPermission(perm)
+		if p == permToCheck {
+			if ctxID == "" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func GetAllPermissionCtxIDs(perms []string) []string {
 	ctxIDs := make([]string, 0)
 	for _, perm := range perms {
 		_, ctxID := SplitPermission(perm)
 		if ctxID != "" {
 			ctxIDs = append(ctxIDs, ctxID)
+		}
+	}
+	return ctxIDs
+}
+
+func GetExplicitPermissionCtxIDs(perms []string, searchPerm string) []string {
+	ctxIDs := make([]string, 0)
+	for _, perm := range perms {
+		p, ctxID := SplitPermission(perm)
+		if p == searchPerm {
+			if ctxID != "" {
+				ctxIDs = append(ctxIDs, ctxID)
+			}
 		}
 	}
 	return ctxIDs

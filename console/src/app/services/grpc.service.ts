@@ -1,6 +1,6 @@
+import { PlatformLocation } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformLocation } from '@angular/common';
 
 import { AdminServicePromiseClient } from '../proto/generated/admin_grpc_web_pb';
 import { AuthServicePromiseClient } from '../proto/generated/auth_grpc_web_pb';
@@ -28,7 +28,10 @@ export class GrpcService {
     public async loadAppEnvironment(): Promise<any> {
         return this.http.get('./assets/environment.json')
             .toPromise().then((data: any) => {
+                console.log('init grpc');
+
                 if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
+                    console.log('init grpc promiseclients');
                     this.auth = new AuthServicePromiseClient(data.authServiceUrl);
                     this.mgmt = new ManagementServicePromiseClient(data.mgmtServiceUrl);
                     this.admin = new AdminServicePromiseClient(data.adminServiceUrl);

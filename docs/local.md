@@ -11,7 +11,7 @@ docker run -d \
 --hostname=zitadel-db \
 -p 26257:26257 -p 8080:8080  \
 -v "${GOPATH}/src/github.com/caos/zitadel/cockroach-data/zitadel1:/cockroach/cockroach-data"  \
-cockroachdb/cockroach:v19.2.2 start --insecure
+cockroachdb/cockroach:latest start --insecure
 ``` 
 
 ### local database migrations

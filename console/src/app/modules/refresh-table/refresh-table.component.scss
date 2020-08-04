@@ -1,0 +1,32 @@
+
+.table-header-row {
+  display: flex;
+  align-items: center;
+
+  .col {
+    display: flex;
+    flex-direction: column;
+
+    .desc {
+      font-size: .8rem;
+      color: #8795a1;
+    }
+
+    .count {
+      font-size: 2rem;
+    }
+  }
+
+  .spinner {
+    margin-top: 2px;
+    margin-bottom: 1px;
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .icon-button {
+    margin-right: .5rem;
+  }
+}

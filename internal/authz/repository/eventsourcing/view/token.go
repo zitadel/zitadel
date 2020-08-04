@@ -42,7 +42,7 @@ func (v *View) DeleteSessionTokens(agentID, userID string, eventSequence uint64)
 	return v.ProcessedTokenSequence(eventSequence)
 }
 
-func (v *View) GetLatestTokenSequence() (uint64, error) {
+func (v *View) GetLatestTokenSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(tokenTable)
 }
 

@@ -1,7 +1,7 @@
-import { animate, group, query, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, HostBinding, OnDestroy, ViewChild } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
+import { Component, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -10,9 +10,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
+import { ProjectService } from './services/project.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { UpdateService } from './services/update.service';
@@ -22,97 +24,10 @@ import { UpdateService } from './services/update.service';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     animations: [
-        trigger('accounts', [
-            transition(':enter', [
-                style({
-                    transform: 'scale(.9) translateY(-10%)',
-                    height: '200px',
-                    opacity: 0,
-                }),
-                animate(
-                    '.1s ease-out',
-                    style({
-                        transform: 'scale(1) translateY(0%)',
-                        height: '*',
-                        opacity: 1,
-                    }),
-                ),
-            ]),
-        ]),
-        trigger('routeAnimations', [
-            transition('HomePage => AddPage', [
-                style({ transform: 'translateX(100%)' }),
-                animate('250ms ease-in-out', style({ transform: 'translateX(0%)' })),
-            ]),
-            transition('AddPage => HomePage', [animate('250ms', style({ transform: 'translateX(100%)' }))]),
-            transition('HomePage => DetailPage', [
-                query(':enter, :leave', style({ position: 'absolute', left: 0, right: 0 }), {
-                    optional: true,
-                }),
-                group([
-                    query(
-                        ':enter',
-                        [
-                            style({
-                                transform: 'translateX(20%)',
-                                opacity: 0.5,
-                            }),
-                            animate(
-                                '.35s ease-in',
-                                style({
-                                    transform: 'translateX(0%)',
-                                    opacity: 1,
-                                }),
-                            ),
-                        ],
-                        {
-                            optional: true,
-                        },
-                    ),
-                    query(
-                        ':leave',
-                        [style({ opacity: 1, width: '100%' }), animate('.35s ease-out', style({ opacity: 0 }))],
-                        {
-                            optional: true,
-                        },
-                    ),
-                ]),
-            ]),
-            transition('DetailPage => HomePage', [
-                query(':enter, :leave', style({ position: 'absolute', left: 0, right: 0 }), {
-                    optional: true,
-                }),
-                group([
-                    query(
-                        ':enter',
-                        [
-                            style({
-                                opacity: 0,
-                            }),
-                            animate(
-                                '.35s ease-out',
-                                style({
-                                    opacity: 1,
-                                }),
-                            ),
-                        ],
-                        {
-                            optional: true,
-                        },
-                    ),
-                    query(
-                        ':leave',
-                        [
-                            style({ width: '100%', transform: 'translateX(0%)' }),
-                            animate('.35s ease-in', style({ transform: 'translateX(30%)', opacity: 0 })),
-                        ],
-                        {
-                            optional: true,
-                        },
-                    ),
-                ]),
-            ]),
-        ]),
+        toolbarAnimation,
+        ...navAnimations,
+        accountCard,
+        routeAnimations,
     ],
 })
 export class AppComponent implements OnDestroy {
@@ -134,20 +49,23 @@ export class AppComponent implements OnDestroy {
     public orgLoading: boolean = false;
 
     public showProjectSection: boolean = false;
-    public showOrgSection: boolean = false;
-    public showUserSection: boolean = false;
-    public iamreadwrite: boolean = false;
+
+    public grantedProjectsCount: number = 0;
+    public ownedProjectsCount: number = 0;
 
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
 
     constructor(
+        public viewPortScroller: ViewportScroller,
+        @Inject('windowObject') public window: Window,
         public translate: TranslateService,
         public authService: AuthService,
         private breakpointObserver: BreakpointObserver,
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
         public userService: AuthUserService,
+        private projectService: ProjectService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
         private toast: ToastService,
@@ -155,7 +73,7 @@ export class AppComponent implements OnDestroy {
         update: UpdateService,
     ) {
         console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5282c1; font-size: 50px');
-        console.log('%cInserting something here could give attackers access to your caos account.', 'color: red; font-size: 18px');
+        console.log('%cInserting something here could give attackers access to your zitadel account.', 'color: red; font-size: 18px');
         console.log('%cIf you don\'t know exactly what you\'re doing, close the window and stay on the safe side', 'font-size: 16px');
         console.log('%cIf you know exactly what you are doing, you should work for us', 'font-size: 16px');
         this.setLanguage();
@@ -205,15 +123,30 @@ export class AppComponent implements OnDestroy {
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lock-reset.svg'),
         );
 
+        this.matIconRegistry.addSvgIcon(
+            'mdi_broom',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/broom.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_pin_outline',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin-outline.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_pin',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin.svg'),
+        );
+        this.getProjectCount();
+
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
-            this.loadPermissions();
+
+            this.getProjectCount();
         });
 
         this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
             if (authenticated) {
-                // this.userService.GetMyzitadelPermissions().pipe(take(1)).subscribe(perm => console.log(perm.toObject()));
-                this.loadPermissions();
                 this.authService.GetActiveOrg().then(org => {
                     this.org = org;
                 });
@@ -233,13 +166,6 @@ export class AppComponent implements OnDestroy {
     public ngOnDestroy(): void {
         this.authSub.unsubscribe();
         this.orgSub.unsubscribe();
-    }
-
-    public loadPermissions(): void {
-        this.userService.isAllowed(['iam.read', 'iam.write'], true).subscribe(allowed => this.iamreadwrite = allowed);
-        this.userService.isAllowed(['org.read']).subscribe(allowed => this.showOrgSection = allowed);
-        this.userService.isAllowed(['project.read']).subscribe(allowed => this.showProjectSection = allowed);
-        this.userService.isAllowed(['user.read']).subscribe(allowed => this.showUserSection = allowed);
     }
 
     public loadOrgs(): void {
@@ -284,6 +210,16 @@ export class AppComponent implements OnDestroy {
         this.org = org;
         this.authService.setActiveOrg(org);
         this.router.navigate(['/']);
+    }
+
+    private async getProjectCount(): Promise<any> {
+        this.ownedProjectsCount = await this.projectService.SearchProjects(0, 0).then(res => {
+            return res.toObject().totalResult;
+        });
+
+        this.grantedProjectsCount = await this.projectService.SearchGrantedProjects(0, 0).then(res => {
+            return res.toObject().totalResult;
+        });
     }
 }
 

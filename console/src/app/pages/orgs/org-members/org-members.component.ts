@@ -5,11 +5,11 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
-import { Org, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
+import { Org, OrgMemberView, ProjectMember, ProjectType, User } from 'src/app/proto/generated/management_pb';
 import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { ProjectMembersDataSource } from './org-members-datasource';
+import { OrgMembersDataSource } from './org-members-datasource';
 
 @Component({
     selector: 'app-org-members',
@@ -21,9 +21,9 @@ export class OrgMembersComponent implements AfterViewInit {
     public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
     public disabled: boolean = false;
     @ViewChild(MatPaginator) public paginator!: MatPaginator;
-    @ViewChild(MatTable) public table!: MatTable<ProjectMember.AsObject>;
-    public dataSource!: ProjectMembersDataSource;
-    public selection: SelectionModel<ProjectMember.AsObject> = new SelectionModel<ProjectMember.AsObject>(true, []);
+    @ViewChild(MatTable) public table!: MatTable<OrgMemberView.AsObject>;
+    public dataSource!: OrgMembersDataSource;
+    public selection: SelectionModel<OrgMemberView.AsObject> = new SelectionModel<OrgMemberView.AsObject>(true, []);
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
     public displayedColumns: string[] = ['select', 'firstname', 'lastname', 'username', 'email', 'roles'];
@@ -33,8 +33,8 @@ export class OrgMembersComponent implements AfterViewInit {
         private toast: ToastService) {
         this.orgService.GetMyOrg().then(org => {
             this.org = org.toObject();
-            this.dataSource = new ProjectMembersDataSource(this.orgService);
-            this.dataSource.loadMembers(0, 25, 'asc');
+            this.dataSource = new OrgMembersDataSource(this.orgService);
+            this.dataSource.loadMembers(0, 25);
         });
     }
 
@@ -57,7 +57,7 @@ export class OrgMembersComponent implements AfterViewInit {
     public removeProjectMemberSelection(): void {
         Promise.all(this.selection.selected.map(member => {
             return this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-                this.toast.showInfo('Removed successfully');
+                this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
             }).catch(error => {
                 this.toast.showError(error);
             });
@@ -66,7 +66,7 @@ export class OrgMembersComponent implements AfterViewInit {
 
     public removeMember(member: ProjectMember.AsObject): void {
         this.orgService.RemoveMyOrgMember(member.userId).then(() => {
-            this.toast.showInfo('Member removed successfully');
+            this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
         }).catch(error => {
             this.toast.showError(error);
         });
@@ -101,7 +101,7 @@ export class OrgMembersComponent implements AfterViewInit {
                     Promise.all(users.map(user => {
                         return this.orgService.AddMyOrgMember(user.id, roles);
                     })).then(() => {
-                        this.toast.showError('members added');
+                        this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
                     }).catch(error => {
                         this.toast.showError(error);
                     });

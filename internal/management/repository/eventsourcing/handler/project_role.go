@@ -2,13 +2,13 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	proj_event "github.com/caos/zitadel/internal/project/repository/eventsourcing"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
-	"time"
 )
 
 type ProjectRole struct {
@@ -20,8 +20,6 @@ const (
 	projectRoleTable = "management.project_roles"
 )
 
-func (p *ProjectRole) MinimumCycleDuration() time.Duration { return p.cycleDuration }
-
 func (p *ProjectRole) ViewModel() string {
 	return projectRoleTable
 }
@@ -31,7 +29,7 @@ func (p *ProjectRole) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.ProjectQuery(sequence), nil
+	return eventsourcing.ProjectQuery(sequence.CurrentSequence), nil
 }
 
 func (p *ProjectRole) Reduce(event *models.Event) (err error) {

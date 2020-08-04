@@ -13,6 +13,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 
 import { IamMembersRoutingModule } from './iam-members-routing.module';
 import { IamMembersComponent } from './iam-members.component';
@@ -22,6 +23,7 @@ import { IamMembersComponent } from './iam-members.component';
     declarations: [IamMembersComponent],
     imports: [
         IamMembersRoutingModule,
+        DetailLayoutModule,
         CommonModule,
         MatAutocompleteModule,
         MatChipsModule,

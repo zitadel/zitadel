@@ -26,7 +26,7 @@ func (v *View) UserByLoginName(loginName string) (*model.UserView, error) {
 func (v *View) UsersByOrgID(orgID string) ([]*model.UserView, error) {
 	return view.UsersByOrgID(v.Db, userTable, orgID)
 }
-func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, int, error) {
+func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	return view.SearchUsers(v.Db, userTable, request)
 }
 
@@ -58,7 +58,7 @@ func (v *View) DeleteUser(userID string, eventSequence uint64) error {
 	return v.ProcessedUserSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserSequence() (uint64, error) {
+func (v *View) GetLatestUserSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userTable)
 }
 

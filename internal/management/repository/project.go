@@ -14,6 +14,7 @@ type ProjectRepository interface {
 	ReactivateProject(ctx context.Context, id string) (*model.Project, error)
 	SearchProjects(ctx context.Context, request *model.ProjectViewSearchRequest) (*model.ProjectViewSearchResponse, error)
 	SearchProjectGrants(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
+	SearchGrantedProjects(ctx context.Context, request *model.ProjectGrantViewSearchRequest) (*model.ProjectGrantViewSearchResponse, error)
 	ProjectGrantViewByID(ctx context.Context, grantID string) (*model.ProjectGrantView, error)
 
 	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMemberView, error)
@@ -26,7 +27,7 @@ type ProjectRepository interface {
 	AddProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	ChangeProjectRole(ctx context.Context, role *model.ProjectRole) (*model.ProjectRole, error)
 	RemoveProjectRole(ctx context.Context, projectID, key string) error
-	SearchProjectRoles(ctx context.Context, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
+	SearchProjectRoles(ctx context.Context, projectId string, request *model.ProjectRoleSearchRequest) (*model.ProjectRoleSearchResponse, error)
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool) (*model.ProjectChanges, error)
 	BulkAddProjectRole(ctx context.Context, role []*model.ProjectRole) error
 

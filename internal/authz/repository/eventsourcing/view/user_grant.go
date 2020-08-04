@@ -27,7 +27,7 @@ func (v *View) UserGrantsByProjectID(projectID string) ([]*model.UserGrantView, 
 	return view.UserGrantsByProjectID(v.Db, userGrantTable, projectID)
 }
 
-func (v *View) SearchUserGrants(request *grant_model.UserGrantSearchRequest) ([]*model.UserGrantView, int, error) {
+func (v *View) SearchUserGrants(request *grant_model.UserGrantSearchRequest) ([]*model.UserGrantView, uint64, error) {
 	return view.SearchUserGrants(v.Db, userGrantTable, request)
 }
 
@@ -47,7 +47,7 @@ func (v *View) DeleteUserGrant(grantID string, eventSequence uint64) error {
 	return v.ProcessedUserGrantSequence(eventSequence)
 }
 
-func (v *View) GetLatestUserGrantSequence() (uint64, error) {
+func (v *View) GetLatestUserGrantSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(userGrantTable)
 }
 

@@ -42,6 +42,7 @@ func userGrantCreateToModel(u *management.UserGrantCreate) *grant_model.UserGran
 		UserID:     u.UserId,
 		ProjectID:  u.ProjectId,
 		RoleKeys:   u.RoleKeys,
+		GrantID:    u.GrantId,
 	}
 }
 
@@ -125,17 +126,23 @@ func userGrantSearchKeyToModel(key management.UserGrantSearchKey) grant_model.Us
 		return grant_model.UserGrantSearchKeyUserID
 	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_ROLE_KEY:
 		return grant_model.UserGrantSearchKeyRoleKey
+	case management.UserGrantSearchKey_USERGRANTSEARCHKEY_GRANT_ID:
+		return grant_model.UserGrantSearchKeyGrantID
 	default:
 		return grant_model.UserGrantSearchKeyUnspecified
 	}
 }
 
 func userGrantSearchResponseFromModel(response *grant_model.UserGrantSearchResponse) *management.UserGrantSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-Wd7hs").OnError(err).Debug("unable to parse timestamp")
 	return &management.UserGrantSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      userGrantViewsFromModel(response.Result),
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            userGrantViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 

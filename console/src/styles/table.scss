@@ -1,33 +1,35 @@
 @import '~@angular/material/theming';
 
 @mixin table-theme($theme) {
-    $primary: map-get($theme, primary);
-    $primary-dark: mat-color($primary, A900);
-    $secondary-dark: mat-color($primary, A800);
-    $foreground: map-get($theme, foreground);
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $primary-dark: mat-color($primary, A900);
+  $secondary-dark: mat-color($primary, A800);
+  $foreground: map-get($theme, foreground);
 
-    .mat-table,
-    mat-paginator {
-        background-color: inherit !important;
-        transition: background-color .5s ease-in-out;
+  .mat-table,
+  .mat-paginator {
+    background-color: inherit !important;
+    transition: background-color .4s ease-in-out;
 
-        &.background-style {
-            background-color: inherit !important;
-        }
+    &.background-style {
+      background-color: inherit !important;
     }
+  }
+  /* stylelint-enable */
 
-    .app-label {
-        font-size: 12px;
-        border-radius: 1rem;
-        color: mat-color($foreground, text);
-        white-space: nowrap;
-        background-color: #8795a1;
-        padding: 3px 1rem;
-    }
+  .app-label {
+    font-size: 12px;
+    border-radius: 1rem;
+    color: mat-color($foreground, text);
+    white-space: nowrap;
+    background-color: #8795a1;
+    padding: 3px 1rem;
+  }
 
-    td {
-        .mat-form-field-wrapper {
-            padding-bottom: 0;
-        }
+  td {
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
     }
+  }
 }

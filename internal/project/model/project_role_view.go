@@ -46,6 +46,8 @@ type ProjectRoleSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*ProjectRoleView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(orgID string) {

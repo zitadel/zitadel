@@ -15,10 +15,10 @@
 
             <span class="fill-space"></span>
 
-            <button mat-stroked-button color="accent" [disabled]="isZitadel"
+            <button mat-stroked-button color="warn" [disabled]="isZitadel"
                 *ngIf="project?.state === ProjectState.PROJECTSTATE_ACTIVE" class="state-button"
                 (click)="changeState(ProjectState.PROJECTSTATE_INACTIVE)">{{'PROJECT.TABLE.DEACTIVATE' | translate}}</button>
-            <button mat-stroked-button color="accent" [disabled]="isZitadel"
+            <button mat-stroked-button color="warn" [disabled]="isZitadel"
                 *ngIf="project?.state === ProjectState.PROJECTSTATE_INACTIVE" class="state-button"
                 (click)="changeState(ProjectState.PROJECTSTATE_ACTIVE)">{{'PROJECT.TABLE.ACTIVATE' | translate}}</button>
 
@@ -43,18 +43,17 @@
 
         <ng-container *ngIf="project">
             <ng-template appHasRole [appHasRole]="['project.app.read:' + project.projectId, 'project.app.read']">
-                <app-project-application-grid *ngIf="grid"
+                <app-application-grid *ngIf="grid"
                     [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
-                    (changeView)="grid = false" [projectId]="projectId"></app-project-application-grid>
+                    (changeView)="grid = false" [projectId]="projectId"></app-application-grid>
                 <app-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
-                    <card-actions class="card-actions">
+                    <div class="card-actions" card-actions>
                         <button mat-icon-button (click)="grid = true">
                             <i matTooltip="show grid view" class="las la-th-large"></i>
                         </button>
-                    </card-actions>
-                    <app-project-applications
-                        [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
-                        [projectId]="projectId"></app-project-applications>
+                    </div>
+                    <app-applications [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE || isZitadel"
+                        [projectId]="projectId"></app-applications>
                 </app-card>
             </ng-template>
 
@@ -83,15 +82,15 @@
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="userGrantContext" [projectId]="projectId"
                             [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                            [allowCreate]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.write'] | hasRole)"
-                            [allowDelete]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.delete'] | hasRole)">
+                            [allowCreate]="(['user.grant.write'] | hasRole) | async"
+                            [allowDelete]="(['user.grant.delete'] | hasRole) | async">
                         </app-user-grants>
                     </app-card>
                 </ng-template>
             </ng-container>
         </ng-container>
     </div>
-    <metainfo class="side">
+    <div class="side" metainfo>
         <div class="details">
             <div class="row">
                 <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
@@ -102,14 +101,15 @@
 
         <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
             <mat-tab label="Details">
-                <app-project-contributors *ngIf="project"
-                    [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                    [projectType]="ProjectType.PROJECTTYPE_OWNED" [project]="project">
-                </app-project-contributors>
+                <app-contributors [loading]="loading$ | async" [totalResult]="totalMemberResult"
+                    [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+                    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+                    (showDetailClicked)="showDetail()" [disabled]="false">
+                </app-contributors>
             </mat-tab>
             <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="flex-col">
                 <app-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></app-changes>
             </mat-tab>
         </mat-tab-group>
-    </metainfo>
+    </div>
 </app-meta-layout>

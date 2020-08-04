@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, filter, map, mergeMap, take, timeout } from 'rxjs/operators';
+import { catchError, filter, finalize, first, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import { Org, UserProfileView } from '../proto/generated/auth_pb';
 import { AuthUserService } from './auth-user.service';
@@ -21,6 +21,8 @@ export class AuthService {
     private readonly _authenticationChanged: BehaviorSubject<
         boolean
     > = new BehaviorSubject(this.authenticated);
+
+    private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
 
     constructor(
         private grpcService: GrpcService,
@@ -43,10 +45,46 @@ export class AuthService {
             ),
         ).pipe(
             take(1),
-            mergeMap(token => {
-                return from(this.userService.GetMyUserProfile()).pipe(map(userprofile => userprofile.toObject()));
+            mergeMap(() => {
+                return from(this.userService.GetMyUserProfile().then(userprofile => userprofile.toObject()));
+            }),
+            finalize(() => {
+                this.loadPermissions();
             }),
         );
+
+        this.activeOrgChanged.subscribe(() => {
+            this.loadPermissions();
+        });
+    }
+
+    private loadPermissions(): void {
+        merge([
+            // this.authenticationChanged,
+            this.activeOrgChanged.pipe(map(org => !!org)),
+        ]).pipe(
+            first(),
+            switchMap(() => from(this.userService.GetMyzitadelPermissions())),
+            map(rolesResp => rolesResp.toObject().permissionsList),
+        ).subscribe(roles => this.zitadelPermissions.next(roles));
+    }
+
+    public isAllowed(roles: string[], each: boolean = false): Observable<boolean> {
+        if (roles && roles.length > 0) {
+            return this.zitadelPermissions.pipe(switchMap(zroles => {
+                return of(this.hasRoles(zroles, roles, each));
+            }));
+        } else {
+            return of(false);
+        }
+    }
+
+    public hasRoles(userRoles: string[], requestedRoles: string[], each: boolean = false): boolean {
+        return each ?
+            requestedRoles.every(role => userRoles.includes(role)) :
+            requestedRoles.findIndex(role => {
+                return userRoles.findIndex(i => i.includes(role)) > -1;
+            }) > -1;
     }
 
     public get authenticated(): boolean {

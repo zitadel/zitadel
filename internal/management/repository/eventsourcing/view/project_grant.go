@@ -27,7 +27,7 @@ func (v *View) ProjectGrantsByProjectIDAndRoleKey(projectID, key string) ([]*mod
 	return view.ProjectGrantsByProjectIDAndRoleKey(v.Db, grantedProjectTable, projectID, key)
 }
 
-func (v *View) SearchProjectGrants(request *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, int, error) {
+func (v *View) SearchProjectGrants(request *proj_model.ProjectGrantViewSearchRequest) ([]*model.ProjectGrantView, uint64, error) {
 	return view.SearchProjectGrants(v.Db, grantedProjectTable, request)
 }
 
@@ -47,7 +47,7 @@ func (v *View) DeleteProjectGrant(grantID string, eventSequence uint64) error {
 	return v.ProcessedProjectGrantSequence(eventSequence)
 }
 
-func (v *View) GetLatestProjectGrantSequence() (uint64, error) {
+func (v *View) GetLatestProjectGrantSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(grantedProjectTable)
 }
 

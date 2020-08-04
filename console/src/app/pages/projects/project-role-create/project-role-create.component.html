@@ -9,8 +9,8 @@
     </div>
 
     <h1>{{'PROJECT.ROLE.ADDDESCRIPTION' | translate}}</h1>
-    <button class="add-line-btn" color="primary" mat-stroked-button (click)="addEntry()">
-        Add another role
+    <button class="add-line-btn" color="primary" type="button" mat-stroked-button (click)="addEntry()">
+        {{'PROJECT.ROLE.ADDNEWLINE' | translate}}
     </button>
     <form @list (ngSubmit)="addRole()">
         <div @animate *ngFor="let formGroup of formArray.controls; index as i" class="content">
@@ -18,8 +18,6 @@
                 <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'PROJECT.ROLE.KEY' | translate }}</mat-label>
                     <input matInput formControlName="key" />
-                    <!-- <mat-error *ngIf="formGroup.get('key')?.errors?.required">{{'ERRORS.REQUIRED' | translate}}
-                    </mat-error> -->
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="formfield">
                     <mat-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</mat-label>
@@ -29,15 +27,14 @@
                     <mat-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</mat-label>
                     <input matInput formControlName="group" />
                 </mat-form-field>
-                <button mat-icon-button (click)="removeEntry(i)" color="warn"
+                <button *ngIf="i !== 0" mat-icon-button (click)="removeEntry(i)" type="button" color="warn"
                     matTooltip="{{ 'ACTIONS.REMOVE' | translate }}">
                     <i class="las la-trash"></i>
                 </button>
             </ng-container>
         </div>
 
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="formArray.invalid" cdkFocusInitial
-            type="submit">
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="formArray.invalid" type="submit">
             {{ 'ACTIONS.SAVE' | translate }}
         </button>
     </form>

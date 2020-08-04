@@ -15,7 +15,7 @@ func (v *View) OrgByID(orgID string) (*model.OrgView, error) {
 	return org_view.OrgByID(v.Db, orgTable, orgID)
 }
 
-func (v *View) SearchOrgs(query *org_model.OrgSearchRequest) ([]*model.OrgView, int, error) {
+func (v *View) SearchOrgs(query *org_model.OrgSearchRequest) ([]*model.OrgView, uint64, error) {
 	return org_view.SearchOrgs(v.Db, orgTable, query)
 }
 
@@ -35,7 +35,7 @@ func (v *View) ProcessedOrgFailedEvent(failedEvent *repository.FailedEvent) erro
 	return v.saveFailedEvent(failedEvent)
 }
 
-func (v *View) GetLatestOrgSequence() (uint64, error) {
+func (v *View) GetLatestOrgSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(orgTable)
 }
 

@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"github.com/caos/logging"
 
 	admin_model "github.com/caos/zitadel/internal/admin/model"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
@@ -72,16 +73,23 @@ func (repo *OrgRepo) OrgByID(ctx context.Context, id string) (*org_model.Org, er
 
 func (repo *OrgRepo) SearchOrgs(ctx context.Context, query *org_model.OrgSearchRequest) (*org_model.OrgSearchResult, error) {
 	query.EnsureLimit(repo.SearchLimit)
+	sequence, err := repo.View.GetLatestOrgSequence()
+	logging.Log("EVENT-LXo9w").OnError(err).Warn("could not read latest iam sequence")
 	orgs, count, err := repo.View.SearchOrgs(query)
 	if err != nil {
 		return nil, err
 	}
-	return &org_model.OrgSearchResult{
+	result := &org_model.OrgSearchResult{
 		Offset:      query.Offset,
 		Limit:       query.Limit,
 		TotalResult: uint64(count),
 		Result:      model.OrgsToModel(orgs),
-	}, nil
+	}
+	if err == nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.CurrentTimestamp
+	}
+	return result, nil
 }
 
 func (repo *OrgRepo) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {

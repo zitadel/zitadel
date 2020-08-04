@@ -16,7 +16,7 @@ func (v *View) IamMemberByIDs(orgID, userID string) (*model.IamMemberView, error
 	return view.IamMemberByIDs(v.Db, iamMemberTable, orgID, userID)
 }
 
-func (v *View) SearchIamMembers(request *iam_model.IamMemberSearchRequest) ([]*model.IamMemberView, int, error) {
+func (v *View) SearchIamMembers(request *iam_model.IamMemberSearchRequest) ([]*model.IamMemberView, uint64, error) {
 	return view.SearchIamMembers(v.Db, iamMemberTable, request)
 }
 
@@ -40,7 +40,7 @@ func (v *View) DeleteIamMember(iamID, userID string, eventSequence uint64) error
 	return v.ProcessedIamMemberSequence(eventSequence)
 }
 
-func (v *View) GetLatestIamMemberSequence() (uint64, error) {
+func (v *View) GetLatestIamMemberSequence() (*global_view.CurrentSequence, error) {
 	return v.latestSequence(iamMemberTable)
 }
 

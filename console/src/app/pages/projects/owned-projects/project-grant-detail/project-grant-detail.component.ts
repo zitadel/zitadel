@@ -73,14 +73,13 @@ export class ProjectGrantDetailComponent {
     public getRoleOptions(projectId: string): void {
         this.projectService.SearchProjectRoles(projectId, 100, 0).then(resp => {
             this.memberRoleOptions = resp.toObject().resultList;
-            console.log(resp.toObject());
         });
     }
 
     updateRoles(selectionChange: MatSelectChange): void {
         this.projectService.UpdateProjectGrant(this.grant.id, this.grant.projectId, selectionChange.value)
             .then((newgrant: ProjectGrant) => {
-                this.toast.showInfo('Grant updated!');
+                this.toast.showInfo('PROJECT.TOAST.GRANTUPDATED');
             }).catch(error => {
                 this.toast.showError(error);
             });

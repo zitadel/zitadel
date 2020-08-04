@@ -30,8 +30,8 @@ export class ProjectCreateComponent implements OnInit {
             .then((data: Project) => {
                 this.router.navigate(['projects', data.getId()]);
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.toast.showError(error);
             });
     }
 

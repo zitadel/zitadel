@@ -1,7 +1,7 @@
 {{template "main-top" .}}
 
+{{ template "user-profile" . }}
 
-<h1>{{t "EmailVerification.Title"}}</h1>
 <p>{{t "EmailVerification.Description"}}</p>
 
 <form action="{{ mailVerificationUrl }}" method="POST">
@@ -21,13 +21,17 @@
     {{ template "error-message" .}}
 
     <div class="actions">
-        <button type="submit" name="resend" value="false" class="primary right" >{{t "Actions.Next"}}</buttontype="submit">
+        <button type="submit" id="submit-button" name="resend" value="false" class="primary right" disabled>{{t "Actions.Next"}}</button>
         {{ if .UserID }}
         <button type="submit" name="resend" value="true" class="secondary right" formnovalidate>{{t "Actions.Resend"}}</button>
         {{ end }}
+        <a href="{{ loginUrl }}">
+            <button class="secondary" type="button">{{t "Actions.Cancel"}}</button>
+        </a>
     </div>
 </form>
-
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 
 {{template "main-bottom" .}}
  

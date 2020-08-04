@@ -5,6 +5,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -15,11 +16,12 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { PipesModule } from 'src/app/pipes/pipes.module';
+import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
 
+import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ProjectMembersRoutingModule } from './project-members-routing.module';
 import { ProjectMembersComponent } from './project-members.component';
-
 
 @NgModule({
     declarations: [ProjectMembersComponent],
@@ -42,7 +44,10 @@ import { ProjectMembersComponent } from './project-members.component';
         MatProgressSpinnerModule,
         FormsModule,
         TranslateModule,
-        PipesModule,
+        HasRolePipeModule,
+        RefreshTableModule,
+        DetailLayoutModule,
+        MatDialogModule,
     ],
 })
 export class ProjectMembersModule { }

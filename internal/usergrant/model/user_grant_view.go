@@ -61,12 +61,23 @@ type UserGrantSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*UserGrantView
+	Sequence    uint64
+	Timestamp   time.Time
 }
 
 func (r *UserGrantSearchRequest) EnsureLimit(limit uint64) {
 	if r.Limit == 0 || r.Limit > limit {
 		r.Limit = limit
 	}
+}
+
+func (r *UserGrantSearchRequest) GetSearchQuery(key UserGrantSearchKey) (int, *UserGrantSearchQuery) {
+	for i, q := range r.Queries {
+		if q.Key == key {
+			return i, q
+		}
+	}
+	return -1, nil
 }
 
 func (r *UserGrantSearchRequest) AppendMyOrgQuery(orgID string) {

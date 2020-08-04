@@ -29,11 +29,12 @@ h1 {
     color: $fontColor;
     font-family: $headerFont;
     font-weight: 300;
-    font-size: 40px;
+    font-size: $headerSize;
 }
 
 p {
     font-weight: 300;
+    text-align: center;
 }
 
 header {
@@ -78,6 +79,7 @@ button {
     outline: none;
     &:hover {
         background-color: $primaryColorHover;
+        color: $backgroundColor;
         border: 2px solid $primaryColorHover;
     }
 
@@ -89,6 +91,16 @@ button {
             background-color: $primaryColorHover;
         }
     }
+
+    &:disabled {
+        background-color: $inputBorderColor;
+        border: 2px solid $inputBorderColor;
+
+        &:hover {
+            background-color: $inputBorderColor;
+            border: 2px solid $inputBorderColor;
+        }
+    }
 }
 
 input:not([type='radio']), select {
@@ -98,6 +110,45 @@ input:not([type='radio']), select {
     border: 2px solid $inputBorderColor;
     border-radius: 5px;
     padding-left: 15px;
+}
+
+%profile-image {
+    .profile-image {
+        height: 80px;
+        width: 80px;
+        background-position: center;
+        background-repeat: no-repeat;
+        @include retina-background-image($profileImgDark, "png", false, 80px, 80px);
+    }
+
+    &:hover .profile-image {
+        @include retina-background-image($profileImgDark, "png", true, 80px, 80px);
+    }
+}
+
+.login-profile {
+    @extend %profile-image;
+    .profile-image {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .names {
+        padding: 10px 0;
+        text-align: center;
+
+        div:first-of-type {
+            font-size: $headerSize;
+            font-weight: 300;
+        }
+
+        div:nth-of-type(2) {
+            font-weight: 300;
+            font-size: 0.9rem;
+            font-style: italic;
+            color: $labelColor;
+        }
+    }
 }
 
 form {
@@ -166,20 +217,14 @@ form {
     }
 
     .user-selection-list {
-        margin-bottom: 80px;
+        margin-bottom: 40px;
     }
 
     button.user-selection {
+        @extend %profile-image;
         .profile-image {
-            width: 100px;
-            height: 100px;
-            @include retina-background-image($profileImgDark, "png", false, 100px, 100px);
-        }
-
-        &:hover {
-            .profile-image {
-                @include retina-background-image($profileImgDark, "png", true, 100px, 100px);
-            }
+            height: 80px;
+            width: 80px;
         }
 
         .sessionstate {
@@ -225,24 +270,52 @@ form {
             margin-top: 80px;
         }
         .other-user-image {
-            width: 100px;
-            height: 75px;
+            width: 80px;
+            height: 60px;
             background-repeat: no-repeat;
             background-position: center;
-            @include retina-background-image($otherUserImgDark, "png", false, 100px, 75px);
+            @include retina-background-image($otherUserImgDark, "png", false, 80px, 60px);
         }
 
         &:hover {
             .other-user-image {
                 background-repeat: no-repeat;
                 background-position: center;
-                @include retina-background-image($otherUserImgDark, "png", true, 100px, 75px);
+                @include retina-background-image($otherUserImgDark, "png", true, 80px, 60px);
             }
         }
 
         & > div:nth-of-type(2) {
             margin: 15px;
             font-size: 1.4rem;
+        }
+    }
+
+    ul#passwordcomplexity {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        list-style: none;
+
+        li {
+            flex: 1 0 50%;
+            display: block;
+            font-weight: 300;
+            font-size: 12px;
+            line-height: 12px;
+
+            i {
+                height: 26px;
+                padding-right: 10px;
+                vertical-align: middle;
+                color: $okColor;
+            }
+        }
+
+        li.invalid {
+            i {
+                color: $nokColor;
+            }
         }
     }
 }

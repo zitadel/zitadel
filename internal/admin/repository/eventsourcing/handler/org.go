@@ -1,14 +1,13 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
-	"time"
-
 	"github.com/caos/logging"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
 type Org struct {
@@ -19,8 +18,6 @@ const (
 	orgTable = "adminapi.orgs"
 )
 
-func (o *Org) MinimumCycleDuration() time.Duration { return o.cycleDuration }
-
 func (o *Org) ViewModel() string {
 	return orgTable
 }
@@ -30,7 +27,7 @@ func (o *Org) EventQuery() (*es_models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.OrgQuery(sequence), nil
+	return eventsourcing.OrgQuery(sequence.CurrentSequence), nil
 }
 
 func (o *Org) Reduce(event *es_models.Event) error {

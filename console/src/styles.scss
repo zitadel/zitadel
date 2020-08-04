@@ -17,168 +17,206 @@
 }
 
 $caos-dark-brand: (
-    50: #ffffff,
-    100: #dde6f3,
-    200: #b4c9e4,
-    300: #7fa3d1,
-    400: #6992c9,
-    500: #5282c1,
-    600: #4072b4,
-    700: #38649d,
-    800: #305687,
-    900: #284770,
-    A100: #ffffff,
-    A200: #dde6f3,
-    A300: #6992c9,
-    A400: #38649d,
-    A500: #666666,
-    A600: #ffffff,
-    A700: #8795a1,
-    A800: #2d2e30,
-    A900: #212224,
-    contrast: (
-        50: $black-87-opacity,
-        100: $black-87-opacity,
-        200: $black-87-opacity,
-        300: $black-87-opacity,
-        400: $black-87-opacity,
-        500: white,
-        600: white,
-        700: white,
-        800: white,
-        900: white,
-        A100: $black-87-opacity,
-        A200: $black-87-opacity,
-        A400: $black-87-opacity,
-        A700: white,
-    )
+  50: #fff,
+  100: #dde6f3,
+  200: #b4c9e4,
+  300: #7fa3d1,
+  400: #6992c9,
+  500: #5282c1,
+  600: #4072b4,
+  700: #38649d,
+  800: #305687,
+  900: #284770,
+  A100: #fff,
+  A200: #dde6f3,
+  A300: #6992c9,
+  A400: #38649d,
+  A500: #666,
+  A600: #fff,
+  A700: #8795a1,
+  A800: #2d2e30,
+  A900: #212224,
+  contrast: (
+    50: $black-87-opacity,
+    100: $black-87-opacity,
+    200: $black-87-opacity,
+    300: $black-87-opacity,
+    400: $black-87-opacity,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: $black-87-opacity,
+    A200: $black-87-opacity,
+    A400: $black-87-opacity,
+    A700: white,
+  )
 );
 
 $caos-light-brand: (
-    50: #ffffff,
-    100: #dde6f3,
-    200: #b4c9e4,
-    300: #7fa3d1,
-    400: #6992c9,
-    500: #5282c1,
-    600: #4072b4,
-    700: #38649d,
-    800: #305687,
-    900: #284770,
-    A100: #ffffff,
-    A200: #dde6f3,
-    A300: #6992c9,
-    A400: #38649d,
-    A500:#333333,
-    A600: #000000,
-    A700: #8795a1,
-    A800: #fafafa,
-    A900: #fafafa,
-    contrast: (
-        50: #3d4852,
-        100: #3d4852,
-        200: #3d4852,
-        300: #3d4852,
-        400: #3d4852,
-        500: white,
-        600: white,
-        700: white,
-        800: white,
-        900: white,
-        A100: #3d4852,
-        A200: #3d4852,
-        A400: #3d4852,
-        A700: white,
-    )
+  50: #fff,
+  100: #dde6f3,
+  200: #b4c9e4,
+  300: #7fa3d1,
+  400: #6992c9,
+  500: #5282c1,
+  600: #4072b4,
+  700: #38649d,
+  800: #305687,
+  900: #284770,
+  A100: #fff,
+  A200: #dde6f3,
+  A300: #6992c9,
+  A400: #38649d,
+  A500:#333,
+  A600: #000,
+  A700: #8795a1,
+  A800: white,
+  A900: #fafafa,
+  contrast: (
+    50: #3d4852,
+    100: #3d4852,
+    200: #3d4852,
+    300: #3d4852,
+    400: #3d4852,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: #3d4852,
+    A200: #3d4852,
+    A400: #3d4852,
+    A700: white,
+  )
+);
+
+$caos-accent-color: (
+  50: #ebf4f2,
+  100: #cce3de,
+  200: #abd1c9,
+  300: #89bfb3,
+  400: #6fb1a2,
+  500: #56a392,
+  600: #4f9b8a,
+  700: #45917f,
+  800: #3c8875,
+  900: #2b7763,
+  A100: #beffed,
+  A200: #8bffde,
+  A400: #58ffd0,
+  A700: #3effc9,
+  contrast: (
+    50: $black-87-opacity,
+    100: $black-87-opacity,
+    200: $black-87-opacity,
+    300: $black-87-opacity,
+    400: $black-87-opacity,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: $black-87-opacity,
+    A200: $black-87-opacity,
+    A400: $black-87-opacity,
+    A700: white,
+  )
 );
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 
 $light-primary: mat-palette($caos-light-brand);
-$light-accent: mat-palette($mat-pink);
+$light-accent: mat-palette($caos-accent-color);
 $light-warn: mat-palette($mat-red);
 
 $dark-primary: mat-palette($caos-dark-brand);
-$dark-accent: mat-palette($mat-pink, 500, 700, A700);
+$dark-accent: mat-palette($mat-pink);
 $dark-warn: mat-palette($mat-red);
 
 $light-theme: mat-light-theme($light-primary, $light-accent, $light-warn);
 
 $dark-theme: mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
-
-$custom-typography: mat-typography-config(
+$custom-typography:
+  mat-typography-config(
     $font-family: 'Lato'
-);
+  );
+
 @include mat-core($custom-typography);
 
 // default theme
 @include component-themes($dark-theme);
 @include angular-material-theme($dark-theme);
-.light-theme {
-    @include component-themes($light-theme);
-    @include angular-material-theme($light-theme);
-    color: #202124;
-
-	.side, .main-container {
-        background-color: white;
-        transition: background-color .5s ease-in-out;
-    }
-
-    ::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        background-color: #fafafa;
-        border-radius: 8px;
-    }
-
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-        background-color: #fafafa;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background-color: #5282c1;
-        border-radius: 8px;
-    }
-}
-
-.dark-theme {
-    @include component-themes($dark-theme);
-    @include angular-material-theme($dark-theme);
-
-	.side, .main-container {
-        background-color: #212224;
-        transition: background-color .5s ease-in-out;
-    }
-    
-    .mat-dialog-container {
-		background-color: #2d2e30;
-    } 
-
-    ::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        background-color: #2d2e30;
-        border-radius: 8px;
-    }
-
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-        background-color: #2d2e30;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background-color: #5282c1;
-        border-radius: 8px;
-    }
-}
 
 .mat-dialog-container {
   border-radius: .5rem !important;
+}
+
+.light-theme {
+  @include component-themes($light-theme);
+  @include angular-material-theme($light-theme);
+
+  color: #202124;
+
+  .sidenav,
+  .main-container,
+  .mat-dialog-container {
+    background-color: #fafafa;
+    transition: background-color .4s ease-in-out;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #fafafa;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #fafafa;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #737c8850;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+}
+
+.dark-theme {
+  @include component-themes($dark-theme);
+  @include angular-material-theme($dark-theme);
+
+  .sidenav,
+  .main-container,
+  .mat-dialog-container {
+    background-color: #212224;
+    transition: background-color .4s ease-in-out;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #2d2e30;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #2d2e30;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #737c8870;
+    border-radius: 8px;
+    cursor: pointer;
+  }
 }
 // @include mat-checkbox-theme($candy-app-theme);
 
@@ -186,51 +224,55 @@ $custom-typography: mat-typography-config(
 
 html,
 body {
-	height: 100%;
-}
-body {
-    margin: 0;
-    font-family: 'Lato', -apple-system, BlinkMacSystemFont,
-    "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
+  height: 100%;
 }
 
+body {
+  margin: 0;
+  font-family:
+    'Lato',
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
+}
 
 .max-width-container {
-    max-width: 1350px;
-    padding: 0 1.5rem;
-    padding-top: 4rem;
-    padding-left: 4rem;
-  
-    @media only screen and (min-width: 1024px) {
-      max-width: 1120px;
-    }
-  
-    @media only screen and (min-width: 899px) {
-      max-width: 899px;
-    }
-  
-    @media only screen and (max-width: 500px) {
-      padding-left: 1.5rem;
-    }
-  }
-  
-  .enlarged-container {
-      padding: 0 1.5rem;
-      padding-top: 4rem;
-      padding-left: 4rem;
-  
-      @media only screen and (max-width: 500px) {
-          padding-left: 1.5rem;
-      }
+  max-width: 1350px;
+  padding: 0 1.5rem;
+  padding-top: 4rem;
+  padding-left: 4rem;
+
+  @media only screen and (min-width: 1024px) {
+    max-width: 1120px;
   }
 
-.mat-dialog-container {
-  border-radius: 0.5rem;
-  background-color: #212224;
+  @media only screen and (min-width: 899px) {
+    max-width: 899px;
+  }
+
+  @media only screen and (max-width: 500px) {
+    padding-left: 1.5rem;
+  }
+}
+
+.enlarged-container {
+  padding: 0 1.5rem;
+  padding-top: 4rem;
+  padding-left: 4rem;
+
+  @media only screen and (max-width: 500px) {
+    padding-left: 1.5rem;
+  }
 }
 
 i {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
 }

@@ -1,75 +1,148 @@
 h1 {
-    font-weight: 500;
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+p.desc {
+  font-size: 14px;
+  color: #8795a1;
+}
+
+.proswitch {
+  margin-bottom: 2rem;
+  display: block;
 }
 
 .container {
-	padding: 4rem 4rem 2rem 4rem;
+  padding: 4rem 4rem 2rem 4rem;
 
-	.abort-container {
-		display: flex;
-		align-items: center;
-		margin-bottom: 2rem;
+  .progress-bar {
+    margin-bottom: 1rem;
+  }
 
-		.abort {
-			font-size: 1.2rem;
-			margin-left: 2rem;
-		}
+  .abort-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
 
-		.abort-2 {
-			font-size: 1.2rem;
-			margin-left: 2rem;
-		}
-	}
+    .abort {
+      font-size: 1.2rem;
+      margin-left: 2rem;
+    }
+
+    .abort-2 {
+      font-size: 1.2rem;
+      margin-left: 2rem;
+      white-space: nowrap;
+    }
+  }
 }
 
 .margin-right {
-	margin-right: 0.5rem;
+  margin-right: .5rem;
 }
 
-.column {
-    display: flex;
-    flex-direction: column;
-
-    .formfield {
-        width: 400px;
-        input {
-            font-size: 1.5rem;
-        }
-
-        &.autocomplete {
-            margin-top: 1rem;
-        }
-    }
-
-    .slider {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        font-size: 0.8rem;
-    }
-
-    .access-token {
-        width: 400px;
-    }
+.formfield {
+  width: 400px;
+  display: block;
 }
 
-.content {
+.full-width {
+  width: 100%;
+}
+
+.stepper {
+  background: inherit !important;
+  margin: 0 -1.5rem;
+
+  .step-title {
+    font-size: 1.2rem;
+    color: #8795a1;
+  }
+
+  .step-description {
+    font-size: .9rem;
+    color: #8795a1;
+  }
+
+  .error {
+    font-size: 13px;
+    color: #f44336;
+    margin-top: 0;
+  }
+
+  .chip[color='white'] {
+    background-color: #fafafa;
+  }
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+
+  .radio-button {
+    margin: .5rem 0;
+  }
+}
+
+.checkbox-container {
+  display: flex;
+  flex-direction: column;
+
+  .checkbox {
+    margin: .5rem 0;
+  }
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+
+  .left,
+  .right {
+    margin-bottom: .5rem;
+    font-size: 14px;
+    color: #8795a1;
+  }
+}
+
+.actions {
+  button[mat-stroked-button] {
+    float: left;
+    margin-top: 1rem;
+    border-radius: .5rem;
+  }
+
+  button[mat-raised-button] {
+    float: right;
+    margin-top: 1rem;
+    border-radius: .5rem;
+    padding: .5rem 1rem;
+    min-width: 100px;
+  }
+}
+
+.dev {
+  .content {
     display: flex;
     margin: 0 -.5rem;
     flex-wrap: wrap;
 
-    mat-form-field {
-        flex: 1 0 40%;
-        margin: 0 .5rem;
-    }
+    .formfield {
+      flex: 1 0 40%;
+      margin: 0 .5rem;
 
-    .full-width {
+      &.full-width {
         flex-basis: 80%;
+      }
     }
-}
+  }
 
-.continue-button {
+  .continue-button {
     margin-top: 3rem;
     display: block;
-    padding: 0.5rem 4rem;
-    border-radius: 0.5rem;
+    padding: .5rem 4rem;
+    border-radius: .5rem;
+    float: right;
+  }
 }

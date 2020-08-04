@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
 )
@@ -9,8 +10,9 @@ import (
 type key int
 
 const (
-	permissionsKey key = 1
-	dataKey        key = 2
+	requestPermissionsKey key = 1
+	dataKey               key = 2
+	allPermissionsKey     key = 3
 )
 
 type CtxData struct {
@@ -33,6 +35,13 @@ type Grant struct {
 }
 
 func VerifyTokenAndWriteCtxData(ctx context.Context, token, orgID string, t *TokenVerifier, method string) (_ context.Context, err error) {
+	if orgID != "" {
+		err = t.ExistsOrg(ctx, orgID)
+		if err != nil {
+			return nil, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+		}
+	}
+
 	userID, clientID, agentID, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return nil, err
@@ -51,7 +60,12 @@ func GetCtxData(ctx context.Context) CtxData {
 	return ctxData
 }
 
-func GetPermissionsFromCtx(ctx context.Context) []string {
-	ctxPermission, _ := ctx.Value(permissionsKey).([]string)
+func GetRequestPermissionsFromCtx(ctx context.Context) []string {
+	ctxPermission, _ := ctx.Value(requestPermissionsKey).([]string)
+	return ctxPermission
+}
+
+func GetAllPermissionsFromCtx(ctx context.Context) []string {
+	ctxPermission, _ := ctx.Value(allPermissionsKey).([]string)
 	return ctxPermission
 }

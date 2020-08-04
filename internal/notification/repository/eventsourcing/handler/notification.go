@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/caos/logging"
 
@@ -35,8 +34,6 @@ const (
 	NotifyUserID      = "NOTIFICATION"
 )
 
-func (n *Notification) MinimumCycleDuration() time.Duration { return n.cycleDuration }
-
 func (n *Notification) ViewModel() string {
 	return notificationTable
 }
@@ -46,7 +43,7 @@ func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsourcing.UserQuery(sequence), nil
+	return eventsourcing.UserQuery(sequence.CurrentSequence), nil
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {

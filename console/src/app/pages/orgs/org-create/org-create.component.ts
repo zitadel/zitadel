@@ -1,13 +1,13 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { CreateOrgRequest, CreateUserRequest, Gender, OrgSetUpResponse } from 'src/app/proto/generated/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/auth_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { AuthUserService } from 'src/app/services/auth-user.service';
+import { OrgService } from 'src/app/services/org.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 function passwordConfirmValidator(c: AbstractControl): any {
@@ -49,19 +49,20 @@ function passwordConfirmValidator(c: AbstractControl): any {
 export class OrgCreateComponent {
     public orgForm!: FormGroup;
     public userForm!: FormGroup;
+    public pwdForm!: FormGroup;
 
     public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
     public languages: string[] = ['de', 'en'];
 
     public policy!: PasswordComplexityPolicy.AsObject;
-
+    public usePassword: boolean = false;
     constructor(
         private router: Router,
         private toast: ToastService,
         private adminService: AdminService,
         private _location: Location,
         private fb: FormBuilder,
-        private authUserService: AuthUserService,
+        private orgService: OrgService,
     ) {
         const validators: Validators[] = [];
 
@@ -69,49 +70,8 @@ export class OrgCreateComponent {
             name: ['', [Validators.required]],
             domain: [''],
         });
-        this.authUserService.GetMyPasswordComplexityPolicy().then(data => {
-            this.policy = data.toObject();
-            if (this.policy.minLength) {
-                validators.push(Validators.minLength(this.policy.minLength));
-            }
-            if (this.policy.hasLowercase) {
-                validators.push(lowerCaseValidator);
-            }
-            if (this.policy.hasUppercase) {
-                validators.push(upperCaseValidator);
-            }
-            if (this.policy.hasNumber) {
-                validators.push(numberValidator);
-            }
-            if (this.policy.hasSymbol) {
-                validators.push(symbolValidator);
-            }
 
-            this.userForm = this.fb.group({
-                userName: ['', [Validators.required]],
-                firstName: ['', [Validators.required]],
-                lastName: ['', [Validators.required]],
-                email: ['', [Validators.required]],
-                gender: [''],
-                nickName: [''],
-                preferredLanguage: [''],
-                password: ['', validators],
-                confirmPassword: ['', [...validators, passwordConfirmValidator]],
-            });
-        }).catch(error => {
-            console.error(error);
-            this.userForm = this.fb.group({
-                userName: ['', [Validators.required]],
-                firstName: ['', [Validators.required]],
-                lastName: ['', [Validators.required]],
-                email: ['', [Validators.required]],
-                gender: [''],
-                nickName: [''],
-                preferredLanguage: [''],
-                password: ['', validators],
-                confirmPassword: ['', [...validators, passwordConfirmValidator]],
-            });
-        });
+        this.initForm();
     }
 
     public createSteps: number = 2;
@@ -129,16 +89,19 @@ export class OrgCreateComponent {
         registerUserRequest.setLastName(this.lastName?.value);
         registerUserRequest.setNickName(this.nickName?.value);
         registerUserRequest.setGender(this.gender?.value);
-        registerUserRequest.setPassword(this.password?.value);
         registerUserRequest.setPreferredLanguage(this.preferredLanguage?.value);
+
+        if (this.usePassword && this.password) {
+            registerUserRequest.setPassword(this.password?.value);
+        }
 
         this.adminService
             .SetUpOrg(createOrgRequest, registerUserRequest)
             .then((data: OrgSetUpResponse) => {
                 this.router.navigate(['orgs', data.toObject().org?.id]);
             })
-            .catch(data => {
-                this.toast.showError(data.message);
+            .catch(error => {
+                this.toast.showError(error);
             });
     }
 
@@ -148,6 +111,58 @@ export class OrgCreateComponent {
 
     public previous(): void {
         this.currentCreateStep--;
+    }
+
+    private initForm(): void {
+        this.userForm = this.fb.group({
+            userName: ['', [Validators.required]],
+            firstName: ['', [Validators.required]],
+            lastName: ['', [Validators.required]],
+            email: ['', [Validators.required]],
+            gender: [''],
+            nickName: [''],
+            preferredLanguage: [''],
+        });
+    }
+
+    public initPwdValidators(): void {
+        const validators: Validators[] = [Validators.required];
+
+        if (this.usePassword) {
+            this.orgService.GetDefaultPasswordComplexityPolicy().then(data => {
+                this.policy = data.toObject();
+
+                if (this.policy.minLength) {
+                    validators.push(Validators.minLength(this.policy.minLength));
+                }
+                if (this.policy.hasLowercase) {
+                    validators.push(lowerCaseValidator);
+                }
+                if (this.policy.hasUppercase) {
+                    validators.push(upperCaseValidator);
+                }
+                if (this.policy.hasNumber) {
+                    validators.push(numberValidator);
+                }
+                if (this.policy.hasSymbol) {
+                    validators.push(symbolValidator);
+                }
+
+                // this.initForm(validators);
+                const pwdValidators = [...validators] as ValidatorFn[];
+                const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+                this.pwdForm = this.fb.group({
+                    password: ['', pwdValidators],
+                    confirmPassword: ['', confirmPwdValidators],
+                });
+
+            });
+        } else {
+            this.pwdForm = this.fb.group({
+                password: ['', []],
+                confirmPassword: ['', []],
+            });
+        }
     }
 
     public get name(): AbstractControl | null {
@@ -187,11 +202,11 @@ export class OrgCreateComponent {
     }
 
     public get password(): AbstractControl | null {
-        return this.userForm.get('password');
+        return this.pwdForm.get('password');
     }
 
     public get confirmPassword(): AbstractControl | null {
-        return this.userForm.get('confirmPassword');
+        return this.pwdForm.get('confirmPassword');
     }
 
     public close(): void {

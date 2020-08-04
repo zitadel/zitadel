@@ -87,6 +87,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, cookieName str
 		"mfaPromptUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMfaPrompt)
 		},
+		"mfaPromptChangeUrl": func(id string, provider model.MfaType) string {
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMfaPrompt, queryAuthRequestID, id, "provider", provider))
+		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMfaInitVerify)
 		},
@@ -186,6 +189,13 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	l.renderer.RenderTemplate(w, r, l.renderer.Templates[tmplError], data, nil)
 }
 
+func (l *Login) getUserData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) userData {
+	return userData{
+		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
+		profileData: l.getProfileData(authReq),
+	}
+}
+
 func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title string, errType, errMessage string) baseData {
 	return baseData{
 		errorData: errorData{
@@ -199,6 +209,18 @@ func (l *Login) getBaseData(r *http.Request, authReq *model.AuthRequest, title s
 		AuthReqID: getRequestID(authReq, r),
 		CSRF:      csrf.TemplateField(r),
 		Nonce:     middleware.GetNonce(r),
+	}
+}
+
+func (l *Login) getProfileData(authReq *model.AuthRequest) profileData {
+	var loginName, displayName string
+	if authReq != nil {
+		loginName = authReq.LoginName
+		displayName = authReq.DisplayName
+	}
+	return profileData{
+		LoginName:   loginName,
+		DisplayName: displayName,
 	}
 }
 
@@ -258,10 +280,26 @@ type errorData struct {
 
 type userData struct {
 	baseData
-	LoginName           string
+	profileData
 	PasswordChecked     string
 	MfaProviders        []model.MfaType
 	SelectedMfaProvider model.MfaType
+}
+
+type profileData struct {
+	LoginName   string
+	DisplayName string
+}
+
+type passwordData struct {
+	baseData
+	profileData
+	PasswordPolicyDescription string
+	MinLength                 uint64
+	HasUppercase              string
+	HasLowercase              string
+	HasNumber                 string
+	HasSymbol                 string
 }
 
 type userSelectionData struct {
@@ -271,22 +309,22 @@ type userSelectionData struct {
 
 type mfaData struct {
 	baseData
-	LoginName    string
+	profileData
 	MfaProviders []model.MfaType
 	MfaRequired  bool
 }
 
 type mfaVerifyData struct {
 	baseData
-	LoginName string
-	MfaType   model.MfaType
+	profileData
+	MfaType model.MfaType
 	otpData
 }
 
 type mfaDoneData struct {
 	baseData
-	LoginName string
-	MfaType   model.MfaType
+	profileData
+	MfaType model.MfaType
 }
 
 type otpData struct {

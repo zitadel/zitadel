@@ -140,6 +140,41 @@ func userSearchKeyToModel(key management.UserSearchKey) usr_model.UserSearchKey 
 	}
 }
 
+func userMembershipSearchRequestsToModel(request *management.UserMembershipSearchRequest) *usr_model.UserMembershipSearchRequest {
+	return &usr_model.UserMembershipSearchRequest{
+		Offset:  request.Offset,
+		Limit:   request.Limit,
+		Queries: userMembershipSearchQueriesToModel(request.Queries),
+	}
+}
+
+func userMembershipSearchQueriesToModel(queries []*management.UserMembershipSearchQuery) []*usr_model.UserMembershipSearchQuery {
+	converted := make([]*usr_model.UserMembershipSearchQuery, len(queries))
+	for i, q := range queries {
+		converted[i] = userMembershipSearchQueryToModel(q)
+	}
+	return converted
+}
+
+func userMembershipSearchQueryToModel(query *management.UserMembershipSearchQuery) *usr_model.UserMembershipSearchQuery {
+	return &usr_model.UserMembershipSearchQuery{
+		Key:    userMembershipSearchKeyToModel(query.Key),
+		Method: searchMethodToModel(query.Method),
+		Value:  query.Value,
+	}
+}
+
+func userMembershipSearchKeyToModel(key management.UserMembershipSearchKey) usr_model.UserMembershipSearchKey {
+	switch key {
+	case management.UserMembershipSearchKey_USERMEMBERSHIPSEARCHKEY_TYPE:
+		return usr_model.UserMembershipSearchKeyMemberType
+	case management.UserMembershipSearchKey_USERMEMBERSHIPSEARCHKEY_OBJECT_ID:
+		return usr_model.UserMembershipSearchKeyObjectID
+	default:
+		return usr_model.UserMembershipSearchKeyUnspecified
+	}
+}
+
 func profileFromModel(profile *usr_model.Profile) *management.UserProfile {
 	creationDate, err := ptypes.TimestampProto(profile.CreationDate)
 	logging.Log("GRPC-dkso3").OnError(err).Debug("unable to parse timestamp")
@@ -335,11 +370,15 @@ func updateAddressToModel(address *management.UpdateUserAddressRequest) *usr_mod
 }
 
 func userSearchResponseFromModel(response *usr_model.UserSearchResponse) *management.UserSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-aBezr").OnError(err).Debug("unable to parse timestamp")
 	return &management.UserSearchResponse{
-		Offset:      response.Offset,
-		Limit:       response.Limit,
-		TotalResult: response.TotalResult,
-		Result:      userViewsFromModel(response.Result),
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            userViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
 	}
 }
 
@@ -391,6 +430,48 @@ func userViewFromModel(user *usr_model.UserView) *management.UserView {
 		ResourceOwner:      user.ResourceOwner,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
+	}
+}
+
+func userMembershipSearchResponseFromModel(response *usr_model.UserMembershipSearchResponse) *management.UserMembershipSearchResponse {
+	timestamp, err := ptypes.TimestampProto(response.Timestamp)
+	logging.Log("GRPC-Hs8jd").OnError(err).Debug("unable to parse timestamp")
+	return &management.UserMembershipSearchResponse{
+		Offset:            response.Offset,
+		Limit:             response.Limit,
+		TotalResult:       response.TotalResult,
+		Result:            userMembershipViewsFromModel(response.Result),
+		ProcessedSequence: response.Sequence,
+		ViewTimestamp:     timestamp,
+	}
+}
+
+func userMembershipViewsFromModel(memberships []*usr_model.UserMembershipView) []*management.UserMembershipView {
+	converted := make([]*management.UserMembershipView, len(memberships))
+	for i, membership := range memberships {
+		converted[i] = userMembershipViewFromModel(membership)
+	}
+	return converted
+}
+
+func userMembershipViewFromModel(membership *usr_model.UserMembershipView) *management.UserMembershipView {
+	creationDate, err := ptypes.TimestampProto(membership.CreationDate)
+	logging.Log("GRPC-Msnu8").OnError(err).Debug("unable to parse timestamp")
+
+	changeDate, err := ptypes.TimestampProto(membership.ChangeDate)
+	logging.Log("GRPC-Slco9").OnError(err).Debug("unable to parse timestamp")
+
+	return &management.UserMembershipView{
+		UserId:        membership.UserID,
+		AggregateId:   membership.AggregateID,
+		ObjectId:      membership.ObjectID,
+		MemberType:    memberTypeFromModel(membership.MemberType),
+		DisplayName:   membership.DisplayName,
+		Roles:         membership.Roles,
+		CreationDate:  creationDate,
+		ChangeDate:    changeDate,
+		Sequence:      membership.Sequence,
+		ResourceOwner: membership.ResourceOwner,
 	}
 }
 
@@ -450,6 +531,18 @@ func genderFromModel(gender usr_model.Gender) management.Gender {
 	}
 }
 
+func memberTypeFromModel(memberType usr_model.MemberType) management.MemberType {
+	switch memberType {
+	case usr_model.MemberTypeOrganisation:
+		return management.MemberType_MEMBERTYPE_ORGANISATION
+	case usr_model.MemberTypeProject:
+		return management.MemberType_MEMBERTYPE_PROJECT
+	case usr_model.MemberTypeProjectGrant:
+		return management.MemberType_MEMBERTYPE_PROJECT_GRANT
+	default:
+		return management.MemberType_MEMBERTYPE_UNSPECIFIED
+	}
+}
 func genderToModel(gender management.Gender) usr_model.Gender {
 	switch gender {
 	case management.Gender_GENDER_FEMALE:

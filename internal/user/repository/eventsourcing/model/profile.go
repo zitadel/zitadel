@@ -1,9 +1,10 @@
 package model
 
 import (
+	"golang.org/x/text/language"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/user/model"
-	"golang.org/x/text/language"
 )
 
 type Profile struct {
@@ -31,7 +32,7 @@ func (p *Profile) Changes(changed *Profile) map[string]interface{} {
 	if changed.NickName != p.NickName {
 		changes["nickName"] = changed.NickName
 	}
-	if changed.DisplayName != p.DisplayName {
+	if changed.DisplayName != "" && p.DisplayName != changed.DisplayName {
 		changes["displayName"] = changed.DisplayName
 	}
 	if changed.PreferredLanguage != language.Und && changed.PreferredLanguage != p.PreferredLanguage {

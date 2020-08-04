@@ -1,5 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSort } from '@angular/material/sort';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MfaOtpResponse, MFAState, MfaType, MultiFactor } from 'src/app/proto/generated/auth_pb';
 import { AuthUserService } from 'src/app/services/auth-user.service';
@@ -13,27 +15,31 @@ import { DialogOtpComponent } from '../dialog-otp/dialog-otp.component';
     styleUrls: ['./auth-user-mfa.component.scss'],
 })
 export class AuthUserMfaComponent implements OnInit, OnDestroy {
-    public mfaSubject: BehaviorSubject<MultiFactor.AsObject[]> = new BehaviorSubject<MultiFactor.AsObject[]>([]);
+    public displayedColumns: string[] = ['type', 'state', 'actions'];
     private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+
+    @ViewChild(MatTable) public table!: MatTable<MultiFactor.AsObject>;
+    @ViewChild(MatSort) public sort!: MatSort;
+    public dataSource!: MatTableDataSource<MultiFactor.AsObject>;
 
     public MfaType: any = MfaType;
     public MFAState: any = MFAState;
 
     public error: string = '';
-    constructor(private userService: AuthUserService, private toast: ToastService, private dialog: MatDialog) { }
+    public otpAvailable: boolean = false;
+    constructor(private service: AuthUserService, private toast: ToastService, private dialog: MatDialog) { }
 
     public ngOnInit(): void {
         this.getOTP();
     }
 
     public ngOnDestroy(): void {
-        this.mfaSubject.complete();
         this.loadingSubject.complete();
     }
 
     public addOTP(): void {
-        this.userService.AddMfaOTP().then((otpresp) => {
+        this.service.AddMfaOTP().then((otpresp) => {
             const otp: MfaOtpResponse.AsObject = otpresp.toObject();
             const dialogRef = this.dialog.open(DialogOtpComponent, {
                 data: otp.url,
@@ -42,7 +48,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
             dialogRef.afterClosed().subscribe((code) => {
                 if (code) {
-                    this.userService.VerifyMfaOTP(code).then((res) => {
+                    (this.service as AuthUserService).VerifyMfaOTP(code).then(() => {
                         // TODO: show state
                     });
                 }
@@ -53,24 +59,27 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     }
 
     public getOTP(): void {
-        this.userService.GetMyMfas().then(mfas => {
-            this.mfaSubject.next(mfas.toObject().mfasList);
+        this.service.GetMyMfas().then(mfas => {
+            this.dataSource = new MatTableDataSource(mfas.toObject().mfasList);
+            this.dataSource.sort = this.sort;
+
+            const index = mfas.toObject().mfasList.findIndex(mfa => mfa.type === MfaType.MFATYPE_OTP);
+            if (index === -1) {
+                this.otpAvailable = true;
+            }
         }).catch(error => {
-            console.error(error);
             this.error = error.message;
         });
     }
 
     public deleteMFA(type: MfaType): void {
         if (type === MfaType.MFATYPE_OTP) {
-            this.userService.RemoveMfaOTP().then(() => {
+            this.service.RemoveMfaOTP().then(() => {
                 this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
-                const index = this.mfaSubject.value.findIndex(mfa => mfa.type === type);
+                const index = this.dataSource.data.findIndex(mfa => mfa.type === type);
                 if (index > -1) {
-                    const newValues = this.mfaSubject.value;
-                    newValues.splice(index, 1);
-                    this.mfaSubject.next(newValues);
+                    this.dataSource.data.splice(index, 1);
                 }
 
             }).catch(error => {
