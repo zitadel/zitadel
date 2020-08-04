@@ -9,6 +9,14 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
 
+func (s *Server) CreateOrg(ctx context.Context, request *management.OrgCreateRequest) (_ *management.Org, err error) {
+	org, err := s.org.CreateOrg(ctx, request.Name)
+	if err != nil {
+		return nil, err
+	}
+	return orgFromModel(org), err
+}
+
 func (s *Server) GetMyOrg(ctx context.Context, _ *empty.Empty) (*management.OrgView, error) {
 	org, err := s.org.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
