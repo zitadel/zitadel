@@ -284,7 +284,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserRegistered, model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.UserRegistered, model.InitializedUserCodeAdded},
 			},
 		},
 		{
@@ -316,7 +316,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			},
 		},
 		{
-			name: "create with email code",
+			name: "create with init code",
 			args: args{
 				ctx: authz.NewMockContext("orgID", "userID"),
 				new: &model.User{ObjectRoot: models.ObjectRoot{AggregateID: "ID"},
@@ -329,7 +329,7 @@ func TestUserRegisterAggregate(t *testing.T) {
 			},
 			res: res{
 				eventLen:   2,
-				eventTypes: []models.EventType{model.UserRegistered, model.UserEmailCodeAdded},
+				eventTypes: []models.EventType{model.UserRegistered, model.InitializedUserCodeAdded},
 			},
 		},
 		{
