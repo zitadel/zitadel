@@ -64,7 +64,10 @@ func request_AdminService_IsOrgUnique_0(ctx context.Context, marshaler runtime.M
 	var protoReq UniqueOrgRequest
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_AdminService_IsOrgUnique_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_IsOrgUnique_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -910,45 +913,45 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_AdminService_Healthz_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"healthz"}, ""))
+	pattern_AdminService_Healthz_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"healthz"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, ""))
+	pattern_AdminService_Ready_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"ready"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"validate"}, ""))
+	pattern_AdminService_Validate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"validate"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_IsOrgUnique_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"orgs", "_isunique"}, ""))
+	pattern_AdminService_IsOrgUnique_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"orgs", "_isunique"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetOrgByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"orgs", "id"}, ""))
+	pattern_AdminService_GetOrgByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"orgs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_SearchOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"orgs", "_search"}, ""))
+	pattern_AdminService_SearchOrgs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"orgs", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_SetUpOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"orgs", "_setup"}, ""))
+	pattern_AdminService_SetUpOrg_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"orgs", "_setup"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, ""))
+	pattern_AdminService_GetOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_CreateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, ""))
+	pattern_AdminService_CreateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_UpdateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, ""))
+	pattern_AdminService_UpdateOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_DeleteOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, ""))
+	pattern_AdminService_DeleteOrgIamPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"orgs", "org_id", "iampolicy"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetIamMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"members", "roles"}, ""))
+	pattern_AdminService_GetIamMemberRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"members", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_AddIamMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"members"}, ""))
+	pattern_AdminService_AddIamMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"members"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_ChangeIamMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"members", "user_id"}, ""))
+	pattern_AdminService_ChangeIamMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_RemoveIamMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"members", "user_id"}, ""))
+	pattern_AdminService_RemoveIamMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"members", "user_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_SearchIamMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"members", "_search"}, ""))
+	pattern_AdminService_SearchIamMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"members", "_search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetViews_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"views"}, ""))
+	pattern_AdminService_GetViews_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"views"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_ClearView_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"views", "database", "view_name"}, ""))
+	pattern_AdminService_ClearView_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"views", "database", "view_name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_GetFailedEvents_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"failedevents"}, ""))
+	pattern_AdminService_GetFailedEvents_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"failedevents"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_AdminService_RemoveFailedEvent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"failedevents", "database", "view_name", "failed_sequence"}, ""))
+	pattern_AdminService_RemoveFailedEvent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"failedevents", "database", "view_name", "failed_sequence"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

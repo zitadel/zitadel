@@ -1617,6 +1617,26 @@ func (mr *MockManagementServiceClientMockRecorder) RemoveMyOrgMember(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMyOrgMember", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveMyOrgMember), varargs...)
 }
 
+// RemoveProject mocks base method
+func (m *MockManagementServiceClient) RemoveProject(arg0 context.Context, arg1 *management.ProjectID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RemoveProject", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveProject indicates an expected call of RemoveProject
+func (mr *MockManagementServiceClientMockRecorder) RemoveProject(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProject", reflect.TypeOf((*MockManagementServiceClient)(nil).RemoveProject), varargs...)
+}
+
 // RemoveProjectGrant mocks base method
 func (m *MockManagementServiceClient) RemoveProjectGrant(arg0 context.Context, arg1 *management.ProjectGrantID, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()

@@ -730,6 +730,17 @@ service ManagementService {
         };
     }
 
+    rpc RemoveProject(ProjectID) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/projects/{id}"
+        };
+
+        option (caos.zitadel.utils.v1.auth_option) = {
+            permission: "project.delete"
+            check_field_name: "Id"
+        };
+    }
+
     // returns all projects my organisation got granted from another organisation
     rpc SearchGrantedProjects(GrantedProjectSearchRequest) returns (ProjectGrantSearchResponse) {
         option (google.api.http) = {

@@ -324,6 +324,11 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "Id",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/RemoveProject": authz.Option{
+		Permission: "project.delete",
+		CheckParam: "Id",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/SearchGrantedProjects": authz.Option{
 		Permission: "project.read",
 		CheckParam: "",
