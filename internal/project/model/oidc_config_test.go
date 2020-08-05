@@ -176,7 +176,7 @@ func TestGetOIDCNativeApplicationCompliance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetOIDCNativeApplicationCompliance(tt.args.grantTypes, tt.args.authMethod, tt.args.redirectUris)
+			result := GetOIDCV1NativeApplicationCompliance(tt.args.grantTypes, tt.args.authMethod, tt.args.redirectUris)
 			if tt.result.noneCompliant != result.NoneCompliant {
 				t.Errorf("got wrong result nonecompliant: expected: %v, actual: %v ", tt.result.noneCompliant, result.NoneCompliant)
 			}
@@ -236,7 +236,7 @@ func TestGetOIDCWebApplicationCompliance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetOIDCWebApplicationCompliance(tt.args.grantTypes, tt.args.redirectUris)
+			result := GetOIDCV1WebApplicationCompliance(tt.args.grantTypes, tt.args.redirectUris)
 			if tt.result.noneCompliant != result.NoneCompliant {
 				t.Errorf("got wrong result nonecompliant: expected: %v, actual: %v ", tt.result.noneCompliant, result.NoneCompliant)
 			}
@@ -360,7 +360,7 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetOIDCUserAgentApplicationCompliance(tt.args.grantTypes, tt.args.authMethod, tt.args.redirectUris)
+			result := GetOIDCV1UserAgentApplicationCompliance(tt.args.grantTypes, tt.args.authMethod, tt.args.redirectUris)
 			if tt.result.noneCompliant != result.NoneCompliant {
 				t.Errorf("got wrong result nonecompliant: expected: %v, actual: %v ", tt.result.noneCompliant, result.NoneCompliant)
 			}

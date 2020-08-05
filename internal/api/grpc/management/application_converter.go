@@ -54,7 +54,7 @@ func oidcConfigFromModel(config *proj_model.OIDCConfig) *management.OIDCConfig {
 		PostLogoutRedirectUris: config.PostLogoutRedirectUris,
 		Version:                oidcVersionFromModel(config.OIDCVersion),
 		NoneCompliant:          config.Compliance.NoneCompliant,
-		ComplianceProblems:     config.Compliance.Problems,
+		ComplianceProblems:     complianceProblemsToLocalizedMessages(config.Compliance.Problems),
 	}
 }
 
@@ -69,8 +69,17 @@ func oidcConfigFromApplicationViewModel(app *proj_model.ApplicationView) *manage
 		PostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
 		Version:                oidcVersionFromModel(app.OIDCVersion),
 		NoneCompliant:          app.NoneCompliant,
-		ComplianceProblems:     app.ComplianceProblems,
+		ComplianceProblems:     complianceProblemsToLocalizedMessages(app.ComplianceProblems),
 	}
+}
+
+func complianceProblemsToLocalizedMessages(problems []string) []*message.LocalizedMessage {
+	converted := make([]*message.LocalizedMessage, len(problems))
+	for i, p := range problems {
+		converted[i] = message.NewLocalizedMessage(p)
+	}
+	return converted
+
 }
 
 func oidcAppCreateToModel(app *management.OIDCApplicationCreate) *proj_model.Application {

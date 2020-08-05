@@ -285,3 +285,30 @@ EventTypes:
       removed: ZITADEL Mitglied entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
+Application:
+  OIDC:
+    V1:
+      NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
+      Native:
+        GrantType:
+          MultipleTypes: Mehr als nur Authorizatin Code Flow ist konfiguriert.
+          NotAuthorizationCodeFlow: Grant Type ist nicht als Authorization Code Flow konfiguriert.
+        AuthMethodType:
+          NotNone: Bei Native Applikationen sollte der AuthMethodType none sein.
+        RediredtUris:
+          HttpOnlyForLocalhost: Http ist nur für localhost erlaubt.
+      Web:
+        GrantType:
+          MultipleTypes: Mehr als nur Authorizatin Code Flow ist konfiguriert.
+          NotAuthorizationCodeFlow: Grant Type ist nicht als Authorization Code Flow konfiguriert.
+        RediredtUris:
+          NotHttps: Nur https Uris sind erlaubt.
+      UserAgent:
+        AuthorizationCodeFlow:
+          AuthMethodType:
+            NotNone: Bei Authorization Code Flow sollte der AuthMethodTye none sein.
+        Implicit:
+          AuthMethodType:
+            NotNone: Bei Implicit sollte der AuthMethodTye none sein.
+        RediredtUris:
+          NotHttps: Nur https Uris sind erlaubt.

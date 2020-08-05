@@ -97,68 +97,77 @@ func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTy
 func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	switch appType {
 	case OIDCApplicationTypeNative:
-		return GetOIDCNativeApplicationCompliance(grantTypes, authMethod, redirectUris)
+		return GetOIDCV1NativeApplicationCompliance(grantTypes, authMethod, redirectUris)
 	case OIDCApplicationTypeWeb:
-		return GetOIDCWebApplicationCompliance(grantTypes, redirectUris)
+		return GetOIDCV1WebApplicationCompliance(grantTypes, redirectUris)
 	case OIDCApplicationTypeUserAgent:
-		return GetOIDCUserAgentApplicationCompliance(grantTypes, authMethod, redirectUris)
+		return GetOIDCV1UserAgentApplicationCompliance(grantTypes, authMethod, redirectUris)
 	}
 	return nil
 }
 
-func GetOIDCNativeApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+func GetOIDCV1NativeApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
 	if len(grantTypes) != 1 {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.GrantType.MultipleTypes")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.GrantType.MultipleTypes")
 	} else if !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.GrantType.NotAuthorizationCodeFlow")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.GrantType.NotAuthorizationCodeFlow")
 	}
 	if authMethod != OIDCAuthMethodTypeNone {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.AuthMethodType.NotNone")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.AuthMethodType.NotNone")
 	}
 	if !onlyLocalhostIsHttp(redirectUris) {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Native.RediredtUris.HttpOnlyForLocalhost")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RediredtUris.HttpOnlyForLocalhost")
+	}
+	if compliance.NoneCompliant {
+		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
 	}
 	return compliance
 }
 
-func GetOIDCWebApplicationCompliance(grantTypes []OIDCGrantType, redirectUris []string) *Compliance {
+func GetOIDCV1WebApplicationCompliance(grantTypes []OIDCGrantType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
 	if len(grantTypes) != 1 {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.GrantType.NotAuthorizationCodeFlow")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Web.GrantType.MultipleTypes")
 	} else if !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.GrantType.NotAuthorizationCodeFlow")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Web.GrantType.NotAuthorizationCodeFlow")
 	}
 	if !urlsAreHttps(redirectUris) {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.RediredtUris.NotHttps")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Web.RediredtUris.NotHttps")
+	}
+	if compliance.NoneCompliant {
+		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
 	}
 	return compliance
 }
 
-func GetOIDCUserAgentApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+func GetOIDCV1UserAgentApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		if authMethod != OIDCAuthMethodTypeNone {
 			compliance.NoneCompliant = true
-			compliance.Problems = append(compliance.Problems, "Application.OIDC.UserAgent.AuthorizationCodeFlow.AuthMethodType.NotNone")
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.AuthorizationCodeFlow.AuthMethodType.NotNone")
 		}
 	}
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) {
 		if authMethod != OIDCAuthMethodTypeNone {
 			compliance.NoneCompliant = true
-			compliance.Problems = append(compliance.Problems, "Application.OIDC.UserAgent.Implicit.AuthMethodType.NotNone")
+			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.Implicit.AuthMethodType.NotNone")
 		}
 	}
 	if !urlsAreHttps(redirectUris) {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.Web.RediredtUris.NotHttps")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.RediredtUris.NotHttps")
+	}
+	if compliance.NoneCompliant {
+		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
 	}
 	return compliance
 }

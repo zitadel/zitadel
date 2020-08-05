@@ -2255,7 +2255,7 @@ message OIDCConfig {
     repeated string post_logout_redirect_uris = 8;
     OIDCVersion version = 9;
     bool none_compliant = 10;
-    repeated string compliance_problems = 11;
+    repeated caos.zitadel.api.v1.LocalizedMessage compliance_problems = 11;
 }
 
 message OIDCApplicationCreate {

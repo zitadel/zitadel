@@ -285,3 +285,30 @@ EventTypes:
       removed: ZITADEL member removed
   key_pair:
     added: Key pair added
+Application:
+  OIDC:
+    V1:
+      NotCompliant: Your configuration is not compliant and differs from OIDC 1.0 standard.
+      Native:
+        GrantType:
+          MultipleTypes: More than just authorization code flow is configured.
+          NotAuthorizationCodeFlow: Granttype is not authorization code flow.
+        AuthMethodType:
+          NotNone: Native applications should have authmethodtype none.
+        RediredtUris:
+          HttpOnlyForLocalhost: Http is only allowed for localhost.
+      Web:
+        GrantType:
+          MultipleTypes: More than just authorization code flow is configured.
+          NotAuthorizationCodeFlow: Granttype is not authorization code flow.
+        RediredtUris:
+          NotHttps: Only https uris are allowed.
+      UserAgent:
+        AuthorizationCodeFlow:
+          AuthMethodType:
+            NotNone: Authorization code flow should have authmethodtype none.
+        Implicit:
+          AuthMethodType:
+            NotNone: Implicit should have authmethodtype none
+        RediredtUris:
+          NotHttps: Only https uris are allowed.
