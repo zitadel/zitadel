@@ -39,8 +39,8 @@ func (v *View) DeleteApplication(appID string, eventSequence uint64) error {
 	return v.ProcessedApplicationSequence(eventSequence)
 }
 
-func (v *View) DeleteApplicationsByPrjectID(ProjectID string) error {
-	return view.DeleteApplicationsByPrjectID(v.Db, applicationTable, ProjectID)
+func (v *View) DeleteApplicationsByProjectID(ProjectID string) error {
+	return view.DeleteApplicationsByProjectID(v.Db, applicationTable, ProjectID)
 }
 
 func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
