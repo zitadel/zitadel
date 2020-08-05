@@ -27,7 +27,7 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
-					"https://zitadel.ch/auth/callback",
+					"zitadel://auth/callback",
 					"http://localhost/auth/callback",
 				},
 			},
@@ -133,7 +133,7 @@ func TestGetOIDCNativeApplicationCompliance(t *testing.T) {
 				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
-					"https://zitadel.ch/auth/callback",
+					"zitadel://auth/callback",
 					"http://localhost/auth/callback",
 				},
 			},
@@ -147,18 +147,19 @@ func TestGetOIDCNativeApplicationCompliance(t *testing.T) {
 				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 				authMethod: OIDCAuthMethodTypePost,
 				redirectUris: []string{
-					"https://zitadel.ch/auth/callback",
+					"zitadel://auth/callback",
 				},
 			},
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.Native.AuthMethodType.NotNone",
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Native.AuthMethodType.NotNone",
 				},
 			},
 		},
 		{
-			name: "none compliant authorizationcode config, not https",
+			name: "none compliant authorizationcode config, not localhost http",
 			args: args{
 				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 				authMethod: OIDCAuthMethodTypeNone,
@@ -169,7 +170,25 @@ func TestGetOIDCNativeApplicationCompliance(t *testing.T) {
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.Native.RediredtUris.HttpOnlyForLocalhost",
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Native.RediredtUris.HttpOnlyForLocalhost",
+				},
+			},
+		},
+		{
+			name: "none compliant authorizationcode config, https",
+			args: args{
+				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+				authMethod: OIDCAuthMethodTypeNone,
+				redirectUris: []string{
+					"https://zitadel.ch/auth/callback",
+				},
+			},
+			result: result{
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Native.RediredtUris.HttpsNotAllowed",
 				},
 			},
 		},
@@ -229,7 +248,8 @@ func TestGetOIDCWebApplicationCompliance(t *testing.T) {
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.Web.RediredtUris.NotHttps",
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Web.RediredtUris.NotHttps",
 				},
 			},
 		},
@@ -292,7 +312,8 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.UserAgent.Implicit.AuthMethodType.NotNone",
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.UserAgent.Implicit.AuthMethodType.NotNone",
 				},
 			},
 		},
@@ -308,7 +329,8 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.Web.RediredtUris.NotHttps",
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.UserAgent.RediredtUris.NotHttps",
 				},
 			},
 		},
@@ -337,7 +359,8 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.UserAgent.AuthorizationCodeFlow.AuthMethodType.NotNone",
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.UserAgent.AuthorizationCodeFlow.AuthMethodType.NotNone",
 				},
 			},
 		},
@@ -353,7 +376,8 @@ func TestGetOIDCUserAgentApplicationCompliance(t *testing.T) {
 			result: result{
 				noneCompliant: true,
 				complianceProblems: []string{
-					"Application.OIDC.Web.RediredtUris.NotHttps",
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.UserAgent.RediredtUris.NotHttps",
 				},
 			},
 		},

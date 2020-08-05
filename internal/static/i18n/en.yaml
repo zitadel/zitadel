@@ -297,6 +297,7 @@ Application:
           NotNone: Native applications should have authmethodtype none.
         RediredtUris:
           HttpOnlyForLocalhost: Http is only allowed for localhost.
+          HttpsNotAllowed: Https is not allowed for native applications, only custom uris. (e.g appname:// )
       Web:
         GrantType:
           MultipleTypes: More than just authorization code flow is configured.

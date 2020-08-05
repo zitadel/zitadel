@@ -123,6 +123,10 @@ func GetOIDCV1NativeApplicationCompliance(grantTypes []OIDCGrantType, authMethod
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RediredtUris.HttpOnlyForLocalhost")
 	}
+	if hasHttpsUrl(redirectUris) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RediredtUris.HttpsNotAllowed")
+	}
 	if compliance.NoneCompliant {
 		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
 	}
@@ -205,6 +209,15 @@ func urlsAreHttps(uris []string) bool {
 		}
 	}
 	return true
+}
+
+func hasHttpsUrl(uris []string) bool {
+	for _, uri := range uris {
+		if strings.HasPrefix(uri, https) {
+			return true
+		}
+	}
+	return false
 }
 
 func onlyLocalhostIsHttp(uris []string) bool {
