@@ -43,6 +43,10 @@ func (v *View) DeleteProjectMember(projectID, userID string, eventSequence uint6
 	return v.ProcessedProjectMemberSequence(eventSequence)
 }
 
+func (v *View) DeleteProjectMembersByProjectID(projectID string) error {
+	return view.DeleteProjectMembersByProjectID(v.Db, projectMemberTable, projectID)
+}
+
 func (v *View) GetLatestProjectMemberSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectMemberTable)
 }

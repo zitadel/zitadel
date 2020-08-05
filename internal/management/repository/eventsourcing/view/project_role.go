@@ -47,6 +47,10 @@ func (v *View) DeleteProjectRole(projectID, orgID, key string, eventSequence uin
 	return v.ProcessedProjectRoleSequence(eventSequence)
 }
 
+func (v *View) DeleteProjectRolesByProjectID(projectID string) error {
+	return view.DeleteProjectRolesByProjectID(v.Db, projectRoleTable, projectID)
+}
+
 func (v *View) GetLatestProjectRoleSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(projectRoleTable)
 }

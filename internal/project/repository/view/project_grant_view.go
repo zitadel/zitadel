@@ -72,3 +72,8 @@ func DeleteProjectGrant(db *gorm.DB, table, grantID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.ProjectGrantSearchKey(proj_model.GrantedProjectSearchKeyGrantID), grantID)
 	return delete(db)
 }
+
+func DeleteProjectGrantsByProjectID(db *gorm.DB, table, projectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ProjectGrantSearchKey(proj_model.GrantedProjectSearchKeyProjectID), projectID)
+	return delete(db)
+}

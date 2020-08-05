@@ -87,16 +87,7 @@ func (p *ProjectGrant) Reduce(event *models.Event) (err error) {
 		}
 		return p.view.DeleteProjectGrant(grant.GrantID, event.Sequence)
 	case es_model.ProjectRemoved:
-		projectGrants, err := p.view.ProjectGrantsByProjectID(event.AggregateID)
-		if err != nil {
-			logging.LogWithFields("HANDL-h8jVH", "id", event.AggregateID).WithError(err).Warn("could not update existing projects")
-		}
-		for _, existing := range projectGrants {
-			err := p.view.DeleteProjectGrant(existing.GrantID, event.Sequence)
-			if err != nil {
-				return err
-			}
-		}
+		return p.view.DeleteProjectGrantsByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectGrantSequence(event.Sequence)
 	}

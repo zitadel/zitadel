@@ -70,3 +70,8 @@ func DeleteProjectMember(db *gorm.DB, table, projectID, userID string) error {
 	delete := repository.PrepareDeleteByObject(table, role)
 	return delete(db)
 }
+
+func DeleteProjectMembersByProjectID(db *gorm.DB, table, projectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ProjectMemberSearchKey(proj_model.ProjectMemberSearchKeyProjectID), projectID)
+	return delete(db)
+}

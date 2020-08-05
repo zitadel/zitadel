@@ -71,13 +71,7 @@ func (p *ProjectMember) processProjectMember(event *models.Event) (err error) {
 		}
 		return p.view.DeleteProjectMember(event.AggregateID, member.UserID, event.Sequence)
 	case proj_es_model.ProjectRemoved:
-		projectMembers, err := p.view.ProjectMembersByProjectID(event.AggregateID)
-		if err != nil {
-			logging.LogWithFields("HANDL-ZQ48D", "id", event.AggregateID).WithError(err).Warn("could not update existing projects")
-		}
-		for _, existing := range projectMembers {
-			p.view.DeleteProjectMember(existing.ProjectID, existing.UserID, event.Sequence)
-		}
+		return p.view.DeleteProjectMembersByProjectID(event.AggregateID)
 	default:
 		return p.view.ProcessedProjectMemberSequence(event.Sequence)
 	}

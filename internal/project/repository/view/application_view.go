@@ -71,3 +71,8 @@ func DeleteApplication(db *gorm.DB, table, appID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyAppID), appID)
 	return delete(db)
 }
+
+func DeleteApplicationsByPrjectID(db *gorm.DB, table, projectID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.ApplicationSearchKey(proj_model.AppSearchKeyProjectID), projectID)
+	return delete(db)
+}
