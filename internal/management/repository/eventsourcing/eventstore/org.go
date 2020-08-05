@@ -2,8 +2,9 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/logging"
 	"strings"
+
+	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
@@ -80,6 +81,21 @@ func (repo *OrgRepository) SearchMyOrgDomains(ctx context.Context, request *org_
 func (repo *OrgRepository) AddMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) (*org_model.OrgDomain, error) {
 	domain.AggregateID = authz.GetCtxData(ctx).OrgID
 	return repo.OrgEventstore.AddOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) GenerateMyOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error) {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.GenerateOrgDomainValidation(ctx, domain)
+}
+
+func (repo *OrgRepository) ValidateMyOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.ValidateOrgDomain(ctx, domain)
+}
+
+func (repo *OrgRepository) SetMyPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	domain.AggregateID = authz.GetCtxData(ctx).OrgID
+	return repo.OrgEventstore.SetPrimaryOrgDomain(ctx, domain)
 }
 
 func (repo *OrgRepository) RemoveMyOrgDomain(ctx context.Context, domain string) error {

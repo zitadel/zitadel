@@ -68,6 +68,32 @@ func addOrgDomainToModel(domain *management.AddOrgDomainRequest) *org_model.OrgD
 	return &org_model.OrgDomain{Domain: domain.Domain}
 }
 
+func orgDomainValidationToModel(domain *management.OrgDomainValidationRequest) *org_model.OrgDomain {
+	return &org_model.OrgDomain{
+		Domain:         domain.Domain,
+		ValidationType: orgDomainValidationTypeToModel(domain.Type),
+	}
+}
+
+func validateOrgDomainToModel(domain *management.ValidateOrgDomainRequest) *org_model.OrgDomain {
+	return &org_model.OrgDomain{Domain: domain.Domain}
+}
+
+func orgDomainValidationTypeToModel(key management.OrgDomainValidationType) org_model.OrgDomainValidationType {
+	switch key {
+	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_HTTP:
+		return org_model.OrgDomainValidationTypeHTTP
+	case management.OrgDomainValidationType_ORGDOMAINVALIDATIONTYPE_DNS:
+		return org_model.OrgDomainValidationTypeDNS
+	default:
+		return org_model.OrgDomainValidationTypeUnspecified
+	}
+}
+
+func primaryOrgDomainToModel(domain *management.PrimaryOrgDomainRequest) *org_model.OrgDomain {
+	return &org_model.OrgDomain{Domain: domain.Domain}
+}
+
 func orgDomainFromModel(domain *org_model.OrgDomain) *management.OrgDomain {
 	creationDate, err := ptypes.TimestampProto(domain.CreationDate)
 	logging.Log("GRPC-u8Ksj").OnError(err).Debug("unable to get timestamp from time")

@@ -259,6 +259,21 @@ var ManagementService_AuthMethods = authz.MethodMapping{
 		CheckParam: "",
 	},
 
+	"/caos.zitadel.management.api.v1.ManagementService/GenerateMyOrgDomainValidation": authz.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/ValidateMyOrgDomain": authz.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
+	"/caos.zitadel.management.api.v1.ManagementService/SetMyPrimaryOrgDomain": authz.Option{
+		Permission: "org.write",
+		CheckParam: "",
+	},
+
 	"/caos.zitadel.management.api.v1.ManagementService/RemoveMyOrgDomain": authz.Option{
 		Permission: "org.write",
 		CheckParam: "",

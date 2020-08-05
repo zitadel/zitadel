@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
+
+	http_utils "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
@@ -14,29 +17,36 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/golang/protobuf/ptypes"
 )
 
 type OrgEventstore struct {
 	eventstore.Eventstore
-	IAMDomain           string
-	idGenerator         id.Generator
-	defaultOrgIamPolicy *org_model.OrgIamPolicy
+	IAMDomain             string
+	idGenerator           id.Generator
+	verificationAlgorithm crypto.EncryptionAlgorithm
+	verificationGenerator crypto.Generator
+	defaultOrgIamPolicy   *org_model.OrgIamPolicy
 }
 
 type OrgConfig struct {
 	eventstore.Eventstore
-	IAMDomain string
+	IAMDomain          string
+	VerificationConfig *crypto.KeyConfig
 }
 
 func StartOrg(conf OrgConfig, defaults systemdefaults.SystemDefaults) *OrgEventstore {
 	policy := defaults.DefaultPolicies.OrgIam
 	policy.Default = true
+	verificationAlg, err := crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
+	logging.Log("EVENT-aZ22d").OnError(err).Panic("cannot create verificationAlgorithm for domain verification")
+	verificationGen := crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, verificationAlg)
 	return &OrgEventstore{
-		Eventstore:          conf.Eventstore,
-		idGenerator:         id.SonyFlakeGenerator,
-		IAMDomain:           conf.IAMDomain,
-		defaultOrgIamPolicy: &policy,
+		Eventstore:            conf.Eventstore,
+		idGenerator:           id.SonyFlakeGenerator,
+		verificationAlgorithm: verificationAlg,
+		verificationGenerator: verificationGen,
+		IAMDomain:             conf.IAMDomain,
+		defaultOrgIamPolicy:   &policy,
 	}
 }
 
@@ -168,6 +178,91 @@ func (es *OrgEventstore) AddOrgDomain(ctx context.Context, domain *org_model.Org
 		return model.OrgDomainToModel(d), nil
 	}
 	return nil, errors.ThrowInternal(nil, "EVENT-ISOP0", "Errors.Internal")
+}
+
+func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain *org_model.OrgDomain) (string, string, error) {
+	if !domain.IsValid() {
+		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-R24hb", "Errors.Org.InvalidDomain")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	if err != nil {
+		return "", "", err
+	}
+	_, d := existing.GetDomain(domain)
+	if d == nil {
+		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-AGD31", "Errors.Org.DomainNotOnOrg")
+	}
+	token, err := domain.GenerateVerificationCode(es.verificationGenerator)
+	if err != nil {
+		return "", "", err
+	}
+
+	repoOrg := model.OrgFromModel(existing)
+	repoDomain := model.OrgDomainFromModel(domain)
+	aggregate := OrgDomainValidationGeneratedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
+
+	err = es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, aggregate)
+	if err != nil {
+		return "", "", err
+	}
+
+	url, err := http_utils.TokenUrl(domain.Domain, token, domain.ValidationType.CheckType())
+	return token, url, err
+}
+
+func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	if !domain.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-R24hb", "Errors.Org.InvalidDomain")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	if err != nil {
+		return err
+	}
+	_, d := existing.GetDomain(domain)
+	if d == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.DomainNotOnOrg")
+	}
+	validationCode, err := crypto.DecryptString(d.ValidationCode, es.verificationAlgorithm)
+	if err != nil {
+		return err
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoDomain := model.OrgDomainFromModel(domain)
+	err = http_utils.ValidateDomain(d.Domain, validationCode, validationCode, d.ValidationType.CheckType())
+	if err == nil {
+		orgAggregates, err := OrgDomainVerifiedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
+		if err != nil {
+			return err
+		}
+		return es_sdk.PushAggregates(ctx, es.PushAggregates, repoOrg.AppendEvents, orgAggregates...)
+	}
+	if err := es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, OrgDomainValidationFailedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)); err != nil {
+		return err
+	}
+	return errors.ThrowInvalidArgument(err, "EVENT-GH3s", "Errors.Org.Code.Invalid")
+}
+
+func (es *OrgEventstore) SetPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
+	if !domain.IsValid() {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-SsDG2", "Errors.Org.InvalidDomain")
+	}
+	existing, err := es.OrgByID(ctx, org_model.NewOrg(domain.AggregateID))
+	if err != nil {
+		return err
+	}
+	_, d := existing.GetDomain(domain)
+	if d == nil {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-GDfA3", "Errors.Org.DomainNotOnOrg")
+	}
+	if !d.Verified {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-Ggd32", "Errors.Org.DomainNotVerified")
+	}
+	repoOrg := model.OrgFromModel(existing)
+	repoDomain := model.OrgDomainFromModel(domain)
+	if err := es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, OrgDomainSetPrimaryAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (es *OrgEventstore) RemoveOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {
