@@ -289,27 +289,20 @@ Application:
   OIDC:
     V1:
       NotCompliant: Your configuration is not compliant and differs from OIDC 1.0 standard.
+      NotAllCombinationsAreAllowed: Configuration is compliant, but not all possible combinations are allowed.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Grant type code only allowed http redirect uris for apptype web.
+          CustomOnlyForNative: Grant type code only allowes custom redirect uris for apptype native  (e.g appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
+          HttpNotAllowed: Grant tpye implicit doesn't allow http redirect uris
+          NativeShouldBeHttpLocalhost: Grant tpye implicit only allowed http://localhost for native apptype
+          HttpLocalhostOnlyForNative: Http://localhost redirect uri is only allowed for native applications.
       Native:
-        GrantType:
-          MultipleTypes: More than just authorization code flow is configured.
-          NotAuthorizationCodeFlow: Granttype is not authorization code flow.
         AuthMethodType:
           NotNone: Native applications should have authmethodtype none.
-        RediredtUris:
-          HttpOnlyForLocalhost: Http is only allowed for localhost.
-          HttpsNotAllowed: Https is not allowed for native applications, only custom uris. (e.g appname:// )
-      Web:
-        GrantType:
-          MultipleTypes: More than just authorization code flow is configured.
-          NotAuthorizationCodeFlow: Granttype is not authorization code flow.
-        RediredtUris:
-          NotHttps: Only https uris are allowed.
       UserAgent:
-        AuthorizationCodeFlow:
-          AuthMethodType:
-            NotNone: Authorization code flow should have authmethodtype none.
-        Implicit:
-          AuthMethodType:
-            NotNone: Implicit should have authmethodtype none
-        RediredtUris:
-          NotHttps: Only https uris are allowed.
+        AuthMethodType:
+          NotNone: User agent app should have authmethodtype none.

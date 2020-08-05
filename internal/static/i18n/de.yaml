@@ -289,27 +289,20 @@ Application:
   OIDC:
     V1:
       NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
+      NotAllCombinationsAreAllowed: Die Konfiguration ist konform, jedoch werden nicht alle möglichen Kombinationen erlaubt.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Grant Type Code erlaubt http Redirect Uris nur für den Apptype Web.
+          CustomOnlyForNative: Grant Type Code erlaubt custom Redirect Uris nur für den Apptype Native. (z.B appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Grant Type Implicit erlaubt keine custom Redirect Uris.
+          HttpNotAllowed: Grant Type Implicit erlaubt keine http Redirect Uris.
+          NativeShouldBeHttpLocalhost: Grant Type Implicit erlaubt beim Apptype Native http nur mit localhost (http://localhost)
+          HttpLocalhostOnlyForNative: Http://localhost Redirect Uri ist nur für Native Applikationen erlaubt.
       Native:
-        GrantType:
-          MultipleTypes: Mehr als nur Authorizatin Code Flow ist konfiguriert.
-          NotAuthorizationCodeFlow: Grant Type ist nicht als Authorization Code Flow konfiguriert.
         AuthMethodType:
           NotNone: Bei Native Applikationen sollte der AuthMethodType none sein.
-        RediredtUris:
-          HttpOnlyForLocalhost: Http ist nur für localhost erlaubt.
-          HttpsNotAllowed: Https ist für native Applikationen nicht erlaubt, nur Custom uris. (z.B appname:// )
-      Web:
-        GrantType:
-          MultipleTypes: Mehr als nur Authorizatin Code Flow ist konfiguriert.
-          NotAuthorizationCodeFlow: Grant Type ist nicht als Authorization Code Flow konfiguriert.
-        RediredtUris:
-          NotHttps: Nur https Uris sind erlaubt.
       UserAgent:
-        AuthorizationCodeFlow:
-          AuthMethodType:
-            NotNone: Bei Authorization Code Flow sollte der AuthMethodTye none sein.
-        Implicit:
-          AuthMethodType:
-            NotNone: Bei Implicit sollte der AuthMethodTye none sein.
-        RediredtUris:
-          NotHttps: Nur https Uris sind erlaubt.
+        AuthMethodType:
+          NotNone: Bei einem User Agent sollte der AuthMethodType none sein.

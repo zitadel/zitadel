@@ -95,85 +95,98 @@ func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTy
 }
 
 func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+	compliance := &Compliance{NoneCompliant: false}
+	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		CheckRedirectUrisImplicitAndCode(compliance, appType, redirectUris)
+	} else {
+		if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) {
+			CheckRedirectUrisImplicit(compliance, appType, redirectUris)
+		}
+		if containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+			CheckRedirectUrisCode(compliance, appType, redirectUris)
+		}
+	}
+
 	switch appType {
 	case OIDCApplicationTypeNative:
-		return GetOIDCV1NativeApplicationCompliance(grantTypes, authMethod, redirectUris)
-	case OIDCApplicationTypeWeb:
-		return GetOIDCV1WebApplicationCompliance(grantTypes, redirectUris)
+		GetOIDCV1NativeApplicationCompliance(compliance, authMethod)
 	case OIDCApplicationTypeUserAgent:
-		return GetOIDCV1UserAgentApplicationCompliance(grantTypes, authMethod, redirectUris)
+		GetOIDCV1UserAgentApplicationCompliance(compliance, authMethod)
 	}
-	return nil
+	if compliance.NoneCompliant {
+		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
+	}
+	return compliance
 }
 
-func GetOIDCV1NativeApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
-	compliance := &Compliance{NoneCompliant: false}
-	if len(grantTypes) != 1 {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.GrantType.MultipleTypes")
-	} else if !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.GrantType.NotAuthorizationCodeFlow")
-	}
+func GetOIDCV1NativeApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
 	if authMethod != OIDCAuthMethodTypeNone {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.AuthMethodType.NotNone")
 	}
-	if !onlyLocalhostIsHttp(redirectUris) {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RediredtUris.HttpOnlyForLocalhost")
-	}
-	if hasHttpsUrl(redirectUris) {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RediredtUris.HttpsNotAllowed")
-	}
-	if compliance.NoneCompliant {
-		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
-	}
-	return compliance
 }
 
-func GetOIDCV1WebApplicationCompliance(grantTypes []OIDCGrantType, redirectUris []string) *Compliance {
-	compliance := &Compliance{NoneCompliant: false}
-	if len(grantTypes) != 1 {
+func GetOIDCV1UserAgentApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
+	if authMethod != OIDCAuthMethodTypeNone {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Web.GrantType.MultipleTypes")
-	} else if !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Web.GrantType.NotAuthorizationCodeFlow")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.AuthMethodType.NotNone")
 	}
-	if !urlsAreHttps(redirectUris) {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Web.RediredtUris.NotHttps")
-	}
-	if compliance.NoneCompliant {
-		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
-	}
-	return compliance
 }
 
-func GetOIDCV1UserAgentApplicationCompliance(grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
-	compliance := &Compliance{NoneCompliant: false}
-	if containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
-		if authMethod != OIDCAuthMethodTypeNone {
-			compliance.NoneCompliant = true
-			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.AuthorizationCodeFlow.AuthMethodType.NotNone")
-		}
+func CheckRedirectUrisCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+	if urlsAreHttps(redirectUris) {
+		return
 	}
-	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) {
-		if authMethod != OIDCAuthMethodTypeNone {
-			compliance.NoneCompliant = true
-			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.Implicit.AuthMethodType.NotNone")
-		}
-	}
-	if !urlsAreHttps(redirectUris) {
+	if urlContainsPrefix(redirectUris, http) && appType != OIDCApplicationTypeWeb {
 		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.RediredtUris.NotHttps")
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
 	}
-	if compliance.NoneCompliant {
-		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
+	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.CustomOnlyForNative")
 	}
-	return compliance
+}
+
+func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+	if urlsAreHttps(redirectUris) {
+		return
+	}
+	if containsCustom(redirectUris) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
+	}
+	if urlContainsPrefix(redirectUris, http) {
+		if appType == OIDCApplicationTypeNative {
+			if !onlyLocalhostIsHttp(redirectUris) {
+				compliance.NoneCompliant = true
+				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.NativeShouldBeHttpLocalhost")
+			}
+			return
+		}
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpNotAllowed")
+	}
+}
+
+func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+	if urlsAreHttps(redirectUris) {
+		return
+	}
+	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
+	}
+	if urlContainsPrefix(redirectUris, httpLocalhost) && appType != OIDCApplicationTypeNative {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.HttpLocalhostOnlyForNative")
+	}
+	if urlContainsPrefix(redirectUris, http) && !urlContainsPrefix(redirectUris, httpLocalhost) && appType != OIDCApplicationTypeWeb {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
+	}
+	if !compliance.NoneCompliant {
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.NotAllCombinationsAreAllowed")
+	}
 }
 
 func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
@@ -211,9 +224,18 @@ func urlsAreHttps(uris []string) bool {
 	return true
 }
 
-func hasHttpsUrl(uris []string) bool {
+func urlContainsPrefix(uris []string, prefix string) bool {
 	for _, uri := range uris {
-		if strings.HasPrefix(uri, https) {
+		if strings.HasPrefix(uri, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func containsCustom(uris []string) bool {
+	for _, uri := range uris {
+		if !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https) {
 			return true
 		}
 	}
