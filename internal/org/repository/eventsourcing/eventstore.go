@@ -196,6 +196,11 @@ func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain
 	if err != nil {
 		return "", "", err
 	}
+	checkType, ok := domain.ValidationType.CheckType()
+	if !ok {
+		return "", "", errors.ThrowPreconditionFailed(nil, "EVENT-Gsw31", "Errors.Org.DomainVerificationTypeInvalid")
+	}
+	url, err := http_utils.TokenUrl(domain.Domain, token, checkType)
 
 	repoOrg := model.OrgFromModel(existing)
 	repoDomain := model.OrgDomainFromModel(domain)
@@ -205,8 +210,6 @@ func (es *OrgEventstore) GenerateOrgDomainValidation(ctx context.Context, domain
 	if err != nil {
 		return "", "", err
 	}
-
-	url, err := http_utils.TokenUrl(domain.Domain, token, domain.ValidationType.CheckType())
 	return token, url, err
 }
 
@@ -222,13 +225,20 @@ func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_mode
 	if d == nil {
 		return errors.ThrowPreconditionFailed(nil, "EVENT-Sjdi3", "Errors.Org.DomainNotOnOrg")
 	}
+	if d.Verified {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-4gT342", "Errors.Org.DomainAlreadyVerified")
+	}
+	if d.ValidationCode == nil || d.ValidationType == org_model.OrgDomainValidationTypeUnspecified {
+		return errors.ThrowPreconditionFailed(nil, "EVENT-SFBB3", "Errors.Org.DomainVerificationMissing")
+	}
 	validationCode, err := crypto.DecryptString(d.ValidationCode, es.verificationAlgorithm)
 	if err != nil {
 		return err
 	}
 	repoOrg := model.OrgFromModel(existing)
 	repoDomain := model.OrgDomainFromModel(domain)
-	err = http_utils.ValidateDomain(d.Domain, validationCode, validationCode, d.ValidationType.CheckType())
+	checkType, _ := d.ValidationType.CheckType()
+	err = http_utils.ValidateDomain(d.Domain, validationCode, validationCode, checkType)
 	if err == nil {
 		orgAggregates, err := OrgDomainVerifiedAggregate(ctx, es.Eventstore.AggregateCreator(), repoOrg, repoDomain)
 		if err != nil {
@@ -239,7 +249,7 @@ func (es *OrgEventstore) ValidateOrgDomain(ctx context.Context, domain *org_mode
 	if err := es_sdk.Push(ctx, es.PushAggregates, repoOrg.AppendEvents, OrgDomainValidationFailedAggregate(es.Eventstore.AggregateCreator(), repoOrg, repoDomain)); err != nil {
 		return err
 	}
-	return errors.ThrowInvalidArgument(err, "EVENT-GH3s", "Errors.Org.Code.Invalid")
+	return errors.ThrowInvalidArgument(err, "EVENT-GH3s", "Errors.Org.DomainVerificationFailed")
 }
 
 func (es *OrgEventstore) SetPrimaryOrgDomain(ctx context.Context, domain *org_model.OrgDomain) error {

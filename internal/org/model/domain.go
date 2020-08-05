@@ -23,10 +23,14 @@ const (
 	OrgDomainValidationTypeDNS
 )
 
-func (t OrgDomainValidationType) CheckType() http_util.CheckType {
+func (t OrgDomainValidationType) CheckType() (http_util.CheckType, bool) {
 	switch t {
 	case OrgDomainValidationTypeHTTP:
-		return http_util.CheckTypeHTTP
+		return http_util.CheckTypeHTTP, true
+	case OrgDomainValidationTypeDNS:
+		return http_util.CheckTypeDNS, true
+	default:
+		return -1, false
 	}
 }
 

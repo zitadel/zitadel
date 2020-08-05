@@ -26,7 +26,7 @@ func ValidateDomain(domain, token, verifier string, checkType CheckType) error {
 	case CheckTypeDNS:
 		return ValidateDomainDNS(domain, verifier)
 	default:
-		return errors.ThrowInvalidArgument(nil, "HTTP-Iqd11", "")
+		return errors.ThrowInvalidArgument(nil, "HTTP-Iqd11", "Errors.Internal")
 	}
 }
 

@@ -56,6 +56,10 @@ Errors:
     DomainMissing: Domain missing
     DomainNotOnOrg: Domain doesn't exist on organisation
     DomainNotVerified: Domain is not verified
+    DomainAlreadyVerified: Domain is already verified
+    DomainVerificationTypeInvalid: Domain verification type is invalid
+    DomainVerificationMissing: Domain verification not yet startet
+    DomainVerificationFailed: Domain verification failed
     PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
     MemberIDMissing: Member ID missing
