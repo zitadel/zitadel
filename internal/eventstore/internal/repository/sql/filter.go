@@ -3,44 +3,26 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	"github.com/lib/pq"
-)
-
-const (
-	selectStmt = "SELECT" +
-		" id" +
-		", creation_date" +
-		", event_type" +
-		", event_sequence" +
-		", previous_sequence" +
-		", event_data" +
-		", editor_service" +
-		", editor_user" +
-		", resource_owner" +
-		", aggregate_type" +
-		", aggregate_id" +
-		", aggregate_version" +
-		" FROM eventstore.events"
 )
 
 type Querier interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 
-func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQuery) (events []*models.Event, err error) {
+func (db *SQL) Filter(ctx context.Context, searchQuery *es_models.SearchQueryFactory) (events []*models.Event, err error) {
 	return filter(db.client, searchQuery)
 }
 
-func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_models.Event, err error) {
-	query, values := prepareQuery(searchQuery)
+func filter(querier Querier, searchQuery *es_models.SearchQueryFactory) (events []*es_models.Event, err error) {
+	query, limit, values, rowScanner := buildQuery(searchQuery)
+	if query == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+	}
 
 	rows, err := querier.Query(query, values...)
 	if err != nil {
@@ -49,37 +31,14 @@ func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_m
 	}
 	defer rows.Close()
 
-	events = make([]*es_models.Event, 0, searchQuery.Limit)
+	events = make([]*es_models.Event, 0, limit)
 
 	for rows.Next() {
 		event := new(models.Event)
-		var previousSequence Sequence
-		data := make(Data, 0)
-
-		err = rows.Scan(
-			&event.ID,
-			&event.CreationDate,
-			&event.Type,
-			&event.Sequence,
-			&previousSequence,
-			&data,
-			&event.EditorService,
-			&event.EditorUser,
-			&event.ResourceOwner,
-			&event.AggregateType,
-			&event.AggregateID,
-			&event.AggregateVersion,
-		)
-
+		err := rowScanner(rows.Scan, event)
 		if err != nil {
-			logging.Log("SQL-wHNPo").WithError(err).Warn("unable to scan row")
-			return nil, errors.ThrowInternal(err, "SQL-BfZwF", "unable to scan row")
+			return nil, err
 		}
-
-		event.PreviousSequence = uint64(previousSequence)
-
-		event.Data = make([]byte, len(data))
-		copy(event.Data, data)
 
 		events = append(events, event)
 	}
@@ -87,98 +46,17 @@ func filter(querier Querier, searchQuery *es_models.SearchQuery) (events []*es_m
 	return events, nil
 }
 
-func prepareQuery(searchQuery *es_models.SearchQuery) (query string, values []interface{}) {
-	where, values := prepareWhere(searchQuery)
-	query = selectStmt + where
-
-	query += " ORDER BY event_sequence"
-	if searchQuery.Desc {
-		query += " DESC"
+func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.SearchQueryFactory) (uint64, error) {
+	query, _, values, rowScanner := buildQuery(queryFactory)
+	if query == "" {
+		return 0, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
-
-	if searchQuery.Limit > 0 {
-		values = append(values, searchQuery.Limit)
-		query += " LIMIT ?"
+	row := db.client.QueryRow(query, values...)
+	sequence := new(Sequence)
+	err := rowScanner(row.Scan, sequence)
+	if err != nil {
+		logging.Log("SQL-WsxTg").WithError(err).Info("query failed")
+		return 0, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
 	}
-
-	query = numberPlaceholder(query, "?", "$")
-
-	return query, values
-}
-
-func numberPlaceholder(query, old, new string) string {
-	for i, hasChanged := 1, true; hasChanged; i++ {
-		newQuery := strings.Replace(query, old, new+strconv.Itoa(i), 1)
-		hasChanged = query != newQuery
-		query = newQuery
-	}
-	return query
-}
-
-func prepareWhere(searchQuery *es_models.SearchQuery) (clause string, values []interface{}) {
-	values = make([]interface{}, len(searchQuery.Filters))
-	clauses := make([]string, len(searchQuery.Filters))
-
-	if len(values) == 0 {
-		return clause, values
-	}
-
-	for i, filter := range searchQuery.Filters {
-		value := filter.GetValue()
-		switch value.(type) {
-		case []bool, []float64, []int64, []string, []models.AggregateType, []models.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]models.AggregateType, *[]models.EventType:
-			value = pq.Array(value)
-		}
-
-		clauses[i] = getCondition(filter)
-		values[i] = value
-	}
-	return " WHERE " + strings.Join(clauses, " AND "), values
-}
-
-func getCondition(filter *es_models.Filter) string {
-	field := getField(filter.GetField())
-	operation := getOperation(filter.GetOperation())
-	format := prepareConditionFormat(filter.GetOperation())
-
-	return fmt.Sprintf(format, field, operation)
-}
-
-func prepareConditionFormat(operation es_models.Operation) string {
-	if operation == es_models.Operation_In {
-		return "%s %s ANY(?)"
-	}
-	return "%s %s ?"
-}
-
-func getField(field es_models.Field) string {
-	switch field {
-	case es_models.Field_AggregateID:
-		return "aggregate_id"
-	case es_models.Field_AggregateType:
-		return "aggregate_type"
-	case es_models.Field_LatestSequence:
-		return "event_sequence"
-	case es_models.Field_ResourceOwner:
-		return "resource_owner"
-	case es_models.Field_EditorService:
-		return "editor_service"
-	case es_models.Field_EditorUser:
-		return "editor_user"
-	case es_models.Field_EventType:
-		return "event_type"
-	}
-	return ""
-}
-
-func getOperation(operation es_models.Operation) string {
-	switch operation {
-	case es_models.Operation_Equals, es_models.Operation_In:
-		return "="
-	case es_models.Operation_Greater:
-		return ">"
-	case es_models.Operation_Less:
-		return "<"
-	}
-	return ""
+	return uint64(*sequence), nil
 }

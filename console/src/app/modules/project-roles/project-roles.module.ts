@@ -16,6 +16,7 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
@@ -46,6 +47,7 @@ import { ProjectRolesComponent } from './project-roles.component';
         MatMenuModule,
         TimestampToDatePipeModule,
         RefreshTableModule,
+        LocalizedDatePipeModule,
     ],
     exports: [
         ProjectRolesComponent,

@@ -13,7 +13,7 @@ func TestPrepareSearchQuery(t *testing.T) {
 		searchRequest SearchRequest
 	}
 	type res struct {
-		count   int
+		count   uint64
 		wantErr bool
 		errFunc func(err error) bool
 	}

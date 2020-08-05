@@ -1,14 +1,13 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
-	"time"
-
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
 )
 
 type OrgDomain struct {
@@ -18,8 +17,6 @@ type OrgDomain struct {
 const (
 	orgDomainTable = "management.org_domains"
 )
-
-func (d *OrgDomain) MinimumCycleDuration() time.Duration { return d.cycleDuration }
 
 func (d *OrgDomain) ViewModel() string {
 	return orgDomainTable

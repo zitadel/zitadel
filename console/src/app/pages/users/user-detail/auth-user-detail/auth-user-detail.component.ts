@@ -39,9 +39,11 @@ export class AuthUserDetailComponent implements OnDestroy {
         private dialog: MatDialog,
     ) {
         this.loading = true;
-        this.getData().then(() => {
+        this.userService.GetMyUser().then(user => {
+            this.user = user.toObject();
             this.loading = false;
         }).catch(error => {
+            this.toast.showError(error);
             this.loading = false;
         });
     }
@@ -148,31 +150,5 @@ export class AuthUserDetailComponent implements OnDestroy {
                 this.toast.showError(error);
                 this.phoneEditState = false;
             });
-    }
-
-    private async getData(): Promise<void> {
-        this.userService.GetMyUser().then(user => {
-            this.user = user.toObject();
-        }).catch(error => {
-            this.toast.showError(error);
-        });
-    }
-
-    public copytoclipboard(value: string): void {
-        const selBox = document.createElement('textarea');
-        selBox.style.position = 'fixed';
-        selBox.style.left = '0';
-        selBox.style.top = '0';
-        selBox.style.opacity = '0';
-        selBox.value = value;
-        document.body.appendChild(selBox);
-        selBox.focus();
-        selBox.select();
-        document.execCommand('copy');
-        document.body.removeChild(selBox);
-        this.copied = value;
-        setTimeout(() => {
-            this.copied = '';
-        }, 3000);
     }
 }

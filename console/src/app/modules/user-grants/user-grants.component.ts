@@ -4,7 +4,14 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
-import { ProjectRoleView, UserGrant, UserGrantView } from 'src/app/proto/generated/management_pb';
+import {
+    ProjectRoleView,
+    SearchMethod,
+    UserGrant,
+    UserGrantSearchKey,
+    UserGrantSearchQuery,
+    UserGrantView,
+} from 'src/app/proto/generated/management_pb';
 import { MgmtUserService } from 'src/app/services/mgmt-user.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -137,7 +144,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         switch (this.context) {
             case UserGrantContext.OWNED_PROJECT:
                 if (grant.id && grant.projectId) {
-                    this.userService.UpdateProjectUserGrant(grant.id, grant.projectId, grant.userId, selectionChange.value)
+                    this.userService.UpdateUserGrant(grant.id, grant.userId, selectionChange.value)
                         .then(() => {
                             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
                         }).catch(error => {
@@ -147,8 +154,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
                 break;
             case UserGrantContext.GRANTED_PROJECT:
                 if (this.grantId && this.projectId) {
-                    this.userService.updateProjectGrantUserGrant(grant.id,
-                        this.grantId, grant.userId, selectionChange.value)
+                    const projectQuery: UserGrantSearchQuery = new UserGrantSearchQuery();
+                    projectQuery.setKey(UserGrantSearchKey.USERGRANTSEARCHKEY_PROJECT_ID);
+                    projectQuery.setMethod(SearchMethod.SEARCHMETHOD_EQUALS);
+                    projectQuery.setValue(this.projectId);
+                    this.userService.UpdateUserGrant(
+                        grant.id, grant.userId, selectionChange.value)
                         .then(() => {
                             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
                         }).catch(error => {

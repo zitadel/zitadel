@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"math"
 	"testing"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -15,39 +16,46 @@ func TestSQL_Filter(t *testing.T) {
 	}
 	type args struct {
 		events      *mockEvents
-		searchQuery *es_models.SearchQuery
+		searchQuery *es_models.SearchQueryFactory
 	}
-	tests := []struct {
-		name      string
-		fields    fields
-		args      args
-		eventsLen int
+	type res struct {
 		wantErr   bool
 		isErrFunc func(error) bool
+		eventsLen int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
 	}{
 		{
 			name: "only limit filter",
 			fields: fields{
-				client: mockDB(t).expectFilterEventsLimit(34, 3),
+				client: mockDB(t).expectFilterEventsLimit("user", 34, 3),
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery().SetLimit(34),
+				searchQuery: es_models.NewSearchQueryFactory("user").Limit(34),
 			},
-			eventsLen: 3,
-			wantErr:   false,
+			res: res{
+				eventsLen: 3,
+				wantErr:   false,
+			},
 		},
 		{
 			name: "only desc filter",
 			fields: fields{
-				client: mockDB(t).expectFilterEventsDesc(34),
+				client: mockDB(t).expectFilterEventsDesc("user", 34),
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery().OrderDesc(),
+				searchQuery: es_models.NewSearchQueryFactory("user").OrderDesc(),
 			},
-			eventsLen: 34,
-			wantErr:   false,
+			res: res{
+				eventsLen: 34,
+				wantErr:   false,
+			},
 		},
 		{
 			name: "no events found",
@@ -56,10 +64,12 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: &es_models.SearchQuery{},
+				searchQuery: es_models.NewSearchQueryFactory("nonAggregate"),
 			},
-			wantErr:   true,
-			isErrFunc: errors.IsInternal,
+			res: res{
+				wantErr:   true,
+				isErrFunc: errors.IsInternal,
+			},
 		},
 		{
 			name: "filter fails because sql internal error",
@@ -68,34 +78,40 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: &es_models.SearchQuery{},
+				searchQuery: es_models.NewSearchQueryFactory("user"),
 			},
-			wantErr:   true,
-			isErrFunc: errors.IsInternal,
+			res: res{
+				wantErr:   true,
+				isErrFunc: errors.IsInternal,
+			},
 		},
 		{
 			name: "filter by aggregate id",
 			fields: fields{
-				client: mockDB(t).expectFilterEventsAggregateIDLimit("hop", 5),
+				client: mockDB(t).expectFilterEventsAggregateIDLimit("user", "hop", 5),
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery().SetLimit(5).AggregateIDFilter("hop"),
+				searchQuery: es_models.NewSearchQueryFactory("user").Limit(5).AggregateIDs("hop"),
 			},
-			wantErr:   false,
-			isErrFunc: nil,
+			res: res{
+				wantErr:   false,
+				isErrFunc: nil,
+			},
 		},
 		{
 			name: "filter by aggregate id and aggregate type",
 			fields: fields{
-				client: mockDB(t).expectFilterEventsAggregateIDTypeLimit("hop", "user", 5),
+				client: mockDB(t).expectFilterEventsAggregateIDTypeLimit("user", "hop", 5),
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQuery().SetLimit(5).AggregateIDFilter("hop").AggregateTypeFilter("user"),
+				searchQuery: es_models.NewSearchQueryFactory("user").Limit(5).AggregateIDs("hop"),
 			},
-			wantErr:   false,
-			isErrFunc: nil,
+			res: res{
+				wantErr:   false,
+				isErrFunc: nil,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -104,13 +120,13 @@ func TestSQL_Filter(t *testing.T) {
 				client: tt.fields.client.sqlClient,
 			}
 			events, err := sql.Filter(context.Background(), tt.args.searchQuery)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("SQL.Filter() error = %v, wantErr %v", err, tt.wantErr)
+			if (err != nil) != tt.res.wantErr {
+				t.Errorf("SQL.Filter() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
-			if tt.eventsLen != 0 && len(events) != tt.eventsLen {
-				t.Errorf("events has wrong length got: %d want %d", len(events), tt.eventsLen)
+			if tt.res.eventsLen != 0 && len(events) != tt.res.eventsLen {
+				t.Errorf("events has wrong length got: %d want %d", len(events), tt.res.eventsLen)
 			}
-			if tt.wantErr && !tt.isErrFunc(err) {
+			if tt.res.wantErr && !tt.res.isErrFunc(err) {
 				t.Errorf("got wrong error %v", err)
 			}
 			if err := tt.fields.client.mock.ExpectationsWereMet(); err != nil {
@@ -121,35 +137,97 @@ func TestSQL_Filter(t *testing.T) {
 	}
 }
 
-func Test_getCondition(t *testing.T) {
+func TestSQL_LatestSequence(t *testing.T) {
+	type fields struct {
+		client *dbMock
+	}
 	type args struct {
-		filter *es_models.Filter
+		searchQuery *es_models.SearchQueryFactory
+	}
+	type res struct {
+		wantErr   bool
+		isErrFunc func(error) bool
+		sequence  uint64
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name   string
+		fields fields
+		args   args
+		res    res
 	}{
 		{
-			name: "single value",
+			name: "invalid query factory",
 			args: args{
-				filter: es_models.NewFilter(es_models.Field_LatestSequence, 34, es_models.Operation_Greater),
+				searchQuery: nil,
 			},
-			want: "event_sequence > ?",
+			fields: fields{
+				client: mockDB(t),
+			},
+			res: res{
+				wantErr:   true,
+				isErrFunc: errors.IsErrorInvalidArgument,
+			},
 		},
 		{
-			name: "list value",
+			name: "no events for aggregate",
 			args: args{
-				filter: es_models.NewFilter(es_models.Field_AggregateType, []string{"a", "b"}, es_models.Operation_In),
+				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence),
 			},
-			want: "aggregate_type = ANY(?)",
+			fields: fields{
+				client: mockDB(t).expectLatestSequenceFilterError("idiot", sql.ErrNoRows),
+			},
+			res: res{
+				wantErr:  false,
+				sequence: 0,
+			},
+		},
+		{
+			name: "sql query error",
+			args: args{
+				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence),
+			},
+			fields: fields{
+				client: mockDB(t).expectLatestSequenceFilterError("idiot", sql.ErrConnDone),
+			},
+			res: res{
+				wantErr:   true,
+				isErrFunc: errors.IsInternal,
+				sequence:  0,
+			},
+		},
+		{
+			name: "events for aggregate found",
+			args: args{
+				searchQuery: es_models.NewSearchQueryFactory("user").Columns(es_models.Columns_Max_Sequence),
+			},
+			fields: fields{
+				client: mockDB(t).expectLatestSequenceFilter("user", math.MaxUint64),
+			},
+			res: res{
+				wantErr:  false,
+				sequence: math.MaxUint64,
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getCondition(tt.args.filter); got != tt.want {
-				t.Errorf("getCondition() = %v, want %v", got, tt.want)
+			sql := &SQL{
+				client: tt.fields.client.sqlClient,
 			}
+			sequence, err := sql.LatestSequence(context.Background(), tt.args.searchQuery)
+			if (err != nil) != tt.res.wantErr {
+				t.Errorf("SQL.Filter() error = %v, wantErr %v", err, tt.res.wantErr)
+			}
+			if tt.res.sequence != sequence {
+				t.Errorf("events has wrong length got: %d want %d", sequence, tt.res.sequence)
+			}
+			if tt.res.wantErr && !tt.res.isErrFunc(err) {
+				t.Errorf("got wrong error %v", err)
+			}
+			if err := tt.fields.client.mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("there were unfulfilled expectations: %s", err)
+			}
+			tt.fields.client.close()
 		})
 	}
 }

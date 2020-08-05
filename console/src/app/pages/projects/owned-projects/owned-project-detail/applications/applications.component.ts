@@ -33,7 +33,7 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
 
     public ngOnInit(): void {
         this.dataSource = new ProjectApplicationsDataSource(this.projectService);
-        this.dataSource.loadApps(this.projectId, 0, 25, 'asc');
+        this.dataSource.loadApps(this.projectId, 0, 25);
     }
 
     public ngAfterViewInit(): void {
@@ -51,7 +51,6 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
             this.projectId,
             this.paginator.pageIndex,
             this.paginator.pageSize,
-            this.sort.direction,
         );
     }
 
@@ -65,5 +64,9 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
         this.isAllSelected() ?
             this.selection.clear() :
             this.dataSource.appsSubject.value.forEach((row: Application.AsObject) => this.selection.select(row));
+    }
+
+    public refreshPage(): void {
+        this.dataSource.loadApps(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
     }
 }

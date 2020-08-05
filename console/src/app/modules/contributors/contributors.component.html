@@ -2,10 +2,12 @@
     <span class="header">{{ title }}</span>
     <span class="sub-header">{{ description }}</span>
     <div class="people">
-        <div class="img-list">
+        <div class="img-list" [@cardAnimation]="totalResult">
+            <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
+
             <ng-container *ngIf="totalResult < 10; else compact">
                 <ng-container *ngFor="let member of membersSubject | async; index as i">
-                    <div (click)="emitShowDetail()" class="avatar-circle"
+                    <div @animate (click)="emitShowDetail()" class="avatar-circle"
                         matTooltip="{{ member.email }} | {{member.rolesList?.join(' ')}}"
                         [ngStyle]="{'z-index': 100 - i}">
                         <app-avatar *ngIf="member && (member.displayName || (member.firstName && member.lastName))"

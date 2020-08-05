@@ -1,9 +1,17 @@
-<div class="wrapper">
-    <div class="header">
-        <img alt="zitadel logo" *ngIf="dark; else lighttheme"
-            src="../assets/images/zitadel-logo-oneline-darkdesign.svg" />
-        <ng-template #lighttheme>
-            <img alt="zitadel logo" src="../assets/images/zitadel-logo-oneline-lightdesign.svg" />
+<div class="wrapper max-width-container">
+    <div class="header" *ngIf="(authService.user | async) || {} as user">
+        <app-avatar [routerLink]="['/users/me']" *ngIf="user && (user.displayName || (user.firstName && user.lastName))"
+            class="avatar" [name]="user.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)"
+            [size]="100">
+        </app-avatar>
+        <h3 *ngIf="(user.displayName || user.firstName || user.lastName); else loader">
+            {{'HOME.WELCOME' | translate}},
+            {{user?.displayName ? user.displayName : (user.firstName + ' '+ user.lastName)}}</h3>
+        <p>{{user?.userName}}</p>
+
+        <p class="wlc_stnce">{{'HOME.WELCOMESENTENCE' | translate}}</p>
+        <ng-template #loader>
+            <mat-spinner diameter="50"></mat-spinner>
         </ng-template>
     </div>
 
@@ -71,15 +79,21 @@
             <app-card class="item">
                 <div class="top">
                     <h2>
-                        <i class="las la-crosshairs"></i>
+                        <i class="las la-users"></i>
                         {{'HOME.USERS'| translate}}</h2>
                     <p>{{'HOME.USERS_DESC'| translate}}</p>
                 </div>
                 <span class="fill-space"></span>
                 <div class="footer">
-                    <a color="primary" mat-button [routerLink]="['/users/me']">{{'HOME.USERS_BUTTON' | translate}}</a>
+                    <a color="primary" mat-stroked-button
+                        [routerLink]="['/users/all']">{{'HOME.USERS_BUTTON' | translate}}</a>
                 </div>
             </app-card>
         </ng-template>
     </div>
+
+    <p class="disclaimer">{{'HOME.DISCLAIMER' | translate}}
+        <!-- TODO: Add doc link to security here -->
+        <!-- <a href="https://caos.github.io/site#security"></a> -->
+    </p>
 </div>

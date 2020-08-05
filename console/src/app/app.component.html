@@ -53,7 +53,7 @@
                 <div class="side-column">
                     <div class="list">
                         <ng-container *ngIf="authService.authenticationChanged | async">
-                            <a class="nav-item" [routerLinkActive]="['active']"
+                            <a @navitem class="nav-item" [routerLinkActive]="['active']"
                                 [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/users/me']">
                                 <i class="icon las la-user-circle"></i>
                                 <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
@@ -64,52 +64,65 @@
                             <div class="divider">
                                 <div class="line"></div>
                             </div>
-                            <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
+                            <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/iam']">
                                 <i class="icon las la-gem"></i>
                                 <span class="label">{{'MENU.IAM' | translate}}</span>
                             </a>
                         </ng-container>
 
-                        <ng-template appHasRole [appHasRole]="['org.read']">
-                            <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
-                                <i class="icon las la-archway"></i>
-                                <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
-                            </a>
-                        </ng-template>
+                        <div *ngIf="org" [@navAnimation]="org">
+                            <ng-template appHasRole [appHasRole]="['org.read']">
+                                <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org']">
+                                    <i class="icon las la-archway"></i>
+                                    <span
+                                        class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}</span>
+                                </a>
+                            </ng-template>
 
-                        <ng-template appHasRole [appHasRole]="['project.read']">
-                            <div class="divider">
-                                <div class="line"></div>
-                                <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
-                                <div class="line"></div>
-                            </div>
+                            <ng-template appHasRole [appHasRole]="['project.read']">
+                                <div @navitem class="divider">
+                                    <div class="line"></div>
+                                    <span>{{'MENU.PROJECTSSECTION' | translate}}</span>
+                                    <div class="line"></div>
+                                </div>
 
-                            <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
-                                <i class="icon las la-layer-group"></i>
-                                <span class="label">{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
-                                    {{ 'MENU.PROJECT' | translate }}</span>
-                            </a>
+                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                    [routerLink]="[ '/projects']">
+                                    <i class="icon las la-layer-group"></i>
 
-                            <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/granted-projects']">
-                                <i class="icon las la-layer-group"></i>
-                                <span class="label">{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
-                            </a>
-                        </ng-template>
+                                    <div class="c_label">
+                                        <span>{{org?.name ? org.name : 'MENU.ORGANIZATION' | translate}}
+                                            {{'MENU.PROJECT' | translate}} </span>
+                                        <span *ngIf="ownedProjectsCount as ownedPCount"
+                                            class="count">{{ownedPCount}}</span>
+                                    </div>
+                                </a>
 
-                        <ng-template appHasRole [appHasRole]="['user.read']">
-                            <div class="divider">
-                                <div class="line"></div>
-                                <span class="label">
-                                    {{ 'MENU.USERSECTION' | translate }}</span>
-                                <div class="line"></div>
-                            </div>
+                                <a @navitem *ngIf="grantedProjectsCount as grantPCount" class="nav-item"
+                                    [routerLinkActive]="['active']" [routerLink]="[ '/granted-projects']">
+                                    <i class="icon las la-layer-group"></i>
+                                    <div class="c_label">
+                                        <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
+                                        <span class="count">{{grantPCount}}</span>
+                                    </div>
+                                </a>
+                            </ng-template>
 
-                            <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/users/all']"
-                                [routerLinkActiveOptions]="{ exact: true }">
-                                <i class="icon las la-users"></i>
-                                <span class="label">{{ 'MENU.USER' | translate }}</span>
-                            </a>
-                        </ng-template>
+                            <ng-template appHasRole [appHasRole]="['user.read']">
+                                <div @navitem class="divider">
+                                    <div class="line"></div>
+                                    <span class="label">
+                                        {{ 'MENU.USERSECTION' | translate }}</span>
+                                    <div class="line"></div>
+                                </div>
+
+                                <a @navitem class="nav-item" [routerLinkActive]="['active']"
+                                    [routerLink]="[ '/users/all']" [routerLinkActiveOptions]="{ exact: true }">
+                                    <i class="icon las la-users"></i>
+                                    <span class="label">{{ 'MENU.USER' | translate }}</span>
+                                </a>
+                            </ng-template>
+                        </div>
 
                         <span class="fill-space"></span>
                     </div>
@@ -117,7 +130,7 @@
                 </div>
             </mat-drawer>
             <mat-drawer-content class="content">
-                <div *ngIf="iamuser$ | async" class="admin-line" matTooltip="IAM Administrator">
+                <div @toolbar *ngIf="iamuser$ | async" class="admin-line" matTooltip="IAM Administrator">
                     <span>{{'MENU.IAMADMIN' | translate}}</span>
                 </div>
                 <div class="router" [@routeAnimations]="prepareRoute(outlet)">

@@ -25,6 +25,7 @@ import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
@@ -70,6 +71,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
         TranslateModule,
         TimestampToDatePipeModule,
         SharedModule,
+        LocalizedDatePipeModule,
         MemberCreateDialogModule,
     ],
 })

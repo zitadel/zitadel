@@ -82,8 +82,8 @@
                         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
                         <app-user-grants [context]="userGrantContext" [projectId]="projectId"
                             [disabled]="project?.state !== ProjectState.PROJECTSTATE_ACTIVE"
-                            [allowCreate]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.write'] | hasRole | async)"
-                            [allowDelete]="project?.state == ProjectState.PROJECTSTATE_ACTIVE && (['user.grant.delete'] | hasRole | async)">
+                            [allowCreate]="(['user.grant.write'] | hasRole) | async"
+                            [allowDelete]="(['user.grant.delete'] | hasRole) | async">
                         </app-user-grants>
                     </app-card>
                 </ng-template>
@@ -101,8 +101,8 @@
 
         <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
             <mat-tab label="Details">
-                <app-contributors [totalResult]="totalMemberResult" [membersSubject]="membersSubject"
-                    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+                <app-contributors [loading]="loading$ | async" [totalResult]="totalMemberResult"
+                    [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
                     description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
                     (showDetailClicked)="showDetail()" [disabled]="false">
                 </app-contributors>

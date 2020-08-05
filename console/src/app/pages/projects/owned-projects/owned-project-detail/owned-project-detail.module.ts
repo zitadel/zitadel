@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -22,6 +23,7 @@ import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe.module';
 
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
@@ -56,6 +58,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MatFormFieldModule,
         CardModule,
         MatPaginatorModule,
+        MatRippleModule,
         MatCheckboxModule,
         MatSelectModule,
         MatProgressSpinnerModule,
@@ -63,6 +66,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
         MetaLayoutModule,
         RefreshTableModule,
         MemberCreateDialogModule,
+        LocalizedDatePipeModule,
     ],
 })
 export class OwnedProjectDetailModule { }

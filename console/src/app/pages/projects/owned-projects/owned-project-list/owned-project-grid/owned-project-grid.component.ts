@@ -1,30 +1,36 @@
-import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
+import { animate, animateChild, keyframes, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
+import { Org } from 'src/app/proto/generated/auth_pb';
 import { ProjectState, ProjectType, ProjectView } from 'src/app/proto/generated/management_pb';
 import { AuthService } from 'src/app/services/auth.service';
+import { StorageKey, StorageService } from 'src/app/services/storage.service';
 
 @Component({
     selector: 'app-owned-project-grid',
     templateUrl: './owned-project-grid.component.html',
     styleUrls: ['./owned-project-grid.component.scss'],
     animations: [
-        trigger('list', [
-            transition(':enter', [
-                query('@animate',
-                    stagger(100, animateChild()),
-                ),
+        trigger('cardAnimation', [
+            transition('* => *', [
+                query('@animate', stagger('100ms', animateChild()), { optional: true }),
             ]),
         ]),
         trigger('animate', [
             transition(':enter', [
-                style({ opacity: 0, transform: 'translateY(-100%)' }),
-                animate('100ms', style({ opacity: 1, transform: 'translateY(0)' })),
+                animate('.2s ease-in', keyframes([
+                    style({ opacity: 0, transform: 'translateY(-50%)', offset: 0 }),
+                    style({ opacity: .5, transform: 'translateY(-10px) scale(1.1)', offset: 0.3 }),
+                    style({ opacity: 1, transform: 'translateY(0)', offset: 1 }),
+                ])),
             ]),
             transition(':leave', [
-                style({ opacity: 1, transform: 'translateY(0)' }),
-                animate('100ms', style({ opacity: 0, transform: 'translateY(100%)' })),
+                animate('.2s ease-out', keyframes([
+                    style({ opacity: 1, transform: 'scale(1.1)', offset: 0 }),
+                    style({ opacity: .5, transform: 'scale(.5)', offset: 0.3 }),
+                    style({ opacity: 0, transform: 'scale(0)', offset: 1 }),
+                ])),
             ]),
         ]),
     ],
@@ -43,7 +49,7 @@ export class OwnedProjectGridComponent implements OnChanges {
     public ProjectState: any = ProjectState;
     public ProjectType: any = ProjectType;
 
-    constructor(private router: Router, private authService: AuthService) {
+    constructor(private router: Router, private authService: AuthService, private storage: StorageService) {
         this.selection.changed.subscribe(selection => {
             this.setPrefixedItem('pinned-projects', JSON.stringify(
                 this.selection.selected.map(item => item.projectId),
@@ -83,7 +89,6 @@ export class OwnedProjectGridComponent implements OnChanges {
                 const array: string[] = JSON.parse(storageEntry);
                 const toSelect: ProjectView.AsObject[] = this.items.filter((item, index) => {
                     if (array.includes(item.projectId)) {
-                        // this.notPinned.splice(index, 1);
                         return true;
                     }
                 });
@@ -100,13 +105,13 @@ export class OwnedProjectGridComponent implements OnChanges {
     }
 
     private async getPrefixedItem(key: string): Promise<string | null> {
-        const prefix = (await this.authService.GetActiveOrg()).id;
-        return localStorage.getItem(`${prefix}:${key}`);
+        const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
+        return localStorage.getItem(`${org.id}:${key}`);
     }
 
     private async setPrefixedItem(key: string, value: any): Promise<void> {
-        const prefix = (await this.authService.GetActiveOrg()).id;
-        return localStorage.setItem(`${prefix}:${key}`, value);
+        const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
+        return localStorage.setItem(`${org.id}:${key}`, value);
     }
 
     public navigateToProject(id: string, event: any): void {

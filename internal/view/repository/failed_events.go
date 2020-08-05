@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/model"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/jinzhu/gorm"
-	"strings"
 )
 
 const (

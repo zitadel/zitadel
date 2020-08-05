@@ -10,7 +10,7 @@
         </ng-container>
     </div>
     <span class="fill-space"></span>
-    <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+    <mat-spinner class="spinner" *ngIf="loading" diameter="20"></mat-spinner>
     <button mat-icon-button (click)="emitRefresh()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
         <mat-icon>refresh</mat-icon>
     </button>

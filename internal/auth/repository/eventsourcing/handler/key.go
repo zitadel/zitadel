@@ -21,8 +21,6 @@ const (
 	keyTable = "auth.keys"
 )
 
-func (k *Key) MinimumCycleDuration() time.Duration { return k.cycleDuration }
-
 func (k *Key) ViewModel() string {
 	return keyTable
 }
@@ -42,11 +40,13 @@ func (k *Key) Reduce(event *models.Event) error {
 		if err != nil {
 			return err
 		}
+		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
+			return k.view.ProcessedKeySequence(event.Sequence)
+		}
 		return k.view.PutKeys(privateKey, publicKey, event.Sequence)
 	default:
 		return k.view.ProcessedKeySequence(event.Sequence)
 	}
-	return nil
 }
 
 func (k *Key) OnError(event *models.Event, err error) error {

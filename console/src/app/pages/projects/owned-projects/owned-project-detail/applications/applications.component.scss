@@ -1,80 +1,48 @@
 
-.table-header-row {
-  display: flex;
-  align-items: center;
-
-  .col {
-      display: flex;
-      flex-direction: column;
-      .desc {
-          font-size: .8rem;
-          color: #8795a1;
-      }
-      .count {
-          font-size: 2rem;
-      }
-  }
-
-  .fill-space {
-      flex: 1;
-  }
-
-  .icon-button {
-      margin-right: .5rem;
-  }
-
-  .add-button {
-      border-radius: .5rem;
-  }
-}
-
 .table-wrapper {
-    overflow: auto;
+  overflow: auto;
 
-    .spinner-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+  .table,
+  .paginator {
+    width: 100%;
+    background-color: #2d2e30;
+
+    td,
+    th {
+      &:first-child {
+        padding-left: 0;
+        padding-right: 1rem;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
     }
 
-  table, mat-paginator {
-      width: 100%;
-      background-color: #2d2e30;
+    .data-row {
+      cursor: pointer;
 
-      td, th {
-          &:first-child {
-              padding-left: 0;
-              padding-right: 1rem;
-          }
-
-          &:last-child {
-              padding-right: 0;
-          }
+      &:hover {
+        background-color: #ffffff05;
       }
+    }
 
-      .data-row {
-          cursor: pointer;
-          &:hover {
-              background-color: #ffffff05;
-          }
-      }
+    .selection {
+      width: 50px;
+      max-width: 50px;
+    }
 
-      .selection {
-        width: 50px;
-        max-width: 50px;
-      }
-
-      .margin-neg {
-          margin-left: -1rem;
-      }
+    .margin-neg {
+      margin-left: -1rem;
+    }
   }
 }
 
 .pointer {
-    outline: none;
-    cursor: pointer;
+  outline: none;
+  cursor: pointer;
 }
 
 tr {
-    outline: none;
+  outline: none;
 }

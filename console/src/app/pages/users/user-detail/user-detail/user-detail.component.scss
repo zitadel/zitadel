@@ -6,121 +6,91 @@
   padding-bottom: .5rem;
 
   a {
-      display: block;
-      margin-right: 2rem;
+    display: block;
+    margin-right: 2rem;
   }
 
   h1 {
-      font-size: 2rem;
-      margin: 0;
-      font-weight: normal;
-      margin-right: 1rem;
+    font-size: 2rem;
+    margin: 0;
+    font-weight: normal;
+    margin-right: 1rem;
   }
 
   .fill-space {
-      flex: 1;
+    flex: 1;
   }
 
   .state-button {
-      border-radius: .5rem;
+    border-radius: .5rem;
   }
 }
 
 .card-actions {
-    button {
-        border-radius: .5rem;
-    }
-}
-
-.content {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -.5rem; 
-
-  &.nowrap{
-    flex-wrap: nowrap;
-  }
-
-  &.center {
-    align-items: center;
-  }
-
-  mat-form-field {
-    flex: 1 1 33%;
-    margin: 0 .5rem;
-  }  
-}
-
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 -.5rem;
-
   button {
     border-radius: .5rem;
-    margin: 0 .5rem;
   }
 }
 
 .method-col {
-    display: flex;
-    flex-direction: column;
-    margin: -.5rem;
-  
-    .method-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
-        padding: .5rem;
-        border-bottom: 1px solid #ffffff20;
-        flex-wrap: wrap;
-    
-        .label, .name {
-            margin-right: 1rem;
-        }
-    
-        .actions {
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: -.5rem;
 
-            .notify-change-pwd {
-                border-radius: .5rem;
-            }
-        }
-    
-        .label {
-            flex: 1;
-            font-size: .9rem;
-            color: #818a8a;
-        }
-    
-        mat-icon {
-          margin-right: .5rem;
-        }
-    
-        .submit-button {
-          border-radius: .5rem;
-        }
-    
-        .verify {
-          text-decoration: none;
-          font-size: .8rem;
-          color: #8795a1;
-          border-radius: .5rem;
-          cursor: pointer;
-          word-wrap: none;
-          white-space: nowrap;
-          margin-right: 1rem;
-    
-          &:hover {
-              color: white;
-              text-decoration: underline;
-          }
-        }
+  .method-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: .5rem;
+    border-bottom: 1px solid #ffffff20;
+    flex-wrap: wrap;
+
+    .label,
+    .name {
+      margin-right: 1rem;
+    }
+
+    .actions {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .notify-change-pwd {
+        border-radius: .5rem;
       }
+    }
+
+    .label {
+      flex: 1;
+      font-size: .9rem;
+      color: #818a8a;
+    }
+
+    .icon {
+      margin-right: .5rem;
+    }
+
+    .submit-button {
+      border-radius: .5rem;
+    }
+
+    .verify {
+      text-decoration: none;
+      font-size: .8rem;
+      color: #8795a1;
+      border-radius: .5rem;
+      cursor: pointer;
+      word-wrap: none;
+      white-space: nowrap;
+      margin-right: 1rem;
+
+      &:hover {
+        color: white;
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 .img-phone-email {
@@ -128,120 +98,35 @@
 }
 
 .side {
-    .details {
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #81868a40;
-        padding-bottom: 1rem;
-    
-        .row {
-            display: flex;
-            margin-bottom: 0.5rem;
-            align-items: center;
-    
-            button {
-                display: none;
-                visibility: hidden;
-            }
-    
-            &:hover {
-                button {
-                    display: inline-block;
-                    visibility: visible;
-                    mat-icon {
-                        font-size: 1.2rem;
-                    }
-                }
-            }
-    
-            .first {
-                flex: 1;
-                font-size: 0.8rem;
-                margin-right: 0.5rem;
-                white-space: nowrap;
-            }
-    
-            .fill-space {
-                flex: 1;
-            }
-    
-            .second {
-                font-size: 0.8rem;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                margin-left: 1rem;
-                text-align: right;
-            }
+  .details {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #81868a40;
+    padding-bottom: 1rem;
 
-            a {
-                &:hover {
-                    cursor: pointer;
-                    text-decoration: underline;
-                }
-            }
-        }
+    .row {
+      display: flex;
+      margin-bottom: .5rem;
+      align-items: center;
 
-        .side-section {
-            color: #8795a1;
-        }
-    }  
-
-    .details {
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #81868a40;
-        padding-bottom: 1rem;
-    
-        .row {
-            display: flex;
-            margin-bottom: 0.5rem;
-            align-items: center;
-    
-            button {
-                display: none;
-                visibility: hidden;
-            }
-    
-            &:hover {
-                button {
-                    display: inline-block;
-                    visibility: visible;
-                    mat-icon {
-                        font-size: 1.2rem;
-                    }
-                }
-            }
-    
-            .first {
-                flex: 1;
-                font-size: 0.8rem;
-                margin-right: 0.5rem;
-            }
-    
-            .fill-space {
-                flex: 1;
-            }
-    
-            .second {
-                font-size: 0.8rem;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                margin-left: 1rem;
-            }
-
-            a {
-                &:hover {
-                    cursor: pointer;
-                    text-decoration: underline;
-                }
-            }
-        }
-
-        .side-section {
-            color: #8795a1;
-        }
-    }    
-
-    app-changes {
+      .first {
         flex: 1;
-        min-height: 0;
+        font-size: .8rem;
+        margin-right: .5rem;
+        white-space: nowrap;
+      }
+
+      .second {
+        font-size: .8rem;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        margin-left: 1rem;
+        text-align: right;
+      }
     }
+  }
+
+  .changes {
+    flex: 1;
+    min-height: 0;
+  }
 }

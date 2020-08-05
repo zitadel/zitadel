@@ -15,7 +15,7 @@ func (v *View) UserByID(userID string) (*model.UserView, error) {
 	return view.UserByID(v.Db, userTable, userID)
 }
 
-func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, int, error) {
+func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	return view.SearchUsers(v.Db, userTable, request)
 }
 
@@ -33,6 +33,14 @@ func (v *View) IsUserUnique(userName, email string) (bool, error) {
 
 func (v *View) UserMfas(userID string) ([]*usr_model.MultiFactor, error) {
 	return view.UserMfas(v.Db, userTable, userID)
+}
+
+func (v *View) PutUsers(user []*model.UserView, sequence uint64) error {
+	err := view.PutUsers(v.Db, userTable, user...)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedUserSequence(sequence)
 }
 
 func (v *View) PutUser(user *model.UserView, sequence uint64) error {

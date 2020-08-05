@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -27,8 +26,6 @@ type User struct {
 const (
 	userTable = "auth.users"
 )
-
-func (p *User) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *User) ViewModel() string {
 	return userTable

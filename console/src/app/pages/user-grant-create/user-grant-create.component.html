@@ -42,7 +42,7 @@
             </app-card>
         </ng-container>
 
-        <ng-container *ngIf="context === UserGrantContext.GRANTED_PROJECT && grantRolesKeyList; else noGrantRolesFound">
+        <ng-container *ngIf="context === UserGrantContext.GRANTED_PROJECT && grantRolesKeyList">
             <mat-form-field class="form-field" appearance="outline">
                 <mat-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</mat-label>
                 <mat-select multiple (selectionChange)="rolesList = $event.value">
@@ -52,9 +52,6 @@
                 </mat-select>
             </mat-form-field>
         </ng-container>
-        <ng-template #noGrantRolesFound>
-            <span>{{'PROJECT.GRANT.NOROLES'}}</span>
-        </ng-template>
     </ng-container>
 
     <div class="btn-container">

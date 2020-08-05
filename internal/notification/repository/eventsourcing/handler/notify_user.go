@@ -2,18 +2,17 @@ package handler
 
 import (
 	"context"
-	es_models "github.com/caos/zitadel/internal/eventstore/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"time"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/models"
+	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
+	org_model "github.com/caos/zitadel/internal/org/model"
+	org_events "github.com/caos/zitadel/internal/org/repository/eventsourcing"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -26,8 +25,6 @@ type NotifyUser struct {
 const (
 	userTable = "notification.notify_users"
 )
-
-func (p *NotifyUser) MinimumCycleDuration() time.Duration { return p.cycleDuration }
 
 func (p *NotifyUser) ViewModel() string {
 	return userTable

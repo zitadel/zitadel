@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
     OrgIamPolicy,
@@ -32,8 +32,8 @@ export enum PolicyComponentType {
     styleUrls: ['./password-policy.component.scss'],
 })
 export class PasswordPolicyComponent implements OnInit, OnDestroy {
-    titleSub: BehaviorSubject<string> = new BehaviorSubject('');
-    descSub: BehaviorSubject<string> = new BehaviorSubject('');
+    public title: string = '';
+    public desc: string = '';
 
     componentAction: PolicyComponentAction = PolicyComponentAction.CREATE;
 
@@ -68,20 +68,20 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
 
             switch (params.policytype) {
                 case PolicyComponentType.LOCKOUT:
-                    this.titleSub.next('ORG.POLICY.PWD_LOCKOUT.TITLECREATE');
-                    this.descSub.next('ORG.POLICY.PWD_LOCKOUT.DESCRIPTIONCREATE');
+                    this.title = 'ORG.POLICY.PWD_LOCKOUT.TITLECREATE';
+                    this.desc = 'ORG.POLICY.PWD_LOCKOUT.DESCRIPTIONCREATE';
                     break;
                 case PolicyComponentType.AGE:
-                    this.titleSub.next('ORG.POLICY.PWD_AGE.TITLECREATE');
-                    this.descSub.next('ORG.POLICY.PWD_AGE.DESCRIPTIONCREATE');
+                    this.title = 'ORG.POLICY.PWD_AGE.TITLECREATE';
+                    this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTIONCREATE';
                     break;
                 case PolicyComponentType.COMPLEXITY:
-                    this.titleSub.next('ORG.POLICY.PWD_COMPLEXITY.TITLECREATE');
-                    this.descSub.next('ORG.POLICY.PWD_COMPLEXITY.DESCRIPTIONCREATE');
+                    this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLECREATE';
+                    this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTIONCREATE';
                     break;
                 case PolicyComponentType.IAM_POLICY:
-                    this.titleSub.next('ORG.POLICY.IAM_POLICY.TITLECREATE');
-                    this.descSub.next('ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE');
+                    this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
+                    this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
                     break;
             }
 
@@ -119,20 +119,20 @@ export class PasswordPolicyComponent implements OnInit, OnDestroy {
         Promise<PasswordLockoutPolicy | PasswordAgePolicy | PasswordComplexityPolicy | OrgIamPolicy | undefined> {
         switch (params.policytype) {
             case PolicyComponentType.LOCKOUT:
-                this.titleSub.next('ORG.POLICY.PWD_LOCKOUT.TITLE');
-                this.descSub.next('ORG.POLICY.PWD_LOCKOUT.DESCRIPTION');
+                this.title = 'ORG.POLICY.PWD_LOCKOUT.TITLE';
+                this.desc = 'ORG.POLICY.PWD_LOCKOUT.DESCRIPTION';
                 return this.orgService.GetPasswordLockoutPolicy();
             case PolicyComponentType.AGE:
-                this.titleSub.next('ORG.POLICY.PWD_AGE.TITLE');
-                this.descSub.next('ORG.POLICY.PWD_AGE.DESCRIPTION');
+                this.title = 'ORG.POLICY.PWD_AGE.TITLE';
+                this.desc = 'ORG.POLICY.PWD_AGE.DESCRIPTION';
                 return this.orgService.GetPasswordAgePolicy();
             case PolicyComponentType.COMPLEXITY:
-                this.titleSub.next('ORG.POLICY.PWD_COMPLEXITY.TITLE');
-                this.descSub.next('ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION');
+                this.title = 'ORG.POLICY.PWD_COMPLEXITY.TITLE';
+                this.desc = 'ORG.POLICY.PWD_COMPLEXITY.DESCRIPTION';
                 return this.orgService.GetPasswordComplexityPolicy();
             case PolicyComponentType.IAM_POLICY:
-                this.titleSub.next('ORG.POLICY.IAM_POLICY.TITLECREATE');
-                this.descSub.next('ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE');
+                this.title = 'ORG.POLICY.IAM_POLICY.TITLECREATE';
+                this.desc = 'ORG.POLICY.IAM_POLICY.DESCRIPTIONCREATE';
                 return this.orgService.GetMyOrgIamPolicy();
         }
     }

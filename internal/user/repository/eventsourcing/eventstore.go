@@ -325,7 +325,7 @@ func ChangesQuery(userID string, latestSequence, limit uint64, sortAscending boo
 	query := es_models.NewSearchQuery().
 		AggregateTypeFilter(model.UserAggregate)
 	if !sortAscending {
-		query.OrderDesc() //TODO: configure from param
+		query.OrderDesc()
 	}
 
 	query.LatestSequenceFilter(latestSequence).
@@ -611,6 +611,7 @@ func (es *UserEventstore) ProfileByID(ctx context.Context, userID string) (*usr_
 }
 
 func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.Profile) (*usr_model.Profile, error) {
+	profile.SetNamesAsDisplayname()
 	if !profile.IsValid() {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-d82i3", "Errors.User.ProfileInvalid")
 	}
@@ -618,6 +619,7 @@ func (es *UserEventstore) ChangeProfile(ctx context.Context, profile *usr_model.
 	if err != nil {
 		return nil, err
 	}
+
 	repoExisting := model.UserFromModel(existing)
 	repoNew := model.ProfileFromModel(profile)
 

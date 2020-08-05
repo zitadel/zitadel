@@ -23,7 +23,7 @@ func (v *View) VerifiedOrgDomain(domain string) (*model.OrgDomainView, error) {
 	return view.VerifiedOrgDomain(v.Db, orgDomainTable, domain)
 }
 
-func (v *View) SearchOrgDomains(request *org_model.OrgDomainSearchRequest) ([]*model.OrgDomainView, int, error) {
+func (v *View) SearchOrgDomains(request *org_model.OrgDomainSearchRequest) ([]*model.OrgDomainView, uint64, error) {
 	return view.SearchOrgDomains(v.Db, orgDomainTable, request)
 }
 

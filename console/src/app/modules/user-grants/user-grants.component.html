@@ -10,7 +10,7 @@
     </a>
 
     <div class="table-wrapper">
-        <table mat-table multiTemplateDataRows class="full-width-table" aria-label="Elements" [dataSource]="dataSource">
+        <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>
                     <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -51,13 +51,13 @@
             <ng-container matColumnDef="creationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CREATIONDATE' | translate }} </th>
                 <td class="pointer" mat-cell *matCellDef="let grant">
-                    {{grant.creationDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
+                    {{grant.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
             </ng-container>
 
             <ng-container matColumnDef="changeDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
                 <td class="pointer" mat-cell *matCellDef="let grant">
-                    {{grant.changeDate | timestampToDate | date: 'dd. MMM, HH:mm' }} </td>
+                    {{grant.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }} </td>
             </ng-container>
 
             <ng-container matColumnDef="roleNamesList">
@@ -110,8 +110,8 @@
             </tr>
         </table>
 
-        <mat-paginator #paginator [length]="dataSource.totalResult" [pageSize]="50" [length]="dataSource.totalResult"
-            [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
+        <mat-paginator class="paginator" #paginator [length]="dataSource.totalResult" [pageSize]="50"
+            [length]="dataSource.totalResult" [pageSizeOptions]="[2, 3, 25, 50, 100, 250]" (page)="changePage($event)">
         </mat-paginator>
     </div>
 </app-refresh-table>

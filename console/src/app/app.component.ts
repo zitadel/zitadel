@@ -1,4 +1,3 @@
-import { animate, group, query, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { ViewportScroller } from '@angular/common';
@@ -11,9 +10,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { accountCard, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org, UserProfileView } from './proto/generated/auth_pb';
 import { AuthUserService } from './services/auth-user.service';
 import { AuthService } from './services/auth.service';
+import { ProjectService } from './services/project.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { UpdateService } from './services/update.service';
@@ -23,97 +24,10 @@ import { UpdateService } from './services/update.service';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     animations: [
-        trigger('accounts', [
-            transition(':enter', [
-                style({
-                    transform: 'scale(.9) translateY(-10%)',
-                    height: '200px',
-                    opacity: 0,
-                }),
-                animate(
-                    '.1s ease-out',
-                    style({
-                        transform: 'scale(1) translateY(0%)',
-                        height: '*',
-                        opacity: 1,
-                    }),
-                ),
-            ]),
-        ]),
-        trigger('routeAnimations', [
-            transition('HomePage => AddPage', [
-                style({ transform: 'translateX(100%)' }),
-                animate('250ms ease-in-out', style({ transform: 'translateX(0%)' })),
-            ]),
-            transition('AddPage => HomePage', [animate('250ms', style({ transform: 'translateX(100%)' }))]),
-            transition('HomePage => DetailPage', [
-                query(':enter, :leave', style({ position: 'absolute', left: 0, right: 0 }), {
-                    optional: true,
-                }),
-                group([
-                    query(
-                        ':enter',
-                        [
-                            style({
-                                transform: 'translateX(20%)',
-                                opacity: 0.5,
-                            }),
-                            animate(
-                                '.35s ease-in',
-                                style({
-                                    transform: 'translateX(0%)',
-                                    opacity: 1,
-                                }),
-                            ),
-                        ],
-                        {
-                            optional: true,
-                        },
-                    ),
-                    query(
-                        ':leave',
-                        [style({ opacity: 1, width: '100%' }), animate('.35s ease-out', style({ opacity: 0 }))],
-                        {
-                            optional: true,
-                        },
-                    ),
-                ]),
-            ]),
-            transition('DetailPage => HomePage', [
-                query(':enter, :leave', style({ position: 'absolute', left: 0, right: 0 }), {
-                    optional: true,
-                }),
-                group([
-                    query(
-                        ':enter',
-                        [
-                            style({
-                                opacity: 0,
-                            }),
-                            animate(
-                                '.35s ease-out',
-                                style({
-                                    opacity: 1,
-                                }),
-                            ),
-                        ],
-                        {
-                            optional: true,
-                        },
-                    ),
-                    query(
-                        ':leave',
-                        [
-                            style({ width: '100%', transform: 'translateX(0%)' }),
-                            animate('.35s ease-in', style({ transform: 'translateX(30%)', opacity: 0 })),
-                        ],
-                        {
-                            optional: true,
-                        },
-                    ),
-                ]),
-            ]),
-        ]),
+        toolbarAnimation,
+        ...navAnimations,
+        accountCard,
+        routeAnimations,
     ],
 })
 export class AppComponent implements OnDestroy {
@@ -135,6 +49,10 @@ export class AppComponent implements OnDestroy {
     public orgLoading: boolean = false;
 
     public showProjectSection: boolean = false;
+
+    public grantedProjectsCount: number = 0;
+    public ownedProjectsCount: number = 0;
+
     private authSub: Subscription = new Subscription();
     private orgSub: Subscription = new Subscription();
 
@@ -147,6 +65,7 @@ export class AppComponent implements OnDestroy {
         public overlayContainer: OverlayContainer,
         private themeService: ThemeService,
         public userService: AuthUserService,
+        private projectService: ProjectService,
         public matIconRegistry: MatIconRegistry,
         public domSanitizer: DomSanitizer,
         private toast: ToastService,
@@ -204,8 +123,26 @@ export class AppComponent implements OnDestroy {
             this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lock-reset.svg'),
         );
 
+        this.matIconRegistry.addSvgIcon(
+            'mdi_broom',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/broom.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_pin_outline',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin-outline.svg'),
+        );
+
+        this.matIconRegistry.addSvgIcon(
+            'mdi_pin',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin.svg'),
+        );
+        this.getProjectCount();
+
         this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
             this.org = org;
+
+            this.getProjectCount();
         });
 
         this.authSub = this.authService.authenticationChanged.subscribe((authenticated) => {
@@ -273,6 +210,16 @@ export class AppComponent implements OnDestroy {
         this.org = org;
         this.authService.setActiveOrg(org);
         this.router.navigate(['/']);
+    }
+
+    private async getProjectCount(): Promise<any> {
+        this.ownedProjectsCount = await this.projectService.SearchProjects(0, 0).then(res => {
+            return res.toObject().totalResult;
+        });
+
+        this.grantedProjectsCount = await this.projectService.SearchGrantedProjects(0, 0).then(res => {
+            return res.toObject().totalResult;
+        });
     }
 }
 

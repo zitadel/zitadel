@@ -1,6 +1,6 @@
 <app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource.totalResult"
     [selection]="selection" [loading]="dataSource.loading$ | async">
-    <ng-template appHasRole [appHasRole]="['project.role.delete']" actions>
+    <ng-template appHasRole [appHasRole]="['project.role.delete', 'project.role.delete:' + projectId]" actions>
         <button color="warn" class="icon-button" [disabled]="disabled"
             matTooltip="{{'PROJECT.ROLE.DELETE' | translate}}" (click)="deleteSelectedRoles()" mat-icon-button
             *ngIf="selection.hasValue() && actionsVisible">
@@ -15,7 +15,7 @@
     </ng-template>
 
     <div class="table-wrapper">
-        <table [dataSource]="dataSource" mat-table class="full-width-table" matSort aria-label="Elements">
+        <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">
             <ng-container matColumnDef="select">
                 <th class="selection" mat-header-cell *matHeaderCellDef>
                     <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
@@ -51,7 +51,7 @@
             <ng-container matColumnDef="creationDate">
                 <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.CREATIONDATE' | translate }} </th>
                 <td (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
-                    <span>{{role.creationDate | timestampToDate | date: 'dd. MMM, HH:mm' }}</span>
+                    <span>{{role.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
                 </td>
             </ng-container>
 

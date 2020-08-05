@@ -2,12 +2,12 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/models"
 	"github.com/caos/zitadel/internal/eventstore/spooler"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/repository/view/model"
-	"time"
 )
 
 type Org struct {
@@ -17,8 +17,6 @@ type Org struct {
 const (
 	orgTable = "auth.orgs"
 )
-
-func (o *Org) MinimumCycleDuration() time.Duration { return o.cycleDuration }
 
 func (o *Org) ViewModel() string {
 	return orgTable

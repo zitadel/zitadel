@@ -7,7 +7,7 @@
     <span class="u-email">{{profile?.preferredLoginName}}</span>
     <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
-    <button (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
+    <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
     <div class="l-accounts">
         <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
         <a class="row" *ngFor="let user of users" (click)="selectAccount(user.loginName)">
@@ -35,5 +35,5 @@
         </a>
     </div>
 
-    <button (click)="logout()" mat-stroked-button>{{'MENU.LOGOUT' | translate}}</button>
+    <button (click)="logout()" color="primary" mat-stroked-button>{{'MENU.LOGOUT' | translate}}</button>
 </div>

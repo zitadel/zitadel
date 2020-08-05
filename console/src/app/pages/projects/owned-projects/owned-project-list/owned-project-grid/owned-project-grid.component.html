@@ -15,21 +15,20 @@
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
 
             <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
-                        item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+                        item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="fill-space"></span>
-            <div class="icons">
-            </div>
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>
-            <mat-icon>push_pin</mat-icon>
+            <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
+            <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
         </button>
     </div>
 
@@ -43,21 +42,20 @@
         <div class="text-part">
             <span *ngIf="item.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
                 {{
-                        item.changeDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+                        item.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="name" *ngIf="item.name">{{ item.name }}</span>
 
             <span *ngIf="item.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
-                        item.creationDate | timestampToDate | date: 'EEE dd. MMM, HH:mm'
+                        item.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
             }}</span>
             <span class="fill-space"></span>
-            <div class="icons">
-            </div>
         </div>
         <button [ngClass]="{ selected: selection.isSelected(item)}" (click)="selection.toggle(item)" class="edit-button"
             mat-icon-button>
-            <mat-icon>push_pin</mat-icon>
+            <mat-icon *ngIf="selection.isSelected(item)" svgIcon="mdi_pin"></mat-icon>
+            <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(item)"></mat-icon>
         </button>
     </div>
 

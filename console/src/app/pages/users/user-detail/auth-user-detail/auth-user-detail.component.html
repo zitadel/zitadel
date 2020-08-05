@@ -1,6 +1,6 @@
 <app-meta-layout>
     <div class="max-width-container">
-        <h1>{{ 'USER.TITLE' | translate }}</h1>
+        <h1 class="h1">{{ 'USER.TITLE' | translate }}</h1>
         <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
 
         <mat-progress-bar *ngIf="loading" color="accent" mode="indeterminate"></mat-progress-bar>
@@ -13,7 +13,7 @@
                 <span>{{login}}</span>
                 <button color="primary" [disabled]="copied == login"
                     [matTooltip]="(copied != login ? 'USER.PAGES.COPY' : 'USER.PAGES.COPIED' ) | translate"
-                    (click)="copytoclipboard(login)" mat-icon-button>
+                    appCopyToClipboard [valueToCopy]="login" (copiedValue)="copied = $event" mat-icon-button>
                     <i *ngIf="copied != login" class="las la-clipboard"></i>
                     <i *ngIf="copied == login" class="las la-clipboard-check"></i>
                 </button>
@@ -21,13 +21,13 @@
         </app-card>
 
         <div class="col" *ngIf="user">
-            <app-card title="{{ 'USER.PROFILE.TITLE' | translate }}">
+            <app-card class="app-card" title="{{ 'USER.PROFILE.TITLE' | translate }}">
                 <app-detail-form [genders]="genders" [languages]="languages" [profile]="user"
                     (changedLanguage)="changedLanguage($event)" (submitData)="saveProfile($event)">
                 </app-detail-form>
             </app-card>
 
-            <app-card title="Theme" class="theme-card">
+            <app-card title="Theme" class="app-card theme-card">
                 <app-theme-setting></app-theme-setting>
             </app-card>
         </div>
@@ -41,7 +41,7 @@
                     <span>*********</span>
                     <div class="actions">
                         <a [routerLink]="['password']" mat-icon-button>
-                            <mat-icon>chevron_right</mat-icon>
+                            <mat-icon class="icon">chevron_right</mat-icon>
                         </a>
                     </div>
                 </div>
@@ -52,11 +52,12 @@
                     <ng-container *ngIf="!emailEditState; else emailEdit">
                         <div class="actions">
                             <span class="name">{{user?.email}}</span>
-                            <mat-icon *ngIf="user?.isEmailVerified" color="primary" aria-hidden="false"
+                            <mat-icon class="icon" *ngIf="user?.isEmailVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
                             <ng-container *ngIf="user?.email && !user?.isEmailVerified">
-                                <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
+                                <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
+                                    highlight_off
                                 </mat-icon>
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
                                     (click)="resendVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
@@ -65,7 +66,7 @@
 
                         <div class="actions">
                             <button (click)="emailEditState = true" mat-icon-button>
-                                <mat-icon>edit</mat-icon>
+                                <mat-icon class="icon">edit</mat-icon>
                             </button>
                         </div>
                     </ng-container>
@@ -75,7 +76,7 @@
                             <input matInput [(ngModel)]="user.email" />
                         </mat-form-field>
                         <button (click)="emailEditState = false" mat-icon-button>
-                            <mat-icon>close</mat-icon>
+                            <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button [disabled]="!user.email" class="submit-button" type="button" color="primary"
                             (click)="saveEmail()" mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
@@ -88,11 +89,12 @@
                     <ng-container *ngIf="!phoneEditState; else phoneEdit">
                         <div class="actions">
                             <span class="name">{{user?.phone}}</span>
-                            <mat-icon *ngIf="user?.isPhoneVerified" color="primary" aria-hidden="false"
+                            <mat-icon class="icon" *ngIf="user?.isPhoneVerified" color="primary" aria-hidden="false"
                                 aria-label="verified icon">
                                 check_circle_outline</mat-icon>
                             <ng-container *ngIf="user?.phone && !user?.isPhoneVerified">
-                                <mat-icon color="warn" aria-hidden="false" aria-label="not verified icon">highlight_off
+                                <mat-icon class="icon" color="warn" aria-hidden="false" aria-label="not verified icon">
+                                    highlight_off
                                 </mat-icon>
                                 <a class="verify" matTooltip="{{'USER.LOGINMETHODS.ENTERCODE_DESC' | translate}}"
                                     (click)="enterCode()">{{'USER.LOGINMETHODS.ENTERCODE' | translate}}</a>
@@ -103,7 +105,7 @@
 
                         <div class="actions">
                             <button (click)="phoneEditState = true" mat-icon-button>
-                                <mat-icon>edit</mat-icon>
+                                <mat-icon class="icon">edit</mat-icon>
                             </button>
                         </div>
                     </ng-container>
@@ -114,7 +116,7 @@
                             <input matInput [(ngModel)]="user.phone" />
                         </mat-form-field>
                         <button (click)="phoneEditState = false" mat-icon-button>
-                            <mat-icon>close</mat-icon>
+                            <mat-icon class="icon">close</mat-icon>
                         </button>
                         <button *ngIf="user.phone" color="warn" (click)="deletePhone()" mat-icon-button>
                             <i class="las la-trash"></i>
@@ -137,6 +139,6 @@
             </div>
         </div>
 
-        <app-changes [changeType]="ChangeType.MYUSER" [id]="user.id"></app-changes>
+        <app-changes class="changes" [changeType]="ChangeType.MYUSER" [id]="user.id"></app-changes>
     </div>
 </app-meta-layout>

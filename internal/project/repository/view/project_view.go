@@ -34,7 +34,7 @@ func ProjectsByResourceOwner(db *gorm.DB, table, orgID string) ([]*model.Project
 	return projects, nil
 }
 
-func SearchProjects(db *gorm.DB, table string, req *proj_model.ProjectViewSearchRequest) ([]*model.ProjectView, int, error) {
+func SearchProjects(db *gorm.DB, table string, req *proj_model.ProjectViewSearchRequest) ([]*model.ProjectView, uint64, error) {
 	projects := make([]*model.ProjectView, 0)
 	query := repository.PrepareSearchQuery(table, model.ProjectSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
 	count, err := query(db, &projects)
