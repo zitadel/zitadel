@@ -139,6 +139,5 @@ func (d registerOrgFormData) toUserModel() *usr_model.User {
 func (d registerOrgFormData) toOrgModel() *org_model.Org {
 	return &org_model.Org{
 		Name:    d.OrgName,
-		Domains: []*org_model.OrgDomain{{Domain: d.OrgDomain}},
 	}
 }
