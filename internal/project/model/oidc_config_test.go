@@ -188,13 +188,15 @@ func TestGetOIDCC1Compliance(t *testing.T) {
 				grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode, OIDCGrantTypeImplicit},
 				authMethod: OIDCAuthMethodTypeNone,
 				redirectUris: []string{
-					"https://zitadel.ch/auth/callback",
-					"zitadel://auth/callback",
-					"http://localhost/auth/callback",
+					"http://zitadel.ch/auth/callback",
 				},
 			},
 			result: result{
-				noneCompliant: false,
+				noneCompliant: true,
+				complianceProblems: []string{
+					"Application.OIDC.V1.NotCompliant",
+					"Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb",
+				},
 			},
 		},
 		{
