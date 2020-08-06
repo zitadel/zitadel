@@ -112,7 +112,7 @@ Registration:
 
 RegistrationOrg:
   Title: Organisations Registration
-  Description: Gib deinen Organisationsnamen und deine Benutzerangaben an. Optional kann auch die Domäne der Organisation bereits angegeben werde,
+  Description: Gib deinen Organisationsnamen und deine Benutzerangaben an.
   OrgName: Organisationsname
   OrgDomain: Domäne
   Email: E-Mail
