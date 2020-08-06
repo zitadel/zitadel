@@ -112,7 +112,7 @@ Registration:
 
 RegistrationOrg:
   Title: Organisation Registration
-  Description: Enter your organisationname and userdata. Optional you can fill out your organisation domain.
+  Description: Enter your organisationname and userdata.
   OrgName: Organisationname
   OrgDomain: Domäne
   Email: E-Mail
